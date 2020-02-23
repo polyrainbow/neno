@@ -593,16 +593,30 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       yLoc = 100;
 
   // initial node data
-  var nodes = [{title: "new concept", id: 0, x: xLoc, y: yLoc},
-               {title: "new concept", id: 1, x: xLoc, y: yLoc + 200}];
-  var links = [{source: nodes[1], target: nodes[0]}];
+  fetch("/api/graph")
+    .then(response => response.json())
+    .then(graph => {
+      const nodes = graph.nodes;
+      const links = graph.links;
 
-
-  /** MAIN SVG **/
-  var svg = d3.select("body").append("svg")
+        /** MAIN SVG **/
+      var svg = d3.select("body")
+        .append("svg")
         .attr("width", width)
         .attr("height", height);
-  var graph = new GraphCreator(svg, nodes, links);
+
+      var graph = new GraphCreator(svg, nodes, links);
       graph.setIdCt(2);
-  graph.updateGraph();
+      graph.updateGraph();
+    });
+    
+  /*
+  var nodes = [
+    {title: "new concept", id: 0, x: xLoc, y: yLoc},
+    {title: "new concept", id: 1, x: xLoc, y: yLoc + 200}
+  ];
+  var links = [{source: nodes[1], target: nodes[0]}];
+  */
+
+
 })(window.d3, window.saveAs, window.Blob);

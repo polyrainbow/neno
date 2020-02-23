@@ -9,9 +9,24 @@ app.use("/", express.static(path.join(__dirname, "static")));
 app.use(express.json());
 
 app.get("/api", function(req, res) {
-  if (req.method === "GET") {
-    res.send("Hello World!");
-  }
+  res.send("Hello World!");
+});
+
+
+app.get("/api/graph", function(req, res) {
+  const notes = Notes.getAll();
+  const nodes = notes;
+
+  const links = notes.reduce((accumulator, currentValue) => {
+    accumulator = [...accumulator, ...currentValue.links];
+    return accumulator;
+  }, []);
+
+  const graph = {
+    nodes,
+    links,
+  };
+  res.end(JSON.stringify(graph));
 });
 
 
