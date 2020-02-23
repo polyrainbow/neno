@@ -11,6 +11,9 @@ header h1 {
 #controls {
   background-color: blanchedalmond;
   padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 button {
