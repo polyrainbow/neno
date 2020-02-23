@@ -15,6 +15,12 @@ app.get("/api", function(req, res) {
 });
 
 
+app.get("/api/notes", function(req, res) {
+  const notes = Notes.getAll();
+  res.end(JSON.stringify(notes));
+});
+
+
 app.get("/api/note/:noteId", function(req, res) {
   const note = Notes.get(req.params.noteId);
   res.end(JSON.stringify(note));
@@ -27,6 +33,7 @@ app.put("/api/note", function(req, res) {
   const noteId = Notes.create(note);
   res.end(JSON.stringify({
     noteId,
+    success: true,
   }));
   console.log("Note created: " + noteId);
 });

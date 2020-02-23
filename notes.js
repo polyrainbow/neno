@@ -11,6 +11,26 @@ const getNewId = () => {
   return id;
 };
 
+const get = (noteId) => {
+  const filename = path.join(DATA_FOLDER, noteId + ".json");
+  const note = JSON.parse(fs.readFileSync(filename));
+  return note;
+};
+
+
+const getAll = () => {
+  const notes = [];
+  fs.readdirSync(DATA_FOLDER).forEach((filename) => {
+    if (!filename.endsWith(".json")) {
+      return;
+    }
+    const string = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
+    const note = JSON.parse(string);
+    notes.push(note);
+  });
+  return notes;
+};
+
 const create = (noteFromUser) => {
   console.log(noteFromUser);
   const id = getNewId();
@@ -42,6 +62,8 @@ const remove = (noteId) => {
 };
 
 module.exports = {
+  get,
+  getAll,
   create,
   update,
   remove,
