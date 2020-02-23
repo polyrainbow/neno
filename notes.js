@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const getKeySortFunction = require("./utils.js").getKeySortFunction;
 
 const DATA_FOLDER = path.join(__dirname, "data");
 
@@ -19,16 +20,15 @@ const get = (noteId) => {
 
 
 const getAll = () => {
-  const notes = [];
-  fs.readdirSync(DATA_FOLDER).forEach((filename) => {
-    if (!filename.endsWith(".json")) {
-      return;
-    }
-    const string = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
-    const note = JSON.parse(string);
-    notes.push(note);
-  });
-  return notes;
+  return fs.readdirSync(DATA_FOLDER)
+    .filter((filename) => {
+      return filename.endsWith(".json");
+    })
+    .map((filename) => {
+      const string = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
+      return JSON.parse(string);
+    })
+    .sort(getKeySortFunction("id"));
 };
 
 const create = (noteFromUser) => {
@@ -40,24 +40,20 @@ const create = (noteFromUser) => {
   };
   const filename = path.join(DATA_FOLDER, id + ".json");
   fs.writeFileSync(filename, JSON.stringify(note), "utf8");
-  return id;
+  return note;
 };
 
 
-const update = (note) => {
-  const filename = path.join(DATA_FOLDER, note.id + ".json");
-  let noteFromDB = JSON.parse(fs.readFileSync(filename));
-  noteFromDB = {
-    ...noteFromDB,
-    ...note,
-  };
-  fs.writeFileSync(filename, JSON.stringify(noteFromDB), "utf8");
+const update = (updatedNote) => {
+  const filename = path.join(DATA_FOLDER, updatedNote.id + ".json");
+  fs.writeFileSync(filename, JSON.stringify(updatedNote), "utf8");
+  return updatedNote;
 };
 
 
 const remove = (noteId) => {
   const filename = path.join(DATA_FOLDER, noteId + ".json");
-  fs.deleteFileSync(filename);
+  fs.unlinkSync(filename);
   return true;
 };
 

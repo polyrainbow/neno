@@ -3,16 +3,24 @@
   <head>
     <meta charset="UTF-8">
     <title>Network Notes</title>
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <h1>Network Notes</h1>
+    <header>
+      <h1>Network Notes</h1>
+    </header>
+
     <div id="editor"></div>
 
-    <button id="button_upload">Upload</button>
-    <button id="button_remove">Remove</button>
+    <section id="controls">
+      <button id="button_new">New</button>
+      <button id="button_upload">Upload</button>
+      <button id="button_remove">Remove</button>
+      Active Note ID: <span id="span_activeNoteId">No note loaded</span>
+    </section>
 
-    <h2>Notes</h2>
     <section id="section_list">
+      <h2>Notes</h2>
       <table id="list"></table>
     </section>
 

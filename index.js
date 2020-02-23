@@ -17,7 +17,13 @@ app.get("/api", function(req, res) {
 
 app.get("/api/notes", function(req, res) {
   const notes = Notes.getAll();
-  res.end(JSON.stringify(notes));
+  const notesList = notes.map((note) => {
+    return {
+      id: note.id,
+      title: note.editorData.blocks[0].data.text,
+    };
+  });
+  res.end(JSON.stringify(notesList));
 });
 
 
@@ -30,24 +36,26 @@ app.get("/api/note/:noteId", function(req, res) {
 app.put("/api/note", function(req, res) {
   console.log(req);
   const note = req.body; console.log(req.body);
-  const noteId = Notes.create(note);
-  res.end(JSON.stringify({
-    noteId,
-    success: true,
-  }));
-  console.log("Note created: " + noteId);
-});
-
-
-app.put("/api/note/:noteId", function(req, res) {
-  const note = req.body;
-  const updatedNote = Notes.update(req.params.noteId, note);
-  res.end(JSON.stringify(updatedNote));
+  if (note.id) {
+    const updatedNote = Notes.update(note);
+    res.end(JSON.stringify({
+      noteId: updatedNote.id,
+      success: true,
+    }));
+    console.log("Note updated: " + updatedNote.id);
+  } else {
+    const noteFromDB = Notes.create(note);
+    res.end(JSON.stringify({
+      noteId: noteFromDB.id,
+      success: true,
+    }));
+    console.log("Note created: " + noteFromDB.id);
+  }
 });
 
 
 app.delete("/api/note/:noteId", function(req, res) {
-  const success = Notes.delete(req.params.noteId);
+  const success = Notes.remove(req.params.noteId);
   res.end(JSON.stringify({
     success,
   }));
