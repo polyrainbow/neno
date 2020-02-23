@@ -1,0 +1,69 @@
+{
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true
+  },
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "extends": [
+    "standard",
+    "eslint:recommended",
+    "standard-preact",
+    "google"
+  ],
+  "plugins": [
+    "react-hooks"
+  ],
+  "rules": {
+    "indent": [
+      "error",
+      2
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "no-unused-vars": [
+      "error", {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": false
+      }
+    ],
+    "eqeqeq": ["error"],
+    "no-redeclare": ["error"],
+    "no-empty": ["error"],
+    "vars-on-top": ["error"],
+    "no-extra-boolean-cast": ["error"],
+    "no-label-var": ["error"],
+    "no-undefined": ["error"],
+    "no-use-before-define": ["error"],
+    "no-mixed-requires": ["error"],
+    "camelcase": ["error"],
+    "no-mixed-spaces-and-tabs": ["error"],
+    "no-multi-assign": ["error"],
+    "no-const-assign": ["error"],
+    "no-var": ["error"],
+    "prefer-const": ["error"],
+    "operator-linebreak": ["error", "before"],
+    "jsx-quotes": ["error", "prefer-double"],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/jsx-pascal-case": "error"
+  }
+}
