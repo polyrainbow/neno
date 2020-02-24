@@ -35,6 +35,7 @@ app.get("/api/notes", function(req, res) {
     return {
       id: note.id,
       title: note.editorData.blocks[0].data.text,
+      time: note.time,
     };
   });
   res.end(JSON.stringify(notesList));

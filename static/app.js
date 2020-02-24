@@ -97,9 +97,15 @@ const createAndAppendNoteListItem = (note) => {
   const tdId = document.createElement("td");
   tdId.innerHTML = note.id;
   listItem.appendChild(tdId);
+
   const tdTitle = document.createElement("td");
   tdTitle.innerHTML = note.title;
   listItem.appendChild(tdTitle);
+
+  const tdTime = document.createElement("td");
+  tdTime.innerHTML = new Date(note.time);
+  listItem.appendChild(tdTime);
+
   listContainer.appendChild(listItem);
   listItem.addEventListener("click", () => {
     loadNote(note.id);
