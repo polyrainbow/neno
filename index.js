@@ -2,6 +2,8 @@ const path = require("path");
 const express = require("express");
 const app = express();
 const Notes = require("./notes.js");
+const urlMetadata = require("url-metadata");
+
 
 const PORT = 8080;
 
@@ -76,4 +78,32 @@ app.delete("/api/note/:noteId", function(req, res) {
 
 app.listen(PORT, function() {
   console.log("Ready!");
+});
+
+
+app.get("/api/link-data", (req, res) => {
+  const url = req.query.url;
+
+  urlMetadata(url)
+    .then((metadata) => {
+      const response = {
+        "success": 1,
+        "meta": {
+          "title": metadata.title,
+          "description": metadata.description,
+          "image": {
+            "url": metadata.image,
+          },
+        },
+      };
+      res.end(JSON.stringify(response));
+      console.log(metadata);
+    })
+    .catch((e) => {
+      const response = {
+        "success": 0,
+        "error": e,
+      };
+      res.end(JSON.stringify(response));
+    });
 });

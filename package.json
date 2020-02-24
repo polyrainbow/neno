@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "url-metadata": "^2.4.0"
   },
   "devDependencies": {
     "@editorjs/editorjs": "^2.16.1",

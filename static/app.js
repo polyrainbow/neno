@@ -55,7 +55,7 @@ const loadEditor = (data) => {
         // eslint-disable-next-line no-undef
         class: LinkTool,
         config: {
-          // endpoint: 'http://localhost:8080/fetchUrl', // Your backend endpoint for url data fetching
+          endpoint: "/api/link-data",
         },
       },
     },

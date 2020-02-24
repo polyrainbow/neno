@@ -19,6 +19,10 @@ header h1 {
   margin: 0;
 }
 
+#editor{
+  min-height: 511.547px;
+}
+
 #controls {
   background-color: blanchedalmond;
   padding: 10px;
