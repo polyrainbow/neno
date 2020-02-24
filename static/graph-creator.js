@@ -121,48 +121,47 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     });
 
 
-    // handle uploaded data
     d3.select("#upload-input").on("click", function(){
-      document.getElementById("hidden-file-upload").click();
-    });
-    d3.select("#hidden-file-upload").on("change", function(){
-      if (window.File && window.FileReader && window.FileList && window.Blob) {
-        var uploadFile = this.files[0];
-        var filereader = new window.FileReader();
-        
-        filereader.onload = function(){
-          var txtRes = filereader.result;
-          // TODO better error handling
-          try{
-            var jsonObj = JSON.parse(txtRes);
-            thisGraph.deleteGraph(true);
-            thisGraph.nodes = jsonObj.nodes;
-            thisGraph.setIdCt(jsonObj.nodes.length + 1);
-            // if no position defined, put in grid
-            thisGraph.nodes.forEach(function(n, i){
-              if ( !("x" in n) ) {
-              	n.x = (i % 10) * 25;
-              	n.y = Math.floor(i / 10) * 25;
-              }
-            });
-            var newEdges = jsonObj.links;
-            newEdges.forEach(function(e, i){
-              newEdges[i] = {source: thisGraph.nodes.filter(function(n){return n.id == e.source;})[0],
-                          target: thisGraph.nodes.filter(function(n){return n.id == e.target;})[0]};
-            });
-            thisGraph.links = newEdges;
-            thisGraph.updateGraph();
-          }catch(err){
-            window.alert("Error parsing uploaded file\nerror message: " + err.message);
-            return;
-          }
+      const links = thisGraph.links.map((link) => {
+        return {
+          id0: link.source.id,
+          id1: link.target.id,
         };
-        filereader.readAsText(uploadFile);
-        
-      } else {
-        alert("Your browser won't let you save this graph -- try upgrading your browser to IE 10+ or Chrome or Firefox.");
-      }
+      });
 
+      const graphObject = {
+        nodes: thisGraph.nodes,
+        links: links,
+      };
+
+      fetch("/api/graph", {
+        method: "POST",
+        body: JSON.stringify(graphObject),
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
+        .then((response) => console.log("Graph saved!"));
+
+      /*
+      thisGraph.deleteGraph(true);
+      thisGraph.nodes = jsonObj.nodes;
+      thisGraph.setIdCt(jsonObj.nodes.length + 1);
+      // if no position defined, put in grid
+      thisGraph.nodes.forEach(function(n, i){
+        if ( !("x" in n) ) {
+          n.x = (i % 10) * 25;
+          n.y = Math.floor(i / 10) * 25;
+        }
+      });
+      var newEdges = jsonObj.links;
+      newEdges.forEach(function(e, i){
+        newEdges[i] = {source: thisGraph.nodes.filter(function(n){return n.id == e.source;})[0],
+                    target: thisGraph.nodes.filter(function(n){return n.id == e.target;})[0]};
+      });
+      thisGraph.links = newEdges;
+      thisGraph.updateGraph();
+      */
     });
 
     // handle delete graph
@@ -580,7 +579,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
   // warn the user when leaving
   window.onbeforeunload = function(){
-    return "Make sure to save your graph locally before leaving :-)";
+    return "Make sure to save your graph before leaving";
   };      
 
   var docEl = document.documentElement,
@@ -589,15 +588,17 @@ document.onload = (function(d3, saveAs, Blob, undefined){
   var width = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth,
       height =  window.innerHeight|| docEl.clientHeight|| bodyEl.clientHeight;
 
-  var xLoc = width/2 - 25,
-      yLoc = 100;
-
   // initial node data
   fetch("/api/graph")
     .then(response => response.json())
     .then(graph => {
       const nodes = graph.nodes;
-      const links = graph.links;
+      const links = graph.links.map(link => {
+        return {
+          source: nodes.find(node => node.id === link.id0),
+          target: nodes.find(node => node.id === link.id1),
+        };
+      });
 
         /** MAIN SVG **/
       var svg = d3.select("body")
@@ -606,17 +607,8 @@ document.onload = (function(d3, saveAs, Blob, undefined){
         .attr("height", height);
 
       var graph = new GraphCreator(svg, nodes, links);
-      graph.setIdCt(2);
+      graph.setIdCt(nodes[0].id);
       graph.updateGraph();
     });
-    
-  /*
-  var nodes = [
-    {title: "new concept", id: 0, x: xLoc, y: yLoc},
-    {title: "new concept", id: 1, x: xLoc, y: yLoc + 200}
-  ];
-  var links = [{source: nodes[1], target: nodes[0]}];
-  */
-
 
 })(window.d3, window.saveAs, window.Blob);

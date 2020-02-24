@@ -14,19 +14,18 @@ app.get("/api", function(req, res) {
 
 
 app.get("/api/graph", function(req, res) {
-  const notes = Notes.getAll();
-  const nodes = notes;
-
-  const links = notes.reduce((accumulator, currentValue) => {
-    accumulator = [...accumulator, ...currentValue.links];
-    return accumulator;
-  }, []);
-
-  const graph = {
-    nodes,
-    links,
-  };
+  const graph = Notes.getGraph();
   res.end(JSON.stringify(graph));
+});
+
+
+app.post("/api/graph", function(req, res) {
+  Notes.setGraph(req.body);
+  res.end(JSON.stringify(
+    {
+      success: true,
+    },
+  ));
 });
 
 
@@ -49,22 +48,19 @@ app.get("/api/note/:noteId", function(req, res) {
 
 
 app.put("/api/note", function(req, res) {
-  console.log(req);
-  const note = req.body; console.log(req.body);
+  const note = req.body;
   if (note.id) {
     const updatedNote = Notes.update(note);
     res.end(JSON.stringify({
       noteId: updatedNote.id,
       success: true,
     }));
-    console.log("Note updated: " + updatedNote.id);
   } else {
     const noteFromDB = Notes.create(note);
     res.end(JSON.stringify({
       noteId: noteFromDB.id,
       success: true,
     }));
-    console.log("Note created: " + noteFromDB.id);
   }
 });
 

@@ -129,10 +129,8 @@ const refreshNotesList = () => {
 
 const saveNote = () => {
   editor.save().then((outputData) => {
-    console.log("Article data: ", outputData);
     const note = {
       editorData: outputData,
-      links: [],
       time: outputData.time,
     };
 
