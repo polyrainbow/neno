@@ -1,3 +1,11 @@
+body {
+  margin: 0;
+}
+
+header, #controls, #section_list{
+  font-family: sans-serif;
+}
+
 header {
   background: lightskyblue;
   margin: 0;
@@ -21,6 +29,10 @@ header h1 {
 
 button {
   font-size: larger;
+}
+
+#section_list{
+  padding: 20px;
 }
 
 table {
