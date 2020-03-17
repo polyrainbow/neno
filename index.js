@@ -4,8 +4,14 @@ const app = express();
 const Notes = require("./notes.js");
 const urlMetadata = require("url-metadata");
 
+const customPort = parseInt(
+  process.argv.find((arg) => {
+    return arg.startsWith("port=");
+  })
+    .substring(5),
+);
 
-const PORT = 8080;
+const PORT = customPort || 8080;
 
 app.use("/", express.static(path.join(__dirname, "static")));
 app.use(express.json());
@@ -77,7 +83,7 @@ app.delete("/api/note/:noteId", function(req, res) {
 
 
 app.listen(PORT, function() {
-  console.log("Ready!");
+  console.log("Ready on port " + PORT);
 });
 
 
