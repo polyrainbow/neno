@@ -22,7 +22,7 @@
   "scripts": {
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
-    "start": "node index.js"
+    "start": "node index.js port=8080"
   },
   "author": "",
   "license": "ISC"

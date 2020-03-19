@@ -4,14 +4,15 @@ const app = express();
 const Notes = require("./notes.js");
 const urlMetadata = require("url-metadata");
 
-const customPort = parseInt(
-  process.argv.find((arg) => {
-    return arg.startsWith("port=");
-  })
-    .substring(5),
-);
+let PORT = 8080;
 
-const PORT = customPort || 8080;
+const customPortArgument = process.argv.find((arg) => {
+  return arg.startsWith("port=");
+});
+
+if (customPortArgument) {
+  PORT = parseInt(customPortArgument.substring(5));
+}
 
 Notes.init(
   process.env.DATA_FOLDER_PATH
