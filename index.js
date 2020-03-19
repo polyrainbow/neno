@@ -96,7 +96,7 @@ app.get("/api/note/:noteId", function(req, res) {
 
 app.put("/api/note", function(req, res) {
   const note = req.body;
-  if (note.id) {
+  if (typeof note.id === "number") {
     const updatedNote = Notes.update(note, req.userId);
     res.end(JSON.stringify({
       noteId: updatedNote.id,
