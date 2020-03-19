@@ -22,7 +22,7 @@
   "scripts": {
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
-    "dev": "node index.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC"
