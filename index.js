@@ -13,6 +13,11 @@ const customPort = parseInt(
 
 const PORT = customPort || 8080;
 
+Notes.init(
+  process.env.DATA_FOLDER_PATH
+  || path.join(__dirname, "..", "network-notes-data"),
+);
+
 app.use("/", express.static(path.join(__dirname, "static")));
 app.use(express.json());
 

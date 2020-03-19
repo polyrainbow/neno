@@ -3,7 +3,13 @@ const path = require("path");
 const getKeySortFunction = require("./utils.js").getKeySortFunction;
 
 const NOTE_FILE_SUFFIX = ".note.json";
-const DATA_FOLDER = path.join(__dirname, "data");
+let DATA_FOLDER = null;
+
+
+const init = (dataFolderPath) => {
+  DATA_FOLDER = dataFolderPath;
+};
+
 
 const getNewId = () => {
   const idFile = path.join(DATA_FOLDER, "idcounter");
@@ -101,6 +107,7 @@ const remove = (noteId) => {
 };
 
 module.exports = {
+  init,
   get,
   getAll,
   getGraph,
