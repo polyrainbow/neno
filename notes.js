@@ -13,8 +13,8 @@ const init = (dataFolderPath) => {
 };
 
 
-const getNewId = () => {
-  const idFile = path.join(DATA_FOLDER, "idcounter");
+const getNewNoteId = (userId) => {
+  const idFile = path.join(DATA_FOLDER, userId + ".idcounter");
 
   if (fs.existsSync(idFile)) {
     const idString = fs.readFileSync(idFile);
@@ -30,17 +30,23 @@ const getNewId = () => {
 };
 
 
-const get = (noteId) => {
-  const filename = path.join(DATA_FOLDER, noteId + NOTE_FILE_SUFFIX);
+const get = (noteId, userId) => {
+  const filename = path.join(
+    DATA_FOLDER,
+    userId + "." + noteId + NOTE_FILE_SUFFIX,
+  );
   const note = JSON.parse(fs.readFileSync(filename));
   return note;
 };
 
 
-const getAll = () => {
+const getAll = (userId) => {
   return fs.readdirSync(DATA_FOLDER)
     .filter((filename) => {
-      return filename.endsWith(NOTE_FILE_SUFFIX);
+      return (
+        filename.startsWith(userId + ".")
+        && filename.endsWith(NOTE_FILE_SUFFIX)
+      );
     })
     .map((filename) => {
       const string = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
@@ -50,9 +56,9 @@ const getAll = () => {
 };
 
 
-const getGraph = () => {
-  const nodes = getAll();
-  const filename = path.join(DATA_FOLDER, "links.json");
+const getGraph = (userId) => {
+  const nodes = getAll(userId);
+  const filename = path.join(DATA_FOLDER, userId + ".links.json");
 
   let links;
   if (fs.existsSync(filename)) {
@@ -74,36 +80,44 @@ const getGraph = () => {
 };
 
 
-const setGraph = (graph) => {
-  graph.nodes.forEach(update);
-  const filename = path.join(DATA_FOLDER, "links.json");
+const setGraph = (graph, userId) => {
+  graph.nodes.forEach((node) => {
+    update(node, userId);
+  });
+  const filename = path.join(DATA_FOLDER, userId + ".links.json");
   fs.writeFileSync(filename, JSON.stringify(graph.links), "utf8");
 };
 
 
-const create = (noteFromUser) => {
-  const id = getNewId();
+const create = (noteFromUser, userId) => {
+  const noteId = getNewNoteId(userId);
   const note = {
-    id,
+    id: noteId,
     x: 0,
     y: 0,
     ...noteFromUser,
   };
-  const filename = path.join(DATA_FOLDER, id + NOTE_FILE_SUFFIX);
+  const filename = path.join(
+    DATA_FOLDER, userId + "." + noteId + NOTE_FILE_SUFFIX,
+  );
   fs.writeFileSync(filename, JSON.stringify(note), "utf8");
   return note;
 };
 
 
-const update = (updatedNote) => {
-  const filename = path.join(DATA_FOLDER, updatedNote.id + NOTE_FILE_SUFFIX);
+const update = (updatedNote, userId) => {
+  const filename = path.join(
+    DATA_FOLDER, userId + "." + updatedNote.id + NOTE_FILE_SUFFIX,
+  );
   fs.writeFileSync(filename, JSON.stringify(updatedNote), "utf8");
   return updatedNote;
 };
 
 
-const remove = (noteId) => {
-  const filename = path.join(DATA_FOLDER, noteId + NOTE_FILE_SUFFIX);
+const remove = (noteId, userId) => {
+  const filename = path.join(
+    DATA_FOLDER, userId + "." + noteId + NOTE_FILE_SUFFIX,
+  );
   fs.unlinkSync(filename);
   return true;
 };

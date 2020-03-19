@@ -19,6 +19,38 @@ Notes.init(
   || path.join(__dirname, "..", "network-notes-data"),
 );
 
+app.use((req, res, next) => {
+  // -----------------------------------------------------------------------
+  // authentication middleware
+
+  const users = [
+    { id: "sebastian", login: "sebastian", password: "9575" },
+    { id: "sophia", login: "sophia", password: ":-*" },
+  ];
+
+  // parse login and password from headers
+  const b64auth = (req.headers.authorization || "").split(" ")[1] || "";
+  const [login, password]
+    = Buffer.from(b64auth, "base64").toString().split(":");
+
+  const validUser = users.find((user) => {
+    return user.login === login && user.password === password;
+  });
+
+  // Verify login and password are set and correct
+  if (login && password && validUser) {
+    req.userId = validUser.id;
+    // Access granted...
+    return next();
+  }
+
+  // Access denied...
+  res.set("WWW-Authenticate", "Basic realm=\"401\""); // change this
+  res.status(401).send("Authentication required."); // custom message
+
+  // -----------------------------------------------------------------------
+});
+
 app.use("/", express.static(path.join(__dirname, "static")));
 app.use(express.json());
 
@@ -28,13 +60,13 @@ app.get("/api", function(req, res) {
 
 
 app.get("/api/graph", function(req, res) {
-  const graph = Notes.getGraph();
+  const graph = Notes.getGraph(req.userId);
   res.end(JSON.stringify(graph));
 });
 
 
 app.post("/api/graph", function(req, res) {
-  Notes.setGraph(req.body);
+  Notes.setGraph(req.body, req.userId);
   res.end(JSON.stringify(
     {
       success: true,
@@ -44,7 +76,7 @@ app.post("/api/graph", function(req, res) {
 
 
 app.get("/api/notes", function(req, res) {
-  const notes = Notes.getAll();
+  const notes = Notes.getAll(req.userId);
   const notesList = notes.map((note) => {
     return {
       id: note.id,
@@ -57,7 +89,7 @@ app.get("/api/notes", function(req, res) {
 
 
 app.get("/api/note/:noteId", function(req, res) {
-  const note = Notes.get(req.params.noteId);
+  const note = Notes.get(req.params.noteId, req.userId);
   res.end(JSON.stringify(note));
 });
 
@@ -65,13 +97,13 @@ app.get("/api/note/:noteId", function(req, res) {
 app.put("/api/note", function(req, res) {
   const note = req.body;
   if (note.id) {
-    const updatedNote = Notes.update(note);
+    const updatedNote = Notes.update(note, req.userId);
     res.end(JSON.stringify({
       noteId: updatedNote.id,
       success: true,
     }));
   } else {
-    const noteFromDB = Notes.create(note);
+    const noteFromDB = Notes.create(note, req.userId);
     res.end(JSON.stringify({
       noteId: noteFromDB.id,
       success: true,
@@ -81,7 +113,7 @@ app.put("/api/note", function(req, res) {
 
 
 app.delete("/api/note/:noteId", function(req, res) {
-  const success = Notes.remove(req.params.noteId);
+  const success = Notes.remove(req.params.noteId, req.userId);
   res.end(JSON.stringify({
     success,
   }));
