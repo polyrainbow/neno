@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const mkdirp = require("mkdirp");
 const getKeySortFunction = require("./utils.js").getKeySortFunction;
 
 const NOTE_FILE_SUFFIX = ".note.json";
@@ -8,6 +9,7 @@ let DATA_FOLDER = null;
 
 const init = (dataFolderPath) => {
   DATA_FOLDER = dataFolderPath;
+  mkdirp(DATA_FOLDER);
 };
 
 
