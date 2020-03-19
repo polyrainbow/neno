@@ -103,7 +103,7 @@ const createAndAppendNoteListItem = (note) => {
   listItem.appendChild(tdTitle);
 
   const tdTime = document.createElement("td");
-  tdTime.innerHTML = new Date(note.time);
+  tdTime.innerHTML = new Date(note.time).toLocaleString();
   listItem.appendChild(tdTime);
 
   listContainer.appendChild(listItem);
