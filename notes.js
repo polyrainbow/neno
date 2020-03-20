@@ -58,12 +58,12 @@ const getAll = (userId) => {
 
 const getGraph = (userId) => {
   const nodes = getAll(userId);
-  const filename = path.join(DATA_FOLDER, userId + ".links.json");
+  const linksFilename = path.join(DATA_FOLDER, userId + ".links.json");
 
   let links;
-  if (fs.existsSync(filename)) {
+  if (fs.existsSync(linksFilename)) {
     links = JSON.parse(
-      fs.readFileSync(filename, "utf8"),
+      fs.readFileSync(linksFilename, "utf8"),
     );
   } else {
     links = [];
@@ -73,9 +73,24 @@ const getGraph = (userId) => {
     node.title = node.editorData && node.editorData.blocks[0].data.text;
   });
 
+  const configFilename = path.join(DATA_FOLDER, userId + ".config.json");
+  let screenPosition;
+  if (fs.existsSync(configFilename)) {
+    screenPosition = JSON.parse(
+      fs.readFileSync(configFilename, "utf8"),
+    ).screenPosition;
+  } else {
+    screenPosition = {
+      translateX: 0,
+      translateY: 0,
+      scale: 1,
+    };
+  }
+
   return {
     nodes,
     links,
+    screenPosition,
   };
 };
 
@@ -84,8 +99,12 @@ const setGraph = (graph, userId) => {
   graph.nodes.forEach((node) => {
     update(node, userId);
   });
-  const filename = path.join(DATA_FOLDER, userId + ".links.json");
-  fs.writeFileSync(filename, JSON.stringify(graph.links), "utf8");
+  const linksFilename = path.join(DATA_FOLDER, userId + ".links.json");
+  fs.writeFileSync(linksFilename, JSON.stringify(graph.links), "utf8");
+  const configFilename = path.join(DATA_FOLDER, userId + ".config.json");
+  fs.writeFileSync(configFilename, JSON.stringify({
+    screenPosition: graph.screenPosition,
+  }), "utf8");
 };
 
 
