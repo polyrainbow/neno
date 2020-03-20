@@ -33,7 +33,7 @@ const placeholderNoteObject = {
 };
 
 let editor;
-let activeNoteId = null;
+let activeNote = null;
 
 const loadEditor = (data) => {
   editor && editor.destroy();
@@ -65,9 +65,10 @@ const loadEditor = (data) => {
 
 const loadNote = (noteId) => {
   if (typeof noteId !== "number") {
-    activeNoteId = null;
-    spanActiveNoteId.innerHTML = activeNoteId;
+    activeNote = null;
+    spanActiveNoteId.innerHTML = "No ID";
     loadEditor(null);
+    removeButton.disabled = true;
     return;
   }
 
@@ -79,9 +80,10 @@ const loadNote = (noteId) => {
   })
     .then((response) => response.json())
     .then((note) => {
-      activeNoteId = note.id;
-      spanActiveNoteId.innerHTML = activeNoteId;
+      activeNote = note;
+      spanActiveNoteId.innerHTML = activeNote.id;
       loadEditor(note.editorData);
+      removeButton.disabled = false;
       refreshNotesList();
     });
 };
@@ -90,7 +92,7 @@ const loadNote = (noteId) => {
 const createAndAppendNoteListItem = (note) => {
   const listItem = document.createElement("tr");
 
-  if (note.id === activeNoteId) {
+  if (activeNote && (note.id === activeNote.id)) {
     listItem.classList.add("active");
   }
 
@@ -135,13 +137,19 @@ const refreshNotesList = () => {
 
 const saveNote = () => {
   editor.save().then((outputData) => {
-    const note = {
+    let note = {
       editorData: outputData,
       time: outputData.time,
     };
 
-    if (typeof activeNoteId === "number") {
-      note.id = activeNoteId;
+    if (
+      typeof activeNote === "object"
+      && activeNote !== null
+    ) {
+      note = {
+        ...activeNote,
+        ...note,
+      };
     }
 
     fetch("/api/note", {
@@ -157,8 +165,9 @@ const saveNote = () => {
       })
       .then((responseJSON) => {
         console.log(responseJSON);
-        activeNoteId = responseJSON.noteId;
-        spanActiveNoteId.innerHTML = activeNoteId;
+        activeNote = responseJSON.note;
+        spanActiveNoteId.innerHTML = activeNote.id;
+        removeButton.disabled = false;
         return refreshNotesList();
       })
       .catch((error) => {
@@ -169,11 +178,11 @@ const saveNote = () => {
 
 
 const removeActiveNote = () => {
-  if (typeof activeNoteId !== "number") {
+  if (activeNote === null) {
     return;
   }
 
-  fetch("/api/note/" + activeNoteId, {
+  fetch("/api/note/" + activeNote.id, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

@@ -109,6 +109,11 @@ const update = (updatedNote, userId) => {
   const filename = path.join(
     DATA_FOLDER, userId + "." + updatedNote.id + NOTE_FILE_SUFFIX,
   );
+
+  // fix broken legacy notes without coordinates
+  updatedNote.x = updatedNote.x || 0;
+  updatedNote.y = updatedNote.y || 0;
+
   fs.writeFileSync(filename, JSON.stringify(updatedNote), "utf8");
   return updatedNote;
 };

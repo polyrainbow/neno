@@ -99,13 +99,13 @@ app.put("/api/note", function(req, res) {
   if (typeof note.id === "number") {
     const updatedNote = Notes.update(note, req.userId);
     res.end(JSON.stringify({
-      noteId: updatedNote.id,
+      note: updatedNote,
       success: true,
     }));
   } else {
     const noteFromDB = Notes.create(note, req.userId);
     res.end(JSON.stringify({
-      noteId: noteFromDB.id,
+      note: noteFromDB,
       success: true,
     }));
   }
