@@ -208,9 +208,9 @@ document.onload = (function(d3, saveAs, Blob, undefined){
   GraphCreator.prototype.insertTitleLinebreaks = function (gEl, title) {
     var words = title && title.split(/\s+/g) || "";
     var nwords = words.length;
-    var el = gEl.append("text")
-          .attr("text-anchor","middle")
-          .attr("dy", "-" + (nwords-1)*7.5);
+    const el = gEl.append("text")
+      .attr("text-anchor", "middle")
+      .attr("dy", "-" + (Math.min(nwords, 1)-1)*7.5);
 
     for (var i = 0; i < words.length; i++) {
       var tspan = el.append('tspan').text(words[i]);
@@ -548,7 +548,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     thisGraph.circles.exit().remove();
   };
 
-  GraphCreator.prototype.zoomed = function(){ console.log(d3.event.translate)
+  GraphCreator.prototype.zoomed = function(){
     this.state.justScaleTransGraph = true;
     d3.select("." + this.consts.graphClass)
       .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
