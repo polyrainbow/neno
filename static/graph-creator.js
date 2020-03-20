@@ -225,8 +225,8 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
   /* insert svg line breaks: taken from http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
   GraphCreator.prototype.insertTitleLinebreaks = function (gEl, title) {
-    var words = title.split(/\s+/g),
-        nwords = words.length;
+    var words = title && title.split(/\s+/g) || "";
+    var nwords = words.length;
     var el = gEl.append("text")
           .attr("text-anchor","middle")
           .attr("dy", "-" + (nwords-1)*7.5);
@@ -567,6 +567,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     this.state.justScaleTransGraph = true;
     d3.select("." + this.consts.graphClass)
       .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")"); 
+    console.log(d3.event.translate, d3.event.scale)
   };
 
   GraphCreator.prototype.updateWindow = function(svg){
