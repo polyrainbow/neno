@@ -54,8 +54,9 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     // displayed when dragging between nodes
     thisGraph.dragLine = svgG.append('svg:path')
           .attr('class', 'link dragline hidden')
-          .attr('d', 'M0,0L0,0')
-          .style('marker-end', 'url(#mark-end-arrow)');
+          .attr('d', 'M0,0L0,0');
+          // do not show arrow at end of line
+          //.style('marker-end', 'url(#mark-end-arrow)');
 
     // svg nodes and links 
     thisGraph.paths = svgG.append("g").selectAll("g");
@@ -495,7 +496,9 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     });
     var paths = thisGraph.paths;
     // update existing paths
-    paths.style('marker-end', 'url(#end-arrow)')
+
+    paths
+      //.style('marker-end', 'url(#end-arrow)')
       .classed(consts.selectedClass, function(d){
         return d === state.selectedEdge;
       })
@@ -503,10 +506,11 @@ document.onload = (function(d3, saveAs, Blob, undefined){
         return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
       });
 
+
     // add new paths
     paths.enter()
       .append("path")
-      .style('marker-end','url(#end-arrow)')
+      //.style('marker-end','url(#end-arrow)')
       .classed("link", true)
       .attr("d", function(d){
         return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
