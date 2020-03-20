@@ -70,7 +70,7 @@ const getGraph = (userId) => {
   }
 
   nodes.forEach((node) => {
-    node.title = node.editorData.blocks[0].data.text;
+    node.title = node.editorData && node.editorData.blocks[0].data.text;
   });
 
   return {
