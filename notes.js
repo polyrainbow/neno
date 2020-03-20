@@ -12,6 +12,18 @@ const init = (dataFolderPath) => {
   mkdirp(DATA_FOLDER);
 };
 
+const readJSONFileInDataFolder = (filename) => {
+  const json = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
+  let object;
+  try {
+    object = JSON.parse(json);
+    return object;
+  } catch (e) {
+    console.error("Database corrupted. Could not parse file " + filename);
+    console.log("File content: " + json);
+  }
+};
+
 
 const getNewNoteId = (userId) => {
   const idFile = path.join(DATA_FOLDER, userId + ".idcounter");
@@ -31,11 +43,8 @@ const getNewNoteId = (userId) => {
 
 
 const get = (noteId, userId) => {
-  const filename = path.join(
-    DATA_FOLDER,
-    userId + "." + noteId + NOTE_FILE_SUFFIX,
-  );
-  const note = JSON.parse(fs.readFileSync(filename));
+  const filename = userId + "." + noteId + NOTE_FILE_SUFFIX;
+  const note = readJSONFileInDataFolder(filename);
   return note;
 };
 
@@ -49,8 +58,7 @@ const getAll = (userId) => {
       );
     })
     .map((filename) => {
-      const string = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
-      return JSON.parse(string);
+      return readJSONFileInDataFolder(filename);
     })
     .sort(getKeySortFunction("id"));
 };
