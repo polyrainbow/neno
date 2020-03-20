@@ -210,7 +210,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     var nwords = words.length;
     const el = gEl.append("text")
       .attr("text-anchor", "middle")
-      .attr("dy", "-" + (Math.min(nwords, 1)-1)*7.5);
+      .attr("dy", "-" + (Math.max(nwords, 1)-1)*7.5);
 
     for (var i = 0; i < words.length; i++) {
       var tspan = el.append('tspan').text(words[i]);
