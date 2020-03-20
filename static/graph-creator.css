@@ -30,6 +30,12 @@ body{
   border-radius: 5px;
   padding: 1em;
   z-index: 5;
+  display: flex;
+  align-items: center;
+}
+
+#toolbox * {
+  margin: 0px 10px;
 }
 
 #toolbox input{
