@@ -94,7 +94,7 @@ const renderNote = (note) => {
 };
 
 
-const createAndAppendNoteListItem = (note) => {
+const createAndAppendNoteListItem = (note, parent) => {
   const listItem = document.createElement("tr");
 
   if (activeNote && (note.id === activeNote.id)) {
@@ -113,7 +113,7 @@ const createAndAppendNoteListItem = (note) => {
   tdTime.innerHTML = new Date(note.time).toLocaleString();
   listItem.appendChild(tdTime);
 
-  listContainer.appendChild(listItem);
+  parent.appendChild(listItem);
   listItem.addEventListener("click", () => {
     loadNote(note.id);
   });
@@ -121,8 +121,12 @@ const createAndAppendNoteListItem = (note) => {
 
 
 const createNotesList = (notes) => {
-  listContainer.innerHTML = "";
-  notes.forEach(createAndAppendNoteListItem);
+  listContainer.innerHTML = `<p>${notes.length} note(s) available</p>`;
+
+  const table = document.createElement("table");
+  table.id = "list";
+  listContainer.appendChild(table);
+  notes.forEach((note) => createAndAppendNoteListItem(note, listContainer));
 };
 
 
