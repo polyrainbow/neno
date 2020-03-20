@@ -5,13 +5,15 @@ const removeButton = document.getElementById("button_remove");
 const listContainer = document.getElementById("list");
 const spanActiveNoteId = document.getElementById("span_activeNoteId");
 
+const DEFAULT_NOTE_TITLE = "Note title";
+
 const placeholderNoteObject = {
   "time": 1582493003964,
   "blocks": [
     {
       "type": "header",
       "data": {
-        "text": "Note title",
+        "text": DEFAULT_NOTE_TITLE,
         "level": 1,
       },
     },
@@ -79,13 +81,16 @@ const loadNote = (noteId) => {
     },
   })
     .then((response) => response.json())
-    .then((note) => {
-      activeNote = note;
-      spanActiveNoteId.innerHTML = activeNote.id;
-      loadEditor(note.editorData);
-      removeButton.disabled = false;
-      refreshNotesList();
-    });
+    .then(renderNote);
+};
+
+
+const renderNote = (note) => {
+  activeNote = note;
+  spanActiveNoteId.innerHTML = activeNote.id;
+  loadEditor(note.editorData);
+  removeButton.disabled = false;
+  refreshNotesList();
 };
 
 
@@ -152,6 +157,20 @@ const saveNote = () => {
       };
     }
 
+    // if the note has no title yet, take the title of the link metadata
+    const firstLinkBlock = note.editorData.blocks.find(
+      (block) => block.type === "linkTool",
+    );
+
+    if (
+      note.editorData.blocks[0].data.text === DEFAULT_NOTE_TITLE
+      && firstLinkBlock
+      && typeof firstLinkBlock.data.meta.title === "string"
+      && firstLinkBlock.data.meta.title.length > 0
+    ) {
+      note.editorData.blocks[0].data.text = firstLinkBlock.data.meta.title;
+    }
+
     fetch("/api/note", {
       method: "PUT",
       body: JSON.stringify(note),
@@ -159,17 +178,8 @@ const saveNote = () => {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => {
-        console.log("Note created");
-        return response.json();
-      })
-      .then((responseJSON) => {
-        console.log(responseJSON);
-        activeNote = responseJSON.note;
-        spanActiveNoteId.innerHTML = activeNote.id;
-        removeButton.disabled = false;
-        return refreshNotesList();
-      })
+      .then((response) => response.json())
+      .then((response) => renderNote(response.note))
       .catch((error) => {
         console.log("Saving failed: ", error);
       });
