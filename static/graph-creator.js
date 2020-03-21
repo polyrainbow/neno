@@ -619,6 +619,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
         svg, nodes, links, graph.screenPosition,
       );
       graphInstance.updateGraph();
+      screenPosition = graph.screenPosition;
       d3.select(".graph")
         .attr(
           "transform",
