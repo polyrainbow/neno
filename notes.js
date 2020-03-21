@@ -42,14 +42,31 @@ const getNewNoteId = (userId) => {
 };
 
 
-const get = (noteId, userId) => {
+const getLinkedNotes = (noteId, userId) => {
+  return getLinks(userId)
+    .filter((link) => {
+      return (link.id0 === noteId) || (link.id1 === noteId);
+    })
+    .map((link) => {
+      return (link.id0 === noteId) ? link.id1 : link.id0;
+    })
+    .map((linkedNoteId) => {
+      return get(linkedNoteId, userId, false);
+    });
+};
+
+
+const get = (noteId, userId, includeLinkedNotes) => {
   const filename = userId + "." + noteId + NOTE_FILE_SUFFIX;
   const note = readJSONFileInDataFolder(filename);
+  if (includeLinkedNotes) {
+    note.linkedNotes = getLinkedNotes(noteId, userId);
+  }
   return note;
 };
 
 
-const getAll = (userId) => {
+const getAll = (userId, includeLinkedNotes) => {
   return fs.readdirSync(DATA_FOLDER)
     .filter((filename) => {
       return (
@@ -58,14 +75,17 @@ const getAll = (userId) => {
       );
     })
     .map((filename) => {
-      return readJSONFileInDataFolder(filename);
+      const note = readJSONFileInDataFolder(filename);
+      if (includeLinkedNotes) {
+        note.linkedNotes = getLinkedNotes(note.id, userId);
+      }
+      return note;
     })
     .sort(getKeySortFunction("id"));
 };
 
 
-const getGraph = (userId) => {
-  const nodes = getAll(userId);
+const getLinks = (userId) => {
   const linksFilename = path.join(DATA_FOLDER, userId + ".links.json");
 
   let links;
@@ -76,6 +96,14 @@ const getGraph = (userId) => {
   } else {
     links = [];
   }
+
+  return links;
+};
+
+
+const getGraph = (userId) => {
+  const nodes = getAll(userId);
+  const links = getLinks(userId);
 
   nodes.forEach((node) => {
     node.title = node.editorData && node.editorData.blocks[0].data.text;

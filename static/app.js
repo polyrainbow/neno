@@ -4,6 +4,8 @@ const uploadButton = document.getElementById("button_upload");
 const removeButton = document.getElementById("button_remove");
 const listContainer = document.getElementById("list");
 const spanActiveNoteId = document.getElementById("span_activeNoteId");
+const spanAvailableNotes = document.getElementById("span_available-notes");
+const spanLinked = document.getElementById("span_linked");
 
 const DEFAULT_NOTE_TITLE = "Note title";
 
@@ -68,7 +70,8 @@ const loadEditor = (data) => {
 const loadNote = (noteId) => {
   if (typeof noteId !== "number") {
     activeNote = null;
-    spanActiveNoteId.innerHTML = "No ID";
+    spanActiveNoteId.innerHTML = "--";
+    spanLinked.innerHTML = "--";
     loadEditor(null);
     removeButton.disabled = true;
     return;
@@ -88,13 +91,14 @@ const loadNote = (noteId) => {
 const renderNote = (note) => {
   activeNote = note;
   spanActiveNoteId.innerHTML = activeNote.id;
+  spanLinked.innerHTML = note.linkedNotes.length;
   loadEditor(note.editorData);
   removeButton.disabled = false;
   refreshNotesList();
 };
 
 
-const createAndAppendNoteListItem = (note, parent) => {
+const createAndAppendNoteListItem = (note, i, parent) => {
   const listItem = document.createElement("tr");
 
   if (activeNote && (note.id === activeNote.id)) {
@@ -102,12 +106,19 @@ const createAndAppendNoteListItem = (note, parent) => {
   }
 
   const tdId = document.createElement("td");
-  tdId.innerHTML = note.id;
+  tdId.innerHTML = i;
   listItem.appendChild(tdId);
+  tdId.style.textAlign = "right";
 
   const tdTitle = document.createElement("td");
   tdTitle.innerHTML = note.title;
   listItem.appendChild(tdTitle);
+
+  const tdLinkedNotesIndicator = document.createElement("td");
+  tdLinkedNotesIndicator.innerHTML = note.numberOfLinkedNotes > 0
+    ? "<span title=\"Linked\">🔵</span>"
+    : "<span title=\"Not linked\">🔴</span>";
+  listItem.appendChild(tdLinkedNotesIndicator);
 
   const tdTime = document.createElement("td");
   tdTime.innerHTML = new Date(note.time).toLocaleString();
@@ -121,12 +132,13 @@ const createAndAppendNoteListItem = (note, parent) => {
 
 
 const createNotesList = (notes) => {
-  listContainer.innerHTML = `<p>${notes.length} note(s) available</p>`;
+  spanAvailableNotes.innerHTML = notes.length;
 
+  listContainer.innerHTML = "";
   const table = document.createElement("table");
   table.id = "list";
   listContainer.appendChild(table);
-  notes.forEach((note) => createAndAppendNoteListItem(note, table));
+  notes.forEach((note, i) => createAndAppendNoteListItem(note, i + 1, table));
 };
 
 

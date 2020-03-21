@@ -76,12 +76,13 @@ app.post("/api/graph", function(req, res) {
 
 
 app.get("/api/notes", function(req, res) {
-  const notes = Notes.getAll(req.userId);
+  const notes = Notes.getAll(req.userId, true);
   const notesList = notes.map((note) => {
     return {
       id: note.id,
       title: note.editorData && note.editorData.blocks[0].data.text,
       time: note.time,
+      numberOfLinkedNotes: note.linkedNotes.length,
     };
   });
   res.end(JSON.stringify(notesList));
@@ -89,7 +90,7 @@ app.get("/api/notes", function(req, res) {
 
 
 app.get("/api/note/:noteId", function(req, res) {
-  const note = Notes.get(req.params.noteId, req.userId);
+  const note = Notes.get(parseInt(req.params.noteId), req.userId, true);
   res.end(JSON.stringify(note));
 });
 
