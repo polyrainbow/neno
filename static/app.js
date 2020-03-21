@@ -93,7 +93,11 @@ const loadNote = (noteId) => {
 const renderNote = (note) => {
   activeNote = note;
   spanActiveNoteId.innerHTML = activeNote.id;
-  spanLinked.innerHTML = note.linkedNotes.length;
+  if (Array.isArray(note.linkedNotes)) {
+    spanLinked.innerHTML = note.linkedNotes.length;
+  } else {
+    spanLinked.innerHTML = "--";
+  }
   loadEditor(note.editorData);
   removeButton.disabled = false;
   refreshNotesList();
