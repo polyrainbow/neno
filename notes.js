@@ -100,15 +100,7 @@ const getLinks = (userId) => {
   return links;
 };
 
-
-const getGraph = (userId) => {
-  const nodes = getAll(userId);
-  const links = getLinks(userId);
-
-  nodes.forEach((node) => {
-    node.title = node.editorData && node.editorData.blocks[0].data.text;
-  });
-
+const getGraphScreenPosition = (userId) => {
   const configFilename = path.join(DATA_FOLDER, userId + ".config.json");
   let screenPosition;
   if (fs.existsSync(configFilename)) {
@@ -122,6 +114,20 @@ const getGraph = (userId) => {
       scale: 1,
     };
   }
+
+  return screenPosition;
+};
+
+
+const getGraph = (userId) => {
+  const nodes = getAll(userId);
+  const links = getLinks(userId);
+
+  nodes.forEach((node) => {
+    node.title = node.editorData && node.editorData.blocks[0].data.text;
+  });
+
+  const screenPosition = getGraphScreenPosition(userId);
 
   return {
     nodes,
@@ -182,6 +188,27 @@ const remove = (noteId, userId) => {
   return true;
 };
 
+const exportDB = (userId) => {
+  const notes = getAll(userId, false);
+  const links = getLinks(userId);
+  const idCounter = getNewNoteId(userId);
+  const screenPosition = getGraphScreenPosition(userId);
+
+  return {
+    notes,
+    links,
+    idCounter,
+    screenPosition,
+    timestamp: new Date(),
+  };
+};
+
+
+const importDB = () => {
+  // TO DO
+};
+
+
 module.exports = {
   init,
   get,
@@ -191,4 +218,6 @@ module.exports = {
   create,
   update,
   remove,
+  exportDB,
+  importDB,
 };

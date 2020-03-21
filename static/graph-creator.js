@@ -131,7 +131,7 @@ document.onload = (function(d3) {
     // listen for resize
     window.onresize = function() {thisGraph.updateWindow(svg);};
 
-    d3.select("#upload-input").on("click", function() {
+    d3.select("#button-save").on("click", function() {
       const links = thisGraph.links.map((link) => {
         return {
           id0: link.source.id,
@@ -623,3 +623,7 @@ document.onload = (function(d3) {
         );
     });
 })(window.d3);
+
+document.getElementById("button-home").addEventListener("click", () => {
+  window.location.href = "/";
+});

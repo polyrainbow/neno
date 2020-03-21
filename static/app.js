@@ -2,6 +2,8 @@ const editorContainer = document.getElementById("editor");
 const newButton = document.getElementById("button_new");
 const uploadButton = document.getElementById("button_upload");
 const removeButton = document.getElementById("button_remove");
+const graphButton = document.getElementById("button_graph");
+const archiveButton = document.getElementById("button_archive");
 const listContainer = document.getElementById("list");
 const spanActiveNoteId = document.getElementById("span_activeNoteId");
 const spanAvailableNotes = document.getElementById("span_available-notes");
@@ -229,6 +231,30 @@ const removeActiveNote = () => {
 };
 
 
+const archiveDatabase = () => {
+  fetch("/api/database/", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      return response.text();
+    })
+    .then((text) => {
+      const blob = new Blob([text], {
+        type: "application/json",
+      });
+      // eslint-disable-next-line no-undef
+      saveAs(blob, `archive-${new Date()}.json`);
+      return text;
+    })
+    .catch((error) => {
+      console.log("Archive download failed: ", error);
+    });
+};
+
+
 const init = () => {
   loadEditor(null);
   newButton.addEventListener("click", () => {
@@ -238,6 +264,12 @@ const init = () => {
   uploadButton.addEventListener("click", saveNote);
   removeButton.addEventListener("click", removeActiveNote);
   refreshNotesList();
+
+  graphButton.addEventListener("click", () => {
+    window.location.href = "graph.html";
+  });
+
+  archiveButton.addEventListener("click", archiveDatabase);
 };
 
 init();

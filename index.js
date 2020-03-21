@@ -59,6 +59,22 @@ app.get("/api", function(req, res) {
 });
 
 
+app.get("/api/database", function(req, res) {
+  const database = Notes.exportDB(req.userId);
+  res.end(JSON.stringify(database));
+});
+
+
+app.put("/api/database", function(req, res) {
+  Notes.importDB(req.body, req.userId);
+  res.end(JSON.stringify(
+    {
+      success: true,
+    },
+  ));
+});
+
+
 app.get("/api/graph", function(req, res) {
   const graph = Notes.getGraph(req.userId);
   res.end(JSON.stringify(graph));

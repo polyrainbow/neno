@@ -28,22 +28,34 @@
   <body>
     <header>
       <h1>Network Notes</h1>
-      <div>
+      <!--<div>
         <a href="graph.html">Graph</a>
-      </div>
+      </div>-->
     </header>
 
     <section id="controls">
       <div>
-        <button id="button_new">New</button>
-        <button id="button_upload">Save & Upload</button>
-        <button id="button_remove" disabled>Remove</button>
+        <button id="button_new" alt="New">
+          <img src="icons/note_add-24px.svg">
+        </button>
+        <button id="button_upload" alt="Save">
+          <img src="icons/save-24px.svg">
+        </button>
+        <button id="button_remove" disabled alt="Remove">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
+        </button>
+        <button id="button_graph" alt="Graph">
+          <img src="icons/account_tree-24px.svg">
+        </button>
+        <button id="button_archive" alt="Graph">
+          <img src="icons/archive-24px.svg">
+        </button>
       </div>
       <div>
-        <span>Available:</span>
+        <span>All:</span>
         <span id="span_available-notes">--</span>
         🔸
-        <span>Active Note ID:</span>
+        <span>Active ID:</span>
         <span id="span_activeNoteId">--</span>
         🔸
         <span>Linked:</span>
@@ -59,6 +71,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@2.1.3/dist/bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+    <script src="FileSaver.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

@@ -28,7 +28,6 @@ main {
 #editor{
   min-height: 511.547px;
   padding: 0px 10px;
-  grid-area: 1 / 2 / 2 / 3;
 }
 
 #controls {
@@ -41,12 +40,19 @@ main {
 }
 
 button {
-  font-size: larger;
+  height: 50px;
+  display: inline-block;
+  border: none;
+  cursor: pointer;
+  width: 50px;
+  padding: 0;
+  background: none;
 }
 
-#list{
-  padding: 20px;
-  grid-area: 1 / 1 / 2 / 2;
+button[disabled]{
+  color: grey;
+  fill: grey;
+  cursor: inherit;
 }
 
 table {
@@ -89,17 +95,19 @@ tr[class*="active"]{
   #editor{
     overflow-y: auto;
     min-width: 720px;
+    grid-area: 1 / 2 / 2 / 3;
   }
 
   #list{
     overflow-y: auto;
     padding: 0px;
+    grid-area: 1 / 1 / 2 / 2;
   }
 }
 
 
 
-@media only screen and (max-width: 1200px) {
+@media only screen and (max-width: 1200px) and (min-width: 649px){
   main {
     grid-template-columns: 1fr;
   }
@@ -111,5 +119,23 @@ tr[class*="active"]{
   #list{
     grid-area: 2 / 1 / 3 / 2;
     margin: auto;
+    padding: 20px;
+  }
+}
+
+
+@media only screen and (max-width: 648px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+
+  #editor{
+    grid-area: 1 / 1 / 2 / 2;
+  }
+
+  #list{
+    grid-area: 2 / 1 / 3 / 2;
+    margin: auto;
+    padding: 0px;
   }
 }
