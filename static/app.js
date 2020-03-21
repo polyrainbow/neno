@@ -126,7 +126,7 @@ const createNotesList = (notes) => {
   const table = document.createElement("table");
   table.id = "list";
   listContainer.appendChild(table);
-  notes.forEach((note) => createAndAppendNoteListItem(note, listContainer));
+  notes.forEach((note) => createAndAppendNoteListItem(note, table));
 };
 
 

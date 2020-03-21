@@ -23,7 +23,6 @@ header h1 {
 
 main {
   display: grid;
-  grid-template-columns: 2fr 3fr;
 }
 
 #editor{
@@ -78,15 +77,18 @@ tr[class*="active"]{
 }
 
 
-@media only screen and (min-width: 1231px) {
+@media only screen and (min-width: 1201px) {
   main {
-    position: absolute;
+    grid-template-columns: auto auto;
+    position: fixed;
     bottom: 0px;
     top: 100px;
+    width: 100%;
   }
 
   #editor{
     overflow-y: auto;
+    min-width: 720px;
   }
 
   #list{
@@ -97,7 +99,7 @@ tr[class*="active"]{
 
 
 
-@media only screen and (max-width: 1230px) {
+@media only screen and (max-width: 1200px) {
   main {
     grid-template-columns: 1fr;
   }

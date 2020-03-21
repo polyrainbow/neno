@@ -1,20 +1,21 @@
-/* eslint-disable */
+/* eslint-disable no-invalid-this */
+
 let screenPosition = {
   translateX: 0,
   translateY: 0,
   scale: 1,
-}
+};
 
-document.onload = (function(d3, saveAs, Blob, undefined){
+document.onload = (function(d3) {
   "use strict";
 
   // define graphcreator object
-  var GraphCreator = function(svg, nodes, links, initialScreenPosition){
-    var thisGraph = this;
-    
+  const GraphCreator = function(svg, nodes, links, initialScreenPosition) {
+    const thisGraph = this;
+
     thisGraph.nodes = nodes || [];
     thisGraph.links = links || [];
-    
+
     thisGraph.state = {
       selectedNode: null,
       selectedEdge: null,
@@ -24,93 +25,99 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       justScaleTransGraph: false,
       lastKeyDown: -1,
       shiftNodeDrag: false,
-      selectedText: null
+      selectedText: null,
     };
 
     // define arrow markers for graph links
-    var defs = svg.append('svg:defs');
-    defs.append('svg:marker')
-      .attr('id', 'end-arrow')
-      .attr('viewBox', '0 -5 10 10')
-      .attr('refX', "32")
-      .attr('markerWidth', 3.5)
-      .attr('markerHeight', 3.5)
-      .attr('orient', 'auto')
-      .append('svg:path')
-      .attr('d', 'M0,-5L10,0L0,5');
+    const defs = svg.append("svg:defs");
+    defs.append("svg:marker")
+      .attr("id", "end-arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", "32")
+      .attr("markerWidth", 3.5)
+      .attr("markerHeight", 3.5)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("d", "M0,-5L10,0L0,5");
 
     // define arrow markers for leading arrow
-    defs.append('svg:marker')
-      .attr('id', 'mark-end-arrow')
-      .attr('viewBox', '0 -5 10 10')
-      .attr('refX', 7)
-      .attr('markerWidth', 3.5)
-      .attr('markerHeight', 3.5)
-      .attr('orient', 'auto')
-      .append('svg:path')
-      .attr('d', 'M0,-5L10,0L0,5');
+    defs.append("svg:marker")
+      .attr("id", "mark-end-arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 7)
+      .attr("markerWidth", 3.5)
+      .attr("markerHeight", 3.5)
+      .attr("orient", "auto")
+      .append("svg:path")
+      .attr("d", "M0,-5L10,0L0,5");
 
     thisGraph.svg = svg;
     thisGraph.svgG = svg.append("g")
       .classed(thisGraph.consts.graphClass, true);
-    var svgG = thisGraph.svgG;
+    const svgG = thisGraph.svgG;
 
     // displayed when dragging between nodes
-    thisGraph.dragLine = svgG.append('svg:path')
-      .attr('class', 'link dragline hidden')
-      .attr('d', 'M0,0L0,0');
-      // do not show arrow at end of line
-      //.style('marker-end', 'url(#mark-end-arrow)');
+    thisGraph.dragLine = svgG.append("svg:path")
+      .attr("class", "link dragline hidden")
+      .attr("d", "M0,0L0,0");
+    // do not show arrow at end of line
+    // .style('marker-end', 'url(#mark-end-arrow)');
 
-    // svg nodes and links 
+    // svg nodes and links
     thisGraph.paths = svgG.append("g").selectAll("g");
     thisGraph.circles = svgG.append("g").selectAll("g");
 
     thisGraph.drag = d3.behavior.drag()
-      .origin(function(d){
-        return {x: d.x, y: d.y};
+      .origin(function(d) {
+        return { x: d.x, y: d.y };
       })
-      .on("drag", function(args){
+      .on("drag", function(args) {
         thisGraph.state.justDragged = true;
-        thisGraph.dragmove.call(thisGraph, args);
+        thisGraph.dragmove(args);
       })
       .on("dragend", function() {
         // todo check if edge-mode is selected
       });
 
     // listen for key events
-    d3.select(window).on("keydown", function(){
-      thisGraph.svgKeyDown.call(thisGraph);
+    d3.select(window).on("keydown", function() {
+      thisGraph.svgKeyDown();
     })
-    .on("keyup", function(){
-      thisGraph.svgKeyUp.call(thisGraph);
+      .on("keyup", function() {
+        thisGraph.svgKeyUp();
+      });
+    svg.on("mousedown", function(d) {
+      thisGraph.svgMouseDown(d);
     });
-    svg.on("mousedown", function(d){thisGraph.svgMouseDown.call(thisGraph, d);});
-    svg.on("mouseup", function(d){thisGraph.svgMouseUp.call(thisGraph, d);});
+    svg.on("mouseup", function(d) {
+      thisGraph.svgMouseUp(d);
+    });
 
     // listen for dragging
     const zoom = d3.behavior.zoom();
 
-    zoom.on("zoom", function(){
-      if (d3.event.sourceEvent.shiftKey){
+    zoom.on("zoom", function() {
+      if (d3.event.sourceEvent.shiftKey) {
         // TODO  the internal d3 state is still changing
         return false;
       } else {
-        thisGraph.zoomed.call(thisGraph);
+        thisGraph.zoomed();
       }
       return true;
     });
 
-    zoom.on("zoomstart", function(){
-      var ael = d3.select("#" + thisGraph.consts.activeEditId).node();
-      if (ael){
+    zoom.on("zoomstart", function() {
+      const ael = d3.select("#" + thisGraph.consts.activeEditId).node();
+      if (ael) {
         ael.blur();
       }
-      if (!d3.event.sourceEvent.shiftKey) d3.select('body').style("cursor", "move");
+      if (!d3.event.sourceEvent.shiftKey) {
+        d3.select("body").style("cursor", "move");
+      }
     });
 
-    zoom.on("zoomend", function(){
-      d3.select('body').style("cursor", "auto");
+    zoom.on("zoomend", function() {
+      d3.select("body").style("cursor", "auto");
     });
 
     zoom.translate([
@@ -118,13 +125,13 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       initialScreenPosition.translateY,
     ]);
     zoom.scale(initialScreenPosition.scale);
-    
+
     svg.call(zoom).on("dblclick.zoom", null);
 
     // listen for resize
-    window.onresize = function(){thisGraph.updateWindow(svg);};
+    window.onresize = function() {thisGraph.updateWindow(svg);};
 
-    d3.select("#upload-input").on("click", function(){
+    d3.select("#upload-input").on("click", function() {
       const links = thisGraph.links.map((link) => {
         return {
           id0: link.source.id,
@@ -143,14 +150,14 @@ document.onload = (function(d3, saveAs, Blob, undefined){
         body: JSON.stringify(graphObject),
         headers: {
           "Content-Type": "application/json",
-        }
+        },
       })
         .then((response) => {
           return response.json();
         })
         .then((response) => {
           const statusElement = document.getElementById("status");
-          if (!response.success === true){
+          if (!response.success === true) {
             statusElement.innerHTML = "ERROR SAVING GRAPH!";
             return;
           }
@@ -162,32 +169,12 @@ document.onload = (function(d3, saveAs, Blob, undefined){
         })
         .catch((e) => {
           const statusElement = document.getElementById("status");
-          statusElement.innerHTML = "ERROR SAVING GRAPH!";
+          statusElement.innerHTML = "ERROR SAVING GRAPH! " + e;
         });
-
-      /*
-      thisGraph.deleteGraph(true);
-      thisGraph.nodes = jsonObj.nodes;
-      // if no position defined, put in grid
-      thisGraph.nodes.forEach(function(n, i){
-        if ( !("x" in n) ) {
-          n.x = (i % 10) * 25;
-          n.y = Math.floor(i / 10) * 25;
-        }
-      });
-      var newEdges = jsonObj.links;
-      newEdges.forEach(function(e, i){
-        newEdges[i] = {source: thisGraph.nodes.filter(function(n){return n.id == e.source;})[0],
-                    target: thisGraph.nodes.filter(function(n){return n.id == e.target;})[0]};
-      });
-      thisGraph.links = newEdges;
-      thisGraph.updateGraph();
-      */
     });
-
   };
 
-  GraphCreator.prototype.consts =  {
+  GraphCreator.prototype.consts = {
     selectedClass: "selected",
     connectClass: "connect-node",
     circleGClass: "conceptG",
@@ -196,52 +183,56 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     BACKSPACE_KEY: 8,
     DELETE_KEY: 46,
     ENTER_KEY: 13,
-    nodeRadius: 50
+    nodeRadius: 50,
   };
 
   /* PROTOTYPE FUNCTIONS */
 
   GraphCreator.prototype.dragmove = function(d) {
-    var thisGraph = this;
-    if (thisGraph.state.shiftNodeDrag){
-      thisGraph.dragLine.attr('d', 'M' + d.x + ',' + d.y + 'L' + d3.mouse(thisGraph.svgG.node())[0] + ',' + d3.mouse(this.svgG.node())[1]);
+    const thisGraph = this;
+    if (thisGraph.state.shiftNodeDrag) {
+      thisGraph.dragLine.attr(
+        "d",
+        "M" + d.x + "," + d.y
+        + "L" + d3.mouse(thisGraph.svgG.node())[0] + ","
+        + d3.mouse(this.svgG.node())[1],
+      );
     } else {
       d.x += d3.event.dx;
-      d.y +=  d3.event.dy;
+      d.y += d3.event.dy;
       thisGraph.updateGraph();
     }
   };
 
   /* select all text in element: taken from http://stackoverflow.com/questions/6139107/programatically-select-text-in-a-contenteditable-html-element */
   GraphCreator.prototype.selectElementContents = function(el) {
-    var range = document.createRange();
+    const range = document.createRange();
     range.selectNodeContents(el);
-    var sel = window.getSelection();
+    const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
   };
 
 
   /* insert svg line breaks: taken from http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
-  GraphCreator.prototype.insertTitleLinebreaks = function (gEl, title) {
-    var words = title && title.split(/\s+/g) || "";
-    var nwords = words.length;
+  GraphCreator.prototype.insertTitleLinebreaks = function(gEl, title) {
+    const words = (title && title.split(/\s+/g)) || "";
+    const nwords = words.length;
     const el = gEl.append("text")
       .attr("text-anchor", "middle")
-      .attr("dy", "-" + (Math.max(nwords, 1)-1)*7.5);
+      .attr("dy", "-" + (Math.max(nwords, 1) - 1) * 7.5);
 
-    for (var i = 0; i < words.length; i++) {
-      var tspan = el.append('tspan').text(words[i]);
-      if (i > 0)
-        tspan.attr('x', 0).attr('dy', '15');
+    for (let i = 0; i < words.length; i++) {
+      const tspan = el.append("tspan").text(words[i]);
+      if (i > 0) {tspan.attr("x", 0).attr("dy", "15");}
     }
   };
 
-  
+
   // remove links associated with a node
   GraphCreator.prototype.spliceLinksForNode = function(node) {
-    var thisGraph = this,
-        toSplice = thisGraph.links.filter(function(l) {
+    const thisGraph = this;
+    const toSplice = thisGraph.links.filter(function(l) {
       return (l.source === node || l.target === node);
     });
     toSplice.map(function(l) {
@@ -249,106 +240,107 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     });
   };
 
-  GraphCreator.prototype.replaceSelectEdge = function(d3Path, edgeData){
-    var thisGraph = this;
+  GraphCreator.prototype.replaceSelectEdge = function(d3Path, edgeData) {
+    const thisGraph = this;
     d3Path.classed(thisGraph.consts.selectedClass, true);
-    if (thisGraph.state.selectedEdge){
+    if (thisGraph.state.selectedEdge) {
       thisGraph.removeSelectFromEdge();
     }
     thisGraph.state.selectedEdge = edgeData;
   };
 
-  GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData){
-    var thisGraph = this;
+  GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData) {
+    const thisGraph = this;
     d3Node.classed(this.consts.selectedClass, true);
-    if (thisGraph.state.selectedNode){
+    if (thisGraph.state.selectedNode) {
       thisGraph.removeSelectFromNode();
     }
     thisGraph.state.selectedNode = nodeData;
   };
-  
-  GraphCreator.prototype.removeSelectFromNode = function(){
-    var thisGraph = this;
-    thisGraph.circles.filter(function(cd){
+
+  GraphCreator.prototype.removeSelectFromNode = function() {
+    const thisGraph = this;
+    thisGraph.circles.filter(function(cd) {
       return cd.id === thisGraph.state.selectedNode.id;
     }).classed(thisGraph.consts.selectedClass, false);
     thisGraph.state.selectedNode = null;
   };
 
-  GraphCreator.prototype.removeSelectFromEdge = function(){
-    var thisGraph = this;
-    thisGraph.paths.filter(function(cd){
+  GraphCreator.prototype.removeSelectFromEdge = function() {
+    const thisGraph = this;
+    thisGraph.paths.filter(function(cd) {
       return cd === thisGraph.state.selectedEdge;
     }).classed(thisGraph.consts.selectedClass, false);
     thisGraph.state.selectedEdge = null;
   };
 
-  GraphCreator.prototype.pathMouseDown = function(d3path, d){
-    var thisGraph = this,
-        state = thisGraph.state;
+  GraphCreator.prototype.pathMouseDown = function(d3path, d) {
+    const thisGraph = this;
+    const state = thisGraph.state;
     d3.event.stopPropagation();
     state.mouseDownLink = d;
 
-    if (state.selectedNode){
+    if (state.selectedNode) {
       thisGraph.removeSelectFromNode();
     }
-    
-    var prevEdge = state.selectedEdge;  
-    if (!prevEdge || prevEdge !== d){
+
+    const prevEdge = state.selectedEdge;
+    if (!prevEdge || prevEdge !== d) {
       thisGraph.replaceSelectEdge(d3path, d);
-    } else{
+    } else {
       thisGraph.removeSelectFromEdge();
     }
   };
 
   // mousedown on node
-  GraphCreator.prototype.circleMouseDown = function(d3node, d){
-    var thisGraph = this,
-        state = thisGraph.state;
+  GraphCreator.prototype.circleMouseDown = function(d3node, d) {
+    const thisGraph = this;
+    const state = thisGraph.state;
     d3.event.stopPropagation();
     state.mouseDownNode = d;
-    if (d3.event.shiftKey){
+    if (d3.event.shiftKey) {
       state.shiftNodeDrag = d3.event.shiftKey;
       // reposition dragged directed edge
-      thisGraph.dragLine.classed('hidden', false)
-        .attr('d', 'M' + d.x + ',' + d.y + 'L' + d.x + ',' + d.y);
-      return;
+      thisGraph.dragLine.classed("hidden", false)
+        .attr("d", "M" + d.x + "," + d.y + "L" + d.x + "," + d.y);
     }
   };
 
   /* place editable text on node in place of svg text */
-  GraphCreator.prototype.changeTextOfNode = function(d3node, d){
-    var thisGraph= this,
-        consts = thisGraph.consts,
-        htmlEl = d3node.node();
+  GraphCreator.prototype.changeTextOfNode = function(d3node, d) {
+    const thisGraph = this;
+    const consts = thisGraph.consts;
+    const htmlEl = d3node.node();
     d3node.selectAll("text").remove();
-    var nodeBCR = htmlEl.getBoundingClientRect(),
-        curScale = nodeBCR.width/consts.nodeRadius,
-        placePad  =  5*curScale,
-        useHW = curScale > 1 ? nodeBCR.width*0.71 : consts.nodeRadius*1.42;
+    const nodeBCR = htmlEl.getBoundingClientRect();
+    const curScale = nodeBCR.width / consts.nodeRadius;
+    const placePad = 5 * curScale;
+    const useHW = curScale > 1
+      ? nodeBCR.width * 0.71
+      : consts.nodeRadius * 1.42;
     // replace with editableconent text
-    var d3txt = thisGraph.svg.selectAll("foreignObject")
+    const d3txt = thisGraph.svg.selectAll("foreignObject")
       .data([d])
       .enter()
       .append("foreignObject")
-      .attr("x", nodeBCR.left + placePad )
+      .attr("x", nodeBCR.left + placePad)
       .attr("y", nodeBCR.top + placePad)
-      .attr("height", 2*useHW)
+      .attr("height", 2 * useHW)
       .attr("width", useHW)
       .append("xhtml:p")
       .attr("id", consts.activeEditId)
       .attr("contentEditable", "true")
       .text(d.title)
-      .on("mousedown", function(d){
+      .on("mousedown", function() {
         d3.event.stopPropagation();
       })
-      .on("keydown", function(d){
+      .on("keydown", function() {
         d3.event.stopPropagation();
-        if (d3.event.keyCode == consts.ENTER_KEY && !d3.event.shiftKey){
+        if (d3.event.keyCode === consts.ENTER_KEY && !d3.event.shiftKey) {
           this.blur();
         }
       })
-      .on("blur", function(d){
+      .on("blur", function(d) {
         d.title = this.textContent;
         thisGraph.insertTitleLinebreaks(d3node, d.title);
         d3.select(this.parentElement).remove();
@@ -357,30 +349,31 @@ document.onload = (function(d3, saveAs, Blob, undefined){
   };
 
   // mouseup on nodes
-  GraphCreator.prototype.circleMouseUp = function(d3node, d){
-    var thisGraph = this,
-        state = thisGraph.state,
-        consts = thisGraph.consts;
+  GraphCreator.prototype.circleMouseUp = function(d3node, d) {
+    const thisGraph = this;
+    const state = thisGraph.state;
+    const consts = thisGraph.consts;
     // reset the states
-    state.shiftNodeDrag = false;    
+    state.shiftNodeDrag = false;
     d3node.classed(consts.connectClass, false);
-    
-    var mouseDownNode = state.mouseDownNode;
-    
+
+    const mouseDownNode = state.mouseDownNode;
+
     if (!mouseDownNode) return;
 
     thisGraph.dragLine.classed("hidden", true);
 
-    if (mouseDownNode !== d){
-      // we're in a different node: create new edge for mousedown edge and add to graph
-      var newEdge = {source: mouseDownNode, target: d};
-      var filtRes = thisGraph.paths.filter(function(d){
-        if (d.source === newEdge.target && d.target === newEdge.source){
+    if (mouseDownNode !== d) {
+      // we're in a different node:
+      // create new edge for mousedown edge and add to graph
+      const newEdge = { source: mouseDownNode, target: d };
+      const filtRes = thisGraph.paths.filter(function(d) {
+        if (d.source === newEdge.target && d.target === newEdge.source) {
           thisGraph.links.splice(thisGraph.links.indexOf(d), 1);
         }
         return d.source === newEdge.source && d.target === newEdge.target;
       });
-      if (!filtRes[0].length){
+      if (!filtRes[0].length) {
         thisGraph.links.push(newEdge);
         thisGraph.updateGraph();
       }
@@ -389,57 +382,44 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       if (state.justDragged) {
         // dragged, not clicked
         state.justDragged = false;
-      } else{
+      } else {
         // clicked, not dragged
-        if (d3.event.shiftKey){
+        if (d3.event.shiftKey) {
           // shift-clicked node: edit text content
-          var d3txt = thisGraph.changeTextOfNode(d3node, d);
-          var txtNode = d3txt.node();
+          const d3txt = thisGraph.changeTextOfNode(d3node, d);
+          const txtNode = d3txt.node();
           thisGraph.selectElementContents(txtNode);
           txtNode.focus();
-        } else{
-          if (state.selectedEdge){
+        } else {
+          if (state.selectedEdge) {
             thisGraph.removeSelectFromEdge();
           }
-          var prevNode = state.selectedNode;            
-          
-          if (!prevNode || prevNode.id !== d.id){
+          const prevNode = state.selectedNode;
+
+          if (!prevNode || prevNode.id !== d.id) {
             thisGraph.replaceSelectNode(d3node, d);
-          } else{
+          } else {
             thisGraph.removeSelectFromNode();
           }
         }
       }
     }
     state.mouseDownNode = null;
-    return;
-    
   }; // end of circles mouseup
 
   // mousedown on main svg
-  GraphCreator.prototype.svgMouseDown = function(){
+  GraphCreator.prototype.svgMouseDown = function() {
     this.state.graphMouseDown = true;
   };
 
   // mouseup on main svg
-  GraphCreator.prototype.svgMouseUp = function(){
-    var thisGraph = this,
-        state = thisGraph.state;
+  GraphCreator.prototype.svgMouseUp = function() {
+    const thisGraph = this;
+    const state = thisGraph.state;
     if (state.justScaleTransGraph) {
       // dragged not clicked
       state.justScaleTransGraph = false;
-    } else if (state.graphMouseDown && d3.event.shiftKey){
-      // clicked not dragged from svg
-      var xycoords = d3.mouse(thisGraph.svgG.node());
-      thisGraph.updateGraph();
-      // make title of text immediently editable
-      var d3txt = thisGraph.changeTextOfNode(thisGraph.circles.filter(function(dval){
-        return dval.id === d.id;
-      }), d),
-          txtNode = d3txt.node();
-      thisGraph.selectElementContents(txtNode);
-      txtNode.focus();
-    } else if (state.shiftNodeDrag){
+    } else if (state.shiftNodeDrag) {
       // dragged from node
       state.shiftNodeDrag = false;
       thisGraph.dragLine.classed("hidden", true);
@@ -449,26 +429,26 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
   // keydown on main svg
   GraphCreator.prototype.svgKeyDown = function() {
-    var thisGraph = this,
-        state = thisGraph.state,
-        consts = thisGraph.consts;
+    const thisGraph = this;
+    const state = thisGraph.state;
+    const consts = thisGraph.consts;
     // make sure repeated key presses don't register for each keydown
-    if(state.lastKeyDown !== -1) return;
+    if (state.lastKeyDown !== -1) return;
 
     state.lastKeyDown = d3.event.keyCode;
-    var selectedNode = state.selectedNode,
-        selectedEdge = state.selectedEdge;
+    const selectedNode = state.selectedNode;
+    const selectedEdge = state.selectedEdge;
 
-    switch(d3.event.keyCode) {
+    switch (d3.event.keyCode) {
     case consts.BACKSPACE_KEY:
     case consts.DELETE_KEY:
       d3.event.preventDefault();
-      if (selectedNode){
+      if (selectedNode) {
         thisGraph.nodes.splice(thisGraph.nodes.indexOf(selectedNode), 1);
         thisGraph.spliceLinksForNode(selectedNode);
         state.selectedNode = null;
         thisGraph.updateGraph();
-      } else if (selectedEdge){
+      } else if (selectedEdge) {
         thisGraph.links.splice(thisGraph.links.indexOf(selectedEdge), 1);
         state.selectedEdge = null;
         thisGraph.updateGraph();
@@ -482,83 +462,87 @@ document.onload = (function(d3, saveAs, Blob, undefined){
   };
 
   // call to propagate changes to graph
-  GraphCreator.prototype.updateGraph = function(){
-    
-    var thisGraph = this;
-    var consts = thisGraph.consts;
-    var state = thisGraph.state;
-    
-    thisGraph.paths = thisGraph.paths.data(thisGraph.links, function(d){
+  GraphCreator.prototype.updateGraph = function() {
+    const thisGraph = this;
+    const consts = thisGraph.consts;
+    const state = thisGraph.state;
+
+    thisGraph.paths = thisGraph.paths.data(thisGraph.links, function(d) {
       return String(d.source.id) + "+" + String(d.target.id);
     });
-    var paths = thisGraph.paths;
+    const paths = thisGraph.paths;
     // update existing paths
 
     paths
-      //.style('marker-end', 'url(#end-arrow)')
-      .classed(consts.selectedClass, function(d){
+      // .style('marker-end', 'url(#end-arrow)')
+      .classed(consts.selectedClass, function(d) {
         return d === state.selectedEdge;
       })
-      .attr("d", function(d){
-        return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
+      .attr("d", function(d) {
+        return "M" + d.source.x + "," + d.source.y
+          + "L" + d.target.x + "," + d.target.y;
       });
 
 
     // add new paths
     paths.enter()
       .append("path")
-      //.style('marker-end','url(#end-arrow)')
+      // .style('marker-end','url(#end-arrow)')
       .classed("link", true)
-      .attr("d", function(d){
-        return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
+      .attr("d", function(d) {
+        return "M" + d.source.x + "," + d.source.y
+        + "L" + d.target.x + "," + d.target.y;
       })
-      .on("mousedown", function(d){
-        thisGraph.pathMouseDown.call(thisGraph, d3.select(this), d);
-        }
+      .on("mousedown", function(d) {
+        thisGraph.pathMouseDown(d3.select(this), d);
+      },
       )
-      .on("mouseup", function(d){
+      .on("mouseup", function() {
         state.mouseDownLink = null;
       });
 
     // remove old links
     paths.exit().remove();
-    
+
     // update existing nodes
     thisGraph.circles = thisGraph.circles.data(
       thisGraph.nodes,
-      function(d){ return d.id;}
+      function(d) {return d.id;},
     );
     thisGraph.circles.attr(
       "transform",
-      function(d){return "translate(" + d.x + "," + d.y + ")";}
+      function(d) {return "translate(" + d.x + "," + d.y + ")";},
     );
 
     // add new nodes
     const newGs = thisGraph.circles.enter()
-          .append("g");
+      .append("g");
 
     newGs.classed(consts.circleGClass, true)
-      .attr("transform", function(d){return "translate(" + d.x + "," + d.y + ")";})
-      .on("mouseover", function(d){        
-        if (state.shiftNodeDrag){
+      .attr(
+        "transform",
+        function(d) {return "translate(" + d.x + "," + d.y + ")";},
+      )
+      .on("mouseover", function() {
+        if (state.shiftNodeDrag) {
           d3.select(this).classed(consts.connectClass, true);
         }
       })
-      .on("mouseout", function(d){
+      .on("mouseout", function() {
         d3.select(this).classed(consts.connectClass, false);
       })
-      .on("mousedown", function(d){
-        thisGraph.circleMouseDown.call(thisGraph, d3.select(this), d);
+      .on("mousedown", function(d) {
+        thisGraph.circleMouseDown(d3.select(this), d);
       })
-      .on("mouseup", function(d){
-        thisGraph.circleMouseUp.call(thisGraph, d3.select(this), d);
+      .on("mouseup", function(d) {
+        thisGraph.circleMouseUp(d3.select(this), d);
       })
       .call(thisGraph.drag);
 
     newGs.append("circle")
       .attr("r", String(consts.nodeRadius));
 
-    newGs.each(function(d){
+    newGs.each(function(d) {
       thisGraph.insertTitleLinebreaks(d3.select(this), d.title);
     });
 
@@ -566,10 +550,13 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     thisGraph.circles.exit().remove();
   };
 
-  GraphCreator.prototype.zoomed = function(){
+  GraphCreator.prototype.zoomed = function() {
     this.state.justScaleTransGraph = true;
     d3.select("." + this.consts.graphClass)
-      .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+      .attr(
+        "transform",
+        "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")",
+      );
     screenPosition = {
       translateX: d3.event.translate[0],
       translateY: d3.event.translate[1],
@@ -577,44 +564,43 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     };
   };
 
-  GraphCreator.prototype.updateWindow = function(svg){
-    var docEl = document.documentElement,
-        bodyEl = document.getElementsByTagName('body')[0];
-    var x = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
-    var y = window.innerHeight|| docEl.clientHeight|| bodyEl.clientHeight;
+  GraphCreator.prototype.updateWindow = function(svg) {
+    const docEl = document.documentElement;
+    const bodyEl = document.getElementsByTagName("body")[0];
+    const x = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
+    const y = window.innerHeight || docEl.clientHeight || bodyEl.clientHeight;
     svg.attr("width", x).attr("height", y);
   };
 
 
-  
-  /**** MAIN ****/
+  /** ** MAIN ****/
 
   // warn the user when leaving
-  window.onbeforeunload = function(){
+  window.onbeforeunload = function() {
     return "Make sure to save your graph before leaving";
-  };      
+  };
 
   const docEl = document.documentElement;
-  const bodyEl = document.getElementsByTagName('body')[0];
-  
+  const bodyEl = document.getElementsByTagName("body")[0];
+
   const width = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
   const height = window.innerHeight
     || docEl.clientHeight || bodyEl.clientHeight;
 
   // initial node data
   fetch("/api/graph")
-    .then(response => response.json())
-    .then(graph => {
+    .then((response) => response.json())
+    .then((graph) => {
       const nodes = graph.nodes;
-      const links = graph.links.map(link => {
+      const links = graph.links.map((link) => {
         return {
-          source: nodes.find(node => node.id === link.id0),
-          target: nodes.find(node => node.id === link.id1),
+          source: nodes.find((node) => node.id === link.id0),
+          target: nodes.find((node) => node.id === link.id1),
         };
       });
 
-        /** MAIN SVG **/
-      var svg = d3.select("body")
+      /** MAIN SVG **/
+      const svg = d3.select("body")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
@@ -633,8 +619,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
             + graph.screenPosition.translateY
             + ") scale("
             + graph.screenPosition.scale
-            + ")"
+            + ")",
         );
     });
-
-})(window.d3, window.saveAs, window.Blob);
+})(window.d3);
