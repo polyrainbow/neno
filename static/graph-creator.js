@@ -145,7 +145,21 @@ document.onload = (function(d3, saveAs, Blob, undefined){
           "Content-Type": "application/json",
         }
       })
-        .then((response) => console.log("Graph saved!"));
+        .then((response) => {
+          return response.json();
+        })
+        .then((response) => {
+          const statusElement = document.getElementById("status");
+          if (!response.success === true){
+            statusElement.innerHTML = "ERROR SAVING GRAPH!";
+            return;
+          }
+          statusElement.innerHTML = "Graph saved!";
+          setTimeout(() => {
+            statusElement.innerHTML = "";
+          }, 2000);
+          console.log("Graph saved!");
+        });
 
       /*
       thisGraph.deleteGraph(true);

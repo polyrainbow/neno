@@ -78,21 +78,26 @@ tr[class*="active"]{
 }
 
 
-@media only screen and (min-width: 1101px) {
+@media only screen and (min-width: 1231px) {
   main {
     position: absolute;
     bottom: 0px;
     top: 100px;
   }
 
+  #editor{
+    overflow-y: auto;
+  }
+
   #list{
     overflow-y: auto;
+    padding: 0px;
   }
 }
 
 
 
-@media only screen and (max-width: 1100px) {
+@media only screen and (max-width: 1230px) {
   main {
     grid-template-columns: 1fr;
   }
