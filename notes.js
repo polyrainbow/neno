@@ -24,6 +24,14 @@ const readJSONFileInDataFolder = (filename) => {
   }
 };
 
+const writeJSONFileInDataFolder = (filename, value) => {
+  fs.writeFileSync(
+    path.join(DATA_FOLDER, filename),
+    JSON.stringify(value),
+    "utf8",
+  );
+};
+
 
 const getNewNoteId = (userId) => {
   const idFile = path.join(DATA_FOLDER, userId + ".idcounter");
@@ -144,12 +152,12 @@ const setGraph = (graph, userId) => {
   graph.nodes.forEach((node) => {
     updatePosition(node.id, node.x, node.y, userId);
   });
-  const linksFilename = path.join(DATA_FOLDER, userId + ".links.json");
-  fs.writeFileSync(linksFilename, JSON.stringify(graph.links), "utf8");
-  const configFilename = path.join(DATA_FOLDER, userId + ".config.json");
-  fs.writeFileSync(configFilename, JSON.stringify({
+  const linksFilename = userId + ".links.json";
+  writeJSONFileInDataFolder(linksFilename, graph.links);
+  const configFilename = userId + ".config.json";
+  writeJSONFileInDataFolder(configFilename, {
     screenPosition: graph.screenPosition,
-  }), "utf8");
+  });
 };
 
 
@@ -161,24 +169,20 @@ const create = (noteFromUser, userId) => {
     y: 0,
     ...noteFromUser,
   };
-  const filename = path.join(
-    DATA_FOLDER, userId + "." + noteId + NOTE_FILE_SUFFIX,
-  );
-  fs.writeFileSync(filename, JSON.stringify(note), "utf8");
+  const filename = userId + "." + noteId + NOTE_FILE_SUFFIX;
+  writeJSONFileInDataFolder(filename, note);
   return note;
 };
 
 
 const update = (updatedNote, userId) => {
-  const filename = path.join(
-    DATA_FOLDER, userId + "." + updatedNote.id + NOTE_FILE_SUFFIX,
-  );
+  const filename = userId + "." + updatedNote.id + NOTE_FILE_SUFFIX;
 
   // fix broken legacy notes without coordinates
   updatedNote.x = updatedNote.x || 0;
   updatedNote.y = updatedNote.y || 0;
 
-  fs.writeFileSync(filename, JSON.stringify(updatedNote), "utf8");
+  writeJSONFileInDataFolder(filename, updatedNote);
   return updatedNote;
 };
 
@@ -190,7 +194,7 @@ const updatePosition = (noteId, x, y, userId) => {
   note.x = x;
   note.y = y;
 
-  fs.writeFileSync(filename, JSON.stringify(note), "utf8");
+  writeJSONFileInDataFolder(filename, note);
   return note;
 };
 
