@@ -125,6 +125,9 @@ const getGraph = (userId) => {
 
   nodes.forEach((node) => {
     node.title = node.editorData && node.editorData.blocks[0].data.text;
+    // we don't need the editorData for the graph after we've taken the title
+    // from it
+    delete node.editorData;
   });
 
   const screenPosition = getGraphScreenPosition(userId);
@@ -139,7 +142,7 @@ const getGraph = (userId) => {
 
 const setGraph = (graph, userId) => {
   graph.nodes.forEach((node) => {
-    update(node, userId);
+    updatePosition(node.id, node.x, node.y, userId);
   });
   const linksFilename = path.join(DATA_FOLDER, userId + ".links.json");
   fs.writeFileSync(linksFilename, JSON.stringify(graph.links), "utf8");
@@ -177,6 +180,18 @@ const update = (updatedNote, userId) => {
 
   fs.writeFileSync(filename, JSON.stringify(updatedNote), "utf8");
   return updatedNote;
+};
+
+
+const updatePosition = (noteId, x, y, userId) => {
+  const filename = userId + "." + noteId + NOTE_FILE_SUFFIX;
+  const note = readJSONFileInDataFolder(filename);
+
+  note.x = x;
+  note.y = y;
+
+  fs.writeFileSync(filename, JSON.stringify(note), "utf8");
+  return note;
 };
 
 
