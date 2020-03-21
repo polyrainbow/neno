@@ -159,6 +159,10 @@ document.onload = (function(d3, saveAs, Blob, undefined){
             statusElement.innerHTML = "";
           }, 2000);
           console.log("Graph saved!");
+        })
+        .catch((e) => {
+          const statusElement = document.getElementById("status");
+          statusElement.innerHTML = "ERROR SAVING GRAPH!";
         });
 
       /*
