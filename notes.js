@@ -13,14 +13,13 @@ const init = (dataFolderPath) => {
 };
 
 const readJSONFileInDataFolder = (filename) => {
-  const json = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
-  let object;
   try {
-    object = JSON.parse(json);
+    const json = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
+    const object = JSON.parse(json);
     return object;
   } catch (e) {
-    console.error("Database corrupted. Could not parse file " + filename);
-    console.log("File content: " + json);
+    console.log(e);
+    console.error("Could not find or parse file " + filename);
   }
 };
 
@@ -60,6 +59,9 @@ const getLinkedNotes = (noteId, userId) => {
     })
     .map((linkedNoteId) => {
       return get(linkedNoteId, userId, false);
+    })
+    .filter((linkedNote) => {
+      return (typeof linkedNote === "object") && (linkedNote !== null);
     });
 };
 
@@ -67,6 +69,9 @@ const getLinkedNotes = (noteId, userId) => {
 const get = (noteId, userId, includeLinkedNotes) => {
   const filename = userId + "." + noteId + NOTE_FILE_SUFFIX;
   const note = readJSONFileInDataFolder(filename);
+  if (!note) {
+    return;
+  }
   if (includeLinkedNotes) {
     note.linkedNotes = getLinkedNotes(noteId, userId);
   }
@@ -107,6 +112,17 @@ const getLinks = (userId) => {
 
   return links;
 };
+
+
+const removeLinksOfNote = (noteId, userId) => {
+  let links = getLinks(userId);
+  links = links.filter((link) => {
+    return (link.id0 !== noteId) && (link.id1 !== noteId);
+  });
+  const linksFilename = userId + ".links.json";
+  writeJSONFileInDataFolder(linksFilename, links);
+};
+
 
 const getGraphScreenPosition = (userId) => {
   const configFilename = path.join(DATA_FOLDER, userId + ".config.json");
@@ -204,6 +220,7 @@ const remove = (noteId, userId) => {
     DATA_FOLDER, userId + "." + noteId + NOTE_FILE_SUFFIX,
   );
   fs.unlinkSync(filename);
+  removeLinksOfNote(noteId, userId);
   return true;
 };
 
