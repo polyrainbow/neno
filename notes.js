@@ -112,7 +112,7 @@ const getLinks = (userId) => {
 
   links = links.filter((link) => {
     const note0 = get(link.id0, userId, false);
-    const note1 = get(link.id0, userId, false);
+    const note1 = get(link.id1, userId, false);
     return (
       (typeof note0 === "object")
       && (note0 !== null)
