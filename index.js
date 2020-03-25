@@ -121,7 +121,7 @@ app.put("/api/note", function(req, res) {
 
 
 app.delete("/api/note/:noteId", function(req, res) {
-  const success = Notes.remove(req.params.noteId, req.userId);
+  const success = Notes.remove(parseInt(req.params.noteId), req.userId);
   res.end(JSON.stringify({
     success,
   }));

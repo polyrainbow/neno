@@ -57,7 +57,7 @@ const binaryArrayFindIndex = function(sortedArray, sortKeyKey, sortKeyToFind) {
     // Find the mid index
     const mid = Math.floor((start + end) / 2);
 
-    // If element is present at mid, return it
+    // If element is present at mid, return index
     if (sortedArray[mid][sortKeyKey] === sortKeyToFind) {
       return mid;
     // Else look in left or right half accordingly
