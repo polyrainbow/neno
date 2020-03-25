@@ -145,7 +145,7 @@ const setGraph = (graph, userId) => {
   graph.nodes.forEach((node) => {
     updateNotePosition(db, node.id, node.x, node.y);
   });
-  DB.set(userId);
+  DB.set(db);
 };
 
 
@@ -161,10 +161,12 @@ const put = (noteFromUser, userId) => {
   }
 
   if (note !== null) {
-    note = {
-      ...note,
-      ...noteFromUser,
-    };
+    // overwrite note from db
+    for (const key in noteFromUser) {
+      if (Object.prototype.hasOwnProperty.call(noteFromUser, key)) {
+        note[key] = noteFromUser[key];
+      }
+    }
   } else {
     const noteId = getNewNoteId(userId);
     note = {
