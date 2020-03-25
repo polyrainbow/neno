@@ -150,7 +150,6 @@ app.get("/api/link-data", (req, res) => {
         },
       };
       res.end(JSON.stringify(response));
-      console.log(metadata);
     })
     .catch((e) => {
       const response = {
