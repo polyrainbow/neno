@@ -96,7 +96,6 @@ app.get("/api/notes", function(req, res) {
   const notesList = notes.map((note) => {
     return {
       id: note.id,
-      title: note.editorData && note.editorData.blocks[0].data.text,
       time: note.time,
       numberOfLinkedNotes: note.linkedNotes.length,
     };

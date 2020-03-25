@@ -5,6 +5,7 @@ const removeButton = document.getElementById("button_remove");
 const graphButton = document.getElementById("button_graph");
 const archiveButton = document.getElementById("button_archive");
 const listContainer = document.getElementById("list");
+const linksContainer = document.getElementById("links");
 const spanActiveNoteId = document.getElementById("span_activeNoteId");
 const spanAvailableNotes = document.getElementById("span_available-notes");
 const spanLinked = document.getElementById("span_linked");
@@ -75,6 +76,7 @@ const loadNote = (noteId) => {
     spanActiveNoteId.innerHTML = "--";
     spanLinked.innerHTML = "--";
     loadEditor(null);
+    renderLinks([]);
     removeButton.disabled = true;
     return;
   }
@@ -99,12 +101,13 @@ const renderNote = (note) => {
     spanLinked.innerHTML = "--";
   }
   loadEditor(note.editorData);
+  renderLinks(note.linkedNotes);
   removeButton.disabled = false;
   refreshNotesList();
 };
 
 
-const createAndAppendNoteListItem = (note, i, parent) => {
+const createAndAppendNoteListItem = (note, i, parent, showLinksIndicator) => {
   const listItem = document.createElement("tr");
 
   if (activeNote && (note.id === activeNote.id)) {
@@ -117,14 +120,18 @@ const createAndAppendNoteListItem = (note, i, parent) => {
   tdId.style.textAlign = "right";
 
   const tdTitle = document.createElement("td");
-  tdTitle.innerHTML = note.title;
+  tdTitle.className = "title";
+  tdTitle.innerHTML
+    = note.title || (note.editorData && note.editorData.blocks[0].data.text);
   listItem.appendChild(tdTitle);
 
-  const tdLinkedNotesIndicator = document.createElement("td");
-  tdLinkedNotesIndicator.innerHTML = note.numberOfLinkedNotes > 0
-    ? "<span title=\"Linked\">🔵</span>"
-    : "<span title=\"Not linked\">🔴</span>";
-  listItem.appendChild(tdLinkedNotesIndicator);
+  if (showLinksIndicator) {
+    const tdLinkedNotesIndicator = document.createElement("td");
+    tdLinkedNotesIndicator.innerHTML = note.numberOfLinkedNotes > 0
+      ? "<span title=\"Linked\">🔵</span>"
+      : "<span title=\"Not linked\">🔴</span>";
+    listItem.appendChild(tdLinkedNotesIndicator);
+  }
 
   const tdTime = document.createElement("td");
   tdTime.innerHTML = new Date(note.time).toLocaleString();
@@ -137,6 +144,17 @@ const createAndAppendNoteListItem = (note, i, parent) => {
 };
 
 
+const renderLinks = (links) => {
+  linksContainer.innerHTML = "<h2>Links</h2>";
+  const table = document.createElement("table");
+  table.id = "links-table";
+  linksContainer.appendChild(table);
+  links.forEach((link, i) => {
+    createAndAppendNoteListItem(link, i + 1, table, false);
+  });
+};
+
+
 const createNotesList = (notes) => {
   spanAvailableNotes.innerHTML = notes.length;
 
@@ -144,7 +162,9 @@ const createNotesList = (notes) => {
   const table = document.createElement("table");
   table.id = "list";
   listContainer.appendChild(table);
-  notes.forEach((note, i) => createAndAppendNoteListItem(note, i + 1, table));
+  notes.forEach((note, i) => {
+    createAndAppendNoteListItem(note, i + 1, table, true);
+  });
 };
 
 

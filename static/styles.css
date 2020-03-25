@@ -25,7 +25,7 @@ main {
   display: grid;
 }
 
-#editor{
+#note{
   min-height: 511.547px;
   padding: 0px 10px;
 }
@@ -57,6 +57,10 @@ button[disabled]{
 
 table {
   border-collapse: collapse;
+  width: 100%;
+}
+
+td.title {
   width: 100%;
 }
 
@@ -92,7 +96,7 @@ tr[class*="active"]{
     width: 100%;
   }
 
-  #editor{
+  #note{
     overflow-y: auto;
     min-width: 720px;
     grid-area: 1 / 2 / 2 / 3;
@@ -112,7 +116,7 @@ tr[class*="active"]{
     grid-template-columns: 1fr;
   }
 
-  #editor{
+  #note{
     grid-area: 1 / 1 / 2 / 2;
   }
 
