@@ -21,7 +21,7 @@ const updateNotePosition = (db, noteId, x, y) => {
 
 
 const getNewNoteId = (db) => {
-  db.idCounter = db.idCounter++;
+  db.idCounter = db.idCounter + 1;
   return db.idCounter;
 };
 
@@ -94,11 +94,14 @@ const init = (dataFolderPath) => {
     // remove invalid links
     cleanUpLinks(db);
 
+    const ids = [];
+
     // assign id to id-less notes
     db.notes.forEach((note) => {
-      if (typeof note.id !== "number") {
+      if (typeof note.id !== "number" || ids.includes(note.id)) {
         note.id = getNewNoteId(db);
       }
+      ids.push(note.id);
     });
   });
 };
