@@ -32,9 +32,7 @@ const getLinkedNotes = (db, noteId) => {
       return (link.id0 === noteId) || (link.id1 === noteId);
     })
     .map((link) => {
-      return (link.id0 === noteId) ? link.id1 : link.id0;
-    })
-    .map((linkedNoteId) => {
+      const linkedNoteId = (link.id0 === noteId) ? link.id1 : link.id0;
       return findNote(db, linkedNoteId);
     })
     .filter((linkedNote) => {
@@ -72,6 +70,8 @@ const removeLinksOfNote = (db, noteId) => {
 
 
 const init = (dataFolderPath) => {
+  console.log("Initializing notes module...");
+
   const newDBTemplate = {
     id: null,
     notes: [],
@@ -88,6 +88,9 @@ const init = (dataFolderPath) => {
     dataFolderPath,
     newDBTemplate,
   });
+
+  console.log("Cleaning data...");
+  DB.forEach(cleanUpLinks);
 };
 
 

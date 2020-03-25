@@ -35,6 +35,7 @@ const writeJSONFileInDataFolder = (filename, value) => {
 **/
 
 const init = (config) => {
+  console.log("Initializing DB module...");
   DATA_FOLDER = config.dataFolderPath;
   newDBTemplate = config.newDBTemplate;
   mkdirp(DATA_FOLDER);
@@ -63,8 +64,23 @@ const set = (db) => {
   writeJSONFileInDataFolder(db.id + DB_FILE_SUFFIX);
 };
 
+
+const forEach = (handler) => {
+  return fs.readdirSync(DATA_FOLDER)
+    .filter((filename) => {
+      return filename.endsWith(DB_FILE_SUFFIX);
+    })
+    .forEach((filename) => {
+      const id = filename.substr(0, filename.indexOf(DB_FILE_SUFFIX));
+      const db = get(id);
+      handler(db);
+      set(db);
+    });
+};
+
 export {
   init,
   get,
   set,
+  forEach,
 };
