@@ -101,7 +101,7 @@ const renderNote = (note) => {
     spanLinked.innerHTML = "--";
   }
   loadEditor(note.editorData);
-  renderLinks(note.linkedNotes);
+  renderLinks(note.linkedNotes || []);
   removeButton.disabled = false;
   refreshNotesList();
 };
