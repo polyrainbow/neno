@@ -55,14 +55,14 @@ const get = (id) => {
 
   const newDB = cloneObject(newDBTemplate);
   newDB.id = id;
-  writeJSONFileInDataFolder(id + DB_FILE_SUFFIX);
+  writeJSONFileInDataFolder(id + DB_FILE_SUFFIX, newDB);
   return newDB;
 };
 
 
 const set = (db) => {
   db.timestamp = Date.now();
-  writeJSONFileInDataFolder(db.id + DB_FILE_SUFFIX);
+  writeJSONFileInDataFolder(db.id + DB_FILE_SUFFIX, db);
 };
 
 
@@ -79,7 +79,7 @@ const forEach = (handler) => {
     });
 };
 
-export {
+module.exports = {
   init,
   get,
   set,

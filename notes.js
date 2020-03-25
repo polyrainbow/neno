@@ -1,5 +1,5 @@
 const DB = require("./database.js");
-const Utils = require("./utils.js").binaryArrayFind;
+const Utils = require("./utils.js");
 
 /**
   PRIVATE
