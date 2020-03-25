@@ -1,5 +1,75 @@
 const DB = require("./database.js");
-const binaryArrayFind = require("./utils.js").binaryArrayFind;
+const Utils = require("./utils.js").binaryArrayFind;
+
+/**
+  PRIVATE
+  These private methods manipulate a db object that is passed to them as
+  argument.
+*/
+
+const findNote = (db, noteId) => {
+  return Utils.binaryArrayFind(db.notes, "id", noteId);
+};
+
+
+const updateNotePosition = (db, noteId, x, y) => {
+  const note = findNote(db, noteId);
+  note.x = x;
+  note.y = y;
+  return true;
+};
+
+
+const getNewNoteId = (db) => {
+  db.idCounter = db.idCounter++;
+  return db.idCounter;
+};
+
+
+const getLinkedNotes = (db, noteId) => {
+  return db.links
+    .filter((link) => {
+      return (link.id0 === noteId) || (link.id1 === noteId);
+    })
+    .map((link) => {
+      return (link.id0 === noteId) ? link.id1 : link.id0;
+    })
+    .map((linkedNoteId) => {
+      return findNote(db, linkedNoteId);
+    })
+    .filter((linkedNote) => {
+      return (typeof linkedNote === "object") && (linkedNote !== null);
+    });
+};
+
+
+const cleanUpLinks = (db) => {
+  db.links = db.links.filter((link) => {
+    const note0 = findNote(db, link.id0);
+    const note1 = findNote(db, link.id1);
+    return (
+      (typeof note0 === "object")
+      && (note0 !== null)
+      && (typeof note1 === "object")
+      && (note1 !== null)
+    );
+  });
+  return true;
+};
+
+
+const removeLinksOfNote = (db, noteId) => {
+  db.links = db.links.filter((link) => {
+    return (link.id0 !== noteId) && (link.id1 !== noteId);
+  });
+  return true;
+};
+
+
+/**
+  EXPORTS
+**/
+
 
 const init = (dataFolderPath) => {
   const newDBTemplate = {
@@ -21,43 +91,17 @@ const init = (dataFolderPath) => {
 };
 
 
-const getNewNoteId = (userId) => {
-  const db = DB.get(userId);
-  db.idCounter = db.idCounter++ || 0;
-  db.update(userId, db);
-  return db.idCounter;
-};
-
-
-const getLinkedNotes = (noteId, userId) => {
-  const db = DB.get(userId);
-
-  return db.links
-    .filter((link) => {
-      return (link.id0 === noteId) || (link.id1 === noteId);
-    })
-    .map((link) => {
-      return (link.id0 === noteId) ? link.id1 : link.id0;
-    })
-    .map((linkedNoteId) => {
-      return get(linkedNoteId, userId, false);
-    })
-    .filter((linkedNote) => {
-      return (typeof linkedNote === "object") && (linkedNote !== null);
-    });
-};
-
-
 const get = (noteId, userId, includeLinkedNotes) => {
   const db = DB.get(userId);
-  binaryArrayFind();
-  const note = db.notes.find((note) => note.id === noteId);
+  let note = findNote(db, noteId);
   if (!note) {
     return null;
   }
   if (includeLinkedNotes) {
-    note.linkedNotes = getLinkedNotes(noteId, userId);
+    note = Utils.cloneObject(note);
+    note.linkedNotes = getLinkedNotes(db, noteId);
   }
+
   return note;
 };
 
@@ -67,44 +111,10 @@ const getAll = (userId, includeLinkedNotes) => {
   return db.notes
     .map((note) => {
       if (includeLinkedNotes) {
-        note.linkedNotes = getLinkedNotes(note.id, userId);
+        note.linkedNotes = getLinkedNotes(db, note.id);
       }
       return note;
     });
-};
-
-
-const getLinks = (userId) => {
-  const db = DB.get(userId);
-  let links = db.links;
-
-  links = links.filter((link) => {
-    const note0 = get(link.id0, userId, false);
-    const note1 = get(link.id1, userId, false);
-    return (
-      (typeof note0 === "object")
-      && (note0 !== null)
-      && (typeof note1 === "object")
-      && (note1 !== null)
-    );
-  });
-
-  return links;
-};
-
-
-const removeLinksOfNote = (noteId, userId) => {
-  const db = DB.get(userId);
-  db.links = db.links.filter((link) => {
-    return (link.id0 !== noteId) && (link.id1 !== noteId);
-  });
-  DB.set(db);
-};
-
-
-const getGraphScreenPosition = (userId) => {
-  const db = DB.get(userId);
-  return db.screenPosition;
 };
 
 
@@ -130,14 +140,9 @@ const getGraph = (userId) => {
 const setGraph = (graph, userId) => {
   const db = DB.get(userId);
   graph.nodes.forEach((node) => {
-    updatePosition(node.id, node.x, node.y, userId);
+    updateNotePosition(db, node.id, node.x, node.y);
   });
-  const linksFilename = userId + ".links.json";
-  writeJSONFileInDataFolder(linksFilename, graph.links);
-  const configFilename = userId + ".config.json";
-  writeJSONFileInDataFolder(configFilename, {
-    screenPosition: graph.screenPosition,
-  });
+  DB.set(userId);
 };
 
 
@@ -149,7 +154,7 @@ const put = (noteFromUser, userId) => {
   if (
     typeof noteFromUser.id === "number"
   ) {
-    note = db.notes.find((note) => note.id === noteFromUser.id);
+    note = findNote(db, noteFromUser.id);
   }
 
   if (note !== null) {
@@ -173,26 +178,15 @@ const put = (noteFromUser, userId) => {
 };
 
 
-const updatePosition = (noteId, x, y, userId) => {
-  const filename = userId + "." + noteId + NOTE_FILE_SUFFIX;
-  const note = readJSONFileInDataFolder(filename);
-
-  note.x = x;
-  note.y = y;
-
-  writeJSONFileInDataFolder(filename, note);
-  return note;
-};
-
-
 const remove = (noteId, userId) => {
-  const filename = path.join(
-    DATA_FOLDER, userId + "." + noteId + NOTE_FILE_SUFFIX,
-  );
-  fs.unlinkSync(filename);
-  removeLinksOfNote(noteId, userId);
+  const db = DB.get(userId);
+  const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
+  db.notes.splice(noteIndex, 1);
+  removeLinksOfNote(db, noteId);
+  DB.set(db);
   return true;
 };
+
 
 const exportDB = (userId) => {
   return DB.get(userId);
@@ -200,7 +194,7 @@ const exportDB = (userId) => {
 
 
 const importDB = (db) => {
-  // TO DO
+  return DB.set(db);
 };
 
 

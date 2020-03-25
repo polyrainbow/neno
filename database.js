@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const mkdirp = require("mkdirp");
+const cloneObject = require("./utils.js").cloneObject;
 
 const DB_FILE_SUFFIX = ".db.json";
 let DATA_FOLDER = null;
@@ -29,9 +30,9 @@ const writeJSONFileInDataFolder = (filename, value) => {
 };
 
 
-/******
+/**
   EXPORTS
-*/
+**/
 
 const init = (config) => {
   DATA_FOLDER = config.dataFolderPath;
