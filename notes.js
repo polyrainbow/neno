@@ -145,6 +145,8 @@ const setGraph = (graph, userId) => {
   graph.nodes.forEach((node) => {
     updateNotePosition(db, node.id, node.x, node.y);
   });
+  db.links = graph.links;
+  db.screenPosition = graph.screenPosition;
   DB.set(db);
 };
 
