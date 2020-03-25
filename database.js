@@ -63,6 +63,7 @@ const get = (id) => {
 const set = (db) => {
   db.timestamp = Date.now();
   writeJSONFileInDataFolder(db.id + DB_FILE_SUFFIX, db);
+  return true;
 };
 
 
