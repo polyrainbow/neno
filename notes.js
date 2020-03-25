@@ -1,5 +1,5 @@
 const DB = require("./database.js");
-
+const binaryArrayFind = require("./utils.js").binaryArrayFind;
 
 const init = (dataFolderPath) => {
   const newDBTemplate = {

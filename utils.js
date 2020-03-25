@@ -13,7 +13,6 @@ const getKeySortFunction = function(key, doCaseInsensitiveSort) {
 };
 
 
-
 /*
   @function binaryArrayFind:
     This function performs a binary search in an array of objects that is
@@ -27,12 +26,11 @@ const getKeySortFunction = function(key, doCaseInsensitiveSort) {
   @param sortKeyKey:
     The sort key we want to find.
 */
-const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind){
+const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind) {
   let start = 0;
   let end = sortedArray.length - 1;
 
-  while (start <= end){
-
+  while (start <= end) {
     // Find the mid index
     const mid = Math.floor((start + end) / 2);
 
@@ -40,7 +38,7 @@ const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind){
     if (sortedArray[mid][sortKeyKey] === sortKeyToFind) {
       return sortedArray[mid];
     // Else look in left or right half accordingly
-    } else if (sortedArray[mid][sortKeyKey] < sortKeyToFind){
+    } else if (sortedArray[mid][sortKeyKey] < sortKeyToFind) {
       start = mid + 1;
     } else {
       end = mid - 1;
@@ -61,12 +59,11 @@ const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind){
   @param valueToLookFor:
     The value we want to find.
 */
-const binaryArrayIncludes = function(sortedArray, valueToLookFor){
+const binaryArrayIncludes = function(sortedArray, valueToLookFor) {
   let start = 0;
   let end = sortedArray.length - 1;
 
-  while (start <= end){
-
+  while (start <= end) {
     // Find the mid index
     const mid = Math.floor((start + end) / 2);
 
@@ -74,7 +71,7 @@ const binaryArrayIncludes = function(sortedArray, valueToLookFor){
     if (sortedArray[mid] === valueToLookFor) {
       return true;
     // Else look in left or right half accordingly
-    } else if (sortedArray[mid] < valueToLookFor){
+    } else if (sortedArray[mid] < valueToLookFor) {
       start = mid + 1;
     } else {
       end = mid - 1;
@@ -88,7 +85,7 @@ const binaryArrayIncludes = function(sortedArray, valueToLookFor){
 const cloneObject = function(obj) {
   let clone = {};
 
-  if (Array.isArray(obj)){
+  if (Array.isArray(obj)) {
     clone = [];
   }
 
