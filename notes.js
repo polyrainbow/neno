@@ -123,17 +123,17 @@ const getAll = (userId, includeLinkedNotes) => {
 
 const getGraph = (userId) => {
   const db = DB.get(userId);
-  const nodes = db.nodes;
+  const notes = Utils.cloneObject(db.notes);
 
-  nodes.forEach((node) => {
-    node.title = node.editorData && node.editorData.blocks[0].data.text;
+  notes.forEach((note) => {
+    note.title = note.editorData && note.editorData.blocks[0].data.text;
     // we don't need the editorData for the graph after we've taken the title
     // from it
-    delete node.editorData;
+    delete note.editorData;
   });
 
   return {
-    nodes,
+    nodes: notes,
     links: db.links,
     screenPosition: db.screenPosition,
   };
