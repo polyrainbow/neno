@@ -154,7 +154,7 @@ const setGraph = (graph, userId) => {
 const put = (noteFromUser, userId) => {
   const db = DB.get(userId);
 
-  let note;
+  let note = null;
 
   if (
     typeof noteFromUser.id === "number"
