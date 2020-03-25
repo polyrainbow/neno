@@ -170,7 +170,7 @@ const put = (noteFromUser, userId) => {
       }
     }
   } else {
-    const noteId = getNewNoteId(userId);
+    const noteId = getNewNoteId(db);
     note = {
       id: noteId,
       x: 0,
