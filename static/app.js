@@ -108,7 +108,10 @@ const renderNote = (note) => {
 
 
 const createAndAppendNoteListItem = (note, i, parent, showLinksIndicator) => {
+  const isHub = note.numberOfLinkedNotes >= 5;
+
   const listItem = document.createElement("tr");
+  isHub && listItem.classList.add("hub");
 
   if (activeNote && (note.id === activeNote.id)) {
     listItem.classList.add("active");
@@ -127,8 +130,11 @@ const createAndAppendNoteListItem = (note, i, parent, showLinksIndicator) => {
 
   if (showLinksIndicator) {
     const tdLinkedNotesIndicator = document.createElement("td");
+    tdId.className = "linkedNotesIndicator";
     tdLinkedNotesIndicator.innerHTML = note.numberOfLinkedNotes > 0
-      ? "<span title=\"Linked\">🔵</span>"
+      ? `<span title="${note.numberOfLinkedNotes} Links">
+        ${note.numberOfLinkedNotes}
+      </span>`
       : "<span title=\"Not linked\">🔴</span>";
     listItem.appendChild(tdLinkedNotesIndicator);
   }

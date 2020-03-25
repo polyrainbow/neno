@@ -2,7 +2,7 @@ body {
   margin: 0;
 }
 
-header, #controls, #list{
+header, #controls, #list, #links{
   font-family: sans-serif;
 }
 
@@ -58,6 +58,10 @@ button[disabled]{
 table {
   border-collapse: collapse;
   width: 100%;
+}
+
+tr.hub{
+  background: chartreuse;
 }
 
 td.title {
