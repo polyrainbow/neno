@@ -4,12 +4,8 @@ const mkdirp = require("mkdirp");
 
 const DB_FILE_SUFFIX = ".db.json";
 let DATA_FOLDER = null;
+let newDBTemplate = null;
 const loadedDBs = [];
-
-const init = (dataFolderPath) => {
-  DATA_FOLDER = dataFolderPath;
-  mkdirp(DATA_FOLDER);
-};
 
 
 const readJSONFileInDataFolder = (filename) => {
@@ -33,6 +29,17 @@ const writeJSONFileInDataFolder = (filename, value) => {
 };
 
 
+/******
+  EXPORTS
+*/
+
+const init = (config) => {
+  DATA_FOLDER = config.dataFolderPath;
+  newDBTemplate = config.newDBTemplate;
+  mkdirp(DATA_FOLDER);
+};
+
+
 const get = (id) => {
   const dbFromLoadedDBs = loadedDBs.find((db) => db.id === id);
   if (dbFromLoadedDBs) {
@@ -44,18 +51,8 @@ const get = (id) => {
     return dbFromFile;
   }
 
-  const newDB = {
-    id,
-    notes: [],
-    links: [],
-    idCounter: 0,
-    screenPosition: {
-      translateX: 0,
-      translateY: 0,
-      scale: 1,
-    },
-  };
-
+  const newDB = cloneObject(newDBTemplate);
+  newDB.id = id;
   writeJSONFileInDataFolder(id + DB_FILE_SUFFIX);
   return newDB;
 };

@@ -2,7 +2,22 @@ const DB = require("./database.js");
 
 
 const init = (dataFolderPath) => {
-  DB.init(dataFolderPath);
+  const newDBTemplate = {
+    id: null,
+    notes: [],
+    links: [],
+    idCounter: 0,
+    screenPosition: {
+      translateX: 0,
+      translateY: 0,
+      scale: 1,
+    },
+  };
+
+  DB.init({
+    dataFolderPath,
+    newDBTemplate,
+  });
 };
 
 
