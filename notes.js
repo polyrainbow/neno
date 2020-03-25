@@ -90,7 +90,17 @@ const init = (dataFolderPath) => {
   });
 
   console.log("Cleaning data...");
-  DB.forEach(cleanUpLinks);
+  DB.forEach((db) => {
+    // remove invalid links
+    cleanUpLinks(db);
+
+    // assign id to id-less notes
+    db.notes.forEach((note) => {
+      if (typeof note.id !== "number") {
+        note.id = getNewNoteId(db);
+      }
+    });
+  });
 };
 
 
