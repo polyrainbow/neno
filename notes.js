@@ -1,56 +1,23 @@
-const fs = require("fs");
-const path = require("path");
-const mkdirp = require("mkdirp");
-const getKeySortFunction = require("./utils.js").getKeySortFunction;
-
-const NOTE_FILE_SUFFIX = ".note.json";
-let DATA_FOLDER = null;
+const DB = require("./database.js");
 
 
 const init = (dataFolderPath) => {
-  DATA_FOLDER = dataFolderPath;
-  mkdirp(DATA_FOLDER);
-};
-
-const readJSONFileInDataFolder = (filename) => {
-  try {
-    const json = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
-    const object = JSON.parse(json);
-    return object;
-  } catch (e) {
-    console.log(e);
-    console.error("Could not find or parse file " + filename);
-  }
-};
-
-const writeJSONFileInDataFolder = (filename, value) => {
-  fs.writeFileSync(
-    path.join(DATA_FOLDER, filename),
-    JSON.stringify(value),
-    "utf8",
-  );
+  DB.init(dataFolderPath);
 };
 
 
 const getNewNoteId = (userId) => {
-  const idFile = path.join(DATA_FOLDER, userId + ".idcounter");
-
-  if (fs.existsSync(idFile)) {
-    const idString = fs.readFileSync(idFile);
-    let id = parseInt(idString);
-    id++;
-    fs.writeFileSync(idFile, id.toString(), "utf8");
-    return id;
-  } else {
-    const id = 0;
-    fs.writeFileSync(idFile, id.toString(), "utf8");
-    return id;
-  }
+  const db = DB.get(userId);
+  db.idCounter = db.idCounter++ || 0;
+  db.update(userId, db);
+  return db.idCounter;
 };
 
 
 const getLinkedNotes = (noteId, userId) => {
-  return getLinks(userId)
+  const db = DB.get(userId);
+
+  return db.links
     .filter((link) => {
       return (link.id0 === noteId) || (link.id1 === noteId);
     })
@@ -67,10 +34,11 @@ const getLinkedNotes = (noteId, userId) => {
 
 
 const get = (noteId, userId, includeLinkedNotes) => {
-  const filename = userId + "." + noteId + NOTE_FILE_SUFFIX;
-  const note = readJSONFileInDataFolder(filename);
+  const db = DB.get(userId);
+  binaryArrayFind();
+  const note = db.notes.find((note) => note.id === noteId);
   if (!note) {
-    return;
+    return null;
   }
   if (includeLinkedNotes) {
     note.linkedNotes = getLinkedNotes(noteId, userId);
@@ -80,35 +48,20 @@ const get = (noteId, userId, includeLinkedNotes) => {
 
 
 const getAll = (userId, includeLinkedNotes) => {
-  return fs.readdirSync(DATA_FOLDER)
-    .filter((filename) => {
-      return (
-        filename.startsWith(userId + ".")
-        && filename.endsWith(NOTE_FILE_SUFFIX)
-      );
-    })
-    .map((filename) => {
-      const note = readJSONFileInDataFolder(filename);
+  const db = DB.get(userId);
+  return db.notes
+    .map((note) => {
       if (includeLinkedNotes) {
         note.linkedNotes = getLinkedNotes(note.id, userId);
       }
       return note;
-    })
-    .sort(getKeySortFunction("id"));
+    });
 };
 
 
 const getLinks = (userId) => {
-  const linksFilename = path.join(DATA_FOLDER, userId + ".links.json");
-
-  let links;
-  if (fs.existsSync(linksFilename)) {
-    links = JSON.parse(
-      fs.readFileSync(linksFilename, "utf8"),
-    );
-  } else {
-    links = [];
-  }
+  const db = DB.get(userId);
+  let links = db.links;
 
   links = links.filter((link) => {
     const note0 = get(link.id0, userId, false);
@@ -126,37 +79,23 @@ const getLinks = (userId) => {
 
 
 const removeLinksOfNote = (noteId, userId) => {
-  let links = getLinks(userId);
-  links = links.filter((link) => {
+  const db = DB.get(userId);
+  db.links = db.links.filter((link) => {
     return (link.id0 !== noteId) && (link.id1 !== noteId);
   });
-  const linksFilename = userId + ".links.json";
-  writeJSONFileInDataFolder(linksFilename, links);
+  DB.set(db);
 };
 
 
 const getGraphScreenPosition = (userId) => {
-  const configFilename = path.join(DATA_FOLDER, userId + ".config.json");
-  let screenPosition;
-  if (fs.existsSync(configFilename)) {
-    screenPosition = JSON.parse(
-      fs.readFileSync(configFilename, "utf8"),
-    ).screenPosition;
-  } else {
-    screenPosition = {
-      translateX: 0,
-      translateY: 0,
-      scale: 1,
-    };
-  }
-
-  return screenPosition;
+  const db = DB.get(userId);
+  return db.screenPosition;
 };
 
 
 const getGraph = (userId) => {
-  const nodes = getAll(userId);
-  const links = getLinks(userId);
+  const db = DB.get(userId);
+  const nodes = db.nodes;
 
   nodes.forEach((node) => {
     node.title = node.editorData && node.editorData.blocks[0].data.text;
@@ -165,17 +104,16 @@ const getGraph = (userId) => {
     delete node.editorData;
   });
 
-  const screenPosition = getGraphScreenPosition(userId);
-
   return {
     nodes,
-    links,
-    screenPosition,
+    links: db.links,
+    screenPosition: db.screenPosition,
   };
 };
 
 
 const setGraph = (graph, userId) => {
+  const db = DB.get(userId);
   graph.nodes.forEach((node) => {
     updatePosition(node.id, node.x, node.y, userId);
   });
@@ -188,29 +126,35 @@ const setGraph = (graph, userId) => {
 };
 
 
-const create = (noteFromUser, userId) => {
-  const noteId = getNewNoteId(userId);
-  const note = {
-    id: noteId,
-    x: 0,
-    y: 0,
-    ...noteFromUser,
-  };
-  const filename = userId + "." + noteId + NOTE_FILE_SUFFIX;
-  writeJSONFileInDataFolder(filename, note);
+const put = (noteFromUser, userId) => {
+  const db = DB.get(userId);
+
+  let note;
+
+  if (
+    typeof noteFromUser.id === "number"
+  ) {
+    note = db.notes.find((note) => note.id === noteFromUser.id);
+  }
+
+  if (note !== null) {
+    note = {
+      ...note,
+      ...noteFromUser,
+    };
+  } else {
+    const noteId = getNewNoteId(userId);
+    note = {
+      id: noteId,
+      x: 0,
+      y: 0,
+      ...noteFromUser,
+    };
+    db.notes.push(note);
+  }
+
+  DB.set(db);
   return note;
-};
-
-
-const update = (updatedNote, userId) => {
-  const filename = userId + "." + updatedNote.id + NOTE_FILE_SUFFIX;
-
-  // fix broken legacy notes without coordinates
-  updatedNote.x = updatedNote.x || 0;
-  updatedNote.y = updatedNote.y || 0;
-
-  writeJSONFileInDataFolder(filename, updatedNote);
-  return updatedNote;
 };
 
 
@@ -236,22 +180,11 @@ const remove = (noteId, userId) => {
 };
 
 const exportDB = (userId) => {
-  const notes = getAll(userId, false);
-  const links = getLinks(userId);
-  const idCounter = getNewNoteId(userId);
-  const screenPosition = getGraphScreenPosition(userId);
-
-  return {
-    notes,
-    links,
-    idCounter,
-    screenPosition,
-    timestamp: new Date(),
-  };
+  return DB.get(userId);
 };
 
 
-const importDB = () => {
+const importDB = (db) => {
   // TO DO
 };
 
@@ -262,8 +195,7 @@ module.exports = {
   getAll,
   getGraph,
   setGraph,
-  create,
-  update,
+  put,
   remove,
   exportDB,
   importDB,

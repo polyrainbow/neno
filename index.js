@@ -113,19 +113,11 @@ app.get("/api/note/:noteId", function(req, res) {
 
 app.put("/api/note", function(req, res) {
   const note = req.body;
-  if (typeof note.id === "number") {
-    const updatedNote = Notes.update(note, req.userId);
-    res.end(JSON.stringify({
-      note: updatedNote,
-      success: true,
-    }));
-  } else {
-    const noteFromDB = Notes.create(note, req.userId);
-    res.end(JSON.stringify({
-      note: noteFromDB,
-      success: true,
-    }));
-  }
+  const noteFromDB = Notes.put(note, req.userId);
+  res.end(JSON.stringify({
+    note: noteFromDB,
+    success: true,
+  }));
 });
 
 
