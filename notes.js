@@ -188,6 +188,9 @@ const put = (noteFromUser, userId) => {
 const remove = (noteId, userId) => {
   const db = DB.get(userId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
+  if (noteIndex === null) {
+    return false;
+  }
   db.notes.splice(noteIndex, 1);
   removeLinksOfNote(db, noteId);
   DB.set(db);
