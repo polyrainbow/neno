@@ -1,3 +1,5 @@
+import * as Utils from "./utils.js";
+
 const editorContainer = document.getElementById("editor");
 const newButton = document.getElementById("button_new");
 const uploadButton = document.getElementById("button_upload");
@@ -140,7 +142,7 @@ const createAndAppendNoteListItem = (note, i, parent, showLinksIndicator) => {
   }
 
   const tdTime = document.createElement("td");
-  tdTime.innerHTML = new Date(note.time).toLocaleString();
+  tdTime.innerHTML = Utils.yyyymmdd(new Date(note.time));
   listItem.appendChild(tdTime);
 
   parent.appendChild(listItem);

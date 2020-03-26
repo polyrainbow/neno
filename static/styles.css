@@ -61,16 +61,12 @@ table {
 }
 
 tr.hub{
-  background: chartreuse;
-}
-
-td.title {
-  width: 100%;
+  font-weight: bold;
 }
 
 th, td {
   text-align: left;
-  padding: 8px;
+  padding: 5px;
 }
 
 td {
