@@ -277,8 +277,9 @@ const archiveDatabase = () => {
       const blob = new Blob([text], {
         type: "application/json",
       });
+      const dateSuffix = Utils.yyyymmdd(new Date());
       // eslint-disable-next-line no-undef
-      saveAs(blob, `archive-${new Date()}.json`);
+      saveAs(blob, `neno-${dateSuffix}.db.json`);
       return text;
     })
     .catch((error) => {
