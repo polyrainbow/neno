@@ -6,6 +6,12 @@ const urlMetadata = require("url-metadata");
 
 let PORT = 8080;
 
+// passwords and usernames must not contain colons
+const users = [
+  { id: "sebastian", login: "sebastian", password: "9575" },
+  { id: "sophia", login: "sophia", password: "kuss" },
+];
+
 const customPortArgument = process.argv.find((arg) => {
   return arg.startsWith("port=");
 });
@@ -22,11 +28,6 @@ Notes.init(
 app.use((req, res, next) => {
   // -----------------------------------------------------------------------
   // authentication middleware
-
-  const users = [
-    { id: "sebastian", login: "sebastian", password: "9575" },
-    { id: "sophia", login: "sophia", password: ":-*" },
-  ];
 
   // parse login and password from headers
   const b64auth = (req.headers.authorization || "").split(" ")[1] || "";
