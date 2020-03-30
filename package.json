@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "express": "^4.17.1",
+    "formidable": "^1.2.2",
     "mkdirp": "^1.0.3",
     "url-metadata": "^2.4.0"
   },

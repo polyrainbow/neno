@@ -67,6 +67,16 @@ const loadEditor = (data) => {
           endpoint: "/api/link-data",
         },
       },
+      image: {
+        // eslint-disable-next-line no-undef
+        class: ImageTool,
+        config: {
+          endpoints: {
+            byFile: "/api/image", // Your backend file uploader endpoint
+            byUrl: "/api/image-by-url", // endpoint providing uploading by Url
+          },
+        },
+      },
     },
   });
 };

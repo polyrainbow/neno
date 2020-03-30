@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const Notes = require("./notes.js");
 const urlMetadata = require("url-metadata");
+const formidable = require("formidable");
 
 let PORT = 8080;
 
@@ -160,3 +161,25 @@ app.get("/api/link-data", (req, res) => {
       res.end(JSON.stringify(response));
     });
 });
+
+app.post("/api/image", function(req, res) {
+  const form = new formidable.IncomingForm();
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      console.log(err);
+      res.end(err);
+      return;
+    }
+
+    const oldpath = files.filetoupload.path;
+    const newpath = FILEPATH + filename;
+    fs.renameSync(oldpath, newpath);
+
+    res.end(JSON.stringify(
+      {
+        success: true,
+      },
+    ));
+  });
+});
+
