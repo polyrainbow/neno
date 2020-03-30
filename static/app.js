@@ -121,6 +121,7 @@ const createAndAppendNoteListItem = (note, i, parent, showLinksIndicator) => {
 
   const tdId = document.createElement("td");
   tdId.innerHTML = i;
+  tdId.className = "index";
   listItem.appendChild(tdId);
   tdId.style.textAlign = "right";
 
@@ -132,7 +133,7 @@ const createAndAppendNoteListItem = (note, i, parent, showLinksIndicator) => {
 
   if (showLinksIndicator) {
     const tdLinkedNotesIndicator = document.createElement("td");
-    tdId.className = "linkedNotesIndicator";
+    tdLinkedNotesIndicator.className = "linkedNotesIndicator";
     tdLinkedNotesIndicator.innerHTML = note.numberOfLinkedNotes > 0
       ? `<span title="${note.numberOfLinkedNotes} Links">
         ${note.numberOfLinkedNotes}

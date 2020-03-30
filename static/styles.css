@@ -26,7 +26,6 @@ main {
 }
 
 #note{
-  min-height: 511.547px;
   padding: 0px 10px;
 }
 
@@ -102,6 +101,7 @@ tr[class*="active"]{
 
   main {
     grid-template-columns: auto auto;
+    grid-template-rows: 100%;
     position: fixed;
     bottom: 0px;
     top: 100px;
