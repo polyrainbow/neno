@@ -4,8 +4,16 @@ const app = express();
 const Notes = require("./notes.js");
 const urlMetadata = require("url-metadata");
 const formidable = require("formidable");
+const fs = require("fs");
 
 let PORT = 8080;
+let DATA_PATH = path.join(__dirname, "..", "network-notes-data");
+const UPLOAD_PATH = path.join(DATA_PATH, "uploads");
+
+const users = [
+  { id: "sebastian", login: "sebastian", password: "9575" },
+  { id: "sophia", login: "sophia", password: ":-*" },
+];
 
 // passwords and usernames must not contain colons
 const users = [
@@ -21,10 +29,11 @@ if (customPortArgument) {
   PORT = parseInt(customPortArgument.substring(5));
 }
 
-Notes.init(
-  process.env.DATA_FOLDER_PATH
-  || path.join(__dirname, "..", "network-notes-data"),
-);
+if (process.env.DATA_FOLDER_PATH) {
+  DATA_PATH = process.env.DATA_FOLDER_PATH;
+}
+
+Notes.init(DATA_PATH);
 
 app.use((req, res, next) => {
   // -----------------------------------------------------------------------
@@ -177,7 +186,10 @@ app.post("/api/image", function(req, res) {
 
     res.end(JSON.stringify(
       {
-        success: true,
+        "success": 1,
+        "file": {
+          "url": "/api/image/" + filename,
+        },
       },
     ));
   });
