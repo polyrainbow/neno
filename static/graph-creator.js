@@ -133,10 +133,10 @@ document.onload = (function(d3) {
 
     d3.select("#button-save").on("click", function() {
       const links = thisGraph.links.map((link) => {
-        return {
-          id0: link.source.id,
-          id1: link.target.id,
-        };
+        return [
+          link.source.id,
+          link.target.id,
+        ];
       });
 
       const graphObject = {
@@ -594,8 +594,8 @@ document.onload = (function(d3) {
       const nodes = graph.nodes;
       const links = graph.links.map((link) => {
         return {
-          source: nodes.find((node) => node.id === link.id0),
-          target: nodes.find((node) => node.id === link.id1),
+          source: nodes.find((node) => node.id === link[0]),
+          target: nodes.find((node) => node.id === link[1]),
         };
       });
 

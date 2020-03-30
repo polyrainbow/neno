@@ -29,10 +29,10 @@ const getNewNoteId = (db) => {
 const getLinkedNotes = (db, noteId) => {
   return db.links
     .filter((link) => {
-      return (link.id0 === noteId) || (link.id1 === noteId);
+      return (link[0] === noteId) || (link[1] === noteId);
     })
     .map((link) => {
-      const linkedNoteId = (link.id0 === noteId) ? link.id1 : link.id0;
+      const linkedNoteId = (link[0] === noteId) ? link[1] : link[0];
       return findNote(db, linkedNoteId);
     })
     .filter((linkedNote) => {
@@ -43,8 +43,8 @@ const getLinkedNotes = (db, noteId) => {
 
 const cleanUpLinks = (db) => {
   db.links = db.links.filter((link) => {
-    const note0 = findNote(db, link.id0);
-    const note1 = findNote(db, link.id1);
+    const note0 = findNote(db, link[0]);
+    const note1 = findNote(db, link[1]);
     return (
       (typeof note0 === "object")
       && (note0 !== null)
@@ -58,7 +58,19 @@ const cleanUpLinks = (db) => {
 
 const removeLinksOfNote = (db, noteId) => {
   db.links = db.links.filter((link) => {
-    return (link.id0 !== noteId) && (link.id1 !== noteId);
+    return (link[0] !== noteId) && (link[1] !== noteId);
+  });
+  return true;
+};
+
+
+const convertLinksFromLegacyFormat = (db) => {
+  db.links = db.links.map((link) => {
+    if ("id0" in link) {
+      return [link.id0, link.id1];
+    } else {
+      return link;
+    }
   });
   return true;
 };
@@ -91,6 +103,8 @@ const init = (dataFolderPath) => {
 
   console.log("Cleaning data...");
   DB.forEach((db) => {
+    convertLinksFromLegacyFormat(db);
+
     // remove invalid links
     cleanUpLinks(db);
 
