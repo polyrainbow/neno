@@ -3,7 +3,7 @@ body {
 }
 
 header, #controls, #list, #links{
-  font-family: sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 header {
@@ -71,6 +71,10 @@ th, td {
 
 td {
   cursor: pointer;
+}
+
+td.time{
+  width: 92px;
 }
 
 tr:hover, tr:nth-child(even):hover {

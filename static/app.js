@@ -142,6 +142,7 @@ const createAndAppendNoteListItem = (note, i, parent, showLinksIndicator) => {
   }
 
   const tdTime = document.createElement("td");
+  tdTime.className = "time";
   tdTime.innerHTML = Utils.yyyymmdd(new Date(note.time));
   listItem.appendChild(tdTime);
 
