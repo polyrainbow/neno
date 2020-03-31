@@ -220,6 +220,7 @@ const remove = (noteId, userId) => {
   }
   db.notes.splice(noteIndex, 1);
   removeLinksOfNote(db, noteId);
+  // TO DO: removeUploadsOfNote(note);
   DB.set(db);
   return true;
 };

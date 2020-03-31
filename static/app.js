@@ -307,7 +307,12 @@ const init = () => {
     refreshNotesList();
   });
   uploadButton.addEventListener("click", saveNote);
-  removeButton.addEventListener("click", removeActiveNote);
+  removeButton.addEventListener("click", () => {
+    if (confirm("Do you really want to remove this note?")) {
+      removeActiveNote();
+    }
+  });
+
   refreshNotesList();
 
   graphButton.addEventListener("click", () => {
