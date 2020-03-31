@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const express = require("express");
 const app = express();
@@ -5,20 +6,28 @@ const Notes = require("./notes.js");
 const urlMetadata = require("url-metadata");
 const formidable = require("formidable");
 const fs = require("fs");
+const mkdirp = require("mkdirp");
+
 
 let PORT = 8080;
 let DATA_PATH = path.join(__dirname, "..", "network-notes-data");
-const UPLOAD_PATH = path.join(DATA_PATH, "uploads");
-
-const users = [
-  { id: "sebastian", login: "sebastian", password: "9575" },
-  { id: "sophia", login: "sophia", password: ":-*" },
-];
+let UPLOAD_PATH = path.join(DATA_PATH, "uploads");
 
 // passwords and usernames must not contain colons
 const users = [
   { id: "sebastian", login: "sebastian", password: "9575" },
   { id: "sophia", login: "sophia", password: "kuss" },
+];
+
+const ALLOWED_UPLOAD_TYPES = [
+  {
+    mimeType: "image/png",
+    ending: "png",
+  },
+  {
+    mimeType: "image/jpeg",
+    ending: "jpg",
+  },
 ];
 
 const customPortArgument = process.argv.find((arg) => {
@@ -31,6 +40,7 @@ if (customPortArgument) {
 
 if (process.env.DATA_FOLDER_PATH) {
   DATA_PATH = process.env.DATA_FOLDER_PATH;
+  UPLOAD_PATH = path.join(DATA_PATH, "uploads");
 }
 
 Notes.init(DATA_PATH);
@@ -171,6 +181,7 @@ app.get("/api/link-data", (req, res) => {
     });
 });
 
+
 app.post("/api/image", function(req, res) {
   const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
@@ -180,18 +191,48 @@ app.post("/api/image", function(req, res) {
       return;
     }
 
-    const oldpath = files.filetoupload.path;
-    const newpath = FILEPATH + filename;
+    const file = files.image;
+
+    if (!file) {
+      res.end("File upload error");
+      return;
+    }
+
+    const fileTypeObject = ALLOWED_UPLOAD_TYPES.find((filetype) => {
+      return filetype.mimeType === file.type;
+    });
+
+    if (!fileTypeObject) {
+      console.log("Invalid MIME type: " + file.type);
+      res.end("Invalid MIME type: " + file.type);
+      return;
+    }
+
+    const newFilename = uuidv4() + "." + fileTypeObject.ending;
+
+    const oldpath = files.image.path;
+    mkdirp.sync(UPLOAD_PATH);
+    const newpath = path.join(UPLOAD_PATH, newFilename);
     fs.renameSync(oldpath, newpath);
 
     res.end(JSON.stringify(
       {
         "success": 1,
         "file": {
-          "url": "/api/image/" + filename,
+          "url": "/api/image/" + newFilename,
         },
       },
     ));
   });
+});
+
+
+app.get("/api/image/:imageId", function(req, res) {
+  const file = path.join(UPLOAD_PATH, req.params.imageId);
+  if (!fs.existsSync(file)) {
+    res.end("ERROR: File does not exist!");
+    return;
+  }
+  res.download(file);
 });
 

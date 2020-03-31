@@ -38,7 +38,7 @@ const init = (config) => {
   console.log("Initializing DB module...");
   DATA_FOLDER = config.dataFolderPath;
   newDBTemplate = config.newDBTemplate;
-  mkdirp(DATA_FOLDER);
+  mkdirp.sync(DATA_FOLDER);
 };
 
 
