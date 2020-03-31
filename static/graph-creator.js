@@ -139,8 +139,16 @@ document.onload = (function(d3) {
         ];
       });
 
+      const nodes = thisGraph.nodes.map((node) => {
+        return {
+          id: node.id,
+          x: node.x,
+          y: node.y,
+        };
+      });
+
       const graphObject = {
-        nodes: thisGraph.nodes,
+        nodes: nodes,
         links: links,
         screenPosition,
       };
