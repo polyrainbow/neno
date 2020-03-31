@@ -86,7 +86,7 @@ const removeUploadsOfNote = (note) => {
       return imageBlock.data.file.imageId;
     })
     .forEach((imageId) => {
-      DB.removeBlob(imageId);
+      DB.deleteBlob(imageId);
     });
 };
 
