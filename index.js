@@ -220,6 +220,7 @@ app.post("/api/image", function(req, res) {
         "success": 1,
         "file": {
           "url": "/api/image/" + newFilename,
+          "imageId": newFilename,
         },
       },
     ));
