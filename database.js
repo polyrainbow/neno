@@ -5,6 +5,7 @@ const cloneObject = require("./utils.js").cloneObject;
 
 const DB_FILE_SUFFIX = ".db.json";
 let DATA_FOLDER = null;
+let UPLOAD_PATH = null;
 let newDBTemplate = null;
 const loadedDBs = [];
 
@@ -37,6 +38,7 @@ const writeJSONFileInDataFolder = (filename, value) => {
 const init = (config) => {
   console.log("Initializing DB module...");
   DATA_FOLDER = config.dataFolderPath;
+  UPLOAD_PATH = path.join(DATA_FOLDER, "uploads");
   newDBTemplate = config.newDBTemplate;
   mkdirp.sync(DATA_FOLDER);
 };
@@ -80,9 +82,27 @@ const forEach = (handler) => {
     });
 };
 
+
+const addBlob = (name, sourcePath) => {
+  mkdirp.sync(UPLOAD_PATH);
+  const newpath = path.join(UPLOAD_PATH, name);
+  fs.renameSync(sourcePath, newpath);
+};
+
+const deleteBlob = (name) => {
+  fs.unlinkSync(path.join(UPLOAD_PATH, name));
+};
+
+const getBlob = (name) => {
+  return path.join(UPLOAD_PATH, name);
+};
+
 module.exports = {
   init,
   get,
   set,
   forEach,
+  addBlob,
+  deleteBlob,
+  getBlob,
 };

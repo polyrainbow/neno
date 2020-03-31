@@ -1,5 +1,6 @@
 const DB = require("./database.js");
 const Utils = require("./utils.js");
+const { v4: uuidv4 } = require("uuid");
 
 /**
   PRIVATE
@@ -73,6 +74,20 @@ const convertLinksFromLegacyFormat = (db) => {
     }
   });
   return true;
+};
+
+
+const removeUploadsOfNote = (note) => {
+  note.editorData.blocks
+    .filter((block) => {
+      return block.type === "image";
+    })
+    .map((imageBlock) => {
+      return imageBlock.data.file.imageId;
+    })
+    .forEach((imageId) => {
+      DB.removeBlob(imageId);
+    });
 };
 
 
@@ -215,12 +230,13 @@ const put = (noteFromUser, userId) => {
 const remove = (noteId, userId) => {
   const db = DB.get(userId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
+  const note = db.notes[noteIndex];
   if (noteIndex === null) {
     return false;
   }
   db.notes.splice(noteIndex, 1);
   removeLinksOfNote(db, noteId);
-  // TO DO: removeUploadsOfNote(note);
+  removeUploadsOfNote(note);
   DB.set(db);
   return true;
 };
@@ -236,6 +252,17 @@ const importDB = (db) => {
 };
 
 
+const addImage = (sourcePath, fileType) => {
+  const newFilename = uuidv4() + "." + fileType.ending;
+  DB.addBlob(newFilename, sourcePath);
+  return newFilename;
+};
+
+
+const getImage = (imageId) => {
+  return DB.getBlob(imageId);
+};
+
 module.exports = {
   init,
   get,
@@ -246,4 +273,6 @@ module.exports = {
   remove,
   exportDB,
   importDB,
+  addImage,
+  getImage,
 };

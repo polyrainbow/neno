@@ -1,4 +1,3 @@
-const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const express = require("express");
 const app = express();
@@ -6,12 +5,10 @@ const Notes = require("./notes.js");
 const urlMetadata = require("url-metadata");
 const formidable = require("formidable");
 const fs = require("fs");
-const mkdirp = require("mkdirp");
 
 
 let PORT = 8080;
 let DATA_PATH = path.join(__dirname, "..", "network-notes-data");
-let UPLOAD_PATH = path.join(DATA_PATH, "uploads");
 
 // passwords and usernames must not contain colons
 const users = [
@@ -40,7 +37,6 @@ if (customPortArgument) {
 
 if (process.env.DATA_FOLDER_PATH) {
   DATA_PATH = process.env.DATA_FOLDER_PATH;
-  UPLOAD_PATH = path.join(DATA_PATH, "uploads");
 }
 
 Notes.init(DATA_PATH);
@@ -208,19 +204,15 @@ app.post("/api/image", function(req, res) {
       return;
     }
 
-    const newFilename = uuidv4() + "." + fileTypeObject.ending;
-
     const oldpath = files.image.path;
-    mkdirp.sync(UPLOAD_PATH);
-    const newpath = path.join(UPLOAD_PATH, newFilename);
-    fs.renameSync(oldpath, newpath);
+    const imageId = Notes.addImage(oldpath, fileTypeObject);
 
     res.end(JSON.stringify(
       {
         "success": 1,
         "file": {
-          "url": "/api/image/" + newFilename,
-          "imageId": newFilename,
+          "url": "/api/image/" + imageId,
+          "imageId": imageId,
         },
       },
     ));
@@ -229,7 +221,7 @@ app.post("/api/image", function(req, res) {
 
 
 app.get("/api/image/:imageId", function(req, res) {
-  const file = path.join(UPLOAD_PATH, req.params.imageId);
+  const file = Notes.getImage(req.params.imageId);
   if (!fs.existsSync(file)) {
     res.end("ERROR: File does not exist!");
     return;
