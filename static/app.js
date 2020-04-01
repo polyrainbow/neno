@@ -217,6 +217,10 @@ const saveNote = () => {
         ...activeNote,
         ...note,
       };
+
+      if (note.linkedNotes) {
+        delete note.linkedNotes;
+      }
     }
 
     // if the note has no title yet, take the title of the link metadata

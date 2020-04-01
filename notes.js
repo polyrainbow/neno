@@ -125,12 +125,17 @@ const init = (dataFolderPath) => {
 
     const ids = [];
 
-    // assign id to id-less notes
     db.notes.forEach((note) => {
+      // assign id to id-less notes
       if (typeof note.id !== "number" || ids.includes(note.id)) {
         note.id = getNewNoteId(db);
       }
       ids.push(note.id);
+
+      // remove unnecessary linkedNotes object if it exists
+      if (note.linkedNotes) {
+        delete note.linkedNotes;
+      }
     });
   });
 };
