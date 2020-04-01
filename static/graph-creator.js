@@ -1,4 +1,5 @@
 /* eslint-disable no-invalid-this */
+import * as Utils from "./utils.js";
 
 let screenPosition = {
   translateX: 0,
