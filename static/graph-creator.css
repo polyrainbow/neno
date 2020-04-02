@@ -2,22 +2,20 @@ body{
   margin: 0;
   padding: 0;
   overflow:hidden;
-}
-
-p{ 
-   text-align: center; 
-   overflow: overlay;
-   position: relative;
-}
-
-body{
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  background-color: rgb(248, 248, 248)
+  background-color: rgb(248, 248, 248);
+  font-family: sans-serif;
+}
+
+p{ 
+  text-align: center; 
+  overflow: overlay;
+  position: relative;
 }
 
 #toolbox{
