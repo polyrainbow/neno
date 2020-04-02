@@ -186,7 +186,7 @@ document.onload = (function(d3) {
   GraphCreator.prototype.consts = {
     selectedClass: "selected",
     connectClass: "connect-node",
-    circleGClass: "conceptG",
+    circleGClass: "node",
     graphClass: "graph",
     activeEditId: "active-editing",
     BACKSPACE_KEY: 8,

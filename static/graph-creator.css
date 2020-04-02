@@ -50,7 +50,7 @@ body{
   margin: 0 0.5em;
 }
 
-.conceptG text{
+.node text{
   pointer-events: none;
 }
 
@@ -58,13 +58,13 @@ marker{
   fill: #333;
 }
 
-g.conceptG circle{
+g.node circle{
   fill: #F6FBFF;
   stroke: #333;
   stroke-width: 2px;
 }
 
-g.conceptG:hover circle{
+g.node:hover circle{
   fill: rgb(200, 238, 241);
 }
 
