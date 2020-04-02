@@ -45,15 +45,15 @@ document.onload = (function(d3) {
     thisGraph.paths = svgG.append("g").selectAll("g");
     thisGraph.circles = svgG.append("g").selectAll("g");
 
-    thisGraph.drag = d3.behavior.drag()
-      .origin(function(d) {
+    thisGraph.drag = d3.drag()
+      .subject(function(d) {
         return { x: d.x, y: d.y };
       })
       .on("drag", function(args) {
         thisGraph.state.justDragged = true;
         thisGraph.dragmove(args);
       })
-      .on("dragend", function() {
+      .on("end", function() {
         // todo check if edge-mode is selected
       });
 
@@ -72,10 +72,10 @@ document.onload = (function(d3) {
     });
 
     // listen for dragging
-    const zoom = d3.behavior.zoom();
+    const zoom = d3.zoom();
 
     zoom.on("zoom", function() {
-      if (d3.event.sourceEvent.shiftKey) {
+      if (d3.event.shiftKey) {
         // TODO  the internal d3 state is still changing
         return false;
       } else {
@@ -84,25 +84,25 @@ document.onload = (function(d3) {
       return true;
     });
 
-    zoom.on("zoomstart", function() {
+    zoom.on("start", function() {
       const ael = d3.select("#" + thisGraph.consts.activeEditId).node();
       if (ael) {
         ael.blur();
       }
-      if (!d3.event.sourceEvent.shiftKey) {
+      if (!d3.event.shiftKey) {
         d3.select("body").style("cursor", "move");
       }
     });
 
-    zoom.on("zoomend", function() {
+    zoom.on("end", function() {
       d3.select("body").style("cursor", "auto");
     });
 
-    zoom.translate([
+    zoom.translateTo(svg,
       initialScreenPosition.translateX,
       initialScreenPosition.translateY,
-    ]);
-    zoom.scale(initialScreenPosition.scale);
+    );
+    zoom.scaleTo(svg, initialScreenPosition.scale);
 
     svg.call(zoom).on("dblclick.zoom", null);
 
