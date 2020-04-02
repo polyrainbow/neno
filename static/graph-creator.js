@@ -73,14 +73,6 @@ document.onload = (function(d3) {
 
     // listen for dragging
     const zoom = d3.zoom();
-    svg.call(zoom);
-
-    zoom.translateTo(
-      svg,
-      screenPosition.translateX,
-      screenPosition.translateY,
-    );
-    zoom.scaleTo(svg, screenPosition.scale);
 
     zoom.on("zoom", function() {
       if (d3.event.shiftKey) {
@@ -101,10 +93,18 @@ document.onload = (function(d3) {
         d3.select("body").style("cursor", "move");
       }
     });
-
+    svg.call(zoom).on("dblclick.zoom", null);
     zoom.on("end", function() {
       d3.select("body").style("cursor", "auto");
     });
+
+    const initialZoomTranform = d3.zoomIdentity
+      .translate(
+        screenPosition.translateX,
+        screenPosition.translateY,
+      )
+      .scale(screenPosition.scale);
+    zoom.transform(svg, initialZoomTranform);
 
     // listen for resize
     window.onresize = function() {thisGraph.updateWindow(svg);};
@@ -534,7 +534,7 @@ document.onload = (function(d3) {
     thisGraph.circles.exit().remove();
   };
 
-  GraphCreator.prototype.zoomed = function() { console.log(d3.event.transform);
+  GraphCreator.prototype.zoomed = function() {
     this.state.justScaleTransGraph = true;
     d3.select("." + this.consts.graphClass)
       .attr(
@@ -543,11 +543,9 @@ document.onload = (function(d3) {
         + d3.event.transform.x + "," + d3.event.transform.y + ") "
         + "scale(" + d3.event.transform.k + ")",
       );
-    console.log(d3.event.transform);
     screenPosition.translateX = d3.event.transform.x;
     screenPosition.translateY = d3.event.transform.y;
     screenPosition.scale = d3.event.transform.k;
-    console.log(screenPosition);
   };
 
   GraphCreator.prototype.updateWindow = function(svg) {
@@ -603,17 +601,6 @@ document.onload = (function(d3) {
         svg, nodes, links,
       );
       graphInstance.updateGraph();
-      /*d3.select(".graph")
-        .attr(
-          "transform",
-          "translate("
-            + graph.screenPosition.translateX
-            + ", "
-            + graph.screenPosition.translateY
-            + ") scale("
-            + graph.screenPosition.scale
-            + ")",
-        );*/
     });
 })(window.d3);
 
