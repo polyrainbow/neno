@@ -600,7 +600,11 @@ document.onload = (function(d3) {
   fetch("/api/graph")
     .then((response) => response.json())
     .then((graph) => {
-      const nodes = graph.nodes;
+      const nodes = graph.nodes.map((node) => {
+        node.title = Utils.htmlDecode(node.title);
+        return node;
+      });
+
       const links = graph.links.map((link) => {
         return {
           source: nodes.find((node) => node.id === link[0]),
