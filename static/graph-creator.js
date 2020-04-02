@@ -460,7 +460,6 @@ document.onload = (function(d3) {
     // update existing paths
 
     paths
-      // .style('marker-end', 'url(#end-arrow)')
       .classed(consts.selectedClass, function(d) {
         return d === state.selectedEdge;
       })
@@ -473,7 +472,6 @@ document.onload = (function(d3) {
     // add new paths
     paths.enter()
       .append("path")
-      // .style('marker-end','url(#end-arrow)')
       .classed("link", true)
       .attr("d", function(d) {
         return "M" + d.source.x + "," + d.source.y
