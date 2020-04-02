@@ -1,7 +1,7 @@
 /* eslint-disable no-invalid-this */
 import * as Utils from "./utils.js";
 
-let screenPosition = {
+const screenPosition = {
   translateX: 0,
   translateY: 0,
   scale: 1,
@@ -11,7 +11,7 @@ document.onload = (function(d3) {
   "use strict";
 
   // define graphcreator object
-  const GraphCreator = function(svg, nodes, links, initialScreenPosition) {
+  const GraphCreator = function(svg, nodes, links) {
     const thisGraph = this;
 
     thisGraph.nodes = nodes || [];
@@ -51,7 +51,7 @@ document.onload = (function(d3) {
       })
       .on("drag", function(args) {
         thisGraph.state.justDragged = true;
-        thisGraph.dragmove(args);
+        //thisGraph.dragmove(args);
       })
       .on("end", function() {
         // todo check if edge-mode is selected
@@ -73,6 +73,14 @@ document.onload = (function(d3) {
 
     // listen for dragging
     const zoom = d3.zoom();
+    svg.call(zoom);
+
+    zoom.translateTo(
+      svg,
+      screenPosition.translateX,
+      screenPosition.translateY,
+    );
+    zoom.scaleTo(svg, screenPosition.scale);
 
     zoom.on("zoom", function() {
       if (d3.event.shiftKey) {
@@ -97,14 +105,6 @@ document.onload = (function(d3) {
     zoom.on("end", function() {
       d3.select("body").style("cursor", "auto");
     });
-
-    zoom.translateTo(svg,
-      initialScreenPosition.translateX,
-      initialScreenPosition.translateY,
-    );
-    zoom.scaleTo(svg, initialScreenPosition.scale);
-
-    svg.call(zoom).on("dblclick.zoom", null);
 
     // listen for resize
     window.onresize = function() {thisGraph.updateWindow(svg);};
@@ -534,7 +534,7 @@ document.onload = (function(d3) {
     thisGraph.circles.exit().remove();
   };
 
-  GraphCreator.prototype.zoomed = function() {
+  GraphCreator.prototype.zoomed = function() { console.log(d3.event.transform);
     this.state.justScaleTransGraph = true;
     d3.select("." + this.consts.graphClass)
       .attr(
@@ -543,11 +543,11 @@ document.onload = (function(d3) {
         + d3.event.transform.x + "," + d3.event.transform.y + ") "
         + "scale(" + d3.event.transform.k + ")",
       );
-    screenPosition = {
-      translateX: d3.event.transform.x,
-      translateY: d3.event.transform.y,
-      scale: d3.event.transform.k,
-    };
+    console.log(d3.event.transform);
+    screenPosition.translateX = d3.event.transform.x;
+    screenPosition.translateY = d3.event.transform.y;
+    screenPosition.scale = d3.event.transform.k;
+    console.log(screenPosition);
   };
 
   GraphCreator.prototype.updateWindow = function(svg) {
@@ -595,12 +595,15 @@ document.onload = (function(d3) {
         .attr("width", width)
         .attr("height", height);
 
+      screenPosition.translateX = graph.screenPosition.translateX;
+      screenPosition.translateY = graph.screenPosition.translateY;
+      screenPosition.scale = graph.screenPosition.scale;
+      window.screenPosition = screenPosition;
       const graphInstance = new GraphCreator(
-        svg, nodes, links, graph.screenPosition,
+        svg, nodes, links,
       );
       graphInstance.updateGraph();
-      screenPosition = graph.screenPosition;
-      d3.select(".graph")
+      /*d3.select(".graph")
         .attr(
           "transform",
           "translate("
@@ -610,7 +613,7 @@ document.onload = (function(d3) {
             + ") scale("
             + graph.screenPosition.scale
             + ")",
-        );
+        );*/
     });
 })(window.d3);
 
