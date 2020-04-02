@@ -539,12 +539,14 @@ document.onload = (function(d3) {
     d3.select("." + this.consts.graphClass)
       .attr(
         "transform",
-        "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")",
+        "translate("
+        + d3.event.transform.x + "," + d3.event.transform.y + ") "
+        + "scale(" + d3.event.transform.k + ")",
       );
     screenPosition = {
-      translateX: d3.event.translate[0],
-      translateY: d3.event.translate[1],
-      scale: d3.event.scale,
+      translateX: d3.event.transform.x,
+      translateY: d3.event.transform.y,
+      scale: d3.event.transform.k,
     };
   };
 
