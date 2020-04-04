@@ -372,11 +372,12 @@ document.onload = (function(d3) {
     if (state.justScaleTransGraph) {
       // dragged not clicked
       state.justScaleTransGraph = false;
-    } else if (state.shiftDragInProgress) {
-      // dragged from node
-      state.shiftDragInProgress = false;
-      thisGraph.newLinkLine.classed("hidden", true);
     }
+
+    // on mouse up, shift drag is always over
+    state.shiftDragInProgress = false;
+    thisGraph.newLinkLine.classed("hidden", true);
+
     state.graphMouseDown = false;
   };
 
