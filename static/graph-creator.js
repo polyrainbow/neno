@@ -50,6 +50,9 @@ document.onload = (function(d3) {
       .subject(function(d) {
         return { x: d.x, y: d.y };
       })
+      .filter(() => {
+        return !d3.event.shiftKey;
+      })
       .on("drag", function(args) {
         thisGraph.state.justDragged = true;
         thisGraph.dragmove(args);
@@ -69,10 +72,10 @@ document.onload = (function(d3) {
     svg.on("mousedown", function(d) {
       thisGraph.svgMouseDown(d);
     });
-    svg.on("mouseup", function(d) { console.log("mouseup on svg")
+    svg.on("mouseup", function(d) {
       thisGraph.svgMouseUp(d);
     });
-/*
+
     // listen for dragging
     const zoom = d3.zoom();
 
@@ -107,7 +110,7 @@ document.onload = (function(d3) {
       )
       .scale(screenPosition.scale);
     zoom.transform(svg, initialZoomTranform);
-*/
+
     // listen for resize
     window.onresize = function() {thisGraph.updateWindow(svg);};
 
@@ -294,24 +297,35 @@ document.onload = (function(d3) {
     // reset the states
     state.shiftNodeDrag = false;
     d3node.classed(consts.connectClass, false);
-console.log("mouse up on node")
+
     const mouseDownNode = state.mouseDownNode;
 
     if (!mouseDownNode) return;
 
     thisGraph.dragLine.classed("hidden", true);
 
-    if (mouseDownNode !== d) { console.log("creating edge");
+    if (mouseDownNode !== d) {
+      console.log("creating edge");
       // we're in a different node:
       // create new edge for mousedown edge and add to graph
       const newEdge = { source: mouseDownNode, target: d };
-      const filtRes = thisGraph.linkElements.filter(function(d) {
-        if (d.source === newEdge.target && d.target === newEdge.source) {
-          thisGraph.links.splice(thisGraph.links.indexOf(d), 1);
-        }
-        return d.source === newEdge.source && d.target === newEdge.target;
-      });
-      if (!filtRes[0].length) {
+
+      // check if such an edge is already there ...
+      const edgeAlreadyExists = thisGraph
+        .linksContainer
+        .selectAll("path.link")
+        .filter(
+          function(d) {
+            return (
+              (d.source === newEdge.source && d.target === newEdge.target)
+              || (d.source === newEdge.target && d.target === newEdge.source)
+            );
+          },
+        )
+        .size() !== 0;
+
+      // ... if not, create it
+      if (!edgeAlreadyExists) {
         thisGraph.links.push(newEdge);
         thisGraph.updateGraph();
       }
@@ -436,7 +450,7 @@ console.log("mouse up on node")
         thisGraph.pathMouseDown(d3.select(this), d);
       },
       )
-      .on("mouseup", function() { console.log("mouseup on link")
+      .on("mouseup", function() {
         state.mouseDownLink = null;
       });
 
@@ -483,10 +497,10 @@ console.log("mouse up on node")
       .on("mouseout", function() {
         d3.select(this).classed(consts.connectClass, false);
       })
-      .on("mousedown", function(d) { console.log("mousedown on node 1")
+      .on("mousedown", function(d) {
         thisGraph.handleMouseDownOnNode(d3.select(this), d);
       })
-      .on("mouseup", function(d) { console.log("mouseup on node 1")
+      .on("mouseup", function(d) {
         thisGraph.handleMouseUpOnNode(d3.select(this), d);
       })
       .call(thisGraph.drag);
