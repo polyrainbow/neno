@@ -1,6 +1,8 @@
 /* eslint-disable no-invalid-this */
 import * as Utils from "./utils.js";
 
+const DEFAULT_STATUS = "Hold shift to draw links";
+
 const screenPosition = {
   translateX: 0,
   translateY: 0,
@@ -157,7 +159,7 @@ document.onload = (function(d3) {
           }
           statusElement.innerHTML = "Graph saved!";
           setTimeout(() => {
-            statusElement.innerHTML = "";
+            statusElement.innerHTML = DEFAULT_STATUS;
           }, 2000);
           console.log("Graph saved!");
         })
