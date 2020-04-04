@@ -59,19 +59,20 @@ document.onload = (function(d3) {
       });
 
     // listen for key events
-    d3.select(window).on("keydown", function() {
-      thisGraph.svgKeyDown();
-    })
+    d3.select(window)
+      .on("keydown", function() {
+        thisGraph.svgKeyDown();
+      })
       .on("keyup", function() {
         thisGraph.svgKeyUp();
       });
     svg.on("mousedown", function(d) {
       thisGraph.svgMouseDown(d);
     });
-    svg.on("mouseup", function(d) {
+    svg.on("mouseup", function(d) { console.log("mouseup on svg")
       thisGraph.svgMouseUp(d);
     });
-
+/*
     // listen for dragging
     const zoom = d3.zoom();
 
@@ -106,7 +107,7 @@ document.onload = (function(d3) {
       )
       .scale(screenPosition.scale);
     zoom.transform(svg, initialZoomTranform);
-
+*/
     // listen for resize
     window.onresize = function() {thisGraph.updateWindow(svg);};
 
@@ -467,7 +468,7 @@ console.log("mouse up on node")
 
     const newNode = nodeEnter
       .append("g");
-console.log("creating new nodes")
+
     newNode
       .classed(consts.nodeClassName, true)
       .attr(
@@ -482,7 +483,7 @@ console.log("creating new nodes")
       .on("mouseout", function() {
         d3.select(this).classed(consts.connectClass, false);
       })
-      .on("mousedown", function(d) { console.log("mousedown")
+      .on("mousedown", function(d) { console.log("mousedown on node 1")
         thisGraph.handleMouseDownOnNode(d3.select(this), d);
       })
       .on("mouseup", function(d) { console.log("mouseup on node 1")
