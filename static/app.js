@@ -305,7 +305,14 @@ const archiveDatabase = () => {
 
 
 const init = () => {
-  loadEditor(null);
+  const initialId = parseInt(
+    Utils.getParameterByName("id", window.location.href),
+  );
+  if (initialId) {
+    loadNote(initialId);
+  } else {
+    loadEditor(null);
+  }
   newButton.addEventListener("click", () => {
     loadNote();
     refreshNotesList();

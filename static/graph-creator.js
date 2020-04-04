@@ -53,7 +53,7 @@ document.onload = (function(d3) {
         return { x: d.x, y: d.y };
       })
       .filter(() => {
-        return !d3.event.shiftKey;
+        return (!d3.event.shiftKey) && (!d3.event.ctrlKey);
       })
       .on("drag", function(args) {
         thisGraph.state.justDragged = true;
@@ -459,8 +459,7 @@ document.onload = (function(d3) {
       })
       .on("mousedown", function(d) {
         thisGraph.pathMouseDown(d3.select(this), d);
-      },
-      )
+      })
       .on("mouseup", function() {
         state.mouseDownLink = null;
       });
@@ -513,6 +512,11 @@ document.onload = (function(d3) {
       })
       .on("mouseup", function(d) {
         thisGraph.handleMouseUpOnNode(d3.select(this), d);
+      })
+      .on("click", function(d) {
+        if (d3.event.ctrlKey) {
+          window.location.href = "/?id=" + d.id;
+        }
       })
       .call(thisGraph.drag);
 
