@@ -38,7 +38,11 @@ main {
   height: 50px;
 }
 
-button {
+#controls-left{
+  height: 50px;
+}
+
+button, a.button {
   height: 50px;
   display: inline-block;
   border: none;
@@ -46,6 +50,7 @@ button {
   width: 50px;
   padding: 0;
   background: none;
+  text-align: center;
 }
 
 button[disabled]{

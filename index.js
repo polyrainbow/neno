@@ -5,6 +5,7 @@ const Notes = require("./lib/notes.js");
 const urlMetadata = require("url-metadata");
 const formidable = require("formidable");
 const fs = require("fs");
+const archiver = require("archiver");
 
 
 let PORT = 8080;
@@ -83,6 +84,34 @@ app.use(express.json());
 
 app.get("/api", function(req, res) {
   res.send("Hello World!");
+});
+
+
+app.get("/api/database-with-uploads", function(req, res) {
+  const archive = archiver("zip");
+
+  archive.on("error", function(err) {
+    res.status(500).send({ error: err.message });
+  });
+
+  // on stream closed we can end the request
+  archive.on("end", function() {
+    console.log("Archive wrote %d bytes", archive.pointer());
+  });
+
+  // set the archive name
+  res.attachment(req.userId + ".db.zip");
+
+  // this is the streaming magic
+  archive.pipe(res);
+
+  Notes
+    .getFilesForDBExport(req.userId)
+    .forEach((file) => {
+      archive.file(file, { name: path.basename(file) });
+    });
+
+  archive.finalize();
 });
 
 
