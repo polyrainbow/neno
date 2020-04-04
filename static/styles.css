@@ -25,10 +25,6 @@ main {
   display: grid;
 }
 
-#note{
-  padding: 0px 10px;
-}
-
 #controls {
   background-color: blanchedalmond;
   padding: 0px 10px;
@@ -117,6 +113,11 @@ tr[class*="active"]{
     overflow-y: auto;
     min-width: 720px;
     grid-area: 1 / 2 / 2 / 3;
+    padding: 0;
+  }
+
+  #links h2{
+    padding: 0px 10px;
   }
 
   #list{
@@ -144,6 +145,7 @@ tr[class*="active"]{
   #note{
     grid-area: 1 / 1 / 2 / 2;
     border-bottom: 15px solid black;
+    padding: 0px 10px;
   }
 
   #list{
@@ -169,11 +171,17 @@ tr[class*="active"]{
 
   #editor{
     grid-area: 1 / 1 / 2 / 2;
+    padding: 0px 10px;
   }
 
   #note{
     grid-area: 1 / 1 / 2 / 2;
     border-bottom: 15px solid black;
+    padding: 0;
+  }
+
+  #links h2{
+    padding: 0px 10px;
   }
 
   #list{
