@@ -22,19 +22,11 @@ p{
   position: absolute;
   bottom: 0;
   left: 0;
-  margin-bottom: 0.5em;
-  margin-left: 1em;
-  border: 2px solid #EEEEEE;
-  border-radius: 5px;
-  padding: 1em;
   z-index: 5;
   display: flex;
   align-items: center;
 }
 
-#toolbox * {
-  margin: 0px 10px;
-}
 
 #toolbox button{
   width: 50px;
