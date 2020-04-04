@@ -25,7 +25,7 @@ document.onload = (function(d3) {
       justDragged: false,
       justScaleTransGraph: false,
       lastKeyDown: -1,
-      shiftNodeDrag: false,
+      shiftDragInProgress: false,
       selectedText: null,
     };
 
@@ -35,8 +35,8 @@ document.onload = (function(d3) {
     const svgG = thisGraph.svgG;
 
     // displayed when dragging between nodes
-    thisGraph.dragLine = svgG.append("svg:path")
-      .attr("class", "link dragline hidden")
+    thisGraph.newLinkLine = svgG.append("svg:path")
+      .attr("class", "link newLinkLine hidden")
       .attr("d", "M0,0L0,0");
 
     // svg nodes and links
@@ -74,6 +74,9 @@ document.onload = (function(d3) {
     });
     svg.on("mouseup", function(d) {
       thisGraph.svgMouseUp(d);
+    });
+    svg.on("mousemove", function() {
+      thisGraph.newPathMove(thisGraph.state.mouseDownNode);
     });
 
     // listen for dragging
@@ -178,21 +181,26 @@ document.onload = (function(d3) {
   };
 
   /* PROTOTYPE FUNCTIONS */
+  GraphCreator.prototype.newPathMove = function(originNode) {
+    const thisGraph = this;
+    if (!thisGraph.state.shiftDragInProgress) {
+      return;
+    }
+
+    thisGraph.newLinkLine.attr(
+      "d",
+      "M" + originNode.x + "," + originNode.y
+      + "L" + (d3.mouse(thisGraph.svgG.node())[0] - 1) + ","
+      + (d3.mouse(this.svgG.node())[1] - 1),
+    );
+  };
+
 
   GraphCreator.prototype.dragmove = function(d) {
     const thisGraph = this;
-    if (thisGraph.state.shiftNodeDrag) {
-      thisGraph.dragLine.attr(
-        "d",
-        "M" + d.x + "," + d.y
-        + "L" + (d3.mouse(thisGraph.svgG.node())[0] - 1) + ","
-        + (d3.mouse(this.svgG.node())[1] - 1),
-      );
-    } else {
-      d.x += d3.event.dx;
-      d.y += d3.event.dy;
-      thisGraph.updateGraph();
-    }
+    d.x += d3.event.dx;
+    d.y += d3.event.dy;
+    thisGraph.updateGraph();
   };
 
   /* insert svg line breaks: taken from http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
@@ -280,9 +288,9 @@ document.onload = (function(d3) {
     d3.event.stopPropagation();
     state.mouseDownNode = d;
     if (d3.event.shiftKey) {
-      state.shiftNodeDrag = d3.event.shiftKey;
+      state.shiftDragInProgress = d3.event.shiftKey;
       // reposition dragged directed edge
-      thisGraph.dragLine
+      thisGraph.newLinkLine
         .classed("hidden", false)
         .attr("d", "M" + d.x + "," + d.y + "L" + d.x + "," + d.y);
     }
@@ -295,14 +303,14 @@ document.onload = (function(d3) {
     const state = thisGraph.state;
     const consts = thisGraph.consts;
     // reset the states
-    state.shiftNodeDrag = false;
+    state.shiftDragInProgress = false;
     d3node.classed(consts.connectClass, false);
 
     const mouseDownNode = state.mouseDownNode;
 
     if (!mouseDownNode) return;
 
-    thisGraph.dragLine.classed("hidden", true);
+    thisGraph.newLinkLine.classed("hidden", true);
 
     if (mouseDownNode !== d) {
       console.log("creating edge");
@@ -362,10 +370,10 @@ document.onload = (function(d3) {
     if (state.justScaleTransGraph) {
       // dragged not clicked
       state.justScaleTransGraph = false;
-    } else if (state.shiftNodeDrag) {
+    } else if (state.shiftDragInProgress) {
       // dragged from node
-      state.shiftNodeDrag = false;
-      thisGraph.dragLine.classed("hidden", true);
+      state.shiftDragInProgress = false;
+      thisGraph.newLinkLine.classed("hidden", true);
     }
     state.graphMouseDown = false;
   };
@@ -490,7 +498,7 @@ document.onload = (function(d3) {
         function(d) {return "translate(" + d.x + "," + d.y + ")";},
       )
       .on("mouseover", function() {
-        if (state.shiftNodeDrag) {
+        if (state.shiftDragInProgress) {
           d3.select(this).classed(consts.connectClass, true);
         }
       })
