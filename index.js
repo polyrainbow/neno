@@ -8,13 +8,27 @@ const fs = require("fs");
 
 
 let PORT = 8080;
+
 let DATA_PATH = path.join(__dirname, "..", "network-notes-data");
+if (process.env.DATA_FOLDER_PATH) {
+  DATA_PATH = process.env.DATA_FOLDER_PATH;
+}
 
 // passwords and usernames must not contain colons
-const users = [
-  { id: "sebastian", login: "sebastian", password: "9575" },
-  { id: "sophia", login: "sophia", password: "kuss" },
-];
+let users;
+const usersFile = path.join(DATA_PATH, "users.json");
+if (fs.existsSync(usersFile)) {
+  console.log("Loading existing users file...");
+  const json = fs.readFileSync(usersFile);
+  users = JSON.parse(json);
+} else {
+  const defaultUsers = [
+    { id: "admin", login: "admin", password: "0000" },
+  ];
+  console.log("No users file found. Creating one by myself...");
+  fs.writeFileSync(usersFile, JSON.stringify(defaultUsers));
+  users = defaultUsers;
+}
 
 const ALLOWED_UPLOAD_TYPES = [
   {
@@ -33,10 +47,6 @@ const customPortArgument = process.argv.find((arg) => {
 
 if (customPortArgument) {
   PORT = parseInt(customPortArgument.substring(5));
-}
-
-if (process.env.DATA_FOLDER_PATH) {
-  DATA_PATH = process.env.DATA_FOLDER_PATH;
 }
 
 Notes.init(DATA_PATH);
