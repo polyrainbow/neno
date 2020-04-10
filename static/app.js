@@ -77,6 +77,11 @@ const loadEditor = (data) => {
           },
         },
       },
+      list: {
+        // eslint-disable-next-line no-undef
+        class: List,
+        inlineToolbar: true,
+      },
     },
   });
 };
