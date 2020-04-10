@@ -83,6 +83,8 @@ const loadEditor = (data) => {
         class: List,
         inlineToolbar: true,
       },
+      // eslint-disable-next-line no-undef
+      code: CodeTool,
     },
   });
 };
