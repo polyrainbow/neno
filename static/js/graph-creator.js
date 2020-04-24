@@ -1,6 +1,7 @@
 /* eslint-disable no-invalid-this */
 import * as Utils from "./utils.js";
 
+const statusElement = document.getElementById("status");
 const DEFAULT_STATUS = "Hold shift to draw links";
 
 const screenPosition = {
@@ -152,7 +153,6 @@ document.onload = (function(d3) {
           return response.json();
         })
         .then((response) => {
-          const statusElement = document.getElementById("status");
           if (!response.success === true) {
             statusElement.innerHTML = "ERROR SAVING GRAPH!";
             return;
@@ -499,13 +499,15 @@ document.onload = (function(d3) {
         "transform",
         function(d) {return "translate(" + d.x + "," + d.y + ")";},
       )
-      .on("mouseover", function() {
+      .on("mouseover", function(d) {
         if (state.shiftDragInProgress) {
           d3.select(this).classed(consts.connectClass, true);
         }
+        statusElement.innerHTML = d.title;
       })
       .on("mouseout", function() {
         d3.select(this).classed(consts.connectClass, false);
+        statusElement.innerHTML = "";
       })
       .on("mousedown", function(d) {
         thisGraph.handleMouseDownOnNode(d3.select(this), d);
