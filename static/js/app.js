@@ -11,7 +11,7 @@ const listContainer = document.getElementById("list");
 const linksContainer = document.getElementById("links");
 const spanActiveNoteId = document.getElementById("span_activeNoteId");
 const spanAvailableNotes = document.getElementById("span_available-notes");
-const spanLinked = document.getElementById("span_linked");
+const spanLinks = document.getElementById("span_links");
 
 const DEFAULT_NOTE_TITLE = "Note title";
 
@@ -92,7 +92,6 @@ const loadNote = async (noteId) => {
   if (typeof noteId !== "number") {
     activeNote = null;
     spanActiveNoteId.innerHTML = "--";
-    spanLinked.innerHTML = "--";
     loadEditor(null);
     renderLinks([]);
     removeButton.disabled = true;
@@ -107,11 +106,6 @@ const loadNote = async (noteId) => {
 const renderNote = (note) => {
   activeNote = note;
   spanActiveNoteId.innerHTML = activeNote.id;
-  if (Array.isArray(note.linkedNotes)) {
-    spanLinked.innerHTML = note.linkedNotes.length;
-  } else {
-    spanLinked.innerHTML = "--";
-  }
   loadEditor(note.editorData);
   renderLinks(note.linkedNotes || []);
   removeButton.disabled = false;
@@ -289,6 +283,10 @@ const init = async () => {
   });
 
   archiveButton.addEventListener("click", archiveDatabase);
+
+  const graph = await API.getGraph();
+  const links = graph.links;
+  spanLinks.innerHTML = links.length;
 };
 
 init();

@@ -63,11 +63,24 @@ const getDatabaseAsJSON = async () => {
 };
 
 
+const getGraph = async () => {
+  const response = await fetch("/api/graph", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const json = await response.json();
+  return json;
+};
+
+
 export {
   getNote,
   getNotes,
   putNote,
   deleteNote,
   getDatabaseAsJSON,
+  getGraph,
 };
 
