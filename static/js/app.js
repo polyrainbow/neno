@@ -1,4 +1,5 @@
 import * as Utils from "./utils.js";
+import * as API from "./api.js";
 
 const editorContainer = document.getElementById("editor");
 const newButton = document.getElementById("button_new");
@@ -87,7 +88,7 @@ const loadEditor = (data) => {
 };
 
 
-const loadNote = (noteId) => {
+const loadNote = async (noteId) => {
   if (typeof noteId !== "number") {
     activeNote = null;
     spanActiveNoteId.innerHTML = "--";
@@ -98,14 +99,8 @@ const loadNote = (noteId) => {
     return;
   }
 
-  return fetch("/api/note/" + noteId, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then(renderNote);
+  const note = await API.getNote(noteId);
+  renderNote(note);
 };
 
 
@@ -193,123 +188,81 @@ const createNotesList = (notes) => {
 };
 
 
-const refreshNotesList = () => {
-  return fetch("/api/notes", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((notes) => {
-      createNotesList(notes);
-    });
+const refreshNotesList = async () => {
+  const notes = await API.getNotes();
+  createNotesList(notes);
 };
 
 
-const saveNote = () => {
-  editor.save().then((outputData) => {
-    let note = {
-      editorData: outputData,
-      time: outputData.time,
+const saveNote = async () => {
+  const outputData = await editor.save();
+
+  let note = {
+    editorData: outputData,
+    time: outputData.time,
+  };
+
+  if (
+    typeof activeNote === "object"
+    && activeNote !== null
+  ) {
+    note = {
+      ...activeNote,
+      ...note,
     };
 
-    if (
-      typeof activeNote === "object"
-      && activeNote !== null
-    ) {
-      note = {
-        ...activeNote,
-        ...note,
-      };
-
-      if (note.linkedNotes) {
-        delete note.linkedNotes;
-      }
+    if (note.linkedNotes) {
+      delete note.linkedNotes;
     }
+  }
 
-    // if the note has no title yet, take the title of the link metadata
-    const firstLinkBlock = note.editorData.blocks.find(
-      (block) => block.type === "linkTool",
-    );
+  // if the note has no title yet, take the title of the link metadata
+  const firstLinkBlock = note.editorData.blocks.find(
+    (block) => block.type === "linkTool",
+  );
 
-    if (
-      note.editorData.blocks[0].data.text === DEFAULT_NOTE_TITLE
-      && firstLinkBlock
-      && typeof firstLinkBlock.data.meta.title === "string"
-      && firstLinkBlock.data.meta.title.length > 0
-    ) {
-      note.editorData.blocks[0].data.text = firstLinkBlock.data.meta.title;
-    }
+  if (
+    note.editorData.blocks[0].data.text === DEFAULT_NOTE_TITLE
+    && firstLinkBlock
+    && typeof firstLinkBlock.data.meta.title === "string"
+    && firstLinkBlock.data.meta.title.length > 0
+  ) {
+    note.editorData.blocks[0].data.text = firstLinkBlock.data.meta.title;
+  }
 
-    fetch("/api/note", {
-      method: "PUT",
-      body: JSON.stringify(note),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((response) => renderNote(response.note))
-      .catch((error) => {
-        console.log("Saving failed: ", error);
-      });
-  });
+  try {
+    const noteFromServer = await API.putNote(note);
+    renderNote(noteFromServer);
+  } catch (e) {
+    console.log("Saving failed: ", e);
+  }
 };
 
 
-const removeActiveNote = () => {
+const removeActiveNote = async () => {
   if (activeNote === null) {
     return;
   }
 
-  fetch("/api/note/" + activeNote.id, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      console.log("Note deleted");
-      return response.json();
-    })
-    .then((responseJSON) => {
-      console.log(responseJSON);
-      loadNote(null);
-      return refreshNotesList();
-    })
-    .catch((error) => {
-      console.log("Saving failed: ", error);
-    });
+  await API.deleteNote(activeNote.id);
+  loadNote(null);
+  refreshNotesList();
 };
 
 
-const archiveDatabase = () => {
-  fetch("/api/database/", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      return response.text();
-    })
-    .then((text) => {
-      const blob = new Blob([text], {
-        type: "application/json",
-      });
-      const dateSuffix = Utils.yyyymmdd(new Date());
-      // eslint-disable-next-line no-undef
-      saveAs(blob, `neno-${dateSuffix}.db.json`);
-      return text;
-    })
-    .catch((error) => {
-      console.log("Archive download failed: ", error);
-    });
+const archiveDatabase = async () => {
+  const json = await API.getDatabaseAsJSON();
+  const blob = new Blob([json], {
+    type: "application/json",
+  });
+  const dateSuffix = Utils.yyyymmdd(new Date());
+  // eslint-disable-next-line no-undef
+  saveAs(blob, `neno-${dateSuffix}.db.json`);
+  return json;
 };
 
 
-const init = () => {
+const init = async () => {
   const initialId = parseInt(
     Utils.getParameterByName("id", window.location.href),
   );
