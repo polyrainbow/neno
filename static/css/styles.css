@@ -92,14 +92,6 @@ tr[class*="active"]{
 
 
 @media only screen and (min-width: 1201px) {
-  #heading #full-heading{
-    display: inline;
-  }
-
-  #heading #short-heading{
-    display: none;
-  }
-
   main {
     grid-template-columns: auto auto;
     grid-template-rows: 100%;
@@ -130,14 +122,6 @@ tr[class*="active"]{
 
 
 @media only screen and (max-width: 1200px) and (min-width: 649px){
-  #heading #full-heading{
-    display: none;
-  }
-
-  #heading #short-heading{
-    display: inline;
-  }
-
   main {
     grid-template-columns: 1fr;
   }
@@ -157,14 +141,6 @@ tr[class*="active"]{
 
 
 @media only screen and (max-width: 648px) {
-  #heading #full-heading{
-    display: none;
-  }
-
-  #heading #short-heading{
-    display: inline;
-  }
-
   main {
     grid-template-columns: 1fr;
   }
