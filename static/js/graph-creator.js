@@ -2,6 +2,7 @@
 import * as Utils from "./utils.js";
 
 const statusElement = document.getElementById("status");
+const openButton = document.getElementById("button-open");
 const DEFAULT_STATUS = "Hold shift to draw links";
 
 const screenPosition = {
@@ -32,6 +33,14 @@ document.onload = (function(d3) {
       selectedText: null,
     };
 
+    openButton.addEventListener("click", () => {
+      if (!thisGraph.state.selectedNode) {
+        return;
+      }
+
+      window.open("/?id=" + thisGraph.state.selectedNode.id, "_blank");
+    });
+
     thisGraph.svg = svg;
     thisGraph.svgG = svg.append("g")
       .classed(thisGraph.consts.graphClass, true);
@@ -60,8 +69,8 @@ document.onload = (function(d3) {
         thisGraph.state.justDragged = true;
         thisGraph.dragmove(args);
       })
-      .on("end", function() {
-        // todo check if edge-mode is selected
+      .on("end", function(d) {
+        thisGraph.replaceSelectNode(d3.select(this), d);
       });
 
     // listen for key events
@@ -242,18 +251,17 @@ document.onload = (function(d3) {
 
   GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData) {
     const thisGraph = this;
-    d3Node.classed(this.consts.selectedClass, true);
     if (thisGraph.state.selectedNode) {
       thisGraph.removeSelectFromNode();
     }
+    d3Node.classed(this.consts.selectedClass, true);
     thisGraph.state.selectedNode = nodeData;
   };
 
   GraphCreator.prototype.removeSelectFromNode = function() {
     const thisGraph = this;
-    thisGraph.nodeElements.filter(function(cd) {
-      return cd.id === thisGraph.state.selectedNode.id;
-    }).classed(thisGraph.consts.selectedClass, false);
+    thisGraph.nodeElements
+      .classed(thisGraph.consts.selectedClass, false);
     thisGraph.state.selectedNode = null;
   };
 
@@ -352,8 +360,6 @@ document.onload = (function(d3) {
 
         if (!prevNode || prevNode.id !== d.id) {
           thisGraph.replaceSelectNode(d3node, d);
-        } else {
-          thisGraph.removeSelectFromNode();
         }
       }
     }
@@ -517,7 +523,7 @@ document.onload = (function(d3) {
       })
       .on("click", function(d) {
         if (d3.event.ctrlKey) {
-          window.location.href = "/?id=" + d.id;
+          window.open("/?id=" + d.id, "_blank");
         }
       })
       .call(thisGraph.drag);
