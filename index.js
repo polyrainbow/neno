@@ -40,6 +40,10 @@ const ALLOWED_UPLOAD_TYPES = [
     mimeType: "image/jpeg",
     ending: "jpg",
   },
+  {
+    mimeType: "image/webp",
+    ending: "webp",
+  },
 ];
 
 const customPortArgument = process.argv.find((arg) => {
