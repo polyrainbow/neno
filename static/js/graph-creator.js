@@ -570,8 +570,11 @@ document.onload = (function(d3) {
   const bodyEl = document.getElementsByTagName("body")[0];
 
   const width = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
-  const height = window.innerHeight
-    || docEl.clientHeight || bodyEl.clientHeight;
+  const height = (
+    window.innerHeight
+    || docEl.clientHeight
+    || bodyEl.clientHeight
+  ) - 50;
 
   // initial node data
   fetch("/api/graph")
