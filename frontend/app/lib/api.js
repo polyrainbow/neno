@@ -1,5 +1,8 @@
+import { API_URL } from "./config.js";
+import { yyyymmdd } from "./utils.js";
+
 const getNote = async (noteId) => {
-  const response = await fetch("/api/note/" + noteId, {
+  const response = await fetch(API_URL + "note/" + noteId, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -12,7 +15,7 @@ const getNote = async (noteId) => {
 
 
 const getNotes = async () => {
-  const response = await fetch("/api/notes", {
+  const response = await fetch(API_URL + "notes", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -25,7 +28,7 @@ const getNotes = async () => {
 
 
 const putNote = async (note) => {
-  const response = await fetch("/api/note", {
+  const response = await fetch(API_URL + "note", {
     method: "PUT",
     body: JSON.stringify(note),
     headers: {
@@ -40,7 +43,7 @@ const putNote = async (note) => {
 
 const deleteNote = async (noteId) => {
   await fetch(
-    "/api/note/" + noteId,
+    API_URL + "note/" + noteId,
     {
       method: "DELETE",
       headers: {
@@ -52,7 +55,7 @@ const deleteNote = async (noteId) => {
 
 
 const getDatabaseAsJSON = async () => {
-  const response = await fetch("/api/database/", {
+  const response = await fetch(API_URL + "database/", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -64,13 +67,25 @@ const getDatabaseAsJSON = async () => {
 
 
 const getGraph = async () => {
-  const response = await fetch("/api/graph", {
+  const response = await fetch(API_URL + "graph", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
   const json = await response.json();
+  return json;
+};
+
+
+const archiveDatabase = async () => {
+  const json = await getDatabaseAsJSON();
+  const blob = new Blob([json], {
+    type: "application/json",
+  });
+  const dateSuffix = yyyymmdd(new Date());
+  // eslint-disable-next-line no-undef
+  saveAs(blob, `neno-${dateSuffix}.db.json`);
   return json;
 };
 
@@ -82,5 +97,6 @@ export {
   deleteNote,
   getDatabaseAsJSON,
   getGraph,
+  archiveDatabase,
 };
 

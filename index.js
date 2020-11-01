@@ -84,7 +84,7 @@ app.use((req, res, next) => {
   // -----------------------------------------------------------------------
 });
 
-app.use("/", express.static(path.join(__dirname, "static")));
+app.use("/", express.static(path.join(__dirname, "frontend")));
 app.use(express.json());
 
 app.get("/api", function(req, res) {
