@@ -6,6 +6,7 @@ const urlMetadata = require("url-metadata");
 const formidable = require("formidable");
 const fs = require("fs");
 const archiver = require("archiver");
+const yyyymmdd = require("./lib/utils.js").yyyymmdd;
 
 
 let PORT = 8080;
@@ -104,7 +105,8 @@ app.get("/api/database-with-uploads", function(req, res) {
   });
 
   // set the archive name
-  res.attachment(req.userId + ".db.zip");
+  const dateSuffix = yyyymmdd(new Date());
+  res.attachment(`neno-${req.userId}-${dateSuffix}.db.zip`);
 
   // this is the streaming magic
   archive.pipe(res);
