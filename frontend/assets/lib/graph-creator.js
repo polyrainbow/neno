@@ -5,6 +5,9 @@ const statusElement = document.getElementById("status");
 const openButton = document.getElementById("button-open");
 const DEFAULT_STATUS = "Hold shift to draw links";
 
+let graphIsRendered = false;
+let unsavedChanges = false;
+
 const screenPosition = {
   translateX: 0,
   translateY: 0,
@@ -116,6 +119,7 @@ document.onload = (function(d3) {
     svg.call(zoom).on("dblclick.zoom", null);
     zoom.on("end", function() {
       d3.select("body").style("cursor", "auto");
+      unsavedChanges = true;
     });
 
     const initialZoomTranform = d3.zoomIdentity
@@ -171,6 +175,7 @@ document.onload = (function(d3) {
             statusElement.innerHTML = DEFAULT_STATUS;
           }, 2000);
           console.log("Graph saved!");
+          unsavedChanges = false;
         })
         .catch((e) => {
           const statusElement = document.getElementById("status");
@@ -540,6 +545,15 @@ document.onload = (function(d3) {
     // remove old nodes
     const nodeExitSelection = thisGraph.nodeElements.exit();
     nodeExitSelection.remove();
+
+    // when the graph is rendered for the first time, no unsaved change has
+    // been made, but if the graph is updated a 2nd time, these must be unsaved
+    // changes
+    if (graphIsRendered) {
+      unsavedChanges = true;
+    } else {
+      graphIsRendered = true;
+    }
   };
 
   GraphCreator.prototype.zoomed = function() {
@@ -568,9 +582,17 @@ document.onload = (function(d3) {
   /** ** MAIN ****/
 
   // warn the user when leaving
-  window.onbeforeunload = function() {
-    return "Make sure to save your graph before leaving";
-  };
+  window.addEventListener('beforeunload', function (e) {
+    if (unsavedChanges) {
+      // Cancel the event
+      e.preventDefault(); // If you prevent default behavior in Mozilla Firefox prompt will always be shown
+      // Chrome requires returnValue to be set
+      e.returnValue = '';
+    } else {
+      // the absence of a returnValue property on the event will guarantee the browser unload happens
+      delete e['returnValue'];
+    }
+  });
 
   const docEl = document.documentElement;
   const bodyEl = document.getElementsByTagName("body")[0];
