@@ -49,9 +49,9 @@ const NoteListItem = ({
         : ""
     }
     <td
-      className="time"
+      className="update-time"
     >
-      {yyyymmdd(new Date(note.time))}
+      {yyyymmdd(new Date(note.updateTime))}
     </td>
   </tr>;
 };

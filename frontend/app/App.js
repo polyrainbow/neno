@@ -51,7 +51,6 @@ const App = () => {
 
     let note = {
       editorData: outputData,
-      time: outputData.time,
     };
 
     if (

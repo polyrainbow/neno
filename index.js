@@ -159,7 +159,8 @@ app.get("/api/notes", function(req, res) {
     return {
       id: note.id,
       title: note.editorData && note.editorData.blocks[0].data.text,
-      time: note.time,
+      creationTime: note.creationTime,
+      updateTime: note.updateTime,
       numberOfLinkedNotes: note.linkedNotes.length,
     };
   });
