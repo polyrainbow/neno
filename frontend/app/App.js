@@ -117,7 +117,6 @@ const App = () => {
     <Header
       notes={notes}
       links={links}
-      activeNote={activeNote}
     />
     <Controls
       activeNote={activeNote}

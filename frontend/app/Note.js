@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import NoteListItem from "./NoteListItem.js";
 import * as Editor from "./lib/editor.js";
+import NoteStats from "./NoteStats.js";
 
 const Note = ({
   note,
@@ -33,6 +34,11 @@ const Note = ({
         </tbody>
       </table>
     </div>
+    {
+      note !== null
+        ? <NoteStats note={note} />
+        : ""
+    }
   </section>;
 };
 

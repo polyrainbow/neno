@@ -60,7 +60,7 @@ table {
   width: 100%;
 }
 
-tr.hub{
+.note-list-item.hub{
   font-weight: bold;
 }
 
@@ -69,15 +69,15 @@ th, td {
   padding: 5px;
 }
 
-td {
+.note-list-item {
   cursor: pointer;
 }
 
-td.update-time{
+.note-list-item .update-time{
   width: 92px;
 }
 
-tr:hover, tr:nth-child(even):hover {
+.note-list-item:hover, .note-list-item:nth-child(even):hover {
   background-color: aqua;
 }
 
@@ -85,7 +85,7 @@ tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-tr[class*="active"]{
+.note-list-item[class*="active"]{
   font-weight: bold;
   background-color: chartreuse;
 }
@@ -108,7 +108,7 @@ tr[class*="active"]{
     padding: 0;
   }
 
-  #links h2{
+  #links h2, #stats h2{
     padding: 0px 10px;
   }
 
@@ -156,7 +156,7 @@ tr[class*="active"]{
     padding: 0;
   }
 
-  #links h2{
+  #links h2, #stats h2{
     padding: 0px 10px;
   }
 

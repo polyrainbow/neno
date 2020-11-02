@@ -10,7 +10,7 @@ const NoteListItem = ({
 }) => {
   const isHub = note.numberOfLinkedNotes >= 5;
 
-  const trClassList = [];
+  const trClassList = ["note-list-item"];
   if (isHub) {
     trClassList.push("hub");
   }
@@ -46,7 +46,7 @@ const NoteListItem = ({
               : <span title="Not linked">🔴</span>
           }
         </td>
-        : ""
+        : null
     }
     <td
       className="update-time"

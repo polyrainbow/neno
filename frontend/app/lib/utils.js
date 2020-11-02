@@ -22,8 +22,27 @@ const getParameterByName = (name, url) => {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 };
 
+
+const getNumberOfCharacters = (note) => {
+  return note.editorData.blocks.reduce((accumulator, block) => {
+    if (["paragraph", "header"].includes(block.type)) {
+      return accumulator + block.data.text.length;
+    } else {
+      return accumulator;
+    }
+  }, 0);
+};
+
+
+const makeTimestampHumanReadable = (timestamp) => {
+  return (new Date(timestamp)).toString();
+};
+
+
 export {
   yyyymmdd,
   htmlDecode,
   getParameterByName,
+  getNumberOfCharacters,
+  makeTimestampHumanReadable,
 };
