@@ -14,8 +14,15 @@ const getNote = async (noteId) => {
 };
 
 
-const getNotes = async () => {
-  const response = await fetch(API_URL + "notes", {
+const getNotes = async ({ query, caseSensitive }) => {
+  let url = API_URL + "notes";
+  if (typeof query === "string") {
+    url = url
+      + "?q=" + encodeURIComponent(query)
+      + "&caseSensitive=" + caseSensitive;
+  }
+
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

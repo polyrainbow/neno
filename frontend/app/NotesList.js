@@ -12,7 +12,7 @@ const NotesList = ({
   }
 
   return <section id="list">
-    <table id="list">
+    <table id="list-table">
       <tbody>
         {
           notes.map((note, i) => {

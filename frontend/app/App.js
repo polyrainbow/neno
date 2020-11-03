@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Header from "./Header.js";
 import NoteControls from "./NoteControls.js";
 import NotesList from "./NotesList.js";
+import NoteSearchInput from "./NoteSearchInput.js";
 import Note from "./Note.js";
 import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
@@ -12,6 +13,12 @@ const App = () => {
   const [notes, setNotes] = useState(null);
   const [links, setLinks] = useState(null);
   const [activeNote, setActiveNote] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearchInputChange = (value) => {
+    setSearchValue(value);
+    refreshNotesList();
+  };
 
   const loadNote = async (noteId) => {
     if (typeof noteId !== "number") {
@@ -24,10 +31,18 @@ const App = () => {
   };
 
 
-  const refreshNotesList = async () => {
-    const notes = await API.getNotes();
-    setNotes(notes);
-  };
+  const refreshNotesList = useCallback(
+    async () => {
+      const options = {};
+      if (searchValue.length > 0) {
+        options.query = searchValue;
+        options.caseSensitive = false;
+      }
+      const notes = await API.getNotes(options);
+      setNotes(notes);
+    },
+    [searchValue],
+  );
 
 
   const removeActiveNote = async () => {
@@ -110,7 +125,7 @@ const App = () => {
         // eslint-disable-next-line no-console
         console.error(e);
       });
-  }, []);
+  }, [refreshNotesList]);
 
 
   return <>
@@ -119,12 +134,18 @@ const App = () => {
       links={links}
     />
     <main>
-      <NotesList
-        notes={notes}
-        loadNote={loadNote}
-        activeNote={activeNote}
-      />
-      <div>
+      <div id="left-view">
+        <NoteSearchInput
+          onChange={handleSearchInputChange}
+          value={searchValue}
+        />
+        <NotesList
+          notes={notes}
+          loadNote={loadNote}
+          activeNote={activeNote}
+        />
+      </div>
+      <div id="right-view">
         <NoteControls
           activeNote={activeNote}
           createNewNote={createNewNote}

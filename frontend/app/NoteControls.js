@@ -7,7 +7,7 @@ const NoteControls = ({
   saveNote,
   removeActiveNote,
 }) => {
-  return <section id="controls">
+  return <section id="note-controls">
     <div id="controls-left">
       <button
         id="button_new"

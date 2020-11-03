@@ -158,33 +158,17 @@ app.post(API_PATH + "/graph", function(req, res) {
 
 
 app.get(API_PATH + "/notes", function(req, res) {
-  const notes = Notes.getAll(req.userId, {
-    includeLinkedNotes: true,
-  });
-  const notesList = notes.map((note) => {
-    return {
-      id: note.id,
-      title: getNoteTitle(note),
-      creationTime: note.creationTime,
-      updateTime: note.updateTime,
-      numberOfLinkedNotes: note.linkedNotes.length,
-    };
-  });
-  res.end(JSON.stringify(notesList));
-});
-
-
-app.get(API_PATH + "/search", function(req, res) {
   const query = req.query.q;
   const caseSensitiveQuery = req.query.caseSensitive === "true";
+  const includeLinkedNotes = true;
 
   let notes;
 
-  if (query.length < 3) {
+  if (typeof query === "string" && query.length < 3) {
     notes = [];
   } else {
     notes = Notes.getAll(req.userId, {
-      includeLinkedNotes: false,
+      includeLinkedNotes,
       query,
       caseSensitiveQuery,
     });
@@ -192,12 +176,18 @@ app.get(API_PATH + "/search", function(req, res) {
 
 
   const notesList = notes.map((note) => {
-    return {
+    const noteCleaned = {
       id: note.id,
       title: getNoteTitle(note),
       creationTime: note.creationTime,
       updateTime: note.updateTime,
     };
+
+    if (includeLinkedNotes) {
+      noteCleaned.numberOfLinkedNotes = note.linkedNotes.length;
+    }
+
+    return noteCleaned;
   });
   res.end(JSON.stringify(notesList));
 });
