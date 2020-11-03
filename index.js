@@ -6,6 +6,7 @@ const urlMetadata = require("url-metadata");
 const formidable = require("formidable");
 const fs = require("fs");
 const archiver = require("archiver");
+const { getNoteTitle } = require("./lib/noteUtils.js");
 const yyyymmdd = require("./lib/utils.js").yyyymmdd;
 
 
@@ -159,7 +160,7 @@ app.get(API_PATH + "/notes", function(req, res) {
   const notesList = notes.map((note) => {
     return {
       id: note.id,
-      title: note.editorData && note.editorData.blocks[0].data.text,
+      title: getNoteTitle(note),
       creationTime: note.creationTime,
       updateTime: note.updateTime,
       numberOfLinkedNotes: note.linkedNotes.length,
