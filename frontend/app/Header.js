@@ -2,18 +2,18 @@ import React from "react";
 import HeaderControls from "./HeaderControls";
 
 const Header = ({
-  notes,
+  allNotes,
   links,
 }) => {
-  const numberOfUnlinkedNotes = notes?.filter((note) => {
+  const numberOfUnlinkedNotes = allNotes?.filter((note) => {
     return note.numberOfLinkedNotes === 0;
   }).length;
 
   const percentageOfUnlinkedNotes = Math.round(
-    (numberOfUnlinkedNotes / notes?.length) * 100 * 100,
+    (numberOfUnlinkedNotes / allNotes?.length) * 100 * 100,
   ) / 100;
 
-  const showStats = (notes !== null) && (links !== null);
+  const showStats = (allNotes !== null) && (links !== null);
 
   return (
     <header>
@@ -26,7 +26,7 @@ const Header = ({
           ? <div id="app-stats">
             <span>Nodes: </span>
             <span id="span_available-notes">
-              {notes.length}
+              {allNotes.length}
             </span>
             <span> 🔸 </span>
             <span>Links: </span>

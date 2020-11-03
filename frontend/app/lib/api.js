@@ -14,7 +14,10 @@ const getNote = async (noteId) => {
 };
 
 
-const getNotes = async ({ query, caseSensitive }) => {
+const getNotes = async (options) => {
+  const query = options?.query;
+  const caseSensitive = options?.caseSensitive;
+
   let url = API_URL + "notes";
   if (typeof query === "string") {
     url = url

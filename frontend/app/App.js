@@ -10,7 +10,8 @@ import * as API from "./lib/api.js";
 import * as Editor from "./lib/editor.js";
 
 const App = () => {
-  const [notes, setNotes] = useState(null);
+  const [displayedNotes, setDisplayedNotes] = useState(null);
+  const [allNotes, setAllNotes] = useState(null);
   const [links, setLinks] = useState(null);
   const [activeNote, setActiveNote] = useState(null);
   const [searchValue, setSearchValue] = useState("");
@@ -39,7 +40,13 @@ const App = () => {
         options.caseSensitive = false;
       }
       const notes = await API.getNotes(options);
-      setNotes(notes);
+      setDisplayedNotes(notes);
+
+      const allNotes = (searchValue.length === 0)
+        ? notes
+        : await API.getNotes();
+
+      setAllNotes(allNotes);
     },
     [searchValue],
   );
@@ -130,7 +137,7 @@ const App = () => {
 
   return <>
     <Header
-      notes={notes}
+      allNotes={allNotes}
       links={links}
     />
     <main>
@@ -140,7 +147,7 @@ const App = () => {
           value={searchValue}
         />
         <NotesList
-          notes={notes}
+          notes={displayedNotes}
           loadNote={loadNote}
           activeNote={activeNote}
         />
