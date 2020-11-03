@@ -177,11 +177,20 @@ app.get(API_PATH + "/notes", function(req, res) {
 app.get(API_PATH + "/search", function(req, res) {
   const query = req.query.q;
   const caseSensitiveQuery = req.query.caseSensitive === "true";
-  const notes = Notes.getAll(req.userId, {
-    includeLinkedNotes: false,
-    query,
-    caseSensitiveQuery,
-  });
+
+  let notes;
+
+  if (query.length < 3) {
+    notes = [];
+  } else {
+    notes = Notes.getAll(req.userId, {
+      includeLinkedNotes: false,
+      query,
+      caseSensitiveQuery,
+    });
+  }
+
+
   const notesList = notes.map((note) => {
     return {
       id: note.id,
