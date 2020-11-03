@@ -44,12 +44,12 @@
   "scripts": {
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
-    "start-server": "node index.js port=8080",
+    "start-server": "node index.mjs port=8080",
     "start": "npm run build-frontend-production && npm run start-server",
-    "dev-frontend": "cd frontend && npx webpack --config webpack.development.js",
-    "dev-server-frontend": "cd frontend && npx webpack serve --config webpack.development.js",
+    "dev-frontend": "npx webpack --config frontend/webpack.development.js",
+    "dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
     "dev": "concurrently --kill-others \"npm run start-server\" \"npm run dev-frontend\"",
-    "build-frontend-production": "cd frontend && npx webpack --config webpack.production.js"
+    "build-frontend-production": "npx webpack --config frontend/webpack.production.js"
   },
   "author": "",
   "license": "ISC"

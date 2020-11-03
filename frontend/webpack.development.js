@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   mode: "development",
-  entry: "./app/index.js",
+  entry: path.join(__dirname, "app", "index.js"),
   output: {
     // `filename` provides a template for naming your bundles (remember to use
     // `[name]`)

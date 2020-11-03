@@ -1,14 +1,16 @@
-const path = require("path");
-const express = require("express");
-const app = express();
-const Notes = require("./lib/notes.js");
-const urlMetadata = require("url-metadata");
-const formidable = require("formidable");
-const fs = require("fs");
-const archiver = require("archiver");
-const { getNoteTitle } = require("./lib/noteUtils.js");
-const yyyymmdd = require("./lib/utils.js").yyyymmdd;
+import * as path from "path";
+import express from "express";
+import * as Notes from "./lib/notes.mjs";
+import urlMetadata from "url-metadata";
+import formidable from "formidable";
+import fs from "fs";
+import archiver from "archiver";
+import { getNoteTitle } from "./lib/noteUtils.mjs";
+import { yyyymmdd } from "./lib/utils.mjs";
+import { fileURLToPath } from "url";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const app = express();
 
 let PORT = 8080;
 const API_PATH = "/api";
@@ -164,6 +166,21 @@ app.get(API_PATH + "/notes", function(req, res) {
       creationTime: note.creationTime,
       updateTime: note.updateTime,
       numberOfLinkedNotes: note.linkedNotes.length,
+    };
+  });
+  res.end(JSON.stringify(notesList));
+});
+
+
+app.get(API_PATH + "/search", function(req, res) {
+  const query = req.params.q;
+  const notes = Notes.getAll(req.userId, false, query);
+  const notesList = notes.map((note) => {
+    return {
+      id: note.id,
+      title: getNoteTitle(note),
+      creationTime: note.creationTime,
+      updateTime: note.updateTime,
     };
   });
   res.end(JSON.stringify(notesList));
