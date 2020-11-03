@@ -10,6 +10,7 @@ const yyyymmdd = require("./lib/utils.js").yyyymmdd;
 
 
 let PORT = 8080;
+const API_PATH = "/api";
 
 let DATA_PATH = path.join(__dirname, "..", "network-notes-data");
 if (process.env.DATA_FOLDER_PATH) {
@@ -87,12 +88,12 @@ app.use((req, res, next) => {
 app.use("/", express.static(path.join(__dirname, "frontend")));
 app.use(express.json());
 
-app.get("/api", function(req, res) {
+app.get(API_PATH, function(req, res) {
   res.send("Hello World!");
 });
 
 
-app.get("/api/database-with-uploads", function(req, res) {
+app.get(API_PATH + "/database-with-uploads", function(req, res) {
   const archive = archiver("zip");
 
   archive.on("error", function(err) {
@@ -121,13 +122,13 @@ app.get("/api/database-with-uploads", function(req, res) {
 });
 
 
-app.get("/api/database", function(req, res) {
+app.get(API_PATH + "/database", function(req, res) {
   const database = Notes.exportDB(req.userId);
   res.end(JSON.stringify(database));
 });
 
 
-app.put("/api/database", function(req, res) {
+app.put(API_PATH + "/database", function(req, res) {
   Notes.importDB(req.body, req.userId);
   res.end(JSON.stringify(
     {
@@ -137,13 +138,13 @@ app.put("/api/database", function(req, res) {
 });
 
 
-app.get("/api/graph", function(req, res) {
+app.get(API_PATH + "/graph", function(req, res) {
   const graph = Notes.getGraph(req.userId);
   res.end(JSON.stringify(graph));
 });
 
 
-app.post("/api/graph", function(req, res) {
+app.post(API_PATH + "/graph", function(req, res) {
   Notes.setGraph(req.body, req.userId);
   res.end(JSON.stringify(
     {
@@ -153,7 +154,7 @@ app.post("/api/graph", function(req, res) {
 });
 
 
-app.get("/api/notes", function(req, res) {
+app.get(API_PATH + "/notes", function(req, res) {
   const notes = Notes.getAll(req.userId, true);
   const notesList = notes.map((note) => {
     return {
@@ -168,13 +169,13 @@ app.get("/api/notes", function(req, res) {
 });
 
 
-app.get("/api/note/:noteId", function(req, res) {
+app.get(API_PATH + "/note/:noteId", function(req, res) {
   const note = Notes.get(parseInt(req.params.noteId), req.userId, true);
   res.end(JSON.stringify(note));
 });
 
 
-app.put("/api/note", function(req, res) {
+app.put(API_PATH + "/note", function(req, res) {
   const note = req.body;
   const noteFromDB = Notes.put(note, req.userId);
   res.end(JSON.stringify({
@@ -184,7 +185,7 @@ app.put("/api/note", function(req, res) {
 });
 
 
-app.delete("/api/note/:noteId", function(req, res) {
+app.delete(API_PATH + "/note/:noteId", function(req, res) {
   const success = Notes.remove(parseInt(req.params.noteId), req.userId);
   res.end(JSON.stringify({
     success,
@@ -197,7 +198,7 @@ app.listen(PORT, function() {
 });
 
 
-app.get("/api/link-data", (req, res) => {
+app.get(API_PATH + "/link-data", (req, res) => {
   const url = req.query.url;
 
   urlMetadata(url)
@@ -224,7 +225,7 @@ app.get("/api/link-data", (req, res) => {
 });
 
 
-app.post("/api/image", function(req, res) {
+app.post(API_PATH + "/image", function(req, res) {
   const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -266,7 +267,7 @@ app.post("/api/image", function(req, res) {
 });
 
 
-app.get("/api/image/:imageId", function(req, res) {
+app.get(API_PATH + "/image/:imageId", function(req, res) {
   const file = Notes.getImage(req.params.imageId);
   if (!fs.existsSync(file)) {
     res.end("ERROR: File does not exist!");
