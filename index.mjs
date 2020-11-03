@@ -7,9 +7,9 @@ import fs from "fs";
 import archiver from "archiver";
 import { getNoteTitle } from "./lib/noteUtils.mjs";
 import { yyyymmdd } from "./lib/utils.mjs";
-import { fileURLToPath } from "url";
+import * as url from "url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const app = express();
 
 let PORT = 8080;
@@ -158,7 +158,9 @@ app.post(API_PATH + "/graph", function(req, res) {
 
 
 app.get(API_PATH + "/notes", function(req, res) {
-  const notes = Notes.getAll(req.userId, true);
+  const notes = Notes.getAll(req.userId, {
+    includeLinkedNotes: true,
+  });
   const notesList = notes.map((note) => {
     return {
       id: note.id,
@@ -173,8 +175,13 @@ app.get(API_PATH + "/notes", function(req, res) {
 
 
 app.get(API_PATH + "/search", function(req, res) {
-  const query = req.params.q;
-  const notes = Notes.getAll(req.userId, false, query);
+  const query = req.query.q;
+  const caseSensitiveQuery = req.query.caseSensitive === "true";
+  const notes = Notes.getAll(req.userId, {
+    includeLinkedNotes: false,
+    query,
+    caseSensitiveQuery,
+  });
   const notesList = notes.map((note) => {
     return {
       id: note.id,
