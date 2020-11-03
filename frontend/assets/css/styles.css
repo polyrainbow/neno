@@ -21,6 +21,21 @@ header h1 {
   font-size: x-large;
 }
 
+#header-left {
+  display: flex;
+  justify-content: center;
+  height: 50px;
+}
+
+#heading {
+  margin: 8px;
+  font-size: 24px;
+}
+
+#header-controls {
+  display: inline-block;
+}
+
 main {
   display: grid;
 }
@@ -31,10 +46,6 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 50px;
-}
-
-#controls-left{
   height: 50px;
 }
 
@@ -97,7 +108,7 @@ tr:nth-child(even) {
     grid-template-rows: 100%;
     position: fixed;
     bottom: 0px;
-    top: 100px;
+    top: 50px;
     width: 100%;
   }
 
@@ -106,6 +117,7 @@ tr:nth-child(even) {
     min-width: 720px;
     grid-area: 1 / 2 / 2 / 3;
     padding: 0;
+    height: calc(100vh - 100px);
   }
 
   #links h2, #stats h2{
@@ -121,7 +133,7 @@ tr:nth-child(even) {
 
 
 
-@media only screen and (max-width: 1200px) and (min-width: 649px){
+@media only screen and (max-width: 1200px) and (min-width: 711px){
   main {
     grid-template-columns: 1fr;
   }
@@ -140,7 +152,11 @@ tr:nth-child(even) {
 }
 
 
-@media only screen and (max-width: 648px) {
+@media only screen and (max-width: 710px) {
+  #app-stats{
+    display: none;
+  }
+
   main {
     grid-template-columns: 1fr;
   }

@@ -1,4 +1,5 @@
 import React from "react";
+import HeaderControls from "./HeaderControls";
 
 const Header = ({
   notes,
@@ -16,10 +17,13 @@ const Header = ({
 
   return (
     <header>
-      <h1 id="heading">NeNo</h1>
+      <div id="header-left">
+        <h1 id="heading">NeNo</h1>
+        <HeaderControls />
+      </div>
       {
         showStats
-          ? <div>
+          ? <div id="app-stats">
             <span>Nodes: </span>
             <span id="span_available-notes">
               {notes.length}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Header from "./Header.js";
-import Controls from "./Controls.js";
+import NoteControls from "./NoteControls.js";
 import NotesList from "./NotesList.js";
 import Note from "./Note.js";
 import * as Utils from "./lib/utils.js";
@@ -118,22 +118,25 @@ const App = () => {
       notes={notes}
       links={links}
     />
-    <Controls
-      activeNote={activeNote}
-      createNewNote={createNewNote}
-      saveNote={saveNote}
-      removeActiveNote={removeActiveNote}
-    />
     <main>
       <NotesList
         notes={notes}
         loadNote={loadNote}
         activeNote={activeNote}
       />
-      <Note
-        note={activeNote}
-        loadNote={loadNote}
-      />
+      <div>
+        <NoteControls
+          activeNote={activeNote}
+          createNewNote={createNewNote}
+          saveNote={saveNote}
+          removeActiveNote={removeActiveNote}
+        />
+        <Note
+          note={activeNote}
+          loadNote={loadNote}
+        />
+      </div>
+
     </main>
   </>;
 };
