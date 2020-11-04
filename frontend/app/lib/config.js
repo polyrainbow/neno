@@ -29,8 +29,15 @@ const placeholderNoteObject = {
 
 const API_URL = "/api/";
 
+const texts = {
+  titleAlreadyExistsConfirmation:
+    "A note with this title already exists. Do you want to save this note "
+    + "with the same title?",
+};
+
 export {
   DEFAULT_NOTE_TITLE,
   placeholderNoteObject,
   API_URL,
+  texts,
 };

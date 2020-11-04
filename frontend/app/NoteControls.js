@@ -1,5 +1,5 @@
 import React from "react";
-
+import * as Config from "./lib/config.js";
 
 const NoteControls = ({
   activeNote,
@@ -25,7 +25,7 @@ const NoteControls = ({
           saveNote({ ignoreDuplicateTitles: false }).catch((e) => {
             if (e.message === "NOTE_WITH_SAME_TITLE_EXISTS") {
               if (confirm(
-                "A note with this title already exists. Do you want to save this note with the same title?",
+                Config.texts.titleAlreadyExistsConfirmation,
               )) {
                 saveNote({ ignoreDuplicateTitles: true }).catch((e) => {
                   alert(e);
