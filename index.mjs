@@ -200,12 +200,19 @@ app.get(API_PATH + "/note/:noteId", function(req, res) {
 
 
 app.put(API_PATH + "/note", function(req, res) {
-  const note = req.body;
-  const noteFromDB = Notes.put(note, req.userId);
-  res.end(JSON.stringify({
-    note: noteFromDB,
-    success: true,
-  }));
+  const reqBody = req.body;
+  try {
+    const noteFromDB = Notes.put(reqBody.note, req.userId, reqBody.options);
+    res.end(JSON.stringify({
+      note: noteFromDB,
+      success: true,
+    }));
+  } catch (e) {
+    res.end(JSON.stringify({
+      success: false,
+      error: e.message,
+    }));
+  }
 });
 
 

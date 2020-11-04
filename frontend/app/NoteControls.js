@@ -21,7 +21,19 @@ const NoteControls = ({
         id="button_upload"
         alt="Save"
         title="Save"
-        onClick={saveNote}
+        onClick={() => {
+          saveNote({ ignoreDuplicateTitles: false }).catch((e) => {
+            if (e.message === "NOTE_WITH_SAME_TITLE_EXISTS") {
+              if (confirm(
+                "A note with this title already exists. Do you want to save this note with the same title?",
+              )) {
+                saveNote({ ignoreDuplicateTitles: true }).catch((e) => {
+                  alert(e);
+                });
+              }
+            }
+          });
+        }}
       >
         <img src="/assets/icons/save-24px.svg" />
       </button>

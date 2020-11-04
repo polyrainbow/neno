@@ -37,17 +37,25 @@ const getNotes = async (options) => {
 };
 
 
-const putNote = async (note) => {
+const putNote = async (note, options) => {
   const response = await fetch(API_URL + "note", {
     method: "PUT",
-    body: JSON.stringify(note),
+    body: JSON.stringify({
+      note,
+      options,
+    }),
     headers: {
       "Content-Type": "application/json",
     },
   });
 
-  const noteFromServer = (await response.json()).note;
-  return noteFromServer;
+  const json = await response.json();
+
+  if (json.success === false) {
+    throw new Error(json.error);
+  }
+
+  return json.note;
 };
 
 

@@ -68,7 +68,7 @@ const App = () => {
   };
 
 
-  const saveNote = async () => {
+  const saveNote = async (options) => {
     const outputData = await Editor.save();
 
     let note = {
@@ -103,14 +103,9 @@ const App = () => {
       note.editorData.blocks[0].data.text = firstLinkBlock.data.meta.title;
     }
 
-    try {
-      const noteFromServer = await API.putNote(note);
-      setActiveNote(noteFromServer);
-      refreshNotesList();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log("Saving failed: ", e);
-    }
+    const noteFromServer = await API.putNote(note, options);
+    setActiveNote(noteFromServer);
+    refreshNotesList();
   };
 
 
