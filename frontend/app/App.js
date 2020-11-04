@@ -140,6 +140,8 @@ const App = () => {
         <NoteSearchInput
           onChange={handleSearchInputChange}
           value={searchValue}
+          displayedNotes={displayedNotes}
+          allNotes={allNotes}
         />
         <NotesList
           notes={displayedNotes}

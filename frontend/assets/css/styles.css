@@ -41,12 +41,19 @@ main {
 }
 
 #note-controls, #search-input {
-  background-color: blanchedalmond;
   padding: 0px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 50px;
+}
+
+#search-input{
+  background-color: lightpink;
+}
+
+#note-controls {
+  background-color: blanchedalmond;
 }
 
 button, a.button {
