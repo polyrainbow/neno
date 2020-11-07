@@ -2,7 +2,12 @@ body, #app {
   margin: 0;
 }
 
-header, #controls, #list, #links{
+header,
+#controls,
+#left-view,
+#list,
+#links,
+#stats {
   font-family: 'Open Sans', sans-serif;
 }
 
@@ -29,6 +34,7 @@ header h1 {
 
 #heading {
   margin: 8px;
+  margin-left: 0px;
   font-size: 24px;
 }
 
@@ -40,7 +46,7 @@ main {
   display: grid;
 }
 
-#note-controls, #search-input {
+#note-controls, #section-search-input {
   padding: 0px 10px;
   display: flex;
   justify-content: space-between;
@@ -48,12 +54,16 @@ main {
   height: 50px;
 }
 
-#search-input{
+#section-search-input{
   background-color: lightpink;
 }
 
 #note-controls {
   background-color: blanchedalmond;
+}
+
+#note-controls-left {
+  display: flex;
 }
 
 button, a.button {
@@ -65,6 +75,10 @@ button, a.button {
   padding: 0;
   background: none;
   text-align: center;
+}
+
+button img, a.button img {
+  vertical-align: middle;
 }
 
 button[disabled]{

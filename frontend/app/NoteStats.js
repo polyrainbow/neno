@@ -9,9 +9,6 @@ const NoteStats = ({
 }) => {
   return <div
     id="stats"
-    style={{
-      "fontFamily": "sans-serif",
-    }}
   >
     <h2>Stats</h2>
     <table>

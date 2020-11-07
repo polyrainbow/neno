@@ -18,18 +18,25 @@ const NoteSearchInput = ({
     label = "Please type at least 3 characters to search";
   }
 
-  return <section id="search-input">
+  return <section id="section-search-input">
     <div
       style={{
         display: "flex",
         alignItems: "center",
       }}
     >
+      <label
+        htmlFor="search-input"
+        style={{
+          marginRight: "5px",
+        }}
+      >Search notes</label>
       <input
         style={{
           "border": "none",
           "fontSize": "24px",
         }}
+        id="search-input"
         type="text"
         placeholder="Search..."
         value={value}
@@ -52,7 +59,6 @@ const NoteSearchInput = ({
     </div>
     <span style={{
       fontSize: "16px",
-      fontFamily: "sans-serif",
     }}>{label}</span>
   </section>;
 };

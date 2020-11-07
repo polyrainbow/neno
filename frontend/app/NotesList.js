@@ -13,7 +13,6 @@ const NotesList = ({
   if (isBusy) {
     return <div
       style={{
-        fontFamily: "sans-serif",
         fontSize: "20px",
         textAlign: "center",
         margin: "30px auto",
