@@ -39,7 +39,7 @@ const NoteControls = ({
       </button>
       <button
         id="button_remove"
-        disabled={activeNote === null}
+        disabled={activeNote.isUnsaved}
         alt="Remove"
         title="Remove"
         onClick={() => {

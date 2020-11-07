@@ -38,7 +38,7 @@ const Note = ({
       </table>
     </div>
     {
-      note !== null
+      (!note.isUnsaved)
         ? <NoteStats note={note} />
         : ""
     }

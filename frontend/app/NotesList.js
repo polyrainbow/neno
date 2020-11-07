@@ -18,12 +18,14 @@ const NotesList = ({
       <tbody>
         {
           notes.map((note, i) => {
-            const isActive = activeNote && (note.id === activeNote.id);
-            const isLinked = activeNote && displayedLinkedNotes.some(
-              (linkedNote) => {
-                return linkedNote.id === note.id;
-              },
-            );
+            const isActive
+              = (!activeNote.isUnsaved) && (note.id === activeNote.id);
+            const isLinked
+              = (!activeNote.isUnsaved) && displayedLinkedNotes.some(
+                (linkedNote) => {
+                  return linkedNote.id === note.id;
+                },
+              );
 
             return <NoteListItem
               note={note}

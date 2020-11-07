@@ -9,17 +9,23 @@ import * as Config from "./lib/config.js";
 import * as API from "./lib/api.js";
 import * as Editor from "./lib/editor.js";
 
+const getNewNoteObject = () => {
+  return {
+    isUnsaved: true,
+    changes: [],
+  };
+};
+
 const App = () => {
   const [displayedNotes, setDisplayedNotes] = useState(null);
   const [allNotes, setAllNotes] = useState(null);
   const [links, setLinks] = useState(null);
-  const [activeNote, setActiveNote] = useState(null);
+  const [activeNote, setActiveNote] = useState(getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
-  const [activeNoteLinkChanges, setActiveNoteLinkChanges] = useState([]);
   const displayedLinkedNotes = [
-    ...activeNote
+    ...(!activeNote.isUnsaved)
       ? activeNote.linkedNotes.filter((note) => {
-        const isRemoved = activeNoteLinkChanges.some((change) => {
+        const isRemoved = activeNote.changes.some((change) => {
           return (
             change.type === "LINKED_NOTE_DELETED"
             && change.noteId === note.id
@@ -28,7 +34,7 @@ const App = () => {
         return !isRemoved;
       })
       : [],
-    ...activeNoteLinkChanges
+    ...activeNote.changes
       .filter((change) => {
         return change.type === "LINKED_NOTE_ADDED";
       })
@@ -44,11 +50,8 @@ const App = () => {
     refreshNotesList();
   };
 
-  console.log(activeNoteLinkChanges)
-
-
   const handleLinkAddition = (note) => {
-    if (activeNoteLinkChanges.some((change) => {
+    if (activeNote.changes.some((change) => {
       return (
         change.type === "LINKED_NOTE_ADDED"
         && change.noteId === note.id
@@ -57,23 +60,26 @@ const App = () => {
       return;
     }
 
-    setActiveNoteLinkChanges([
-      ...activeNoteLinkChanges.filter((change) => {
-        return !(
-          change.type === "LINKED_NOTE_DELETED"
-          && change.noteId === note.id
-        );
-      }),
-      {
-        type: "LINKED_NOTE_ADDED",
-        noteId: note.id,
-      },
-    ]);
+    setActiveNote({
+      ...activeNote,
+      changes: [
+        ...activeNote.changes.filter((change) => {
+          return !(
+            change.type === "LINKED_NOTE_DELETED"
+            && change.noteId === note.id
+          );
+        }),
+        {
+          type: "LINKED_NOTE_ADDED",
+          noteId: note.id,
+        },
+      ],
+    });
   };
 
 
   const handleLinkRemoval = (linkedNoteId) => {
-    if (activeNoteLinkChanges.some((change) => {
+    if (activeNote.changes.some((change) => {
       return (
         change.type === "LINKED_NOTE_DELETED"
         && change.noteId === linkedNoteId
@@ -82,31 +88,35 @@ const App = () => {
       return;
     }
 
-    setActiveNoteLinkChanges([
-      ...activeNoteLinkChanges.filter((change) => {
-        return !(
-          change.type === "LINKED_NOTE_ADDED"
-          && change.noteId === linkedNoteId
-        );
-      }),
-      {
-        type: "LINKED_NOTE_DELETED",
-        noteId: linkedNoteId,
-      },
-    ]);
+    setActiveNote({
+      ...activeNote,
+      changes: [
+        ...activeNote.changes.filter((change) => {
+          return !(
+            change.type === "LINKED_NOTE_ADDED"
+            && change.noteId === linkedNoteId
+          );
+        }),
+        {
+          type: "LINKED_NOTE_DELETED",
+          noteId: linkedNoteId,
+        },
+      ],
+    });
   };
 
 
   const loadNote = async (noteId) => {
     if (typeof noteId !== "number") {
-      setActiveNoteLinkChanges([]);
-      setActiveNote(null);
+      setActiveNote(getNewNoteObject());
       return;
     }
 
     const note = await API.getNote(noteId);
-    setActiveNoteLinkChanges([]);
-    setActiveNote(note);
+    setActiveNote({
+      ...note,
+      changes: [],
+    });
   };
 
 
@@ -131,7 +141,7 @@ const App = () => {
 
 
   const removeActiveNote = async () => {
-    if (activeNote === null) {
+    if (activeNote.isUnsaved) {
       return;
     }
 
@@ -149,43 +159,43 @@ const App = () => {
   const saveNote = async (options) => {
     const outputData = await Editor.save();
 
-    let note = {
+    let noteToTransmit = {
       editorData: outputData,
     };
 
-    if (
-      typeof activeNote === "object"
-      && activeNote !== null
-    ) {
-      note = {
+    if (!activeNote.isUnsaved) {
+      noteToTransmit = {
         ...activeNote,
-        ...note,
+        ...noteToTransmit,
       };
 
-      if (note.linkedNotes) {
-        delete note.linkedNotes;
+      if (noteToTransmit.linkedNotes) {
+        delete noteToTransmit.linkedNotes;
       }
     }
 
     // if the note has no title yet, take the title of the link metadata
-    const firstLinkBlock = note.editorData.blocks.find(
+    const firstLinkBlock = noteToTransmit.editorData.blocks.find(
       (block) => block.type === "linkTool",
     );
 
     if (
-      note.editorData.blocks[0].data.text === Config.DEFAULT_NOTE_TITLE
+      (noteToTransmit.editorData.blocks[0].data.text
+        === Config.DEFAULT_NOTE_TITLE)
       && firstLinkBlock
       && typeof firstLinkBlock.data.meta.title === "string"
       && firstLinkBlock.data.meta.title.length > 0
     ) {
-      note.editorData.blocks[0].data.text = firstLinkBlock.data.meta.title;
+      noteToTransmit.editorData.blocks[0].data.tex
+        = firstLinkBlock.data.meta.title;
     }
 
-    note.changes = activeNoteLinkChanges;
-
-    const noteFromServer = await API.putNote(note, options);
-    setActiveNoteLinkChanges([]);
-    setActiveNote(noteFromServer);
+    const noteFromServer = await API.putNote(noteToTransmit, options);
+    setActiveNote({
+      ...noteFromServer,
+      isUnsaved: false,
+      changes: [],
+    });
     refreshNotesList();
   };
 
