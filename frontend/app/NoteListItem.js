@@ -39,11 +39,13 @@ const NoteListItem = ({
     >
       {note.title || (note.editorData && note.editorData.blocks[0].data.text)}
     </td>
-    <td>
+    <td
+      className="noteListItemControls"
+    >
       {
         onAdd
           ? <img
-            style={{ "verticalAlign": "middle" }}
+            style={{ "verticalAlign": "bottom" }}
             src="/assets/icons/link-24px.svg"
             title="Add as link to current note"
             onClick={(e) => {
@@ -56,7 +58,7 @@ const NoteListItem = ({
       {
         onDelete
           ? <img
-            style={{ "verticalAlign": "middle" }}
+            style={{ "verticalAlign": "bottom" }}
             src="/assets/icons/link_off-24px.svg"
             title="Remove"
             onClick={(e) => {

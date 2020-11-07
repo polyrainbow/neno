@@ -91,6 +91,21 @@ th, td {
   cursor: pointer;
 }
 
+.note-list-item .index {
+  width: 56px;
+}
+
+.note-list-item .noteListItemControls {
+  height: 22px;
+  text-align: right;
+  padding: 4px 5px;
+}
+
+.note-list-item .linkedNotesIndicator {
+  width: 32px;
+  text-align: right;
+}
+
 .note-list-item .update-time{
   width: 92px;
 }
