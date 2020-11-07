@@ -10,7 +10,7 @@ const HeaderControls = () => {
         window.location.href = "graph.html";
       }}
     >
-      <img src="/assets/icons/account_tree-24px.svg" />
+      <img src="/assets/icons/account_tree-24px.svg" alt="Graph" />
     </button>
     <button
       id="button_archive"
@@ -18,7 +18,7 @@ const HeaderControls = () => {
       title="Download database"
       onClick={API.archiveDatabase}
     >
-      <img src="/assets/icons/save_alt-24px.svg" />
+      <img src="/assets/icons/save_alt-24px.svg" alt="Archive database" />
     </button>
     <a
       href="/api/database-with-uploads"
@@ -28,7 +28,10 @@ const HeaderControls = () => {
       title="Download database including uploads"
       download
     >
-      <img src="/assets/icons/archive-24px.svg" />
+      <img
+        src="/assets/icons/archive-24px.svg"
+        alt="Archive database including uploads"
+      />
     </a>
   </section>;
 };

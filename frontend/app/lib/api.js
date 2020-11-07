@@ -1,5 +1,6 @@
 import { API_URL } from "./config.js";
 import { yyyymmdd } from "./utils.js";
+import { saveAs } from "file-saver";
 
 const getNote = async (noteId) => {
   const response = await fetch(API_URL + "note/" + noteId, {
@@ -102,7 +103,6 @@ const archiveDatabase = async () => {
     type: "application/json",
   });
   const dateSuffix = yyyymmdd(new Date());
-  // eslint-disable-next-line no-undef
   saveAs(blob, `neno-${dateSuffix}.db.json`);
   return json;
 };

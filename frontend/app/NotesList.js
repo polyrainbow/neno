@@ -24,6 +24,7 @@ const NotesList = ({
           width: "100px",
         }}
         src="/assets/icons/pending-24px.svg"
+        alt="Loading notes"
       />
       <p>Loading notes ...</p>
     </div>;

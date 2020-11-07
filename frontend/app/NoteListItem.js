@@ -52,6 +52,7 @@ const NoteListItem = ({
               onAdd();
               e.stopPropagation();
             }}
+            alt="Add as link to current note"
           />
           : null
       }
@@ -65,6 +66,7 @@ const NoteListItem = ({
               onDelete();
               e.stopPropagation();
             }}
+            alt="Remove link"
           />
           : null
       }

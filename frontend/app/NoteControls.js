@@ -15,7 +15,7 @@ const NoteControls = ({
         title="New"
         onClick={createNewNote}
       >
-        <img src="/assets/icons/note_add-24px.svg" />
+        <img src="/assets/icons/note_add-24px.svg" alt="New" />
       </button>
       <button
         id="button_upload"
@@ -35,7 +35,7 @@ const NoteControls = ({
           });
         }}
       >
-        <img src="/assets/icons/save-24px.svg" />
+        <img src="/assets/icons/save-24px.svg" alt="Save" />
       </button>
       <button
         id="button_remove"

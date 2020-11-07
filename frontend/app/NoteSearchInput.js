@@ -41,11 +41,12 @@ const NoteSearchInput = ({
         }}
       />
       <button
-        title="Cancel search"
+        title="Clear search"
         onClick={() => onChange("")}
       >
         <img
           src="/assets/icons/cancel-24px.svg"
+          alt="Clear search"
         />
       </button>
     </div>
