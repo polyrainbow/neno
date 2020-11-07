@@ -15,19 +15,97 @@ const App = () => {
   const [links, setLinks] = useState(null);
   const [activeNote, setActiveNote] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+  const [activeNoteLinkChanges, setActiveNoteLinkChanges] = useState([]);
+  const displayedLinkedNotes = [
+    ...activeNote
+      ? activeNote.linkedNotes.filter((note) => {
+        const isRemoved = activeNoteLinkChanges.some((change) => {
+          return (
+            change.type === "LINKED_NOTE_DELETED"
+            && change.noteId === note.id
+          );
+        });
+        return !isRemoved;
+      })
+      : [],
+    ...activeNoteLinkChanges
+      .filter((change) => {
+        return change.type === "LINKED_NOTE_ADDED";
+      })
+      .map((change) => {
+        return allNotes.find((note) => {
+          return note.id === change.noteId;
+        });
+      }),
+  ];
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
     refreshNotesList();
   };
 
+  console.log(activeNoteLinkChanges)
+
+
+  const handleLinkAddition = (note) => {
+    if (activeNoteLinkChanges.some((change) => {
+      return (
+        change.type === "LINKED_NOTE_ADDED"
+        && change.noteId === note.id
+      );
+    })) {
+      return;
+    }
+
+    setActiveNoteLinkChanges([
+      ...activeNoteLinkChanges.filter((change) => {
+        return !(
+          change.type === "LINKED_NOTE_DELETED"
+          && change.noteId === note.id
+        );
+      }),
+      {
+        type: "LINKED_NOTE_ADDED",
+        noteId: note.id,
+      },
+    ]);
+  };
+
+
+  const handleLinkRemoval = (linkedNoteId) => {
+    if (activeNoteLinkChanges.some((change) => {
+      return (
+        change.type === "LINKED_NOTE_DELETED"
+        && change.noteId === linkedNoteId
+      );
+    })) {
+      return;
+    }
+
+    setActiveNoteLinkChanges([
+      ...activeNoteLinkChanges.filter((change) => {
+        return !(
+          change.type === "LINKED_NOTE_ADDED"
+          && change.noteId === linkedNoteId
+        );
+      }),
+      {
+        type: "LINKED_NOTE_DELETED",
+        noteId: linkedNoteId,
+      },
+    ]);
+  };
+
+
   const loadNote = async (noteId) => {
     if (typeof noteId !== "number") {
+      setActiveNoteLinkChanges([]);
       setActiveNote(null);
       return;
     }
 
     const note = await API.getNote(noteId);
+    setActiveNoteLinkChanges([]);
     setActiveNote(note);
   };
 
@@ -103,7 +181,10 @@ const App = () => {
       note.editorData.blocks[0].data.text = firstLinkBlock.data.meta.title;
     }
 
+    note.changes = activeNoteLinkChanges;
+
     const noteFromServer = await API.putNote(note, options);
+    setActiveNoteLinkChanges([]);
     setActiveNote(noteFromServer);
     refreshNotesList();
   };
@@ -147,6 +228,8 @@ const App = () => {
           notes={displayedNotes}
           loadNote={loadNote}
           activeNote={activeNote}
+          displayedLinkedNotes={displayedLinkedNotes}
+          onLinkAddition={handleLinkAddition}
         />
       </div>
       <div id="right-view">
@@ -159,6 +242,8 @@ const App = () => {
         <Note
           note={activeNote}
           loadNote={loadNote}
+          onLinkRemoval={handleLinkRemoval}
+          displayedLinkedNotes={displayedLinkedNotes}
         />
       </div>
 

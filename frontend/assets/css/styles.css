@@ -108,6 +108,10 @@ tr:nth-child(even) {
   background-color: chartreuse;
 }
 
+.note-list-item[class*="linked"]{
+  background-color: yellow;
+}
+
 
 @media only screen and (min-width: 1201px) {
   main {

@@ -6,6 +6,8 @@ const NotesList = ({
   notes,
   loadNote,
   activeNote,
+  onLinkAddition,
+  displayedLinkedNotes,
 }) => {
   if (!Array.isArray(notes)) {
     return "";
@@ -16,13 +18,28 @@ const NotesList = ({
       <tbody>
         {
           notes.map((note, i) => {
+            const isActive = activeNote && (note.id === activeNote.id);
+            const isLinked = activeNote && displayedLinkedNotes.some(
+              (linkedNote) => {
+                return linkedNote.id === note.id;
+              },
+            );
+
             return <NoteListItem
               note={note}
               index={i + 1}
               showLinksIndicator={true}
-              isActive={activeNote && (note.id === activeNote.id)}
+              isActive={isActive}
+              isLinked={isLinked}
               key={"notes-list-item-" + note.id}
               onClick={() => loadNote(note.id)}
+              onAdd={
+                (!isActive) && (!isLinked)
+                  ? () => {
+                    onLinkAddition(note);
+                  }
+                  : null
+              }
             />;
           })
         }

@@ -4,9 +4,12 @@ import { yyyymmdd } from "./lib/utils.js";
 const NoteListItem = ({
   note,
   isActive,
+  isLinked,
   index,
   showLinksIndicator,
   onClick,
+  onAdd,
+  onDelete,
 }) => {
   const isHub = note.numberOfLinkedNotes >= 5;
 
@@ -16,6 +19,9 @@ const NoteListItem = ({
   }
   if (isActive) {
     trClassList.push("active");
+  }
+  if (isLinked) {
+    trClassList.push("linked");
   }
 
   return <tr
@@ -32,6 +38,34 @@ const NoteListItem = ({
       className="title"
     >
       {note.title || (note.editorData && note.editorData.blocks[0].data.text)}
+    </td>
+    <td>
+      {
+        onAdd
+          ? <img
+            style={{ "verticalAlign": "middle" }}
+            src="/assets/icons/link-24px.svg"
+            title="Add as link to current note"
+            onClick={(e) => {
+              onAdd();
+              e.stopPropagation();
+            }}
+          />
+          : null
+      }
+      {
+        onDelete
+          ? <img
+            style={{ "verticalAlign": "middle" }}
+            src="/assets/icons/link_off-24px.svg"
+            title="Remove"
+            onClick={(e) => {
+              onDelete();
+              e.stopPropagation();
+            }}
+          />
+          : null
+      }
     </td>
     {
       showLinksIndicator

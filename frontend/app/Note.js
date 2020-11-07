@@ -6,6 +6,8 @@ import NoteStats from "./NoteStats.js";
 const Note = ({
   note,
   loadNote,
+  displayedLinkedNotes,
+  onLinkRemoval,
 }) => {
   useEffect(() => {
     const data = note?.editorData;
@@ -22,13 +24,14 @@ const Note = ({
       <table id="links-table">
         <tbody>
           {
-            note?.linkedNotes?.map((link, i) => <NoteListItem
-              note={link}
+            displayedLinkedNotes.map((displayedLinkedNote, i) => <NoteListItem
+              note={displayedLinkedNote}
               index={i + 1}
               showLinksIndicator={false}
-              key={"note-link-list-item-" + link.id}
-              onClick={() => loadNote(link.id)}
+              key={"note-link-list-item-" + displayedLinkedNote.id}
+              onClick={() => loadNote(displayedLinkedNote.id)}
               isActive={false}
+              onDelete={() => onLinkRemoval(displayedLinkedNote.id)}
             />)
           }
         </tbody>
