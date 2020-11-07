@@ -13,9 +13,9 @@ const NoteSearchInput = ({
       label = "Showing all " + allNotes.length + " note(s)";
     } else if (value.length > 2) {
       label = displayedNotes.length + " note(s) found";
-    } else {
-      label = "Please type at least 3 characters to search";
     }
+  } else if (value.length > 0 && value.length < 3) {
+    label = "Please type at least 3 characters to search";
   }
 
   return <section id="search-input">

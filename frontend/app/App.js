@@ -19,6 +19,7 @@ const getNewNoteObject = () => {
 const App = () => {
   const [displayedNotes, setDisplayedNotes] = useState(null);
   const [allNotes, setAllNotes] = useState(null);
+  const [isBusy, setIsBusy] = useState(true);
   const [links, setLinks] = useState(null);
   const [activeNote, setActiveNote] = useState(getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
@@ -47,7 +48,6 @@ const App = () => {
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
-    refreshNotesList();
   };
 
   const handleLinkAddition = (note) => {
@@ -123,20 +123,25 @@ const App = () => {
   const refreshNotesList = useCallback(
     async () => {
       setDisplayedNotes(null);
+      setIsBusy(true);
 
       const options = {};
-      if (searchValue.length > 0) {
+      if (searchValue.length > 2) {
         options.query = searchValue;
         options.caseSensitive = false;
+
+        const notes = await API.getNotes(options);
+        setDisplayedNotes(notes);
+      } else if (searchValue.length === 0) {
+        const allNotes = await API.getNotes();
+        setAllNotes(allNotes);
+        setDisplayedNotes(allNotes);
       }
-      const notes = await API.getNotes(options);
-      setDisplayedNotes(notes);
 
-      const allNotes = (searchValue.length === 0)
-        ? notes
-        : await API.getNotes();
+      // if searchValue is 1 or 2 chars long, we don't do anything and leave
+      // the note list empty
 
-      setAllNotes(allNotes);
+      setIsBusy(false);
     },
     [searchValue],
   );
@@ -209,7 +214,10 @@ const App = () => {
     if (initialId) {
       loadNote(initialId);
     }
+  }, []);
 
+
+  useEffect(() => {
     refreshNotesList();
 
     API.getGraph()
@@ -242,6 +250,7 @@ const App = () => {
           activeNote={activeNote}
           displayedLinkedNotes={displayedLinkedNotes}
           onLinkAddition={handleLinkAddition}
+          isBusy={isBusy}
         />
       </div>
       <div id="right-view">

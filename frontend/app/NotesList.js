@@ -8,8 +8,9 @@ const NotesList = ({
   activeNote,
   onLinkAddition,
   displayedLinkedNotes,
+  isBusy,
 }) => {
-  if (!Array.isArray(notes)) {
+  if (isBusy) {
     return <div
       style={{
         fontFamily: "sans-serif",
@@ -26,6 +27,10 @@ const NotesList = ({
       />
       <p>Loading notes ...</p>
     </div>;
+  }
+
+  if (!Array.isArray(notes)) {
+    return "";
   }
 
   return <section id="list">
