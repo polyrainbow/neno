@@ -19,21 +19,36 @@ const NoteSearchInput = ({
   }
 
   return <section id="search-input">
-    <input
+    <div
       style={{
-        "border": "none",
-        "fontSize": "24px",
+        display: "flex",
+        alignItems: "center",
       }}
-      type="text"
-      placeholder="Search..."
-      value={value}
-      onChange={(e) => {onChange(e.target.value);}}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") {
-          onChange("");
-        }
-      }}
-    />
+    >
+      <input
+        style={{
+          "border": "none",
+          "fontSize": "24px",
+        }}
+        type="text"
+        placeholder="Search..."
+        value={value}
+        onChange={(e) => {onChange(e.target.value);}}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            onChange("");
+          }
+        }}
+      />
+      <button
+        title="Cancel search"
+        onClick={() => onChange("")}
+      >
+        <img
+          src="/assets/icons/cancel-24px.svg"
+        />
+      </button>
+    </div>
     <span style={{
       fontSize: "16px",
       fontFamily: "sans-serif",

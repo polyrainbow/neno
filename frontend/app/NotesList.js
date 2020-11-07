@@ -10,7 +10,22 @@ const NotesList = ({
   displayedLinkedNotes,
 }) => {
   if (!Array.isArray(notes)) {
-    return "";
+    return <div
+      style={{
+        fontFamily: "sans-serif",
+        fontSize: "20px",
+        textAlign: "center",
+        margin: "30px auto",
+      }}
+    >
+      <img
+        style={{
+          width: "100px",
+        }}
+        src="/assets/icons/pending-24px.svg"
+      />
+      <p>Loading notes ...</p>
+    </div>;
   }
 
   return <section id="list">

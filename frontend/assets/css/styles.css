@@ -125,16 +125,18 @@ tr:nth-child(even) {
 
   #left-view{
     grid-area: 1 / 1 / 2 / 2;
+    width: calc(100vw - 800px);
   }
 
   #list{
-    overflow-y: auto;
+    overflow-y: scroll;
     padding: 0px;
     height: calc(100vh - 100px);
   }
 
   #right-view{
     grid-area: 1 / 2 / 2 / 3;
+    width: 800px;
   }
 
   #note{

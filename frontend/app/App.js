@@ -122,6 +122,8 @@ const App = () => {
 
   const refreshNotesList = useCallback(
     async () => {
+      setDisplayedNotes(null);
+
       const options = {};
       if (searchValue.length > 0) {
         options.query = searchValue;
