@@ -187,7 +187,7 @@ const App = () => {
     );
 
     if (
-      (noteToTransmit.editorData.blocks[0].data.text
+      (noteToTransmit.editorData?.blocks?.[0]?.data?.text
         === Config.DEFAULT_NOTE_TITLE)
       && firstLinkBlock
       && typeof firstLinkBlock.data.meta.title === "string"
