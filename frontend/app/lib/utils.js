@@ -25,7 +25,7 @@ const getParameterByName = (name, url) => {
 
 const getNumberOfCharacters = (note) => {
   return note.editorData.blocks.reduce((accumulator, block) => {
-    if (["paragraph", "header"].includes(block.type)) {
+    if (["paragraph", "header"].includes(block.type) && block.data?.text) {
       return accumulator + block.data.text.length;
     } else {
       return accumulator;
