@@ -37,7 +37,7 @@ const NoteListItem = ({
     <td
       className="title"
     >
-      {note.title || (note.editorData && note.editorData.blocks[0].data.text)}
+      {note.title}
     </td>
     <td
       className="noteListItemControls"
