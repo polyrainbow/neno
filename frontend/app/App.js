@@ -193,7 +193,7 @@ const App = () => {
       && typeof firstLinkBlock.data.meta.title === "string"
       && firstLinkBlock.data.meta.title.length > 0
     ) {
-      noteToTransmit.editorData.blocks[0].data.tex
+      noteToTransmit.editorData.blocks[0].data.text
         = firstLinkBlock.data.meta.title;
     }
 
