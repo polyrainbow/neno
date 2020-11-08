@@ -164,10 +164,8 @@ const App = () => {
 
 
   const saveNote = async (options) => {
-    const outputData = await Editor.save();
-
     let noteToTransmit = {
-      editorData: outputData,
+      editorData: await Editor.save(),
     };
 
     if (!activeNote.isUnsaved) {
