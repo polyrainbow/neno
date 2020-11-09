@@ -114,9 +114,10 @@ const App = () => {
       return;
     }
 
-    const note = await API.getNote(noteId);
+    const noteFromServer = await API.getNote(noteId);
     setActiveNote({
-      ...note,
+      ...noteFromServer,
+      isUnsaved: false,
       changes: [],
     });
   };
