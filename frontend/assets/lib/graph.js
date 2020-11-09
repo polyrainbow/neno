@@ -260,6 +260,24 @@ document.onload = (function(d3) {
       thisGraph.removeSelectFromNode();
     }
     d3Node.classed(this.consts.selectedClass, true);
+
+    const connectedNodeIds = nodeData.linkedNotes.map((node) => node.id);
+
+    thisGraph.nodesContainer.selectAll("g.node")
+      .filter((d) => {
+        return connectedNodeIds.includes(d.id);
+      })
+      .classed("connected-to-selected", true);
+
+    thisGraph.linksContainer.selectAll("path.link")
+      .filter((d) => {
+        return (
+          nodeData.id === d.source.id 
+          || nodeData.id === d.target.id
+        );
+      })
+      .classed("connected-to-selected", true);
+
     thisGraph.state.selectedNode = nodeData;
   };
 
@@ -267,6 +285,13 @@ document.onload = (function(d3) {
     const thisGraph = this;
      thisGraph.nodesContainer.selectAll("g.node.selected")
       .classed(this.consts.selectedClass, false);
+
+    thisGraph.nodesContainer.selectAll("g.node.connected-to-selected")
+      .classed("connected-to-selected", false);
+
+    thisGraph.linksContainer.selectAll("path.link.connected-to-selected")
+      .classed("connected-to-selected", false);
+
     thisGraph.state.selectedNode = null;
   };
 
@@ -507,13 +532,14 @@ document.onload = (function(d3) {
     newNode
       .classed(consts.nodeClassName, true)
       .classed("new", function(d) {
-        return Date.now() - d.creationTime < 1000 * 60 * 60 * 24 * 10;
+        const MAX_NEW_AGE = 1000 * 60 * 60 * 24 * 10; // 10 days
+        return Date.now() - d.creationTime < MAX_NEW_AGE;
       })
       .classed("hub", function(d) {
-        return d.numberOfLinks > 7;
+        return d.linkedNotes.length > 7;
       })
       .classed("unconnected", function(d) {
-        return d.numberOfLinks === 0;
+        return d.linkedNotes.length === 0;
       })
       .attr(
         "transform",

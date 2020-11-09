@@ -109,6 +109,11 @@ path.link {
   cursor: default;
 }
 
+path.link.connected-to-selected {
+  stroke: rgb(255, 114, 33);
+  stroke-width: 12px;
+}
+
 path.link:hover{
   stroke: rgb(94, 196, 204);
 }
