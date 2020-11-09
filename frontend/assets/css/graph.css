@@ -77,16 +77,30 @@ g.node circle{
   stroke-width: 2px;
 }
 
+g.node.unconnected circle{
+  fill: rgb(255, 101, 101);
+}
+
+g.node.hub circle{
+  fill: rgb(90, 156, 255);
+}
+
+g.node.new circle{
+  fill: rgb(28, 255, 115);
+}
+
+g.node.connected-to-selected circle{
+  fill: rgb(255, 213, 28);
+}
+
+g.node.selected circle{
+  fill: rgb(250, 232, 255) !important;
+}
+
 g.node:hover circle{
   fill: rgb(200, 238, 241);
 }
 
-g.selected circle{
-  fill: rgb(250, 232, 255);
-}
-g.selected:hover circle{
-  fill: rgb(250, 232, 255);
-}
 
 path.link {
   fill: none;

@@ -265,8 +265,8 @@ document.onload = (function(d3) {
 
   GraphCreator.prototype.removeSelectFromNode = function() {
     const thisGraph = this;
-    thisGraph.nodeElements
-      .classed(thisGraph.consts.selectedClass, false);
+     thisGraph.nodesContainer.selectAll("g.node.selected")
+      .classed(this.consts.selectedClass, false);
     thisGraph.state.selectedNode = null;
   };
 
@@ -506,6 +506,15 @@ document.onload = (function(d3) {
 
     newNode
       .classed(consts.nodeClassName, true)
+      .classed("new", function(d) {
+        return Date.now() - d.creationTime < 1000 * 60 * 60 * 24 * 10;
+      })
+      .classed("hub", function(d) {
+        return d.numberOfLinks > 7;
+      })
+      .classed("unconnected", function(d) {
+        return d.numberOfLinks === 0;
+      })
       .attr(
         "transform",
         function(d) {return "translate(" + d.x + "," + d.y + ")";},
