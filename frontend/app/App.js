@@ -10,10 +10,20 @@ import * as API from "./lib/api.js";
 import * as Editor from "./lib/editor.js";
 
 const getNewNoteObject = () => {
-  return {
-    isUnsaved: true,
+  const note = {
     changes: [],
+    creationTime: null,
+    editorData: null,
+    id: null,
+    isUnsaved: true,
+    linkedNotes: null,
+    updateTime: null,
+    x: null,
+    y: null,
   };
+
+  Object.seal(note);
+  return note;
 };
 
 const App = () => {
