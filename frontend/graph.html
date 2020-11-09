@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <title>Network Notes - Graph</title>
-    <link rel="stylesheet" href="/assets/css/graph-creator.css" />
+    <link rel="stylesheet" href="/assets/css/graph.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
 
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="NENO is a note app with graph features">
@@ -29,7 +30,9 @@
 
   <body>
 
-    <div id="toolbox">
+    <header>
+      <h1 id="heading">NeNo Graph</h1>
+
       <button
         id="button-home" title="Home" alt="Home"
       >
@@ -46,12 +49,15 @@
         <img src="/assets/icons/open_in_browser-24px.svg" alt="Open">
       </button>
       <span id="status">Hold shift to draw links</span>
-    </div>
+    </header>
+    
+    <main></main>
+
     <script src="https://d3js.org/d3-zoom.v1.min.js"></script>
     <script src="https://d3js.org/d3-drag.v1.min.js"></script>
     <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>    
     <script src="https://cdn.jsdelivr.net/filesaver.js/0.1/FileSaver.min.js"></script>
-    <script src="/assets/lib/graph-creator.js" type="module"></script>
+    <script src="/assets/lib/graph.js" type="module"></script>
   </body>
 
 </html>

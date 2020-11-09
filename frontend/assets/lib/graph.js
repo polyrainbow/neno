@@ -621,7 +621,7 @@ document.onload = (function(d3) {
       });
 
       /** MAIN SVG **/
-      const svg = d3.select("body")
+      const svg = d3.select("main")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
