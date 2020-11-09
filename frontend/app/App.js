@@ -50,7 +50,7 @@ const App = () => {
     setSearchValue(value);
   };
 
-  const handleLinkAddition = (note) => {
+  const handleLinkAddition = async (note) => {
     if (activeNote.changes.some((change) => {
       return (
         change.type === "LINKED_NOTE_ADDED"
@@ -62,6 +62,7 @@ const App = () => {
 
     setActiveNote({
       ...activeNote,
+      editorData: await Editor.save(),
       changes: [
         ...activeNote.changes.filter((change) => {
           return !(
@@ -78,7 +79,7 @@ const App = () => {
   };
 
 
-  const handleLinkRemoval = (linkedNoteId) => {
+  const handleLinkRemoval = async (linkedNoteId) => {
     if (activeNote.changes.some((change) => {
       return (
         change.type === "LINKED_NOTE_DELETED"
@@ -90,6 +91,7 @@ const App = () => {
 
     setActiveNote({
       ...activeNote,
+      editorData: await Editor.save(),
       changes: [
         ...activeNote.changes.filter((change) => {
           return !(
