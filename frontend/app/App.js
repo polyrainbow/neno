@@ -177,21 +177,11 @@ const App = () => {
 
 
   const saveNote = async (options) => {
-    let noteToTransmit = {
+    const noteToTransmit = {
       editorData: await Editor.save(),
       changes: activeNote.changes,
+      id: activeNote.isUnsaved ? null : activeNote.id,
     };
-
-    if (!activeNote.isUnsaved) {
-      noteToTransmit = {
-        ...activeNote,
-        ...noteToTransmit,
-      };
-
-      if (noteToTransmit.linkedNotes) {
-        delete noteToTransmit.linkedNotes;
-      }
-    }
 
     // if the note has no title yet, take the title of the link metadata
     const firstLinkBlock = noteToTransmit.editorData.blocks.find(
