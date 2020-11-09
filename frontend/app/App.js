@@ -168,6 +168,7 @@ const App = () => {
   const saveNote = async (options) => {
     let noteToTransmit = {
       editorData: await Editor.save(),
+      changes: activeNote.changes,
     };
 
     if (!activeNote.isUnsaved) {
