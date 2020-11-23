@@ -66,7 +66,7 @@ main {
   display: flex;
 }
 
-button, a.button {
+.icon-button {
   height: 50px;
   display: inline-block;
   border: none;
@@ -77,7 +77,7 @@ button, a.button {
   text-align: center;
 }
 
-button img, a.button img {
+.icon-button img {
   vertical-align: middle;
 }
 

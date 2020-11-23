@@ -48,6 +48,7 @@ const NoteSearchInput = ({
         }}
       />
       <button
+        className="icon-button"
         title="Clear search"
         onClick={() => onChange("")}
       >

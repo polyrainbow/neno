@@ -10,6 +10,7 @@ const NoteControls = ({
   return <section id="note-controls">
     <div id="note-controls-left">
       <button
+        className="icon-button"
         id="button_new"
         alt="New"
         title="New"
@@ -18,6 +19,7 @@ const NoteControls = ({
         <img src="/assets/icons/note_add-24px.svg" alt="New" />
       </button>
       <button
+        className="icon-button"
         id="button_upload"
         alt="Save"
         title="Save"
@@ -38,6 +40,7 @@ const NoteControls = ({
         <img src="/assets/icons/save-24px.svg" alt="Save" />
       </button>
       <button
+        className="icon-button"
         id="button_remove"
         disabled={activeNote.isUnsaved}
         alt="Remove"
