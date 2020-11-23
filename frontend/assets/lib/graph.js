@@ -434,6 +434,9 @@ document.onload = (function(d3) {
     case consts.DELETE_KEY:
       d3.event.preventDefault();
       if (selectedNode) {
+        return;
+        // right now, we don't support deleting nodes from the graph view
+
         thisGraph.nodes.splice(thisGraph.nodes.indexOf(selectedNode), 1);
         thisGraph.spliceLinksForNode(selectedNode);
         state.selectedNode = null;
