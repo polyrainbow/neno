@@ -78,7 +78,7 @@ g.node circle{
 }
 
 g.node.unconnected circle{
-  fill: rgb(255, 101, 101);
+  fill: rgb(255, 101, 101) !important;
 }
 
 g.node.hub circle{
