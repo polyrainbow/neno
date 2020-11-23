@@ -29,10 +29,11 @@ const getNewNoteObject = () => {
 
 const App = () => {
   const currentRequestId = useRef(null);
-  const [displayedNotes, setDisplayedNotes] = useState(null);
+  const [displayedNotes, setDisplayedNotes] = useState([]);
   const [allNotes, setAllNotes] = useState(null);
   const [isBusy, setIsBusy] = useState(true);
   const [links, setLinks] = useState(null);
+  const [sortBy, setSortBy] = useState("UPDATE_DATE_DESCENDING");
   const [activeNote, setActiveNote] = useState(getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
   const displayedLinkedNotes = [
@@ -57,6 +58,26 @@ const App = () => {
         });
       }),
   ];
+
+  const displayedNotesSorted = displayedNotes.sort((a, b) => {
+    if (sortBy === "UPDATE_DATE_ASCENDING") {
+      return a.updateTime - b.updateTime;
+    }
+
+    if (sortBy === "UPDATE_DATE_DESCENDING") {
+      return b.updateTime - a.updateTime;
+    }
+
+    if (sortBy === "NUMBER_OF_LINKS_ASCENDING") {
+      return a.numberOfLinkedNotes - b.numberOfLinkedNotes;
+    }
+
+    if (sortBy === "NUMBER_OF_LINKS_DESCENDING") {
+      return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
+    }
+
+    return a.updateTime - b.updateTime;
+  });
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
@@ -136,7 +157,7 @@ const App = () => {
 
   const refreshNotesList = useCallback(
     async () => {
-      setDisplayedNotes(null);
+      setDisplayedNotes([]);
 
       // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
       // we don't do anything and leave the note list empty
@@ -246,6 +267,16 @@ const App = () => {
       });
   }, [refreshNotesList]);
 
+  let notesListStatus = "DEFAULT";
+
+  if (searchValue.length > 0 && searchValue.length < 3) {
+    notesListStatus = "SEARCH_VALUE_TOO_SHORT";
+  }
+
+  if (isBusy) {
+    notesListStatus = "BUSY";
+  }
+
 
   return <>
     <Header
@@ -257,8 +288,10 @@ const App = () => {
         <NoteSearchInput
           onChange={handleSearchInputChange}
           value={searchValue}
-          displayedNotes={displayedNotes}
+          displayedNotes={displayedNotesSorted}
           allNotes={allNotes}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
         />
         <NotesList
           notes={displayedNotes}
@@ -266,7 +299,8 @@ const App = () => {
           activeNote={activeNote}
           displayedLinkedNotes={displayedLinkedNotes}
           onLinkAddition={handleLinkAddition}
-          isBusy={isBusy}
+          status={notesListStatus}
+          searchValue
         />
       </div>
       <div id="right-view">

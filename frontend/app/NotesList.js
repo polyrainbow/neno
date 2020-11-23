@@ -8,9 +8,9 @@ const NotesList = ({
   activeNote,
   onLinkAddition,
   displayedLinkedNotes,
-  isBusy,
+  status,
 }) => {
-  if (isBusy) {
+  if (status === "BUSY" || status === "SEARCH_VALUE_TOO_SHORT") {
     return <div
       style={{
         fontSize: "20px",
@@ -22,10 +22,22 @@ const NotesList = ({
         style={{
           width: "100px",
         }}
-        src="/assets/icons/pending-24px.svg"
-        alt="Loading notes"
+        src={
+          status === "BUSY"
+            ? "/assets/icons/pending-24px.svg"
+            : "/assets/icons/looks_3-24px.svg"
+        }
+        alt={
+          status === "BUSY"
+            ? "Loading notes"
+            : "Please type at least 3 characters to search"
+        }
       />
-      <p>Loading notes ...</p>
+      <p>{
+        status === "BUSY"
+          ? "Loading notes ..."
+          : "Please type at least 3 characters to search"
+      }</p>
     </div>;
   }
 
