@@ -515,12 +515,21 @@ document.onload = (function(d3) {
         function(d) {return d.id;},
       );
 
+    const connectedNodeIds = thisGraph.links.reduce((accumulator, link) => {
+      accumulator.push(link.source.id);
+      accumulator.push(link.target.id);
+      return accumulator;
+    }, []);
+
     // update existing nodes
     thisGraph.nodeElements
       .attr(
         "transform",
         function(d) {return "translate(" + d.x + "," + d.y + ")";},
-      );
+      )
+      .classed("unconnected", function(d) {
+        return !connectedNodeIds.includes(d.id);
+      });
 
     // add new nodes
     const nodeEnter = thisGraph.nodeElements
@@ -539,7 +548,7 @@ document.onload = (function(d3) {
         return d.linkedNotes.length > 7;
       })
       .classed("unconnected", function(d) {
-        return d.linkedNotes.length === 0;
+        return !connectedNodeIds.includes(d.id);
       })
       .attr(
         "transform",
