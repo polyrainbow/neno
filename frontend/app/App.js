@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import Header from "./Header.js";
 import NoteControls from "./NoteControls.js";
 import NotesList from "./NotesList.js";
-import NoteSearchInput from "./NoteSearchInput.js";
+import NoteListControls from "./NoteListControls.js";
 import Note from "./Note.js";
 import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
@@ -33,7 +33,7 @@ const App = () => {
   const [allNotes, setAllNotes] = useState(null);
   const [isBusy, setIsBusy] = useState(true);
   const [links, setLinks] = useState(null);
-  const [sortBy, setSortBy] = useState("UPDATE_DATE_DESCENDING");
+  const [sortBy, setSortBy] = useState("CREATION_DATE_ASCENDING");
   const [activeNote, setActiveNote] = useState(getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
   const displayedLinkedNotes = [
@@ -60,6 +60,14 @@ const App = () => {
   ];
 
   const displayedNotesSorted = displayedNotes.sort((a, b) => {
+    if (sortBy === "CREATION_DATE_ASCENDING") {
+      return a.creationTime - b.creationTime;
+    }
+
+    if (sortBy === "CREATION_DATE_DESCENDING") {
+      return b.creationTime - a.creationTime;
+    }
+
     if (sortBy === "UPDATE_DATE_ASCENDING") {
       return a.updateTime - b.updateTime;
     }
@@ -285,7 +293,7 @@ const App = () => {
     />
     <main>
       <div id="left-view">
-        <NoteSearchInput
+        <NoteListControls
           onChange={handleSearchInputChange}
           value={searchValue}
           displayedNotes={displayedNotesSorted}

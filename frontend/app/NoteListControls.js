@@ -1,7 +1,7 @@
 import React from "react";
 
 
-const NoteSearchInput = ({
+const NoteListControls = ({
   value,
   onChange,
   displayedNotes,
@@ -77,6 +77,12 @@ const NoteSearchInput = ({
       onChange={(e) => setSortBy(e.target.value)}
     >
       <option
+        value="CREATION_DATE_ASCENDING"
+      >Sort by creation date (ascending)</option>
+      <option
+        value="CREATION_DATE_DESCENDING"
+      >Sort by creation date (descending)</option>
+      <option
         value="UPDATE_DATE_ASCENDING"
       >Sort by update date (ascending)</option>
       <option
@@ -92,4 +98,4 @@ const NoteSearchInput = ({
   </section>;
 };
 
-export default NoteSearchInput;
+export default NoteListControls;
