@@ -94,7 +94,11 @@ g.node.connected-to-selected circle{
 }
 
 g.node.selected circle{
-  fill: rgb(250, 232, 255) !important;
+  fill: rgb(29, 114, 241) !important;
+}
+
+g.node.selected text{
+  fill: white !important;
 }
 
 g.node:hover circle{
