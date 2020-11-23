@@ -189,7 +189,13 @@ app.get(API_PATH + "/notes", function(req, res) {
 
     return noteCleaned;
   });
-  res.end(JSON.stringify(notesList));
+
+  const response = {
+    success: true,
+    notes: notesList,
+  };
+
+  res.end(JSON.stringify(response));
 });
 
 

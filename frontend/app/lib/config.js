@@ -35,9 +35,12 @@ const texts = {
     + "with the same title?",
 };
 
+const MINIMUM_SEARCH_QUERY_LENGTH = 3;
+
 export {
   DEFAULT_NOTE_TITLE,
   placeholderNoteObject,
   API_URL,
   texts,
+  MINIMUM_SEARCH_QUERY_LENGTH,
 };

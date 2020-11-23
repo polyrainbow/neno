@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 import Header from "./Header.js";
 import NoteControls from "./NoteControls.js";
 import NotesList from "./NotesList.js";
@@ -27,6 +28,7 @@ const getNewNoteObject = () => {
 };
 
 const App = () => {
+  const currentRequestId = useRef(null);
   const [displayedNotes, setDisplayedNotes] = useState(null);
   const [allNotes, setAllNotes] = useState(null);
   const [isBusy, setIsBusy] = useState(true);
@@ -132,29 +134,41 @@ const App = () => {
     });
   };
 
-
   const refreshNotesList = useCallback(
     async () => {
       setDisplayedNotes(null);
+
+      // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
+      // we don't do anything and leave the note list empty
+      if (
+        searchValue.length > 0
+        && searchValue.length < Config.MINIMUM_SEARCH_QUERY_LENGTH
+      ) {
+        return;
+      }
+
       setIsBusy(true);
 
       const options = {};
-      if (searchValue.length > 2) {
+
+      if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
         options.query = searchValue;
         options.caseSensitive = false;
-
-        const notes = await API.getNotes(options);
-        setDisplayedNotes(notes);
-      } else if (searchValue.length === 0) {
-        const allNotes = await API.getNotes();
-        setAllNotes(allNotes);
-        setDisplayedNotes(allNotes);
       }
 
-      // if searchValue is 1 or 2 chars long, we don't do anything and leave
-      // the note list empty
+      const requestId = uuidv4();
+      currentRequestId.current = requestId;
+      const notes = await API.getNotes(options);
 
-      setIsBusy(false);
+      // ... some time later - check if this is the current request
+      if (currentRequestId.current === requestId) {
+        setDisplayedNotes(notes);
+        if (searchValue.length === 0) {
+          setAllNotes(notes);
+        }
+
+        setIsBusy(false);
+      }
     },
     [searchValue],
   );

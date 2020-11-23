@@ -33,8 +33,13 @@ const getNotes = async (options) => {
     },
   });
 
-  const notes = await response.json();
-  return notes;
+  const responseObject = await response.json();
+
+  if (!responseObject.success) {
+    throw new Error("Server says this was unsuccessful");
+  }
+
+  return responseObject.notes;
 };
 
 
