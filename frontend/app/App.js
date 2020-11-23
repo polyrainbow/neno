@@ -9,6 +9,7 @@ import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
 import * as API from "./lib/api.js";
 import * as Editor from "./lib/editor.js";
+import ImportLinksDialog from "./ImportLinksDialog.js";
 
 const getNewNoteObject = () => {
   const note = {
@@ -36,6 +37,9 @@ const App = () => {
   const [sortBy, setSortBy] = useState("CREATION_DATE_ASCENDING");
   const [activeNote, setActiveNote] = useState(getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
+  const [isImportLinksDialogOpen, setIsImportLinksDialogOpen]
+    = useState(false);
+
   const displayedLinkedNotes = [
     ...(!activeNote.isUnsaved)
       ? activeNote.linkedNotes.filter((note) => {
@@ -285,11 +289,28 @@ const App = () => {
     notesListStatus = "BUSY";
   }
 
+  const importLinksAsNotes = async (links) => {
+    await API.importLinksAsNotes(links);
+    refreshNotesList();
+  };
+
 
   return <>
+    {
+      isImportLinksDialogOpen
+        ? <ImportLinksDialog
+          importLinksAsNotes={(links) => {
+            importLinksAsNotes(links);
+            setIsImportLinksDialogOpen(false);
+          }}
+          onCancel={() => setIsImportLinksDialogOpen(false)}
+        />
+        : null
+    }
     <Header
       allNotes={allNotes}
       links={links}
+      openImportLinksDialog={() => setIsImportLinksDialogOpen(true)}
     />
     <main>
       <div id="left-view">

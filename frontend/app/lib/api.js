@@ -113,6 +113,27 @@ const archiveDatabase = async () => {
 };
 
 
+const importLinksAsNotes = async (links) => {
+  const response = await fetch(API_URL + "import-links-as-notes", {
+    method: "PUT",
+    body: JSON.stringify({
+      links,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const json = await response.json();
+
+  if (json.success === false) {
+    throw new Error(json.error);
+  }
+
+  return json.note;
+};
+
+
 export {
   getNote,
   getNotes,
@@ -121,5 +142,6 @@ export {
   getDatabaseAsJSON,
   getGraph,
   archiveDatabase,
+  importLinksAsNotes,
 };
 

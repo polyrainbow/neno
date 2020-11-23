@@ -224,6 +224,74 @@ app.put(API_PATH + "/note", function(req, res) {
 });
 
 
+app.put(API_PATH + "/import-links-as-notes", function(req, res) {
+  const reqBody = req.body;
+  const links = reqBody.links;
+  Promise.allSettled(links.map((url) => {
+    return getUrlMetadata(url);
+  }))
+    .then((responses) => {
+      const urlMetadataObjects = responses
+        .filter((response) => {
+          return response.status === "fulfilled";
+        })
+        .map((response) => {
+          return response.value;
+        });
+
+      const notes = urlMetadataObjects.map((urlMetadataObject) => {
+        const newNoteObject = {
+          editorData: {
+            "time": Date.now(),
+            "blocks": [
+              {
+                "type": "header",
+                "data": {
+                  "text": urlMetadataObject.meta.title,
+                  "level": 1,
+                },
+              },
+              {
+                "type": "linkTool",
+                "data": {
+                  "link": urlMetadataObject.url,
+                  "meta": urlMetadataObject.meta,
+                },
+              },
+            ],
+            "version": "2.16.1",
+          },
+        };
+
+        return newNoteObject;
+      });
+
+      const notesFromDB = [];
+      const failures = [];
+
+      notes.forEach((note) => {
+        try {
+          const noteFromDB = Notes.put(note, req.userId, {
+            ignoreDuplicateTitles: true,
+          });
+          notesFromDB.push(noteFromDB);
+        } catch (e) {
+          failures.push({
+            note,
+            error: e,
+          });
+        }
+      });
+
+      res.end(JSON.stringify({
+        notesFromDB,
+        failures,
+        success: true,
+      }));
+    });
+});
+
+
 app.delete(API_PATH + "/note/:noteId", function(req, res) {
   const success = Notes.remove(parseInt(req.params.noteId), req.userId);
   res.end(JSON.stringify({
@@ -237,22 +305,31 @@ app.listen(PORT, function() {
 });
 
 
+const getUrlMetadata = async (url) => {
+  const metadata = await urlMetadata(url);
+
+  const response = {
+    "success": 1,
+    "url": url,
+    "meta": {
+      "title": metadata.title,
+      "description": metadata.description,
+      "image": {
+        "url": metadata.image,
+      },
+    },
+  };
+
+  return response;
+};
+
+
 app.get(API_PATH + "/link-data", (req, res) => {
   const url = req.query.url;
 
-  urlMetadata(url)
+  getUrlMetadata(url)
     .then((metadata) => {
-      const response = {
-        "success": 1,
-        "meta": {
-          "title": metadata.title,
-          "description": metadata.description,
-          "image": {
-            "url": metadata.image,
-          },
-        },
-      };
-      res.end(JSON.stringify(response));
+      res.end(JSON.stringify(metadata));
     })
     .catch((e) => {
       const response = {

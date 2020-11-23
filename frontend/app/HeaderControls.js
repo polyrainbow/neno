@@ -2,7 +2,9 @@ import React from "react";
 import * as API from "./lib/api.js";
 
 
-const HeaderControls = () => {
+const HeaderControls = ({
+  openImportLinksDialog,
+}) => {
   return <section id="header-controls">
     <button
       className="icon-button"
@@ -35,6 +37,18 @@ const HeaderControls = () => {
         alt="Archive database including uploads"
       />
     </a>
+    <button
+      className="icon-button"
+      id="button_import_links_as_notes"
+      alt="Import links as notes"
+      title="Import links as notes"
+      onClick={openImportLinksDialog}
+    >
+      <img
+        src="/assets/icons/dynamic_feed-24px.svg"
+        alt="Import links as notes"
+      />
+    </button>
   </section>;
 };
 

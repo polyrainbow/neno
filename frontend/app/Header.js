@@ -4,6 +4,7 @@ import HeaderControls from "./HeaderControls";
 const Header = ({
   allNotes,
   links,
+  openImportLinksDialog,
 }) => {
   const numberOfUnlinkedNotes = allNotes?.filter((note) => {
     return note.numberOfLinkedNotes === 0;
@@ -19,7 +20,9 @@ const Header = ({
     <header>
       <div id="header-left">
         <h1 id="heading">NeNo</h1>
-        <HeaderControls />
+        <HeaderControls
+          openImportLinksDialog={openImportLinksDialog}
+        />
       </div>
       {
         showStats
