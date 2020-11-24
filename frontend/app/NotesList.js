@@ -1,4 +1,5 @@
 import React from "react";
+import NotesListStatus from "./NotesListStatus.js";
 import NoteListItem from "./NoteListItem.js";
 
 
@@ -11,38 +12,15 @@ const NotesList = ({
   status,
 }) => {
   if (status === "BUSY" || status === "SEARCH_VALUE_TOO_SHORT") {
-    return <div
-      style={{
-        fontSize: "20px",
-        textAlign: "center",
-        margin: "30px auto",
-      }}
-    >
-      <img
-        style={{
-          width: "100px",
-        }}
-        src={
-          status === "BUSY"
-            ? "/assets/icons/pending-24px.svg"
-            : "/assets/icons/looks_3-24px.svg"
-        }
-        alt={
-          status === "BUSY"
-            ? "Loading notes"
-            : "Please type at least 3 characters to search"
-        }
-      />
-      <p>{
-        status === "BUSY"
-          ? "Loading notes ..."
-          : "Please type at least 3 characters to search"
-      }</p>
-    </div>;
+    return <NotesListStatus
+      status={status}
+    />;
   }
 
-  if (!Array.isArray(notes)) {
-    return "";
+  if (!Array.isArray(notes) || (notes.length === 0)) {
+    return <NotesListStatus
+      status="NO_NOTES_FOUND"
+    />;
   }
 
   return <section id="list">
