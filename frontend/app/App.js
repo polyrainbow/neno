@@ -31,6 +31,7 @@ const getNewNoteObject = () => {
 const App = () => {
   const currentRequestId = useRef(null);
   const [displayedNotes, setDisplayedNotes] = useState([]);
+  const [noteListScrollTop, setNoteListScrollTop] = useState(0);
   const [allNotes, setAllNotes] = useState(null);
   const [isBusy, setIsBusy] = useState(true);
   const [links, setLinks] = useState(null);
@@ -93,6 +94,7 @@ const App = () => {
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
+    setNoteListScrollTop(0);
   };
 
   const handleLinkAddition = async (note) => {
@@ -320,7 +322,10 @@ const App = () => {
           displayedNotes={displayedNotesSorted}
           allNotes={allNotes}
           sortBy={sortBy}
-          setSortBy={setSortBy}
+          setSortBy={(sortBy) => {
+            setNoteListScrollTop(0);
+            setSortBy(sortBy);
+          }}
         />
         <NotesList
           notes={displayedNotes}
@@ -330,6 +335,9 @@ const App = () => {
           onLinkAddition={handleLinkAddition}
           status={notesListStatus}
           searchValue
+          scrollTop={noteListScrollTop}
+          setScrollTop={setNoteListScrollTop}
+          sortBy={sortBy}
         />
       </div>
       <div id="right-view">
