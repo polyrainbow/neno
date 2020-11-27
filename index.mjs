@@ -8,6 +8,7 @@ import archiver from "archiver";
 import { getNoteTitle } from "./lib/noteUtils.mjs";
 import { yyyymmdd } from "./lib/utils.mjs";
 import * as url from "url";
+import mkdirp from "mkdirp";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const app = express();
@@ -32,6 +33,7 @@ if (fs.existsSync(usersFile)) {
     { id: "admin", login: "admin", password: "0000" },
   ];
   console.log("No users file found. Creating one by myself...");
+  mkdirp.sync(DATA_PATH);
   fs.writeFileSync(usersFile, JSON.stringify(defaultUsers));
   users = defaultUsers;
 }
