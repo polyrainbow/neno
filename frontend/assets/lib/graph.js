@@ -496,6 +496,12 @@ document.onload = (function(d3) {
         return "M" + d.source.x + "," + d.source.y
         + "L" + d.target.x + "," + d.target.y;
       })
+      .on("mouseover", function(d) {
+        statusElement.innerHTML = d.source.title + " - " + d.target.title;
+      })
+      .on("mouseout", function() {
+        statusElement.innerHTML = "";
+      })
       .on("mousedown", function(d) {
         thisGraph.pathMouseDown(d3.select(this), d);
       })
