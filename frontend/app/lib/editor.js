@@ -17,7 +17,7 @@ const load = async ({ data, parent, onChange }) => {
 
   instance = new EditorJS({
     holder: parent,
-    data: data || Config.placeholderNoteObject,
+    data,
     autofocus: true,
     placeholder: "Let's write an awesome note!",
     hideToolbar: false,

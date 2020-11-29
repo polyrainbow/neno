@@ -1,3 +1,5 @@
+import * as Config from "./config.js";
+
 const yyyymmdd = (date) => {
   const yyyy = date.getFullYear().toString();
   const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
@@ -43,10 +45,10 @@ const getNewNoteObject = () => {
   const note = {
     changes: [],
     creationTime: null,
-    editorData: null,
+    editorData: Config.newEditorDataObject,
     id: null,
     isUnsaved: true,
-    linkedNotes: null,
+    linkedNotes: [],
     updateTime: null,
     x: null,
     y: null,

@@ -130,7 +130,7 @@ const App = () => {
       setUnsavedChanges(false);
     }
 
-    if (typeof noteId !== "number") {
+    if (typeof noteId !== "number" || isNaN(noteId)) {
       setActiveNote(Utils.getNewNoteObject());
       return;
     }
@@ -235,8 +235,10 @@ const App = () => {
     const initialId = parseInt(
       Utils.getParameterByName("id", window.location.href),
     );
-    if (initialId) {
+    if (typeof initialId === "number") {
       loadNote(initialId);
+    } else {
+      loadNote(null);
     }
   }, []);
 

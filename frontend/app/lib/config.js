@@ -1,6 +1,6 @@
 const DEFAULT_NOTE_TITLE = "Note title";
 
-const placeholderNoteObject = {
+const newEditorDataObject = {
   "time": 1582493003964,
   "blocks": [
     {
@@ -42,7 +42,7 @@ const MINIMUM_SEARCH_QUERY_LENGTH = 3;
 
 export {
   DEFAULT_NOTE_TITLE,
-  placeholderNoteObject,
+  newEditorDataObject,
   API_URL,
   texts,
   MINIMUM_SEARCH_QUERY_LENGTH,
