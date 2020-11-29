@@ -59,6 +59,7 @@ const load = async ({ data, parent, onChange }) => {
 
 const save = async () => {
   if (!instance) return false;
+  await instance.isReady;
   const editorData = await instance.save();
   return editorData;
 };
