@@ -39,10 +39,56 @@ const makeTimestampHumanReadable = (timestamp) => {
 };
 
 
+const getNewNoteObject = () => {
+  const note = {
+    changes: [],
+    creationTime: null,
+    editorData: null,
+    id: null,
+    isUnsaved: true,
+    linkedNotes: null,
+    updateTime: null,
+    x: null,
+    y: null,
+  };
+
+  Object.seal(note);
+  return note;
+};
+
+
+const getSortFunction = (sortBy) => {
+  const sortFunctions = {
+    "CREATION_DATE_ASCENDING": (a, b) => {
+      return a.creationTime - b.creationTime;
+    },
+    "CREATION_DATE_DESCENDING": (a, b) => {
+      return b.creationTime - a.creationTime;
+    },
+    "UPDATE_DATE_ASCENDING": (a, b) => {
+      return a.updateTime - b.updateTime;
+    },
+    "UPDATE_DATE_DESCENDING": (a, b) => {
+      return b.updateTime - a.updateTime;
+    },
+    "NUMBER_OF_LINKS_ASCENDING": (a, b) => {
+      return a.numberOfLinkedNotes - b.numberOfLinkedNotes;
+    },
+    "NUMBER_OF_LINKS_DESCENDING": (a, b) => {
+      return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
+    },
+  };
+
+  return sortFunctions[sortBy] ?? sortFunctions.UPDATE_DATE_ASCENDING;
+};
+
+
 export {
   yyyymmdd,
   htmlDecode,
   getParameterByName,
   getNumberOfCharacters,
   makeTimestampHumanReadable,
+  getNewNoteObject,
+  getSortFunction,
 };

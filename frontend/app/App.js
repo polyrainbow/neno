@@ -11,23 +11,6 @@ import * as API from "./lib/api.js";
 import * as Editor from "./lib/editor.js";
 import ImportLinksDialog from "./ImportLinksDialog.js";
 
-const getNewNoteObject = () => {
-  const note = {
-    changes: [],
-    creationTime: null,
-    editorData: null,
-    id: null,
-    isUnsaved: true,
-    linkedNotes: null,
-    updateTime: null,
-    x: null,
-    y: null,
-  };
-
-  Object.seal(note);
-  return note;
-};
-
 const App = () => {
   const currentRequestId = useRef(null);
   const [displayedNotes, setDisplayedNotes] = useState([]);
@@ -36,7 +19,7 @@ const App = () => {
   const [isBusy, setIsBusy] = useState(true);
   const [links, setLinks] = useState(null);
   const [sortBy, setSortBy] = useState("CREATION_DATE_ASCENDING");
-  const [activeNote, setActiveNote] = useState(getNewNoteObject());
+  const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
   const [isImportLinksDialogOpen, setIsImportLinksDialogOpen]
     = useState(false);
@@ -65,33 +48,9 @@ const App = () => {
       }),
   ];
 
-  const displayedNotesSorted = displayedNotes.sort((a, b) => {
-    if (sortBy === "CREATION_DATE_ASCENDING") {
-      return a.creationTime - b.creationTime;
-    }
-
-    if (sortBy === "CREATION_DATE_DESCENDING") {
-      return b.creationTime - a.creationTime;
-    }
-
-    if (sortBy === "UPDATE_DATE_ASCENDING") {
-      return a.updateTime - b.updateTime;
-    }
-
-    if (sortBy === "UPDATE_DATE_DESCENDING") {
-      return b.updateTime - a.updateTime;
-    }
-
-    if (sortBy === "NUMBER_OF_LINKS_ASCENDING") {
-      return a.numberOfLinkedNotes - b.numberOfLinkedNotes;
-    }
-
-    if (sortBy === "NUMBER_OF_LINKS_DESCENDING") {
-      return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
-    }
-
-    return a.updateTime - b.updateTime;
-  });
+  const displayedNotesSorted = displayedNotes.sort(
+    Utils.getSortFunction(sortBy),
+  );
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
@@ -175,7 +134,7 @@ const App = () => {
     }
 
     if (typeof noteId !== "number") {
-      setActiveNote(getNewNoteObject());
+      setActiveNote(Utils.getNewNoteObject());
       return;
     }
 
@@ -301,16 +260,6 @@ const App = () => {
       });
   }, [refreshNotesList]);
 
-  let notesListStatus = "DEFAULT";
-
-  if (searchValue.length > 0 && searchValue.length < 3) {
-    notesListStatus = "SEARCH_VALUE_TOO_SHORT";
-  }
-
-  if (isBusy) {
-    notesListStatus = "BUSY";
-  }
-
   const importLinksAsNotes = async (links) => {
     await API.importLinksAsNotes(links);
     refreshNotesList();
@@ -353,8 +302,8 @@ const App = () => {
           activeNote={activeNote}
           displayedLinkedNotes={displayedLinkedNotes}
           onLinkAddition={handleLinkAddition}
-          status={notesListStatus}
-          searchValue
+          isBusy={isBusy}
+          searchValue={searchValue}
           scrollTop={noteListScrollTop}
           setScrollTop={setNoteListScrollTop}
           sortBy={sortBy}

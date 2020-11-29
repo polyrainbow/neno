@@ -9,12 +9,23 @@ const NotesList = ({
   activeNote,
   onLinkAddition,
   displayedLinkedNotes,
-  status,
+  isBusy,
+  searchValue,
   scrollTop,
   setScrollTop,
   sortBy,
 }) => {
   const containerRef = useRef(null);
+
+  let status = "DEFAULT";
+
+  if (searchValue.length > 0 && searchValue.length < 3) {
+    status = "SEARCH_VALUE_TOO_SHORT";
+  }
+
+  if (isBusy) {
+    status = "BUSY";
+  }
 
   useEffect(() => {
     const container = containerRef.current;
@@ -34,6 +45,7 @@ const NotesList = ({
     };
   }, [status]);
 
+  // set scrollTop when notes, status or sortBy have changed
   useEffect(() => {
     const container = containerRef.current;
     if (!container) {
