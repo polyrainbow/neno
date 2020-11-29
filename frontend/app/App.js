@@ -196,35 +196,31 @@ const App = () => {
     refreshNotesList();
   };
 
+
   const createNewNote = () => {
-    loadNote();
+    loadNote(null);
     refreshNotesList();
   };
 
 
-  const saveNote = async (options) => {
+  const prepareNoteToTransmit = async () => {
     const noteToTransmit = {
       editorData: await Editor.save(),
       changes: activeNote.changes,
       id: activeNote.isUnsaved ? null : activeNote.id,
     };
 
-    // if the note has no title yet, take the title of the link metadata
-    const firstLinkBlock = noteToTransmit.editorData.blocks.find(
-      (block) => block.type === "linkTool",
+    Utils.setNoteTitleByLinkTitleIfUnset(
+      noteToTransmit,
+      Config.DEFAULT_NOTE_TITLE,
     );
 
-    if (
-      (noteToTransmit.editorData?.blocks?.[0]?.data?.text
-        === Config.DEFAULT_NOTE_TITLE)
-      && firstLinkBlock
-      && typeof firstLinkBlock.data.meta.title === "string"
-      && firstLinkBlock.data.meta.title.length > 0
-    ) {
-      noteToTransmit.editorData.blocks[0].data.text
-        = firstLinkBlock.data.meta.title;
-    }
+    return noteToTransmit;
+  };
 
+
+  const saveNote = async (options) => {
+    const noteToTransmit = await prepareNoteToTransmit();
     const noteFromServer = await API.putNote(noteToTransmit, options);
     setActiveNote({
       ...noteFromServer,
