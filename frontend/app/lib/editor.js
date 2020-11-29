@@ -8,7 +8,7 @@ import Code from "@editorjs/code";
 
 let instance = null;
 
-const load = (data, parent) => {
+const load = ({ data, parent, onChange }) => {
   // destroy does currently not work
   // https://github.com/codex-team/editor.js/issues/1400
   // https://github.com/codex-team/editor.js/issues/1380
@@ -49,6 +49,7 @@ const load = (data, parent) => {
       },
       code: Code,
     },
+    onChange,
   });
 };
 

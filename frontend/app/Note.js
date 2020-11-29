@@ -8,12 +8,17 @@ const Note = ({
   loadNote,
   displayedLinkedNotes,
   onLinkRemoval,
+  setUnsavedChanges,
 }) => {
   useEffect(() => {
     const data = note?.editorData;
     const parent = document.getElementById("editor");
     if (!parent) return;
-    Editor.load(data, parent);
+    Editor.load({
+      data,
+      parent,
+      onChange: () => setUnsavedChanges(true),
+    });
   }, [note]);
 
 

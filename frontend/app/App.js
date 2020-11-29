@@ -40,6 +40,7 @@ const App = () => {
   const [searchValue, setSearchValue] = useState("");
   const [isImportLinksDialogOpen, setIsImportLinksDialogOpen]
     = useState(false);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
 
   const displayedLinkedNotes = [
     ...(!activeNote.isUnsaved)
@@ -123,6 +124,8 @@ const App = () => {
         },
       ],
     });
+
+    setUnsavedChanges(true);
   };
 
 
@@ -152,10 +155,25 @@ const App = () => {
         },
       ],
     });
+
+    setUnsavedChanges(true);
   };
 
 
   const loadNote = async (noteId) => {
+    if (unsavedChanges) {
+      const confirmed = confirm(
+        "There are unsaved changes. Do you really want to discard them "
+        + "and load another note?",
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      setUnsavedChanges(false);
+    }
+
     if (typeof noteId !== "number") {
       setActiveNote(getNewNoteObject());
       return;
@@ -254,10 +272,12 @@ const App = () => {
       isUnsaved: false,
       changes: [],
     });
+    setUnsavedChanges(false);
     refreshNotesList();
   };
 
 
+  // startup
   useEffect(() => {
     const initialId = parseInt(
       Utils.getParameterByName("id", window.location.href),
@@ -346,12 +366,14 @@ const App = () => {
           createNewNote={createNewNote}
           saveNote={saveNote}
           removeActiveNote={removeActiveNote}
+          unsavedChanges={unsavedChanges}
         />
         <Note
           note={activeNote}
           loadNote={loadNote}
           onLinkRemoval={handleLinkRemoval}
           displayedLinkedNotes={displayedLinkedNotes}
+          setUnsavedChanges={setUnsavedChanges}
         />
       </div>
 

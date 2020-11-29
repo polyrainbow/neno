@@ -19,6 +19,7 @@ header {
   align-items: center;
   justify-content: space-between;
   height: 50px;
+  user-select: none;
 }
 
 header h1 {
@@ -60,6 +61,7 @@ main {
 
 #note-controls {
   background-color: blanchedalmond;
+  user-select: none;
 }
 
 #note-controls-left {

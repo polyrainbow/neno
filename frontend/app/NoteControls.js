@@ -6,6 +6,7 @@ const NoteControls = ({
   createNewNote,
   saveNote,
   removeActiveNote,
+  unsavedChanges,
 }) => {
   return <section id="note-controls">
     <div id="note-controls-left">
@@ -59,6 +60,13 @@ const NoteControls = ({
           alt="Delete"
         />
       </button>
+    </div>
+    <div id="note-controls-right">
+      {
+        unsavedChanges
+          ? <span title="Unsaved changes">✳️</span>
+          : ""
+      }
     </div>
   </section>;
 };
