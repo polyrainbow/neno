@@ -65,7 +65,7 @@ const NoteControls = ({
       {
         unsavedChanges
           ? <span title="Unsaved changes">✳️</span>
-          : ""
+          : <span title="No unsaved changes">✔️</span>
       }
     </div>
   </section>;
