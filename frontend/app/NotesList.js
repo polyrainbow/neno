@@ -74,7 +74,7 @@ const NotesList = ({
             const isActive
               = (!activeNote.isUnsaved) && (note.id === activeNote.id);
             const isLinked
-              = (!activeNote.isUnsaved) && displayedLinkedNotes.some(
+              = displayedLinkedNotes.some(
                 (linkedNote) => {
                   return linkedNote.id === note.id;
                 },
