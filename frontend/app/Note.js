@@ -21,7 +21,6 @@ const Note = ({
     });
   }, [note]);
 
-
   return <section id="note">
     <div id="editor"></div>
     <div id="links">

@@ -8,7 +8,7 @@ import Code from "@editorjs/code";
 
 let instance = null;
 
-const load = ({ data, parent, onChange }) => {
+const load = async ({ data, parent, onChange }) => {
   // destroy does currently not work
   // https://github.com/codex-team/editor.js/issues/1400
   // https://github.com/codex-team/editor.js/issues/1380
@@ -51,11 +51,16 @@ const load = ({ data, parent, onChange }) => {
     },
     onChange,
   });
+
+  await instance.isReady;
+  return true;
 };
 
 
-const save = () => {
-  return instance.save();
+const save = async () => {
+  if (!instance) return false;
+  const editorData = await instance.save();
+  return editorData;
 };
 
 
