@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import NoteListItem from "./NoteListItem.js";
 import * as Editor from "./lib/editor.js";
 import NoteStats from "./NoteStats.js";
+import isEqual from "react-fast-compare";
 
 const Note = ({
   note,
@@ -10,16 +11,25 @@ const Note = ({
   onLinkRemoval,
   setUnsavedChanges,
 }) => {
+  const previousEditorData = useRef(null);
+  const editorData = note?.editorData;
+
   useEffect(() => {
-    const data = note?.editorData;
     const parent = document.getElementById("editor");
     if (!parent) return;
+
+    if (isEqual(editorData?.blocks, previousEditorData.current?.blocks)) {
+      return;
+    }
+
     Editor.load({
-      data,
+      data: editorData,
       parent,
       onChange: () => setUnsavedChanges(true),
     });
-  }, [note]);
+
+    previousEditorData.current = editorData;
+  });
 
   return <section id="note">
     <div id="editor"></div>
