@@ -121,10 +121,7 @@ const App = () => {
 
   const loadNote = async (noteId) => {
     if (unsavedChanges) {
-      const confirmed = confirm(
-        "There are unsaved changes. Do you really want to discard them "
-        + "and load another note?",
-      );
+      const confirmed = confirm(Config.texts.discardChangesConfirmation);
 
       if (!confirmed) {
         return;
@@ -145,6 +142,7 @@ const App = () => {
       changes: [],
     });
   };
+
 
   const refreshNotesList = useCallback(
     async () => {
@@ -186,18 +184,18 @@ const App = () => {
   );
 
 
+  const createNewNote = () => {
+    loadNote(null);
+    refreshNotesList();
+  };
+
+
   const removeActiveNote = async () => {
     if (activeNote.isUnsaved) {
       return;
     }
 
     await API.deleteNote(activeNote.id);
-    loadNote(null);
-    refreshNotesList();
-  };
-
-
-  const createNewNote = () => {
     loadNote(null);
     refreshNotesList();
   };
@@ -255,6 +253,7 @@ const App = () => {
         console.error(e);
       });
   }, [refreshNotesList]);
+
 
   const importLinksAsNotes = async (links) => {
     await API.importLinksAsNotes(links);

@@ -33,6 +33,9 @@ const texts = {
   titleAlreadyExistsConfirmation:
     "A note with this title already exists. Do you want to save this note "
     + "with the same title?",
+  discardChangesConfirmation:
+    "There are unsaved changes. Do you really want to discard them "
+    + "and load another note?",
 };
 
 const MINIMUM_SEARCH_QUERY_LENGTH = 3;
