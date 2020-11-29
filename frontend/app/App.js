@@ -253,9 +253,12 @@ const App = () => {
     } else {
       loadNote(null);
     }
-
-    refreshNotesList();
   }, []);
+
+
+  useEffect(() => {
+    refreshNotesList();
+  }, [searchValue]);
 
 
   const importLinksAsNotes = async (links) => {
