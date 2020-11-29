@@ -144,8 +144,21 @@ const App = () => {
   };
 
 
+  const refreshLinks = () => {
+    API.getGraph()
+      .then((graph) => {
+        setLinks(graph.links);
+      })
+      .catch((e) => {
+        console.error("Could not get graph via API.");
+        console.error(e);
+      });
+  };
+
+
   const refreshNotesList = useCallback(
     async () => {
+      refreshLinks();
       setDisplayedNotes([]);
 
       // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
@@ -235,26 +248,14 @@ const App = () => {
     const initialId = parseInt(
       Utils.getParameterByName("id", window.location.href),
     );
-    if (typeof initialId === "number") {
+    if (typeof initialId === "number" && !isNaN(initialId)) {
       loadNote(initialId);
     } else {
       loadNote(null);
     }
-  }, []);
 
-
-  useEffect(() => {
     refreshNotesList();
-
-    API.getGraph()
-      .then((graph) => setLinks(graph.links))
-      .catch((e) => {
-        // eslint-disable-next-line no-console
-        console.error("Could not get graph via API.");
-        // eslint-disable-next-line no-console
-        console.error(e);
-      });
-  }, [refreshNotesList]);
+  }, []);
 
 
   const importLinksAsNotes = async (links) => {
