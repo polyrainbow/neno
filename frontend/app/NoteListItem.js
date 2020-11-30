@@ -1,5 +1,6 @@
 import React from "react";
 import { yyyymmdd } from "./lib/utils.js";
+import NoteListItemButton from "./NoteListItemButton.js";
 
 const NoteListItem = ({
   note,
@@ -44,29 +45,19 @@ const NoteListItem = ({
     >
       {
         onAdd
-          ? <img
-            style={{ "verticalAlign": "bottom" }}
-            src="/assets/icons/link-24px.svg"
+          ? <NoteListItemButton
+            icon="link"
             title="Add as link to current note"
-            onClick={(e) => {
-              onAdd();
-              e.stopPropagation();
-            }}
-            alt="Add as link to current note"
+            onClick={onAdd}
           />
           : null
       }
       {
         onDelete
-          ? <img
-            style={{ "verticalAlign": "bottom" }}
-            src="/assets/icons/link_off-24px.svg"
+          ? <NoteListItemButton
+            icon="link_off"
             title="Remove"
-            onClick={(e) => {
-              onDelete();
-              e.stopPropagation();
-            }}
-            alt="Remove link"
+            onClick={onDelete}
           />
           : null
       }

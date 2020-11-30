@@ -112,9 +112,14 @@ th, td {
 }
 
 .note-list-item .noteListItemControls {
-  height: 28px;
+  height: 36px;
   text-align: right;
-  padding: 4px 5px;
+  padding: 0px 5px;
+}
+
+.noteListItemButton {
+  height: 32px;
+  cursor: pointer;
 }
 
 .note-list-item .linkedNotesIndicator {
