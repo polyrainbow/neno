@@ -1,6 +1,8 @@
 // import all modules dynamically, so that webpack writes them into a separate
 // bundles
 
+import "react-tippy/dist/tippy.css";
+
 Promise.all([
   import("react"),
   import("react-dom"),

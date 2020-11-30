@@ -113,6 +113,14 @@ const archiveDatabase = async () => {
 };
 
 
+const archiveDatabaseWithUploads = async () => {
+  const a = document.createElement("a");
+  a.href = API_URL + "database-with-uploads";
+  a.download = true;
+  a.click();
+};
+
+
 const importLinksAsNotes = async (links) => {
   const response = await fetch(API_URL + "import-links-as-notes", {
     method: "PUT",
@@ -142,6 +150,7 @@ export {
   getDatabaseAsJSON,
   getGraph,
   archiveDatabase,
+  archiveDatabaseWithUploads,
   importLinksAsNotes,
 };
 

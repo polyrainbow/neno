@@ -1,54 +1,37 @@
 import React from "react";
 import * as API from "./lib/api.js";
-
+import IconButton from "./IconButton.js";
 
 const HeaderControls = ({
   openImportLinksDialog,
 }) => {
   return <section id="header-controls">
-    <button
-      className="icon-button"
-      id="button_graph" alt="Graph" title="Graph"
+    <IconButton
+      id="button_graph"
+      title="Show graph"
+      icon="account_tree"
       onClick={() => {
         window.location.href = "graph.html";
       }}
-    >
-      <img src="/assets/icons/account_tree-24px.svg" alt="Graph" />
-    </button>
-    <button
-      className="icon-button"
+    />
+    <IconButton
       id="button_archive"
-      alt="Download database"
       title="Download database"
+      icon="save_alt"
       onClick={API.archiveDatabase}
-    >
-      <img src="/assets/icons/save_alt-24px.svg" alt="Archive database" />
-    </button>
-    <a
-      href="/api/database-with-uploads"
-      className="icon-button"
+    />
+    <IconButton
       id="button_archive-with-uploads"
-      alt="Download database including uploads"
       title="Download database including uploads"
-      download
-    >
-      <img
-        src="/assets/icons/archive-24px.svg"
-        alt="Archive database including uploads"
-      />
-    </a>
-    <button
-      className="icon-button"
+      icon="archive"
+      onClick={API.archiveDatabaseWithUploads}
+    />
+    <IconButton
       id="button_import_links_as_notes"
-      alt="Import links as notes"
       title="Import links as notes"
+      icon="dynamic_feed"
       onClick={openImportLinksDialog}
-    >
-      <img
-        src="/assets/icons/dynamic_feed-24px.svg"
-        alt="Import links as notes"
-      />
-    </button>
+    />
   </section>;
 };
 

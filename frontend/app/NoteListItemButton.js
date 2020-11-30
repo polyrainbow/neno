@@ -1,4 +1,7 @@
 import React from "react";
+import {
+  Tooltip,
+} from "react-tippy";
 
 const NoteListItemButton = ({
   icon,
@@ -7,22 +10,26 @@ const NoteListItemButton = ({
   disabled,
 }) => {
   return (
-    <button
-      onClick={(e) => {
-        onClick();
-        e.stopPropagation();
-      }}
+    <Tooltip
       title={title}
-      className="noteListItemButton"
-      disabled={disabled}
+      position="bottom"
+      trigger="mouseenter focus"
     >
-      <img
-        style={{ "verticalAlign": "bottom" }}
-        src={"/assets/icons/" + icon + "-24px.svg"}
-        title={title}
-        alt={title}
-      />
-    </button>
+      <button
+        onClick={(e) => {
+          onClick();
+          e.stopPropagation();
+        }}
+        className="noteListItemButton"
+        disabled={disabled}
+      >
+        <img
+          style={{ "verticalAlign": "bottom" }}
+          src={"/assets/icons/" + icon + "-24px.svg"}
+          alt={title}
+        />
+      </button>
+    </Tooltip>
   );
 };
 

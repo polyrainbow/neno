@@ -1,5 +1,6 @@
 import React from "react";
 import * as Config from "./lib/config.js";
+import IconButton from "./IconButton.js";
 
 const NoteControls = ({
   activeNote,
@@ -10,20 +11,16 @@ const NoteControls = ({
 }) => {
   return <section id="note-controls">
     <div id="note-controls-left">
-      <button
-        className="icon-button"
+      <IconButton
         id="button_new"
-        alt="New"
-        title="New"
+        title="New note"
+        icon="note_add"
         onClick={createNewNote}
-      >
-        <img src="/assets/icons/note_add-24px.svg" alt="New" />
-      </button>
-      <button
-        className="icon-button"
+      />
+      <IconButton
         id="button_upload"
-        alt="Save"
-        title="Save"
+        title="Save note"
+        icon="save"
         onClick={() => {
           saveNote({ ignoreDuplicateTitles: false }).catch((e) => {
             if (e.message === "NOTE_WITH_SAME_TITLE_EXISTS") {
@@ -37,29 +34,21 @@ const NoteControls = ({
             }
           });
         }}
-      >
-        <img src="/assets/icons/save-24px.svg" alt="Save" />
-      </button>
-      <button
-        className="icon-button"
+      />
+      <IconButton
         id="button_remove"
         disabled={activeNote.isUnsaved}
-        alt="Remove"
-        title="Remove"
+        title="Remove note"
+        icon={activeNote.isUnsaved
+          ? "delete_disabled"
+          : "delete"
+        }
         onClick={() => {
           if (confirm("Do you really want to remove this note?")) {
             removeActiveNote();
           }
         }}
-      >
-        <img
-          src={activeNote.isUnsaved
-            ? "/assets/icons/delete-24px_disabled.svg"
-            : "/assets/icons/delete-24px.svg"
-          }
-          alt="Delete"
-        />
-      </button>
+      />
     </div>
     <div id="note-controls-right">
       {

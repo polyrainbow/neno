@@ -43,6 +43,10 @@ module.exports = {
           cacheCompression: false,
         },
       },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
   devServer: {

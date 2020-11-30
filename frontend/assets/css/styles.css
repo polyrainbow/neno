@@ -11,6 +11,10 @@ header,
   font-family: 'Open Sans', sans-serif;
 }
 
+.tippy-popper{
+  font-family: 'Open Sans', sans-serif;
+}
+
 header {
   background: lightskyblue;
   margin: 0;

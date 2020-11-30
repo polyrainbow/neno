@@ -56,7 +56,7 @@ const NoteListItem = ({
         onDelete
           ? <NoteListItemButton
             icon="link_off"
-            title="Remove"
+            title="Remove link to this note"
             onClick={onDelete}
           />
           : null

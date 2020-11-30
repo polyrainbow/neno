@@ -1,5 +1,5 @@
 import React from "react";
-
+import IconButton from "./IconButton.js";
 
 const NoteListControls = ({
   value,
@@ -49,21 +49,17 @@ const NoteListControls = ({
           }
         }}
       />
-      <button
-        className="icon-button"
+      <IconButton
+        id="button_new"
         title="Clear search"
+        icon={
+          value.length > 0
+            ? "cancel"
+            : "cancel_disabled"
+        }
         onClick={() => onChange("")}
         disabled={value.length === 0}
-      >
-        <img
-          src={
-            value.length > 0
-              ? "/assets/icons/cancel-24px.svg"
-              : "/assets/icons/cancel-24px_disabled.svg"
-          }
-          alt="Clear search"
-        />
-      </button>
+      />
       <span style={{
         fontSize: "16px",
       }}>{label}</span>
