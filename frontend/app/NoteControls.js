@@ -1,6 +1,7 @@
 import React from "react";
 import * as Config from "./lib/config.js";
 import IconButton from "./IconButton.js";
+import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 
 const NoteControls = ({
   activeNote,
@@ -51,11 +52,7 @@ const NoteControls = ({
       />
     </div>
     <div id="note-controls-right">
-      {
-        unsavedChanges
-          ? <span title="Unsaved changes">✳️</span>
-          : <span title="No unsaved changes">✔️</span>
-      }
+      <UnsavedChangesIndicator unsavedChanges={unsavedChanges} />
     </div>
   </section>;
 };
