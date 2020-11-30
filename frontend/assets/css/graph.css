@@ -28,17 +28,43 @@ header{
   top: 0;
   left: 0;
   z-index: 5;
-  display: flex;
   align-items: center;
   font-family: 'Open Sans', sans-serif;
+  justify-content: space-between;
+}
+
+
+#header-left {
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+#header-left #status {
+  text-align: left;
 }
 
 #heading {
   margin: 8px;
   margin-left: 0px;
   font-size: 24px;
+  white-space: pre;
 }
 
+#header-right {
+  display: flex;
+  padding-right: 10px;
+  margin-right: 10px;
+  height: 50px;
+  align-items: center;
+}
+
+#header-right input {
+  width: 240px;
+  height: 24px;
+  font-size: 16px;
+  border: none;
+}
 
 .icon-button{
   width: 50px;
@@ -103,6 +129,11 @@ g.node.selected text{
 
 g.node:hover circle{
   fill: rgb(134, 228, 105);
+}
+
+
+g.node-highlighter circle{
+  fill: #5598cf;
 }
 
 

@@ -31,30 +31,39 @@
   <body>
 
     <header>
-      <h1 id="heading">NeNo Graph</h1>
+      <div id="header-left">
+        <h1 id="heading">NeNo Graph</h1>
 
-      <button
-        class="icon-button"
-        id="button-home" title="Home" alt="Home"
-      >
-        <img src="/assets/icons/home-24px.svg" alt="Home">
-      </button>
-      <button
-        class="icon-button"
-        id="button-save" title="Save" src="/assets/icons/save-24px.svg" alt="Save"
-      >
-        <img src="/assets/icons/save-24px.svg" alt="Save">
-      </button>
-      <button
-        class="icon-button"
-        id="button-open" title="Open note" src="/assets/icons/open_in_browser-24px.svg" alt="Open"
-      >
-        <img src="/assets/icons/open_in_browser-24px.svg" alt="Open">
-      </button>
-      <span id="status">Hold shift to draw links</span>
+        <button
+          class="icon-button"
+          id="button-home" title="Home" alt="Home"
+        >
+          <img src="/assets/icons/home-24px.svg" alt="Home">
+        </button>
+        <button
+          class="icon-button"
+          id="button-save" title="Save" src="/assets/icons/save-24px.svg" alt="Save"
+        >
+          <img src="/assets/icons/save-24px.svg" alt="Save">
+        </button>
+        <button
+          class="icon-button"
+          id="button-open" title="Open note" src="/assets/icons/open_in_browser-24px.svg" alt="Open"
+        >
+          <img src="/assets/icons/open_in_browser-24px.svg" alt="Open">
+        </button>
+        <p id="status">Hold shift to draw links</p>
+      </div>
+      <div id="header-right">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search..."
+        >
+      </div>
     </header>
     
-    <main></main>
+    <main id="main"></main>
 
     <script src="https://d3js.org/d3-zoom.v1.min.js"></script>
     <script src="https://d3js.org/d3-drag.v1.min.js"></script>

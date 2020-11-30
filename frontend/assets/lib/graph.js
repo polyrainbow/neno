@@ -3,10 +3,12 @@ import * as Utils from "./utils.js";
 
 const statusElement = document.getElementById("status");
 const openButton = document.getElementById("button-open");
+const mainElement = document.getElementById("main");
 const DEFAULT_STATUS = "Hold shift to draw links";
 
 let graphIsRendered = false;
 let unsavedChanges = false;
+let searchValue = "";
 
 const screenPosition = {
   translateX: 0,
@@ -53,6 +55,9 @@ document.onload = (function(d3) {
     thisGraph.newLinkLine = svgG.append("svg:path")
       .attr("class", "link newLinkLine hidden")
       .attr("d", "M0,0L0,0");
+
+    thisGraph.nodeHighlighterContainer = svgG.append("g")
+      .classed("note-highlighters", true);
 
     // svg nodes and links
     thisGraph.linksContainer = svgG.append("g")
@@ -134,14 +139,14 @@ document.onload = (function(d3) {
     window.onresize = function() {thisGraph.updateWindow(svg);};
 
     d3.select("#button-save").on("click", function() {
-      const links = thisGraph.links.map((link) => {
+      const linksToTransmit = thisGraph.links.map((link) => {
         return [
           link.source.id,
           link.target.id,
         ];
       });
 
-      const nodes = thisGraph.nodes.map((node) => {
+      const nodesToTransmit = thisGraph.nodes.map((node) => {
         return {
           id: node.id,
           x: node.x,
@@ -150,8 +155,8 @@ document.onload = (function(d3) {
       });
 
       const graphObject = {
-        nodes: nodes,
-        links: links,
+        nodes: nodesToTransmit,
+        links: linksToTransmit,
         screenPosition,
       };
 
@@ -432,7 +437,9 @@ document.onload = (function(d3) {
     switch (d3.event.keyCode) {
     case consts.BACKSPACE_KEY:
     case consts.DELETE_KEY:
-      d3.event.preventDefault();
+      // we cannot prevent default because then we cannot delete values from
+      // search input
+      //d3.event.preventDefault();
       if (selectedNode) {
         return;
         // right now, we don't support deleting nodes from the graph view
@@ -459,6 +466,50 @@ document.onload = (function(d3) {
     const thisGraph = this;
     const consts = thisGraph.consts;
     const state = thisGraph.state;
+
+
+
+
+
+
+    // node highlighters
+    // create node selection
+    thisGraph.nodeHighlighterElements = thisGraph.nodeHighlighterContainer
+      .selectAll("g.node-highlighter");
+    // append new node data
+    thisGraph.nodeHighlighterElements = thisGraph.nodeHighlighterElements
+      .data(
+        thisGraph.nodes.filter((node) => {
+          if (searchValue.length < 3) return false;
+          return node.title.toLowerCase().includes(searchValue);
+        }),
+        function(d) {return d.id;},
+      );
+
+    const nodeHighlighterEnter = thisGraph.nodeHighlighterElements
+      .enter();
+
+    const newHighlighterNode = nodeHighlighterEnter
+      .append("g")
+      .attr(
+        "transform",
+        function(d) {return "translate(" + d.x + "," + d.y + ")";},
+      );
+
+    newHighlighterNode
+      .classed("node-highlighter", true);
+
+    newHighlighterNode
+      .append("circle")
+      .attr("r", "320");
+
+    // remove old links
+    const nodeHighlighterExitSelection = thisGraph.nodeHighlighterElements.exit();
+    nodeHighlighterExitSelection.remove();
+
+
+
+    
 
     // create link selection
     thisGraph.linkElements = thisGraph.linksContainer.selectAll("path.link");
@@ -512,6 +563,10 @@ document.onload = (function(d3) {
     // remove old links
     const linkExitSelection = thisGraph.linkElements.exit();
     linkExitSelection.remove();
+
+
+
+
 
 
     // create node selection
@@ -687,9 +742,16 @@ document.onload = (function(d3) {
         svg, nodes, links,
       );
       graphInstance.updateGraph();
+
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        searchValue = e.target.value;
+        graphInstance.updateGraph();
+      })
     });
 })(window.d3);
 
 document.getElementById("button-home").addEventListener("click", () => {
   window.location.href = "/";
 });
+
+
