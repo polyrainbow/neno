@@ -1,14 +1,26 @@
 import * as Config from "./config.js";
-import EditorJS from "@editorjs/editorjs";
-import Header from "@editorjs/header";
-import Link from "@editorjs/link";
-import Image from "@editorjs/image";
-import List from "@editorjs/list";
-import Code from "@editorjs/code";
 
 let instance = null;
 
 const load = async ({ data, parent, onChange }) => {
+  const modules = await Promise.all([
+    import("@editorjs/editorjs"),
+    import("@editorjs/header"),
+    import("@editorjs/link"),
+    import("@editorjs/image"),
+    import("@editorjs/list"),
+    import("@editorjs/code"),
+  ]);
+
+  const [
+    EditorJS,
+    Header,
+    Link,
+    Image,
+    List,
+    Code,
+  ] = modules.map((module) => module.default);
+
   // destroy does currently not work
   // https://github.com/codex-team/editor.js/issues/1400
   // https://github.com/codex-team/editor.js/issues/1380
