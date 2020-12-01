@@ -45,6 +45,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "eslint-plugin-standard": "^4.0.2",
     "style-loader": "^2.0.0",
+    "webpack-bundle-analyzer": "^4.2.0",
     "webpack-cli": "^4.2.0"
   },
   "scripts": {
@@ -55,7 +56,8 @@
     "dev-frontend": "npx webpack --config frontend/webpack.development.js",
     "dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
     "dev": "concurrently --kill-others \"npm run start-server\" \"npm run dev-frontend\"",
-    "build-frontend-production": "npx webpack --config frontend/webpack.production.js"
+    "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
+    "visualize-bundles": "npx webpack --config frontend/webpack.production.js --profile --json > stats.json && npx webpack-bundle-analyzer stats.json frontend/assets"
   },
   "author": "",
   "license": "ISC"
