@@ -50,7 +50,6 @@ const NoteListControls = ({
         }}
       />
       <IconButton
-        id="button_new"
         title="Clear search"
         icon={
           value.length > 0
@@ -64,7 +63,14 @@ const NoteListControls = ({
         fontSize: "16px",
       }}>{label}</span>
     </div>
+    <label
+      htmlFor="sortBySelect"
+      style={{
+        margin: "0px 5px",
+      }}
+    >Sort by</label>
     <select
+      id="sortBySelect"
       style={{
         fontSize: "24px",
         border: "none",
@@ -74,22 +80,22 @@ const NoteListControls = ({
     >
       <option
         value="CREATION_DATE_ASCENDING"
-      >Sort by creation date (ascending)</option>
+      >Creation date (ascending)</option>
       <option
         value="CREATION_DATE_DESCENDING"
-      >Sort by creation date (descending)</option>
+      >Creation date (descending)</option>
       <option
         value="UPDATE_DATE_ASCENDING"
-      >Sort by update date (ascending)</option>
+      >Update date (ascending)</option>
       <option
         value="UPDATE_DATE_DESCENDING"
-      >Sort by update date (descending)</option>
+      >Update date (descending)</option>
       <option
         value="NUMBER_OF_LINKS_ASCENDING"
-      >Sort by number of links (ascending)</option>
+      >Number of links (ascending)</option>
       <option
         value="NUMBER_OF_LINKS_DESCENDING"
-      >Sort by number of links (descending)</option>
+      >Number of links (descending)</option>
     </select>
   </section>;
 };
