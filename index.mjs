@@ -9,6 +9,7 @@ import { getNoteTitle } from "./lib/noteUtils.mjs";
 import { yyyymmdd } from "./lib/utils.mjs";
 import * as url from "url";
 import mkdirp from "mkdirp";
+import compression from "compression";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const app = express();
@@ -92,6 +93,7 @@ app.use((req, res, next) => {
 
 app.use("/", express.static(path.join(__dirname, "frontend")));
 app.use(express.json());
+app.use(compression());
 
 app.get(API_PATH, function(req, res) {
   res.send("Hello World!");
