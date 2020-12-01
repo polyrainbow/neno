@@ -484,17 +484,18 @@ document.onload = (function(d3) {
           return node.title.toLowerCase().includes(searchValue);
         }),
         function(d) {return d.id;},
-      );
-
-    const nodeHighlighterEnter = thisGraph.nodeHighlighterElements
-      .enter();
-
-    const newHighlighterNode = nodeHighlighterEnter
-      .append("g")
+      )
       .attr(
         "transform",
         function(d) {return "translate(" + d.x + "," + d.y + ")";},
       );
+
+    // add new node highlighters
+    const nodeHighlighterEnter = thisGraph.nodeHighlighterElements
+      .enter();
+
+    const newHighlighterNode = nodeHighlighterEnter
+      .append("g");
 
     newHighlighterNode
       .classed("node-highlighter", true);
