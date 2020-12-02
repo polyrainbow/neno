@@ -104,9 +104,19 @@ const GraphCreator = function(svg, graphObject, onHighlight, onChange) {
     }
   });
   svg.call(zoom).on("dblclick.zoom", null);
+
+  // when creating the graph, a zoom end event is initially dispatched.
+  // since this first one does not change anything, we don't want to fire the
+  // onChange event
+  let firstZoomEndHappened = false;
+
   zoom.on("end", function() {
     d3.select("body").style("cursor", "auto");
-    thisGraph.onChange();
+    if (firstZoomEndHappened) {
+      thisGraph.onChange();
+    } else {
+      firstZoomEndHappened = true;
+    }
   });
 
   const initialZoomTranform = d3.zoomIdentity
