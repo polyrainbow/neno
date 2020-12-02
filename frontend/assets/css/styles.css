@@ -5,12 +5,6 @@ body, #app {
   overflow:hidden;
 }
 
-p{ 
-  text-align: center; 
-  overflow: overlay;
-  position: relative;
-}
-
 header,
 #controls,
 #left-view,
