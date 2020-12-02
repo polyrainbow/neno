@@ -1,5 +1,14 @@
 body, #app {
   margin: 0;
+  margin: 0;
+  padding: 0;
+  overflow:hidden;
+}
+
+p{ 
+  text-align: center; 
+  overflow: overlay;
+  position: relative;
 }
 
 header,
@@ -24,6 +33,13 @@ header {
   justify-content: space-between;
   height: 50px;
   user-select: none;
+
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  font-family: 'Open Sans', sans-serif;
 }
 
 header h1 {
@@ -35,12 +51,35 @@ header h1 {
   display: flex;
   justify-content: center;
   height: 50px;
+  align-items: center;
 }
+
+
+#header-left #status {
+  text-align: left;
+}
+
+#header-right {
+  display: flex;
+  padding-right: 10px;
+  margin-right: 10px;
+  height: 50px;
+  align-items: center;
+}
+
+#header-right input {
+  width: 240px;
+  height: 24px;
+  font-size: 16px;
+  border: none;
+}
+
 
 #heading {
   margin: 8px;
   margin-left: 0px;
   font-size: 24px;
+  white-space: pre;
 }
 
 #header-controls {
@@ -78,6 +117,7 @@ main {
   border: none;
   cursor: pointer;
   width: 50px;
+  min-width: 50px;
   padding: 0;
   background: none;
   text-align: center;

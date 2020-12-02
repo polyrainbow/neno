@@ -1,5 +1,5 @@
 import { API_URL } from "./config.js";
-import { yyyymmdd } from "./utils.js";
+import { yyyymmdd, htmlDecode } from "./utils.js";
 import { saveAs } from "file-saver";
 
 const getNote = async (noteId) => {
@@ -102,6 +102,45 @@ const getGraph = async () => {
 };
 
 
+const getGraphObject = async () => {
+  // initial node data
+  const graph = await getGraph();
+
+  graph.nodes = graph.nodes.map((node) => {
+    node.title = htmlDecode(node.title);
+    return node;
+  });
+
+  graph.links = graph.links.map((link) => {
+    return {
+      source: graph.nodes.find((node) => node.id === link[0]),
+      target: graph.nodes.find((node) => node.id === link[1]),
+    };
+  });
+
+  return graph;
+};
+
+
+const saveGraph = async (graphObject) => {
+  const response = await fetch("/api/graph", {
+    method: "POST",
+    body: JSON.stringify(graphObject),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const responseObject = await response.json();
+
+  if (!responseObject.success === true) {
+    throw new Error("Error saving graph!");
+  }
+
+  return true;
+};
+
+
 const archiveDatabase = async () => {
   const json = await getDatabaseAsJSON();
   const blob = new Blob([json], {
@@ -149,6 +188,8 @@ export {
   deleteNote,
   getDatabaseAsJSON,
   getGraph,
+  getGraphObject,
+  saveGraph,
   archiveDatabase,
   archiveDatabaseWithUploads,
   importLinksAsNotes,

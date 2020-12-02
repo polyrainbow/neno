@@ -4,6 +4,7 @@ import IconButton from "./IconButton.js";
 
 const HeaderControls = ({
   openImportLinksDialog,
+  setActiveView,
 }) => {
   return <section id="header-controls">
     <IconButton
@@ -11,7 +12,7 @@ const HeaderControls = ({
       title="Show graph"
       icon="account_tree"
       onClick={() => {
-        window.location.href = "graph.html";
+        setActiveView("GRAPH");
       }}
     />
     <IconButton

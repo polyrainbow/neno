@@ -1,10 +1,12 @@
 import React from "react";
+import HeaderContainer from "./HeaderContainer";
 import HeaderControls from "./HeaderControls";
 
 const Header = ({
   allNotes,
   links,
   openImportLinksDialog,
+  setActiveView,
 }) => {
   const numberOfUnlinkedNotes = allNotes?.filter((note) => {
     return note.numberOfLinkedNotes === 0;
@@ -17,14 +19,17 @@ const Header = ({
   const showStats = (allNotes !== null) && (links !== null);
 
   return (
-    <header>
-      <div id="header-left">
-        <h1 id="heading">NeNo</h1>
-        <HeaderControls
-          openImportLinksDialog={openImportLinksDialog}
-        />
-      </div>
-      {
+    <HeaderContainer
+      leftContent={
+        <>
+          <h1 id="heading">NeNo</h1>
+          <HeaderControls
+            setActiveView={setActiveView}
+            openImportLinksDialog={openImportLinksDialog}
+          />
+        </>
+      }
+      rightContent={
         showStats
           ? <div id="app-stats">
             <span>Nodes: </span>
@@ -44,7 +49,7 @@ const Header = ({
           </div>
           : "Loading stats ..."
       }
-    </header>
+    />
   );
 };
 

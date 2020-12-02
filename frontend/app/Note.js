@@ -26,9 +26,10 @@ const Note = ({
       data: editorData,
       parent,
       onChange: () => setUnsavedChanges(true),
-    });
-
-    previousEditorData.current = editorData;
+    })
+      .then(() => {
+        previousEditorData.current = editorData;
+      });
   });
 
   return <section id="note">
