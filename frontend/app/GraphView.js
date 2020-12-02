@@ -111,8 +111,14 @@ const GraphView = ({
             onClick={() => {
               if (!graphInstance.current) return;
               const id = graphInstance.current.getSelectedNodeId();
-              setInitialNoteId(id);
-              setActiveView("EDITOR");
+              if (typeof id !== "number") return;
+              if (
+                (!unsavedChanges)
+                || confirm(Config.texts.discardGraphChangesConfirmation)
+              ) {
+                setInitialNoteId(id);
+                setActiveView("EDITOR");
+              }
             }}
           />
           <p id="status">{status}</p>
