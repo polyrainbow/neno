@@ -1,5 +1,6 @@
 /* eslint-disable no-invalid-this */
 import * as d3 from "d3";
+import { binaryArrayIncludes } from "./utils.js";
 
 
 const GraphCreator = function(svg, graphObject, onHighlight, onChange) {
@@ -118,10 +119,24 @@ const GraphCreator = function(svg, graphObject, onHighlight, onChange) {
 
   // listen for resize
   window.onresize = function() {thisGraph.updateWindow(svg);};
+
+  thisGraph.updateConnectedNodeIds();
+};
+
+GraphCreator.prototype.updateConnectedNodeIds = function() {
+  const thisGraph = this;
+
+  thisGraph.connectedNodeIds = thisGraph.links
+    .reduce((accumulator, link) => {
+      accumulator.push(link.source.id);
+      accumulator.push(link.target.id);
+      return accumulator;
+    }, [])
+    .sort((a, b) => a - b);
 };
 
 
-GraphCreator.prototype.getSaveData = () => {
+GraphCreator.prototype.getSaveData = function() {
   const thisGraph = this;
 
   const linksToTransmit = thisGraph.links.map((link) => {
@@ -230,6 +245,7 @@ GraphCreator.prototype.replaceSelectEdge = function(d3Path, edgeData) {
   thisGraph.state.selectedEdge = edgeData;
 };
 
+
 GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData) {
   const thisGraph = this;
   if (thisGraph.state.selectedNode) {
@@ -237,11 +253,12 @@ GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData) {
   }
   d3Node.classed(this.consts.selectedClass, true);
 
-  const connectedNodeIds = nodeData.linkedNotes.map((node) => node.id);
+  const connectedNodeIdsToThisNode
+    = nodeData.linkedNotes.map((node) => node.id);
 
   thisGraph.nodesContainer.selectAll("g.node")
     .filter((d) => {
-      return connectedNodeIds.includes(d.id);
+      return connectedNodeIdsToThisNode.includes(d.id);
     })
     .classed("connected-to-selected", true);
 
@@ -351,6 +368,7 @@ GraphCreator.prototype.handleMouseUpOnNode = function(d3node, d) {
     // ... if not, create it
     if (!edgeAlreadyExists) {
       thisGraph.links.push(newEdge);
+      thisGraph.updateConnectedNodeIds();
       thisGraph.updateGraph();
     }
   } else {
@@ -423,6 +441,7 @@ GraphCreator.prototype.svgKeyDown = function() {
     } else if (selectedEdge) {
       thisGraph.links.splice(thisGraph.links.indexOf(selectedEdge), 1);
       state.selectedEdge = null;
+      thisGraph.updateConnectedNodeIds();
       thisGraph.updateGraph();
     }
     break;
@@ -550,12 +569,6 @@ GraphCreator.prototype.updateGraph = function(newSearchValue) {
       function(d) {return d.id;},
     );
 
-  const connectedNodeIds = thisGraph.links.reduce((accumulator, link) => {
-    accumulator.push(link.source.id);
-    accumulator.push(link.target.id);
-    return accumulator;
-  }, []);
-
   // update existing nodes
   thisGraph.nodeElements
     .attr(
@@ -563,7 +576,7 @@ GraphCreator.prototype.updateGraph = function(newSearchValue) {
       function(d) {return "translate(" + d.x + "," + d.y + ")";},
     )
     .classed("unconnected", function(d) {
-      return !connectedNodeIds.includes(d.id);
+      return !binaryArrayIncludes(thisGraph.connectedNodeIds, d.id);
     });
 
   // add new nodes
@@ -583,7 +596,7 @@ GraphCreator.prototype.updateGraph = function(newSearchValue) {
       return d.linkedNotes.length > 7;
     })
     .classed("unconnected", function(d) {
-      return !connectedNodeIds.includes(d.id);
+      return !binaryArrayIncludes(thisGraph.connectedNodeIds, d.id);
     })
     .attr(
       "transform",
