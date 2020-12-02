@@ -90,6 +90,18 @@ const getDatabaseAsJSON = async () => {
 };
 
 
+const getStats = async () => {
+  const response = await fetch(API_URL + "stats", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const json = await response.json();
+  return json;
+};
+
+
 const getGraph = async () => {
   const response = await fetch(API_URL + "graph", {
     method: "GET",
@@ -187,6 +199,7 @@ export {
   putNote,
   deleteNote,
   getDatabaseAsJSON,
+  getStats,
   getGraph,
   getGraphObject,
   saveGraph,

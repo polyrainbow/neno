@@ -151,6 +151,22 @@ app.get(API_PATH + "/graph", function(req, res) {
 });
 
 
+app.get(API_PATH + "/stats", function(req, res) {
+  const graph = Notes.getGraph(req.userId);
+
+  const numberOfUnlinkedNotes = graph.nodes.filter((note) => {
+    return note.linkedNotes.length === 0;
+  }).length;
+
+  const stats = {
+    numberOfAllNotes: graph.nodes.length,
+    numberOfLinks: graph.links.length,
+    numberOfUnlinkedNotes,
+  };
+  res.end(JSON.stringify(stats));
+});
+
+
 app.post(API_PATH + "/graph", function(req, res) {
   Notes.setGraph(req.body, req.userId);
   res.end(JSON.stringify(

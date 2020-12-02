@@ -20,9 +20,8 @@ const EditorView = ({
   const currentRequestId = useRef(null);
   const [displayedNotes, setDisplayedNotes] = useState([]);
   const [noteListScrollTop, setNoteListScrollTop] = useState(0);
-  const [allNotes, setAllNotes] = useState(null);
   const [isBusy, setIsBusy] = useState(true);
-  const [links, setLinks] = useState(null);
+  const [stats, setStats] = useState(null);
   const [sortBy, setSortBy] = useState("CREATION_DATE_ASCENDING");
   const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
@@ -46,9 +45,7 @@ const EditorView = ({
         return change.type === "LINKED_NOTE_ADDED";
       })
       .map((change) => {
-        return allNotes.find((note) => {
-          return note.id === change.noteId;
-        });
+        return change.note;
       }),
   ];
 
@@ -84,6 +81,11 @@ const EditorView = ({
         {
           type: "LINKED_NOTE_ADDED",
           noteId: note.id,
+          note: {
+            id: note.id,
+            title: note.title,
+            updateTime: note.updateTime,
+          },
         },
       ],
     });
@@ -148,10 +150,10 @@ const EditorView = ({
   };
 
 
-  const refreshLinks = () => {
-    API.getGraph()
-      .then((graph) => {
-        setLinks(graph.links);
+  const refreshStats = () => {
+    API.getStats()
+      .then((stats) => {
+        setStats(stats);
       })
       .catch((e) => {
         console.error("Could not get graph via API.");
@@ -162,7 +164,7 @@ const EditorView = ({
 
   const refreshNotesList = useCallback(
     async () => {
-      refreshLinks();
+      refreshStats();
       setDisplayedNotes([]);
 
       // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
@@ -190,10 +192,6 @@ const EditorView = ({
       // ... some time later - check if this is the current request
       if (currentRequestId.current === requestId) {
         setDisplayedNotes(notes);
-        if (searchValue.length === 0) {
-          setAllNotes(notes);
-        }
-
         setIsBusy(false);
       }
     },
@@ -290,8 +288,7 @@ const EditorView = ({
         : null
     }
     <Header
-      allNotes={allNotes}
-      links={links}
+      stats={stats}
       openImportLinksDialog={() => setIsImportLinksDialogOpen(true)}
       setActiveView={setActiveView}
     />
@@ -301,7 +298,7 @@ const EditorView = ({
           onChange={handleSearchInputChange}
           value={searchValue}
           displayedNotes={displayedNotesSorted}
-          allNotes={allNotes}
+          stats={stats}
           sortBy={sortBy}
           setSortBy={(sortBy) => {
             setNoteListScrollTop(0);

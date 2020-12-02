@@ -3,20 +3,18 @@ import HeaderContainer from "./HeaderContainer";
 import HeaderControls from "./HeaderControls";
 
 const Header = ({
-  allNotes,
-  links,
+  stats,
   openImportLinksDialog,
   setActiveView,
 }) => {
-  const numberOfUnlinkedNotes = allNotes?.filter((note) => {
-    return note.numberOfLinkedNotes === 0;
-  }).length;
+  const showStats = stats !== null;
 
-  const percentageOfUnlinkedNotes = Math.round(
-    (numberOfUnlinkedNotes / allNotes?.length) * 100 * 100,
-  ) / 100;
-
-  const showStats = (allNotes !== null) && (links !== null);
+  let percentageOfUnlinkedNotes = null;
+  if (showStats) {
+    percentageOfUnlinkedNotes = Math.round(
+      (stats.numberOfUnlinkedNotes / stats.numberOfAllNotes) * 100 * 100,
+    ) / 100;
+  }
 
   return (
     <HeaderContainer
@@ -34,17 +32,20 @@ const Header = ({
           ? <div id="app-stats">
             <span>Nodes: </span>
             <span id="span_available-notes">
-              {allNotes.length}
+              {stats.numberOfAllNotes}
             </span>
             <span> 🔸 </span>
             <span>Links: </span>
             <span id="span_links">
-              {links.length}
+              {stats.numberOfLinks}
             </span>
             <span> 🔸 </span>
             <span>Unlinked notes: </span>
             <span id="span_unlinked-notes">
-              {`${numberOfUnlinkedNotes} (${percentageOfUnlinkedNotes} %)`}
+              {
+                `${stats.numberOfUnlinkedNotes} `
+                + `(${percentageOfUnlinkedNotes} %)`
+              }
             </span>
           </div>
           : "Loading stats ..."

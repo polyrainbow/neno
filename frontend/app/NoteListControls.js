@@ -5,14 +5,17 @@ const NoteListControls = ({
   value,
   onChange,
   displayedNotes,
-  allNotes,
+  stats,
   sortBy,
   setSortBy,
 }) => {
   let label = "";
   if (displayedNotes) {
-    if (allNotes && (displayedNotes.length === allNotes.length)) {
-      label = "Showing all " + allNotes.length + " note(s)";
+    if (
+      typeof stats?.numberOfAllNotes === "number"
+      && (displayedNotes.length === stats.numberOfAllNotes)
+    ) {
+      label = "Showing all " + stats.numberOfAllNotes + " note(s)";
     } else if (value.length > 2) {
       label = displayedNotes.length + " note(s) found";
     }
