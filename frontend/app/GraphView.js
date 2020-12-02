@@ -4,6 +4,7 @@ import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import IconButton from "./IconButton.js";
 import { initGraph } from "./lib/graph.js";
 import * as API from "./lib/api.js";
+import * as Config from "./lib/config.js";
 
 
 const GraphView = ({
@@ -90,7 +91,14 @@ const GraphView = ({
           <IconButton
             icon="home"
             title="Home"
-            onClick={() => setActiveView("EDITOR")}
+            onClick={() => {
+              if (
+                (!unsavedChanges)
+                || confirm(Config.texts.discardGraphChangesConfirmation)
+              ) {
+                setActiveView("EDITOR");
+              }
+            }}
           />
           <IconButton
             icon="save"

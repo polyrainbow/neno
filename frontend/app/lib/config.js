@@ -36,6 +36,9 @@ const texts = {
   discardChangesConfirmation:
     "There are unsaved changes. Do you really want to discard them "
     + "and load another note?",
+  discardGraphChangesConfirmation:
+    "There are unsaved changes. Do you really want to discard them? "
+    + "If not, click cancel and save them first.",
 };
 
 const MINIMUM_SEARCH_QUERY_LENGTH = 3;
