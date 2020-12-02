@@ -5,6 +5,7 @@ import IconButton from "./IconButton.js";
 import { initGraph } from "./lib/graph.js";
 import * as API from "./lib/api.js";
 import * as Config from "./lib/config.js";
+import SearchInput from "./SearchInput.js";
 
 
 const GraphView = ({
@@ -112,6 +113,7 @@ const GraphView = ({
               if (!graphInstance.current) return;
               const id = graphInstance.current.getSelectedNodeId();
               if (typeof id !== "number") return;
+
               if (
                 (!unsavedChanges)
                 || confirm(Config.texts.discardGraphChangesConfirmation)
@@ -126,13 +128,10 @@ const GraphView = ({
       }
       rightContent={
         <>
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search..."
-            onChange={
-              (e) => setSearchValue(e.target.value)
-            }
+          <SearchInput
+            label="Search"
+            value={searchValue}
+            onChange={(value) => setSearchValue(value)}
           />
           <UnsavedChangesIndicator unsavedChanges={unsavedChanges} />
         </>

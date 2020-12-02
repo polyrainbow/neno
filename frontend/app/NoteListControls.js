@@ -1,5 +1,5 @@
 import React from "react";
-import IconButton from "./IconButton.js";
+import SearchInput from "./SearchInput.js";
 
 const NoteListControls = ({
   value,
@@ -30,37 +30,10 @@ const NoteListControls = ({
         alignItems: "center",
       }}
     >
-      <label
-        htmlFor="search-input"
-        style={{
-          marginRight: "5px",
-        }}
-      >Search notes</label>
-      <input
-        style={{
-          "border": "none",
-          "fontSize": "24px",
-        }}
-        id="search-input"
-        type="text"
-        placeholder="Search..."
+      <SearchInput
+        label="Search notes"
         value={value}
-        onChange={(e) => {onChange(e.target.value);}}
-        onKeyDown={(e) => {
-          if (e.key === "Escape") {
-            onChange("");
-          }
-        }}
-      />
-      <IconButton
-        title="Clear search"
-        icon={
-          value.length > 0
-            ? "cancel"
-            : "cancel_disabled"
-        }
-        onClick={() => onChange("")}
-        disabled={value.length === 0}
+        onChange={onChange}
       />
       <span style={{
         fontSize: "16px",
