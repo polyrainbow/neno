@@ -30,7 +30,11 @@ const Note = ({
       .then(() => {
         previousEditorData.current = editorData;
       });
-  });
+
+  // it is important that we only perform this effect when editorData changes,
+  // because otherwise it is executed more often and editor loading takes some
+  // time
+  }, [editorData]);
 
   return <section id="note">
     <div id="editor"></div>

@@ -1,8 +1,27 @@
 import * as Config from "./config.js";
 
-let instance = null;
+
+// this instance queue makes sure that there are not several editor instances
+// loaded in parallel and thus become visible on the screen. it queues all
+// incoming promises and executes them only when their previous promise has
+// fulfilled
+let instanceQueue = null;
 
 const load = async ({ data, parent, onChange }) => {
+  if (instanceQueue === null) {
+    instanceQueue = loadInstance({ data, parent, onChange });
+  } else {
+    instanceQueue = instanceQueue.then(() => {
+      return loadInstance({ data, parent, onChange });
+    });
+  }
+
+  const instance = await instanceQueue;
+  return instance;
+};
+
+
+const loadInstance = async ({ data, parent, onChange }) => {
   const modules = await Promise.all([
     import("@editorjs/editorjs"),
     import("@editorjs/header"),
@@ -27,7 +46,7 @@ const load = async ({ data, parent, onChange }) => {
   // instance && instance.destroy();
   parent.innerHTML = "";
 
-  instance = new EditorJS({
+  const instance = new EditorJS({
     holder: parent,
     data,
     autofocus: true,
@@ -65,12 +84,13 @@ const load = async ({ data, parent, onChange }) => {
   });
 
   await instance.isReady;
-  return true;
+  return instance;
 };
 
 
 const save = async () => {
-  if (!instance) return false;
+  if (!instanceQueue) return false;
+  const instance = await instanceQueue;
   await instance.isReady;
   const editorData = await instance.save();
   return editorData;
