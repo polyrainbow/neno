@@ -61,6 +61,10 @@ header h1 {
   align-items: center;
 }
 
+.app-stats-item {
+  margin-left: 15px;
+}
+
 #header-right input {
   width: 240px;
   height: 24px;
