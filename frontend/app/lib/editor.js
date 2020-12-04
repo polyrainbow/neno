@@ -29,6 +29,7 @@ const loadInstance = async ({ data, parent, onChange }) => {
     import("@editorjs/image"),
     import("@editorjs/list"),
     import("@editorjs/code"),
+    import("@editorjs/attaches"),
   ]);
 
   const [
@@ -38,6 +39,7 @@ const loadInstance = async ({ data, parent, onChange }) => {
     Image,
     List,
     Code,
+    Attaches,
   ] = modules.map((module) => module.default);
 
   // destroy does currently not work
@@ -79,6 +81,16 @@ const loadInstance = async ({ data, parent, onChange }) => {
         inlineToolbar: true,
       },
       code: Code,
+      attaches: {
+        class: Attaches,
+        config: {
+          endpoint: Config.API_URL + "file",
+          field: "file",
+          types: "application/pdf",
+          buttonText: "Select PDF file",
+          errorMessage: "File upload failed",
+        },
+      },
     },
     onChange,
   });

@@ -39,7 +39,7 @@ if (fs.existsSync(usersFile)) {
   users = defaultUsers;
 }
 
-const ALLOWED_UPLOAD_TYPES = [
+const ALLOWED_IMAGE_UPLOAD_TYPES = [
   {
     mimeType: "image/png",
     ending: "png",
@@ -53,6 +53,15 @@ const ALLOWED_UPLOAD_TYPES = [
     ending: "webp",
   },
 ];
+
+
+const ALLOWED_FILE_UPLOAD_TYPES = [
+  {
+    mimeType: "application/pdf",
+    ending: "pdf",
+  },
+];
+
 
 const customPortArgument = process.argv.find((arg) => {
   return arg.startsWith("port=");
@@ -375,7 +384,7 @@ app.post(API_PATH + "/image", function(req, res) {
       return;
     }
 
-    const fileTypeObject = ALLOWED_UPLOAD_TYPES.find((filetype) => {
+    const fileTypeObject = ALLOWED_IMAGE_UPLOAD_TYPES.find((filetype) => {
       return filetype.mimeType === file.type;
     });
 
@@ -385,15 +394,15 @@ app.post(API_PATH + "/image", function(req, res) {
       return;
     }
 
-    const oldpath = files.image.path;
-    const imageId = Notes.addImage(oldpath, fileTypeObject);
+    const oldpath = file.path;
+    const fileId = Notes.addFile(oldpath, fileTypeObject);
 
     res.end(JSON.stringify(
       {
         "success": 1,
         "file": {
-          "url": "/api/image/" + imageId,
-          "imageId": imageId,
+          "url": API_PATH + "/file/" + fileId,
+          "fileId": fileId,
         },
       },
     ));
@@ -401,8 +410,52 @@ app.post(API_PATH + "/image", function(req, res) {
 });
 
 
-app.get(API_PATH + "/image/:imageId", function(req, res) {
-  const file = Notes.getImage(req.params.imageId);
+app.post(API_PATH + "/file", function(req, res) {
+  const form = new formidable.IncomingForm();
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      console.log(err);
+      res.end(err);
+      return;
+    }
+
+    const file = files.file;
+
+    if (!file) {
+      res.end("File upload error");
+      return;
+    }
+
+    const fileTypeObject = ALLOWED_FILE_UPLOAD_TYPES.find((filetype) => {
+      return filetype.mimeType === file.type;
+    });
+
+    if (!fileTypeObject) {
+      console.log("Invalid MIME type: " + file.type);
+      res.end("Invalid MIME type: " + file.type);
+      return;
+    }
+
+    const oldpath = file.path;
+    const fileId = Notes.addFile(oldpath, fileTypeObject);
+
+    res.end(JSON.stringify(
+      {
+        "success": 1,
+        "file": {
+          "url": API_PATH + "/file/" + fileId,
+          "size": file.size,
+          "name": file.name,
+          "fileId": fileId,
+        },
+      },
+    ));
+  });
+});
+
+
+app.get(API_PATH + "/file/:fileId", function(req, res) {
+  const file = Notes.getFile(req.params.fileId);
   if (!fs.existsSync(file)) {
     res.end("ERROR: File does not exist!");
     return;
