@@ -39,40 +39,47 @@ const NoteListControls = ({
         fontSize: "16px",
       }}>{label}</span>
     </div>
-    <label
-      htmlFor="sortBySelect"
+    <div
       style={{
-        margin: "0px 5px",
+        display: "flex",
+        alignItems: "center",
       }}
-    >Sort by</label>
-    <select
-      id="sortBySelect"
-      style={{
-        fontSize: "24px",
-        border: "none",
-      }}
-      value={sortBy}
-      onChange={(e) => setSortBy(e.target.value)}
     >
-      <option
-        value="CREATION_DATE_ASCENDING"
-      >Creation date (ascending)</option>
-      <option
-        value="CREATION_DATE_DESCENDING"
-      >Creation date (descending)</option>
-      <option
-        value="UPDATE_DATE_ASCENDING"
-      >Update date (ascending)</option>
-      <option
-        value="UPDATE_DATE_DESCENDING"
-      >Update date (descending)</option>
-      <option
-        value="NUMBER_OF_LINKS_ASCENDING"
-      >Number of links (ascending)</option>
-      <option
-        value="NUMBER_OF_LINKS_DESCENDING"
-      >Number of links (descending)</option>
-    </select>
+      <label
+        htmlFor="sortBySelect"
+        style={{
+          margin: "0px 5px",
+        }}
+      >Sort by</label>
+      <select
+        id="sortBySelect"
+        style={{
+          fontSize: "24px",
+          border: "none",
+        }}
+        value={sortBy}
+        onChange={(e) => setSortBy(e.target.value)}
+      >
+        <option
+          value="CREATION_DATE_ASCENDING"
+        >Creation date (ascending)</option>
+        <option
+          value="CREATION_DATE_DESCENDING"
+        >Creation date (descending)</option>
+        <option
+          value="UPDATE_DATE_ASCENDING"
+        >Update date (ascending)</option>
+        <option
+          value="UPDATE_DATE_DESCENDING"
+        >Update date (descending)</option>
+        <option
+          value="NUMBER_OF_LINKS_ASCENDING"
+        >Number of links (ascending)</option>
+        <option
+          value="NUMBER_OF_LINKS_DESCENDING"
+        >Number of links (descending)</option>
+      </select>
+    </div>
   </section>;
 };
 
