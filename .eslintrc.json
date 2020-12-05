@@ -70,6 +70,7 @@
     "prefer-const": ["error"],
     "operator-linebreak": ["error", "before"],
     "no-console": [0],
+    "require-jsdoc": [0],
 
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": [0],
