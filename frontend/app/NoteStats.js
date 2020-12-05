@@ -38,6 +38,59 @@ const NoteStats = ({
           <td>{getNumberOfCharacters(note)}</td>
         </tr>
         <tr>
+          <td>Images</td>
+          <td>{
+            note.editorData.blocks
+              .filter((block) => block.type === "image").length > 0
+              ? note.editorData.blocks
+                .filter((block) => block.type === "image")
+                .map((block, i, array) => {
+                  return <React.Fragment key={block.data.file.url + note.id}>
+                    <a
+                      href={block.data.file.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {block.data.file.fileId}
+                    </a>
+                    {
+                      i < array.length - 1
+                        ? <br />
+                        : null
+                    }
+                  </React.Fragment>;
+                })
+              : "None"
+          }</td>
+        </tr>
+        <tr>
+          <td>File attachements</td>
+          <td>{
+            note.editorData.blocks
+              .filter((block) => block.type === "attaches").length > 0
+              ? note.editorData.blocks
+                .filter((block) => block.type === "attaches")
+                .map((block, i, array) => {
+                  return <React.Fragment key={block.data.file.url + note.id}>
+                    <a
+                      key={block.data.file.url + note.id}
+                      href={block.data.file.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {block.data.file.name}
+                    </a>
+                    {
+                      i < array.length - 1
+                        ? <br />
+                        : null
+                    }
+                  </React.Fragment>;
+                })
+              : "None"
+          }</td>
+        </tr>
+        <tr>
           <td>X coordinate</td>
           <td>{note.x}</td>
         </tr>

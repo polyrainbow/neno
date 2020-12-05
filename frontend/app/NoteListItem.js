@@ -40,6 +40,20 @@ const NoteListItem = ({
     >
       {note.title}
     </td>
+    {
+      note.features
+        ? <td
+          className="note-features"
+          style={{
+            width: "45px",
+            textAlign: "right",
+          }}
+        >
+          {note.features.containsImages ? "🖼️" : ""}
+          {note.features.containsAttachements ? "📎" : ""}
+        </td>
+        : null
+    }
     <td
       className="noteListItemControls"
     >

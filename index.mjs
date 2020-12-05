@@ -210,6 +210,12 @@ app.get(API_PATH + "/notes", function(req, res) {
       title: getNoteTitle(note),
       creationTime: note.creationTime,
       updateTime: note.updateTime,
+      features: {
+        containsImages:
+          note.editorData.blocks.some((block) => block.type === "image"),
+        containsAttachements:
+          note.editorData.blocks.some((block) => block.type === "attaches"),
+      },
     };
 
     if (includeLinkedNotes) {
