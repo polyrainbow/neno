@@ -21,8 +21,8 @@ const app = express();
 
 let PORT = 8080;
 const API_PATH = "/api";
-
-let DATA_PATH = path.join(__dirname, "..", "network-notes-data");
+const REPO_PATH = path.join(__dirname, "..");
+let DATA_PATH = path.join(REPO_PATH, "..", "network-notes-data");
 if (process.env.DATA_FOLDER_PATH) {
   DATA_PATH = process.env.DATA_FOLDER_PATH;
 }
@@ -105,7 +105,7 @@ app.use((req, res, next) => {
   // -----------------------------------------------------------------------
 });
 
-app.use("/", express.static(path.join(__dirname, "frontend")));
+app.use("/", express.static(path.join(REPO_PATH, "frontend")));
 app.use(express.json());
 app.use(compression());
 

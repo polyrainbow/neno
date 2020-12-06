@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "@babel/core": "^7.12.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.12.1",

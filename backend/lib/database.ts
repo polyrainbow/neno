@@ -75,7 +75,7 @@ const get = (id):Database => {
 };
 
 
-const set = (db) => {
+const set = (db:Database) => {
   db.timestamp = Date.now();
   Object.freeze(db);
 

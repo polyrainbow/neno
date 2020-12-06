@@ -105,7 +105,7 @@ const binaryArrayIncludes = function(sortedArray, valueToLookFor) {
 };
 
 
-const cloneObject = function(obj) {
+const cloneObject = function(obj):any {
   let clone = {};
 
   if (Array.isArray(obj)) {
@@ -134,7 +134,7 @@ const yyyymmdd = (date) => {
 };
 
 
-const unescapeHTML = (str) => {
+const unescapeHTML = (str: string):string => {
   const htmlEntities = {
     nbsp: " ",
     cent: "¢",
