@@ -319,49 +319,38 @@ const put = (
     throw new Error("NOTE_WITH_SAME_TITLE_EXISTS");
   }
 
-  let note;
+  let databaseNote:DatabaseNote | null = null;
 
   if (
     typeof noteFromUser.id === "number"
   ) {
-    const databaseNote:DatabaseNote | null = findNote(db, noteFromUser.id);
-
-    if (databaseNote !== null) {
-      databaseNote.editorData = noteFromUser.editorData;
-      databaseNote.updateTime = Date.now();
-      removeDefaultTextParagraphs(databaseNote);
-      removeEmptyLinks(databaseNote);
-      incorporateUserChangesIntoNote(noteFromUser.changes, databaseNote, db);
-      note = databaseNote;
-    } else {
-      const noteId:NoteId = getNewNoteId(db);
-      const newNote:DatabaseNote = {
-        id: noteId,
-        x: 0,
-        y: 0,
-        editorData: noteFromUser.editorData,
-        creationTime: Date.now(),
-        updateTime: Date.now(),
-      };
-      removeDefaultTextParagraphs(newNote);
-      removeEmptyLinks(newNote);
-      incorporateUserChangesIntoNote(noteFromUser.changes, newNote, db);
-      db.notes.push(newNote);
-      note = newNote;
-    }
+    databaseNote = findNote(db, noteFromUser.id);
   }
+
+  if (databaseNote === null) {
+    const noteId:NoteId = getNewNoteId(db);
+    databaseNote = {
+      id: noteId,
+      x: 0,
+      y: 0,
+      editorData: noteFromUser.editorData,
+      creationTime: Date.now(),
+      updateTime: Date.now(),
+    };
+    db.notes.push(databaseNote);
+  } else {
+    databaseNote.editorData = noteFromUser.editorData;
+    databaseNote.updateTime = Date.now();
+  }
+
+  removeDefaultTextParagraphs(databaseNote);
+  removeEmptyLinks(databaseNote);
+  incorporateUserChangesIntoNote(noteFromUser.changes, databaseNote, db);
 
   DB.flushChanges(db);
 
-  const noteToTransmit:NoteToTransmit = {
-    id: note.id,
-    editorData: note.editorData,
-    title: getNoteTitle(note),
-    creationTime: note.creationTime,
-    updateTime: note.updateTime,
-    linkedNotes: getLinkedNotes(db, note.id),
-  }
-
+  const noteToTransmit:NoteToTransmit
+    = createNoteToTransmit(databaseNote, db);
   return noteToTransmit;
 };
 

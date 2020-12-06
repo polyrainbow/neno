@@ -260,7 +260,7 @@ app.put(API_PATH + "/import-links-as-notes", function(req, res) {
 
       const notesFromUser:NoteFromUser[]
         = urlMetadataResults.map((urlMetadataObject) => {
-        const newNoteObject:NoteFromUser = {
+        const noteFromUser:NoteFromUser = {
           editorData: {
             "time": Date.now(),
             "blocks": [
@@ -283,7 +283,7 @@ app.put(API_PATH + "/import-links-as-notes", function(req, res) {
           },
         };
 
-        return newNoteObject;
+        return noteFromUser;
       });
 
       const notesToTransmit:NoteToTransmit[] = [];
