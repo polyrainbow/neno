@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+      "emitDecoratorMetadata": true,
+      "esModuleInterop": true,
+      "experimentalDecorators": true,
+      "lib": [
+        "esnext",
+        "es2020"
+      ],
+      "module": "es2020",
+      "moduleResolution": "node",
+      "noImplicitAny": false,
+      "noUnusedLocals": false,
+      "outDir": "dist",
+      "preserveConstEnums": true,
+      "allowUnusedLabels": true,
+      "noUnusedParameters": false,
+      "sourceMap": true,
+      "target": "es2020",
+      "types": [
+        "node"
+      ],
+      "typeRoots": [ "./node_modules/@types"],
+      "resolveJsonModule": true
+    },
+    "exclude": [
+      "node_modules",
+      "tests/**/*.spec.ts"
+    ]
+  }

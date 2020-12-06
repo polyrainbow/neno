@@ -1,5 +1,5 @@
-import * as DB from "./database.mjs";
-import * as Utils from "./utils.mjs";
+import * as DB from "./database";
+import * as Utils from "./utils";
 import { v4 as uuidv4 } from "uuid";
 import {
   getNoteTitle,
@@ -8,8 +8,22 @@ import {
   noteWithSameTitleExists,
   findNote,
   getNewNoteId,
-} from "./noteUtils.mjs";
-import cleanUpData from "./cleanUpData.mjs";
+} from "./noteUtils";
+import cleanUpData from "./cleanUpData";
+import Database from "../interfaces/Database";
+import NoteListItem from "../interfaces/NoteListItem";
+import Graph from "../interfaces/Graph";
+import { UserId } from "../interfaces/UserId";
+import { NoteId } from "../interfaces/NoteId";
+import NoteToTransmit from "../interfaces/NoteToTransmit";
+import GraphNode from "../interfaces/GraphNode";
+import DatabaseNote from "../interfaces/DatabaseNote";
+import NoteFromUser from "../interfaces/NoteFromUser";
+import { UserNoteChangeType } from "../interfaces/UserNoteChangeType";
+import { Link } from "../interfaces/Link";
+import NoteListItemFeatures from "../interfaces/NoteListItemFeatures";
+import Stats from "../interfaces/Stats";
+import LinkedNote from "../interfaces/LinkedNote";
 
 /**
   PRIVATE
@@ -18,16 +32,21 @@ import cleanUpData from "./cleanUpData.mjs";
 */
 
 
-const updateNotePosition = (db, noteId, x, y) => {
-  const note = findNote(db, noteId);
+const updateNotePosition = (
+  db:Database,
+  noteId: NoteId,
+  x: number,
+  y: number
+): boolean => {
+  const note:DatabaseNote = findNote(db, noteId);
   note.x = x;
   note.y = y;
   return true;
 };
 
 
-const getLinkedNotes = (db, noteId) => {
-  return db.links
+const getLinkedNotes = (db:Database, noteId:NoteId):LinkedNote[] => {
+  const notes:DatabaseNote[] = db.links
     .filter((link) => {
       return (link[0] === noteId) || (link[1] === noteId);
     })
@@ -37,11 +56,20 @@ const getLinkedNotes = (db, noteId) => {
     })
     .filter((linkedNote) => {
       return (typeof linkedNote === "object") && (linkedNote !== null);
-    })
-    .map((linkedNote) => {
-      linkedNote.title = getNoteTitle(linkedNote);
+    });
+
+  const linkedNotes:LinkedNote[] = notes
+    .map((note:DatabaseNote) => {
+      const linkedNote:LinkedNote = {
+        id: note.id,
+        title: getNoteTitle(note),
+        creationTime: note.creationTime,
+        updateTime: note.updateTime,
+      }
       return linkedNote;
     });
+
+  return linkedNotes;
 };
 
 
@@ -104,24 +132,11 @@ const removeUploadsOfNote = (note) => {
 **/
 
 
-const init = (dataFolderPath) => {
+const init = (dataFolderPath:string):void => {
   console.log("Initializing notes module...");
-
-  const newDBTemplate = {
-    id: null,
-    notes: [],
-    links: [],
-    idCounter: 0,
-    screenPosition: {
-      translateX: 0,
-      translateY: 0,
-      scale: 1,
-    },
-  };
 
   DB.init({
     dataFolderPath,
-    newDBTemplate,
   });
 
   console.log("Cleaning data...");
@@ -129,34 +144,34 @@ const init = (dataFolderPath) => {
 };
 
 
-const get = (noteId, userId, includeLinkedNotes) => {
+const get = (noteId: NoteId, userId: UserId):NoteToTransmit => {
   const db = DB.get(userId);
   const noteFromDB = findNote(db, noteId);
   if (!noteFromDB) {
     return null;
   }
 
-  let noteToTransmit;
-  if (includeLinkedNotes) {
-    noteToTransmit = Utils.cloneObject(noteFromDB);
-    noteToTransmit.linkedNotes = getLinkedNotes(db, noteId);
-  } else {
-    noteToTransmit = noteFromDB;
-  }
+  let noteToTransmit = {
+    id: noteFromDB.id,
+    editorData: noteFromDB.editorData,
+    title: getNoteTitle(noteFromDB),
+    creationTime: noteFromDB.creationTime,
+    updateTime: noteFromDB.updateTime,
+    linkedNotes: getLinkedNotes(db, noteId),
+  };
 
   return noteToTransmit;
 };
 
 
-const getAll = (userId, {
-  includeLinkedNotes,
-  query,
-  caseSensitiveQuery,
-}) => {
-  const db = DB.get(userId);
-  return db.notes
+const getNotesList = (userId: UserId, options): NoteListItem[] => {
+  const query = options.query;
+  const caseSensitiveQuery = options.caseSensitiveQuery;
+
+  const db: Database = DB.get(userId);
+  const filteredNotes = db.notes
     .filter((note) => {
-      if (typeof query !== "string") {
+      if (query.length === 0) {
         return true;
       }
       const title = getNoteTitle(note);
@@ -165,45 +180,65 @@ const getAll = (userId, {
       } else {
         return title.toLowerCase().includes(query.toLowerCase());
       }
-    })
-    .map((note) => {
-      if (includeLinkedNotes) {
-        note.linkedNotes = getLinkedNotes(db, note.id);
-      }
-      return note;
     });
+
+
+  const items:NoteListItem[] = filteredNotes
+    .map((note:DatabaseNote):NoteListItem => {
+      const features:NoteListItemFeatures = {
+        containsImages:
+          note.editorData.blocks.some((block) => block.type === "image"),
+        containsAttachements:
+          note.editorData.blocks.some((block) => block.type === "attaches"),
+      };
+
+      const noteListItem:NoteListItem = {
+        id: note.id,
+        title: getNoteTitle(note),
+        creationTime: note.creationTime,
+        updateTime: note.updateTime,
+        features: features,
+        numberOfLinkedNotes: getLinkedNotes(db, note.id).length,
+      };
+
+      return noteListItem;
+    });
+
+  return items;
 };
 
 
-const getGraph = (userId) => {
+const getGraph = (userId: UserId):Graph => {
   const db = DB.get(userId);
-  const notes = Utils.cloneObject(db.notes);
 
-  notes.forEach((note) => {
-    note.title = getNoteTitle(note);
-    note.linkedNotes = getLinkedNotes(db, note.id);
-
-    // we don't need the editorData for the graph after we've taken the title
-    // from it
-    delete note.editorData;
+  const graphNodes:GraphNode[] = db.notes.map((note) => {
+    const graphNode:GraphNode = {
+      id: note.id,
+      title: getNoteTitle(note),
+      x: note.x,
+      y: note.y,
+    };
+    return graphNode;
   });
 
-  return {
-    nodes: notes,
+  const graph:Graph = {
+    nodes: graphNodes,
     links: db.links,
     screenPosition: db.screenPosition,
-  };
+  }
+
+  return graph;
 };
 
 
-const getStats = (userId) => {
+const getStats = (userId:UserId):Stats => {
   const db = DB.get(userId);
 
   const numberOfUnlinkedNotes = db.notes.filter((note) => {
     return getLinkedNotes(db, note.id).length === 0;
   }).length;
 
-  const stats = {
+  const stats:Stats = {
     numberOfAllNotes: db.notes.length,
     numberOfLinks: db.links.length,
     numberOfUnlinkedNotes,
@@ -213,7 +248,7 @@ const getStats = (userId) => {
 };
 
 
-const setGraph = (graph, userId) => {
+const setGraph = (graph:Graph, userId:UserId):boolean => {
   const db = DB.get(userId);
   graph.nodes.forEach((node) => {
     updateNotePosition(db, node.id, node.x, node.y);
@@ -221,15 +256,15 @@ const setGraph = (graph, userId) => {
   db.links = graph.links;
   db.screenPosition = graph.screenPosition;
   DB.set(db);
+  return true;
 };
 
-/*
-  noteFromUser must contain
-  * changes: Array
-  * id: number or null
-  * editorData: object
-*/
-const put = (noteFromUser, userId, options) => {
+
+const put = (
+  noteFromUser:NoteFromUser,
+  userId:UserId,
+  options
+):NoteToTransmit => {
   let ignoreDuplicateTitles = true;
   if (
     (typeof options === "object")
@@ -238,7 +273,7 @@ const put = (noteFromUser, userId, options) => {
     ignoreDuplicateTitles = false;
   }
 
-  const db = DB.get(userId);
+  const db:Database = DB.get(userId);
 
   if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, db)) {
     throw new Error("NOTE_WITH_SAME_TITLE_EXISTS");
@@ -253,7 +288,7 @@ const put = (noteFromUser, userId, options) => {
   }
 
   if (note === null) {
-    const noteId = getNewNoteId(db);
+    const noteId:NoteId = getNewNoteId(db);
     note = {
       id: noteId,
       x: 0,
@@ -271,11 +306,12 @@ const put = (noteFromUser, userId, options) => {
 
   if (Array.isArray(noteFromUser.changes)) {
     noteFromUser.changes.forEach((change) => {
-      if (change.type === "LINKED_NOTE_ADDED") {
-        db.links.push([note.id, change.noteId]);
+      if (change.type === UserNoteChangeType.LINKED_NOTE_ADDED) {
+        const link:Link = [note.id, change.noteId];
+        db.links.push(link);
       }
 
-      if (change.type === "LINKED_NOTE_DELETED") {
+      if (change.type === UserNoteChangeType.LINKED_NOTE_DELETED) {
         db.links = db.links.filter((link) => {
           return !(
             link.includes(note.id) && link.includes(change.noteId)
@@ -287,10 +323,16 @@ const put = (noteFromUser, userId, options) => {
 
   DB.set(db);
 
-  const noteWithLinkedNotes = Utils.cloneObject(note);
-  noteWithLinkedNotes.linkedNotes = getLinkedNotes(db, note.id);
+  const noteToTransmit:NoteToTransmit = {
+    id: note.id,
+    editorData: note.editorData,
+    title: getNoteTitle(note),
+    creationTime: note.creationTime,
+    updateTime: note.updateTime,
+    linkedNotes: getLinkedNotes(db, note.id),
+  }
 
-  return noteWithLinkedNotes;
+  return noteToTransmit;
 };
 
 
@@ -321,9 +363,8 @@ const importDB = (db) => {
 
 const getFilesForDBExport = (userId) => {
   const jsonFile = DB.getDBFile(userId);
-  const uploadedFiles = getAll(userId, {
-    includeLinkedNotes: false,
-  })
+  const db = DB.get(userId);
+  const uploadedFiles = db.notes
     .map(getUploadsOfNote)
     .flat()
     .map(DB.getBlob);
@@ -346,7 +387,7 @@ const getFile = (fileId) => {
 export {
   init,
   get,
-  getAll,
+  getNotesList,
   getGraph,
   setGraph,
   getStats,

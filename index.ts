@@ -1,15 +1,20 @@
 import * as path from "path";
 import express from "express";
-import * as Notes from "./lib/notes.mjs";
+import * as Notes from "./lib/notes";
 import urlMetadata from "url-metadata";
 import formidable from "formidable";
 import fs from "fs";
 import archiver from "archiver";
-import { getNoteTitle } from "./lib/noteUtils.mjs";
-import { yyyymmdd } from "./lib/utils.mjs";
+import { yyyymmdd } from "./lib/utils";
 import * as url from "url";
 import mkdirp from "mkdirp";
 import compression from "compression";
+import NoteListItem from "./interfaces/NoteListItem";
+import NoteToTransmit from "./interfaces/NoteToTransmit";
+import { NoteId } from "./interfaces/NoteId";
+import UrlMetadataResponse from "./interfaces/UrlMetadataResponse";
+import NoteFromUser from "./interfaces/NoteFromUser";
+import Stats from "./interfaces/Stats";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const app = express();
@@ -27,7 +32,7 @@ let users;
 const usersFile = path.join(DATA_PATH, "users.json");
 if (fs.existsSync(usersFile)) {
   console.log("Loading existing users file...");
-  const json = fs.readFileSync(usersFile);
+  const json = fs.readFileSync(usersFile).toString();
   users = JSON.parse(json);
 } else {
   const defaultUsers = [
@@ -145,7 +150,7 @@ app.get(API_PATH + "/database", function(req, res) {
 
 
 app.put(API_PATH + "/database", function(req, res) {
-  Notes.importDB(req.body, req.userId);
+  Notes.importDB(req.body);
   res.end(JSON.stringify(
     {
       success: true,
@@ -161,18 +166,17 @@ app.get(API_PATH + "/graph", function(req, res) {
 
 
 app.get(API_PATH + "/stats", function(req, res) {
-  const stats = Notes.getStats(req.userId);
+  const stats:Stats = Notes.getStats(req.userId);
   res.end(JSON.stringify(stats));
 });
 
 
 app.post(API_PATH + "/graph", function(req, res) {
-  Notes.setGraph(req.body, req.userId);
-  res.end(JSON.stringify(
-    {
-      success: true,
-    },
-  ));
+  const success = Notes.setGraph(req.body, req.userId);
+
+  res.end(JSON.stringify({
+    success,
+  }));
 });
 
 
@@ -181,38 +185,10 @@ app.get(API_PATH + "/notes", function(req, res) {
   const caseSensitiveQuery = req.query.caseSensitive === "true";
   const includeLinkedNotes = true;
 
-  let notes;
-
-  if (typeof query === "string" && query.length < 3) {
-    notes = [];
-  } else {
-    notes = Notes.getAll(req.userId, {
-      includeLinkedNotes,
-      query,
-      caseSensitiveQuery,
-    });
-  }
-
-
-  const notesList = notes.map((note) => {
-    const noteCleaned = {
-      id: note.id,
-      title: getNoteTitle(note),
-      creationTime: note.creationTime,
-      updateTime: note.updateTime,
-      features: {
-        containsImages:
-          note.editorData.blocks.some((block) => block.type === "image"),
-        containsAttachements:
-          note.editorData.blocks.some((block) => block.type === "attaches"),
-      },
-    };
-
-    if (includeLinkedNotes) {
-      noteCleaned.numberOfLinkedNotes = note.linkedNotes.length;
-    }
-
-    return noteCleaned;
+  const notesList:NoteListItem[] = Notes.getNotesList(req.userId, {
+    includeLinkedNotes,
+    query,
+    caseSensitiveQuery,
   });
 
   const response = {
@@ -225,7 +201,8 @@ app.get(API_PATH + "/notes", function(req, res) {
 
 
 app.get(API_PATH + "/note/:noteId", function(req, res) {
-  const note = Notes.get(parseInt(req.params.noteId), req.userId, true);
+  const noteId:NoteId = parseInt(req.params.noteId);
+  const note:NoteToTransmit = Notes.get(noteId, req.userId);
   res.end(JSON.stringify(note));
 });
 
@@ -233,9 +210,11 @@ app.get(API_PATH + "/note/:noteId", function(req, res) {
 app.put(API_PATH + "/note", function(req, res) {
   const reqBody = req.body;
   try {
-    const noteFromDB = Notes.put(reqBody.note, req.userId, reqBody.options);
+    const noteToTransmit:NoteToTransmit
+      = Notes.put(reqBody.note, req.userId, reqBody.options);
+
     res.end(JSON.stringify({
-      note: noteFromDB,
+      note: noteToTransmit,
       success: true,
     }));
   } catch (e) {
@@ -249,21 +228,27 @@ app.put(API_PATH + "/note", function(req, res) {
 
 app.put(API_PATH + "/import-links-as-notes", function(req, res) {
   const reqBody = req.body;
-  const links = reqBody.links;
-  Promise.allSettled(links.map((url) => {
-    return getUrlMetadata(url);
-  }))
-    .then((responses) => {
-      const urlMetadataObjects = responses
-        .filter((response) => {
+  const links:string[] = reqBody.links;
+  const promises:Promise<UrlMetadataResponse>[]
+    = links.map((url:string):Promise<UrlMetadataResponse> => {
+      return getUrlMetadata(url);
+    });
+
+  Promise.allSettled(promises)
+    .then((promiseSettledResults):void => {
+      const fulfilledPromises:PromiseSettledResult<UrlMetadataResponse>[]
+        = promiseSettledResults.filter((response) => {
           return response.status === "fulfilled";
-        })
-        .map((response) => {
-          return response.value;
+        });
+      
+      const urlMetadataResults:UrlMetadataResponse[]
+        = fulfilledPromises.map((response) => {
+          return (response.status === "fulfilled") && response.value;
         });
 
-      const notes = urlMetadataObjects.map((urlMetadataObject) => {
-        const newNoteObject = {
+      const notes:NoteFromUser[]
+        = urlMetadataResults.map((urlMetadataObject) => {
+        const newNoteObject:NoteFromUser = {
           editorData: {
             "time": Date.now(),
             "blocks": [
@@ -328,10 +313,10 @@ app.listen(PORT, function() {
 });
 
 
-const getUrlMetadata = async (url) => {
+const getUrlMetadata = async (url:string):Promise<UrlMetadataResponse> => {
   const metadata = await urlMetadata(url);
 
-  const response = {
+  const response:UrlMetadataResponse = {
     "success": 1,
     "url": url,
     "meta": {

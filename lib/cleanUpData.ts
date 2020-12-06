@@ -3,8 +3,8 @@ import {
   getNewNoteId,
   removeDefaultTextParagraphs,
   removeEmptyLinks,
-} from "./noteUtils.mjs";
-import * as DB from "./database.mjs";
+} from "./noteUtils";
+import * as DB from "./database";
 
 const convertLinksFromLegacyFormat = (db) => {
   db.links = db.links.map((link) => {

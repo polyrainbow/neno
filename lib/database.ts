@@ -1,12 +1,12 @@
 import path from "path";
 import fs from "fs";
 import mkdirp from "mkdirp";
-import { cloneObject } from "./utils.mjs";
+import { cloneObject } from "./utils";
+import Database from "../interfaces/Database";
 
 const DB_FILE_SUFFIX = ".db.json";
 let DATA_FOLDER = null;
 let UPLOAD_PATH = null;
-let newDBTemplate = null;
 const loadedDBs = [];
 
 
@@ -39,25 +39,37 @@ const init = (config) => {
   console.log("Initializing DB module...");
   DATA_FOLDER = config.dataFolderPath;
   UPLOAD_PATH = path.join(DATA_FOLDER, "uploads");
-  newDBTemplate = config.newDBTemplate;
   mkdirp.sync(DATA_FOLDER);
 };
 
 
-const get = (id) => {
-  const dbFromLoadedDBs = loadedDBs.find((db) => db.id === id);
+const get = (id):Database => {
+  const dbFromLoadedDBs:Database = loadedDBs.find((db) => db.id === id);
   if (dbFromLoadedDBs) {
+    Object.freeze(dbFromLoadedDBs);
     return dbFromLoadedDBs;
   }
 
-  const dbFromFile = readJSONFileInDataFolder(id + DB_FILE_SUFFIX);
+  const dbFromFile:Database = readJSONFileInDataFolder(id + DB_FILE_SUFFIX);
   if (dbFromFile) {
+    Object.freeze(dbFromFile);
     loadedDBs.push(dbFromFile);
     return dbFromFile;
   }
 
-  const newDB = cloneObject(newDBTemplate);
-  newDB.id = id;
+  const newDB:Database = {
+    timestamp: Date.now(),
+    id: id,
+    notes: [],
+    links: [],
+    idCounter: 0,
+    screenPosition: {
+      translateX: 0,
+      translateY: 0,
+      scale: 1,
+    },
+  };
+
   writeJSONFileInDataFolder(id + DB_FILE_SUFFIX, newDB);
   return newDB;
 };
@@ -65,6 +77,7 @@ const get = (id) => {
 
 const set = (db) => {
   db.timestamp = Date.now();
+  Object.freeze(db);
 
   const dbFromLoadedDBsIndex = loadedDBs.findIndex((loadedDB) => {
     return loadedDB.id === db.id;
@@ -89,8 +102,9 @@ const forEach = (handler) => {
     .forEach((filename) => {
       const id = filename.substr(0, filename.indexOf(DB_FILE_SUFFIX));
       const db = get(id);
-      handler(db);
-      set(db);
+      const dbCopy = cloneObject(db);
+      handler(dbCopy);
+      set(dbCopy);
     });
 };
 
