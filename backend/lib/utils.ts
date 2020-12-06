@@ -23,10 +23,14 @@ const getKeySortFunction = function(key, doCaseInsensitiveSort) {
   @param sortKeyKey:
     They key of the object whose corresponding value is the sort key for
     that object.
-  @param sortKeyKey:
+  @param sortKeyToFind:
     The sort key we want to find.
 */
-const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind) {
+function binaryArrayFind<T> (
+  sortedArray:T[],
+  sortKeyKey: string | number,
+  sortKeyToFind: number | string,
+): T | null {
   let start = 0;
   let end = sortedArray.length - 1;
 
@@ -49,7 +53,11 @@ const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind) {
 };
 
 
-const binaryArrayFindIndex = function(sortedArray, sortKeyKey, sortKeyToFind) {
+function binaryArrayFindIndex(
+  sortedArray:any[],
+  sortKeyKey: string | number,
+  sortKeyToFind
+): number {
   let start = 0;
   let end = sortedArray.length - 1;
 
@@ -68,7 +76,7 @@ const binaryArrayFindIndex = function(sortedArray, sortKeyKey, sortKeyToFind) {
     }
   }
 
-  return null;
+  return -1;
 };
 
 
@@ -186,6 +194,16 @@ const deepFreeze = (o) => {
 };
 
 
+function isNotEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined;
+}
+
+
+function isNotFalse<TValue>(value: TValue | false): value is TValue {
+  return value !== false;
+}
+
+
 export {
   getKeySortFunction,
   binaryArrayFind,
@@ -195,4 +213,6 @@ export {
   yyyymmdd,
   unescapeHTML,
   deepFreeze,
+  isNotEmpty,
+  isNotFalse,
 };

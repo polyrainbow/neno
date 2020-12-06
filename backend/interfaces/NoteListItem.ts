@@ -3,8 +3,8 @@ import NoteListItemFeatures from "./NoteListItemFeatures.js";
 export default interface NoteListItem {
     readonly id: number,
     readonly title: string,
-    readonly creationTime: string,
-    readonly updateTime: string,
+    readonly creationTime: number,
+    readonly updateTime: number,
     readonly features: NoteListItemFeatures,
     readonly numberOfLinkedNotes?: number,
 }

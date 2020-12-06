@@ -9,12 +9,14 @@ import { yyyymmdd } from "./lib/utils.js";
 import * as url from "url";
 import mkdirp from "mkdirp";
 import compression from "compression";
-import NoteListItem from "./interfaces/NoteListItem.js";
+import NoteListItem from "./interfaces/ImportLinkAsNoteFailure.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import { NoteId } from "./interfaces/NoteId.js";
 import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
 import NoteFromUser from "./interfaces/NoteFromUser.js";
 import Stats from "./interfaces/Stats.js";
+import * as Utils from "./lib/utils.js";
+import ImportLinkAsNoteFailure from "./interfaces/ImportLinkAsNoteFailure.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const app = express();
@@ -211,7 +213,7 @@ app.get(API_PATH + "/notes", function(req, res) {
 
 app.get(API_PATH + "/note/:noteId", function(req, res) {
   const noteId:NoteId = parseInt(req.params.noteId);
-  const note:NoteToTransmit = Notes.get(noteId, req.userId);
+  const note:NoteToTransmit | null = Notes.get(noteId, req.userId);
   res.end(JSON.stringify(note));
 });
 
@@ -253,7 +255,8 @@ app.put(API_PATH + "/import-links-as-notes", function(req, res) {
       const urlMetadataResults:UrlMetadataResponse[]
         = fulfilledPromises.map((response) => {
           return (response.status === "fulfilled") && response.value;
-        });
+        })
+        .filter(Utils.isNotFalse);
 
       const notes:NoteFromUser[]
         = urlMetadataResults.map((urlMetadataObject) => {
@@ -283,25 +286,25 @@ app.put(API_PATH + "/import-links-as-notes", function(req, res) {
         return newNoteObject;
       });
 
-      const notesFromDB = [];
-      const failures = [];
+      const notesToTransmit:NoteToTransmit[] = [];
+      const failures:ImportLinkAsNoteFailure[] = [];
 
       notes.forEach((note) => {
         try {
-          const noteFromDB = Notes.put(note, req.userId, {
+          const noteToTransmit:NoteToTransmit = Notes.put(note, req.userId, {
             ignoreDuplicateTitles: true,
           });
-          notesFromDB.push(noteFromDB);
+          notesToTransmit.push(noteToTransmit);
         } catch (e) {
           failures.push({
             note,
-            error: e,
+            error: e.toString(),
           });
         }
       });
 
       res.end(JSON.stringify({
-        notesFromDB,
+        notesToTransmit,
         failures,
         success: true,
       }));

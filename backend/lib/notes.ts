@@ -24,6 +24,7 @@ import { Link } from "../interfaces/Link.js";
 import NoteListItemFeatures from "../interfaces/NoteListItemFeatures.js";
 import Stats from "../interfaces/Stats.js";
 import LinkedNote from "../interfaces/LinkedNote.js";
+import UserNoteChange from "../interfaces/UserNoteChange.js";
 
 /**
   PRIVATE
@@ -38,7 +39,10 @@ const updateNotePosition = (
   x: number,
   y: number
 ): boolean => {
-  const note:DatabaseNote = findNote(db, noteId);
+  const note:DatabaseNote | null = findNote(db, noteId);
+  if (note === null) {
+    return false;
+  }
   note.x = x;
   note.y = y;
   return true;
@@ -46,17 +50,15 @@ const updateNotePosition = (
 
 
 const getLinkedNotes = (db:Database, noteId:NoteId):LinkedNote[] => {
-  const notes:DatabaseNote[] = db.links
-    .filter((link) => {
+  const notes:DatabaseNote[] | null = db.links
+    .filter((link:Link):boolean => {
       return (link[0] === noteId) || (link[1] === noteId);
     })
-    .map((link) => {
+    .map((link:Link):DatabaseNote | null => {
       const linkedNoteId = (link[0] === noteId) ? link[1] : link[0];
       return findNote(db, linkedNoteId);
     })
-    .filter((linkedNote) => {
-      return (typeof linkedNote === "object") && (linkedNote !== null);
-    });
+    .filter(Utils.isNotEmpty);
 
   const linkedNotes:LinkedNote[] = notes
     .map((note:DatabaseNote) => {
@@ -127,6 +129,47 @@ const removeUploadsOfNote = (note) => {
 };
 
 
+const incorporateUserChangesIntoNote = (
+  changes:UserNoteChange[] | undefined,
+  note:DatabaseNote,
+  db:Database,
+):void => {
+  if (Array.isArray(changes)) {
+    changes.forEach((change) => {
+      if (change.type === UserNoteChangeType.LINKED_NOTE_ADDED) {
+        const link:Link = [note.id, change.noteId];
+        db.links.push(link);
+      }
+
+      if (change.type === UserNoteChangeType.LINKED_NOTE_DELETED) {
+        db.links = db.links.filter((link) => {
+          return !(
+            link.includes(note.id) && link.includes(change.noteId)
+          );
+        });
+      }
+    });
+  }
+};
+
+
+const createNoteToTransmit = (
+  databaseNote:NonNullable<DatabaseNote>,
+  db: NonNullable<Database>,
+):NoteToTransmit => {
+  const noteToTransmit:NoteToTransmit = {
+    id: databaseNote.id,
+    editorData: databaseNote.editorData,
+    title: getNoteTitle(databaseNote),
+    creationTime: databaseNote.creationTime,
+    updateTime: databaseNote.updateTime,
+    linkedNotes: getLinkedNotes(db, databaseNote.id),
+  };
+
+  return noteToTransmit;
+}
+
+
 /**
   EXPORTS
 **/
@@ -144,22 +187,14 @@ const init = (dataFolderPath:string):void => {
 };
 
 
-const get = (noteId: NoteId, userId: UserId):NoteToTransmit => {
+const get = (noteId: NoteId, userId: UserId):NoteToTransmit | null => {
   const db = DB.get(userId);
-  const noteFromDB = findNote(db, noteId);
+  const noteFromDB:DatabaseNote | null = findNote(db, noteId);
   if (!noteFromDB) {
     return null;
   }
 
-  let noteToTransmit:NoteToTransmit = {
-    id: noteFromDB.id,
-    editorData: noteFromDB.editorData,
-    title: getNoteTitle(noteFromDB),
-    creationTime: noteFromDB.creationTime,
-    updateTime: noteFromDB.updateTime,
-    linkedNotes: getLinkedNotes(db, noteId),
-  };
-
+  const noteToTransmit:NoteToTransmit = createNoteToTransmit(noteFromDB, db);
   return noteToTransmit;
 };
 
@@ -284,46 +319,36 @@ const put = (
     throw new Error("NOTE_WITH_SAME_TITLE_EXISTS");
   }
 
-  let note = null;
+  let note;
 
   if (
     typeof noteFromUser.id === "number"
   ) {
-    note = findNote(db, noteFromUser.id);
-  }
+    const databaseNote:DatabaseNote | null = findNote(db, noteFromUser.id);
 
-  if (note === null) {
-    const noteId:NoteId = getNewNoteId(db);
-    note = {
-      id: noteId,
-      x: 0,
-      y: 0,
-      editorData: noteFromUser.editorData,
-      creationTime: Date.now(),
-    };
-    db.notes.push(note);
-  }
-
-  note.editorData = noteFromUser.editorData;
-  note.updateTime = Date.now();
-  removeDefaultTextParagraphs(note);
-  removeEmptyLinks(note);
-
-  if (Array.isArray(noteFromUser.changes)) {
-    noteFromUser.changes.forEach((change) => {
-      if (change.type === UserNoteChangeType.LINKED_NOTE_ADDED) {
-        const link:Link = [note.id, change.noteId];
-        db.links.push(link);
-      }
-
-      if (change.type === UserNoteChangeType.LINKED_NOTE_DELETED) {
-        db.links = db.links.filter((link) => {
-          return !(
-            link.includes(note.id) && link.includes(change.noteId)
-          );
-        });
-      }
-    });
+    if (databaseNote !== null) {
+      databaseNote.editorData = noteFromUser.editorData;
+      databaseNote.updateTime = Date.now();
+      removeDefaultTextParagraphs(databaseNote);
+      removeEmptyLinks(databaseNote);
+      incorporateUserChangesIntoNote(noteFromUser.changes, databaseNote, db);
+      note = databaseNote;
+    } else {
+      const noteId:NoteId = getNewNoteId(db);
+      const newNote:DatabaseNote = {
+        id: noteId,
+        x: 0,
+        y: 0,
+        editorData: noteFromUser.editorData,
+        creationTime: Date.now(),
+        updateTime: Date.now(),
+      };
+      removeDefaultTextParagraphs(newNote);
+      removeEmptyLinks(newNote);
+      incorporateUserChangesIntoNote(noteFromUser.changes, newNote, db);
+      db.notes.push(newNote);
+      note = newNote;
+    }
   }
 
   DB.flushChanges(db);
@@ -344,6 +369,9 @@ const put = (
 const remove = (noteId, userId) => {
   const db = DB.get(userId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
+  if (noteIndex === -1) {
+    return false;
+  }
   const note = db.notes[noteIndex];
   if (noteIndex === null) {
     return false;

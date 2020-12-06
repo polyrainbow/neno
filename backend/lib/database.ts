@@ -1,13 +1,13 @@
 import path from "path";
 import fs from "fs";
 import mkdirp from "mkdirp";
-import { cloneObject, deepFreeze } from "./utils.js";
+import { cloneObject } from "./utils.js";
 import Database from "../interfaces/Database.js";
 
 const DB_FILE_SUFFIX = ".db.json";
-let DATA_FOLDER = null;
-let UPLOAD_PATH = null;
-const loadedDBs = [];
+let DATA_FOLDER = path.join(__dirname, "..", "..", "..", "network-notes-data");
+let UPLOAD_PATH = path.join(DATA_FOLDER, "uploads");
+const loadedDBs:Database[] = [];
 
 
 const readJSONFileInDataFolder = (filename) => {
@@ -44,15 +44,16 @@ const init = (config) => {
 
 
 const get = (id):Database => {
-  const dbFromLoadedDBs:Database = loadedDBs.find((db) => db.id === id);
+  const dbFromLoadedDBs:Database | undefined = loadedDBs.find(
+    (db) => db.id === id,
+  );
   if (dbFromLoadedDBs) {
-    deepFreeze(dbFromLoadedDBs);
     return dbFromLoadedDBs;
   }
 
-  const dbFromFile:Database = readJSONFileInDataFolder(id + DB_FILE_SUFFIX);
+  const dbFromFile:Database | null
+    = readJSONFileInDataFolder(id + DB_FILE_SUFFIX);
   if (dbFromFile) {
-    deepFreeze(dbFromFile);
     loadedDBs.push(dbFromFile);
     return dbFromFile;
   }
@@ -69,7 +70,6 @@ const get = (id):Database => {
       scale: 1,
     },
   };
-  deepFreeze(newDB);
   writeJSONFileInDataFolder(id + DB_FILE_SUFFIX, newDB);
   return newDB;
 };
@@ -117,9 +117,11 @@ const addBlob = (name, sourcePath) => {
   fs.renameSync(sourcePath, newpath);
 };
 
+
 const deleteBlob = (name) => {
   fs.unlinkSync(path.join(UPLOAD_PATH, name));
 };
+
 
 const getBlob = (name) => {
   return path.join(UPLOAD_PATH, name);

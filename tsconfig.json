@@ -7,7 +7,7 @@
         "esnext",
         "es2020"
       ],
-      "module": "es2020",
+      "module": "esnext",
       "moduleResolution": "node",
       "noImplicitAny": false,
       "noUnusedLocals": false,
@@ -21,7 +21,8 @@
         "node"
       ],
       "typeRoots": [ "./node_modules/@types"],
-      "resolveJsonModule": true
+      "resolveJsonModule": true,
+      "strictNullChecks": true
     },
     "exclude": [
       "node_modules",

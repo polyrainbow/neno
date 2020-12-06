@@ -5,7 +5,7 @@ import { NoteId } from "./NoteId.js";
 export default interface NoteToTransmit extends Note {
     readonly id: NoteId,
     readonly title: string,
-    readonly creationTime: string,
-    readonly updateTime: string,
+    readonly creationTime: number,
+    readonly updateTime: number,
     readonly linkedNotes: LinkedNote[],
 }
