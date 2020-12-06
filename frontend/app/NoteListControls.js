@@ -78,6 +78,9 @@ const NoteListControls = ({
         <option
           value="NUMBER_OF_LINKS_DESCENDING"
         >Number of links (descending)</option>
+        <option
+          value="HAS_FILES"
+        >Notes with images/attachements</option>
       </select>
     </div>
   </section>;

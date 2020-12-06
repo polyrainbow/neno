@@ -79,6 +79,16 @@ const getSortFunction = (sortBy) => {
     "NUMBER_OF_LINKS_DESCENDING": (a, b) => {
       return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
     },
+    "HAS_FILES": (a, b) => {
+      const aHasFiles
+        = a.features.containsImages || a.features.containsAttachements;
+      const bHasFiles
+        = b.features.containsImages || b.features.containsAttachements;
+
+      if (aHasFiles && !bHasFiles) return -1;
+      if (!aHasFiles && bHasFiles) return 1;
+      return 0;
+    },
   };
 
   return sortFunctions[sortBy] ?? sortFunctions.UPDATE_DATE_ASCENDING;
