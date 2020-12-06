@@ -3,6 +3,9 @@ import fs from "fs";
 import mkdirp from "mkdirp";
 import { cloneObject } from "./utils.js";
 import Database from "../interfaces/Database.js";
+import * as url from "url";
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 const DB_FILE_SUFFIX = ".db.json";
 let DATA_FOLDER = path.join(__dirname, "..", "..", "..", "network-notes-data");
@@ -79,7 +82,6 @@ const get = (id):Database => {
 // after any operations on the db object have been performed.
 const flushChanges = (db:Database) => {
   db.timestamp = Date.now();
-  Object.freeze(db);
 
   const dbFromLoadedDBsIndex = loadedDBs.findIndex((loadedDB) => {
     return loadedDB.id === db.id;
