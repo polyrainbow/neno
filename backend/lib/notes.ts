@@ -253,14 +253,14 @@ const getStats = (userId:UserId):Stats => {
 };
 
 
-const setGraph = (graph:Graph, userId:UserId):boolean => {
+const setGraph = (graphFromUser:Graph, userId:UserId):boolean => {
   const db = DB.get(userId);
-  graph.nodes.forEach((node) => {
+  graphFromUser.nodes.forEach((node) => {
     updateNotePosition(db, node.id, node.x, node.y);
   });
-  db.links = graph.links;
-  db.screenPosition = graph.screenPosition;
-  DB.set(db);
+  db.links = graphFromUser.links;
+  db.screenPosition = graphFromUser.screenPosition;
+  DB.flushChanges(db);
   return true;
 };
 
@@ -326,7 +326,7 @@ const put = (
     });
   }
 
-  DB.set(db);
+  DB.flushChanges(db);
 
   const noteToTransmit:NoteToTransmit = {
     id: note.id,
@@ -351,7 +351,7 @@ const remove = (noteId, userId) => {
   db.notes.splice(noteIndex, 1);
   removeLinksOfNote(db, noteId);
   removeUploadsOfNote(note);
-  DB.set(db);
+  DB.flushChanges(db);
   return true;
 };
 
@@ -361,8 +361,11 @@ const exportDB = (userId) => {
 };
 
 
-const importDB = (db) => {
-  return DB.set(db);
+const importDB = (db, userId) => {
+  if (db.id !== userId) {
+    throw new Error("UNAUTHORIZED: You are not allowed to update another DB");
+  }
+  return DB.flushChanges(db);
 };
 
 

@@ -150,12 +150,21 @@ app.get(API_PATH + "/database", function(req, res) {
 
 
 app.put(API_PATH + "/database", function(req, res) {
-  Notes.importDB(req.body);
-  res.end(JSON.stringify(
-    {
-      success: true,
-    },
-  ));
+  try {
+    const success = Notes.importDB(req.body, req.userId);
+    res.end(JSON.stringify(
+      {
+        success,
+      },
+    ));
+  } catch(e) {
+    res.end(JSON.stringify(
+      {
+        success: false,
+        error: e.message
+      },
+    ));
+  }
 });
 
 

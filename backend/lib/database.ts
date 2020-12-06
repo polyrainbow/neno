@@ -74,8 +74,10 @@ const get = (id):Database => {
   return newDB;
 };
 
-
-const set = (db:Database) => {
+// flushChanges makes sure that the changes applied to the db object are
+// written to the disk and thus are persistent. it should always be called
+// after any operations on the db object have been performed.
+const flushChanges = (db:Database) => {
   db.timestamp = Date.now();
   Object.freeze(db);
 
@@ -104,7 +106,7 @@ const forEach = (handler) => {
       const db = get(id);
       const dbCopy = cloneObject(db);
       handler(dbCopy);
-      set(dbCopy);
+      flushChanges(dbCopy);
     });
 };
 
@@ -132,7 +134,7 @@ const getDBFile = (name) => {
 export {
   init,
   get,
-  set,
+  flushChanges,
   forEach,
   addBlob,
   deleteBlob,

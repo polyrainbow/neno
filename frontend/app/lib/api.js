@@ -85,8 +85,8 @@ const getDatabaseAsJSON = async () => {
       "Content-Type": "application/json",
     },
   });
-  const json = await response.text();
-  return json;
+  const jsonString = await response.text();
+  return jsonString;
 };
 
 
