@@ -9,7 +9,7 @@ import { yyyymmdd } from "./lib/utils.js";
 import * as url from "url";
 import mkdirp from "mkdirp";
 import compression from "compression";
-import NoteListItem from "./interfaces/ImportLinkAsNoteFailure.js";
+import NoteListItem from "./interfaces/NoteListItem.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import { NoteId } from "./interfaces/NoteId.js";
 import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
