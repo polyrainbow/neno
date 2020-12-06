@@ -27,11 +27,19 @@ const listDir = (dir, fileList = []) => {
   return fileList;
 };
 
+
+const replaceImports = (filepath) => {
+  const string = fs.readFileSync(filepath, "utf8");
+  const newString = string.replace(/^(import.*)(.js";)$/gm, "$1.mjs\";");
+  fs.writeFileSync(filepath, newString); console.log(newString)
+};
+
 const foundFiles = listDir(distFolder);
 console.log(foundFiles);
 
 foundFiles.forEach((f) => {
   fs.renameSync(f.oldSrc, f.newSrc);
+  replaceImports(f.newSrc);
 });
 
 
