@@ -4,7 +4,7 @@ import { NoteId } from "./NoteId.js";
 
 export default interface DatabaseNote extends Note {
     id: NoteId,
-    creationTime: string,
+    readonly creationTime: string,
     updateTime: string,
     x: number,
     y: number,

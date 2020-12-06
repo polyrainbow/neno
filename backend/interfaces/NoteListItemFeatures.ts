@@ -1,4 +1,4 @@
 export default interface NoteListItemFeatures {
-    containsImages: boolean,
-    containsAttachements: boolean,
+    readonly containsImages: boolean,
+    readonly containsAttachements: boolean,
 };

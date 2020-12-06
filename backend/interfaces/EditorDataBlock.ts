@@ -1,4 +1,4 @@
 export default interface EditorDataBlock {
-    type: string,
+    readonly type: string,
     data: any,
 };

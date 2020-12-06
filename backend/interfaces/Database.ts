@@ -3,7 +3,7 @@ import { Link } from "./Link.js";
 import ScreenPosition from "./ScreenPosition.js";
 
 export default interface Database {
-    id: number,
+    readonly id: number,
     timestamp: number,
     notes: DatabaseNote[],
     links: Link[],

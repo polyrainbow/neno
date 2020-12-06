@@ -1,5 +1,5 @@
 export default interface Stats {
-    numberOfAllNotes: number,
-    numberOfLinks: number,
-    numberOfUnlinkedNotes: number,
+    readonly numberOfAllNotes: number,
+    readonly numberOfLinks: number,
+    readonly numberOfUnlinkedNotes: number,
 };

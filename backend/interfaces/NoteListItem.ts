@@ -1,11 +1,10 @@
 import NoteListItemFeatures from "./NoteListItemFeatures.js";
 
 export default interface NoteListItem {
-    id: number,
-    title: string,
-    creationTime: string,
-    updateTime: string,
-    features: NoteListItemFeatures,
-    numberOfLinkedNotes?: number,
-    
+    readonly id: number,
+    readonly title: string,
+    readonly creationTime: string,
+    readonly updateTime: string,
+    readonly features: NoteListItemFeatures,
+    readonly numberOfLinkedNotes?: number,
 }
