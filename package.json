@@ -58,13 +58,16 @@
   "scripts": {
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
+    "visualize-bundles": "npx webpack --config frontend/webpack.production.js --profile --json > stats.json && npx webpack-bundle-analyzer stats.json frontend/assets",
+
+    "compile-typescript": "npx tsc",
     "start-server": "node index.mjs port=8080",
-    "start": "npm run build-frontend-production && npm run start-server",
-    "dev-frontend": "npx webpack --config frontend/webpack.development.js",
-    "dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
-    "dev": "concurrently --kill-others \"npm run start-server\" \"npm run dev-frontend\"",
     "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
-    "visualize-bundles": "npx webpack --config frontend/webpack.production.js --profile --json > stats.json && npx webpack-bundle-analyzer stats.json frontend/assets"
+    "build-frontend-development": "npx webpack --config frontend/webpack.development.js",
+    "start-dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
+  
+    "start": "npm run compile-typescript && npm run build-frontend-production && npm run start-server",
+    "dev": "concurrently --kill-others \"npm run compile-typescript && npm run start-server\" \"npm run build-frontend-development\""
   },
   "author": "",
   "license": "ISC"
