@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "dependencies": {
     "@babel/core": "^7.12.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
@@ -60,7 +59,7 @@
     "lint-fix": "npx eslint . --fix",
     "visualize-bundles": "npx webpack --config frontend/webpack.production.js --profile --json > stats.json && npx webpack-bundle-analyzer stats.json frontend/assets",
 
-    "compile-typescript": "npx tsc",
+    "compile-typescript": "npx tsc && node renameTypescriptOutputFiles.mjs",
     "start-server": "node index.mjs port=8080",
     "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
     "build-frontend-development": "npx webpack --config frontend/webpack.development.js",
