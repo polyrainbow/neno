@@ -1,20 +1,20 @@
 import * as path from "path";
 import express from "express";
-import * as Notes from "./lib/notes";
+import * as Notes from "./lib/notes.js";
 import urlMetadata from "url-metadata";
 import formidable from "formidable";
 import fs from "fs";
 import archiver from "archiver";
-import { yyyymmdd } from "./lib/utils";
+import { yyyymmdd } from "./lib/utils.js";
 import * as url from "url";
 import mkdirp from "mkdirp";
 import compression from "compression";
-import NoteListItem from "./interfaces/NoteListItem";
-import NoteToTransmit from "./interfaces/NoteToTransmit";
-import { NoteId } from "./interfaces/NoteId";
-import UrlMetadataResponse from "./interfaces/UrlMetadataResponse";
-import NoteFromUser from "./interfaces/NoteFromUser";
-import Stats from "./interfaces/Stats";
+import NoteListItem from "./interfaces/NoteListItem.js";
+import NoteToTransmit from "./interfaces/NoteToTransmit.js";
+import { NoteId } from "./interfaces/NoteId.js";
+import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
+import NoteFromUser from "./interfaces/NoteFromUser.js";
+import Stats from "./interfaces/Stats.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const app = express();
@@ -181,7 +181,7 @@ app.post(API_PATH + "/graph", function(req, res) {
 
 
 app.get(API_PATH + "/notes", function(req, res) {
-  const query = req.query.q;
+  const query = req.query.q || "";
   const caseSensitiveQuery = req.query.caseSensitive === "true";
   const includeLinkedNotes = true;
 

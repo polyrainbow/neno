@@ -1,4 +1,4 @@
-import EditorDataBlock from "./EditorDataBlock";
+import EditorDataBlock from "./EditorDataBlock.js";
 
 export default interface EditorData {
     time: number,

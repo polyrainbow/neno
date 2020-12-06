@@ -1,4 +1,4 @@
-import NoteListItemFeatures from "./NoteListItemFeatures";
+import NoteListItemFeatures from "./NoteListItemFeatures.js";
 
 export default interface NoteListItem {
     id: number,

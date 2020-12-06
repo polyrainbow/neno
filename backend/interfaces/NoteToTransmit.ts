@@ -1,8 +1,6 @@
-import EditorData from "./EditorData";
-import LinkedNote from "./LinkedNote";
-import Note from "./Note";
-import { NoteId } from "./NoteId";
-import NoteListItemFeatures from "./NoteListItemFeatures";
+import LinkedNote from "./LinkedNote.js";
+import Note from "./Note.js";
+import { NoteId } from "./NoteId.js";
 
 export default interface NoteToTransmit extends Note {
     id: NoteId,

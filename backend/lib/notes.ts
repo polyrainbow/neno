@@ -1,5 +1,5 @@
-import * as DB from "./database";
-import * as Utils from "./utils";
+import * as DB from "./database.js";
+import * as Utils from "./utils.js";
 import { v4 as uuidv4 } from "uuid";
 import {
   getNoteTitle,
@@ -8,22 +8,22 @@ import {
   noteWithSameTitleExists,
   findNote,
   getNewNoteId,
-} from "./noteUtils";
-import cleanUpData from "./cleanUpData";
-import Database from "../interfaces/Database";
-import NoteListItem from "../interfaces/NoteListItem";
-import Graph from "../interfaces/Graph";
-import { UserId } from "../interfaces/UserId";
-import { NoteId } from "../interfaces/NoteId";
-import NoteToTransmit from "../interfaces/NoteToTransmit";
-import GraphNode from "../interfaces/GraphNode";
-import DatabaseNote from "../interfaces/DatabaseNote";
-import NoteFromUser from "../interfaces/NoteFromUser";
-import { UserNoteChangeType } from "../interfaces/UserNoteChangeType";
-import { Link } from "../interfaces/Link";
-import NoteListItemFeatures from "../interfaces/NoteListItemFeatures";
-import Stats from "../interfaces/Stats";
-import LinkedNote from "../interfaces/LinkedNote";
+} from "./noteUtils.js";
+import cleanUpData from "./cleanUpData.js";
+import Database from "../interfaces/Database.js";
+import NoteListItem from "../interfaces/NoteListItem.js";
+import Graph from "../interfaces/Graph.js";
+import { UserId } from "../interfaces/UserId.js";
+import { NoteId } from "../interfaces/NoteId.js";
+import NoteToTransmit from "../interfaces/NoteToTransmit.js";
+import GraphNode from "../interfaces/GraphNode.js";
+import DatabaseNote from "../interfaces/DatabaseNote.js";
+import NoteFromUser from "../interfaces/NoteFromUser.js";
+import { UserNoteChangeType } from "../interfaces/UserNoteChangeType.js";
+import { Link } from "../interfaces/Link.js";
+import NoteListItemFeatures from "../interfaces/NoteListItemFeatures.js";
+import Stats from "../interfaces/Stats.js";
+import LinkedNote from "../interfaces/LinkedNote.js";
 
 /**
   PRIVATE
@@ -174,6 +174,11 @@ const getNotesList = (userId: UserId, options): NoteListItem[] => {
       if (query.length === 0) {
         return true;
       }
+
+      if (query.length > 0 && query.length < 3) {
+        return false;
+      }
+
       const title = getNoteTitle(note);
       if (caseSensitiveQuery) {
         return title.includes(query);

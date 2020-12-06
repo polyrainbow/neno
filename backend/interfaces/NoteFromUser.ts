@@ -1,6 +1,6 @@
-import Note from "./Note";
-import { NoteId } from "./NoteId";
-import UserNoteChange from "./UserNoteChange";
+import Note from "./Note.js";
+import { NoteId } from "./NoteId.js";
+import UserNoteChange from "./UserNoteChange.js";
 
 export default interface NoteFromUser extends Note{
     id?: NoteId,

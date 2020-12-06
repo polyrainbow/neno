@@ -1,7 +1,3 @@
-import EditorData from "./EditorData";
-import LinkedNote from "./LinkedNote";
-import { NoteId } from "./NoteId";
-
 export default interface UrlMetadataResponse {
     success: number,
     url: string,

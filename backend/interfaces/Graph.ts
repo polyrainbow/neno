@@ -1,7 +1,7 @@
 import DatabaseNote from "./DatabaseNote";
-import GraphNode from "./GraphNode";
-import { Link } from "./Link";
-import ScreenPosition from "./ScreenPosition";
+import GraphNode from "./GraphNode.js";
+import { Link } from "./Link.js";
+import ScreenPosition from "./ScreenPosition.js";
 
 export default interface Graph {
     nodes: GraphNode[],

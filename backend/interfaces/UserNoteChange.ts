@@ -1,7 +1,6 @@
 import EditorData from "./EditorData";
-import LinkedNote from "./LinkedNote";
-import { NoteId } from "./NoteId";
-import { UserNoteChangeType } from "./UserNoteChangeType";
+import { NoteId } from "./NoteId.js";
+import { UserNoteChangeType } from "./UserNoteChangeType.js";
 
 export default interface UserNoteChange {
     type: UserNoteChangeType,

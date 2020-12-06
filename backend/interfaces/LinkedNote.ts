@@ -1,5 +1,4 @@
-import EditorData from "./EditorData";
-import { NoteId } from "./NoteId";
+import { NoteId } from "./NoteId.js";
 
 export default interface LinkedNote {
     id: NoteId,

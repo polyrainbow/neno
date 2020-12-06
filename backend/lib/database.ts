@@ -1,8 +1,8 @@
 import path from "path";
 import fs from "fs";
 import mkdirp from "mkdirp";
-import { cloneObject } from "./utils";
-import Database from "../interfaces/Database";
+import { cloneObject, deepFreeze } from "./utils.js";
+import Database from "../interfaces/Database.js";
 
 const DB_FILE_SUFFIX = ".db.json";
 let DATA_FOLDER = null;
@@ -46,13 +46,13 @@ const init = (config) => {
 const get = (id):Database => {
   const dbFromLoadedDBs:Database = loadedDBs.find((db) => db.id === id);
   if (dbFromLoadedDBs) {
-    Object.freeze(dbFromLoadedDBs);
+    deepFreeze(dbFromLoadedDBs);
     return dbFromLoadedDBs;
   }
 
   const dbFromFile:Database = readJSONFileInDataFolder(id + DB_FILE_SUFFIX);
   if (dbFromFile) {
-    Object.freeze(dbFromFile);
+    deepFreeze(dbFromFile);
     loadedDBs.push(dbFromFile);
     return dbFromFile;
   }
@@ -69,7 +69,7 @@ const get = (id):Database => {
       scale: 1,
     },
   };
-
+  deepFreeze(newDB);
   writeJSONFileInDataFolder(id + DB_FILE_SUFFIX, newDB);
   return newDB;
 };

@@ -1,9 +1,9 @@
-import Database from "../interfaces/Database";
-import DatabaseNote from "../interfaces/DatabaseNote";
-import Note from "../interfaces/Note";
-import NoteFromUser from "../interfaces/NoteFromUser";
-import { NoteId } from "../interfaces/NoteId";
-import * as Utils from "./utils";
+import Database from "../interfaces/Database.js";
+import DatabaseNote from "../interfaces/DatabaseNote.js";
+import Note from "../interfaces/Note.js";
+import NoteFromUser from "../interfaces/NoteFromUser.js";
+import { NoteId } from "../interfaces/NoteId.js";
+import * as Utils from "./utils.js";
 
 const getNoteTitle = (note:Note):string => {
   if (typeof note?.editorData?.blocks?.[0]?.data?.text === "string") {
