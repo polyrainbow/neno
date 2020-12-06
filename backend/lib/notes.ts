@@ -257,6 +257,8 @@ const getGraph = (userId: UserId):Graph => {
       title: getNoteTitle(note),
       x: note.x,
       y: note.y,
+      linkedNotes: getLinkedNotes(db, note.id),
+      creationTime: note.creationTime,
     };
     return graphNode;
   });
