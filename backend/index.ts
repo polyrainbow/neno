@@ -258,7 +258,7 @@ app.put(API_PATH + "/import-links-as-notes", function(req, res) {
         })
         .filter(Utils.isNotFalse);
 
-      const notes:NoteFromUser[]
+      const notesFromUser:NoteFromUser[]
         = urlMetadataResults.map((urlMetadataObject) => {
         const newNoteObject:NoteFromUser = {
           editorData: {
@@ -289,17 +289,23 @@ app.put(API_PATH + "/import-links-as-notes", function(req, res) {
       const notesToTransmit:NoteToTransmit[] = [];
       const failures:ImportLinkAsNoteFailure[] = [];
 
-      notes.forEach((note) => {
+      notesFromUser.forEach((noteFromUser:NoteFromUser) => {
         try {
-          const noteToTransmit:NoteToTransmit = Notes.put(note, req.userId, {
-            ignoreDuplicateTitles: true,
-          });
+          const noteToTransmit:NoteToTransmit = Notes.put(
+            noteFromUser,
+            req.userId,
+            {
+              ignoreDuplicateTitles: true,
+            },
+          );
           notesToTransmit.push(noteToTransmit);
         } catch (e) {
-          failures.push({
-            note,
-            error: e.toString(),
-          });
+          const errorMessage:string = e.toString();
+          const failure:ImportLinkAsNoteFailure = {
+            note: noteFromUser,
+            error: errorMessage,
+          };
+          failures.push(failure);
         }
       });
 
