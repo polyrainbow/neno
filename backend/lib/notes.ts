@@ -151,7 +151,7 @@ const get = (noteId: NoteId, userId: UserId):NoteToTransmit => {
     return null;
   }
 
-  let noteToTransmit = {
+  let noteToTransmit:NoteToTransmit = {
     id: noteFromDB.id,
     editorData: noteFromDB.editorData,
     title: getNoteTitle(noteFromDB),
