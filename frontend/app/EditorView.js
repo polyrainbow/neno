@@ -22,7 +22,7 @@ const EditorView = ({
   const [noteListScrollTop, setNoteListScrollTop] = useState(0);
   const [isBusy, setIsBusy] = useState(true);
   const [stats, setStats] = useState(null);
-  const [sortBy, setSortBy] = useState("CREATION_DATE_ASCENDING");
+  const [sortBy, setSortBy] = useState("CREATION_DATE_DESCENDING");
   const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
   const [isImportLinksDialogOpen, setIsImportLinksDialogOpen]
