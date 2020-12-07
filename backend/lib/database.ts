@@ -4,6 +4,10 @@ import mkdirp from "mkdirp";
 import { cloneObject } from "./utils.js";
 import Database from "../interfaces/Database.js";
 import * as url from "url";
+import { FileDescriptor } from "../interfaces/FileDescriptor.js";
+import { FileId } from "../interfaces/FileId.js";
+import { UserId } from "../interfaces/UserId.js";
+import { DatabaseId } from "../interfaces/DatabaseId.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
@@ -13,7 +17,7 @@ let UPLOAD_PATH = path.join(DATA_FOLDER, "uploads");
 const loadedDBs:Database[] = [];
 
 
-const readJSONFileInDataFolder = (filename) => {
+const readJSONFileInDataFolder = (filename:FileDescriptor) => {
   try {
     const json = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
     const object = JSON.parse(json);
@@ -25,7 +29,7 @@ const readJSONFileInDataFolder = (filename) => {
   }
 };
 
-const writeJSONFileInDataFolder = (filename, value) => {
+const writeJSONFileInDataFolder = (filename:FileDescriptor, value) => {
   fs.writeFileSync(
     path.join(DATA_FOLDER, filename),
     JSON.stringify(value),
@@ -46,7 +50,7 @@ const init = (config) => {
 };
 
 
-const get = (id):Database => {
+const get = (id: DatabaseId):Database => {
   const dbFromLoadedDBs:Database | undefined = loadedDBs.find(
     (db) => db.id === id,
   );
@@ -80,7 +84,7 @@ const get = (id):Database => {
 // flushChanges makes sure that the changes applied to the db object are
 // written to the disk and thus are persistent. it should always be called
 // after any operations on the db object have been performed.
-const flushChanges = (db:Database) => {
+const flushChanges = (db:Database):boolean => {
   db.timestamp = Date.now();
 
   const dbFromLoadedDBsIndex = loadedDBs.findIndex((loadedDB) => {
@@ -98,7 +102,7 @@ const flushChanges = (db:Database) => {
 };
 
 
-const forEach = (handler) => {
+const forEach = (handler:Function) => {
   return fs.readdirSync(DATA_FOLDER)
     .filter((filename) => {
       return filename.endsWith(DB_FILE_SUFFIX);
@@ -113,25 +117,27 @@ const forEach = (handler) => {
 };
 
 
-const addBlob = (name, sourcePath) => {
+const addBlob = (fileId:FileId, sourcePath:FileDescriptor):boolean => {
   mkdirp.sync(UPLOAD_PATH);
-  const newpath = path.join(UPLOAD_PATH, name);
+  const newpath = path.join(UPLOAD_PATH, fileId);
   fs.renameSync(sourcePath, newpath);
+  return true;
 };
 
 
-const deleteBlob = (name) => {
-  fs.unlinkSync(path.join(UPLOAD_PATH, name));
+const deleteBlob = (fileId:FileId):boolean => {
+  fs.unlinkSync(path.join(UPLOAD_PATH, fileId));
+  return true;
 };
 
 
-const getBlob = (name) => {
-  return path.join(UPLOAD_PATH, name);
+const getBlob = (fileId:FileId):FileDescriptor => {
+  return path.join(UPLOAD_PATH, fileId);
 };
 
 
-const getDBFile = (name) => {
-  return path.join(DATA_FOLDER, name + DB_FILE_SUFFIX);
+const getDBFile = (userId:UserId):FileDescriptor => {
+  return path.join(DATA_FOLDER, userId + DB_FILE_SUFFIX);
 };
 
 

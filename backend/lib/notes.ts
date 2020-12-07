@@ -25,6 +25,10 @@ import NoteListItemFeatures from "../interfaces/NoteListItemFeatures.js";
 import Stats from "../interfaces/Stats.js";
 import LinkedNote from "../interfaces/LinkedNote.js";
 import UserNoteChange from "../interfaces/UserNoteChange.js";
+import GraphFromUser from "../interfaces/GraphFromUser.js";
+import GraphNodePositionUpdate from "../interfaces/GraphNodePositionUpdate.js";
+import { FileId } from "../interfaces/FileId.js";
+import { FileDescriptor } from "../interfaces/FileDescriptor.js";
 
 /**
   PRIVATE
@@ -290,9 +294,9 @@ const getStats = (userId:UserId):Stats => {
 };
 
 
-const setGraph = (graphFromUser:Graph, userId:UserId):boolean => {
-  const db = DB.get(userId);
-  graphFromUser.nodes.forEach((node) => {
+const setGraph = (graphFromUser:GraphFromUser, userId:UserId):boolean => {
+  const db:Database = DB.get(userId);
+  graphFromUser.nodes.forEach((node:GraphNodePositionUpdate):void => {
     updateNotePosition(db, node.id, node.x, node.y);
   });
   db.links = graphFromUser.links;
@@ -388,7 +392,7 @@ const importDB = (db, userId) => {
 };
 
 
-const getFilesForDBExport = (userId) => {
+const getFilesForDBExport = (userId:UserId):FileDescriptor[] => {
   const jsonFile = DB.getDBFile(userId);
   const db = DB.get(userId);
   const uploadedFiles = db.notes
@@ -400,14 +404,14 @@ const getFilesForDBExport = (userId) => {
 };
 
 
-const addFile = (sourcePath, fileType) => {
-  const newFilename = uuidv4() + "." + fileType.ending;
-  DB.addBlob(newFilename, sourcePath);
-  return newFilename;
+const addFile = (sourcePath:FileDescriptor, fileType):FileId => {
+  const fileId:FileId = uuidv4() + "." + fileType.ending;
+  DB.addBlob(fileId, sourcePath);
+  return fileId;
 };
 
 
-const getFile = (fileId) => {
+const getFile = (fileId:FileId):FileDescriptor => {
   return DB.getBlob(fileId);
 };
 
