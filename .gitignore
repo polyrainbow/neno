@@ -108,3 +108,5 @@ dist
 
 # webpack bundle analysis
 stats.json
+
+.DS_Store

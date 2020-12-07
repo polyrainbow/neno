@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import NotesListStatus from "./NotesListStatus.js";
 import NoteListItem from "./NoteListItem.js";
+import Pagination from "./Pagination.js";
 
 
 const NotesList = ({
@@ -16,6 +17,9 @@ const NotesList = ({
   sortBy,
 }) => {
   const containerRef = useRef(null);
+  const [activePage, setActivePage] = useState(1);
+
+  const searchResultsPerPage = 100;
 
   let status = "DEFAULT";
 
@@ -66,11 +70,21 @@ const NotesList = ({
     />;
   }
 
+  const startNote = activePage * searchResultsPerPage - 100;
+  const endNote = startNote + searchResultsPerPage - 1;
+  const firstNoteExcluded = endNote + 1;
+
   return <section ref={containerRef} id="list">
+    <Pagination
+      numberOfResults={notes.length}
+      activePage={activePage}
+      searchResultsPerPage={searchResultsPerPage}
+      onChange={(newPage) => setActivePage(newPage)}
+    />
     <table id="list-table">
       <tbody>
         {
-          notes.map((note, i) => {
+          notes.slice(startNote, firstNoteExcluded).map((note, i) => {
             const isActive
               = (!activeNote.isUnsaved) && (note.id === activeNote.id);
             const isLinked
@@ -82,7 +96,7 @@ const NotesList = ({
 
             return <NoteListItem
               note={note}
-              index={i + 1}
+              index={startNote + 1 + i}
               showLinksIndicator={true}
               isActive={isActive}
               isLinked={isLinked}
