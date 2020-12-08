@@ -59,13 +59,11 @@
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
     "visualize-bundles": "npx webpack --config frontend/webpack.production.js --profile --json > stats.json && npx webpack-bundle-analyzer stats.json frontend/assets",
-
     "compile-typescript": "npx tsc && node renameTypescriptOutputFiles.mjs",
     "start-server": "node dist/index.mjs port=8080",
     "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
     "build-frontend-development": "npx webpack --config frontend/webpack.development.js",
     "start-dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
-  
     "start": "npm run compile-typescript && npm run build-frontend-production && npm run start-server",
     "dev": "concurrently --kill-others \"npm run compile-typescript && npm run start-server\" \"npm run build-frontend-development\""
   },

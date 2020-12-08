@@ -20,6 +20,7 @@ const EditorView = ({
   const currentRequestId = useRef(null);
   const [displayedNotes, setDisplayedNotes] = useState([]);
   const [noteListScrollTop, setNoteListScrollTop] = useState(0);
+  const [page, setPage] = useState(1);
   const [isBusy, setIsBusy] = useState(true);
   const [stats, setStats] = useState(null);
   const [sortBy, setSortBy] = useState("CREATION_DATE_DESCENDING");
@@ -56,6 +57,7 @@ const EditorView = ({
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
     setNoteListScrollTop(0);
+    setPage(1);
   };
 
   const handleLinkAddition = async (note) => {
@@ -303,6 +305,7 @@ const EditorView = ({
           setSortBy={(sortBy) => {
             setNoteListScrollTop(0);
             setSortBy(sortBy);
+            setPage(1);
           }}
         />
         <NotesList
@@ -316,6 +319,8 @@ const EditorView = ({
           scrollTop={noteListScrollTop}
           setScrollTop={setNoteListScrollTop}
           sortBy={sortBy}
+          page={page}
+          setPage={setPage}
         />
       </div>
       <div id="right-view">

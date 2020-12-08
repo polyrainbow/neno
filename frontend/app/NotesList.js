@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import NotesListStatus from "./NotesListStatus.js";
 import NoteListItem from "./NoteListItem.js";
 import Pagination from "./Pagination.js";
@@ -15,9 +15,10 @@ const NotesList = ({
   scrollTop,
   setScrollTop,
   sortBy,
+  page,
+  setPage,
 }) => {
   const containerRef = useRef(null);
-  const [activePage, setActivePage] = useState(1);
 
   const searchResultsPerPage = 100;
 
@@ -70,16 +71,16 @@ const NotesList = ({
     />;
   }
 
-  const startNote = activePage * searchResultsPerPage - 100;
+  const startNote = page * searchResultsPerPage - 100;
   const endNote = startNote + searchResultsPerPage - 1;
   const firstNoteExcluded = endNote + 1;
 
   return <section ref={containerRef} id="list">
     <Pagination
       numberOfResults={notes.length}
-      activePage={activePage}
+      page={page}
       searchResultsPerPage={searchResultsPerPage}
-      onChange={(newPage) => setActivePage(newPage)}
+      onChange={(newPage) => setPage(newPage)}
     />
     <table id="list-table">
       <tbody>
