@@ -83,7 +83,7 @@ const Pagination = (props) => {
                   }}
                   {...item}
                 >
-                  {type === "previous" ? "< Previous page" : "Next page >"}
+                  {type === "previous" ? "< Previous" : "Next >"}
                 </button>
               );
             }
