@@ -23,7 +23,7 @@
     --background-color: black;
     --font-color: white;
     --link-color: rgb(122, 146, 255);
-    --header-background-color: rgb(0, 84, 136);
+    --header-background-color: black;
     --subheader-1-background-color: rgb(110, 69, 75);
     --subheader-2-background-color: rgb(153, 97, 12);
     --table-row-background-color-odd: black;
@@ -35,6 +35,10 @@
     --button-border-color: white;
     --separator-color: white;
     --button-background-color-active: rgb(70, 139, 0);
+  }
+
+  button img {
+    filter: invert(1);
   }
 }
 

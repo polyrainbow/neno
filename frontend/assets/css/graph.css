@@ -1,3 +1,28 @@
+@media (prefers-color-scheme: light) {
+  :root {
+    --graph-background-color: rgb(248, 248, 248);
+    --node-stroke-color: #333;
+    --node-fill-color: #F6FBFF;
+    --hub-color: rgb(90, 156, 255);
+    --new-node-color: rgb(28, 255, 115);
+    --node-text-color: black;
+    --link-stroke-color: #333;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --graph-background-color: black;
+    --node-stroke-color: rgb(255, 255, 255);
+    --node-fill-color: #555555;
+    --hub-color: #0043ff;
+    --new-node-color: #00a23e;
+    --node-text-color: white;
+    --link-stroke-color: #9e9e9e;
+  }
+}
+
+
 .main-graph {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -5,7 +30,7 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  background-color: rgb(248, 248, 248);
+  background-color: var(--graph-background-color);
 
   position: fixed;
   width: 100vw;
@@ -19,6 +44,7 @@
 
 .node text{
   pointer-events: none;
+  fill: var(--node-text-color);
 }
 
 marker{
@@ -26,8 +52,8 @@ marker{
 }
 
 g.node circle{
-  fill: #F6FBFF;
-  stroke: #333;
+  fill: var(--node-fill-color);
+  stroke: var(--node-stroke-color);
   stroke-width: 2px;
 }
 
@@ -36,11 +62,11 @@ g.node.unconnected circle{
 }
 
 g.node.hub circle{
-  fill: rgb(90, 156, 255);
+  fill: var(--hub-color);
 }
 
 g.node.new circle{
-  fill: rgb(28, 255, 115);
+  fill: var(--new-node-color);
 }
 
 g.node.connected-to-selected circle{
@@ -67,7 +93,7 @@ g.node-highlighter circle{
 
 path.link {
   fill: none;
-  stroke: #333;
+  stroke: var(--link-stroke-color);
   stroke-width: 6px;
   cursor: default;
 }
