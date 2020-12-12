@@ -27,6 +27,7 @@ const NotesListStatus = ({
       textAlign: "center",
       margin: "30px auto",
     }}
+    className="noteListStatus"
   >
     <img
       style={{

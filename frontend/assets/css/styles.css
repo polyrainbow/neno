@@ -24,8 +24,8 @@
     --font-color: white;
     --link-color: rgb(122, 146, 255);
     --header-background-color: black;
-    --subheader-1-background-color: rgb(110, 69, 75);
-    --subheader-2-background-color: rgb(153, 97, 12);
+    --subheader-1-background-color: #3d3d3d;
+    --subheader-2-background-color: #3b0101;
     --table-row-background-color-odd: black;
     --table-row-background-color-even: #3d3d3d;
     --table-row-background-color-hover: rgb(0, 139, 139);
@@ -37,7 +37,7 @@
     --button-background-color-active: rgb(70, 139, 0);
   }
 
-  button img {
+  button img, .noteListStatus img {
     filter: invert(1);
   }
 
