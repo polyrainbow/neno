@@ -13,12 +13,12 @@ const ImportLinksDialog = ({
   >
     <div
       style={{
-        "background": "white",
         "width": "400px",
         "display": "block",
         "padding": "20px",
         "margin": "auto",
       }}
+      className="import-link-dialog"
       onClick={(e) => e.stopPropagation()}
     >
       <h1>Import links as notes</h1>

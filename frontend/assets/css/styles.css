@@ -1,3 +1,7 @@
+:root {
+  --main-font: 'Open Sans', sans-serif;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     --background-color: white;
@@ -70,11 +74,11 @@ header,
 #list,
 #links,
 #stats {
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--main-font);
 }
 
 .tippy-popper{
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--main-font);
 }
 
 header {
@@ -91,7 +95,7 @@ header {
   top: 0;
   left: 0;
   z-index: 5;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--main-font);
 }
 
 header h1 {
@@ -271,8 +275,25 @@ tr:nth-child(even) {
   background-color: var(--table-row-background-color-linked);
 }
 
+
+.import-link-dialog {
+  background-color: var(--background-color);
+  color: var(--font-color);
+  border: 2px solid var(--font-color);
+  font-family: var(--main-font);
+}
+
+.import-link-dialog textarea {
+  background-color: var(--background-color);
+  color: var(--font-color);
+}
+
+.import-link-dialog h1 {
+  margin-top: 0px;
+}
+
 .dialog-box-button {
-  font-size: 16px;
+  font-size: 20px;
   margin-top: 5px;
   margin-right: 5px;
 }
