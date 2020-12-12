@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import NotesListStatus from "./NotesListStatus.js";
 import NoteListItem from "./NoteListItem.js";
 import Pagination from "./Pagination.js";
+import NoteSearchDisclaimer from "./NoteSearchDisclaimer.js";
 
 
 const NotesList = ({
@@ -17,6 +18,7 @@ const NotesList = ({
   sortBy,
   page,
   setPage,
+  stats,
 }) => {
   const containerRef = useRef(null);
 
@@ -81,6 +83,11 @@ const NotesList = ({
       page={page}
       searchResultsPerPage={searchResultsPerPage}
       onChange={(newPage) => setPage(newPage)}
+    />
+    <NoteSearchDisclaimer
+      searchValue={searchValue}
+      notes={notes}
+      stats={stats}
     />
     <table id="list-table">
       <tbody>

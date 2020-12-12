@@ -4,25 +4,9 @@ import SearchInput from "./SearchInput.js";
 const NoteListControls = ({
   value,
   onChange,
-  displayedNotes,
-  stats,
   sortBy,
   setSortBy,
 }) => {
-  let label = "";
-  if (displayedNotes) {
-    if (
-      typeof stats?.numberOfAllNotes === "number"
-      && (displayedNotes.length === stats.numberOfAllNotes)
-    ) {
-      label = "Showing all " + stats.numberOfAllNotes + " note(s)";
-    } else if (value.length > 2) {
-      label = displayedNotes.length + " note(s) found";
-    }
-  } else if (value.length > 0 && value.length < 3) {
-    label = "";
-  }
-
   return <section id="section-search-input">
     <div
       style={{
@@ -35,9 +19,6 @@ const NoteListControls = ({
         value={value}
         onChange={onChange}
       />
-      <span style={{
-        fontSize: "16px",
-      }}>{label}</span>
     </div>
     <div
       style={{

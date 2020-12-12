@@ -321,6 +321,7 @@ const EditorView = ({
           sortBy={sortBy}
           page={page}
           setPage={setPage}
+          stats={stats}
         />
       </div>
       <div id="right-view">
