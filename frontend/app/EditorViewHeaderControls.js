@@ -2,14 +2,14 @@ import React from "react";
 import * as API from "./lib/api.js";
 import IconButton from "./IconButton.js";
 
-const HeaderControls = ({
+const EditorViewHeaderControls = ({
   openImportLinksDialog,
   setActiveView,
 }) => {
   return <section id="header-controls">
     <IconButton
       id="button_graph"
-      title="Show graph"
+      title="Graph view"
       icon="account_tree"
       onClick={() => {
         setActiveView("GRAPH");
@@ -36,4 +36,4 @@ const HeaderControls = ({
   </section>;
 };
 
-export default HeaderControls;
+export default EditorViewHeaderControls;

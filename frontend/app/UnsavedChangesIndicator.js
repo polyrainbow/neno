@@ -19,7 +19,7 @@ const UnsavedChangesIndicator = ({
     position="bottom"
     trigger="mouseenter focus"
   >
-    <span title={title}>{symbol}</span>
+    <span>{symbol}</span>
   </Tooltip>;
 };
 

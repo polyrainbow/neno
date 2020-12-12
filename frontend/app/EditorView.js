@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import Header from "./Header.js";
+import EditorViewHeader from "./EditorViewHeader.js";
 import NoteControls from "./NoteControls.js";
 import NotesList from "./NotesList.js";
 import NoteListControls from "./NoteListControls.js";
@@ -289,7 +289,7 @@ const EditorView = ({
         />
         : null
     }
-    <Header
+    <EditorViewHeader
       stats={stats}
       openImportLinksDialog={() => setIsImportLinksDialogOpen(true)}
       setActiveView={setActiveView}

@@ -1,9 +1,9 @@
 import React from "react";
 import HeaderContainer from "./HeaderContainer";
-import HeaderControls from "./HeaderControls";
+import EditorViewHeaderControls from "./EditorViewHeaderControls";
 import AppStats from "./AppStats";
 
-const Header = ({
+const EditorViewHeader = ({
   stats,
   openImportLinksDialog,
   setActiveView,
@@ -13,7 +13,7 @@ const Header = ({
       leftContent={
         <>
           <h1 id="heading">NeNo</h1>
-          <HeaderControls
+          <EditorViewHeaderControls
             setActiveView={setActiveView}
             openImportLinksDialog={openImportLinksDialog}
           />
@@ -26,4 +26,4 @@ const Header = ({
   );
 };
 
-export default Header;
+export default EditorViewHeader;

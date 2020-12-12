@@ -90,8 +90,8 @@ const GraphView = ({
           <h1 id="heading">NeNo</h1>
 
           <IconButton
-            icon="home"
-            title="Home"
+            icon="create"
+            title="Editor View"
             onClick={() => {
               if (
                 (!unsavedChanges)
