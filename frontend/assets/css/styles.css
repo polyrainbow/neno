@@ -14,6 +14,7 @@
     --buton-background-color: rgb(239, 239, 239);
     --button-border-color: black;
     --separator-color: black;
+    --button-background-color-active: chartreuse;
   }
 }
 
@@ -33,6 +34,7 @@
     --buton-background-color: rgb(59, 59, 59);
     --button-border-color: white;
     --separator-color: white;
+    --button-background-color-active: rgb(70, 139, 0);
   }
 }
 
@@ -176,6 +178,7 @@ button {
   border: 2px solid var(--button-border-color);
   cursor: pointer;
   background-color: var(--buton-background-color);
+  color: var(--font-color);
 }
 
 button[disabled]{
@@ -183,6 +186,17 @@ button[disabled]{
   fill: grey;
   cursor: inherit;
   border: 2px solid rgb(100, 100, 100);
+}
+
+.pagination-button {
+  margin: 10px 5px;
+  padding: 5px 15px;
+  font-size: 22px;
+}
+
+.pagination-button.selected {
+  background-color: var(--button-background-color-active);
+  font-weight: bold;
 }
 
 table {

@@ -60,13 +60,9 @@ const Pagination = (props) => {
               children = (
                 <button
                   type="button"
-                  style={{
-                    fontWeight: selected ? "bold" : "",
-                    backgroundColor: selected ? "chartreuse" : "",
-                    margin: "10px 5px",
-                    padding: "5px 15px",
-                    fontSize: "22px",
-                  }}
+                  className={
+                    "pagination-button" + (selected ? " selected" : "")
+                  }
                   {...item}
                 >
                   {page}
@@ -76,11 +72,7 @@ const Pagination = (props) => {
               children = (
                 <button
                   type="button"
-                  style={{
-                    margin: "10px 5px",
-                    padding: "5px 15px",
-                    fontSize: "22px",
-                  }}
+                  className="pagination-button"
                   {...item}
                 >
                   {type === "previous" ? "< Previous" : "Next >"}
