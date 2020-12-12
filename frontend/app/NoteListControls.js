@@ -31,7 +31,7 @@ const NoteListControls = ({
       }}
     >
       <SearchInput
-        label="Search notes"
+        placeholder="Search notes..."
         value={value}
         onChange={onChange}
       />

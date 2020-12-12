@@ -5,14 +5,19 @@ const SearchInput = ({
   value,
   onChange,
   label,
+  placeholder,
 }) => {
   return <>
-    <label
-      htmlFor="search-input"
-      style={{
-        marginRight: "5px",
-      }}
-    >{label}</label>
+    {
+      label
+        ? <label
+          htmlFor="search-input"
+          style={{
+            marginRight: "5px",
+          }}
+        >{label}</label>
+        : null
+    }
     <input
       style={{
         "border": "none",
@@ -20,7 +25,7 @@ const SearchInput = ({
       }}
       id="search-input"
       type="text"
-      placeholder="Search..."
+      placeholder={placeholder}
       value={value}
       onChange={(e) => {onChange(e.target.value);}}
       onKeyDown={(e) => {

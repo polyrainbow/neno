@@ -129,7 +129,7 @@ const GraphView = ({
       rightContent={
         <>
           <SearchInput
-            label="Search"
+            placeholder="Search..."
             value={searchValue}
             onChange={(value) => setSearchValue(value)}
           />
