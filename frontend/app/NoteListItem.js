@@ -49,6 +49,9 @@ const NoteListItem = ({
             textAlign: "right",
           }}
         >
+          {note.features.containsText ? "✏️" : ""}
+          {note.features.containsWeblink ? "🌍" : ""}
+          {note.features.containsCode ? "🤖" : ""}
           {note.features.containsImages ? "🖼️" : ""}
           {note.features.containsAttachements ? "📎" : ""}
         </td>

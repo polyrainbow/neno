@@ -174,6 +174,32 @@ const createNoteToTransmit = (
 }
 
 
+const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
+  let containsText = false;
+  let containsWeblink = false;
+  let containsCode = false;
+  let containsImages = false;
+  let containsAttachements = false;
+
+  note.editorData.blocks.forEach((block) => {
+    if (block.type === "paragraph") containsText = true;
+    if (block.type === "linkTool") containsWeblink = true;
+    if (block.type === "code") containsCode = true;
+    if (block.type === "image") containsImages = true;
+    if (block.type === "attaches") containsAttachements = true;
+  });
+
+  const features:NoteListItemFeatures = {
+    containsText,
+    containsWeblink,
+    containsCode,
+    containsImages,
+    containsAttachements,
+  };
+
+  return features;
+};
+
 /**
   EXPORTS
 **/
@@ -229,19 +255,12 @@ const getNotesList = (userId: UserId, options): NoteListItem[] => {
 
   const items:NoteListItem[] = filteredNotes
     .map((note:DatabaseNote):NoteListItem => {
-      const features:NoteListItemFeatures = {
-        containsImages:
-          note.editorData.blocks.some((block) => block.type === "image"),
-        containsAttachements:
-          note.editorData.blocks.some((block) => block.type === "attaches"),
-      };
-
       const noteListItem:NoteListItem = {
         id: note.id,
         title: getNoteTitle(note),
         creationTime: note.creationTime,
         updateTime: note.updateTime,
-        features: features,
+        features: getNoteFeatures(note),
         numberOfLinkedNotes: getLinkedNotes(db, note.id).length,
       };
 
