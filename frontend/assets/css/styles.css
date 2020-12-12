@@ -1,7 +1,56 @@
+@media (prefers-color-scheme: light) {
+  :root {
+    --background-color: white;
+    --font-color: black;
+    --link-color: rgb(0, 40, 216);
+    --header-background-color: lightskyblue;
+    --subheader-1-background-color: lightpink;
+    --subheader-2-background-color: blanchedalmond;
+    --table-row-background-color-odd: white;
+    --table-row-background-color-even: #f2f2f2;
+    --table-row-background-color-hover: aqua;
+    --table-row-background-color-active: chartreuse;
+    --table-row-background-color-linked: yellow;
+    --buton-background-color: rgb(239, 239, 239);
+    --button-border-color: black;
+    --separator-color: black;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: black;
+    --font-color: white;
+    --link-color: rgb(122, 146, 255);
+    --header-background-color: rgb(0, 84, 136);
+    --subheader-1-background-color: rgb(110, 69, 75);
+    --subheader-2-background-color: rgb(153, 97, 12);
+    --table-row-background-color-odd: black;
+    --table-row-background-color-even: #3d3d3d;
+    --table-row-background-color-hover: rgb(0, 139, 139);
+    --table-row-background-color-active: rgb(70, 139, 0);
+    --table-row-background-color-linked: rgb(167, 167, 0);
+    --buton-background-color: rgb(59, 59, 59);
+    --button-border-color: white;
+    --separator-color: white;
+  }
+}
+
 body, #app {
   margin: 0;
   margin: 0;
   padding: 0;
+  background-color: var(--background-color);
+  color: var(--font-color);
+}
+
+input, select {
+  background: var(--background-color);
+  color: var(--font-color)
+}
+
+a {
+  color: var(--link-color);
 }
 
 header,
@@ -18,7 +67,7 @@ header,
 }
 
 header {
-  background: lightskyblue;
+  background: var(--header-background-color);
   margin: 0;
   padding: 0px 10px;
   display: flex;
@@ -87,11 +136,11 @@ main {
 }
 
 #section-search-input{
-  background-color: lightpink;
+  background-color: var(--subheader-1-background-color);
 }
 
 #note-controls {
-  background-color: blanchedalmond;
+  background-color: var(--subheader-2-background-color);
   user-select: none;
 }
 
@@ -124,8 +173,9 @@ main {
 
 button {
   border-radius: 0;
-  border: 2px solid black;
+  border: 2px solid var(--button-border-color);
   cursor: pointer;
+  background-color: var(--buton-background-color);
 }
 
 button[disabled]{
@@ -178,20 +228,24 @@ th, td {
 }
 
 .note-list-item:hover, .note-list-item:nth-child(even):hover {
-  background-color: aqua;
+  background-color: var(--table-row-background-color-hover);
+}
+
+tr:nth-child(odd) {
+  background-color: var(--table-row-background-color-odd);
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: var(--table-row-background-color-even);
 }
 
 .note-list-item[class*="active"]{
   font-weight: bold;
-  background-color: chartreuse;
+  background-color: var(--table-row-background-color-active);
 }
 
 .note-list-item[class*="linked"]{
-  background-color: yellow;
+  background-color: var(--table-row-background-color-linked);
 }
 
 .dialog-box-button {
@@ -284,7 +338,7 @@ tr:nth-child(even) {
   }
 
   #note{
-    border-bottom: 15px solid black;
+    border-bottom: 15px solid var(--separator-color);
     padding: 0px 10px;
   }
 }
@@ -323,7 +377,7 @@ tr:nth-child(even) {
   }
 
   #note{
-    border-bottom: 15px solid black;
+    border-bottom: 15px solid var(--separator-color);
     padding: 0;
   }
 
@@ -336,3 +390,4 @@ tr:nth-child(even) {
     padding: 0px 10px;
   }
 }
+
