@@ -40,6 +40,15 @@ const Note = ({
     <div id="editor"></div>
     <div id="links">
       <h2>Links</h2>
+      {
+        displayedLinkedNotes.length === 0
+          ? <p
+            style={{
+              "marginLeft": "10px",
+            }}
+          >This note has no links yet.</p>
+          : null
+      }
       <table id="links-table">
         <tbody>
           {
