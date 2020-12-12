@@ -20,7 +20,6 @@ const SearchInput = ({
     }
     <input
       style={{
-        "border": "none",
         "fontSize": "24px",
       }}
       id="search-input"
