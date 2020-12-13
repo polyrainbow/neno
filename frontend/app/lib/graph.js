@@ -29,77 +29,80 @@ const GraphCreator = function(svg, graphObject, onHighlight, onChange) {
 
 
   thisGraph.svg = svg;
-  thisGraph.svgG = svg.append("g")
+  thisGraph.mainSVGGroup = svg.append("g")
     .classed(thisGraph.consts.graphClass, true);
-  const svgG = thisGraph.svgG;
+  const mainSVGGroup = thisGraph.mainSVGGroup;
 
   // displayed when dragging between nodes
-  thisGraph.newLinkLine = svgG.append("svg:path")
+  thisGraph.newLinkLine = mainSVGGroup.append("svg:path")
     .attr("class", "link newLinkLine hidden")
     .attr("d", "M0,0L0,0");
 
-  thisGraph.nodeHighlighterContainer = svgG.append("g")
+  thisGraph.nodeHighlighterContainer = mainSVGGroup.append("g")
     .classed("note-highlighters", true);
 
   // svg nodes and links
-  thisGraph.linksContainer = svgG.append("g")
+  thisGraph.linksContainer = mainSVGGroup.append("g")
     .classed("links", true);
 
-  thisGraph.nodesContainer = svgG.append("g")
+  thisGraph.nodesContainer = mainSVGGroup.append("g")
     .classed("notes", true);
 
+  // drag single nodes, but not, if shift key is pressed
   thisGraph.drag = d3.drag()
     .subject(function(d) {
       return { x: d.x, y: d.y };
     })
     .filter(() => {
-      return (!d3.event.shiftKey) && (!d3.event.ctrlKey);
+      return (!thisGraph.shiftKeyIsPressed) && (!thisGraph.ctrlKeyIsPressed);
     })
-    .on("drag", function(args) {
+    .on("drag", function(e, args) {
       thisGraph.state.justDragged = true;
-      thisGraph.dragmove(args);
+      thisGraph.dragmove(e, args);
     })
-    .on("end", function(d) {
+    .on("end", function(e, d) {
+      if (e.shiftKey) return;
+
       thisGraph.replaceSelectNode(d3.select(this), d);
     });
 
   // listen for key events
   d3.select(window)
-    .on("keydown", function() {
-      thisGraph.svgKeyDown();
+    .on("keydown", function(e) {
+      thisGraph.svgKeyDown(e);
     })
-    .on("keyup", function() {
-      thisGraph.svgKeyUp();
+    .on("keyup", function(e) {
+      thisGraph.svgKeyUp(e);
     });
-  svg.on("mousedown", function(d) {
+  svg.on("mousedown", function(e, d) {
     thisGraph.svgMouseDown(d);
   });
-  svg.on("mouseup", function(d) {
+  svg.on("mouseup", function(e, d) {
     thisGraph.svgMouseUp(d);
   });
-  svg.on("mousemove", function() {
-    thisGraph.newPathMove(thisGraph.state.mouseDownNode);
+  svg.on("mousemove", function(e) {
+    thisGraph.newPathMove(e, thisGraph.state.mouseDownNode);
   });
 
   // listen for dragging
   const zoom = d3.zoom();
 
-  zoom.on("zoom", function() {
-    if (d3.event.shiftKey) {
+  zoom.on("zoom", function(e) {
+    if (e.shiftKey) {
       // TODO  the internal d3 state is still changing
       return false;
     } else {
-      thisGraph.zoomed();
+      thisGraph.zoomed(e);
     }
     return true;
   });
 
-  zoom.on("start", function() {
+  zoom.on("start", function(e) {
     const ael = d3.select("#" + thisGraph.consts.activeEditId).node();
     if (ael) {
       ael.blur();
     }
-    if (!d3.event.shiftKey) {
+    if (!e.shiftKey) {
       d3.select("body").style("cursor", "move");
     }
   });
@@ -198,25 +201,29 @@ GraphCreator.prototype.consts = {
 };
 
 /* PROTOTYPE FUNCTIONS */
-GraphCreator.prototype.newPathMove = function(originNode) {
+GraphCreator.prototype.newPathMove = function(e, originNode) {
   const thisGraph = this;
   if (!thisGraph.state.shiftDragInProgress) {
     return;
   }
 
+  const newLinkEnd = {
+    x: d3.pointer(e, thisGraph.mainSVGGroup.node())[0] - 1,
+    y: d3.pointer(e, thisGraph.mainSVGGroup.node())[1] - 1,
+  };
+
   thisGraph.newLinkLine.attr(
     "d",
     "M" + originNode.x + "," + originNode.y
-    + "L" + (d3.mouse(thisGraph.svgG.node())[0] - 1) + ","
-    + (d3.mouse(this.svgG.node())[1] - 1),
+    + "L" + newLinkEnd.x + "," + newLinkEnd.y,
   );
 };
 
 
-GraphCreator.prototype.dragmove = function(d) {
+GraphCreator.prototype.dragmove = function(e, d) {
   const thisGraph = this;
-  d.x += d3.event.dx;
-  d.y += d3.event.dy;
+  d.x += e.dx;
+  d.y += e.dy;
   thisGraph.updateGraph();
 };
 
@@ -306,10 +313,10 @@ GraphCreator.prototype.removeSelectFromEdge = function() {
   thisGraph.state.selectedEdge = null;
 };
 
-GraphCreator.prototype.pathMouseDown = function(d3path, d) {
+GraphCreator.prototype.pathMouseDown = function(e, d3path, d) {
   const thisGraph = this;
   const state = thisGraph.state;
-  d3.event.stopPropagation();
+  e.stopPropagation();
   state.mouseDownLink = d;
 
   if (state.selectedNode) {
@@ -325,13 +332,13 @@ GraphCreator.prototype.pathMouseDown = function(d3path, d) {
 };
 
 // mousedown on node
-GraphCreator.prototype.handleMouseDownOnNode = function(d3node, d) {
+GraphCreator.prototype.handleMouseDownOnNode = function(e, d3node, d) {
   const thisGraph = this;
   const state = thisGraph.state;
-  d3.event.stopPropagation();
+  e.stopPropagation();
   state.mouseDownNode = d;
-  if (d3.event.shiftKey) {
-    state.shiftDragInProgress = d3.event.shiftKey;
+  if (e.shiftKey) {
+    state.shiftDragInProgress = e.shiftKey;
     // reposition dragged directed edge
     thisGraph.newLinkLine
       .classed("hidden", false)
@@ -356,7 +363,6 @@ GraphCreator.prototype.handleMouseUpOnNode = function(d3node, d) {
   thisGraph.newLinkLine.classed("hidden", true);
 
   if (mouseDownNode !== d) {
-    console.log("creating edge");
     // we're in a different node:
     // create new edge for mousedown edge and add to graph
     const newEdge = { source: mouseDownNode, target: d };
@@ -422,23 +428,32 @@ GraphCreator.prototype.svgMouseUp = function() {
 };
 
 // keydown on main svg
-GraphCreator.prototype.svgKeyDown = function() {
+GraphCreator.prototype.svgKeyDown = function(e) {
   const thisGraph = this;
   const state = thisGraph.state;
   const consts = thisGraph.consts;
+
+  if (e.shiftKey) {
+    thisGraph.shiftKeyIsPressed = true;
+  }
+
+  if (e.ctrlKey) {
+    thisGraph.ctrlKeyIsPressed = true;
+  }
+
   // make sure repeated key presses don't register for each keydown
   if (state.lastKeyDown !== -1) return;
 
-  state.lastKeyDown = d3.event.keyCode;
+  state.lastKeyDown = e.keyCode;
   const selectedNode = state.selectedNode;
   const selectedEdge = state.selectedEdge;
 
-  switch (d3.event.keyCode) {
+  switch (e.keyCode) {
   case consts.BACKSPACE_KEY:
   case consts.DELETE_KEY:
     // we cannot prevent default because then we cannot delete values from
     // search input
-    // d3.event.preventDefault();
+    // e.preventDefault();
     if (selectedNode) {
       // right now, we don't support deleting nodes from the graph view
 
@@ -458,7 +473,11 @@ GraphCreator.prototype.svgKeyDown = function() {
   }
 };
 
-GraphCreator.prototype.svgKeyUp = function() {
+GraphCreator.prototype.svgKeyUp = function(e) {
+  const thisGraph = this;
+  thisGraph.shiftKeyIsPressed = e.shiftKey;
+  thisGraph.ctrlKeyIsPressed = e.ctrlKey;
+
   this.state.lastKeyDown = -1;
 };
 
@@ -551,14 +570,14 @@ GraphCreator.prototype.updateGraph = function(newSearchValue) {
       return "M" + d.source.x + "," + d.source.y
       + "L" + d.target.x + "," + d.target.y;
     })
-    .on("mouseover", function(d) {
+    .on("mouseover", function(e, d) {
       thisGraph.onHighlight(true, d.source.title + " - " + d.target.title);
     })
     .on("mouseout", function() {
       thisGraph.onHighlight(false);
     })
-    .on("mousedown", function(d) {
-      thisGraph.pathMouseDown(d3.select(this), d);
+    .on("mousedown", function(e, d) {
+      thisGraph.pathMouseDown(e, d3.select(this), d);
     })
     .on("mouseup", function() {
       state.mouseDownLink = null;
@@ -612,7 +631,7 @@ GraphCreator.prototype.updateGraph = function(newSearchValue) {
       "transform",
       function(d) {return "translate(" + d.x + "," + d.y + ")";},
     )
-    .on("mouseover", function(d) {
+    .on("mouseover", function(e, d) {
       if (state.shiftDragInProgress) {
         d3.select(this).classed(consts.connectClass, true);
       }
@@ -622,14 +641,14 @@ GraphCreator.prototype.updateGraph = function(newSearchValue) {
       d3.select(this).classed(consts.connectClass, false);
       thisGraph.onHighlight(false);
     })
-    .on("mousedown", function(d) {
-      thisGraph.handleMouseDownOnNode(d3.select(this), d);
+    .on("mousedown", function(e, d) {
+      thisGraph.handleMouseDownOnNode(e, d3.select(this), d);
     })
-    .on("mouseup", function(d) {
+    .on("mouseup", function(e, d) {
       thisGraph.handleMouseUpOnNode(d3.select(this), d);
     })
-    .on("click", function(d) {
-      if (d3.event.ctrlKey) {
+    .on("click", function(e, d) {
+      if (e.ctrlKey) {
         window.open("/?id=" + d.id, "_blank");
       }
     })
@@ -659,7 +678,7 @@ GraphCreator.prototype.updateGraph = function(newSearchValue) {
 };
 
 
-GraphCreator.prototype.zoomed = function() {
+GraphCreator.prototype.zoomed = function(e) {
   const thisGraph = this;
 
   this.state.justScaleTransGraph = true;
@@ -667,12 +686,12 @@ GraphCreator.prototype.zoomed = function() {
     .attr(
       "transform",
       "translate("
-      + d3.event.transform.x + "," + d3.event.transform.y + ") "
-      + "scale(" + d3.event.transform.k + ")",
+      + e.transform.x + "," + e.transform.y + ") "
+      + "scale(" + e.transform.k + ")",
     );
-  thisGraph.screenPosition.translateX = d3.event.transform.x;
-  thisGraph.screenPosition.translateY = d3.event.transform.y;
-  thisGraph.screenPosition.scale = d3.event.transform.k;
+  thisGraph.screenPosition.translateX = e.transform.x;
+  thisGraph.screenPosition.translateY = e.transform.y;
+  thisGraph.screenPosition.scale = e.transform.k;
 };
 
 
