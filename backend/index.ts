@@ -24,7 +24,6 @@ program
   );
 
 program.parse(process.argv);
-console.log(program);
 
 // passwords and usernames must not contain colons
 let users;
