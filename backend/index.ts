@@ -1,7 +1,6 @@
 import * as path from "path";
 import express from "express";
 import * as Notes from "./lib/notes.js";
-import urlMetadata from "url-metadata";
 import formidable from "formidable";
 import fs from "fs";
 import archiver from "archiver";
@@ -17,12 +16,13 @@ import NoteFromUser from "./interfaces/NoteFromUser.js";
 import Stats from "./interfaces/Stats.js";
 import * as Utils from "./lib/utils.js";
 import ImportLinkAsNoteFailure from "./interfaces/ImportLinkAsNoteFailure.js";
+import getUrlMetadata from "./lib/getUrlMetadata.js";
+import * as config from "./config.js";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const app = express();
 
-let PORT = 8080;
-const API_PATH = "/api";
+let PORT = config.DEFAULT_PORT;
 const REPO_PATH = path.join(__dirname, "..");
 let DATA_PATH = path.join(REPO_PATH, "..", "network-notes-data");
 if (process.env.DATA_FOLDER_PATH) {
@@ -37,37 +37,13 @@ if (fs.existsSync(usersFile)) {
   const json = fs.readFileSync(usersFile).toString();
   users = JSON.parse(json);
 } else {
-  const defaultUsers = [
-    { id: "admin", login: "admin", password: "0000" },
-  ];
-  console.log("No users file found. Creating one by myself...");
+  console.log(
+    "No users file found. Creating one by myself with default users...",
+  );
   mkdirp.sync(DATA_PATH);
-  fs.writeFileSync(usersFile, JSON.stringify(defaultUsers));
-  users = defaultUsers;
+  fs.writeFileSync(usersFile, JSON.stringify(config.DEFAULT_USERS));
+  users = config.DEFAULT_USERS;
 }
-
-const ALLOWED_IMAGE_UPLOAD_TYPES = [
-  {
-    mimeType: "image/png",
-    ending: "png",
-  },
-  {
-    mimeType: "image/jpeg",
-    ending: "jpg",
-  },
-  {
-    mimeType: "image/webp",
-    ending: "webp",
-  },
-];
-
-
-const ALLOWED_FILE_UPLOAD_TYPES = [
-  {
-    mimeType: "application/pdf",
-    ending: "pdf",
-  },
-];
 
 
 const customPortArgument = process.argv.find((arg) => {
@@ -111,12 +87,12 @@ app.use("/", express.static(path.join(REPO_PATH, "frontend")));
 app.use(express.json());
 app.use(compression());
 
-app.get(API_PATH, function(req, res) {
+app.get(config.API_PATH, function(req, res) {
   res.send("Hello World!");
 });
 
 
-app.get(API_PATH + "/database-with-uploads", function(req, res) {
+app.get(config.API_PATH + "/database-with-uploads", function(req, res) {
   const archive = archiver("zip");
 
   archive.on("error", function(err) {
@@ -145,13 +121,13 @@ app.get(API_PATH + "/database-with-uploads", function(req, res) {
 });
 
 
-app.get(API_PATH + "/database", function(req, res) {
+app.get(config.API_PATH + "/database", function(req, res) {
   const database = Notes.exportDB(req.userId);
   res.end(JSON.stringify(database));
 });
 
 
-app.put(API_PATH + "/database", function(req, res) {
+app.put(config.API_PATH + "/database", function(req, res) {
   try {
     const success = Notes.importDB(req.body, req.userId);
     res.end(JSON.stringify(
@@ -170,19 +146,19 @@ app.put(API_PATH + "/database", function(req, res) {
 });
 
 
-app.get(API_PATH + "/graph", function(req, res) {
+app.get(config.API_PATH + "/graph", function(req, res) {
   const graph = Notes.getGraph(req.userId);
   res.end(JSON.stringify(graph));
 });
 
 
-app.get(API_PATH + "/stats", function(req, res) {
+app.get(config.API_PATH + "/stats", function(req, res) {
   const stats:Stats = Notes.getStats(req.userId);
   res.end(JSON.stringify(stats));
 });
 
 
-app.post(API_PATH + "/graph", function(req, res) {
+app.post(config.API_PATH + "/graph", function(req, res) {
   const success = Notes.setGraph(req.body, req.userId);
 
   res.end(JSON.stringify({
@@ -191,7 +167,7 @@ app.post(API_PATH + "/graph", function(req, res) {
 });
 
 
-app.get(API_PATH + "/notes", function(req, res) {
+app.get(config.API_PATH + "/notes", function(req, res) {
   const query = req.query.q || "";
   const caseSensitiveQuery = req.query.caseSensitive === "true";
   const includeLinkedNotes = true;
@@ -211,14 +187,14 @@ app.get(API_PATH + "/notes", function(req, res) {
 });
 
 
-app.get(API_PATH + "/note/:noteId", function(req, res) {
+app.get(config.API_PATH + "/note/:noteId", function(req, res) {
   const noteId:NoteId = parseInt(req.params.noteId);
   const note:NoteToTransmit | null = Notes.get(noteId, req.userId);
   res.end(JSON.stringify(note));
 });
 
 
-app.put(API_PATH + "/note", function(req, res) {
+app.put(config.API_PATH + "/note", function(req, res) {
   const reqBody = req.body;
   try {
     const noteToTransmit:NoteToTransmit
@@ -237,7 +213,7 @@ app.put(API_PATH + "/note", function(req, res) {
 });
 
 
-app.put(API_PATH + "/import-links-as-notes", function(req, res) {
+app.put(config.API_PATH + "/import-links-as-notes", function(req, res) {
   const reqBody = req.body;
   const links:string[] = reqBody.links;
   const promises:Promise<UrlMetadataResponse>[]
@@ -318,7 +294,7 @@ app.put(API_PATH + "/import-links-as-notes", function(req, res) {
 });
 
 
-app.delete(API_PATH + "/note/:noteId", function(req, res) {
+app.delete(config.API_PATH + "/note/:noteId", function(req, res) {
   const success = Notes.remove(parseInt(req.params.noteId), req.userId);
   res.end(JSON.stringify({
     success,
@@ -331,26 +307,7 @@ app.listen(PORT, function() {
 });
 
 
-const getUrlMetadata = async (url:string):Promise<UrlMetadataResponse> => {
-  const metadata = await urlMetadata(url);
-
-  const response:UrlMetadataResponse = {
-    "success": 1,
-    "url": url,
-    "meta": {
-      "title": metadata.title,
-      "description": metadata.description,
-      "image": {
-        "url": metadata.image,
-      },
-    },
-  };
-
-  return response;
-};
-
-
-app.get(API_PATH + "/link-data", (req, res) => {
+app.get(config.API_PATH + "/link-data", (req, res) => {
   const url = req.query.url;
 
   getUrlMetadata(url)
@@ -367,7 +324,7 @@ app.get(API_PATH + "/link-data", (req, res) => {
 });
 
 
-app.post(API_PATH + "/image", function(req, res) {
+app.post(config.API_PATH + "/image", function(req, res) {
   const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -383,9 +340,11 @@ app.post(API_PATH + "/image", function(req, res) {
       return;
     }
 
-    const fileTypeObject = ALLOWED_IMAGE_UPLOAD_TYPES.find((filetype) => {
-      return filetype.mimeType === file.type;
-    });
+    const fileTypeObject = config.ALLOWED_IMAGE_UPLOAD_TYPES.find(
+      (filetype) => {
+        return filetype.mimeType === file.type;
+      },
+    );
 
     if (!fileTypeObject) {
       console.log("Invalid MIME type: " + file.type);
@@ -400,7 +359,7 @@ app.post(API_PATH + "/image", function(req, res) {
       {
         "success": 1,
         "file": {
-          "url": API_PATH + "/file/" + fileId,
+          "url": config.API_PATH + "/file/" + fileId,
           "fileId": fileId,
         },
       },
@@ -409,7 +368,7 @@ app.post(API_PATH + "/image", function(req, res) {
 });
 
 
-app.post(API_PATH + "/file", function(req, res) {
+app.post(config.API_PATH + "/file", function(req, res) {
   const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -425,7 +384,7 @@ app.post(API_PATH + "/file", function(req, res) {
       return;
     }
 
-    const fileTypeObject = ALLOWED_FILE_UPLOAD_TYPES.find((filetype) => {
+    const fileTypeObject = config.ALLOWED_FILE_UPLOAD_TYPES.find((filetype) => {
       return filetype.mimeType === file.type;
     });
 
@@ -442,7 +401,7 @@ app.post(API_PATH + "/file", function(req, res) {
       {
         "success": 1,
         "file": {
-          "url": API_PATH + "/file/" + fileId,
+          "url": config.API_PATH + "/file/" + fileId,
           "size": file.size,
           "name": file.name,
           "fileId": fileId,
@@ -453,7 +412,7 @@ app.post(API_PATH + "/file", function(req, res) {
 });
 
 
-app.get(API_PATH + "/file/:fileId", function(req, res) {
+app.get(config.API_PATH + "/file/:fileId", function(req, res) {
   const file = Notes.getFile(req.params.fileId);
   if (!fs.existsSync(file)) {
     res.end("ERROR: File does not exist!");
