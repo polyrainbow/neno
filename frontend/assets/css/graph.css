@@ -124,3 +124,7 @@ path.link.selected {
   stroke: rgb(195, 0, 255);
   stroke-width: 10px;
 }
+
+g.new-node-position-indicator rect {
+  fill: rgb(134, 228, 105);
+}

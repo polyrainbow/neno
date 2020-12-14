@@ -1,8 +1,7 @@
-import LinkedNote from "./LinkedNote";
+import NodePosition from "./NodePosition";
 import { NoteId } from "./NoteId";
 
 export default interface GraphNodePositionUpdate {
     id: NoteId,
-    x: number,
-    y: number,
+    position: NodePosition,
 };

@@ -1,6 +1,7 @@
 import { DatabaseId } from "./DatabaseId.js";
 import DatabaseNote from "./DatabaseNote.js";
 import { Link } from "./Link.js";
+import NodePosition from "./NodePosition.js";
 import ScreenPosition from "./ScreenPosition.js";
 
 export default interface Database {
@@ -10,4 +11,5 @@ export default interface Database {
     links: Link[],
     idCounter: number,
     screenPosition: ScreenPosition,
+    initialNodePosition: NodePosition,
 };

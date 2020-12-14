@@ -1,11 +1,11 @@
 import LinkedNote from "./LinkedNote";
+import NodePosition from "./NodePosition";
 import { NoteId } from "./NoteId";
 
 export default interface GraphNode {
     id: NoteId,
     title: string,
-    x: number,
-    y: number,
+    position: NodePosition,
     linkedNotes: LinkedNote[],
     creationTime: number,
 };

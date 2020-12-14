@@ -14,6 +14,7 @@ const Graph = function(svg, graphObject, onHighlight, onChange) {
   thisGraph.nodes = graphObject.nodes;
   thisGraph.links = graphObject.links;
   thisGraph.screenPosition = graphObject.screenPosition;
+  thisGraph.initialNodePosition = graphObject.initialNodePosition;
 
   thisGraph.state = {
     selectedNode: null,
@@ -32,6 +33,10 @@ const Graph = function(svg, graphObject, onHighlight, onChange) {
   thisGraph.mainSVGGroup = svg.append("g")
     .classed(thisGraph.consts.graphClass, true);
   const mainSVGGroup = thisGraph.mainSVGGroup;
+
+  thisGraph.initialNodePositionIndicator = mainSVGGroup.append("g")
+    .classed("new-node-position-indicator", true)
+    .append("rect");
 
   thisGraph.nodeHighlighterContainer = mainSVGGroup.append("g")
     .classed("note-highlighters", true);
@@ -53,7 +58,7 @@ const Graph = function(svg, graphObject, onHighlight, onChange) {
   // drag single nodes, but not, if shift key is pressed
   thisGraph.drag = d3.drag()
     .subject(function(d) {
-      return { x: d.x, y: d.y };
+      return { x: d.position.x, y: d.position.y };
     })
     .filter(() => {
       return (!thisGraph.shiftKeyIsPressed) && (!thisGraph.ctrlKeyIsPressed);
@@ -161,18 +166,18 @@ Graph.prototype.getSaveData = function() {
     ];
   });
 
-  const nodesToTransmit = thisGraph.nodes.map((node) => {
+  const nodePositionUpdates = thisGraph.nodes.map((node) => {
     return {
       id: node.id,
-      x: node.x,
-      y: node.y,
+      position: node.position,
     };
   });
 
   const graphObject = {
-    nodes: nodesToTransmit,
+    nodePositionUpdates,
     links: linksToTransmit,
     screenPosition: thisGraph.screenPosition,
+    initialNodePosition: thisGraph.initialNodePosition,
   };
 
   return graphObject;
@@ -216,7 +221,7 @@ Graph.prototype.newPathMove = function(e, originNode) {
 
   thisGraph.newLinkLine.attr(
     "d",
-    "M" + originNode.x + "," + originNode.y
+    "M" + originNode.position.x + "," + originNode.position.y
     + "L" + newLinkEnd.x + "," + newLinkEnd.y,
   );
 };
@@ -224,8 +229,8 @@ Graph.prototype.newPathMove = function(e, originNode) {
 
 Graph.prototype.dragmove = function(e, d) {
   const thisGraph = this;
-  d.x += e.dx;
-  d.y += e.dy;
+  d.position.x += e.dx;
+  d.position.y += e.dy;
   thisGraph.updateGraph();
 };
 
@@ -345,7 +350,11 @@ Graph.prototype.handleMouseDownOnNode = function(e, d3node, d) {
     // reposition dragged directed edge
     thisGraph.newLinkLine
       .classed("hidden", false)
-      .attr("d", "M" + d.x + "," + d.y + "L" + d.x + "," + d.y);
+      .attr(
+        "d",
+        "M" + d.position.x + "," + d.position.y
+        + "L" + d.position.x + "," + d.position.y,
+      );
   }
 };
 
@@ -494,6 +503,15 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     thisGraph.searchValue = newSearchValue;
   }
 
+  thisGraph.initialNodePositionIndicatorElement
+    = thisGraph.initialNodePositionIndicator
+      .attr("width", String(3 * consts.nodeRadius))
+      .attr("height", String(3 * consts.nodeRadius))
+      .attr("x", thisGraph.initialNodePosition.x)
+      .attr("y", thisGraph.initialNodePosition.y)
+      .attr("rx", 2)
+      .attr("ry", 2);
+
   /** ********************
     node highlighter circles
   ***********************/
@@ -514,7 +532,9 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     )
     .attr(
       "transform",
-      function(d) {return "translate(" + d.x + "," + d.y + ")";},
+      function(d) {
+        return "translate(" + d.position.x + "," + d.position.y + ")";
+      },
     );
 
   // add new node highlighters
@@ -525,7 +545,9 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     .append("g")
     .attr(
       "transform",
-      function(d) {return "translate(" + d.x + "," + d.y + ")";},
+      function(d) {
+        return "translate(" + d.position.x + "," + d.position.y + ")";
+      },
     )
     .classed("node-highlighter", true)
     .append("circle")
@@ -558,8 +580,8 @@ Graph.prototype.updateGraph = function(newSearchValue) {
       return d === state.selectedEdge;
     })
     .attr("d", function(d) {
-      return "M" + d.source.x + "," + d.source.y
-        + "L" + d.target.x + "," + d.target.y;
+      return "M" + d.source.position.x + "," + d.source.position.y
+        + "L" + d.target.position.x + "," + d.target.position.y;
     });
 
 
@@ -569,8 +591,8 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     .append("path")
     .classed("link", true)
     .attr("d", function(d) {
-      return "M" + d.source.x + "," + d.source.y
-      + "L" + d.target.x + "," + d.target.y;
+      return "M" + d.source.position.x + "," + d.source.position.y
+      + "L" + d.target.position.x + "," + d.target.position.y;
     })
     .on("mouseover", function(e, d) {
       thisGraph.onHighlight(true, d.source.title + " - " + d.target.title);
@@ -607,7 +629,9 @@ Graph.prototype.updateGraph = function(newSearchValue) {
   thisGraph.nodeElements
     .attr(
       "transform",
-      function(d) {return "translate(" + d.x + "," + d.y + ")";},
+      function(d) {
+        return "translate(" + d.position.x + "," + d.position.y + ")";
+      },
     )
     .classed("unconnected", function(d) {
       return !binaryArrayIncludes(thisGraph.connectedNodeIds, d.id);
@@ -630,7 +654,9 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     })
     .attr(
       "transform",
-      function(d) {return "translate(" + d.x + "," + d.y + ")";},
+      function(d) {
+        return "translate(" + d.position.x + "," + d.position.y + ")";
+      },
     )
     .on("mouseover", function(e, d) {
       if (state.shiftDragInProgress) {

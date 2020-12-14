@@ -124,6 +124,18 @@ const cleanUpData = () => {
               = url.substr(url.lastIndexOf("/") + 1);
           }
         });
+
+
+      // new NodePosition format
+      if (typeof note.x === "number") {
+        note.position = {
+          x: note.x,
+          y: note.y,
+        };
+
+        delete note.x;
+        delete note.y;
+      }
     });
   });
 };

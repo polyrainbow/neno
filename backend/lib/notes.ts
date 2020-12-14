@@ -29,6 +29,7 @@ import GraphFromUser from "../interfaces/GraphFromUser.js";
 import GraphNodePositionUpdate from "../interfaces/GraphNodePositionUpdate.js";
 import { FileId } from "../interfaces/FileId.js";
 import { FileDescriptor } from "../interfaces/FileDescriptor.js";
+import NodePosition from "../interfaces/NodePosition.js";
 
 /**
   PRIVATE
@@ -39,16 +40,13 @@ import { FileDescriptor } from "../interfaces/FileDescriptor.js";
 
 const updateNotePosition = (
   db:Database,
-  noteId: NoteId,
-  x: number,
-  y: number
+  nodePositionUpdate: GraphNodePositionUpdate,
 ): boolean => {
-  const note:DatabaseNote | null = findNote(db, noteId);
+  const note:DatabaseNote | null = findNote(db, nodePositionUpdate.id);
   if (note === null) {
     return false;
   }
-  note.x = x;
-  note.y = y;
+  note.position = nodePositionUpdate.position;
   return true;
 };
 
@@ -278,8 +276,7 @@ const getGraph = (userId: UserId):Graph => {
     const graphNode:GraphNode = {
       id: note.id,
       title: getNoteTitle(note),
-      x: note.x,
-      y: note.y,
+      position: note.position,
       linkedNotes: getLinkedNotes(db, note.id),
       creationTime: note.creationTime,
     };
@@ -290,6 +287,7 @@ const getGraph = (userId: UserId):Graph => {
     nodes: graphNodes,
     links: db.links,
     screenPosition: db.screenPosition,
+    initialNodePosition: db.initialNodePosition,
   }
 
   return graph;
@@ -315,9 +313,11 @@ const getStats = (userId:UserId):Stats => {
 
 const setGraph = (graphFromUser:GraphFromUser, userId:UserId):boolean => {
   const db:Database = DB.get(userId);
-  graphFromUser.nodes.forEach((node:GraphNodePositionUpdate):void => {
-    updateNotePosition(db, node.id, node.x, node.y);
-  });
+  graphFromUser.nodePositionUpdates.forEach(
+    (nodePositionUpdate:GraphNodePositionUpdate):void => {
+      updateNotePosition(db, nodePositionUpdate);
+    },
+  );
   db.links = graphFromUser.links;
   db.screenPosition = graphFromUser.screenPosition;
   DB.flushChanges(db);
@@ -356,8 +356,7 @@ const put = (
     const noteId:NoteId = getNewNoteId(db);
     databaseNote = {
       id: noteId,
-      x: 0,
-      y: 0,
+      position: db.initialNodePosition,
       editorData: noteFromUser.editorData,
       creationTime: Date.now(),
       updateTime: Date.now(),

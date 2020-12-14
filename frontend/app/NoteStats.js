@@ -92,11 +92,11 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>X coordinate</td>
-          <td>{note.x}</td>
+          <td>{note.position.x}</td>
         </tr>
         <tr>
           <td>Y coordinate</td>
-          <td>{note.y}</td>
+          <td>{note.position.y}</td>
         </tr>
       </tbody>
     </table>
