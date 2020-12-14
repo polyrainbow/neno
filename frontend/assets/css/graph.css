@@ -47,6 +47,11 @@
   fill: var(--node-text-color);
 }
 
+.node text tspan {
+  /* https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alignment-baseline */
+  alignment-baseline: middle;
+}
+
 marker{
   fill: #333;
 }
