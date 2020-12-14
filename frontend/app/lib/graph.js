@@ -6,7 +6,7 @@ import { binaryArrayIncludes } from "./utils.js";
 const Graph = function(svg, graphObject, onHighlight, onChange) {
   const thisGraph = this;
 
-  thisGraph.graphIsRendered = false;
+  thisGraph.graphHasBeenRenderedOnceBefore = false;
   thisGraph.searchValue = "";
   thisGraph.onHighlight = onHighlight;
   thisGraph.onChange = onChange;
@@ -227,7 +227,8 @@ Graph.prototype.dragmove = function(e, d) {
   thisGraph.updateGraph();
 };
 
-/* insert svg line breaks: taken from http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
+// insert svg line breaks: taken from
+// http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts
 Graph.prototype.insertTitleLinebreaks = function(gEl, title) {
   const words = (title && title.split(/\s+/g)) || "";
   const nwords = words.length;
@@ -491,13 +492,17 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     thisGraph.searchValue = newSearchValue;
   }
 
-  // node highlighters
-  // create node selection
+  /** ********************
+    node highlighter circles
+  ***********************/
+
+  // create selection
   thisGraph.nodeHighlighterElements = thisGraph.nodeHighlighterContainer
     .selectAll("g.node-highlighter");
   // append new node data
   thisGraph.nodeHighlighterElements = thisGraph.nodeHighlighterElements
     .data(
+      // append only the nodes that are search hits
       thisGraph.nodes.filter((node) => {
         if (typeof thisGraph.searchValue !== "string") return false;
         if (thisGraph.searchValue.length < 3) return false;
@@ -514,25 +519,24 @@ Graph.prototype.updateGraph = function(newSearchValue) {
   const nodeHighlighterEnter = thisGraph.nodeHighlighterElements
     .enter();
 
-  const newHighlighterNode = nodeHighlighterEnter
+  nodeHighlighterEnter
     .append("g")
     .attr(
       "transform",
       function(d) {return "translate(" + d.x + "," + d.y + ")";},
-    );
-
-  newHighlighterNode
-    .classed("node-highlighter", true);
-
-  newHighlighterNode
+    )
+    .classed("node-highlighter", true)
     .append("circle")
     .attr("r", "320");
 
-  // remove old links
+  // remove old node highlighters
   const nodeHighlighterExitSelection
     = thisGraph.nodeHighlighterElements.exit();
   nodeHighlighterExitSelection.remove();
 
+  /** ********************
+    links
+  ***********************/
 
   // create link selection
   thisGraph.linkElements = thisGraph.linksContainer.selectAll("path.link");
@@ -557,14 +561,10 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     });
 
 
-  // add new linkElements
-  const linkEnter = thisGraph.linkElements
-    .enter();
-
-  const newLink = linkEnter
-    .append("path");
-
-  newLink
+  // add new links
+  thisGraph.linkElements
+    .enter()
+    .append("path")
     .classed("link", true)
     .attr("d", function(d) {
       return "M" + d.source.x + "," + d.source.y
@@ -587,6 +587,9 @@ Graph.prototype.updateGraph = function(newSearchValue) {
   const linkExitSelection = thisGraph.linkElements.exit();
   linkExitSelection.remove();
 
+  /** ********************
+    nodes
+  ***********************/
 
   // create node selection
   thisGraph.nodeElements = thisGraph.nodesContainer.selectAll("g.node");
@@ -609,13 +612,9 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     });
 
   // add new nodes
-  const nodeEnter = thisGraph.nodeElements
-    .enter();
-
-  const newNode = nodeEnter
-    .append("g");
-
-  newNode
+  const nodeG = thisGraph.nodeElements
+    .enter()
+    .append("g")
     .classed(consts.nodeClassName, true)
     .classed("new", function(d) {
       const MAX_NEW_AGE = 1000 * 60 * 60 * 24 * 10; // 10 days
@@ -654,14 +653,12 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     })
     .call(thisGraph.drag);
 
-  newNode
-    .append("circle")
+  nodeG.append("circle")
     .attr("r", String(consts.nodeRadius));
 
-  newNode
-    .each(function(d) {
-      thisGraph.insertTitleLinebreaks(d3.select(this), d.title);
-    });
+  nodeG.each(function(d) {
+    thisGraph.insertTitleLinebreaks(d3.select(this), d.title);
+  });
 
   // remove old nodes
   const nodeExitSelection = thisGraph.nodeElements.exit();
@@ -670,10 +667,10 @@ Graph.prototype.updateGraph = function(newSearchValue) {
   // when the graph is rendered for the first time, no unsaved change has
   // been made, but if the graph is updated a 2nd time, these must be unsaved
   // changes
-  if (thisGraph.graphIsRendered) {
+  if (thisGraph.graphHasBeenRenderedOnceBefore) {
     thisGraph.onChange();
   } else {
-    thisGraph.graphIsRendered = true;
+    thisGraph.graphHasBeenRenderedOnceBefore = true;
   }
 };
 
