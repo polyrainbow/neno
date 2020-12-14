@@ -158,7 +158,7 @@ class Graph {
     zoom.transform(svg, initialZoomTranform);
 
     // listen for resize
-    window.onresize = () => thisGraph.updateWindow(svg);
+    window.onresize = () => thisGraph.#updateWindow(svg);
 
     thisGraph.updateConnectedNodeIds();
   }
@@ -174,34 +174,6 @@ class Graph {
         return accumulator;
       }, [])
       .sort((a, b) => a - b);
-  };
-
-
-  getSaveData() {
-    const thisGraph = this;
-
-    const linksToTransmit = thisGraph.links.map((link) => {
-      return [
-        link.source.id,
-        link.target.id,
-      ];
-    });
-
-    const nodePositionUpdates = thisGraph.nodes.map((node) => {
-      return {
-        id: node.id,
-        position: node.position,
-      };
-    });
-
-    const graphObject = {
-      nodePositionUpdates,
-      links: linksToTransmit,
-      screenPosition: thisGraph.screenPosition,
-      initialNodePosition: thisGraph.initialNodePosition,
-    };
-
-    return graphObject;
   };
 
 
@@ -739,12 +711,40 @@ class Graph {
   };
 
 
-  updateWindow(svg) {
+  #updateWindow(svg) {
     const docEl = document.documentElement;
     const bodyEl = document.getElementsByTagName("body")[0];
     const x = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
     const y = window.innerHeight || docEl.clientHeight || bodyEl.clientHeight;
     svg.attr("width", x).attr("height", y);
+  };
+
+
+  getSaveData() {
+    const thisGraph = this;
+
+    const linksToTransmit = thisGraph.links.map((link) => {
+      return [
+        link.source.id,
+        link.target.id,
+      ];
+    });
+
+    const nodePositionUpdates = thisGraph.nodes.map((node) => {
+      return {
+        id: node.id,
+        position: node.position,
+      };
+    });
+
+    const graphObject = {
+      nodePositionUpdates,
+      links: linksToTransmit,
+      screenPosition: thisGraph.screenPosition,
+      initialNodePosition: thisGraph.initialNodePosition,
+    };
+
+    return graphObject;
   };
 };
 

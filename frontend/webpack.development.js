@@ -40,6 +40,7 @@ module.exports = {
             ["@babel/plugin-proposal-optional-chaining"],
             ["@babel/plugin-syntax-class-properties"],
             ["@babel/plugin-proposal-class-properties"],
+            ["@babel/plugin-proposal-private-methods"],
           ],
           cacheDirectory: true,
           cacheCompression: false,
