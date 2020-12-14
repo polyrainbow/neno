@@ -27,17 +27,19 @@ class Graph {
   initialNodePosition = null;
   svg = null;
 
-  #state = {
-    selectedNode: null,
-    selectedEdge: null,
-    mouseDownNode: null,
-    mouseDownLink: null,
-    justDragged: false,
-    justScaleTransGraph: false,
-    lastKeyDown: -1,
-    shiftDragInProgress: false,
-    selectedText: null,
+
+  #selection = {
+    type: "null",
+    value: null,
   };
+  #mouseDownNode = null;
+  #mouseDownLink = null;
+  #justDragged = false;
+  #justScaleTransGraph = false;
+  #lastKeyDown = -1;
+  #shiftDragInProgress = false;
+  #selectedText = null;
+  #graphMouseDown = false;
 
   constructor(svg, graphObject, onHighlight, onChange) {
     const thisGraph = this;
@@ -85,15 +87,14 @@ class Graph {
       })
       .on("drag", (e, d) => {
         const thisGraph = this;
-        thisGraph.#state.justDragged = true;
+        thisGraph.#justDragged = true;
         d.position.x += e.dx;
         d.position.y += e.dy;
         thisGraph.updateGraph();
       })
       .on("end", function(e, d) {
         if (e.shiftKey) return;
-
-        thisGraph.replaceSelectNode(d3.select(this), d);
+        thisGraph.select(d);
       });
 
     // drag single nodes, but not, if shift key is pressed
@@ -122,7 +123,7 @@ class Graph {
       thisGraph.svgMouseUp(d);
     });
     svg.on("mousemove", function(e) {
-      thisGraph.newPathMove(e, thisGraph.#state.mouseDownNode);
+      thisGraph.newPathMove(e, thisGraph.#mouseDownNode);
     });
 
     // listen for dragging
@@ -130,7 +131,7 @@ class Graph {
 
     zoom.on("zoom", function(e) {
       if (e.shiftKey) {
-        // TODO  the internal d3 #state is still changing
+        // TODO  the internal d3 state is still changing
         return false;
       } else {
         thisGraph.zoomed(e);
@@ -196,18 +197,22 @@ class Graph {
   getSelectedNodeId() {
     const thisGraph = this;
 
-    if (!thisGraph.#state.selectedNode) {
-      return;
+    if (!thisGraph.#selection) {
+      return null;
     }
 
-    return thisGraph.#state.selectedNode.id;
+    if (thisGraph.#selection.type !== "node") {
+      return null;
+    }
+
+    return thisGraph.#selection.value;
   };
 
 
   /* PROTOTYPE FUNCTIONS */
   newPathMove(e, originNode) {
     const thisGraph = this;
-    if (!thisGraph.#state.shiftDragInProgress) {
+    if (!thisGraph.#shiftDragInProgress) {
       return;
     }
 
@@ -252,94 +257,55 @@ class Graph {
   };
 
 
-  replaceSelectEdge(d3Path, edgeData) {
+  select(value) {
     const thisGraph = this;
-    d3Path.classed(Graph.#consts.selectedClass, true);
-    if (thisGraph.#state.selectedEdge) {
-      thisGraph.removeSelectFromEdge();
+    if (!value) {
+      thisGraph.#selection = {
+        type: "null",
+        value: null,
+      };
+      return;
     }
+    thisGraph.#selection = {
+      type: (value.source && value.target) ? "edge" : "node",
+      value: value,
+    };
 
-    thisGraph.#state.selectedEdge = edgeData;
+    if (thisGraph.#selection.type !== "null") {
+      thisGraph.#selection.connectedNodeIds
+        = thisGraph.#selection.type === "node"
+          ? thisGraph.#selection.value.linkedNotes.map((node) => node.id)
+          : [value.source.id, value.target.id];
+    }
+  
     thisGraph.updateGraph();
-  };
-
-
-  replaceSelectNode(d3Node, nodeData) {
-    const thisGraph = this;
-    if (thisGraph.#state.selectedNode) {
-      thisGraph.removeSelectFromNode();
-    }
-    d3Node.classed(Graph.#consts.selectedClass, true);
-
-    const connectedNodeIdsToThisNode
-      = nodeData.linkedNotes.map((node) => node.id);
-
-    thisGraph.nodesContainer.selectAll("g.node")
-      .filter((d) => {
-        return connectedNodeIdsToThisNode.includes(d.id);
-      })
-      .classed("connected-to-selected", true);
-
-    thisGraph.linksContainer.selectAll("path.link")
-      .filter((d) => {
-        return (
-          nodeData.id === d.source.id
-          || nodeData.id === d.target.id
-        );
-      })
-      .classed("connected-to-selected", true);
-
-    thisGraph.#state.selectedNode = nodeData;
-  };
-
-
-  removeSelectFromNode() {
-    const thisGraph = this;
-    thisGraph.nodesContainer.selectAll("g.node.selected")
-      .classed(Graph.#consts.selectedClass, false);
-
-    thisGraph.nodesContainer.selectAll("g.node.connected-to-selected")
-      .classed("connected-to-selected", false);
-
-    thisGraph.linksContainer.selectAll("path.link.connected-to-selected")
-      .classed("connected-to-selected", false);
-
-    thisGraph.#state.selectedNode = null;
-  };
-
-
-  removeSelectFromEdge() {
-    const thisGraph = this;
-    thisGraph.#state.selectedEdge = null;
   };
 
 
   pathMouseDown(e, d3path, d) {
     const thisGraph = this;
-    const state = thisGraph.#state;
     e.stopPropagation();
-    state.mouseDownLink = d;
+    thisGraph.#mouseDownLink = d;
 
-    if (state.selectedNode) {
-      thisGraph.removeSelectFromNode();
+    if (thisGraph.#selection) {
+      thisGraph.select(null);
     }
 
-    const prevEdge = state.selectedEdge;
+    const prevEdge = thisGraph.#selection.value;
     if (!prevEdge || prevEdge !== d) {
-      thisGraph.replaceSelectEdge(d3path, d);
+      thisGraph.select(d);
     } else {
-      thisGraph.removeSelectFromEdge();
+      thisGraph.select(null);
     }
   };
 
 
   handleMouseDownOnNode(e, d3node, d) {
     const thisGraph = this;
-    const state = thisGraph.#state;
     e.stopPropagation();
-    state.mouseDownNode = d;
+    thisGraph.#mouseDownNode = d;
     if (e.shiftKey) {
-      state.shiftDragInProgress = e.shiftKey;
+      thisGraph.#shiftDragInProgress = e.shiftKey;
       // reposition dragged directed edge
       thisGraph.newLinkLine
         .classed("hidden", false)
@@ -353,24 +319,23 @@ class Graph {
 
 
   // mouseup on nodes
-  handleMouseUpOnNode(d3node, d) {
+  handleMouseUpOnNode(d3node, mouseUpNode) {
     const thisGraph = this;
-    const state = thisGraph.#state;
     const consts = Graph.#consts;
     // reset the states
-    state.shiftDragInProgress = false;
+    thisGraph.#shiftDragInProgress = false;
     d3node.classed(consts.connectClass, false);
 
-    const mouseDownNode = state.mouseDownNode;
+    const mouseDownNode = thisGraph.#mouseDownNode;
 
     if (!mouseDownNode) return;
 
     thisGraph.newLinkLine.classed("hidden", true);
 
-    if (mouseDownNode !== d) {
+    if (mouseDownNode !== mouseUpNode) {
       // we're in a different node:
       // create new edge for mousedown edge and add to graph
-      const newEdge = { source: mouseDownNode, target: d };
+      const newEdge = { source: mouseDownNode, target: mouseUpNode };
 
       // check if such an edge is already there ...
       const edgeAlreadyExists = thisGraph
@@ -394,49 +359,42 @@ class Graph {
       }
     } else {
       // we're in the same node
-      if (state.justDragged) {
+      if (thisGraph.#justDragged) {
         // dragged, not clicked
-        state.justDragged = false;
+        thisGraph.#justDragged = false;
       } else {
-        if (state.selectedEdge) {
-          thisGraph.removeSelectFromEdge();
-        }
-        const prevNode = state.selectedNode;
-
-        if (!prevNode || prevNode.id !== d.id) {
-          thisGraph.replaceSelectNode(d3node, d);
-        }
+        thisGraph.select(mouseUpNode);
       }
     }
-    state.mouseDownNode = null;
+    thisGraph.#mouseDownNode = null;
   };
 
 
   // mousedown on main svg
   svgMouseDown() {
-    this.#state.graphMouseDown = true;
+    this.#graphMouseDown = true;
   };
+
 
   // mouseup on main svg
   svgMouseUp() {
     const thisGraph = this;
-    const state = thisGraph.#state;
-    if (state.justScaleTransGraph) {
+    if (thisGraph.#justScaleTransGraph) {
       // dragged not clicked
-      state.justScaleTransGraph = false;
+      thisGraph.#justScaleTransGraph = false;
     }
 
     // on mouse up, shift drag is always over
-    state.shiftDragInProgress = false;
+    thisGraph.#shiftDragInProgress = false;
     thisGraph.newLinkLine.classed("hidden", true);
 
-    state.graphMouseDown = false;
+    thisGraph.#graphMouseDown = false;
   };
+
 
   // keydown on main svg
   svgKeyDown(e) {
     const thisGraph = this;
-    const state = thisGraph.#state;
     const consts = Graph.#consts;
 
     if (e.shiftKey) {
@@ -448,11 +406,11 @@ class Graph {
     }
 
     // make sure repeated key presses don't register for each keydown
-    if (state.lastKeyDown !== -1) return;
+    if (thisGraph.#lastKeyDown !== -1) return;
 
-    state.lastKeyDown = e.keyCode;
-    const selectedNode = state.selectedNode;
-    const selectedEdge = state.selectedEdge;
+    thisGraph.#lastKeyDown = e.keyCode;
+
+    const selection = thisGraph.#selection;
 
     switch (e.keyCode) {
     case consts.BACKSPACE_KEY:
@@ -460,18 +418,11 @@ class Graph {
       // we cannot prevent default because then we cannot delete values from
       // search input
       // e.preventDefault();
-      if (selectedNode) {
+      if (selection.type  === "node") {
         // right now, we don't support deleting nodes from the graph view
-
-        /*
-        thisGraph.nodes.splice(thisGraph.nodes.indexOf(selectedNode), 1);
-        thisGraph.spliceLinksForNode(selectedNode);
-        state.selectedNode = null;
-        thisGraph.updateGraph();
-        */
-      } else if (selectedEdge) {
-        thisGraph.links.splice(thisGraph.links.indexOf(selectedEdge), 1);
-        state.selectedEdge = null;
+      } else if (selection.type === "edge") {
+        thisGraph.links.splice(thisGraph.links.indexOf(selection.value), 1);
+        thisGraph.select(null);
         thisGraph.updateConnectedNodeIds();
         thisGraph.updateGraph();
       }
@@ -479,19 +430,20 @@ class Graph {
     }
   };
 
+
   svgKeyUp(e) {
     const thisGraph = this;
     thisGraph.shiftKeyIsPressed = e.shiftKey;
     thisGraph.ctrlKeyIsPressed = e.ctrlKey;
 
-    this.#state.lastKeyDown = -1;
+    this.#lastKeyDown = -1;
   };
+
 
   // call to propagate changes to graph
   updateGraph(newSearchValue) {
     const thisGraph = this;
     const consts = Graph.#consts;
-    const state = thisGraph.#state;
 
     if (typeof newSearchValue === "string") {
       thisGraph.searchValue = newSearchValue;
@@ -573,12 +525,25 @@ class Graph {
 
     // update existing links
     thisGraph.linkElements
-      .classed(consts.selectedClass, function(d) {
-        return d === state.selectedEdge;
+      .classed(consts.selectedClass, function(edge) {
+        if (!thisGraph.#selection) return false;
+        return edge === thisGraph.#selection.value;
       })
       .attr("d", function(d) {
         return "M" + d.source.position.x + "," + d.source.position.y
           + "L" + d.target.position.x + "," + d.target.position.y;
+      })
+      .classed("selected", (edge) => {
+        if (thisGraph.#selection.type !== "edge") return false;
+        return thisGraph.#selection.value === edge;
+      })
+      .classed("connected-to-selected", (edge) => {
+        if (thisGraph.#selection.type !== "node") return false;
+        const selectedNodeId = thisGraph.#selection.value.id;
+        return (
+          edge.source.id === selectedNodeId
+          || edge.target.id === selectedNodeId
+        );
       });
 
 
@@ -601,7 +566,7 @@ class Graph {
         thisGraph.pathMouseDown(e, d3.select(this), d);
       })
       .on("mouseup", function() {
-        state.mouseDownLink = null;
+        thisGraph.#mouseDownLink = null;
       });
 
     // remove old links
@@ -632,6 +597,14 @@ class Graph {
       )
       .classed("unconnected", function(d) {
         return !binaryArrayIncludes(thisGraph.connectedNodeIds, d.id);
+      })
+      .classed("selected", (node) => {
+        if (thisGraph.#selection.type !== "node") return false;
+        return thisGraph.#selection.value.id === node.id;
+      })
+      .classed("connected-to-selected", (node) => {
+        if (thisGraph.#selection.type === "null") return false;
+        return thisGraph.#selection.connectedNodeIds.includes(node.id);
       });
 
     // add new nodes
@@ -656,7 +629,7 @@ class Graph {
         },
       )
       .on("mouseover", function(e, d) {
-        if (state.shiftDragInProgress) {
+        if (thisGraph.#shiftDragInProgress) {
           d3.select(this).classed(consts.connectClass, true);
         }
         thisGraph.onHighlight(true, d.title);
@@ -706,7 +679,7 @@ class Graph {
   zoomed(e) {
     const thisGraph = this;
 
-    this.#state.justScaleTransGraph = true;
+    this.#justScaleTransGraph = true;
     d3.select("." + Graph.#consts.graphClass)
       .attr(
         "transform",
