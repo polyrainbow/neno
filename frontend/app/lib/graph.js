@@ -33,13 +33,15 @@ const Graph = function(svg, graphObject, onHighlight, onChange) {
     .classed(thisGraph.consts.graphClass, true);
   const mainSVGGroup = thisGraph.mainSVGGroup;
 
-  // displayed when dragging between nodes
+  thisGraph.nodeHighlighterContainer = mainSVGGroup.append("g")
+    .classed("note-highlighters", true);
+
+  // displayed when dragging between nodes - should be rendered in front of
+  // node highlighter circles, so this code is placed after node highlighter g
+  // creation code
   thisGraph.newLinkLine = mainSVGGroup.append("svg:path")
     .attr("class", "link newLinkLine hidden")
     .attr("d", "M0,0L0,0");
-
-  thisGraph.nodeHighlighterContainer = mainSVGGroup.append("g")
-    .classed("note-highlighters", true);
 
   // svg nodes and links
   thisGraph.linksContainer = mainSVGGroup.append("g")
