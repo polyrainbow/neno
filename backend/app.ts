@@ -73,7 +73,8 @@ const startApp = ({
 
     // on stream closed we can end the request
     archive.on("end", function() {
-      console.log("Archive wrote %d bytes", archive.pointer());
+      const size = archive.pointer();
+      console.log(`Archive for ${req.userId} created. Size: ${size} bytes`);
     });
 
     // set the archive name
@@ -314,7 +315,6 @@ const startApp = ({
       );
 
       if (!fileTypeObject) {
-        console.log("Invalid MIME type: " + file.type);
         res.end("Invalid MIME type: " + file.type);
         return;
       }
@@ -356,7 +356,6 @@ const startApp = ({
       });
 
       if (!fileTypeObject) {
-        console.log("Invalid MIME type: " + file.type);
         res.end("Invalid MIME type: " + file.type);
         return;
       }
