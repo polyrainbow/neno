@@ -38,6 +38,15 @@ const cleanUpLinks = (db) => {
 // canonical data structure
 const cleanUpData = () => {
   DB.forEach((db) => {
+
+    // each database should have an initialNodePosition
+    if (!db.initialNodePosition) {
+      db.initialNodePosition = {
+        x: 0,
+        y: 0,
+      };
+    }
+
     convertLinksFromLegacyFormat(db);
 
     // remove invalid links

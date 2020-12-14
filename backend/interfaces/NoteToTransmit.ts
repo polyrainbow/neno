@@ -1,4 +1,5 @@
 import LinkedNote from "./LinkedNote.js";
+import NodePosition from "./NodePosition.js";
 import Note from "./Note.js";
 import { NoteId } from "./NoteId.js";
 
@@ -8,4 +9,5 @@ export default interface NoteToTransmit extends Note {
     readonly creationTime: number,
     readonly updateTime: number,
     readonly linkedNotes: LinkedNote[],
+    readonly position: NodePosition,
 }

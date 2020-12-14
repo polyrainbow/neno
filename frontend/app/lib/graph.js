@@ -57,8 +57,8 @@ const Graph = function(svg, graphObject, onHighlight, onChange) {
 
   // drag single nodes, but not, if shift key is pressed
   thisGraph.drag = d3.drag()
-    .subject(function(d) {
-      return { x: d.position.x, y: d.position.y };
+    .subject(function(event) {
+      return { x: event.x, y: event.y };
     })
     .filter(() => {
       return (!thisGraph.shiftKeyIsPressed) && (!thisGraph.ctrlKeyIsPressed);
@@ -205,6 +205,7 @@ Graph.prototype.consts = {
   DELETE_KEY: 46,
   ENTER_KEY: 13,
   nodeRadius: 50,
+  newNodeIndicatorSize: 3 * 50,
 };
 
 /* PROTOTYPE FUNCTIONS */
@@ -505,10 +506,14 @@ Graph.prototype.updateGraph = function(newSearchValue) {
 
   thisGraph.initialNodePositionIndicatorElement
     = thisGraph.initialNodePositionIndicator
-      .attr("width", String(3 * consts.nodeRadius))
-      .attr("height", String(3 * consts.nodeRadius))
-      .attr("x", thisGraph.initialNodePosition.x)
-      .attr("y", thisGraph.initialNodePosition.y)
+      .attr("width", String(consts.newNodeIndicatorSize))
+      .attr("height", String(consts.newNodeIndicatorSize))
+      .attr("x",
+        thisGraph.initialNodePosition.x - (consts.newNodeIndicatorSize / 2),
+      )
+      .attr("y",
+        thisGraph.initialNodePosition.y - (consts.newNodeIndicatorSize / 2),
+      )
       .attr("rx", 2)
       .attr("ry", 2);
 

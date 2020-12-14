@@ -166,6 +166,7 @@ const createNoteToTransmit = (
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
     linkedNotes: getLinkedNotes(db, databaseNote.id),
+    position: databaseNote.position,
   };
 
   return noteToTransmit;
