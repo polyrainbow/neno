@@ -38,6 +38,8 @@ module.exports = {
             ],
             ["transform-es2017-object-entries"],
             ["@babel/plugin-proposal-optional-chaining"],
+            ["@babel/plugin-syntax-class-properties"],
+            ["@babel/plugin-proposal-class-properties"],
           ],
           cacheDirectory: true,
           cacheCompression: false,
