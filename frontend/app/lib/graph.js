@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { binaryArrayIncludes } from "./utils.js";
 
 
-const GraphCreator = function(svg, graphObject, onHighlight, onChange) {
+const Graph = function(svg, graphObject, onHighlight, onChange) {
   const thisGraph = this;
 
   thisGraph.graphIsRendered = false;
@@ -136,7 +136,7 @@ const GraphCreator = function(svg, graphObject, onHighlight, onChange) {
   thisGraph.updateConnectedNodeIds();
 };
 
-GraphCreator.prototype.updateConnectedNodeIds = function() {
+Graph.prototype.updateConnectedNodeIds = function() {
   const thisGraph = this;
 
   thisGraph.connectedNodeIds = thisGraph.links
@@ -149,7 +149,7 @@ GraphCreator.prototype.updateConnectedNodeIds = function() {
 };
 
 
-GraphCreator.prototype.getSaveData = function() {
+Graph.prototype.getSaveData = function() {
   const thisGraph = this;
 
   const linksToTransmit = thisGraph.links.map((link) => {
@@ -177,7 +177,7 @@ GraphCreator.prototype.getSaveData = function() {
 };
 
 
-GraphCreator.prototype.getSelectedNodeId = function() {
+Graph.prototype.getSelectedNodeId = function() {
   const thisGraph = this;
 
   if (!thisGraph.state.selectedNode) {
@@ -188,7 +188,7 @@ GraphCreator.prototype.getSelectedNodeId = function() {
 };
 
 
-GraphCreator.prototype.consts = {
+Graph.prototype.consts = {
   selectedClass: "selected",
   connectClass: "connect-node",
   nodeClassName: "node",
@@ -201,7 +201,7 @@ GraphCreator.prototype.consts = {
 };
 
 /* PROTOTYPE FUNCTIONS */
-GraphCreator.prototype.newPathMove = function(e, originNode) {
+Graph.prototype.newPathMove = function(e, originNode) {
   const thisGraph = this;
   if (!thisGraph.state.shiftDragInProgress) {
     return;
@@ -220,7 +220,7 @@ GraphCreator.prototype.newPathMove = function(e, originNode) {
 };
 
 
-GraphCreator.prototype.dragmove = function(e, d) {
+Graph.prototype.dragmove = function(e, d) {
   const thisGraph = this;
   d.x += e.dx;
   d.y += e.dy;
@@ -228,7 +228,7 @@ GraphCreator.prototype.dragmove = function(e, d) {
 };
 
 /* insert svg line breaks: taken from http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts */
-GraphCreator.prototype.insertTitleLinebreaks = function(gEl, title) {
+Graph.prototype.insertTitleLinebreaks = function(gEl, title) {
   const words = (title && title.split(/\s+/g)) || "";
   const nwords = words.length;
   const el = gEl.append("text")
@@ -243,7 +243,7 @@ GraphCreator.prototype.insertTitleLinebreaks = function(gEl, title) {
 
 
 // remove links associated with a node
-GraphCreator.prototype.spliceLinksForNode = function(node) {
+Graph.prototype.spliceLinksForNode = function(node) {
   const thisGraph = this;
   const toSplice = thisGraph.links.filter(function(l) {
     return (l.source === node || l.target === node);
@@ -253,7 +253,7 @@ GraphCreator.prototype.spliceLinksForNode = function(node) {
   });
 };
 
-GraphCreator.prototype.replaceSelectEdge = function(d3Path, edgeData) {
+Graph.prototype.replaceSelectEdge = function(d3Path, edgeData) {
   const thisGraph = this;
   d3Path.classed(thisGraph.consts.selectedClass, true);
   if (thisGraph.state.selectedEdge) {
@@ -263,7 +263,7 @@ GraphCreator.prototype.replaceSelectEdge = function(d3Path, edgeData) {
 };
 
 
-GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData) {
+Graph.prototype.replaceSelectNode = function(d3Node, nodeData) {
   const thisGraph = this;
   if (thisGraph.state.selectedNode) {
     thisGraph.removeSelectFromNode();
@@ -291,7 +291,7 @@ GraphCreator.prototype.replaceSelectNode = function(d3Node, nodeData) {
   thisGraph.state.selectedNode = nodeData;
 };
 
-GraphCreator.prototype.removeSelectFromNode = function() {
+Graph.prototype.removeSelectFromNode = function() {
   const thisGraph = this;
   thisGraph.nodesContainer.selectAll("g.node.selected")
     .classed(this.consts.selectedClass, false);
@@ -305,7 +305,7 @@ GraphCreator.prototype.removeSelectFromNode = function() {
   thisGraph.state.selectedNode = null;
 };
 
-GraphCreator.prototype.removeSelectFromEdge = function() {
+Graph.prototype.removeSelectFromEdge = function() {
   const thisGraph = this;
   thisGraph.linkElements.filter(function(cd) {
     return cd === thisGraph.state.selectedEdge;
@@ -313,7 +313,7 @@ GraphCreator.prototype.removeSelectFromEdge = function() {
   thisGraph.state.selectedEdge = null;
 };
 
-GraphCreator.prototype.pathMouseDown = function(e, d3path, d) {
+Graph.prototype.pathMouseDown = function(e, d3path, d) {
   const thisGraph = this;
   const state = thisGraph.state;
   e.stopPropagation();
@@ -332,7 +332,7 @@ GraphCreator.prototype.pathMouseDown = function(e, d3path, d) {
 };
 
 // mousedown on node
-GraphCreator.prototype.handleMouseDownOnNode = function(e, d3node, d) {
+Graph.prototype.handleMouseDownOnNode = function(e, d3node, d) {
   const thisGraph = this;
   const state = thisGraph.state;
   e.stopPropagation();
@@ -348,7 +348,7 @@ GraphCreator.prototype.handleMouseDownOnNode = function(e, d3node, d) {
 
 
 // mouseup on nodes
-GraphCreator.prototype.handleMouseUpOnNode = function(d3node, d) {
+Graph.prototype.handleMouseUpOnNode = function(d3node, d) {
   const thisGraph = this;
   const state = thisGraph.state;
   const consts = thisGraph.consts;
@@ -407,12 +407,12 @@ GraphCreator.prototype.handleMouseUpOnNode = function(d3node, d) {
 }; // end of nodeElements mouseup
 
 // mousedown on main svg
-GraphCreator.prototype.svgMouseDown = function() {
+Graph.prototype.svgMouseDown = function() {
   this.state.graphMouseDown = true;
 };
 
 // mouseup on main svg
-GraphCreator.prototype.svgMouseUp = function() {
+Graph.prototype.svgMouseUp = function() {
   const thisGraph = this;
   const state = thisGraph.state;
   if (state.justScaleTransGraph) {
@@ -428,7 +428,7 @@ GraphCreator.prototype.svgMouseUp = function() {
 };
 
 // keydown on main svg
-GraphCreator.prototype.svgKeyDown = function(e) {
+Graph.prototype.svgKeyDown = function(e) {
   const thisGraph = this;
   const state = thisGraph.state;
   const consts = thisGraph.consts;
@@ -473,7 +473,7 @@ GraphCreator.prototype.svgKeyDown = function(e) {
   }
 };
 
-GraphCreator.prototype.svgKeyUp = function(e) {
+Graph.prototype.svgKeyUp = function(e) {
   const thisGraph = this;
   thisGraph.shiftKeyIsPressed = e.shiftKey;
   thisGraph.ctrlKeyIsPressed = e.ctrlKey;
@@ -482,7 +482,7 @@ GraphCreator.prototype.svgKeyUp = function(e) {
 };
 
 // call to propagate changes to graph
-GraphCreator.prototype.updateGraph = function(newSearchValue) {
+Graph.prototype.updateGraph = function(newSearchValue) {
   const thisGraph = this;
   const consts = thisGraph.consts;
   const state = thisGraph.state;
@@ -678,7 +678,7 @@ GraphCreator.prototype.updateGraph = function(newSearchValue) {
 };
 
 
-GraphCreator.prototype.zoomed = function(e) {
+Graph.prototype.zoomed = function(e) {
   const thisGraph = this;
 
   this.state.justScaleTransGraph = true;
@@ -695,7 +695,7 @@ GraphCreator.prototype.zoomed = function(e) {
 };
 
 
-GraphCreator.prototype.updateWindow = function(svg) {
+Graph.prototype.updateWindow = function(svg) {
   const docEl = document.documentElement;
   const bodyEl = document.getElementsByTagName("body")[0];
   const x = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
@@ -722,7 +722,7 @@ const initGraph = (parent, graphObject, onHighlight, onChange) => {
     .attr("width", width)
     .attr("height", height);
 
-  const graphInstance = new GraphCreator(
+  const graphInstance = new Graph(
     svg, graphObject, onHighlight, onChange,
   );
   graphInstance.updateGraph();
