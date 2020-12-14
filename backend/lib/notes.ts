@@ -321,6 +321,7 @@ const setGraph = (graphFromUser:GraphFromUser, userId:UserId):boolean => {
   );
   db.links = graphFromUser.links;
   db.screenPosition = graphFromUser.screenPosition;
+  db.initialNodePosition = graphFromUser.initialNodePosition;
   DB.flushChanges(db);
   return true;
 };

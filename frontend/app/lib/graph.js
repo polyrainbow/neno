@@ -76,21 +76,35 @@ class Graph {
       .classed("notes", true);
 
     // drag single nodes, but not, if shift key is pressed
-    thisGraph.drag = d3.drag()
+    thisGraph.nodeDrag = d3.drag()
       .subject(function(event) {
         return { x: event.x, y: event.y };
       })
       .filter(() => {
         return (!thisGraph.shiftKeyIsPressed) && (!thisGraph.ctrlKeyIsPressed);
       })
-      .on("drag", function(e, args) {
+      .on("drag", (e, d) => {
+        const thisGraph = this;
         thisGraph.#state.justDragged = true;
-        thisGraph.dragmove(e, args);
+        d.position.x += e.dx;
+        d.position.y += e.dy;
+        thisGraph.updateGraph();
       })
       .on("end", function(e, d) {
         if (e.shiftKey) return;
 
         thisGraph.replaceSelectNode(d3.select(this), d);
+      });
+
+    // drag single nodes, but not, if shift key is pressed
+    thisGraph.inpIndicatorDrag = d3.drag()
+      .subject(function(event) {
+        return { x: event.x, y: event.y };
+      })
+      .on("drag", function(e) {
+        thisGraph.initialNodePosition.x += e.dx;
+        thisGraph.initialNodePosition.y += e.dy;
+        thisGraph.updateGraph();
       });
 
     // listen for key events
@@ -207,14 +221,6 @@ class Graph {
       "M" + originNode.position.x + "," + originNode.position.y
       + "L" + newLinkEnd.x + "," + newLinkEnd.y,
     );
-  };
-
-
-  dragmove(e, d) {
-    const thisGraph = this;
-    d.position.x += e.dx;
-    d.position.y += e.dy;
-    thisGraph.updateGraph();
   };
 
 
@@ -502,7 +508,8 @@ class Graph {
           thisGraph.initialNodePosition.y - (consts.newNodeIndicatorSize / 2),
         )
         .attr("rx", 2)
-        .attr("ry", 2);
+        .attr("ry", 2)
+        .call(thisGraph.inpIndicatorDrag);
 
     /** ********************
       node highlighter circles
@@ -669,7 +676,7 @@ class Graph {
           window.open("/?id=" + d.id, "_blank");
         }
       })
-      .call(thisGraph.drag);
+      .call(thisGraph.nodeDrag);
 
     nodeG.append("circle")
       .attr("r", String(consts.nodeRadius));
