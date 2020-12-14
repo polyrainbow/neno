@@ -103,7 +103,7 @@ path.link.connected-to-selected {
   stroke-width: 12px;
 }
 
-path.link:hover{
+path.link:not(.newLinkLine):hover{
   stroke: rgb(134, 228, 105);
 }
 
