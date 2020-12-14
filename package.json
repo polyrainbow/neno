@@ -10,7 +10,7 @@
     "@babel/preset-react": "^7.12.1",
     "@editorjs/attaches": "^1.0.1",
     "@editorjs/code": "^2.6.0",
-    "@editorjs/editorjs": "^2.19.1",
+    "@editorjs/editorjs": "2.19.0",
     "@editorjs/header": "^2.6.0",
     "@editorjs/image": "^2.6.0",
     "@editorjs/link": "^2.3.1",
