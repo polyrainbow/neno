@@ -17,7 +17,6 @@ class Graph {
     newNodeIndicatorSize: 3 * 50,
   };
 
-  #graphHasBeenRenderedOnceBefore = false;
   #searchValue = "";
   #onHighlight = null;
   #onChange = null;
@@ -92,13 +91,14 @@ class Graph {
         d.position.x += e.dx;
         d.position.y += e.dy;
         thisGraph.#updateGraph();
+        thisGraph.#onChange();
       })
       .on("end", function(e, d) {
         if (e.shiftKey) return;
         thisGraph.#select(d);
       });
 
-    // drag single nodes, but not, if shift key is pressed
+    // drag intitial node position indicator
     thisGraph.inpIndicatorDrag = d3.drag()
       .subject(function(event) {
         return { x: event.x, y: event.y };
@@ -106,6 +106,7 @@ class Graph {
       .on("drag", function(e) {
         thisGraph.#initialNodePosition.x += e.dx;
         thisGraph.#initialNodePosition.y += e.dy;
+        thisGraph.#onChange();
         thisGraph.#updateGraph();
       });
 
@@ -340,6 +341,7 @@ class Graph {
       // ... if not, create it
       if (!edgeAlreadyExists) {
         thisGraph.#links.push(newEdge);
+        thisGraph.#onChange();
         thisGraph.#updateConnectedNodeIds();
         thisGraph.#updateGraph();
       }
@@ -408,6 +410,7 @@ class Graph {
         // right now, we don't support deleting nodes from the graph view
       } else if (selection.type === "edge") {
         thisGraph.#links.splice(thisGraph.#links.indexOf(selection.value), 1);
+        thisGraph.#onChange();
         thisGraph.#select(null);
         thisGraph.#updateConnectedNodeIds();
         thisGraph.#updateGraph();
@@ -646,15 +649,6 @@ class Graph {
     const nodeExitSelection = thisGraph.nodeElements.exit();
     nodeExitSelection.remove();
   */
-
-    // when the graph is rendered for the first time, no unsaved change has
-    // been made, but if the graph is updated a 2nd time, these must be unsaved
-    // changes
-    if (thisGraph.#graphHasBeenRenderedOnceBefore) {
-      thisGraph.#onChange();
-    } else {
-      thisGraph.#graphHasBeenRenderedOnceBefore = true;
-    }
   };
 
 
@@ -669,6 +663,7 @@ class Graph {
         + e.transform.x + "," + e.transform.y + ") "
         + "scale(" + e.transform.k + ")",
       );
+
     thisGraph.#screenPosition.translateX = e.transform.x;
     thisGraph.#screenPosition.translateY = e.transform.y;
     thisGraph.#screenPosition.scale = e.transform.k;
