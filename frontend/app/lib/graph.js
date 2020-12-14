@@ -161,6 +161,8 @@ class Graph {
     window.onresize = () => thisGraph.#updateWindow(svg);
 
     thisGraph.updateConnectedNodeIds();
+
+    thisGraph.updateGraph();
   }
 
 
@@ -770,7 +772,6 @@ const initGraph = (parent, graphObject, onHighlight, onChange) => {
   const graphInstance = new Graph(
     svg, graphObject, onHighlight, onChange,
   );
-  graphInstance.updateGraph();
 
   return graphInstance;
 };
