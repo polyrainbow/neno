@@ -76,6 +76,10 @@ const get = (id: DatabaseId):Database => {
       translateY: 0,
       scale: 1,
     },
+    initialNodePosition: {
+      x: 0,
+      y: 0,
+    }
   };
   writeJSONFileInDataFolder(id + DB_FILE_SUFFIX, newDB);
   return newDB;
