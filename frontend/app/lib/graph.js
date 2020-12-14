@@ -268,7 +268,9 @@ Graph.prototype.replaceSelectEdge = function(d3Path, edgeData) {
   if (thisGraph.state.selectedEdge) {
     thisGraph.removeSelectFromEdge();
   }
+
   thisGraph.state.selectedEdge = edgeData;
+  thisGraph.updateGraph();
 };
 
 
@@ -316,9 +318,6 @@ Graph.prototype.removeSelectFromNode = function() {
 
 Graph.prototype.removeSelectFromEdge = function() {
   const thisGraph = this;
-  thisGraph.linkElements.filter(function(cd) {
-    return cd === thisGraph.state.selectedEdge;
-  }).classed(thisGraph.consts.selectedClass, false);
   thisGraph.state.selectedEdge = null;
 };
 
@@ -568,10 +567,8 @@ Graph.prototype.updateGraph = function(newSearchValue) {
   ***********************/
 
   // create link selection
-  thisGraph.linkElements = thisGraph.linksContainer.selectAll("path.link");
-
-  // append new link data
-  thisGraph.linkElements = thisGraph.linkElements
+  thisGraph.linkElements = thisGraph.linksContainer
+    .selectAll("path.link")
     .data(
       thisGraph.links,
       function(d) {
@@ -613,8 +610,8 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     });
 
   // remove old links
-  const linkExitSelection = thisGraph.linkElements.exit();
-  linkExitSelection.remove();
+  thisGraph.linkElements
+    = thisGraph.linkElements.exit().remove();
 
   /** ********************
     nodes
@@ -693,9 +690,12 @@ Graph.prototype.updateGraph = function(newSearchValue) {
     thisGraph.insertTitleLinebreaks(d3.select(this), d.title);
   });
 
+  // currently it's not possible to remove nodes in Graph View
+  /*
   // remove old nodes
   const nodeExitSelection = thisGraph.nodeElements.exit();
   nodeExitSelection.remove();
+*/
 
   // when the graph is rendered for the first time, no unsaved change has
   // been made, but if the graph is updated a 2nd time, these must be unsaved
