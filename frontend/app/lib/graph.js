@@ -18,14 +18,15 @@ class Graph {
   };
 
   #graphHasBeenRenderedOnceBefore = false;
-  searchValue = "";
-  onHighlight = null;
-  onChange = null;
-  nodes = null;
-  links = null;
-  screenPosition = null;
-  initialNodePosition = null;
+  #searchValue = "";
+  #onHighlight = null;
+  #onChange = null;
+  #nodes = null;
+  #links = null;
+  #screenPosition = null;
+  #initialNodePosition = null;
   svg = null;
+  #idsOfAllNodesWithLinkedNote = null;
 
 
   #selection = {
@@ -43,13 +44,13 @@ class Graph {
 
   constructor(svg, graphObject, onHighlight, onChange) {
     const thisGraph = this;
-    thisGraph.onHighlight = onHighlight;
-    thisGraph.onChange = onChange;
+    thisGraph.#onHighlight = onHighlight;
+    thisGraph.#onChange = onChange;
 
-    thisGraph.nodes = graphObject.nodes;
-    thisGraph.links = graphObject.links;
-    thisGraph.screenPosition = graphObject.screenPosition;
-    thisGraph.initialNodePosition = graphObject.initialNodePosition;
+    thisGraph.#nodes = graphObject.nodes;
+    thisGraph.#links = graphObject.links;
+    thisGraph.#screenPosition = graphObject.screenPosition;
+    thisGraph.#initialNodePosition = graphObject.initialNodePosition;
 
     thisGraph.svg = svg;
     thisGraph.mainSVGGroup = svg.append("g")
@@ -90,11 +91,11 @@ class Graph {
         thisGraph.#justDragged = true;
         d.position.x += e.dx;
         d.position.y += e.dy;
-        thisGraph.updateGraph();
+        thisGraph.#updateGraph();
       })
       .on("end", function(e, d) {
         if (e.shiftKey) return;
-        thisGraph.select(d);
+        thisGraph.#select(d);
       });
 
     // drag single nodes, but not, if shift key is pressed
@@ -103,27 +104,27 @@ class Graph {
         return { x: event.x, y: event.y };
       })
       .on("drag", function(e) {
-        thisGraph.initialNodePosition.x += e.dx;
-        thisGraph.initialNodePosition.y += e.dy;
-        thisGraph.updateGraph();
+        thisGraph.#initialNodePosition.x += e.dx;
+        thisGraph.#initialNodePosition.y += e.dy;
+        thisGraph.#updateGraph();
       });
 
     // listen for key events
     d3.select(window)
       .on("keydown", function(e) {
-        thisGraph.svgKeyDown(e);
+        thisGraph.#svgKeyDown(e);
       })
       .on("keyup", function(e) {
-        thisGraph.svgKeyUp(e);
+        thisGraph.#svgKeyUp(e);
       });
     svg.on("mousedown", function(e, d) {
-      thisGraph.svgMouseDown(d);
+      thisGraph.#svgMouseDown(d);
     });
     svg.on("mouseup", function(e, d) {
-      thisGraph.svgMouseUp(d);
+      thisGraph.#svgMouseUp(d);
     });
     svg.on("mousemove", function(e) {
-      thisGraph.newPathMove(e, thisGraph.#mouseDownNode);
+      thisGraph.#newPathMove(e, thisGraph.#mouseDownNode);
     });
 
     // listen for dragging
@@ -134,7 +135,7 @@ class Graph {
         // TODO  the internal d3 state is still changing
         return false;
       } else {
-        thisGraph.zoomed(e);
+        thisGraph.#zoomed(e);
       }
       return true;
     });
@@ -158,7 +159,7 @@ class Graph {
     zoom.on("end", function() {
       d3.select("body").style("cursor", "auto");
       if (firstZoomEndHappened) {
-        thisGraph.onChange();
+        thisGraph.#onChange();
       } else {
         firstZoomEndHappened = true;
       }
@@ -166,25 +167,25 @@ class Graph {
 
     const initialZoomTranform = d3.zoomIdentity
       .translate(
-        thisGraph.screenPosition.translateX,
-        thisGraph.screenPosition.translateY,
+        thisGraph.#screenPosition.translateX,
+        thisGraph.#screenPosition.translateY,
       )
-      .scale(thisGraph.screenPosition.scale);
+      .scale(thisGraph.#screenPosition.scale);
     zoom.transform(svg, initialZoomTranform);
 
     // listen for resize
     window.onresize = () => thisGraph.#updateWindow(svg);
 
-    thisGraph.updateConnectedNodeIds();
+    thisGraph.#updateConnectedNodeIds();
 
-    thisGraph.updateGraph();
+    thisGraph.#updateGraph();
   }
 
 
-  updateConnectedNodeIds() {
+  #updateConnectedNodeIds() {
     const thisGraph = this;
 
-    thisGraph.connectedNodeIds = thisGraph.links
+    thisGraph.#idsOfAllNodesWithLinkedNote = thisGraph.#links
       .reduce((accumulator, link) => {
         accumulator.push(link.source.id);
         accumulator.push(link.target.id);
@@ -194,23 +195,7 @@ class Graph {
   };
 
 
-  getSelectedNodeId() {
-    const thisGraph = this;
-
-    if (!thisGraph.#selection) {
-      return null;
-    }
-
-    if (thisGraph.#selection.type !== "node") {
-      return null;
-    }
-
-    return thisGraph.#selection.value;
-  };
-
-
-  /* PROTOTYPE FUNCTIONS */
-  newPathMove(e, originNode) {
+  #newPathMove(e, originNode) {
     const thisGraph = this;
     if (!thisGraph.#shiftDragInProgress) {
       return;
@@ -231,7 +216,7 @@ class Graph {
 
   // insert svg line breaks: taken from
   // http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts
-  insertTitleLinebreaks(gEl, title) {
+  #insertTitleLinebreaks(gEl, title) {
     const words = (title && title.split(/\s+/g)) || "";
     const nwords = words.length;
     const el = gEl.append("text")
@@ -246,18 +231,19 @@ class Graph {
 
 
   // remove links associated with a node
-  spliceLinksForNode(node) {
+  // this method is currently not used
+  #spliceLinksForNode(node) {
     const thisGraph = this;
-    const toSplice = thisGraph.links.filter(function(l) {
+    const toSplice = thisGraph.#links.filter(function(l) {
       return (l.source === node || l.target === node);
     });
     toSplice.map(function(l) {
-      return thisGraph.links.splice(thisGraph.links.indexOf(l), 1);
+      return thisGraph.#links.splice(thisGraph.#links.indexOf(l), 1);
     });
   };
 
 
-  select(value) {
+  #select(value) {
     const thisGraph = this;
     if (!value) {
       thisGraph.#selection = {
@@ -278,29 +264,29 @@ class Graph {
           : [value.source.id, value.target.id];
     }
   
-    thisGraph.updateGraph();
+    thisGraph.#updateGraph();
   };
 
 
-  pathMouseDown(e, d3path, d) {
+  #handleMouseDownOnEdge(e, d3path, d) {
     const thisGraph = this;
     e.stopPropagation();
     thisGraph.#mouseDownLink = d;
 
     if (thisGraph.#selection) {
-      thisGraph.select(null);
+      thisGraph.#select(null);
     }
 
     const prevEdge = thisGraph.#selection.value;
     if (!prevEdge || prevEdge !== d) {
-      thisGraph.select(d);
+      thisGraph.#select(d);
     } else {
-      thisGraph.select(null);
+      thisGraph.#select(null);
     }
   };
 
 
-  handleMouseDownOnNode(e, d3node, d) {
+  #handleMouseDownOnNode(e, d3node, d) {
     const thisGraph = this;
     e.stopPropagation();
     thisGraph.#mouseDownNode = d;
@@ -319,7 +305,7 @@ class Graph {
 
 
   // mouseup on nodes
-  handleMouseUpOnNode(d3node, mouseUpNode) {
+  #handleMouseUpOnNode(d3node, mouseUpNode) {
     const thisGraph = this;
     const consts = Graph.#consts;
     // reset the states
@@ -353,9 +339,9 @@ class Graph {
 
       // ... if not, create it
       if (!edgeAlreadyExists) {
-        thisGraph.links.push(newEdge);
-        thisGraph.updateConnectedNodeIds();
-        thisGraph.updateGraph();
+        thisGraph.#links.push(newEdge);
+        thisGraph.#updateConnectedNodeIds();
+        thisGraph.#updateGraph();
       }
     } else {
       // we're in the same node
@@ -363,7 +349,7 @@ class Graph {
         // dragged, not clicked
         thisGraph.#justDragged = false;
       } else {
-        thisGraph.select(mouseUpNode);
+        thisGraph.#select(mouseUpNode);
       }
     }
     thisGraph.#mouseDownNode = null;
@@ -371,13 +357,13 @@ class Graph {
 
 
   // mousedown on main svg
-  svgMouseDown() {
+  #svgMouseDown() {
     this.#graphMouseDown = true;
   };
 
 
   // mouseup on main svg
-  svgMouseUp() {
+  #svgMouseUp() {
     const thisGraph = this;
     if (thisGraph.#justScaleTransGraph) {
       // dragged not clicked
@@ -393,7 +379,7 @@ class Graph {
 
 
   // keydown on main svg
-  svgKeyDown(e) {
+  #svgKeyDown(e) {
     const thisGraph = this;
     const consts = Graph.#consts;
 
@@ -421,17 +407,17 @@ class Graph {
       if (selection.type  === "node") {
         // right now, we don't support deleting nodes from the graph view
       } else if (selection.type === "edge") {
-        thisGraph.links.splice(thisGraph.links.indexOf(selection.value), 1);
-        thisGraph.select(null);
-        thisGraph.updateConnectedNodeIds();
-        thisGraph.updateGraph();
+        thisGraph.#links.splice(thisGraph.#links.indexOf(selection.value), 1);
+        thisGraph.#select(null);
+        thisGraph.#updateConnectedNodeIds();
+        thisGraph.#updateGraph();
       }
       break;
     }
   };
 
 
-  svgKeyUp(e) {
+  #svgKeyUp(e) {
     const thisGraph = this;
     thisGraph.shiftKeyIsPressed = e.shiftKey;
     thisGraph.ctrlKeyIsPressed = e.ctrlKey;
@@ -441,23 +427,19 @@ class Graph {
 
 
   // call to propagate changes to graph
-  updateGraph(newSearchValue) {
+  #updateGraph() {
     const thisGraph = this;
     const consts = Graph.#consts;
-
-    if (typeof newSearchValue === "string") {
-      thisGraph.searchValue = newSearchValue;
-    }
 
     thisGraph.initialNodePositionIndicatorElement
       = thisGraph.initialNodePositionIndicator
         .attr("width", String(consts.newNodeIndicatorSize))
         .attr("height", String(consts.newNodeIndicatorSize))
         .attr("x",
-          thisGraph.initialNodePosition.x - (consts.newNodeIndicatorSize / 2),
+          thisGraph.#initialNodePosition.x - (consts.newNodeIndicatorSize / 2),
         )
         .attr("y",
-          thisGraph.initialNodePosition.y - (consts.newNodeIndicatorSize / 2),
+          thisGraph.#initialNodePosition.y - (consts.newNodeIndicatorSize / 2),
         )
         .attr("rx", 2)
         .attr("ry", 2)
@@ -474,10 +456,10 @@ class Graph {
     thisGraph.nodeHighlighterElements = thisGraph.nodeHighlighterElements
       .data(
         // append only the nodes that are search hits
-        thisGraph.nodes.filter((node) => {
-          if (typeof thisGraph.searchValue !== "string") return false;
-          if (thisGraph.searchValue.length < 3) return false;
-          return node.title.toLowerCase().includes(thisGraph.searchValue);
+        thisGraph.#nodes.filter((node) => {
+          if (typeof thisGraph.#searchValue !== "string") return false;
+          if (thisGraph.#searchValue.length < 3) return false;
+          return node.title.toLowerCase().includes(thisGraph.#searchValue);
         }),
         function(d) {return d.id;},
       )
@@ -517,7 +499,7 @@ class Graph {
     thisGraph.linkElements = thisGraph.linksContainer
       .selectAll("path.link")
       .data(
-        thisGraph.links,
+        thisGraph.#links,
         function(d) {
           return String(d.source.id) + "+" + String(d.target.id);
         },
@@ -557,13 +539,13 @@ class Graph {
         + "L" + d.target.position.x + "," + d.target.position.y;
       })
       .on("mouseover", function(e, d) {
-        thisGraph.onHighlight(true, d.source.title + " - " + d.target.title);
+        thisGraph.#onHighlight(true, d.source.title + " - " + d.target.title);
       })
       .on("mouseout", function() {
-        thisGraph.onHighlight(false);
+        thisGraph.#onHighlight(false);
       })
       .on("mousedown", function(e, d) {
-        thisGraph.pathMouseDown(e, d3.select(this), d);
+        thisGraph.#handleMouseDownOnEdge(e, d3.select(this), d);
       })
       .on("mouseup", function() {
         thisGraph.#mouseDownLink = null;
@@ -583,7 +565,7 @@ class Graph {
     // append new node data
     thisGraph.nodeElements = thisGraph.nodeElements
       .data(
-        thisGraph.nodes,
+        thisGraph.#nodes,
         function(d) {return d.id;},
       );
 
@@ -596,7 +578,7 @@ class Graph {
         },
       )
       .classed("unconnected", function(d) {
-        return !binaryArrayIncludes(thisGraph.connectedNodeIds, d.id);
+        return !binaryArrayIncludes(thisGraph.#idsOfAllNodesWithLinkedNote, d.id);
       })
       .classed("selected", (node) => {
         if (thisGraph.#selection.type !== "node") return false;
@@ -620,7 +602,7 @@ class Graph {
         return d.linkedNotes.length > 7;
       })
       .classed("unconnected", function(d) {
-        return !binaryArrayIncludes(thisGraph.connectedNodeIds, d.id);
+        return !binaryArrayIncludes(thisGraph.#idsOfAllNodesWithLinkedNote, d.id);
       })
       .attr(
         "transform",
@@ -632,17 +614,17 @@ class Graph {
         if (thisGraph.#shiftDragInProgress) {
           d3.select(this).classed(consts.connectClass, true);
         }
-        thisGraph.onHighlight(true, d.title);
+        thisGraph.#onHighlight(true, d.title);
       })
       .on("mouseout", function() {
         d3.select(this).classed(consts.connectClass, false);
-        thisGraph.onHighlight(false);
+        thisGraph.#onHighlight(false);
       })
       .on("mousedown", function(e, d) {
-        thisGraph.handleMouseDownOnNode(e, d3.select(this), d);
+        thisGraph.#handleMouseDownOnNode(e, d3.select(this), d);
       })
       .on("mouseup", function(e, d) {
-        thisGraph.handleMouseUpOnNode(d3.select(this), d);
+        thisGraph.#handleMouseUpOnNode(d3.select(this), d);
       })
       .on("click", function(e, d) {
         if (e.ctrlKey) {
@@ -655,7 +637,7 @@ class Graph {
       .attr("r", String(consts.nodeRadius));
 
     nodeG.each(function(d) {
-      thisGraph.insertTitleLinebreaks(d3.select(this), d.title);
+      thisGraph.#insertTitleLinebreaks(d3.select(this), d.title);
     });
 
     // currently it's not possible to remove nodes in Graph View
@@ -669,14 +651,14 @@ class Graph {
     // been made, but if the graph is updated a 2nd time, these must be unsaved
     // changes
     if (thisGraph.#graphHasBeenRenderedOnceBefore) {
-      thisGraph.onChange();
+      thisGraph.#onChange();
     } else {
       thisGraph.#graphHasBeenRenderedOnceBefore = true;
     }
   };
 
 
-  zoomed(e) {
+  #zoomed(e) {
     const thisGraph = this;
 
     this.#justScaleTransGraph = true;
@@ -687,9 +669,9 @@ class Graph {
         + e.transform.x + "," + e.transform.y + ") "
         + "scale(" + e.transform.k + ")",
       );
-    thisGraph.screenPosition.translateX = e.transform.x;
-    thisGraph.screenPosition.translateY = e.transform.y;
-    thisGraph.screenPosition.scale = e.transform.k;
+    thisGraph.#screenPosition.translateX = e.transform.x;
+    thisGraph.#screenPosition.translateY = e.transform.y;
+    thisGraph.#screenPosition.scale = e.transform.k;
   };
 
 
@@ -702,17 +684,22 @@ class Graph {
   };
 
 
+  /** *****************
+    PUBLIC METHODS
+  ********************/
+
+
   getSaveData() {
     const thisGraph = this;
 
-    const linksToTransmit = thisGraph.links.map((link) => {
+    const linksToTransmit = thisGraph.#links.map((link) => {
       return [
         link.source.id,
         link.target.id,
       ];
     });
 
-    const nodePositionUpdates = thisGraph.nodes.map((node) => {
+    const nodePositionUpdates = thisGraph.#nodes.map((node) => {
       return {
         id: node.id,
         position: node.position,
@@ -722,11 +709,35 @@ class Graph {
     const graphObject = {
       nodePositionUpdates,
       links: linksToTransmit,
-      screenPosition: thisGraph.screenPosition,
-      initialNodePosition: thisGraph.initialNodePosition,
+      screenPosition: thisGraph.#screenPosition,
+      initialNodePosition: thisGraph.#initialNodePosition,
     };
 
     return graphObject;
+  };
+
+
+  getSelectedNodeId() {
+    const thisGraph = this;
+
+    if (!thisGraph.#selection) {
+      return null;
+    }
+
+    if (thisGraph.#selection.type !== "node") {
+      return null;
+    }
+
+    return thisGraph.#selection.value;
+  };
+
+
+  setSearchValue(newSearchValue) {
+    const thisGraph = this;
+    if (typeof newSearchValue === "string") {
+      thisGraph.#searchValue = newSearchValue;
+    }
+    thisGraph.#updateGraph();
   };
 };
 

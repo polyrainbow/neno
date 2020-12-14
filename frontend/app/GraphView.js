@@ -80,7 +80,7 @@ const GraphView = ({
 
   useEffect(() => {
     if (!graphInstance.current) return;
-    graphInstance.current.updateGraph(searchValue);
+    graphInstance.current.setSearchValue(searchValue);
   }, [searchValue]);
 
   return <>
