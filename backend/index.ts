@@ -1,6 +1,7 @@
 import * as path from "path";
 import fs from "fs";
 import http from "http";
+import https from "https";
 import * as url from "url";
 import mkdirp from "mkdirp";
 import * as config from "./config.js";
@@ -15,13 +16,30 @@ const REPO_PATH = path.join(__dirname, "..");
 
 program
   .option(
-    '-p, --port <value>', 'HTTP port',
+    '-p, --port <value>',
+    'HTTP port',
     config.DEFAULT_PORT.toString(),
   )
   .option(
-    '-d, --data-folder-path <value>', "path to data folder",
+    '-d, --data-folder-path <value>',
+    "path to data folder",
     path.join(REPO_PATH, "..", "network-notes-data"),
-  );
+  )
+  .option(
+    '--use-https',
+    "create a https server (valid cert and key must be passed as parameters)",
+    false,
+  )
+  .option(
+    '--cert-path <value>',
+    "path to TLS certificate",
+    path.join(REPO_PATH, "..", "server.cert"),
+  )
+  .option(
+    '--cert-key-path <value>',
+    "path to private key of TLS certificate",
+    path.join(REPO_PATH, "..", "server.key"),
+  )
 
 program.parse(process.argv);
 
@@ -49,10 +67,21 @@ const app = startApp({
 });
 
 
-const httpServer = http.createServer(app);
-httpServer.listen(parseInt(program.port));
+let server;
+
+if (program.useHttps) {
+  server = https.createServer(
+    {
+      key: fs.readFileSync(program.certKeyPath),
+      cert: fs.readFileSync(program.certPath)
+    },
+    app,
+  );
+} else {
+  server = http.createServer(app);
+}
+
+server.listen(parseInt(program.port));
 console.log("Ready on port " + program.port);
-
-
 
 
