@@ -30,7 +30,7 @@ const listDir = (dir, fileList = []) => {
 
 const replaceImports = (filepath) => {
   const string = fs.readFileSync(filepath, "utf8");
-  const newString = string.replace(/^(import.*)(.js";)$/gm, "$1.mjs\";");
+  const newString = string.replace(/^(import.*)(\.js";)$/gm, "$1.mjs\";");
   fs.writeFileSync(filepath, newString);
 };
 

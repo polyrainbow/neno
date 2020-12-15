@@ -16,6 +16,7 @@ import express from "express";
 import fs from "fs";
 import * as path from "path";
 import * as Notes from "./lib/notes.js";
+import bcrypt from "bcryptjs";
 
 
 const startApp = ({
@@ -33,25 +34,40 @@ const startApp = ({
 
     // parse login and password from headers
     const b64auth = (req.headers.authorization || "").split(" ")[1] || "";
-    const [login, password]
+    const [login, submittedPassword]
       = Buffer.from(b64auth, "base64").toString().split(":");
 
-    const validUser = users.find((user) => {
-      return user.login === login && user.password === password;
-    });
-
-    // Verify login and password are set and correct
-    if (login && password && validUser) {
-      req.userId = validUser.id;
-      // Access granted...
-      return next();
+    if (!login) {
+      // Access denied...
+      res.set("WWW-Authenticate", "Basic realm=\"401\"");
+      res.status(401).send("Authentication required.");
+      return;
     }
 
-    // Access denied...
-    res.set("WWW-Authenticate", "Basic realm=\"401\""); // change this
-    res.status(401).send("Authentication required."); // custom message
+    const user = users.find((user) => {
+      return user.login === login;
+    });
 
-    // -----------------------------------------------------------------------
+    if (!user) {
+      // Access denied...
+      res.set("WWW-Authenticate", "Basic realm=\"401\"");
+      res.status(401).send("Authentication required.");
+      return;
+    }
+
+    const passwordIsValid
+      = bcrypt.compareSync(submittedPassword, user.passwordHash);
+
+    if (!passwordIsValid) {
+      // Access denied...
+      res.set("WWW-Authenticate", "Basic realm=\"401\"");
+      res.status(401).send("Authentication required.");
+      return;
+    }
+
+    // Access granted...
+    req.userId = user.id;
+    return next();
   });
 
   app.use("/", express.static(frontendPath));
