@@ -23,6 +23,11 @@
 }
 
 
+:root {
+  --highlighted-link-stroke-width: 12px;
+}
+
+
 .main-graph {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -105,7 +110,7 @@ path.link {
 
 path.link.connected-to-selected {
   stroke: rgb(255, 114, 33);
-  stroke-width: 12px;
+  stroke-width: var(--highlighted-link-stroke-width);
 }
 
 path.link:not(.newLinkLine):hover{
@@ -122,7 +127,7 @@ path.link.hidden{
 
 path.link.selected {
   stroke: rgb(195, 0, 255);
-  stroke-width: 10px;
+  stroke-width: var(--highlighted-link-stroke-width);
 }
 
 g.new-node-position-indicator rect {
