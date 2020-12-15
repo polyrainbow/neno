@@ -18,7 +18,12 @@ program
   .option(
     '-p, --port <value>',
     'HTTP port',
-    config.DEFAULT_PORT.toString(),
+    "80",
+  )
+  .option(
+    '--https-port <value>',
+    'HTTPS port',
+    "443",
   )
   .option(
     '-d, --data-folder-path <value>',
@@ -67,21 +72,35 @@ const app = startApp({
 });
 
 
-let server;
-
 if (program.useHttps) {
-  server = https.createServer(
+  const httpsServer = https.createServer(
     {
       key: fs.readFileSync(program.certKeyPath),
       cert: fs.readFileSync(program.certPath)
     },
     app,
   );
-} else {
-  server = http.createServer(app);
-}
 
-server.listen(parseInt(program.port));
-console.log("Ready on port " + program.port);
+  httpsServer.listen(parseInt(program.httpsPort));
+
+  console.log("HTTPS access ready on port " + program.httpsPort);
+  
+  if (program.port == "80" && program.httpsPort == "443") {
+    // redirect http requests to https
+    http.createServer(function (req, res) {
+      res.writeHead(301, {
+        "Location": "https://" + req.headers['host'] + req.url,
+      });
+      res.end();
+    }).listen(program.port);
+
+    console.log(
+      "HTTP requests to port " + program.port + " will be redirected to HTTPS.",
+    );
+  }
+} else {
+  const httpServer = http.createServer(app);
+  httpServer.listen(parseInt(program.port));
+}
 
 

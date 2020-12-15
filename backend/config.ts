@@ -1,5 +1,3 @@
-const DEFAULT_PORT = 8080;
-
 const API_PATH = "/api";
 
 const ALLOWED_IMAGE_UPLOAD_TYPES = [
@@ -30,7 +28,6 @@ const DEFAULT_USERS = [
 ];
 
 export {
-  DEFAULT_PORT,
   API_PATH,
   ALLOWED_IMAGE_UPLOAD_TYPES,
   ALLOWED_FILE_UPLOAD_TYPES,
