@@ -127,4 +127,6 @@ path.link.selected {
 
 g.new-node-position-indicator rect {
   fill: rgb(134, 228, 105);
+  stroke-width: 5;
+  stroke: rgb(40, 170, 0)
 }

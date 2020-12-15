@@ -58,7 +58,20 @@ class Graph {
 
     thisGraph.initialNodePositionIndicator = mainSVGGroup.append("g")
       .classed("new-node-position-indicator", true)
-      .append("rect");
+      .append("rect")
+      .attr("width", String(Graph.#consts.newNodeIndicatorSize))
+      .attr("height", String(Graph.#consts.newNodeIndicatorSize))
+      .attr("rx", 4)
+      .attr("ry", 4)
+      .on("mouseover", function(e, d) {
+        thisGraph.#onHighlight(
+          true,
+          "Initial position for new nodes (drag and drop to move)",
+        );
+      })
+      .on("mouseout", function() {
+        thisGraph.#onHighlight(false);
+      });
 
     thisGraph.nodeHighlighterContainer = mainSVGGroup.append("g")
       .classed("note-highlighters", true);
@@ -436,16 +449,12 @@ class Graph {
 
     thisGraph.initialNodePositionIndicatorElement
       = thisGraph.initialNodePositionIndicator
-        .attr("width", String(consts.newNodeIndicatorSize))
-        .attr("height", String(consts.newNodeIndicatorSize))
         .attr("x",
           thisGraph.#initialNodePosition.x - (consts.newNodeIndicatorSize / 2),
         )
         .attr("y",
           thisGraph.#initialNodePosition.y - (consts.newNodeIndicatorSize / 2),
         )
-        .attr("rx", 2)
-        .attr("ry", 2)
         .call(thisGraph.inpIndicatorDrag);
 
     /** ********************
