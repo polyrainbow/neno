@@ -17,12 +17,13 @@ import fs from "fs";
 import * as path from "path";
 import * as Notes from "./lib/notes.js";
 import bcrypt from "bcryptjs";
-
+import jwt from "jsonwebtoken";
 
 const startApp = ({
   users,
   dataPath,
   frontendPath,
+  jwtSecret,
 }) => {
   Notes.init(dataPath);
 
