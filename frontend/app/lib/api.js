@@ -98,6 +98,9 @@ const getDatabaseAsJSON = async () => {
 
 const getStats = async () => {
   const response = await callAPI("GET", "stats");
+  if (!response.success) {
+    throw new Error(response.error);
+  }
   return response.payload;
 };
 

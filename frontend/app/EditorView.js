@@ -158,7 +158,7 @@ const EditorView = ({
         setStats(stats);
       })
       .catch((e) => {
-        console.error("Could not get graph via API.");
+        console.error("Could not get stats via API.");
         console.error(e);
       });
   };

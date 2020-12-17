@@ -19,7 +19,7 @@ const AppStatsItem = ({
 const AppStats = ({
   stats,
 }) => {
-  const showStats = stats !== null;
+  const showStats = !!stats;
 
   if (!showStats) {
     return "Loading stats ...";
