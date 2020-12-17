@@ -11,6 +11,22 @@ const LoginView = ({
   const [wrongPasswordDisclaimer, setWrongPasswordDisclaimer]
     = useState(false);
 
+  const [isBusy, setIsBusy] = useState(false);
+
+
+  const startLoginAttempt = () => {
+    setIsBusy(true);
+    API.login(username, password)
+      .then((success) => {
+        if (success) {
+          setActiveView("EDITOR");
+        } else {
+          setWrongPasswordDisclaimer(true);
+          setIsBusy(false);
+        }
+      });
+  };
+
 
   return <>
     <HeaderContainer
@@ -37,6 +53,11 @@ const LoginView = ({
         <input id="login_input_username" type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          onKeyUp={(e) => {
+            if (e.key === "Enter") {
+              startLoginAttempt();
+            }
+          }}
         />
       </p>
       <p>
@@ -45,23 +66,23 @@ const LoginView = ({
         <input id="login_input_password" type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onKeyUp={(e) => {
+            if (e.key === "Enter") {
+              startLoginAttempt();
+            }
+          }}
         />
       </p>
       <p>
-        <button
-          type="button"
-          className="dialog-box-button"
-          onClick={() => {
-            API.login(username, password)
-              .then((success) => {
-                if (success) {
-                  setActiveView("EDITOR");
-                } else {
-                  setWrongPasswordDisclaimer(true);
-                }
-              });
-          }}
-        >Login</button>
+        {
+          isBusy
+            ? "Trying to log in ..."
+            : <button
+              type="button"
+              className="dialog-box-button"
+              onClick={startLoginAttempt}
+            >Login</button>
+        }
       </p>
     </section>
   </>;
