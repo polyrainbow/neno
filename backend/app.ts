@@ -133,8 +133,9 @@ const startApp = ({
       token: accessToken,
     };
   
-    return res.status(401).json(response);
+    return res.status(200).json(response);
   });
+
 
   app.get(config.API_PATH + "database-with-uploads", function(req, res) {
     const archive = archiver("zip");
