@@ -1,7 +1,7 @@
 import { API_URL } from "./config.js";
 import { yyyymmdd, htmlDecode } from "./utils.js";
 import { saveAs } from "file-saver";
-import { get as getToken } from "./tokenManager.js"; 
+import * as tokenManager from "./tokenManager.js"; 
 
 
 const callAPI = async (method, endpoint, body, outputType = "json") => {
@@ -9,7 +9,7 @@ const callAPI = async (method, endpoint, body, outputType = "json") => {
     method,
     headers: {
       "Content-Type": "application/json",
-      "authorization": getToken(),
+      "authorization": "Bearer " + tokenManager.get(),
     },
   };
 
@@ -32,7 +32,10 @@ const callAPI = async (method, endpoint, body, outputType = "json") => {
 
 
 const login = async (username, password) => {
-  await callAPI("POST", "login", { username, password });
+  const response = await callAPI("POST", "login", { username, password });
+  if (response.success) {
+    tokenManager.set(response.token);
+  }
 };
 
 

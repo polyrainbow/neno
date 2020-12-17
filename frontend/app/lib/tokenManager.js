@@ -9,7 +9,13 @@ const get = () => {
   return token;
 };
 
+const remove = () => {
+  token = null;
+  localStorage.removeItem("token");
+}
+
 export {
   set,
   get,
+  remove,
 }

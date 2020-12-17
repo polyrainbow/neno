@@ -66,6 +66,8 @@ if (program.useHttps) {
 } else {
   const httpServer = http.createServer(app);
   httpServer.listen(parseInt(program.port));
+
+  console.log("HTTP access ready on port " + program.port);
 }
 
 

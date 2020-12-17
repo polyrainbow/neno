@@ -1,6 +1,7 @@
 import React from "react";
 import * as API from "./lib/api.js";
 import IconButton from "./IconButton.js";
+import * as tokenManager from "./lib/tokenManager.js";
 
 const EditorViewHeaderControls = ({
   openImportLinksDialog,
@@ -32,6 +33,15 @@ const EditorViewHeaderControls = ({
       title="Import links as notes"
       icon="dynamic_feed"
       onClick={openImportLinksDialog}
+    />
+    <IconButton
+      id="button_logout"
+      title="Logout"
+      icon="lock"
+      onClick={() => {
+        tokenManager.remove();
+        setActiveView("LOGIN");
+      }}
     />
   </section>;
 };

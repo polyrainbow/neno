@@ -1,5 +1,6 @@
 :root {
   --main-font: 'Open Sans', sans-serif;
+  --input-border-width: 2px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -19,6 +20,10 @@
     --button-border-color: black;
     --separator-color: black;
     --button-background-color-active: chartreuse;
+  }
+
+  input, select {
+    border: var(--input-border-width) solid black !important;
   }
 }
 
@@ -46,7 +51,7 @@
   }
 
   input, select {
-    border: 1px solid white !important;
+    border: var(--input-border-width) solid white !important;
   }
 }
 
@@ -188,7 +193,7 @@ main {
 
 button {
   border-radius: 0;
-  border: 2px solid var(--button-border-color);
+  border: var(--input-border-width) solid var(--button-border-color);
   cursor: pointer;
   background-color: var(--buton-background-color);
   color: var(--font-color);
@@ -198,7 +203,7 @@ button[disabled]{
   color: grey;
   fill: grey;
   cursor: inherit;
-  border: 2px solid rgb(100, 100, 100);
+  border: var(--input-border-width) solid rgb(100, 100, 100);
 }
 
 .pagination-button {
@@ -303,12 +308,16 @@ tr:nth-child(even) {
   font-family: var(--main-font);
   font-size: 20px;
   padding: 20px;
+  width: 100%;
+  margin: auto;
+  height: calc(100vh - 50px);
 }
 
 #section_login input {
   font-family: var(--main-font);
   font-size: 20px;
   padding: 5px;
+  color: var(--font-color);
 }
 
 

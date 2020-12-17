@@ -38,7 +38,6 @@ const startApp = ({
     if (req.path.startsWith(config.API_PATH + "login")) {
       return next();
     }
-  
 
     const authHeader = req.headers.authorization;
 
@@ -48,12 +47,12 @@ const startApp = ({
 
     const token = authHeader.split(' ')[1];
 
-    jwt.verify(token, jwtSecret, (err, user) => {
+    jwt.verify(token, jwtSecret, (err, jwtPayload) => {
       if (err) {
         return res.status(403).send({ error: "INVALID_CREDENTIALS" });
       }
 
-      req.userId = user.id;
+      req.userId = jwtPayload.userId;
       return next();
     });
 
@@ -75,7 +74,7 @@ const startApp = ({
     const submittedUsername = req.body.username;
     const submittedPassword = req.body.password;
 
-    if (!submittedUsername) {
+    if ((!submittedUsername) || (!submittedPassword)) {
       // Access denied...
       res.status(401).send({ error: "INVALID_CREDENTIALS" });
       return;
@@ -103,8 +102,8 @@ const startApp = ({
     // generate an access token
     const accessToken = jwt.sign(
       {
-        username: user.username,
-        role: user.role
+        userLogin: user.login,
+        userId: user.id,
       },
       jwtSecret,
       { expiresIn: '10d' }
