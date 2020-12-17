@@ -189,12 +189,16 @@ const EditorView = ({
 
       const requestId = uuidv4();
       currentRequestId.current = requestId;
-      const notes = await API.getNotes(options);
+      try {
+        const notes = await API.getNotes(options);
 
-      // ... some time later - check if this is the current request
-      if (currentRequestId.current === requestId) {
-        setDisplayedNotes(notes);
-        setIsBusy(false);
+        // ... some time later - check if this is the current request
+        if (currentRequestId.current === requestId) {
+          setDisplayedNotes(notes);
+          setIsBusy(false);
+        }
+      } catch (e) {
+        setActiveView("LOGIN");
       }
     },
     [searchValue],

@@ -1,19 +1,38 @@
 import { API_URL } from "./config.js";
 import { yyyymmdd, htmlDecode } from "./utils.js";
 import { saveAs } from "file-saver";
+import { get as getToken } from "./tokenManager.js"; 
 
 
-const callAPI = async (method, endpoint, body) => {
-  const response = await fetch(API_URL + endpoint, {
+const callAPI = async (method, endpoint, body, outputType = "json") => {
+  const fetchOptions = {
     method,
-    body: JSON.stringify(body),
     headers: {
       "Content-Type": "application/json",
+      "authorization": getToken(),
     },
-  });
+  };
 
-  const responseObject = await response.json();
-  return responseObject;
+  if (body) {
+    fetchOptions.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(API_URL + endpoint, fetchOptions);
+
+  let responseFormatted;
+
+  if (outputType === "json") {
+    responseFormatted = await response.json();
+  } else if (outputType === "text") {
+    responseFormatted = await response.text();
+  }
+  
+  return responseFormatted;
+};
+
+
+const login = async (username, password) => {
+  await callAPI("POST", "login", { username, password });
 };
 
 
@@ -66,20 +85,19 @@ const deleteNote = async (noteId) => {
 
 
 const getDatabaseAsJSON = async () => {
-  const response = await callAPI("GET", "database");
-  const jsonString = JSON.stringify(response);
+  const jsonString = await callAPI("GET", "database", null, "text");
   return jsonString;
 };
 
 
 const getStats = async () => {
-  const response = await fetch("GET", "stats");
+  const response = await callAPI("GET", "stats");
   return response;
 };
 
 
 const getGraph = async () => {
-  const response = await fetch("GET", "graph");
+  const response = await callAPI("GET", "graph");
   return response;
 };
 
@@ -146,6 +164,7 @@ const importLinksAsNotes = async (links) => {
 
 
 export {
+  login,
   getNote,
   getNotes,
   putNote,

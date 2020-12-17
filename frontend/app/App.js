@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import EditorView from "./EditorView.js";
 import GraphView from "./GraphView.js";
+import LoginView from "./LoginView.js";
 
 const App = () => {
   const [activeView, setActiveView] = useState("EDITOR");
@@ -16,6 +17,15 @@ const App = () => {
       unsavedChanges={unsavedChanges}
       setUnsavedChanges={setUnsavedChanges}
       initialNoteId={initialNoteId}
+    />;
+  }
+
+  if (activeView === "LOGIN") {
+    return <LoginView
+      setActiveView={(view) => {
+        setUnsavedChanges(false);
+        setActiveView(view);
+      }}
     />;
   }
 

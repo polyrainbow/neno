@@ -1,4 +1,4 @@
-const API_PATH = "/api";
+const API_PATH = "/api/";
 
 const ALLOWED_IMAGE_UPLOAD_TYPES = [
   {

@@ -299,6 +299,19 @@ tr:nth-child(even) {
 }
 
 
+#section_login {
+  font-family: var(--main-font);
+  font-size: 20px;
+  padding: 20px;
+}
+
+#section_login input {
+  font-family: var(--main-font);
+  font-size: 20px;
+  padding: 5px;
+}
+
+
 @media only screen and (min-width: 1201px) {
   body, #app{
     overflow: hidden;
