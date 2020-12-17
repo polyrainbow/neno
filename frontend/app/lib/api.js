@@ -2,15 +2,23 @@ import { API_URL } from "./config.js";
 import { yyyymmdd, htmlDecode } from "./utils.js";
 import { saveAs } from "file-saver";
 
-const getNote = async (noteId) => {
-  const response = await fetch(API_URL + "note/" + noteId, {
-    method: "GET",
+
+const callAPI = async (method, endpoint, body) => {
+  const response = await fetch(API_URL + endpoint, {
+    method,
+    body: JSON.stringify(body),
     headers: {
       "Content-Type": "application/json",
     },
   });
 
-  const note = await response.json();
+  const responseObject = await response.json();
+  return responseObject;
+};
+
+
+const getNote = async (noteId) => {
+  const note = await callAPI("GET", "note/" + noteId);
   return note;
 };
 
@@ -19,21 +27,14 @@ const getNotes = async (options) => {
   const query = options?.query;
   const caseSensitive = options?.caseSensitive;
 
-  let url = API_URL + "notes";
+  let url = "notes";
   if (typeof query === "string") {
     url = url
       + "?q=" + encodeURIComponent(query)
       + "&caseSensitive=" + caseSensitive;
   }
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const responseObject = await response.json();
+  const responseObject = await callAPI("GET", url);
 
   if (!responseObject.success) {
     throw new Error("Server says this was unsuccessful");
@@ -44,73 +45,42 @@ const getNotes = async (options) => {
 
 
 const putNote = async (note, options) => {
-  const response = await fetch(API_URL + "note", {
-    method: "PUT",
-    body: JSON.stringify({
+  const response = await callAPI("PUT", "note",
+    {
       note,
       options,
-    }),
-    headers: {
-      "Content-Type": "application/json",
     },
-  });
+  );
 
-  const json = await response.json();
-
-  if (json.success === false) {
-    throw new Error(json.error);
+  if (response.success === false) {
+    throw new Error(response.error);
   }
 
-  return json.note;
+  return response.note;
 };
 
 
 const deleteNote = async (noteId) => {
-  await fetch(
-    API_URL + "note/" + noteId,
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
+  await callAPI("DELETE", "note/" + noteId);
 };
 
 
 const getDatabaseAsJSON = async () => {
-  const response = await fetch(API_URL + "database/", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const jsonString = await response.text();
+  const response = await callAPI("GET", "database");
+  const jsonString = JSON.stringify(response);
   return jsonString;
 };
 
 
 const getStats = async () => {
-  const response = await fetch(API_URL + "stats", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const json = await response.json();
-  return json;
+  const response = await fetch("GET", "stats");
+  return response;
 };
 
 
 const getGraph = async () => {
-  const response = await fetch(API_URL + "graph", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const json = await response.json();
-  return json;
+  const response = await fetch("GET", "graph");
+  return response;
 };
 
 
@@ -135,17 +105,9 @@ const getGraphObject = async () => {
 
 
 const saveGraph = async (graphObject) => {
-  const response = await fetch("/api/graph", {
-    method: "POST",
-    body: JSON.stringify(graphObject),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await callAPI("POST", "graph", graphObject);
 
-  const responseObject = await response.json();
-
-  if (!responseObject.success === true) {
+  if (!response.success === true) {
     throw new Error("Error saving graph!");
   }
 
@@ -173,23 +135,13 @@ const archiveDatabaseWithUploads = async () => {
 
 
 const importLinksAsNotes = async (links) => {
-  const response = await fetch(API_URL + "import-links-as-notes", {
-    method: "PUT",
-    body: JSON.stringify({
-      links,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await callAPI("PUT", "import-links-as-notes", links);
 
-  const json = await response.json();
-
-  if (json.success === false) {
-    throw new Error(json.error);
+  if (response.success === false) {
+    throw new Error(response.error);
   }
 
-  return json.note;
+  return response.note;
 };
 
 
