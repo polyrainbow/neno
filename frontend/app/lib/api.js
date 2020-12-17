@@ -43,8 +43,8 @@ const login = async (username, password) => {
 
 
 const getNote = async (noteId) => {
-  const note = await callAPI("GET", "note/" + noteId);
-  return note;
+  const response = await callAPI("GET", "note/" + noteId);
+  return response.payload;
 };
 
 
@@ -65,7 +65,7 @@ const getNotes = async (options) => {
     throw new Error("Server says this was unsuccessful");
   }
 
-  return responseObject.notes;
+  return responseObject.payload;
 };
 
 
@@ -81,7 +81,7 @@ const putNote = async (note, options) => {
     throw new Error(response.error);
   }
 
-  return response.note;
+  return response.payload;
 };
 
 
@@ -98,13 +98,13 @@ const getDatabaseAsJSON = async () => {
 
 const getStats = async () => {
   const response = await callAPI("GET", "stats");
-  return response;
+  return response.payload;
 };
 
 
 const getGraph = async () => {
   const response = await callAPI("GET", "graph");
-  return response;
+  return response.payload;
 };
 
 
@@ -131,7 +131,7 @@ const getGraphObject = async () => {
 const saveGraph = async (graphObject) => {
   const response = await callAPI("POST", "graph", graphObject);
 
-  if (!response.success === true) {
+  if (!response.success) {
     throw new Error("Error saving graph!");
   }
 
@@ -165,7 +165,7 @@ const importLinksAsNotes = async (links) => {
     throw new Error(response.error);
   }
 
-  return response.note;
+  return response.payload;
 };
 
 

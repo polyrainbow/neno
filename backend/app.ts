@@ -18,6 +18,8 @@ import * as path from "path";
 import * as Notes from "./lib/notes.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import APIResponse from "./interfaces/APIResponse.js";
+import { APIError } from "./interfaces/APIError.js";
 
 const startApp = ({
   users,
@@ -42,14 +44,22 @@ const startApp = ({
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-      return res.status(401).send({ error: "INVALID_CREDENTIALS" });
+      const response:APIResponse = {
+        success: false,
+        error: APIError.INVALID_CREDENTIALS,
+      };
+      return res.status(401).json(response);
     }
 
     const token = authHeader.split(' ')[1];
 
     jwt.verify(token, jwtSecret, (err, jwtPayload) => {
       if (err) {
-        return res.status(403).send({ error: "INVALID_CREDENTIALS" });
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_CREDENTIALS,
+        };
+        return res.status(403).json(response);
       }
 
       req.userId = jwtPayload.userId;
@@ -76,8 +86,11 @@ const startApp = ({
 
     if ((!submittedUsername) || (!submittedPassword)) {
       // Access denied...
-      res.status(401).send({ error: "INVALID_CREDENTIALS" });
-      return;
+      const response:APIResponse = {
+        success: false,
+        error: APIError.INVALID_CREDENTIALS,
+      };
+      return res.status(401).json(response);
     }
 
     const user = users.find((user) => {
@@ -86,8 +99,11 @@ const startApp = ({
 
     if (!user) {
       // Access denied...
-      res.status(401).send({ error: "INVALID_CREDENTIALS" });
-      return;
+      const response:APIResponse = {
+        success: false,
+        error: APIError.INVALID_CREDENTIALS,
+      };
+      return res.status(401).json(response);
     }
 
     const passwordIsValid
@@ -95,8 +111,11 @@ const startApp = ({
 
     if (!passwordIsValid) {
       // Access denied...
-      res.status(401).send({ error: "INVALID_CREDENTIALS" });
-      return;
+      const response:APIResponse = {
+        success: false,
+        error: APIError.INVALID_CREDENTIALS,
+      };
+      return res.status(401).json(response);
     }
 
     // generate an access token
@@ -109,17 +128,23 @@ const startApp = ({
       { expiresIn: '10d' }
     );
 
-    res.end(JSON.stringify({
+    const response:APIResponse = {
       success: true,
       token: accessToken,
-    }));
+    };
+  
+    return res.status(401).json(response);
   });
 
   app.get(config.API_PATH + "database-with-uploads", function(req, res) {
     const archive = archiver("zip");
 
     archive.on("error", function(err) {
-      res.status(500).send({ error: err.message });
+      const response:APIResponse = {
+        success: false,
+        error: err.message,
+      }
+      res.status(500).json(response);
     });
 
     // on stream closed we can end the request
@@ -152,42 +177,52 @@ const startApp = ({
 
 
   app.put(config.API_PATH + "database", function(req, res) {
+    const response:APIResponse = {
+      success: false,
+    };
+  
     try {
       const success = Notes.importDB(req.body, req.userId);
-      res.end(JSON.stringify(
-        {
-          success,
-        },
-      ));
+      if (!success) throw new Error("INTERNAL_SERVER_ERROR");
+      response.success = true;
     } catch(e) {
-      res.end(JSON.stringify(
-        {
-          success: false,
-          error: e.message
-        },
-      ));
+      response.success = false;
+      response.error = APIError.INTERNAL_SERVER_ERROR;
+    } finally {
+      res.status(response.success ? 200 : 500).json(response);
     }
   });
 
 
   app.get(config.API_PATH + "graph", function(req, res) {
     const graph = Notes.getGraph(req.userId);
-    res.end(JSON.stringify(graph));
+    const response:APIResponse = {
+      success: true,
+      payload: graph,
+    };
+    res.json(response);
   });
 
 
   app.get(config.API_PATH + "stats", function(req, res) {
     const stats:Stats = Notes.getStats(req.userId);
-    res.end(JSON.stringify(stats));
+    const response:APIResponse = {
+      success: true,
+      payload: stats,
+    };
+    res.json(response);
   });
 
 
   app.post(config.API_PATH + "graph", function(req, res) {
     const success = Notes.setGraph(req.body, req.userId);
-
-    res.end(JSON.stringify({
+    const response:APIResponse = {
       success,
-    }));
+    };
+    if (!success) {
+      response.error = APIError.INTERNAL_SERVER_ERROR;
+    }
+    res.json(response);
   });
 
 
@@ -202,19 +237,25 @@ const startApp = ({
       caseSensitiveQuery,
     });
 
-    const response = {
+    const response:APIResponse = {
       success: true,
-      notes: notesList,
+      payload: notesList,
     };
-
-    res.end(JSON.stringify(response));
+    res.json(response);
   });
 
 
   app.get(config.API_PATH + "note/:noteId", function(req, res) {
     const noteId:NoteId = parseInt(req.params.noteId);
     const note:NoteToTransmit | null = Notes.get(noteId, req.userId);
-    res.end(JSON.stringify(note));
+    const response:APIResponse = {
+      success: !!note,
+      payload: note,
+    };
+    if (!note) {
+      response.error = APIError.NOTE_NOT_FOUND;
+    }
+    res.json(response);
   });
 
 
@@ -224,15 +265,17 @@ const startApp = ({
       const noteToTransmit:NoteToTransmit
         = Notes.put(reqBody.note, req.userId, reqBody.options);
 
-      res.end(JSON.stringify({
-        note: noteToTransmit,
+      const response:APIResponse = {
         success: true,
-      }));
+        payload: noteToTransmit,
+      };
+      res.json(response);
     } catch (e) {
-      res.end(JSON.stringify({
+      const response:APIResponse = {
         success: false,
         error: e.message,
-      }));
+      };
+      res.json(response);
     }
   });
 
@@ -309,20 +352,24 @@ const startApp = ({
           }
         });
 
-        res.end(JSON.stringify({
-          notesToTransmit,
-          failures,
+        const response:APIResponse = {
+          payload: {
+            notesToTransmit,
+            failures,
+          },
           success: true,
-        }));
+        };
+        res.json(response);
       });
   });
 
 
   app.delete(config.API_PATH + "note/:noteId", function(req, res) {
     const success = Notes.remove(parseInt(req.params.noteId), req.userId);
-    res.end(JSON.stringify({
+    const response:APIResponse = {
       success,
-    }));
+    };
+    res.json(response);
   });
 
 
@@ -334,11 +381,12 @@ const startApp = ({
         res.end(JSON.stringify(metadata));
       })
       .catch((e) => {
+        // this is the response style required by the editor.js link plugin
         const response = {
           "success": 0,
           "error": e,
         };
-        res.end(JSON.stringify(response));
+        res.json(response);
       });
   });
 
@@ -373,7 +421,8 @@ const startApp = ({
       const oldpath = file.path;
       const fileId = Notes.addFile(oldpath, fileTypeObject);
 
-      res.end(JSON.stringify(
+      // this is the response style required by the editor.js image plugin
+      res.json(
         {
           "success": 1,
           "file": {
@@ -381,7 +430,7 @@ const startApp = ({
             "fileId": fileId,
           },
         },
-      ));
+      );
     });
   });
 
@@ -414,7 +463,8 @@ const startApp = ({
       const oldpath = file.path;
       const fileId = Notes.addFile(oldpath, fileTypeObject);
 
-      res.end(JSON.stringify(
+      // this is the response style required by the editor.js attaches plugin
+      res.json(
         {
           "success": 1,
           "file": {
@@ -424,7 +474,7 @@ const startApp = ({
             "fileId": fileId,
           },
         },
-      ));
+      );
     });
   });
 
