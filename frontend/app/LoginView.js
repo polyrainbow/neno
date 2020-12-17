@@ -8,6 +8,8 @@ const LoginView = ({
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [wrongPasswordDisclaimer, setWrongPasswordDisclaimer]
+    = useState(false);
 
 
   return <>
@@ -21,6 +23,14 @@ const LoginView = ({
     />
     <section id="section_login">
       <h1>Login</h1>
+      {
+        wrongPasswordDisclaimer
+          ? <p style={{color: "red"}}>
+            Your username and password do not seem to be correct.
+            Please try again.
+          </p>
+          : ""
+      }
       <p>
         <label htmlFor="login_input_username">Username</label>
         <br />
@@ -43,8 +53,12 @@ const LoginView = ({
           className="dialog-box-button"
           onClick={() => {
             API.login(username, password)
-              .then(() => {
-                setActiveView("EDITOR");
+              .then((success) => {
+                if (success) {
+                  setActiveView("EDITOR");
+                } else {
+                  setWrongPasswordDisclaimer(true);
+                }
               });
           }}
         >Login</button>

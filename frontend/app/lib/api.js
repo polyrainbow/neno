@@ -35,7 +35,10 @@ const login = async (username, password) => {
   const response = await callAPI("POST", "login", { username, password });
   if (response.success) {
     tokenManager.set(response.token);
+    return true;
   }
+
+  return false;
 };
 
 
