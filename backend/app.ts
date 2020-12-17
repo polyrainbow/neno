@@ -74,67 +74,13 @@ const startApp = ({
   app.use(compression());
 
 
-  app.get(config.API_PATH, function(req, res) {
-    res.send("Hello World!");
-  });
+  /* ***************
+    Endpoints
+  *****************/
 
-
-  app.post(config.API_PATH + 'login', (req, res) => {
-    // read username and password from request body
-    const submittedUsername = req.body.username;
-    const submittedPassword = req.body.password;
-
-    if ((!submittedUsername) || (!submittedPassword)) {
-      // Access denied...
-      const response:APIResponse = {
-        success: false,
-        error: APIError.INVALID_CREDENTIALS,
-      };
-      return res.status(401).json(response);
-    }
-
-    const user = users.find((user) => {
-      return user.login === submittedUsername;
-    });
-
-    if (!user) {
-      // Access denied...
-      const response:APIResponse = {
-        success: false,
-        error: APIError.INVALID_CREDENTIALS,
-      };
-      return res.status(401).json(response);
-    }
-
-    const passwordIsValid
-      = bcrypt.compareSync(submittedPassword, user.passwordHash);
-
-    if (!passwordIsValid) {
-      // Access denied...
-      const response:APIResponse = {
-        success: false,
-        error: APIError.INVALID_CREDENTIALS,
-      };
-      return res.status(401).json(response);
-    }
-
-    // generate an access token
-    const accessToken = jwt.sign(
-      {
-        userLogin: user.login,
-        userId: user.id,
-      },
-      jwtSecret,
-      { expiresIn: '10d' }
-    );
-
-    const response:APIResponse = {
-      success: true,
-      token: accessToken,
-    };
-  
-    return res.status(200).json(response);
-  });
+  /* ***************
+    Endpoints with authentication required
+  *****************/
 
 
   app.get(config.API_PATH + "database-with-uploads", function(req, res) {
@@ -374,24 +320,6 @@ const startApp = ({
   });
 
 
-  app.get(config.API_PATH + "link-data", (req, res) => {
-    const url = req.query.url;
-
-    getUrlMetadata(url)
-      .then((metadata) => {
-        res.end(JSON.stringify(metadata));
-      })
-      .catch((e) => {
-        // this is the response style required by the editor.js link plugin
-        const response = {
-          "success": 0,
-          "error": e,
-        };
-        res.json(response);
-      });
-  });
-
-
   app.post(config.API_PATH + "image", function(req, res) {
     const form = new formidable.IncomingForm();
     form.parse(req, (err, fields, files) => {
@@ -452,9 +380,10 @@ const startApp = ({
         return;
       }
 
-      const fileTypeObject = config.ALLOWED_FILE_UPLOAD_TYPES.find((filetype) => {
-        return filetype.mimeType === file.type;
-      });
+      const fileTypeObject = config.ALLOWED_FILE_UPLOAD_TYPES
+        .find((filetype) => {
+          return filetype.mimeType === file.type;
+        });
 
       if (!fileTypeObject) {
         res.end("Invalid MIME type: " + file.type);
@@ -480,6 +409,78 @@ const startApp = ({
   });
 
 
+  /* ***************
+    Endpoints with NO authentication required
+  *****************/
+
+
+  app.get(config.API_PATH, function(req, res) {
+    const response:APIResponse = {
+      success: true,
+      payload: "Hello world!",
+    }
+    res.json(response);
+  });
+
+
+  app.post(config.API_PATH + 'login', (req, res) => {
+    // read username and password from request body
+    const submittedUsername = req.body.username;
+    const submittedPassword = req.body.password;
+
+    if ((!submittedUsername) || (!submittedPassword)) {
+      // Access denied...
+      const response:APIResponse = {
+        success: false,
+        error: APIError.INVALID_CREDENTIALS,
+      };
+      return res.status(401).json(response);
+    }
+
+    const user = users.find((user) => {
+      return user.login === submittedUsername;
+    });
+
+    if (!user) {
+      // Access denied...
+      const response:APIResponse = {
+        success: false,
+        error: APIError.INVALID_CREDENTIALS,
+      };
+      return res.status(401).json(response);
+    }
+
+    const passwordIsValid
+      = bcrypt.compareSync(submittedPassword, user.passwordHash);
+
+    if (!passwordIsValid) {
+      // Access denied...
+      const response:APIResponse = {
+        success: false,
+        error: APIError.INVALID_CREDENTIALS,
+      };
+      return res.status(401).json(response);
+    }
+
+    // generate an access token
+    const accessToken = jwt.sign(
+      {
+        userLogin: user.login,
+        userId: user.id,
+      },
+      jwtSecret,
+      { expiresIn: '10d' }
+    );
+
+    const response:APIResponse = {
+      success: true,
+      token: accessToken,
+    };
+
+    return res.status(200).json(response);
+  });
+
+
   app.get(config.API_PATH + "file/:fileId", function(req, res) {
     const file = Notes.getFile(req.params.fileId);
     if (!fs.existsSync(file)) {
@@ -488,6 +489,25 @@ const startApp = ({
     }
     res.download(file);
   });
+
+
+  app.get(config.API_PATH + "link-data", (req, res) => {
+    const url = req.query.url;
+
+    getUrlMetadata(url)
+      .then((metadata) => {
+        res.end(JSON.stringify(metadata));
+      })
+      .catch((e) => {
+        // this is the response style required by the editor.js link plugin
+        const response = {
+          "success": 0,
+          "error": e,
+        };
+        res.json(response);
+      });
+  });
+
 
   return app;
 };
