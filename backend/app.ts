@@ -33,6 +33,11 @@ const startApp = ({
     // -----------------------------------------------------------------------
     // authentication middleware
 
+    // skip authentication when not acessing API
+    if (!req.path.startsWith(config.API_PATH)) {
+      return next();
+    }
+
     // parse login and password from headers
     const b64auth = (req.headers.authorization || "").split(" ")[1] || "";
     const [login, submittedPassword]
