@@ -30,17 +30,7 @@ const startApp = ({
   Notes.init(dataPath);
   const app = express();
 
-  const authenticateJWT = (req, res, next) => {
-    // skip authentication when not acessing API
-    if (!req.path.startsWith(config.API_PATH)) {
-      return next();
-    }
-
-    // allow to login without token
-    if (req.path.startsWith(config.API_PATH + "login")) {
-      return next();
-    }
-
+  const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -68,7 +58,6 @@ const startApp = ({
 
   };
 
-  app.use(authenticateJWT);
   app.use("/", express.static(frontendPath));
   app.use(express.json());
   app.use(compression());
@@ -83,330 +72,382 @@ const startApp = ({
   *****************/
 
 
-  app.get(config.API_PATH + "database-with-uploads", function(req, res) {
-    const archive = archiver("zip");
+  app.get(
+    config.API_PATH + "database-with-uploads",
+    verifyJWT,
+    function(req, res) {
+      const archive = archiver("zip");
 
-    archive.on("error", function(err) {
-      const response:APIResponse = {
-        success: false,
-        error: err.message,
-      }
-      res.status(500).json(response);
-    });
-
-    // on stream closed we can end the request
-    archive.on("end", function() {
-      const size = archive.pointer();
-      console.log(`Archive for ${req.userId} created. Size: ${size} bytes`);
-    });
-
-    // set the archive name
-    const dateSuffix = yyyymmdd(new Date());
-    res.attachment(`neno-${req.userId}-${dateSuffix}.db.zip`);
-
-    // this is the streaming magic
-    archive.pipe(res);
-
-    Notes
-      .getFilesForDBExport(req.userId)
-      .forEach((file) => {
-        archive.file(file, { name: path.basename(file) });
+      archive.on("error", function(err) {
+        const response:APIResponse = {
+          success: false,
+          error: err.message,
+        }
+        res.status(500).json(response);
       });
 
-    archive.finalize();
-  });
+      // on stream closed we can end the request
+      archive.on("end", function() {
+        const size = archive.pointer();
+        console.log(`Archive for ${req.userId} created. Size: ${size} bytes`);
+      });
+
+      // set the archive name
+      const dateSuffix = yyyymmdd(new Date());
+      res.attachment(`neno-${req.userId}-${dateSuffix}.db.zip`);
+
+      // this is the streaming magic
+      archive.pipe(res);
+
+      Notes
+        .getFilesForDBExport(req.userId)
+        .forEach((file) => {
+          archive.file(file, { name: path.basename(file) });
+        });
+
+      archive.finalize();
+    },
+  );
 
 
-  app.get(config.API_PATH + "database", function(req, res) {
-    const database = Notes.exportDB(req.userId);
-    res.end(JSON.stringify(database));
-  });
+  app.get(
+    config.API_PATH + "database",
+    verifyJWT,
+    function(req, res) {
+      const database = Notes.exportDB(req.userId);
+      res.end(JSON.stringify(database));
+    },
+  );
 
 
-  app.put(config.API_PATH + "database", function(req, res) {
-    const response:APIResponse = {
-      success: false,
-    };
-  
-    try {
-      const success = Notes.importDB(req.body, req.userId);
-      if (!success) throw new Error("INTERNAL_SERVER_ERROR");
-      response.success = true;
-    } catch(e) {
-      response.success = false;
-      response.error = APIError.INTERNAL_SERVER_ERROR;
-    } finally {
-      res.status(response.success ? 200 : 500).json(response);
-    }
-  });
+  app.put(
+    config.API_PATH + "database",
+    verifyJWT,
+    function(req, res) {
+      const response:APIResponse = {
+        success: false,
+      };
+    
+      try {
+        const success = Notes.importDB(req.body, req.userId);
+        if (!success) throw new Error("INTERNAL_SERVER_ERROR");
+        response.success = true;
+      } catch(e) {
+        response.success = false;
+        response.error = APIError.INTERNAL_SERVER_ERROR;
+      } finally {
+        res.status(response.success ? 200 : 500).json(response);
+      }
+    },
+  );
 
 
-  app.get(config.API_PATH + "graph", function(req, res) {
-    const graph = Notes.getGraph(req.userId);
-    const response:APIResponse = {
-      success: true,
-      payload: graph,
-    };
-    res.json(response);
-  });
+  app.get(
+    config.API_PATH + "graph",
+    verifyJWT,
+    function(req, res) {
+      const graph = Notes.getGraph(req.userId);
+      const response:APIResponse = {
+        success: true,
+        payload: graph,
+      };
+      res.json(response);
+    },
+  );
 
 
-  app.get(config.API_PATH + "stats", function(req, res) {
-    const stats:Stats = Notes.getStats(req.userId);
-    const response:APIResponse = {
-      success: true,
-      payload: stats,
-    };
-    res.json(response);
-  });
+  app.get(
+    config.API_PATH + "stats",
+    verifyJWT,
+    function(req, res) {
+      const stats:Stats = Notes.getStats(req.userId);
+      const response:APIResponse = {
+        success: true,
+        payload: stats,
+      };
+      res.json(response);
+    },
+  );
 
 
-  app.post(config.API_PATH + "graph", function(req, res) {
-    const success = Notes.setGraph(req.body, req.userId);
-    const response:APIResponse = {
-      success,
-    };
-    if (!success) {
-      response.error = APIError.INTERNAL_SERVER_ERROR;
-    }
-    res.json(response);
-  });
+  app.post(
+    config.API_PATH + "graph",
+    verifyJWT,
+    function(req, res) {
+      const success = Notes.setGraph(req.body, req.userId);
+      const response:APIResponse = {
+        success,
+      };
+      if (!success) {
+        response.error = APIError.INTERNAL_SERVER_ERROR;
+      }
+      res.json(response);
+    },
+  );
 
 
-  app.get(config.API_PATH + "notes", function(req, res) {
-    const query = req.query.q || "";
-    const caseSensitiveQuery = req.query.caseSensitive === "true";
-    const includeLinkedNotes = true;
+  app.get(
+    config.API_PATH + "notes",
+    verifyJWT,
+    function(req, res) {
+      const query = req.query.q || "";
+      const caseSensitiveQuery = req.query.caseSensitive === "true";
+      const includeLinkedNotes = true;
 
-    const notesList:NoteListItem[] = Notes.getNotesList(req.userId, {
-      includeLinkedNotes,
-      query,
-      caseSensitiveQuery,
-    });
-
-    const response:APIResponse = {
-      success: true,
-      payload: notesList,
-    };
-    res.json(response);
-  });
-
-
-  app.get(config.API_PATH + "note/:noteId", function(req, res) {
-    const noteId:NoteId = parseInt(req.params.noteId);
-    const note:NoteToTransmit | null = Notes.get(noteId, req.userId);
-    const response:APIResponse = {
-      success: !!note,
-      payload: note,
-    };
-    if (!note) {
-      response.error = APIError.NOTE_NOT_FOUND;
-    }
-    res.json(response);
-  });
-
-
-  app.put(config.API_PATH + "note", function(req, res) {
-    const reqBody = req.body;
-    try {
-      const noteToTransmit:NoteToTransmit
-        = Notes.put(reqBody.note, req.userId, reqBody.options);
+      const notesList:NoteListItem[] = Notes.getNotesList(req.userId, {
+        includeLinkedNotes,
+        query,
+        caseSensitiveQuery,
+      });
 
       const response:APIResponse = {
         success: true,
-        payload: noteToTransmit,
+        payload: notesList,
       };
       res.json(response);
-    } catch (e) {
+    },
+  );
+
+
+  app.get(
+    config.API_PATH + "note/:noteId",
+    verifyJWT,
+    function(req, res) {
+      const noteId:NoteId = parseInt(req.params.noteId);
+      const note:NoteToTransmit | null = Notes.get(noteId, req.userId);
       const response:APIResponse = {
-        success: false,
-        error: e.message,
+        success: !!note,
+        payload: note,
       };
+      if (!note) {
+        response.error = APIError.NOTE_NOT_FOUND;
+      }
       res.json(response);
-    }
-  });
+    },
+  );
 
 
-  app.put(config.API_PATH + "import-links-as-notes", function(req, res) {
-    const reqBody = req.body;
-    const links:string[] = reqBody.links;
-    const promises:Promise<UrlMetadataResponse>[]
-      = links.map((url:string):Promise<UrlMetadataResponse> => {
-        return getUrlMetadata(url);
-      });
-
-    Promise.allSettled(promises)
-      .then((promiseSettledResults):void => {
-        const fulfilledPromises:PromiseSettledResult<UrlMetadataResponse>[]
-          = promiseSettledResults.filter((response) => {
-            return response.status === "fulfilled";
-          });
-        
-        const urlMetadataResults:UrlMetadataResponse[]
-          = fulfilledPromises.map((response) => {
-            return (response.status === "fulfilled") && response.value;
-          })
-          .filter(Utils.isNotFalse);
-
-        const notesFromUser:NoteFromUser[]
-          = urlMetadataResults.map((urlMetadataObject) => {
-          const noteFromUser:NoteFromUser = {
-            editorData: {
-              "time": Date.now(),
-              "blocks": [
-                {
-                  "type": "header",
-                  "data": {
-                    "text": urlMetadataObject.meta.title,
-                    "level": 1,
-                  },
-                },
-                {
-                  "type": "linkTool",
-                  "data": {
-                    "link": urlMetadataObject.url,
-                    "meta": urlMetadataObject.meta,
-                  },
-                },
-              ],
-              "version": "2.16.1",
-            },
-          };
-
-          return noteFromUser;
-        });
-
-        const notesToTransmit:NoteToTransmit[] = [];
-        const failures:ImportLinkAsNoteFailure[] = [];
-
-        notesFromUser.forEach((noteFromUser:NoteFromUser) => {
-          try {
-            const noteToTransmit:NoteToTransmit = Notes.put(
-              noteFromUser,
-              req.userId,
-              {
-                ignoreDuplicateTitles: true,
-              },
-            );
-            notesToTransmit.push(noteToTransmit);
-          } catch (e) {
-            const errorMessage:string = e.toString();
-            const failure:ImportLinkAsNoteFailure = {
-              note: noteFromUser,
-              error: errorMessage,
-            };
-            failures.push(failure);
-          }
-        });
+  app.put(
+    config.API_PATH + "note",
+    verifyJWT,
+    function(req, res) {
+      const reqBody = req.body;
+      try {
+        const noteToTransmit:NoteToTransmit
+          = Notes.put(reqBody.note, req.userId, reqBody.options);
 
         const response:APIResponse = {
-          payload: {
-            notesToTransmit,
-            failures,
-          },
           success: true,
+          payload: noteToTransmit,
         };
         res.json(response);
-      });
-  });
-
-
-  app.delete(config.API_PATH + "note/:noteId", function(req, res) {
-    const success = Notes.remove(parseInt(req.params.noteId), req.userId);
-    const response:APIResponse = {
-      success,
-    };
-    res.json(response);
-  });
-
-
-  app.post(config.API_PATH + "image", function(req, res) {
-    const form = new formidable.IncomingForm();
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        console.log(err);
-        res.end(err);
-        return;
+      } catch (e) {
+        const response:APIResponse = {
+          success: false,
+          error: e.message,
+        };
+        res.json(response);
       }
-
-      const file = files.image;
-
-      if (!file) {
-        res.end("File upload error");
-        return;
-      }
-
-      const fileTypeObject = config.ALLOWED_IMAGE_UPLOAD_TYPES.find(
-        (filetype) => {
-          return filetype.mimeType === file.type;
-        },
-      );
-
-      if (!fileTypeObject) {
-        res.end("Invalid MIME type: " + file.type);
-        return;
-      }
-
-      const oldpath = file.path;
-      const fileId = Notes.addFile(oldpath, fileTypeObject);
-
-      // this is the response style required by the editor.js image plugin
-      res.json(
-        {
-          "success": 1,
-          "file": {
-            "url": config.API_PATH + "file/" + fileId,
-            "fileId": fileId,
-          },
-        },
-      );
-    });
-  });
+    },
+  );
 
 
-  app.post(config.API_PATH + "file", function(req, res) {
-    const form = new formidable.IncomingForm();
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        console.log(err);
-        res.end(err);
-        return;
-      }
-
-      const file = files.file;
-
-      if (!file) {
-        res.end("File upload error");
-        return;
-      }
-
-      const fileTypeObject = config.ALLOWED_FILE_UPLOAD_TYPES
-        .find((filetype) => {
-          return filetype.mimeType === file.type;
+  app.put(
+    config.API_PATH + "import-links-as-notes",
+    verifyJWT,
+    function(req, res) {
+      const reqBody = req.body;
+      const links:string[] = reqBody.links;
+      const promises:Promise<UrlMetadataResponse>[]
+        = links.map((url:string):Promise<UrlMetadataResponse> => {
+          return getUrlMetadata(url);
         });
 
-      if (!fileTypeObject) {
-        res.end("Invalid MIME type: " + file.type);
-        return;
-      }
+      Promise.allSettled(promises)
+        .then((promiseSettledResults):void => {
+          const fulfilledPromises:PromiseSettledResult<UrlMetadataResponse>[]
+            = promiseSettledResults.filter((response) => {
+              return response.status === "fulfilled";
+            });
+          
+          const urlMetadataResults:UrlMetadataResponse[]
+            = fulfilledPromises.map((response) => {
+              return (response.status === "fulfilled") && response.value;
+            })
+            .filter(Utils.isNotFalse);
 
-      const oldpath = file.path;
-      const fileId = Notes.addFile(oldpath, fileTypeObject);
+          const notesFromUser:NoteFromUser[]
+            = urlMetadataResults.map((urlMetadataObject) => {
+            const noteFromUser:NoteFromUser = {
+              editorData: {
+                "time": Date.now(),
+                "blocks": [
+                  {
+                    "type": "header",
+                    "data": {
+                      "text": urlMetadataObject.meta.title,
+                      "level": 1,
+                    },
+                  },
+                  {
+                    "type": "linkTool",
+                    "data": {
+                      "link": urlMetadataObject.url,
+                      "meta": urlMetadataObject.meta,
+                    },
+                  },
+                ],
+                "version": "2.16.1",
+              },
+            };
 
-      // this is the response style required by the editor.js attaches plugin
-      res.json(
-        {
-          "success": 1,
-          "file": {
-            "url": config.API_PATH + "file/" + fileId,
-            "size": file.size,
-            "name": file.name,
-            "fileId": fileId,
+            return noteFromUser;
+          });
+
+          const notesToTransmit:NoteToTransmit[] = [];
+          const failures:ImportLinkAsNoteFailure[] = [];
+
+          notesFromUser.forEach((noteFromUser:NoteFromUser) => {
+            try {
+              const noteToTransmit:NoteToTransmit = Notes.put(
+                noteFromUser,
+                req.userId,
+                {
+                  ignoreDuplicateTitles: true,
+                },
+              );
+              notesToTransmit.push(noteToTransmit);
+            } catch (e) {
+              const errorMessage:string = e.toString();
+              const failure:ImportLinkAsNoteFailure = {
+                note: noteFromUser,
+                error: errorMessage,
+              };
+              failures.push(failure);
+            }
+          });
+
+          const response:APIResponse = {
+            payload: {
+              notesToTransmit,
+              failures,
+            },
+            success: true,
+          };
+          res.json(response);
+        });
+    },
+  );
+
+
+  app.delete(
+    config.API_PATH + "note/:noteId",
+    verifyJWT,
+    function(req, res) {
+      const success = Notes.remove(parseInt(req.params.noteId), req.userId);
+      const response:APIResponse = {
+        success,
+      };
+      res.json(response);
+    },
+  );
+
+
+  app.post(
+    config.API_PATH + "image",
+    verifyJWT,
+    function(req, res) {
+      const form = new formidable.IncomingForm();
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          console.log(err);
+          res.end(err);
+          return;
+        }
+
+        const file = files.image;
+
+        if (!file) {
+          res.end("File upload error");
+          return;
+        }
+
+        const fileTypeObject = config.ALLOWED_IMAGE_UPLOAD_TYPES.find(
+          (filetype) => {
+            return filetype.mimeType === file.type;
           },
-        },
-      );
-    });
-  });
+        );
+
+        if (!fileTypeObject) {
+          res.end("Invalid MIME type: " + file.type);
+          return;
+        }
+
+        const oldpath = file.path;
+        const fileId = Notes.addFile(oldpath, fileTypeObject);
+
+        // this is the response style required by the editor.js image plugin
+        res.json(
+          {
+            "success": 1,
+            "file": {
+              "url": config.API_PATH + "file/" + fileId,
+              "fileId": fileId,
+            },
+          },
+        );
+      });
+    },
+  );
+
+
+  app.post(
+    config.API_PATH + "file",
+    verifyJWT,
+    function(req, res) {
+      const form = new formidable.IncomingForm();
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          console.log(err);
+          res.end(err);
+          return;
+        }
+
+        const file = files.file;
+
+        if (!file) {
+          res.end("File upload error");
+          return;
+        }
+
+        const fileTypeObject = config.ALLOWED_FILE_UPLOAD_TYPES
+          .find((filetype) => {
+            return filetype.mimeType === file.type;
+          });
+
+        if (!fileTypeObject) {
+          res.end("Invalid MIME type: " + file.type);
+          return;
+        }
+
+        const oldpath = file.path;
+        const fileId = Notes.addFile(oldpath, fileTypeObject);
+
+        // this is the response style required by the editor.js attaches plugin
+        res.json(
+          {
+            "success": 1,
+            "file": {
+              "url": config.API_PATH + "file/" + fileId,
+              "size": file.size,
+              "name": file.name,
+              "fileId": fileId,
+            },
+          },
+        );
+      });
+    },
+  );
 
 
   /* ***************
