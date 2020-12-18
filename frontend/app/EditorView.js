@@ -277,6 +277,7 @@ const EditorView = ({
 
   const importLinksAsNotes = async (links) => {
     await API.importLinksAsNotes(links);
+    setIsImportLinksDialogOpen(false);
     refreshNotesList();
   };
 
@@ -285,10 +286,7 @@ const EditorView = ({
     {
       isImportLinksDialogOpen
         ? <ImportLinksDialog
-          importLinksAsNotes={(links) => {
-            importLinksAsNotes(links);
-            setIsImportLinksDialogOpen(false);
-          }}
+          importLinksAsNotes={importLinksAsNotes}
           onCancel={() => setIsImportLinksDialogOpen(false)}
         />
         : null

@@ -6,6 +6,7 @@ const ImportLinksDialog = ({
   onCancel,
 }) => {
   const [text, setText] = useState("");
+  const [isBusy, setIsBusy] = useState(false);
 
 
   return <Overlay
@@ -31,16 +32,23 @@ const ImportLinksDialog = ({
         }}
         onChange={(e) => setText(e.target.value)}
       ></textarea>
-      <button
-        onClick={() => {
-          importLinksAsNotes(text.split("\n"));
-        }}
-        className="dialog-box-button"
-      >Import as notes</button>
-      <button
-        onClick={onCancel}
-        className="dialog-box-button"
-      >Cancel</button>
+      {
+        isBusy
+          ? <p>Please wait while links are imported ...</p>
+          : <>
+            <button
+              onClick={() => {
+                setIsBusy(true);
+                importLinksAsNotes(text.split("\n"));
+              }}
+              className="dialog-box-button"
+            >Import as notes</button>
+            <button
+              onClick={onCancel}
+              className="dialog-box-button"
+            >Cancel</button>
+          </>
+      }
     </div>
   </Overlay>;
 };
