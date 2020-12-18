@@ -162,7 +162,7 @@ const archiveDatabaseWithUploads = async () => {
 
 
 const importLinksAsNotes = async (links) => {
-  const response = await callAPI("PUT", "import-links-as-notes", links);
+  const response = await callAPI("PUT", "import-links-as-notes", { links });
 
   if (response.success === false) {
     throw new Error(response.error);
