@@ -20,13 +20,13 @@ const EditorViewHeaderControls = ({
       id="button_archive"
       title="Download database"
       icon="save_alt"
-      onClick={API.archiveDatabase}
+      onClick={API.downloadDatabase}
     />
     <IconButton
       id="button_archive-with-uploads"
       title="Download database including uploads"
       icon="archive"
-      onClick={API.archiveDatabaseWithUploads}
+      onClick={API.downloadDatabaseWithUploads}
     />
     <IconButton
       id="button_import_links_as_notes"

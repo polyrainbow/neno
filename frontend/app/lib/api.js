@@ -25,6 +25,8 @@ const callAPI = async (method, endpoint, body, outputType = "json") => {
     responseFormatted = await response.json();
   } else if (outputType === "text") {
     responseFormatted = await response.text();
+  } else if (outputType === "blob") {
+    responseFormatted = await response.blob();
   }
   
   return responseFormatted;
@@ -90,12 +92,6 @@ const deleteNote = async (noteId) => {
 };
 
 
-const getDatabaseAsJSON = async () => {
-  const jsonString = await callAPI("GET", "database", null, "text");
-  return jsonString;
-};
-
-
 const getStats = async () => {
   const response = await callAPI("GET", "stats");
   if (!response.success) {
@@ -142,22 +138,20 @@ const saveGraph = async (graphObject) => {
 };
 
 
-const archiveDatabase = async () => {
-  const json = await getDatabaseAsJSON();
-  const blob = new Blob([json], {
+const downloadDatabase = async () => {
+  const jsonString = await callAPI("GET", "database", null, "text");
+  const blob = new Blob([jsonString], {
     type: "application/json",
   });
   const dateSuffix = yyyymmdd(new Date());
   saveAs(blob, `neno-${dateSuffix}.db.json`);
-  return json;
 };
 
 
-const archiveDatabaseWithUploads = async () => {
-  const a = document.createElement("a");
-  a.href = API_URL + "database-with-uploads";
-  a.download = true;
-  a.click();
+const downloadDatabaseWithUploads = async () => {
+  const blob = await callAPI("GET", "database-with-uploads", null, "blob");
+  const dateSuffix = yyyymmdd(new Date());
+  saveAs(blob, `neno-${dateSuffix}.db.zip`);
 };
 
 
@@ -178,13 +172,12 @@ export {
   getNotes,
   putNote,
   deleteNote,
-  getDatabaseAsJSON,
   getStats,
   getGraph,
   getGraphObject,
   saveGraph,
-  archiveDatabase,
-  archiveDatabaseWithUploads,
+  downloadDatabase,
+  downloadDatabaseWithUploads,
   importLinksAsNotes,
 };
 
