@@ -16,7 +16,7 @@
     "@editorjs/editorjs": "2.19.0",
     "@editorjs/header": "^2.6.0",
     "@editorjs/image": "^2.6.0",
-    "@editorjs/link": "^2.3.1",
+    "@editorjs/link": "github:SebastianZimmer/link#7e9d08e6f320b80e12c2ae80ae9bc3a33335fd9e",
     "@editorjs/list": "^1.6.1",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "archiver": "^5.0.2",

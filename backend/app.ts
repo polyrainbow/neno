@@ -450,6 +450,28 @@ const startApp = ({
   );
 
 
+  app.get(
+    config.API_PATH + "link-data",
+    verifyJWT,
+    (req, res) => {
+      const url = req.query.url;
+
+      getUrlMetadata(url)
+        .then((metadata) => {
+          res.end(JSON.stringify(metadata));
+        })
+        .catch((e) => {
+          // this is the response style required by the editor.js link plugin
+          const response = {
+            "success": 0,
+            "error": e,
+          };
+          res.json(response);
+        });
+    },
+  );
+
+
   /* ***************
     Endpoints with NO authentication required
   *****************/
@@ -529,24 +551,6 @@ const startApp = ({
       return;
     }
     res.download(file);
-  });
-
-
-  app.get(config.API_PATH + "link-data", (req, res) => {
-    const url = req.query.url;
-
-    getUrlMetadata(url)
-      .then((metadata) => {
-        res.end(JSON.stringify(metadata));
-      })
-      .catch((e) => {
-        // this is the response style required by the editor.js link plugin
-        const response = {
-          "success": 0,
-          "error": e,
-        };
-        res.json(response);
-      });
   });
 
 

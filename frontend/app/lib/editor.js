@@ -63,6 +63,9 @@ const loadInstance = async ({ data, parent, onChange }) => {
         class: Link,
         config: {
           endpoint: Config.API_URL + "link-data",
+          additionalRequestHeaders: {
+            authorization: "Bearer " + tokenManager.get(),
+          }
         },
       },
       image: {
