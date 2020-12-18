@@ -119,8 +119,10 @@ const cleanUpData = () => {
         });
 
       // because of https://github.com/editor-js/attaches/issues/15
-      // it is currently not possible to save the fileId as such in the
-      // attaches block object. that's why we have to manually add it afterwards
+      // it was not possible to save the fileId as such in the
+      // attaches block object. that's why we have to make sure that it is
+      // available in every attaches block because the app depends on it.
+      // nowadays, the fileId is added correctly.
       note.editorData.blocks
         .forEach((block) => {
           if (

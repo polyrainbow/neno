@@ -77,7 +77,7 @@ const getLinkedNotes = (db:Database, noteId:NoteId):LinkedNote[] => {
 };
 
 
-const removeLinksOfNote = (db, noteId) => {
+const removeLinksOfNote = (db: Database, noteId: NoteId):true => {
   db.links = db.links.filter((link) => {
     return (link[0] !== noteId) && (link[1] !== noteId);
   });
@@ -85,45 +85,23 @@ const removeLinksOfNote = (db, noteId) => {
 };
 
 
-const getUploadsOfNote = (note) => {
+const getUploadsOfNote = (note:DatabaseNote):FileId[] => {
   return note.editorData.blocks
     .filter((block) => {
-      const blockHasImage = (
-        block.type === "image"
+      const blockHasFileOrImage = (
+        ((block.type === "image") || (block.type === "attaches"))
         && (typeof block.data.file.fileId === "string")
       );
 
-      // because of https://github.com/editor-js/attaches/issues/15
-      // it is currently not possible to save the fileId as such in the
-      // attaches block object. that's why we have to parse it from the url
-      const blockHasFile = (
-        block.type === "attaches"
-        && (typeof block.data.file.url === "string")
-      );
-
-      return blockHasImage || blockHasFile;
+      return blockHasFileOrImage;
     })
     .map((block) => {
-      let fileId = null;
-
-      if (block.type === "image") {
-        fileId = block.data.file.fileId;
-      }
-
-      // because of https://github.com/editor-js/attaches/issues/15
-      // it is currently not possible to save the fileId as such in the
-      // attaches block object. that's why we have to parse it from the url
-      if (block.type === "attaches") {
-        const url = block.data.file.url;
-        fileId = url.substr(url.lastIndexOf("/") + 1);
-      }
-
-      return fileId;
+      return block.data.file.fileId;
     });
 };
 
 
-const removeUploadsOfNote = (note) => {
+const removeUploadsOfNote = (note: DatabaseNote):void => {
   getUploadsOfNote(note)
     .forEach((fileId) => {
       DB.deleteBlob(fileId);
