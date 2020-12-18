@@ -1,5 +1,5 @@
 import * as Config from "./config.js";
-
+import * as tokenManager from "./tokenManager.js";
 
 // this instance queue makes sure that there are not several editor instances
 // loaded in parallel and thus become visible on the screen. it queues all
@@ -74,6 +74,9 @@ const loadInstance = async ({ data, parent, onChange }) => {
             // endpoint providing uploading by Url
             byUrl: Config.API_URL + "image-by-url",
           },
+          additionalRequestHeaders: {
+            authorization: "Bearer " + tokenManager.get(),
+          }
         },
       },
       list: {
@@ -89,6 +92,9 @@ const loadInstance = async ({ data, parent, onChange }) => {
           types: "application/pdf",
           buttonText: "Select PDF file",
           errorMessage: "File upload failed",
+          additionalRequestHeaders: {
+            authorization: "Bearer " + tokenManager.get(),
+          }
         },
       },
     },

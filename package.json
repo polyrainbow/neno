@@ -11,7 +11,7 @@
     "@babel/plugin-proposal-private-methods": "^7.12.1",
     "@babel/plugin-syntax-class-properties": "^7.12.1",
     "@babel/preset-react": "^7.12.1",
-    "@editorjs/attaches": "^1.0.1",
+    "@editorjs/attaches": "github:SebastianZimmer/attaches#c17a35d9dd94a1d8a159c41ac62383ff5f85658b",
     "@editorjs/code": "^2.6.0",
     "@editorjs/editorjs": "2.19.0",
     "@editorjs/header": "^2.6.0",
