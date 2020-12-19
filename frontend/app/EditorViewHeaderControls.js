@@ -1,9 +1,9 @@
 import React from "react";
-import * as API from "./lib/api.js";
 import IconButton from "./IconButton.js";
 import * as tokenManager from "./lib/tokenManager.js";
 
 const EditorViewHeaderControls = ({
+  databaseProvider,
   openImportLinksDialog,
   setActiveView,
 }) => {
@@ -33,7 +33,8 @@ const EditorViewHeaderControls = ({
         // create a FileSystemWritableFileStream to write to
         const writableStream = await newHandle.createWritable();
 
-        const readableStream = await API.getReadableDatabaseStream(false);
+        const readableStream
+          = await databaseProvider.getReadableDatabaseStream(false);
         await readableStream.pipeTo(writableStream);
       }}
     />
@@ -54,7 +55,8 @@ const EditorViewHeaderControls = ({
         // create a FileSystemWritableFileStream to write to
         const writableStream = await newHandle.createWritable();
 
-        const readableStream = await API.getReadableDatabaseStream(true);
+        const readableStream
+          = await databaseProvider.getReadableDatabaseStream(true);
         await readableStream.pipeTo(writableStream);
       }}
     />

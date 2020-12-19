@@ -7,11 +7,11 @@ import NoteListControls from "./NoteListControls.js";
 import Note from "./Note.js";
 import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
-import * as API from "./lib/api.js";
 import * as Editor from "./lib/editor.js";
 import ImportLinksDialog from "./ImportLinksDialog.js";
 
 const EditorView = ({
+  databaseProvider,
   setActiveView,
   unsavedChanges,
   setUnsavedChanges,
@@ -143,7 +143,7 @@ const EditorView = ({
       return;
     }
 
-    const noteFromServer = await API.getNote(noteId);
+    const noteFromServer = await databaseProvider.getNote(noteId);
     setActiveNote({
       ...noteFromServer,
       isUnsaved: false,
@@ -153,7 +153,7 @@ const EditorView = ({
 
 
   const refreshStats = () => {
-    API.getStats()
+    databaseProvider.getStats()
       .then((stats) => {
         setStats(stats);
       })
@@ -193,7 +193,7 @@ const EditorView = ({
       const requestId = uuidv4();
       currentRequestId.current = requestId;
       try {
-        const notes = await API.getNotes(options);
+        const notes = await databaseProvider.getNotes(options);
 
         // ... some time later - check if this is the current request
         if (currentRequestId.current === requestId) {
@@ -224,7 +224,7 @@ const EditorView = ({
       return;
     }
 
-    await API.deleteNote(activeNote.id);
+    await databaseProvider.deleteNote(activeNote.id);
     loadNote(null);
     refreshNotesList();
   };
@@ -248,7 +248,9 @@ const EditorView = ({
 
   const saveNote = async (options) => {
     const noteToTransmit = await prepareNoteToTransmit();
-    const noteFromServer = await API.putNote(noteToTransmit, options);
+    const noteFromServer = await databaseProvider.putNote(
+      noteToTransmit, options,
+    );
     setActiveNote({
       ...noteFromServer,
       isUnsaved: false,
@@ -284,7 +286,7 @@ const EditorView = ({
 
 
   const importLinksAsNotes = async (links) => {
-    await API.importLinksAsNotes(links);
+    await databaseProvider.importLinksAsNotes(links);
     setIsImportLinksDialogOpen(false);
     refreshNotesList();
   };

@@ -3,7 +3,7 @@ import EditorView from "./EditorView.js";
 import GraphView from "./GraphView.js";
 import LoginView from "./LoginView.js";
 import BusyView from "./BusyView.js";
-import * as tokenManager from "./lib/tokenManager.js";
+import databaseProvider from "./lib/database.js";
 
 const App = () => {
   const [activeView, setActiveView] = useState("BUSY");
@@ -11,7 +11,7 @@ const App = () => {
   const [initialNoteId, setInitialNoteId] = useState(null);
 
   useEffect(() => {
-    if (tokenManager.get()) {
+    if (databaseProvider.isAuthorized()) {
       setActiveView("EDITOR");
     } else {
       setActiveView("LOGIN");
@@ -20,6 +20,7 @@ const App = () => {
 
   if (activeView === "EDITOR") {
     return <EditorView
+      databaseProvider={databaseProvider}
       setActiveView={(view) => {
         setUnsavedChanges(false);
         setActiveView(view);
@@ -40,6 +41,7 @@ const App = () => {
         setUnsavedChanges(false);
         setActiveView(view);
       }}
+      databaseProvider={databaseProvider}
     />;
   }
 

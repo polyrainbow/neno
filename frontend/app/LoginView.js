@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import HeaderContainer from "./HeaderContainer.js";
-import * as API from "./lib/api.js";
 
 
 const LoginView = ({
   setActiveView,
+  databaseProvider,
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -16,7 +16,7 @@ const LoginView = ({
 
   const startLoginAttempt = () => {
     setIsBusy(true);
-    API.login(username, password)
+    databaseProvider.login(username, password)
       .then((success) => {
         if (success) {
           setActiveView("EDITOR");

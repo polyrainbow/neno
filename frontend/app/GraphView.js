@@ -3,12 +3,12 @@ import HeaderContainer from "./HeaderContainer.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import IconButton from "./IconButton.js";
 import { initGraph } from "./lib/graph.js";
-import * as API from "./lib/api.js";
 import * as Config from "./lib/config.js";
 import SearchInput from "./SearchInput.js";
 
 
 const GraphView = ({
+  databaseProvider,
   setActiveView,
   unsavedChanges,
   setUnsavedChanges,
@@ -38,7 +38,7 @@ const GraphView = ({
   const saveGraphObject = async () => {
     const graphObject = graphInstance.current.getSaveData();
     try {
-      await API.saveGraph(graphObject);
+      await databaseProvider.saveGraph(graphObject);
       setStatus("Graph saved");
       setTimeout(() => {
         setStatus(DEFAULT_STATUS);
@@ -64,7 +64,7 @@ const GraphView = ({
       }
     };
 
-    API.getGraphObject()
+    databaseProvider.getGraphObject()
       .then((graph) => {
         graphInstance.current
           = initGraph(mainElement.current, graph, onHighlight, onChange);

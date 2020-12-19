@@ -1,5 +1,4 @@
 import * as Config from "./config.js";
-import * as tokenManager from "./tokenManager.js";
 
 // this instance queue makes sure that there are not several editor instances
 // loaded in parallel and thus become visible on the screen. it queues all
@@ -7,12 +6,12 @@ import * as tokenManager from "./tokenManager.js";
 // fulfilled
 let instanceQueue = null;
 
-const load = async ({ data, parent, onChange }) => {
+const load = async ({ data, parent, onChange, databaseProvider }) => {
   if (instanceQueue === null) {
-    instanceQueue = loadInstance({ data, parent, onChange });
+    instanceQueue = loadInstance({ data, parent, onChange, databaseProvider });
   } else {
     instanceQueue = instanceQueue.then(() => {
-      return loadInstance({ data, parent, onChange });
+      return loadInstance({ data, parent, onChange, databaseProvider });
     });
   }
 
@@ -21,7 +20,7 @@ const load = async ({ data, parent, onChange }) => {
 };
 
 
-const loadInstance = async ({ data, parent, onChange }) => {
+const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
   const modules = await Promise.all([
     import("@editorjs/editorjs"),
     import("@editorjs/header"),
@@ -62,10 +61,7 @@ const loadInstance = async ({ data, parent, onChange }) => {
       linkTool: {
         class: Link,
         config: {
-          endpoint: Config.API_URL + "link-data",
-          additionalRequestHeaders: {
-            authorization: "Bearer " + tokenManager.get(),
-          },
+          fetchMetadata: databaseProvider.fetchURLMetadata,
         },
       },
       image: {
@@ -78,7 +74,7 @@ const loadInstance = async ({ data, parent, onChange }) => {
             byUrl: Config.API_URL + "image-by-url",
           },
           additionalRequestHeaders: {
-            authorization: "Bearer " + tokenManager.get(),
+            authorization: "Bearer " + databaseProvider.getAuthToken(),
           },
         },
       },
@@ -96,7 +92,7 @@ const loadInstance = async ({ data, parent, onChange }) => {
           buttonText: "Select PDF file",
           errorMessage: "File upload failed",
           additionalRequestHeaders: {
-            authorization: "Bearer " + tokenManager.get(),
+            authorization: "Bearer " + databaseProvider.getAuthToken(),
           },
         },
       },
