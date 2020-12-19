@@ -512,12 +512,7 @@ class Graph {
     // create link selection
     thisGraph.linkElements = thisGraph.linksContainer
       .selectAll("path.link")
-      .data(
-        thisGraph.#links,
-        function(d) {
-          return String(d.source.id) + "+" + String(d.target.id);
-        },
-      );
+      .data(thisGraph.#links);
 
     // update existing links
     thisGraph.linkElements
