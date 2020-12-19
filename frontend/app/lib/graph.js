@@ -26,6 +26,7 @@ class Graph {
   #initialNodePosition = null;
   svg = null;
   #idsOfAllNodesWithLinkedNote = null;
+  #updatedNodes = new Set();
 
 
   #selection = {
@@ -109,6 +110,7 @@ class Graph {
       .on("end", function(e, d) {
         if (e.shiftKey) return;
         thisGraph.#select(d);
+        thisGraph.#updatedNodes.add(d);
       });
 
     // drag intitial node position indicator
@@ -703,12 +705,13 @@ class Graph {
       ];
     });
 
-    const nodePositionUpdates = thisGraph.#nodes.map((node) => {
-      return {
-        id: node.id,
-        position: node.position,
-      };
-    });
+    const nodePositionUpdates = Array.from(thisGraph.#updatedNodes)
+      .map((node) => {
+        return {
+          id: node.id,
+          position: node.position,
+        };
+      });
 
     const graphObject = {
       nodePositionUpdates,
