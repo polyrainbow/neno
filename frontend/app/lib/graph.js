@@ -105,7 +105,7 @@ class Graph {
         thisGraph.#justDragged = true;
         d.position.x += e.dx;
         d.position.y += e.dy;
-        thisGraph.#updateGraph();
+        thisGraph.#updateGraph(d);
         thisGraph.#onChange();
       })
       .on("end", function(e, d) {
@@ -446,7 +446,7 @@ class Graph {
 
 
   // call to propagate changes to graph
-  #updateGraph() {
+  #updateGraph(draggedNode) {
     const thisGraph = this;
     const consts = Graph.#consts;
 
@@ -579,14 +579,25 @@ class Graph {
         function(d) {return d.id;},
       );
 
-    // update existing nodes
     thisGraph.nodeElements
+      .filter((d) => {
+        return (draggedNode && (d.id === draggedNode.id));
+      })
       .attr(
         "transform",
         function(d) {
           return "translate(" + d.position.x + "," + d.position.y + ")";
         },
-      )
+      );
+
+    // if this function was called when dragging a node, then we need
+    // to deal neither with changing node colors nor with creating new nodes
+    if (draggedNode) {
+      return;
+    }
+
+    // update existing nodes
+    thisGraph.nodeElements
       .classed("unconnected", function(d) {
         return !binaryArrayIncludes(
           thisGraph.#idsOfAllNodesWithLinkedNote,
