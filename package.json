@@ -19,7 +19,6 @@
     "@material-ui/lab": "^4.0.0-alpha.57",
     "archiver": "^5.0.2",
     "babel-loader": "^8.1.0",
-    "babel-plugin-transform-es2017-object-entries": "0.0.5",
     "bcryptjs": "^2.4.3",
     "commander": "^6.2.0",
     "compression": "^1.7.4",
