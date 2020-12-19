@@ -3,7 +3,7 @@ import EditorView from "./EditorView.js";
 import GraphView from "./GraphView.js";
 import LoginView from "./LoginView.js";
 import BusyView from "./BusyView.js";
-import * as tokenManager from "./lib/tokenManager.js"; 
+import * as tokenManager from "./lib/tokenManager.js";
 
 const App = () => {
   const [activeView, setActiveView] = useState("BUSY");

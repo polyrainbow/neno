@@ -65,7 +65,7 @@ const loadInstance = async ({ data, parent, onChange }) => {
           endpoint: Config.API_URL + "link-data",
           additionalRequestHeaders: {
             authorization: "Bearer " + tokenManager.get(),
-          }
+          },
         },
       },
       image: {
@@ -79,7 +79,7 @@ const loadInstance = async ({ data, parent, onChange }) => {
           },
           additionalRequestHeaders: {
             authorization: "Bearer " + tokenManager.get(),
-          }
+          },
         },
       },
       list: {
@@ -97,7 +97,7 @@ const loadInstance = async ({ data, parent, onChange }) => {
           errorMessage: "File upload failed",
           additionalRequestHeaders: {
             authorization: "Bearer " + tokenManager.get(),
-          }
+          },
         },
       },
     },

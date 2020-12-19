@@ -41,7 +41,7 @@ const LoginView = ({
       <h1>Login</h1>
       {
         wrongPasswordDisclaimer
-          ? <p style={{color: "red"}}>
+          ? <p style={{ color: "red" }}>
             Your username and password do not seem to be correct.
             Please try again.
           </p>

@@ -33,6 +33,7 @@ class Graph {
     type: "null",
     value: null,
   };
+
   #mouseDownNode = null;
   #mouseDownLink = null;
   #justDragged = false;
@@ -64,7 +65,7 @@ class Graph {
       .attr("height", String(Graph.#consts.newNodeIndicatorSize))
       .attr("rx", 4)
       .attr("ry", 4)
-      .on("mouseover", function(e, d) {
+      .on("mouseover", function() {
         thisGraph.#onHighlight(
           true,
           "Initial position for new nodes (drag and drop to move)",
@@ -279,7 +280,7 @@ class Graph {
           ? thisGraph.#selection.value.linkedNotes.map((node) => node.id)
           : [value.source.id, value.target.id];
     }
-  
+
     thisGraph.#updateGraph();
   };
 
@@ -421,7 +422,7 @@ class Graph {
       // we cannot prevent default because then we cannot delete values from
       // search input
       // e.preventDefault();
-      if (selection.type  === "node") {
+      if (selection.type === "node") {
         // right now, we don't support deleting nodes from the graph view
       } else if (selection.type === "edge") {
         thisGraph.#links.splice(thisGraph.#links.indexOf(selection.value), 1);
@@ -533,7 +534,7 @@ class Graph {
         const selectedNodeId = thisGraph.#selection.value.id;
         return (
           edge.source.id === selectedNodeId
-          || edge.target.id === selectedNodeId
+          || edge.target.id === selectedNodeId
         );
       });
 
@@ -587,7 +588,10 @@ class Graph {
         },
       )
       .classed("unconnected", function(d) {
-        return !binaryArrayIncludes(thisGraph.#idsOfAllNodesWithLinkedNote, d.id);
+        return !binaryArrayIncludes(
+          thisGraph.#idsOfAllNodesWithLinkedNote,
+          d.id,
+        );
       })
       .classed("selected", (node) => {
         if (thisGraph.#selection.type !== "node") return false;
@@ -597,6 +601,7 @@ class Graph {
         if (thisGraph.#selection.type === "null") return false;
         return thisGraph.#selection.connectedNodeIds.includes(node.id);
       });
+
 
     // add new nodes
     const nodeG = thisGraph.nodeElements
@@ -611,7 +616,10 @@ class Graph {
         return d.linkedNotes.length > 7;
       })
       .classed("unconnected", function(d) {
-        return !binaryArrayIncludes(thisGraph.#idsOfAllNodesWithLinkedNote, d.id);
+        return !binaryArrayIncludes(
+          thisGraph.#idsOfAllNodesWithLinkedNote,
+          d.id,
+        );
       })
       .attr(
         "transform",
@@ -716,7 +724,7 @@ class Graph {
     };
 
     return graphObject;
-  };
+  }
 
 
   getSelectedNodeId() {
@@ -731,7 +739,7 @@ class Graph {
     }
 
     return thisGraph.#selection.value;
-  };
+  }
 
 
   setSearchValue(newSearchValue) {
@@ -740,8 +748,8 @@ class Graph {
       thisGraph.#searchValue = newSearchValue;
     }
     thisGraph.#updateGraph();
-  };
-};
+  }
+}
 
 
 const initGraph = (parent, graphObject, onHighlight, onChange) => {

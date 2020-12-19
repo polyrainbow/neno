@@ -1,7 +1,7 @@
 import { API_URL } from "./config.js";
 import { yyyymmdd, htmlDecode } from "./utils.js";
 import { saveAs } from "file-saver";
-import * as tokenManager from "./tokenManager.js"; 
+import * as tokenManager from "./tokenManager.js";
 
 
 const callAPI = async (method, endpoint, body, outputType = "json") => {
@@ -28,7 +28,7 @@ const callAPI = async (method, endpoint, body, outputType = "json") => {
   } else if (outputType === "blob") {
     responseFormatted = await response.blob();
   }
-  
+
   return responseFormatted;
 };
 
