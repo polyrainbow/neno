@@ -32,13 +32,8 @@ module.exports = {
             ],
           ],
           plugins: [
-            [
-              "@babel/plugin-proposal-object-rest-spread",
-              { useBuiltIns: true },
-            ],
-            ["transform-es2017-object-entries"],
-            ["@babel/plugin-proposal-optional-chaining"],
-            ["@babel/plugin-syntax-class-properties"],
+            // we need these two plugins because webpack does not support
+            // that syntax yet, even though Chrome does already.
             ["@babel/plugin-proposal-class-properties"],
             ["@babel/plugin-proposal-private-methods"],
           ],
