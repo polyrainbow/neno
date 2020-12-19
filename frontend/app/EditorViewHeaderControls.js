@@ -18,15 +18,45 @@ const EditorViewHeaderControls = ({
     />
     <IconButton
       id="button_archive"
-      title="Download database"
+      title="Save database (without images and files)"
       icon="save_alt"
-      onClick={API.downloadDatabase}
+      onClick={async () => {
+        // create a new handle
+
+        const opts = {
+          types: [{
+            description: "JSON database file",
+            accept: { "application/json": [".json"] },
+          }],
+        };
+        const newHandle = await window.showSaveFilePicker(opts);
+        // create a FileSystemWritableFileStream to write to
+        const writableStream = await newHandle.createWritable();
+
+        const readableStream = await API.getReadableDatabaseStream(false);
+        await readableStream.pipeTo(writableStream);
+      }}
     />
     <IconButton
       id="button_archive-with-uploads"
-      title="Download database including uploads"
+      title="Save database (including images and files)"
       icon="archive"
-      onClick={API.downloadDatabaseWithUploads}
+      onClick={async () => {
+        // create a new handle
+
+        const opts = {
+          types: [{
+            description: "ZIP database file",
+            accept: { "application/zip": [".zip"] },
+          }],
+        };
+        const newHandle = await window.showSaveFilePicker(opts);
+        // create a FileSystemWritableFileStream to write to
+        const writableStream = await newHandle.createWritable();
+
+        const readableStream = await API.getReadableDatabaseStream(true);
+        await readableStream.pipeTo(writableStream);
+      }}
     />
     <IconButton
       id="button_import_links_as_notes"

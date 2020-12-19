@@ -1,6 +1,5 @@
 import { API_URL } from "./config.js";
-import { yyyymmdd, htmlDecode } from "./utils.js";
-import { saveAs } from "file-saver";
+import { htmlDecode } from "./utils.js";
 import * as tokenManager from "./tokenManager.js";
 
 
@@ -27,6 +26,8 @@ const callAPI = async (method, endpoint, body, outputType = "json") => {
     responseFormatted = await response.text();
   } else if (outputType === "blob") {
     responseFormatted = await response.blob();
+  } else if (outputType === "body") {
+    responseFormatted = response.body;
   }
 
   return responseFormatted;
@@ -136,20 +137,10 @@ const saveGraph = async (graphObject) => {
 };
 
 
-const downloadDatabase = async () => {
-  const jsonString = await callAPI("GET", "database", null, "text");
-  const blob = new Blob([jsonString], {
-    type: "application/json",
-  });
-  const dateSuffix = yyyymmdd(new Date());
-  saveAs(blob, `neno-${dateSuffix}.db.json`);
-};
-
-
-const downloadDatabaseWithUploads = async () => {
-  const blob = await callAPI("GET", "database-with-uploads", null, "blob");
-  const dateSuffix = yyyymmdd(new Date());
-  saveAs(blob, `neno-${dateSuffix}.db.zip`);
+const getReadableDatabaseStream = async (withUploads) => {
+  const apiEndpoint = withUploads ? "database-with-uploads" : "database";
+  const response = await callAPI("GET", apiEndpoint, null, "body");
+  return response;
 };
 
 
@@ -174,8 +165,7 @@ export {
   getGraph,
   getGraphObject,
   saveGraph,
-  downloadDatabase,
-  downloadDatabaseWithUploads,
+  getReadableDatabaseStream,
   importLinksAsNotes,
 };
 
