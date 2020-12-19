@@ -158,8 +158,11 @@ const EditorView = ({
         setStats(stats);
       })
       .catch((e) => {
-        console.error("Could not get stats via API.");
-        console.error(e);
+        // if credentials are invalid, it's fine, refeshNotesList takes care of
+        // this. if there is another error, throw.
+        if (e.message !== "INVALID_CREDENTIALS") {
+          throw new Error(e);
+        }
       });
   };
 
@@ -198,7 +201,12 @@ const EditorView = ({
           setIsBusy(false);
         }
       } catch (e) {
-        setActiveView("LOGIN");
+        // if credentials are invalid, go to LoginView. If not, throw.
+        if (e.message === "INVALID_CREDENTIALS") {
+          setActiveView("LOGIN");
+        } else {
+          throw new Error(e);
+        }
       }
     },
     [searchValue],

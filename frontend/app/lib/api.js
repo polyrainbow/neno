@@ -61,13 +61,11 @@ const getNotes = async (options) => {
       + "&caseSensitive=" + caseSensitive;
   }
 
-  const responseObject = await callAPI("GET", url);
-
-  if (!responseObject.success) {
-    throw new Error("Server says this was unsuccessful");
+  const response = await callAPI("GET", url);
+  if (!response.success) {
+    throw new Error(response.error);
   }
-
-  return responseObject.payload;
+  return response.payload;
 };
 
 
