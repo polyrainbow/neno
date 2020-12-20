@@ -1,3 +1,5 @@
+import User from "./interfaces/User";
+
 const API_PATH = "/api/";
 
 const ALLOWED_FILE_UPLOAD_TYPES = [
@@ -19,7 +21,7 @@ const ALLOWED_FILE_UPLOAD_TYPES = [
   },
 ];
 
-const DEFAULT_USERS = [
+const DEFAULT_USERS:User[] = [
   {
     id: "admin",
     login: "admin",
