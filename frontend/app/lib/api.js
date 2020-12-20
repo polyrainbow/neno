@@ -3,17 +3,29 @@ import { htmlDecode } from "./utils.js";
 import * as tokenManager from "./tokenManager.js";
 
 
-const callAPI = async (method, endpoint, body, outputType = "json") => {
+const callAPI = async (
+  method,
+  endpoint,
+  body,
+  outputType = "json",
+  bodyType = "json",
+) => {
   const fetchOptions = {
     method,
     headers: {
-      "Content-Type": "application/json",
       "authorization": "Bearer " + tokenManager.get(),
     },
   };
 
+  // do NOT set content-type header if content is form data
+  // https://stackoverflow.com/a/39281156/3890888
+  if (bodyType === "json") {
+    fetchOptions.headers["Content-Type"] = "application/json";
+  }
+
   if (body) {
-    fetchOptions.body = JSON.stringify(body);
+    fetchOptions.body
+      = bodyType === "json" ? JSON.stringify(body) : body;
   }
 
   const response = await fetch(API_URL + endpoint, fetchOptions);
@@ -155,6 +167,23 @@ const importLinksAsNotes = async (links) => {
 };
 
 
+const uploadFile = async (file) => {
+  const data = new FormData();
+  data.append("file", file);
+  const response = await callAPI(
+    "POST", "file", data, "json", "form-data",
+  );
+  return response;
+};
+
+
+const fetchURLMetadata = async (url) => {
+  const requestUrl = "link-data?url=" + url;
+  const response = await callAPI("GET", requestUrl, null, "json");
+  return response;
+};
+
+
 export {
   login,
   getNote,
@@ -167,5 +196,7 @@ export {
   saveGraph,
   getReadableDatabaseStream,
   importLinksAsNotes,
+  uploadFile,
+  fetchURLMetadata,
 };
 

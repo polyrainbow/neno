@@ -1,6 +1,6 @@
 const API_PATH = "/api/";
 
-const ALLOWED_IMAGE_UPLOAD_TYPES = [
+const ALLOWED_FILE_UPLOAD_TYPES = [
   {
     mimeType: "image/png",
     ending: "png",
@@ -13,10 +13,6 @@ const ALLOWED_IMAGE_UPLOAD_TYPES = [
     mimeType: "image/webp",
     ending: "webp",
   },
-];
-
-
-const ALLOWED_FILE_UPLOAD_TYPES = [
   {
     mimeType: "application/pdf",
     ending: "pdf",
@@ -35,7 +31,6 @@ const DEFAULT_USERS = [
 
 export {
   API_PATH,
-  ALLOWED_IMAGE_UPLOAD_TYPES,
   ALLOWED_FILE_UPLOAD_TYPES,
   DEFAULT_USERS,
 }

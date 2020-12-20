@@ -302,6 +302,7 @@ const EditorView = ({
         : null
     }
     <EditorViewHeader
+      databaseProvider={databaseProvider}
       stats={stats}
       openImportLinksDialog={() => setIsImportLinksDialogOpen(true)}
       setActiveView={setActiveView}
@@ -350,6 +351,7 @@ const EditorView = ({
           onLinkRemoval={handleLinkRemoval}
           displayedLinkedNotes={displayedLinkedNotes}
           setUnsavedChanges={setUnsavedChanges}
+          databaseProvider={databaseProvider}
         />
       </div>
 

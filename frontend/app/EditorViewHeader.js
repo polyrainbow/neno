@@ -4,6 +4,7 @@ import EditorViewHeaderControls from "./EditorViewHeaderControls";
 import AppStats from "./AppStats";
 
 const EditorViewHeader = ({
+  databaseProvider,
   stats,
   openImportLinksDialog,
   setActiveView,
@@ -16,6 +17,7 @@ const EditorViewHeader = ({
           <EditorViewHeaderControls
             setActiveView={setActiveView}
             openImportLinksDialog={openImportLinksDialog}
+            databaseProvider={databaseProvider}
           />
         </>
       }

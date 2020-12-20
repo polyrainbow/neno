@@ -10,6 +10,7 @@ const Note = ({
   displayedLinkedNotes,
   onLinkRemoval,
   setUnsavedChanges,
+  databaseProvider,
 }) => {
   const previousEditorData = useRef(null);
   const editorData = note?.editorData;
@@ -26,6 +27,7 @@ const Note = ({
       data: editorData,
       parent,
       onChange: () => setUnsavedChanges(true),
+      databaseProvider,
     })
       .then(() => {
         previousEditorData.current = editorData;

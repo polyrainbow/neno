@@ -1,5 +1,5 @@
 import * as API from "./api.js";
-import * as tokenManager from "./lib/tokenManager.js";
+import * as tokenManager from "./tokenManager.js";
 
 export default class ServerDatabaseProvider {
   isAuthorized() {
@@ -19,7 +19,7 @@ export default class ServerDatabaseProvider {
   }
 
   getNotes(options) {
-    return API.getNote(options);
+    return API.getNotes(options);
   }
 
   getStats() {
@@ -50,7 +50,11 @@ export default class ServerDatabaseProvider {
     return API.getReadableDatabaseStream(includingImagesAndFiles);
   }
 
+  uploadFile(file) {
+    return API.uploadFile(file);
+  }
+
   fetchURLMetadata(url) {
-    
+    return API.fetchURLMetadata(url);
   }
 }
