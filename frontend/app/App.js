@@ -54,6 +54,7 @@ const App = () => {
       unsavedChanges={unsavedChanges}
       setUnsavedChanges={setUnsavedChanges}
       setInitialNoteId={setInitialNoteId}
+      databaseProvider={databaseProvider}
     />;
   }
 };
