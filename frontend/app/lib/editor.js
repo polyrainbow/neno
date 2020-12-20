@@ -59,7 +59,7 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
       linkTool: {
         class: Link,
         config: {
-          fetchMetadata: databaseProvider.fetchURLMetadata,
+          customRequestFunction: databaseProvider.fetchURLMetadata,
         },
       },
       image: {
