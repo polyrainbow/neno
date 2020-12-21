@@ -8,13 +8,13 @@ import { yyyymmdd } from "./lib/utils.js";
 import * as config from "./config.js";
 import compression from "compression";
 import express from "express";
-import fs from "fs";
 import * as Notes from "./lib/notes.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
 import { File } from "./interfaces/File.js";
+import cookieParser from "cookie-parser";
 
 const startApp = ({
   users,
@@ -24,6 +24,21 @@ const startApp = ({
 }) => {
   Notes.init(dataPath);
   const app = express();
+
+  const mapAuthCookieToHeader = (function(req, res, next) {
+    if(req.cookies && req.headers &&
+       !Object.prototype.hasOwnProperty.call(req.headers, 'authorization') &&
+       Object.prototype.hasOwnProperty.call(req.cookies, 'token') &&
+       req.cookies.token.length > 0
+     ) {
+      // req.cookies has no hasOwnProperty function,
+      // likely created with Object.create(null)
+      req.headers.authorization
+        = 'Bearer ' + req.cookies.token.slice(0, req.cookies.token.length);
+    }
+    next();
+  });
+
 
   const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -55,6 +70,7 @@ const startApp = ({
 
   app.use("/", express.static(frontendPath));
   app.use(compression());
+  app.use(cookieParser());
 
 
   /* ***************
@@ -307,6 +323,26 @@ const startApp = ({
   );
 
 
+  app.get(
+    config.API_PATH + "file/:fileId",
+    mapAuthCookieToHeader, // some files are requested via <img src=""> tag
+    verifyJWT,
+    function(req, res) {
+      try {
+        const fileStream
+          = Notes.getReadableFileStream(req.userId, req.params.fileId);
+        fileStream.pipe(res);
+      } catch (e) {
+        const response:APIResponse = {
+          success: false,
+          error: e.message,
+        };
+        res.json(response);
+      }
+    },
+  );
+
+
   // currently returns a custom response style required by the editor.js
   // link plugin
   app.get(
@@ -404,22 +440,6 @@ const startApp = ({
       return res.status(200).json(response);
     },
   );
-
-
-  // TO BE IMPROVED
-  app.get(config.API_PATH + "file/:fileId", function(req, res) {
-    try {
-      const fileStream
-        = Notes.getReadableFileStream(req.userId, req.params.fileId);
-      fileStream.pipe(res);
-    } catch (e) {
-      const response:APIResponse = {
-        success: false,
-        error: e.message,
-      };
-      res.json(response);
-    }
-  });
 
 
   return app;
