@@ -285,7 +285,6 @@ const startApp = ({
             success: true,
             payload: fileId,
           };
-          // this is the response style required by the editor.js attaches plugin
           res.json(response);
         } catch (e) {
           const response:APIResponse = {
