@@ -173,7 +173,12 @@ const uploadFile = async (file) => {
   const response = await callAPI(
     "POST", "file", data, "json", "form-data",
   );
-  return response;
+
+  if (!response.success) {
+    throw new Error(response.error);
+  }
+
+  return response.payload;
 };
 
 

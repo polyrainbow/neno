@@ -1,3 +1,5 @@
+import * as Config from "./config.js";
+
 // this instance queue makes sure that there are not several editor instances
 // loaded in parallel and thus become visible on the screen. it queues all
 // incoming promises and executes them only when their previous promise has
@@ -66,7 +68,18 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
         class: Image,
         config: {
           uploader: {
-            uploadByFile: databaseProvider.uploadFile,
+            uploadByFile: async (file) => {
+              const fileId = await databaseProvider.uploadFile(file);
+              return {
+                success: 1,
+                file: {
+                  "url": Config.API_URL + "file/" + fileId,
+                  "size": file.size,
+                  "name": file.name,
+                  "fileId": fileId,
+                },
+              };
+            },
             uploadByUrl: function() {
               console.log(
                 "that mysterious upload by URL feature was finally triggered",
@@ -83,7 +96,18 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
       attaches: {
         class: Attaches,
         config: {
-          uploader: databaseProvider.uploadFile,
+          uploader: async (file) => {
+            const fileId = await databaseProvider.uploadFile(file);
+            return {
+              success: 1,
+              file: {
+                "url": Config.API_URL + "file/" + fileId,
+                "size": file.size,
+                "name": file.name,
+                "fileId": fileId,
+              },
+            };
+          },
           field: "file",
           types: "application/pdf",
           buttonText: "Select PDF file",

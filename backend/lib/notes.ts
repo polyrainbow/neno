@@ -34,6 +34,8 @@ import archiver from "archiver";
 import UrlMetadataResponse from "../interfaces/UrlMetadataResponse.js";
 import ImportLinkAsNoteFailure from "../interfaces/ImportLinkAsNoteFailure.js";
 import getUrlMetadata from "./getUrlMetadata.js";
+import * as config from "../config.js";
+import { File } from "../interfaces/File.js";
 
 /**
   PRIVATE
@@ -401,7 +403,18 @@ const getFilesForDBExport = (userId:UserId):FileDescriptor[] => {
 };
 
 
-const addFile = (sourcePath:FileDescriptor, fileType):FileId => {
+const addFile = (file:File):FileId => {
+  const fileType = config.ALLOWED_FILE_UPLOAD_TYPES
+    .find((filetype) => {
+      return filetype.mimeType === file.type;
+    });
+
+  if (!fileType) {
+    throw new Error("Invalid MIME type: " + file.type);
+  }
+
+  const sourcePath = file.path;
+
   const fileId:FileId = uuidv4() + "." + fileType.ending;
   DB.addBlob(fileId, sourcePath);
   return fileId;

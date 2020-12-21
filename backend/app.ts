@@ -14,6 +14,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
+import { File } from "./interfaces/File.js";
 
 const startApp = ({
   users,
@@ -270,38 +271,30 @@ const startApp = ({
           return;
         }
 
-        const file = files.file;
+        const file:File = files.file;
 
         if (!file) {
           res.end("File upload error");
           return;
         }
 
-        const fileTypeObject = config.ALLOWED_FILE_UPLOAD_TYPES
-          .find((filetype) => {
-            return filetype.mimeType === file.type;
-          });
+        try {
+          const fileId = Notes.addFile(file);
 
-        if (!fileTypeObject) {
-          res.end("Invalid MIME type: " + file.type);
-          return;
+          const response:APIResponse = {
+            success: true,
+            payload: fileId,
+          };
+          // this is the response style required by the editor.js attaches plugin
+          res.json(response);
+        } catch (e) {
+          const response:APIResponse = {
+            success: false,
+            error: e.message,
+          };
+          res.json(response);
         }
 
-        const oldpath = file.path;
-        const fileId = Notes.addFile(oldpath, fileTypeObject);
-
-        // this is the response style required by the editor.js attaches plugin
-        res.json(
-          {
-            "success": 1,
-            "file": {
-              "url": config.API_PATH + "file/" + fileId,
-              "size": file.size,
-              "name": file.name,
-              "fileId": fileId,
-            },
-          },
-        );
       });
     },
   );
