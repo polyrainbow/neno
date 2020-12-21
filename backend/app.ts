@@ -267,14 +267,22 @@ const startApp = ({
         if (err) {
           console.log("error")
           console.log(err);
-          res.end(err);
+          const response:APIResponse = {
+            success: false,
+            error: APIError.INTERNAL_SERVER_ERROR,
+          };
+          res.status(500).json(response);
           return;
         }
 
         const file:File = files.file;
 
         if (!file) {
-          res.end("File upload error");
+          const response:APIResponse = {
+            success: false,
+            error: APIError.INVALID_REQUEST,
+          };
+          res.status(406).json(response);
           return;
         }
 
@@ -299,6 +307,8 @@ const startApp = ({
   );
 
 
+  // currently returns a custom response style required by the editor.js
+  // link plugin
   app.get(
     config.API_PATH + "link-data",
     verifyJWT,
@@ -310,7 +320,6 @@ const startApp = ({
           res.end(JSON.stringify(metadata));
         })
         .catch((e) => {
-          // this is the response style required by the editor.js link plugin
           const response = {
             "success": 0,
             "error": e,
@@ -397,6 +406,7 @@ const startApp = ({
   );
 
 
+  // TO BE IMPROVED
   app.get(config.API_PATH + "file/:fileId", function(req, res) {
     const file = Notes.getFile(req.params.fileId);
     if (!fs.existsSync(file)) {
