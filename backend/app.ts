@@ -1,20 +1,14 @@
 import NoteListItem from "./interfaces/NoteListItem.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import { NoteId } from "./interfaces/NoteId.js";
-import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
-import NoteFromUser from "./interfaces/NoteFromUser.js";
 import Stats from "./interfaces/Stats.js";
-import * as Utils from "./lib/utils.js";
-import ImportLinkAsNoteFailure from "./interfaces/ImportLinkAsNoteFailure.js";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
 import formidable from "formidable";
-import archiver from "archiver";
 import { yyyymmdd } from "./lib/utils.js";
 import * as config from "./config.js";
 import compression from "compression";
 import express from "express";
 import fs from "fs";
-import * as path from "path";
 import * as Notes from "./lib/notes.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -72,49 +66,25 @@ const startApp = ({
 
 
   app.get(
-    config.API_PATH + "database-with-uploads",
-    verifyJWT,
-    function(req, res) {
-      const archive = archiver("zip");
-
-      archive.on("error", function(err) {
-        const response:APIResponse = {
-          success: false,
-          error: err.message,
-        }
-        res.status(500).json(response);
-      });
-
-      // on stream closed we can end the request
-      archive.on("end", function() {
-        const size = archive.pointer();
-        console.log(`Archive for ${req.userId} created. Size: ${size} bytes`);
-      });
-
-      // set the archive name
-      const dateSuffix = yyyymmdd(new Date());
-      res.attachment(`neno-${req.userId}-${dateSuffix}.db.zip`);
-
-      // this is the streaming magic
-      archive.pipe(res);
-
-      Notes
-        .getFilesForDBExport(req.userId)
-        .forEach((file) => {
-          archive.file(file, { name: path.basename(file) });
-        });
-
-      archive.finalize();
-    },
-  );
-
-
-  app.get(
     config.API_PATH + "database",
     verifyJWT,
     function(req, res) {
-      const database = Notes.exportDB(req.userId);
-      res.end(JSON.stringify(database));
+      const withUploads = req.query.withUploads === "true";
+
+      const databaseStream = Notes.getReadableDatabaseStream(
+        req.userId,
+        withUploads,
+      );
+
+      // set the archive name
+      const dateSuffix = yyyymmdd(new Date());
+
+      const fileEnding = withUploads ? "zip" : "json";
+      const filename = `neno-${req.userId}-${dateSuffix}.db.${fileEnding}`;
+      res.attachment(filename);
+
+      // this is the streaming magic
+      databaseStream.pipe(res);
     },
   );
 
@@ -261,80 +231,11 @@ const startApp = ({
     function(req, res) {
       const reqBody = req.body;
       const links:string[] = reqBody.links;
-      const promises:Promise<UrlMetadataResponse>[]
-        = links.map((url:string):Promise<UrlMetadataResponse> => {
-          return getUrlMetadata(url);
-        });
 
-      Promise.allSettled(promises)
-        .then((promiseSettledResults):void => {
-          const fulfilledPromises:PromiseSettledResult<UrlMetadataResponse>[]
-            = promiseSettledResults.filter((response) => {
-              return response.status === "fulfilled";
-            });
-          
-          const urlMetadataResults:UrlMetadataResponse[]
-            = fulfilledPromises.map((response) => {
-              return (response.status === "fulfilled") && response.value;
-            })
-            .filter(Utils.isNotFalse);
-
-          const notesFromUser:NoteFromUser[]
-            = urlMetadataResults.map((urlMetadataObject) => {
-            const noteFromUser:NoteFromUser = {
-              editorData: {
-                "time": Date.now(),
-                "blocks": [
-                  {
-                    "type": "header",
-                    "data": {
-                      "text": urlMetadataObject.meta.title,
-                      "level": 1,
-                    },
-                  },
-                  {
-                    "type": "linkTool",
-                    "data": {
-                      "link": urlMetadataObject.url,
-                      "meta": urlMetadataObject.meta,
-                    },
-                  },
-                ],
-                "version": "2.16.1",
-              },
-            };
-
-            return noteFromUser;
-          });
-
-          const notesToTransmit:NoteToTransmit[] = [];
-          const failures:ImportLinkAsNoteFailure[] = [];
-
-          notesFromUser.forEach((noteFromUser:NoteFromUser) => {
-            try {
-              const noteToTransmit:NoteToTransmit = Notes.put(
-                noteFromUser,
-                req.userId,
-                {
-                  ignoreDuplicateTitles: true,
-                },
-              );
-              notesToTransmit.push(noteToTransmit);
-            } catch (e) {
-              const errorMessage:string = e.toString();
-              const failure:ImportLinkAsNoteFailure = {
-                note: noteFromUser,
-                error: errorMessage,
-              };
-              failures.push(failure);
-            }
-          });
-
+      Notes.importLinksAsNotes(req.userId, links)
+        .then((result) => {
           const response:APIResponse = {
-            payload: {
-              notesToTransmit,
-              failures,
-            },
+            payload: result,
             success: true,
           };
           res.json(response);
@@ -359,7 +260,7 @@ const startApp = ({
   app.post(
     config.API_PATH + "file",
     verifyJWT,
-    function(req, res) { console.log("incoming file");
+    function(req, res) {
       const form = new formidable.IncomingForm();
       form.parse(req, (err, fields, files) => {
         if (err) {

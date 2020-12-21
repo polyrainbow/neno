@@ -150,7 +150,7 @@ const saveGraph = async (graphObject) => {
 
 
 const getReadableDatabaseStream = async (withUploads) => {
-  const apiEndpoint = withUploads ? "database-with-uploads" : "database";
+  const apiEndpoint = "database?withUploads=" + withUploads.toString();
   const response = await callAPI("GET", apiEndpoint, null, "body");
   return response;
 };

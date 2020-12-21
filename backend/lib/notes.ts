@@ -29,7 +29,11 @@ import GraphFromUser from "../interfaces/GraphFromUser.js";
 import GraphNodePositionUpdate from "../interfaces/GraphNodePositionUpdate.js";
 import { FileId } from "../interfaces/FileId.js";
 import { FileDescriptor } from "../interfaces/FileDescriptor.js";
-import NodePosition from "../interfaces/NodePosition.js";
+import * as path from "path";
+import archiver from "archiver";
+import UrlMetadataResponse from "../interfaces/UrlMetadataResponse.js";
+import ImportLinkAsNoteFailure from "../interfaces/ImportLinkAsNoteFailure.js";
+import getUrlMetadata from "./getUrlMetadata.js";
 
 /**
   PRIVATE
@@ -377,11 +381,6 @@ const remove = (noteId, userId) => {
 };
 
 
-const exportDB = (userId) => {
-  return DB.get(userId);
-};
-
-
 const importDB = (db, userId) => {
   if (db.id !== userId) {
     throw new Error("UNAUTHORIZED: You are not allowed to update another DB");
@@ -413,6 +412,112 @@ const getFile = (fileId:FileId):FileDescriptor => {
   return DB.getBlob(fileId);
 };
 
+
+const getReadableDatabaseStream = (userId, withUploads) => {
+  if (!withUploads) {
+    return DB.getReadableStream(userId);
+  }
+
+  const archive = archiver("zip");
+
+  archive.on("error", function(err) {
+    throw new Error(err);
+  });
+
+  // on stream closed we can end the request
+  archive.on("end", function() {
+    const size = archive.pointer();
+    console.log(`Archive for ${userId} created. Size: ${size} bytes`);
+  });
+
+  getFilesForDBExport(userId)
+    .forEach((file) => {
+      archive.file(file, { name: path.basename(file) });
+    });
+
+  archive.finalize();
+
+  return archive;
+};
+
+
+const importLinksAsNotes = async (userId, links) => {
+  const promises:Promise<UrlMetadataResponse>[]
+    = links.map((url:string):Promise<UrlMetadataResponse> => {
+      return getUrlMetadata(url);
+    });
+
+  const promiseSettledResults = await Promise.allSettled(promises);
+
+  const fulfilledPromises:PromiseSettledResult<UrlMetadataResponse>[]
+    = promiseSettledResults.filter((response) => {
+      return response.status === "fulfilled";
+    });
+  
+  const urlMetadataResults:UrlMetadataResponse[]
+    = fulfilledPromises.map((response) => {
+      return (response.status === "fulfilled") && response.value;
+    })
+    .filter(Utils.isNotFalse);
+
+  const notesFromUser:NoteFromUser[]
+    = urlMetadataResults.map((urlMetadataObject) => {
+    const noteFromUser:NoteFromUser = {
+      editorData: {
+        "time": Date.now(),
+        "blocks": [
+          {
+            "type": "header",
+            "data": {
+              "text": urlMetadataObject.meta.title,
+              "level": 1,
+            },
+          },
+          {
+            "type": "linkTool",
+            "data": {
+              "link": urlMetadataObject.url,
+              "meta": urlMetadataObject.meta,
+            },
+          },
+        ],
+        "version": "2.16.1",
+      },
+    };
+
+    return noteFromUser;
+  });
+
+  const notesToTransmit:NoteToTransmit[] = [];
+  const failures:ImportLinkAsNoteFailure[] = [];
+
+  notesFromUser.forEach((noteFromUser:NoteFromUser) => {
+    try {
+      const noteToTransmit:NoteToTransmit = put(
+        noteFromUser,
+        userId,
+        {
+          ignoreDuplicateTitles: true,
+        },
+      );
+      notesToTransmit.push(noteToTransmit);
+    } catch (e) {
+      const errorMessage:string = e.toString();
+      const failure:ImportLinkAsNoteFailure = {
+        note: noteFromUser,
+        error: errorMessage,
+      };
+      failures.push(failure);
+    }
+  });
+
+  return {
+    notesToTransmit,
+    failures,
+  };
+};
+
+
 export {
   init,
   get,
@@ -422,9 +527,10 @@ export {
   getStats,
   put,
   remove,
-  exportDB,
   importDB,
   addFile,
   getFile,
   getFilesForDBExport,
+  getReadableDatabaseStream,
+  importLinksAsNotes,
 };

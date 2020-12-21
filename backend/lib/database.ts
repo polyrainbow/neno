@@ -8,6 +8,7 @@ import { FileDescriptor } from "../interfaces/FileDescriptor.js";
 import { FileId } from "../interfaces/FileId.js";
 import { UserId } from "../interfaces/UserId.js";
 import { DatabaseId } from "../interfaces/DatabaseId.js";
+import { Readable } from "stream";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
@@ -145,6 +146,15 @@ const getDBFile = (userId:UserId):FileDescriptor => {
 };
 
 
+const getReadableStream = (id:DatabaseId):Readable => {
+  const db = get(id);
+  const s = new Readable();
+  s.push(JSON.stringify(db))    // the string you want
+  s.push(null)      // indicates end-of-file basically - the end of the stream
+  return s;
+};
+
+
 export {
   init,
   get,
@@ -154,4 +164,5 @@ export {
   deleteBlob,
   getBlob,
   getDBFile,
+  getReadableStream,
 };
