@@ -4,7 +4,7 @@ import { Link } from "./Link.js";
 import NodePosition from "./NodePosition.js";
 import ScreenPosition from "./ScreenPosition.js";
 
-export default interface Database {
+export default interface DatabaseMainData {
     readonly id: DatabaseId,
     timestamp: number,
     notes: DatabaseNote[],

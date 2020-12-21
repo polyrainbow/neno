@@ -2,25 +2,39 @@ import path from "path";
 import fs from "fs";
 import mkdirp from "mkdirp";
 import { cloneObject } from "./utils.js";
-import Database from "../interfaces/Database.js";
 import * as url from "url";
-import { FileDescriptor } from "../interfaces/FileDescriptor.js";
+import { Filepath } from "../interfaces/Filepath.js";
 import { FileId } from "../interfaces/FileId.js";
-import { UserId } from "../interfaces/UserId.js";
 import { DatabaseId } from "../interfaces/DatabaseId.js";
 import { Readable } from "stream";
+import DatabaseMainData from "../interfaces/DatabaseMainData.js";
+import FileReadableWithName from "../interfaces/FileReadableWithName.js";
+import archiver from "archiver";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-const DB_FILE_SUFFIX = ".db.json";
+const MAIN_DATA_FILE_NAME = "main.db.json";
+const NAME_OF_FILE_FOLDERS = "files";
 let DATA_FOLDER = path.join(__dirname, "..", "..", "..", "network-notes-data");
-let UPLOAD_PATH = path.join(DATA_FOLDER, "uploads");
-const loadedDBs:Database[] = [];
+
+const getFileFolderPath = (databaseId: DatabaseId) => {
+  const USER_DB_FOLDER = path.join(DATA_FOLDER, databaseId);
+  const fileFolderPath = path.join(USER_DB_FOLDER, NAME_OF_FILE_FOLDERS);
+  return fileFolderPath;
+}
+
+const loadedMainDataObjects:DatabaseMainData[] = [];
 
 
-const readJSONFileInDataFolder = (filename:FileDescriptor) => {
+const readMainDataFile = (databaseId: DatabaseId) => {
+  const filename = path.join(DATA_FOLDER, databaseId, MAIN_DATA_FILE_NAME);
+
   try {
-    const json = fs.readFileSync(path.join(DATA_FOLDER, filename), "utf8");
+    const json
+      = fs.readFileSync(
+        filename,
+        "utf8",
+      );
     const object = JSON.parse(json);
     return object;
   } catch (e) {
@@ -30,45 +44,23 @@ const readJSONFileInDataFolder = (filename:FileDescriptor) => {
   }
 };
 
-const writeJSONFileInDataFolder = (filename:FileDescriptor, value) => {
+
+const writeMainDataFile = (databaseId: DatabaseId, value) => {
   fs.writeFileSync(
-    path.join(DATA_FOLDER, filename),
+    path.join(DATA_FOLDER, databaseId, MAIN_DATA_FILE_NAME),
     JSON.stringify(value),
     "utf8",
   );
 };
 
 
-/**
-  EXPORTS
-**/
+const createDatabase = (databaseId: DatabaseId): DatabaseMainData => {
+  mkdirp.sync(path.join(DATA_FOLDER, databaseId));
+  mkdirp.sync(getFileFolderPath(databaseId));
 
-const init = (config) => {
-  console.log("Initializing DB module...");
-  DATA_FOLDER = config.dataFolderPath;
-  UPLOAD_PATH = path.join(DATA_FOLDER, "uploads");
-  mkdirp.sync(DATA_FOLDER);
-};
-
-
-const get = (id: DatabaseId):Database => {
-  const dbFromLoadedDBs:Database | undefined = loadedDBs.find(
-    (db) => db.id === id,
-  );
-  if (dbFromLoadedDBs) {
-    return dbFromLoadedDBs;
-  }
-
-  const dbFromFile:Database | null
-    = readJSONFileInDataFolder(id + DB_FILE_SUFFIX);
-  if (dbFromFile) {
-    loadedDBs.push(dbFromFile);
-    return dbFromFile;
-  }
-
-  const newDB:Database = {
+  const newMainData:DatabaseMainData = {
     timestamp: Date.now(),
-    id: id,
+    id: databaseId,
     notes: [],
     links: [],
     idCounter: 0,
@@ -82,72 +74,105 @@ const get = (id: DatabaseId):Database => {
       y: 0,
     }
   };
-  writeJSONFileInDataFolder(id + DB_FILE_SUFFIX, newDB);
-  return newDB;
+  writeMainDataFile(databaseId, newMainData);
+
+  return newMainData;
 };
 
-// flushChanges makes sure that the changes applied to the db object are
-// written to the disk and thus are persistent. it should always be called
-// after any operations on the db object have been performed.
-const flushChanges = (db:Database):boolean => {
-  db.timestamp = Date.now();
 
-  const dbFromLoadedDBsIndex = loadedDBs.findIndex((loadedDB) => {
-    return loadedDB.id === db.id;
-  });
+/**
+  EXPORTS
+**/
 
-  if (dbFromLoadedDBsIndex > -1) {
-    loadedDBs[dbFromLoadedDBsIndex] = db;
-  } else {
-    loadedDBs.push(db);
+const init = (config) => {
+  console.log("Initializing DB module...");
+  DATA_FOLDER = config.dataFolderPath;
+  mkdirp.sync(DATA_FOLDER);
+};
+
+
+const getMainData = (id: DatabaseId):DatabaseMainData => {
+  // 1. try to get from loaded objects
+  const mainDataFromLoadedObjects:DatabaseMainData | undefined
+    = loadedMainDataObjects.find(
+      (db) => db.id === id,
+    );
+
+  if (mainDataFromLoadedObjects) {
+    return mainDataFromLoadedObjects;
   }
 
-  writeJSONFileInDataFolder(db.id + DB_FILE_SUFFIX, db);
+  // 2. try to get from file
+  const mainDataFromFile:DatabaseMainData | null
+    = readMainDataFile(id);
+  if (mainDataFromFile) {
+    loadedMainDataObjects.push(mainDataFromFile);
+    return mainDataFromFile;
+  }
+
+  // 3. create new database and return main data
+  const mainDataFromNewDB:DatabaseMainData = createDatabase(id);
+  return mainDataFromNewDB;
+};
+
+// flushChanges makes sure that the changes applied to the main data object are
+// written to the disk and thus are persistent. it should always be called
+// after any operations on the main data object have been performed.
+const flushChanges = (db:DatabaseMainData):boolean => {
+  db.timestamp = Date.now();
+
+  const mdFromLoadedMDOsIndex:number
+    = loadedMainDataObjects.findIndex((loadedDB) => {
+      return loadedDB.id === db.id;
+    });
+
+  if (mdFromLoadedMDOsIndex > -1) {
+    loadedMainDataObjects[mdFromLoadedMDOsIndex] = db;
+  } else {
+    loadedMainDataObjects.push(db);
+  }
+
+  writeMainDataFile(db.id, db);
   return true;
 };
 
 
 const forEach = (handler:Function) => {
   return fs.readdirSync(DATA_FOLDER)
-    .filter((filename) => {
-      return filename.endsWith(DB_FILE_SUFFIX);
+    .filter((objectName:string) => {
+      const stat = fs.statSync(path.join(DATA_FOLDER, objectName));
+      return stat.isDirectory();
     })
-    .forEach((filename) => {
-      const id = filename.substr(0, filename.indexOf(DB_FILE_SUFFIX));
-      const db = get(id);
-      const dbCopy = cloneObject(db);
-      handler(dbCopy);
-      flushChanges(dbCopy);
+    .forEach((databaseId:DatabaseId) => {
+      const mainData = getMainData(databaseId);
+      const mainDataCopy = cloneObject(mainData);
+      handler(mainDataCopy);
+      flushChanges(mainDataCopy);
     });
 };
 
 
-const addBlob = (fileId:FileId, sourcePath:FileDescriptor):boolean => {
-  mkdirp.sync(UPLOAD_PATH);
-  const newpath = path.join(UPLOAD_PATH, fileId);
-  fs.renameSync(sourcePath, newpath);
+const addFile = (
+  databaseId: DatabaseId,
+  fileId:FileId,
+  sourcePath:Filepath,
+):boolean => {
+  const fileFolderPath = getFileFolderPath(databaseId);
+  const newPath = path.join(fileFolderPath, fileId);
+  fs.renameSync(sourcePath, newPath);
   return true;
 };
 
 
-const deleteBlob = (fileId:FileId):boolean => {
-  fs.unlinkSync(path.join(UPLOAD_PATH, fileId));
+const deleteFile = (databaseId: DatabaseId, fileId:FileId):boolean => {
+  const fileFolderPath = getFileFolderPath(databaseId);
+  fs.unlinkSync(path.join(fileFolderPath, fileId));
   return true;
 };
 
 
-const getBlob = (fileId:FileId):FileDescriptor => {
-  return path.join(UPLOAD_PATH, fileId);
-};
-
-
-const getDBFile = (userId:UserId):FileDescriptor => {
-  return path.join(DATA_FOLDER, userId + DB_FILE_SUFFIX);
-};
-
-
-const getReadableStream = (id:DatabaseId):Readable => {
-  const db = get(id);
+const getReadableMainDataStream = (id:DatabaseId):Readable => {
+  const db = getMainData(id);
   const s = new Readable();
   s.push(JSON.stringify(db))    // the string you want
   s.push(null)      // indicates end-of-file basically - the end of the stream
@@ -155,14 +180,62 @@ const getReadableStream = (id:DatabaseId):Readable => {
 };
 
 
+const getReadableFileStream = (
+  databaseId: DatabaseId,
+  fileId:FileId,
+):Readable => {
+  const fileFolderPath = getFileFolderPath(databaseId);
+  const filepath = path.join(fileFolderPath, fileId);
+  return fs.createReadStream(filepath);
+};
+
+
+
+const getReadableDatabaseStream = (
+  databaseId: DatabaseId,
+  withUploads: boolean,
+) => {
+  if (!withUploads) {
+    return getReadableMainDataStream(databaseId);
+  }
+
+  const archive = archiver("zip");
+
+  archive.on("error", function(err) {
+    throw new Error(err);
+  });
+
+  // on stream closed we can end the request
+  archive.on("end", function() {
+    const size = archive.pointer();
+    console.log(`Archive for ${databaseId} created. Size: ${size} bytes`);
+  });
+
+  const fileFolderPath = getFileFolderPath(databaseId);
+  archive.directory(fileFolderPath, "files");
+
+  const mainDataStream = getReadableMainDataStream(databaseId);
+  archive.append(
+    mainDataStream,
+    {
+      name: MAIN_DATA_FILE_NAME,
+    },
+  );
+
+  archive.finalize();
+
+  return archive;
+};
+
+
 export {
   init,
-  get,
+  getMainData,
   flushChanges,
   forEach,
-  addBlob,
-  deleteBlob,
-  getBlob,
-  getDBFile,
-  getReadableStream,
+  addFile,
+  deleteFile,
+  getReadableMainDataStream,
+  getReadableFileStream,
+  getReadableDatabaseStream,
 };

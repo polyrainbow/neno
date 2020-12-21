@@ -1,4 +1,4 @@
-import Database from "../interfaces/Database.js";
+import Database from "../interfaces/DatabaseMainData.js";
 import DatabaseNote from "../interfaces/DatabaseNote.js";
 import Note from "../interfaces/Note.js";
 import NoteFromUser from "../interfaces/NoteFromUser.js";

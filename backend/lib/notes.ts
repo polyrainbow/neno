@@ -10,7 +10,7 @@ import {
   getNewNoteId,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
-import Database from "../interfaces/Database.js";
+import Database from "../interfaces/DatabaseMainData.js";
 import NoteListItem from "../interfaces/NoteListItem.js";
 import Graph from "../interfaces/Graph.js";
 import { UserId } from "../interfaces/UserId.js";
@@ -28,14 +28,12 @@ import UserNoteChange from "../interfaces/UserNoteChange.js";
 import GraphFromUser from "../interfaces/GraphFromUser.js";
 import GraphNodePositionUpdate from "../interfaces/GraphNodePositionUpdate.js";
 import { FileId } from "../interfaces/FileId.js";
-import { FileDescriptor } from "../interfaces/FileDescriptor.js";
-import * as path from "path";
-import archiver from "archiver";
 import UrlMetadataResponse from "../interfaces/UrlMetadataResponse.js";
 import ImportLinkAsNoteFailure from "../interfaces/ImportLinkAsNoteFailure.js";
 import getUrlMetadata from "./getUrlMetadata.js";
 import * as config from "../config.js";
 import { File } from "../interfaces/File.js";
+import { Readable } from "stream";
 
 /**
   PRIVATE
@@ -91,7 +89,7 @@ const removeLinksOfNote = (db: Database, noteId: NoteId):true => {
 };
 
 
-const getUploadsOfNote = (note:DatabaseNote):FileId[] => {
+const getFilesOfNote = (note:DatabaseNote):FileId[] => {
   return note.editorData.blocks
     .filter((block) => {
       const blockHasFileOrImage = (
@@ -107,10 +105,10 @@ const getUploadsOfNote = (note:DatabaseNote):FileId[] => {
 };
 
 
-const removeUploadsOfNote = (note: DatabaseNote):void => {
-  getUploadsOfNote(note)
+const removeUploadsOfNote = (note: DatabaseNote, userId: UserId):void => {
+  getFilesOfNote(note)
     .forEach((fileId) => {
-      DB.deleteBlob(fileId);
+      DB.deleteFile(userId, fileId);
     });
 };
 
@@ -201,7 +199,7 @@ const init = (dataFolderPath:string):void => {
 
 
 const get = (noteId: NoteId, userId: UserId):NoteToTransmit | null => {
-  const db = DB.get(userId);
+  const db = DB.getMainData(userId);
   const noteFromDB:DatabaseNote | null = findNote(db, noteId);
   if (!noteFromDB) {
     return null;
@@ -216,7 +214,7 @@ const getNotesList = (userId: UserId, options): NoteListItem[] => {
   const query = options.query;
   const caseSensitiveQuery = options.caseSensitiveQuery;
 
-  const db: Database = DB.get(userId);
+  const db: Database = DB.getMainData(userId);
   const filteredNotes = db.notes
     .filter((note) => {
       if (query.length === 0) {
@@ -255,7 +253,7 @@ const getNotesList = (userId: UserId, options): NoteListItem[] => {
 
 
 const getGraph = (userId: UserId):Graph => {
-  const db = DB.get(userId);
+  const db = DB.getMainData(userId);
 
   const graphNodes:GraphNode[] = db.notes.map((note) => {
     const graphNode:GraphNode = {
@@ -280,7 +278,7 @@ const getGraph = (userId: UserId):Graph => {
 
 
 const getStats = (userId:UserId):Stats => {
-  const db = DB.get(userId);
+  const db = DB.getMainData(userId);
 
   const numberOfUnlinkedNotes = db.notes.filter((note) => {
     return getLinkedNotes(db, note.id).length === 0;
@@ -297,7 +295,7 @@ const getStats = (userId:UserId):Stats => {
 
 
 const setGraph = (graphFromUser:GraphFromUser, userId:UserId):boolean => {
-  const db:Database = DB.get(userId);
+  const db:Database = DB.getMainData(userId);
   graphFromUser.nodePositionUpdates.forEach(
     (nodePositionUpdate:GraphNodePositionUpdate):void => {
       updateNotePosition(db, nodePositionUpdate);
@@ -324,7 +322,7 @@ const put = (
     ignoreDuplicateTitles = false;
   }
 
-  const db:Database = DB.get(userId);
+  const db:Database = DB.getMainData(userId);
 
   if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, db)) {
     throw new Error("NOTE_WITH_SAME_TITLE_EXISTS");
@@ -366,7 +364,7 @@ const put = (
 
 
 const remove = (noteId, userId) => {
-  const db = DB.get(userId);
+  const db = DB.getMainData(userId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
   if (noteIndex === -1) {
     return false;
@@ -377,7 +375,7 @@ const remove = (noteId, userId) => {
   }
   db.notes.splice(noteIndex, 1);
   removeLinksOfNote(db, noteId);
-  removeUploadsOfNote(note);
+  removeUploadsOfNote(note, userId);
   DB.flushChanges(db);
   return true;
 };
@@ -391,19 +389,7 @@ const importDB = (db, userId) => {
 };
 
 
-const getFilesForDBExport = (userId:UserId):FileDescriptor[] => {
-  const jsonFile = DB.getDBFile(userId);
-  const db = DB.get(userId);
-  const uploadedFiles = db.notes
-    .map(getUploadsOfNote)
-    .flat()
-    .map(DB.getBlob);
-  const files = [jsonFile, ...uploadedFiles];
-  return files;
-};
-
-
-const addFile = (file:File):FileId => {
+const addFile = (userId:UserId, file:File):FileId => {
   const fileType = config.ALLOWED_FILE_UPLOAD_TYPES
     .find((filetype) => {
       return filetype.mimeType === file.type;
@@ -416,41 +402,18 @@ const addFile = (file:File):FileId => {
   const sourcePath = file.path;
 
   const fileId:FileId = uuidv4() + "." + fileType.ending;
-  DB.addBlob(fileId, sourcePath);
+  DB.addFile(userId, fileId, sourcePath);
   return fileId;
 };
 
 
-const getFile = (fileId:FileId):FileDescriptor => {
-  return DB.getBlob(fileId);
+const getReadableFileStream = (userId: UserId, fileId:FileId):Readable => {
+  return DB.getReadableFileStream(userId, fileId);
 };
 
 
 const getReadableDatabaseStream = (userId, withUploads) => {
-  if (!withUploads) {
-    return DB.getReadableStream(userId);
-  }
-
-  const archive = archiver("zip");
-
-  archive.on("error", function(err) {
-    throw new Error(err);
-  });
-
-  // on stream closed we can end the request
-  archive.on("end", function() {
-    const size = archive.pointer();
-    console.log(`Archive for ${userId} created. Size: ${size} bytes`);
-  });
-
-  getFilesForDBExport(userId)
-    .forEach((file) => {
-      archive.file(file, { name: path.basename(file) });
-    });
-
-  archive.finalize();
-
-  return archive;
+  return DB.getReadableDatabaseStream(userId, withUploads);
 };
 
 
@@ -542,8 +505,7 @@ export {
   remove,
   importDB,
   addFile,
-  getFile,
-  getFilesForDBExport,
+  getReadableFileStream,
   getReadableDatabaseStream,
   importLinksAsNotes,
 };

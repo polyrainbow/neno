@@ -287,7 +287,7 @@ const startApp = ({
         }
 
         try {
-          const fileId = Notes.addFile(file);
+          const fileId = Notes.addFile(req.userId, file);
 
           const response:APIResponse = {
             success: true,
@@ -408,12 +408,17 @@ const startApp = ({
 
   // TO BE IMPROVED
   app.get(config.API_PATH + "file/:fileId", function(req, res) {
-    const file = Notes.getFile(req.params.fileId);
-    if (!fs.existsSync(file)) {
-      res.end("ERROR: File does not exist!");
-      return;
+    try {
+      const fileStream
+        = Notes.getReadableFileStream(req.userId, req.params.fileId);
+      fileStream.pipe(res);
+    } catch (e) {
+      const response:APIResponse = {
+        success: false,
+        error: e.message,
+      };
+      res.json(response);
     }
-    res.download(file);
   });
 
 
