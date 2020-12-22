@@ -5,4 +5,4 @@ export default interface LinkedNote {
     readonly title: string,
     readonly creationTime: number,
     readonly updateTime: number
-};
+}

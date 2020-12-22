@@ -1,6 +1,6 @@
 import * as path from "path";
 import fs from "fs";
-import http from "http";
+import http, { RequestListener } from "http";
 import https from "https";
 import * as url from "url";
 import mkdirp from "mkdirp";
@@ -8,6 +8,7 @@ import * as config from "./config.js";
 import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
 import User from "./interfaces/User.js";
+
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REPO_PATH = path.join(__dirname, "..");
@@ -56,7 +57,7 @@ if (program.useHttps) {
       key: fs.readFileSync(program.certKeyPath),
       cert: fs.readFileSync(program.certPath)
     },
-    app,
+    app as RequestListener,
   );
 
   httpsServer.listen(parseInt(program.httpsPort));

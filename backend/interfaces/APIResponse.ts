@@ -5,4 +5,4 @@ export default interface APIResponse {
     payload?: any,
     error?: APIError,
     token?: string,
-};
+}

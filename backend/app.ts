@@ -15,13 +15,15 @@ import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
 import { File } from "./interfaces/File.js";
 import cookieParser from "cookie-parser";
+import AppStartOptions from "./interfaces/AppStartOptions.js";
+
 
 const startApp = ({
   users,
   dataPath,
   frontendPath,
   jwtSecret,
-}) => {
+}:AppStartOptions):Express.Application => {
   Notes.init(dataPath);
   const app = express();
 
@@ -351,7 +353,7 @@ const startApp = ({
     (req, res) => {
       const url = req.query.url;
 
-      getUrlMetadata(url)
+      getUrlMetadata(url as string)
         .then((metadata) => {
           res.end(JSON.stringify(metadata));
         })

@@ -4,4 +4,4 @@ export default interface NoteListItemFeatures {
     readonly containsCode: boolean,
     readonly containsImages: boolean,
     readonly containsAttachements: boolean,
-};
+}

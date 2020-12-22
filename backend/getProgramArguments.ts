@@ -1,6 +1,5 @@
 import * as path from "path";
 import * as url from "url";
-import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 import { Command } from "commander";
 const program = new Command();

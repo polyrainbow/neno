@@ -8,4 +8,4 @@ export default interface Graph {
     links: Link[],
     screenPosition: ScreenPosition,
     initialNodePosition: NodePosition,
-};
+}

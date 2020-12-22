@@ -1,5 +1,8 @@
-const getKeySortFunction = function(key, doCaseInsensitiveSort) {
-  return function(a, b) {
+const getKeySortFunction = function(
+  key: string | number,
+  doCaseInsensitiveSort: boolean,
+) {
+  return function(a, b):number {
     let x = a[key];
     let y = b[key];
 
@@ -50,13 +53,13 @@ function binaryArrayFind<T> (
   }
 
   return null;
-};
+}
 
 
 function binaryArrayFindIndex(
-  sortedArray:any[],
+  sortedArray: any[],
   sortKeyKey: string | number,
-  sortKeyToFind
+  sortKeyToFind: string | number,
 ): number {
   let start = 0;
   let end = sortedArray.length - 1;
@@ -77,7 +80,7 @@ function binaryArrayFindIndex(
   }
 
   return -1;
-};
+}
 
 
 /*

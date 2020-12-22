@@ -8,7 +8,6 @@ import { FileId } from "../interfaces/FileId.js";
 import { DatabaseId } from "../interfaces/DatabaseId.js";
 import { Readable } from "stream";
 import DatabaseMainData from "../interfaces/DatabaseMainData.js";
-import FileReadableWithName from "../interfaces/FileReadableWithName.js";
 import archiver from "archiver";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -137,15 +136,15 @@ const flushChanges = (db:DatabaseMainData):boolean => {
 };
 
 
-const forEach = (handler:Function) => {
+const forEach = (handler:(DatabaseMainData) => any) => {
   return fs.readdirSync(DATA_FOLDER)
     .filter((objectName:string) => {
       const stat = fs.statSync(path.join(DATA_FOLDER, objectName));
       return stat.isDirectory();
     })
     .forEach((databaseId:DatabaseId) => {
-      const mainData = getMainData(databaseId);
-      const mainDataCopy = cloneObject(mainData);
+      const mainData:DatabaseMainData = getMainData(databaseId);
+      const mainDataCopy:DatabaseMainData = cloneObject(mainData);
       handler(mainDataCopy);
       flushChanges(mainDataCopy);
     });

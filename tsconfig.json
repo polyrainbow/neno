@@ -20,7 +20,10 @@
       "types": [
         "node"
       ],
-      "typeRoots": [ "./node_modules/@types"],
+      "typeRoots": [
+        "./custom_typings",
+        "./node_modules/@types"
+      ],
       "resolveJsonModule": true,
       "strictNullChecks": true
     },

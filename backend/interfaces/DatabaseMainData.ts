@@ -12,4 +12,4 @@ export default interface DatabaseMainData {
     idCounter: number,
     screenPosition: ScreenPosition,
     initialNodePosition: NodePosition,
-};
+}

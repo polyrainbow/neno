@@ -4,4 +4,4 @@ export default interface EditorData {
     time: number,
     blocks: EditorDataBlock[],
     readonly version: string,
-};
+}

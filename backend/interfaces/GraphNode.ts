@@ -8,4 +8,4 @@ export default interface GraphNode {
     position: NodePosition,
     linkedNotes: LinkedNote[],
     creationTime: number,
-};
+}
