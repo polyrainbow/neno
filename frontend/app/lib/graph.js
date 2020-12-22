@@ -27,21 +27,15 @@ class Graph {
   svg = null;
   #idsOfAllNodesWithLinkedNote = null;
   #updatedNodes = new Set();
-
-
-  #selection = {
-    type: "null",
-    value: null,
-  };
-
   #mouseDownNode = null;
-  #mouseDownLink = null;
   #justDragged = false;
   #justScaleTransGraph = false;
   #lastKeyDown = -1;
   #shiftDragInProgress = false;
-  #selectedText = null;
-  #graphMouseDown = false;
+  #selection = {
+    type: "null",
+    value: null,
+  };
 
   constructor(svg, graphObject, onHighlight, onChange) {
     const thisGraph = this;
@@ -134,9 +128,6 @@ class Graph {
       .on("keyup", function(e) {
         thisGraph.#svgKeyUp(e);
       });
-    svg.on("mousedown", function(e, d) {
-      thisGraph.#svgMouseDown(d);
-    });
     svg.on("mouseup", function(e, d) {
       thisGraph.#svgMouseUp(d);
     });
@@ -247,19 +238,6 @@ class Graph {
   };
 
 
-  // remove links associated with a node
-  // this method is currently not used
-  #spliceLinksForNode(node) {
-    const thisGraph = this;
-    const toSplice = thisGraph.#links.filter(function(l) {
-      return (l.source === node || l.target === node);
-    });
-    toSplice.map(function(l) {
-      return thisGraph.#links.splice(thisGraph.#links.indexOf(l), 1);
-    });
-  };
-
-
   #select(value) {
     const thisGraph = this;
     if (!value) {
@@ -288,7 +266,6 @@ class Graph {
   #handleMouseDownOnEdge(e, d3path, d) {
     const thisGraph = this;
     e.stopPropagation();
-    thisGraph.#mouseDownLink = d;
 
     if (thisGraph.#selection) {
       thisGraph.#select(null);
@@ -374,12 +351,6 @@ class Graph {
   };
 
 
-  // mousedown on main svg
-  #svgMouseDown() {
-    this.#graphMouseDown = true;
-  };
-
-
   // mouseup on main svg
   #svgMouseUp() {
     const thisGraph = this;
@@ -391,8 +362,6 @@ class Graph {
     // on mouse up, shift drag is always over
     thisGraph.#shiftDragInProgress = false;
     thisGraph.newLinkLine.classed("hidden", true);
-
-    thisGraph.#graphMouseDown = false;
   };
 
 
@@ -556,9 +525,6 @@ class Graph {
       })
       .on("mousedown", function(e, d) {
         thisGraph.#handleMouseDownOnEdge(e, d3.select(this), d);
-      })
-      .on("mouseup", function() {
-        thisGraph.#mouseDownLink = null;
       });
 
     // remove old links
