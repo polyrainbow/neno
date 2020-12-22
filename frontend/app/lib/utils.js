@@ -50,8 +50,10 @@ const getNewNoteObject = () => {
     isUnsaved: true,
     linkedNotes: [],
     updateTime: null,
-    x: null,
-    y: null,
+    position: {
+      x: null,
+      y: null,
+    },
   };
 
   Object.seal(note);
