@@ -226,10 +226,16 @@ const getNotesList = (userId: UserId, options): NoteListItem[] => {
       }
 
       const title = getNoteTitle(note);
+      const queryTokens = query.split(" ");
+
       if (caseSensitiveQuery) {
-        return title.includes(query);
+        return queryTokens.every((queryToken) => {
+          return title.includes(queryToken);
+        });
       } else {
-        return title.toLowerCase().includes(query.toLowerCase());
+        return queryTokens.every((queryToken) => {
+          return title.toLowerCase().includes(queryToken.toLowerCase());
+        });
       }
     });
 
