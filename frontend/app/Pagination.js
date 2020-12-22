@@ -50,6 +50,7 @@ const Pagination = (props) => {
           alignItems: "center",
           fontSize: "22px",
           justifyContent: "center",
+          flexWrap: "wrap",
         }}>
           {items.map(({ page, type, selected, ...item }, index) => {
             let children = null;
@@ -72,10 +73,11 @@ const Pagination = (props) => {
               children = (
                 <button
                   type="button"
-                  className="pagination-button"
+                  className="pagination-button pagination-button-special"
+                  title={type === "previous" ? "Previous page" : "Next page"}
                   {...item}
                 >
-                  {type === "previous" ? "< Previous" : "Next >"}
+                  {type === "previous" ? "<" : ">"}
                 </button>
               );
             }

@@ -212,6 +212,12 @@ button[disabled]{
   font-size: 22px;
 }
 
+.pagination-button-special {
+  width: 80px;
+  padding: 5px 15px;
+  font-size: 22px;
+}
+
 .pagination-button.selected {
   background-color: var(--button-background-color-active);
   font-weight: bold;
