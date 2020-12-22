@@ -207,6 +207,27 @@ function isNotFalse<TValue>(value: TValue | false): value is TValue {
 }
 
 
+const getPagedMatches = <T>(
+  allMatches: Array<T>,
+  page:number,
+  rows:number,
+):Array<T> => {
+  const startIndex = (page - 1) * rows;
+
+  if (allMatches.length < startIndex) {
+    return [];
+  } else {
+    const allMatchesFromThisPageOn = allMatches.slice(startIndex);
+
+    if (allMatchesFromThisPageOn.length > rows) {
+      return allMatches.slice(startIndex, startIndex + rows);
+    } else {
+      return allMatchesFromThisPageOn;
+    }
+  }
+};
+
+
 export {
   getKeySortFunction,
   binaryArrayFind,
@@ -218,4 +239,5 @@ export {
   deepFreeze,
   isNotEmpty,
   isNotFalse,
+  getPagedMatches,
 };

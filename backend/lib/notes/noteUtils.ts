@@ -7,7 +7,9 @@ import LinkedNote from "../../interfaces/LinkedNote.js";
 import Note from "../../interfaces/Note.js";
 import NoteFromUser from "../../interfaces/NoteFromUser.js";
 import { NoteId } from "../../interfaces/NoteId.js";
+import NoteListItem from "../../interfaces/NoteListItem.js";
 import NoteListItemFeatures from "../../interfaces/NoteListItemFeatures.js";
+import { NoteListSortMode } from "../../interfaces/NoteListSortMode.js";
 import NoteToTransmit from "../../interfaces/NoteToTransmit.js";
 import UserNoteChange from "../../interfaces/UserNoteChange.js";
 import { UserNoteChangeType } from "../../interfaces/UserNoteChangeType.js";
@@ -211,6 +213,44 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
 };
 
 
+const getSortFunction = (
+  sortMode:NoteListSortMode,
+):((a:NoteListItem, b:NoteListItem) => number) => {
+  const sortFunctions = {
+    [NoteListSortMode.CREATION_DATE_ASCENDING]: (a, b) => {
+      return a.creationTime - b.creationTime;
+    },
+    [NoteListSortMode.CREATION_DATE_DESCENDING]: (a, b) => {
+      return b.creationTime - a.creationTime;
+    },
+    [NoteListSortMode.UPDATE_DATE_ASCENDING]: (a, b) => {
+      return a.updateTime - b.updateTime;
+    },
+    [NoteListSortMode.UPDATE_DATE_DESCENDING]: (a, b) => {
+      return b.updateTime - a.updateTime;
+    },
+    [NoteListSortMode.NUMBER_OF_LINKS_ASCENDING]: (a, b) => {
+      return a.numberOfLinkedNotes - b.numberOfLinkedNotes;
+    },
+    [NoteListSortMode.NUMBER_OF_LINKS_DESCENDING]: (a, b) => {
+      return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
+    },
+    [NoteListSortMode.HAS_FILES]: (a, b) => {
+      const aHasFiles
+        = a.features.containsImages || a.features.containsAttachements;
+      const bHasFiles
+        = b.features.containsImages || b.features.containsAttachements;
+
+      if (aHasFiles && !bHasFiles) return -1;
+      if (!aHasFiles && bHasFiles) return 1;
+      return 0;
+    },
+  };
+
+  return sortFunctions[sortMode] ?? sortFunctions.UPDATE_DATE_ASCENDING;
+};
+
+
 export {
   getNoteTitle,
   removeDefaultTextParagraphs,
@@ -225,4 +265,5 @@ export {
   incorporateUserChangesIntoNote,
   createNoteToTransmit,
   getNoteFeatures,
+  getSortFunction,
 };

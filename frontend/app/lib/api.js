@@ -66,11 +66,14 @@ const getNote = async (noteId) => {
 const getNotes = async (options) => {
   const query = options?.query;
   const caseSensitive = options?.caseSensitive;
+  const page = options?.page || 1;
+  const sortMode = options?.sortMode;
 
-  let url = "notes";
+  let url = "notes?page=" + page.toString() + "&sortMode=" + sortMode;
+
   if (typeof query === "string") {
     url = url
-      + "?q=" + encodeURIComponent(query)
+      + "&q=" + encodeURIComponent(query)
       + "&caseSensitive=" + caseSensitive;
   }
 

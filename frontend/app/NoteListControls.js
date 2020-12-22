@@ -4,8 +4,8 @@ import SearchInput from "./SearchInput.js";
 const NoteListControls = ({
   value,
   onChange,
-  sortBy,
-  setSortBy,
+  sortMode,
+  setSortMode,
 }) => {
   return <section id="section-search-input">
     <div
@@ -27,19 +27,19 @@ const NoteListControls = ({
       }}
     >
       <label
-        htmlFor="sortBySelect"
+        htmlFor="sortModeSelect"
         style={{
           margin: "0px 5px",
         }}
       >Sort by</label>
       <select
-        id="sortBySelect"
+        id="sortModeSelect"
         style={{
           fontSize: "24px",
           border: "none",
         }}
-        value={sortBy}
-        onChange={(e) => setSortBy(e.target.value)}
+        value={sortMode}
+        onChange={(e) => setSortMode(e.target.value)}
       >
         <option
           value="CREATION_DATE_ASCENDING"

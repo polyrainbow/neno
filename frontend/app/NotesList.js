@@ -7,6 +7,7 @@ import NoteSearchDisclaimer from "./NoteSearchDisclaimer.js";
 
 const NotesList = ({
   notes,
+  numberOfResults,
   loadNote,
   activeNote,
   onLinkAddition,
@@ -15,7 +16,7 @@ const NotesList = ({
   searchValue,
   scrollTop,
   setScrollTop,
-  sortBy,
+  sortMode,
   page,
   setPage,
   stats,
@@ -52,14 +53,14 @@ const NotesList = ({
     };
   }, [status]);
 
-  // set scrollTop when notes, status or sortBy have changed
+  // set scrollTop when notes, status or sortMode have changed
   useEffect(() => {
     const container = containerRef.current;
     if (!container) {
       return;
     }
     container.scrollTop = scrollTop;
-  }, [notes, status, sortBy]);
+  }, [notes, status, sortMode]);
 
   if (status === "BUSY" || status === "SEARCH_VALUE_TOO_SHORT") {
     return <NotesListStatus
@@ -74,25 +75,23 @@ const NotesList = ({
   }
 
   const startNote = page * searchResultsPerPage - 100;
-  const endNote = startNote + searchResultsPerPage - 1;
-  const firstNoteExcluded = endNote + 1;
 
   return <section ref={containerRef} id="list">
     <Pagination
-      numberOfResults={notes.length}
+      numberOfResults={numberOfResults}
       page={page}
       searchResultsPerPage={searchResultsPerPage}
       onChange={(newPage) => setPage(newPage)}
     />
     <NoteSearchDisclaimer
       searchValue={searchValue}
-      notes={notes}
+      numberOfResults={numberOfResults}
       stats={stats}
     />
     <table id="list-table">
       <tbody>
         {
-          notes.slice(startNote, firstNoteExcluded).map((note, i) => {
+          notes.map((note, i) => {
             const isActive
               = (!activeNote.isUnsaved) && (note.id === activeNote.id);
             const isLinked

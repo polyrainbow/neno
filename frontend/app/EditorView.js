@@ -18,12 +18,13 @@ const EditorView = ({
   initialNoteId,
 }) => {
   const currentRequestId = useRef(null);
-  const [displayedNotes, setDisplayedNotes] = useState([]);
+  const [noteListItems, setNoteListItems] = useState([]);
+  const [numberOfResults, setNumberOfResults] = useState([]);
   const [noteListScrollTop, setNoteListScrollTop] = useState(0);
   const [page, setPage] = useState(1);
   const [isBusy, setIsBusy] = useState(true);
   const [stats, setStats] = useState(null);
-  const [sortBy, setSortBy] = useState("CREATION_DATE_DESCENDING");
+  const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
   const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
   const [isImportLinksDialogOpen, setIsImportLinksDialogOpen]
@@ -50,9 +51,6 @@ const EditorView = ({
       }),
   ];
 
-  const displayedNotesSorted = displayedNotes.sort(
-    Utils.getSortFunction(sortBy),
-  );
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
@@ -170,7 +168,7 @@ const EditorView = ({
   const refreshNotesList = useCallback(
     async () => {
       refreshStats();
-      setDisplayedNotes([]);
+      setNoteListItems([]);
 
       // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
       // we don't do anything and leave the note list empty
@@ -183,7 +181,10 @@ const EditorView = ({
 
       setIsBusy(true);
 
-      const options = {};
+      const options = {
+        page,
+        sortMode,
+      };
 
       if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
         options.query = searchValue;
@@ -193,11 +194,15 @@ const EditorView = ({
       const requestId = uuidv4();
       currentRequestId.current = requestId;
       try {
-        const notes = await databaseProvider.getNotes(options);
+        const {
+          results,
+          numberOfResults,
+        } = await databaseProvider.getNotes(options);
 
         // ... some time later - check if this is the current request
         if (currentRequestId.current === requestId) {
-          setDisplayedNotes(notes);
+          setNoteListItems(results);
+          setNumberOfResults(numberOfResults);
           setIsBusy(false);
         }
       } catch (e) {
@@ -209,7 +214,7 @@ const EditorView = ({
         }
       }
     },
-    [searchValue],
+    [searchValue, page, sortMode],
   );
 
 
@@ -282,7 +287,7 @@ const EditorView = ({
 
   useEffect(() => {
     refreshNotesList();
-  }, [searchValue]);
+  }, [searchValue, page, sortMode]);
 
 
   const importLinksAsNotes = async (links) => {
@@ -312,17 +317,18 @@ const EditorView = ({
         <NoteListControls
           onChange={handleSearchInputChange}
           value={searchValue}
-          displayedNotes={displayedNotesSorted}
+          displayedNotes={noteListItems}
           stats={stats}
-          sortBy={sortBy}
-          setSortBy={(sortBy) => {
+          sortMode={sortMode}
+          setSortMode={(sortMode) => {
             setNoteListScrollTop(0);
-            setSortBy(sortBy);
+            setSortMode(sortMode);
             setPage(1);
           }}
         />
         <NotesList
-          notes={displayedNotes}
+          notes={noteListItems}
+          numberOfResults={numberOfResults}
           loadNote={loadNote}
           activeNote={activeNote}
           displayedLinkedNotes={displayedLinkedNotes}
@@ -331,7 +337,7 @@ const EditorView = ({
           searchValue={searchValue}
           scrollTop={noteListScrollTop}
           setScrollTop={setNoteListScrollTop}
-          sortBy={sortBy}
+          sortMode={sortMode}
           page={page}
           setPage={setPage}
           stats={stats}

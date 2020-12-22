@@ -1,4 +1,3 @@
-import NoteListItem from "./interfaces/NoteListItem.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import { NoteId } from "./interfaces/NoteId.js";
 import Stats from "./interfaces/Stats.js";
@@ -15,6 +14,7 @@ import { APIError } from "./interfaces/APIError.js";
 import { File } from "./interfaces/File.js";
 import cookieParser from "cookie-parser";
 import AppStartOptions from "./interfaces/AppStartOptions.js";
+import NoteListPage from "./interfaces/NoteListPage.js";
 
 
 const startApp = ({
@@ -181,17 +181,21 @@ const startApp = ({
     function(req, res) {
       const query = req.query.q || "";
       const caseSensitiveQuery = req.query.caseSensitive === "true";
+      const page = req.query.page || 1;
+      const sortMode = req.query.sortMode;
       const includeLinkedNotes = true;
 
-      const notesList:NoteListItem[] = Notes.getNotesList(req.userId, {
+      const notesListPage:NoteListPage = Notes.getNotesList(req.userId, {
         includeLinkedNotes,
         query,
         caseSensitiveQuery,
+        page,
+        sortMode,
       });
 
       const response:APIResponse = {
         success: true,
-        payload: notesList,
+        payload: notesListPage,
       };
       res.json(response);
     },

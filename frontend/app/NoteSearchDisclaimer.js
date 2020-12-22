@@ -2,18 +2,18 @@ import React from "react";
 
 const NoteSearchDisclaimer = ({
   searchValue,
-  notes,
+  numberOfResults,
   stats,
 }) => {
   let label = "";
-  if (notes) {
+  if (numberOfResults) {
     if (
       typeof stats?.numberOfAllNotes === "number"
-      && (notes.length === stats.numberOfAllNotes)
+      && (numberOfResults === stats.numberOfAllNotes)
     ) {
       label = "";
     } else if (searchValue.length > 2) {
-      label = notes.length + " note(s) found";
+      label = numberOfResults + " note(s) found";
     }
   } else if (searchValue.length > 0 && searchValue.length < 3) {
     label = "";

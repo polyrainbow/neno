@@ -61,42 +61,6 @@ const getNewNoteObject = () => {
 };
 
 
-const getSortFunction = (sortBy) => {
-  const sortFunctions = {
-    "CREATION_DATE_ASCENDING": (a, b) => {
-      return a.creationTime - b.creationTime;
-    },
-    "CREATION_DATE_DESCENDING": (a, b) => {
-      return b.creationTime - a.creationTime;
-    },
-    "UPDATE_DATE_ASCENDING": (a, b) => {
-      return a.updateTime - b.updateTime;
-    },
-    "UPDATE_DATE_DESCENDING": (a, b) => {
-      return b.updateTime - a.updateTime;
-    },
-    "NUMBER_OF_LINKS_ASCENDING": (a, b) => {
-      return a.numberOfLinkedNotes - b.numberOfLinkedNotes;
-    },
-    "NUMBER_OF_LINKS_DESCENDING": (a, b) => {
-      return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
-    },
-    "HAS_FILES": (a, b) => {
-      const aHasFiles
-        = a.features.containsImages || a.features.containsAttachements;
-      const bHasFiles
-        = b.features.containsImages || b.features.containsAttachements;
-
-      if (aHasFiles && !bHasFiles) return -1;
-      if (!aHasFiles && bHasFiles) return 1;
-      return 0;
-    },
-  };
-
-  return sortFunctions[sortBy] ?? sortFunctions.UPDATE_DATE_ASCENDING;
-};
-
-
 const setNoteTitleByLinkTitleIfUnset = (note, defaultNoteTitle) => {
   // if the note has no title yet, take the title of the link metadata
   const firstLinkBlock = note.editorData.blocks.find(
@@ -192,7 +156,6 @@ export {
   getNumberOfCharacters,
   makeTimestampHumanReadable,
   getNewNoteObject,
-  getSortFunction,
   setNoteTitleByLinkTitleIfUnset,
   binaryArrayFind,
   binaryArrayIncludes,

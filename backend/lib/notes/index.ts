@@ -15,6 +15,7 @@ import {
   incorporateUserChangesIntoNote,
   createNoteToTransmit,
   getNoteFeatures,
+  getSortFunction,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "../../interfaces/DatabaseMainData.js";
@@ -36,6 +37,8 @@ import getUrlMetadata from "./getUrlMetadata.js";
 import * as config from "./config.js";
 import { File } from "../../interfaces/File.js";
 import { Readable } from "stream";
+import NoteListPage from "../../interfaces/NoteListPage.js";
+import { NoteListSortMode } from "../../interfaces/NoteListSortMode.js";
 
 
 /**
@@ -67,13 +70,19 @@ const get = (noteId: NoteId, userId: UserId):NoteToTransmit | null => {
 };
 
 
-const getNotesList = (userId: UserId, options): NoteListItem[] => {
+const getNotesList = (
+  userId: UserId,
+  options,
+): NoteListPage => {
   const query = options.query;
   const caseSensitiveQuery = options.caseSensitiveQuery;
+  const page = Math.max(options.page, 1) || 1;
+  const sortMode
+    = options.sortMode || NoteListSortMode.CREATION_DATE_DESCENDING;
 
   const db: Database = DB.getMainData(userId);
-  const filteredNotes = db.notes
-    .filter((note) => {
+  const matchingNotes = db.notes
+    .filter((note:DatabaseNote) => {
       if (query.length === 0) {
         return true;
       }
@@ -94,10 +103,9 @@ const getNotesList = (userId: UserId, options): NoteListItem[] => {
           return title.toLowerCase().includes(queryToken.toLowerCase());
         });
       }
-    });
+    })
 
-
-  const items:NoteListItem[] = filteredNotes
+  const noteListItems:NoteListItem[] = matchingNotes
     .map((note:DatabaseNote):NoteListItem => {
       const noteListItem:NoteListItem = {
         id: note.id,
@@ -109,9 +117,23 @@ const getNotesList = (userId: UserId, options): NoteListItem[] => {
       };
 
       return noteListItem;
-    });
+    })
+    .sort(getSortFunction(sortMode));
 
-  return items;
+  const numberOfResults = noteListItems.length;
+
+  const noteListItemsOfPage:NoteListItem[] = Utils.getPagedMatches(
+    noteListItems,
+    page,
+    config.NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE,
+  );
+
+  const noteListPage:NoteListPage = {
+    results: noteListItemsOfPage,
+    numberOfResults,
+  }
+
+  return noteListPage;
 };
 
 
