@@ -1,13 +1,13 @@
 import path from "path";
 import fs from "fs";
 import mkdirp from "mkdirp";
-import { cloneObject } from "./utils.js";
+import { cloneObject } from "../utils.js";
 import * as url from "url";
-import { Filepath } from "../interfaces/Filepath.js";
-import { FileId } from "../interfaces/FileId.js";
-import { DatabaseId } from "../interfaces/DatabaseId.js";
+import { Filepath } from "../../interfaces/Filepath.js";
+import { FileId } from "../../interfaces/FileId.js";
+import { DatabaseId } from "../../interfaces/DatabaseId.js";
 import { Readable } from "stream";
-import DatabaseMainData from "../interfaces/DatabaseMainData.js";
+import DatabaseMainData from "../../interfaces/DatabaseMainData.js";
 import archiver from "archiver";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));

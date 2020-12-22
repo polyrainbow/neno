@@ -1,5 +1,5 @@
 import * as DB from "./database.js";
-import * as Utils from "./utils.js";
+import * as Utils from "../utils.js";
 import { v4 as uuidv4 } from "uuid";
 import {
   getNoteTitle,
@@ -8,178 +8,35 @@ import {
   noteWithSameTitleExists,
   findNote,
   getNewNoteId,
+  updateNotePosition,
+  getLinkedNotes,
+  removeLinksOfNote,
+  getFilesOfNote,
+  incorporateUserChangesIntoNote,
+  createNoteToTransmit,
+  getNoteFeatures,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
-import Database from "../interfaces/DatabaseMainData.js";
-import NoteListItem from "../interfaces/NoteListItem.js";
-import Graph from "../interfaces/Graph.js";
-import { UserId } from "../interfaces/UserId.js";
-import { NoteId } from "../interfaces/NoteId.js";
-import NoteToTransmit from "../interfaces/NoteToTransmit.js";
-import GraphNode from "../interfaces/GraphNode.js";
-import DatabaseNote from "../interfaces/DatabaseNote.js";
-import NoteFromUser from "../interfaces/NoteFromUser.js";
-import { UserNoteChangeType } from "../interfaces/UserNoteChangeType.js";
-import { Link } from "../interfaces/Link.js";
-import NoteListItemFeatures from "../interfaces/NoteListItemFeatures.js";
-import Stats from "../interfaces/Stats.js";
-import LinkedNote from "../interfaces/LinkedNote.js";
-import UserNoteChange from "../interfaces/UserNoteChange.js";
-import GraphFromUser from "../interfaces/GraphFromUser.js";
-import GraphNodePositionUpdate from "../interfaces/GraphNodePositionUpdate.js";
-import { FileId } from "../interfaces/FileId.js";
-import UrlMetadataResponse from "../interfaces/UrlMetadataResponse.js";
-import ImportLinkAsNoteFailure from "../interfaces/ImportLinkAsNoteFailure.js";
+import Database from "../../interfaces/DatabaseMainData.js";
+import NoteListItem from "../../interfaces/NoteListItem.js";
+import Graph from "../../interfaces/Graph.js";
+import { UserId } from "../../interfaces/UserId.js";
+import { NoteId } from "../../interfaces/NoteId.js";
+import NoteToTransmit from "../../interfaces/NoteToTransmit.js";
+import GraphNode from "../../interfaces/GraphNode.js";
+import DatabaseNote from "../../interfaces/DatabaseNote.js";
+import NoteFromUser from "../../interfaces/NoteFromUser.js";
+import Stats from "../../interfaces/Stats.js";
+import GraphFromUser from "../../interfaces/GraphFromUser.js";
+import GraphNodePositionUpdate from "../../interfaces/GraphNodePositionUpdate.js";
+import { FileId } from "../../interfaces/FileId.js";
+import UrlMetadataResponse from "../../interfaces/UrlMetadataResponse.js";
+import ImportLinkAsNoteFailure from "../../interfaces/ImportLinkAsNoteFailure.js";
 import getUrlMetadata from "./getUrlMetadata.js";
-import * as config from "../config.js";
-import { File } from "../interfaces/File.js";
+import * as config from "../../config.js";
+import { File } from "../../interfaces/File.js";
 import { Readable } from "stream";
 
-/**
-  PRIVATE
-  These private methods manipulate a db object that is passed to them as
-  argument.
-*/
-
-
-const updateNotePosition = (
-  db:Database,
-  nodePositionUpdate: GraphNodePositionUpdate,
-): boolean => {
-  const note:DatabaseNote | null = findNote(db, nodePositionUpdate.id);
-  if (note === null) {
-    return false;
-  }
-  note.position = nodePositionUpdate.position;
-  return true;
-};
-
-
-const getLinkedNotes = (db:Database, noteId:NoteId):LinkedNote[] => {
-  const notes:DatabaseNote[] | null = db.links
-    .filter((link:Link):boolean => {
-      return (link[0] === noteId) || (link[1] === noteId);
-    })
-    .map((link:Link):DatabaseNote | null => {
-      const linkedNoteId = (link[0] === noteId) ? link[1] : link[0];
-      return findNote(db, linkedNoteId);
-    })
-    .filter(Utils.isNotEmpty);
-
-  const linkedNotes:LinkedNote[] = notes
-    .map((note:DatabaseNote) => {
-      const linkedNote:LinkedNote = {
-        id: note.id,
-        title: getNoteTitle(note),
-        creationTime: note.creationTime,
-        updateTime: note.updateTime,
-      }
-      return linkedNote;
-    });
-
-  return linkedNotes;
-};
-
-
-const removeLinksOfNote = (db: Database, noteId: NoteId):true => {
-  db.links = db.links.filter((link) => {
-    return (link[0] !== noteId) && (link[1] !== noteId);
-  });
-  return true;
-};
-
-
-const getFilesOfNote = (note:DatabaseNote):FileId[] => {
-  return note.editorData.blocks
-    .filter((block) => {
-      const blockHasFileOrImage = (
-        ((block.type === "image") || (block.type === "attaches"))
-        && (typeof block.data.file.fileId === "string")
-      );
-
-      return blockHasFileOrImage;
-    })
-    .map((block) => {
-      return block.data.file.fileId;
-    });
-};
-
-
-const removeUploadsOfNote = (note: DatabaseNote, userId: UserId):void => {
-  getFilesOfNote(note)
-    .forEach((fileId) => {
-      DB.deleteFile(userId, fileId);
-    });
-};
-
-
-const incorporateUserChangesIntoNote = (
-  changes:UserNoteChange[] | undefined,
-  note:DatabaseNote,
-  db:Database,
-):void => {
-  if (Array.isArray(changes)) {
-    changes.forEach((change) => {
-      if (change.type === UserNoteChangeType.LINKED_NOTE_ADDED) {
-        const link:Link = [note.id, change.noteId];
-        db.links.push(link);
-      }
-
-      if (change.type === UserNoteChangeType.LINKED_NOTE_DELETED) {
-        db.links = db.links.filter((link) => {
-          return !(
-            link.includes(note.id) && link.includes(change.noteId)
-          );
-        });
-      }
-    });
-  }
-};
-
-
-const createNoteToTransmit = (
-  databaseNote:NonNullable<DatabaseNote>,
-  db: NonNullable<Database>,
-):NoteToTransmit => {
-  const noteToTransmit:NoteToTransmit = {
-    id: databaseNote.id,
-    editorData: databaseNote.editorData,
-    title: getNoteTitle(databaseNote),
-    creationTime: databaseNote.creationTime,
-    updateTime: databaseNote.updateTime,
-    linkedNotes: getLinkedNotes(db, databaseNote.id),
-    position: databaseNote.position,
-  };
-
-  return noteToTransmit;
-}
-
-
-const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
-  let containsText = false;
-  let containsWeblink = false;
-  let containsCode = false;
-  let containsImages = false;
-  let containsAttachements = false;
-
-  note.editorData.blocks.forEach((block) => {
-    if (block.type === "paragraph") containsText = true;
-    if (block.type === "linkTool") containsWeblink = true;
-    if (block.type === "code") containsCode = true;
-    if (block.type === "image") containsImages = true;
-    if (block.type === "attaches") containsAttachements = true;
-  });
-
-  const features:NoteListItemFeatures = {
-    containsText,
-    containsWeblink,
-    containsCode,
-    containsImages,
-    containsAttachements,
-  };
-
-  return features;
-};
 
 /**
   EXPORTS
@@ -381,7 +238,13 @@ const remove = (noteId, userId) => {
   }
   db.notes.splice(noteIndex, 1);
   removeLinksOfNote(db, noteId);
-  removeUploadsOfNote(note, userId);
+
+  // remove files used in this note
+  getFilesOfNote(note)
+    .forEach((fileId) => {
+      DB.deleteFile(userId, fileId);
+    });
+
   DB.flushChanges(db);
   return true;
 };
@@ -514,4 +377,5 @@ export {
   getReadableFileStream,
   getReadableDatabaseStream,
   importLinksAsNotes,
+  getUrlMetadata,
 };

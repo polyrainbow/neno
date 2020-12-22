@@ -2,13 +2,12 @@ import NoteListItem from "./interfaces/NoteListItem.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import { NoteId } from "./interfaces/NoteId.js";
 import Stats from "./interfaces/Stats.js";
-import getUrlMetadata from "./lib/getUrlMetadata.js";
 import formidable from "formidable";
 import { yyyymmdd } from "./lib/utils.js";
 import * as config from "./config.js";
 import compression from "compression";
 import express from "express";
-import * as Notes from "./lib/notes.js";
+import * as Notes from "./lib/notes/index.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import APIResponse from "./interfaces/APIResponse.js";
@@ -353,7 +352,7 @@ const startApp = ({
     (req, res) => {
       const url = req.query.url;
 
-      getUrlMetadata(url as string)
+      Notes.getUrlMetadata(url as string)
         .then((metadata) => {
           res.end(JSON.stringify(metadata));
         })

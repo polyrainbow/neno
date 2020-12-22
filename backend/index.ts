@@ -3,11 +3,10 @@ import fs from "fs";
 import http, { RequestListener } from "http";
 import https from "https";
 import * as url from "url";
-import mkdirp from "mkdirp";
-import * as config from "./config.js";
 import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
 import User from "./interfaces/User.js";
+import getUsers from "./users.js";
 
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -15,33 +14,7 @@ const REPO_PATH = path.join(__dirname, "..");
 const VERSION = "1.0.0";
 const program = getProgramArguments(VERSION);
 
-// passwords and usernames must not contain colons
-let users:User[];
-const usersFile = path.join(program.dataFolderPath, "users.json");
-if (fs.existsSync(usersFile)) {
-  console.log("Loading existing users file...");
-  const json = fs.readFileSync(usersFile).toString();
-  users = JSON.parse(json);
-
-  const isValid = users.every((user) => {
-    return typeof user.id === "string"
-      && typeof user.login === "string"
-      && typeof user.passwordHash === "string";
-  });
-
-  if (!isValid) {
-    console.error("User file is not valid. Please make sure that every user "
-      + "has a valid id, login and passwordHash. Terminating!");
-    process.exit(1);
-  }
-} else {
-  console.log(
-    "No users file found. Creating one by myself with default users...",
-  );
-  mkdirp.sync(program.dataFolderPath);
-  fs.writeFileSync(usersFile, JSON.stringify(config.DEFAULT_USERS));
-  users = config.DEFAULT_USERS;
-}
+const users: User[] = getUsers(program.dataFolderPath);
 
 const app = startApp({
   users,

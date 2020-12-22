@@ -1,5 +1,5 @@
 import urlMetadata from "url-metadata";
-import UrlMetadataResponse from "../interfaces/UrlMetadataResponse.js";
+import UrlMetadataResponse from "../../interfaces/UrlMetadataResponse.js";
 
 const getUrlMetadata = async (
   url:string,
