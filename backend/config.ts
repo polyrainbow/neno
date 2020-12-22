@@ -2,25 +2,6 @@ import User from "./interfaces/User";
 
 const API_PATH = "/api/";
 
-const ALLOWED_FILE_UPLOAD_TYPES = [
-  {
-    mimeType: "image/png",
-    ending: "png",
-  },
-  {
-    mimeType: "image/jpeg",
-    ending: "jpg",
-  },
-  {
-    mimeType: "image/webp",
-    ending: "webp",
-  },
-  {
-    mimeType: "application/pdf",
-    ending: "pdf",
-  },
-];
-
 const DEFAULT_USERS:User[] = [
   {
     id: "admin",
@@ -33,6 +14,5 @@ const DEFAULT_USERS:User[] = [
 
 export {
   API_PATH,
-  ALLOWED_FILE_UPLOAD_TYPES,
   DEFAULT_USERS,
 }

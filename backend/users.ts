@@ -7,6 +7,7 @@ import User from "./interfaces/User.js";
 const getUsers = (dataFolderPath) => {
   let users:User[];
   const usersFile = path.join(dataFolderPath, "users.json");
+
   if (fs.existsSync(usersFile)) {
     console.log("Loading existing users file...");
     const json = fs.readFileSync(usersFile).toString();

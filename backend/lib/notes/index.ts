@@ -33,7 +33,7 @@ import { FileId } from "../../interfaces/FileId.js";
 import UrlMetadataResponse from "../../interfaces/UrlMetadataResponse.js";
 import ImportLinkAsNoteFailure from "../../interfaces/ImportLinkAsNoteFailure.js";
 import getUrlMetadata from "./getUrlMetadata.js";
-import * as config from "../../config.js";
+import * as config from "./config.js";
 import { File } from "../../interfaces/File.js";
 import { Readable } from "stream";
 
@@ -259,7 +259,7 @@ const importDB = (db, userId) => {
 
 
 const addFile = (userId:UserId, file:File):FileId => {
-  const fileType = config.ALLOWED_FILE_UPLOAD_TYPES
+  const fileType = config.ALLOWED_FILE_TYPES
     .find((filetype) => {
       return filetype.mimeType === file.type;
     });
