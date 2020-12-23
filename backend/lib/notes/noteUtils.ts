@@ -105,12 +105,14 @@ const getLinksOfNote = (db:DatabaseMainData, noteId:NoteId):Link[] => {
 
 
 const getLinkedNotes = (db:DatabaseMainData, noteId:NoteId):LinkedNote[] => {
-  const notes:DatabaseNote[] | null = getLinksOfNote(db, noteId)
-    .map((link:Link):DatabaseNote | null => {
+  const notes:DatabaseNote[] = getLinksOfNote(db, noteId)
+    .map((link:Link):DatabaseNote => {
       const linkedNoteId = (link[0] === noteId) ? link[1] : link[0];
-      return findNote(db, linkedNoteId);
-    })
-    .filter(Utils.isNotEmpty);
+      // we are sure that the notes we are retrieving from noteIds in links
+      // really exist. that's why we cast the result of findNote as
+      // DatabaseNote
+      return findNote(db, linkedNoteId) as DatabaseNote;
+    });
 
   const linkedNotes:LinkedNote[] = notes
     .map((note:DatabaseNote) => {
