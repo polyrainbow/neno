@@ -83,6 +83,7 @@ const getNotesList = (
 
   const db: Database = DB.getMainData(userId);
   const matchingNotes = db.notes
+    // filter notes that match the search query
     .filter((note:DatabaseNote) => {
       if (query.length === 0) {
         return true;
@@ -106,6 +107,8 @@ const getNotesList = (
       }
     })
 
+  // now we need to transform all notes into NoteListItems before we can
+  // sort those
   const noteListItems:NoteListItem[] = matchingNotes
     .map((note:DatabaseNote):NoteListItem => {
       const noteListItem:NoteListItem = {
@@ -123,6 +126,7 @@ const getNotesList = (
 
   const numberOfResults = noteListItems.length;
 
+  // let's extract the list items for the requested page
   const noteListItemsOfPage:NoteListItem[] = Utils.getPagedMatches(
     noteListItems,
     page,
