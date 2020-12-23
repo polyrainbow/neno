@@ -171,7 +171,7 @@ const getStats = (userId:UserId):Stats => {
   const db = DB.getMainData(userId);
 
   const numberOfUnlinkedNotes = db.notes.filter((note) => {
-    return getLinkedNotes(db, note.id).length === 0;
+    return getNumberOfLinkedNotes(db, note.id) === 0;
   }).length;
 
   const stats:Stats = {
