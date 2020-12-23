@@ -16,6 +16,7 @@ import {
   createNoteToTransmit,
   getNoteFeatures,
   getSortFunction,
+  getNumberOfLinkedNotes,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "../../interfaces/DatabaseMainData.js";
@@ -113,7 +114,7 @@ const getNotesList = (
         creationTime: note.creationTime,
         updateTime: note.updateTime,
         features: getNoteFeatures(note),
-        numberOfLinkedNotes: getLinkedNotes(db, note.id).length,
+        numberOfLinkedNotes: getNumberOfLinkedNotes(db, note.id),
       };
 
       return noteListItem;

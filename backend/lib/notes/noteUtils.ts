@@ -94,11 +94,18 @@ const updateNotePosition = (
 };
 
 
-const getLinkedNotes = (db:DatabaseMainData, noteId:NoteId):LinkedNote[] => {
-  const notes:DatabaseNote[] | null = db.links
+const getLinksOfNote = (db:DatabaseMainData, noteId:NoteId):Link[] => {
+  const linksOfThisNote:Link[] = db.links
     .filter((link:Link):boolean => {
       return (link[0] === noteId) || (link[1] === noteId);
-    })
+    });
+
+  return linksOfThisNote;
+}
+
+
+const getLinkedNotes = (db:DatabaseMainData, noteId:NoteId):LinkedNote[] => {
+  const notes:DatabaseNote[] | null = getLinksOfNote(db, noteId)
     .map((link:Link):DatabaseNote | null => {
       const linkedNoteId = (link[0] === noteId) ? link[1] : link[0];
       return findNote(db, linkedNoteId);
@@ -118,6 +125,13 @@ const getLinkedNotes = (db:DatabaseMainData, noteId:NoteId):LinkedNote[] => {
 
   return linkedNotes;
 };
+
+
+const getNumberOfLinkedNotes = (db:DatabaseMainData, noteId:NoteId):number => {
+  const linksOfThisNote:Link[] = getLinksOfNote(db, noteId);
+  const numberOfLinkedNotes = linksOfThisNote.length;
+  return numberOfLinkedNotes;
+}
 
 
 const removeLinksOfNote = (db: DatabaseMainData, noteId: NoteId):true => {
@@ -260,6 +274,7 @@ export {
   getNewNoteId,
   updateNotePosition,
   getLinkedNotes,
+  getNumberOfLinkedNotes,
   removeLinksOfNote,
   getFilesOfNote,
   incorporateUserChangesIntoNote,
