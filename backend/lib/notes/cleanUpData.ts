@@ -16,11 +16,10 @@ const convertLinksFromLegacyFormat = (db) => {
       return link;
     }
   });
-  return true;
 };
 
 
-const cleanUpLinks = (db) => {
+const removeLinksOfNonExistingNotes = (db) => {
   db.links = db.links.filter((link) => {
     const note0 = findNote(db, link[0]);
     const note1 = findNote(db, link[1]);
@@ -31,8 +30,50 @@ const cleanUpLinks = (db) => {
       && (note1 !== null)
     );
   });
-  return true;
 };
+
+
+const linkExists = (linkToTest, links) => {
+  return links
+    .filter(
+      (linkOfArray) => {
+        return (
+          (
+            linkOfArray[0] === linkToTest[0]
+            && linkOfArray[1] === linkToTest[1]
+          )
+          || (
+            linkOfArray[0] === linkToTest[1]
+            && linkOfArray[1] === linkToTest[0]
+          )
+        );
+      },
+    )
+    .length > 0;
+};
+
+
+const removeDuplicateLinks = (db) => {
+  const oldLinks = db.links;
+  const newLinks = [];
+
+  for (let i = 0; i < oldLinks.length; i++) {
+    const link = oldLinks[i];
+
+    if (!linkExists(link, newLinks)) {
+      newLinks.push(link);
+    }
+  }
+
+  db.links = newLinks;
+};
+
+
+const cleanUpLinks = (db) => {
+  removeLinksOfNonExistingNotes(db);
+  removeDuplicateLinks(db);
+};
+
 
 // this function must always be indempotent, so that there is only one
 // canonical data structure
