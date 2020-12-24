@@ -13,7 +13,10 @@ const NoteSearchDisclaimer = ({
     ) {
       label = "";
     } else if (searchValue.length > 2) {
-      label = numberOfResults + " note(s) found";
+      const text = numberOfResults === 1
+        ? "{number} note found"
+        : "{number} notes found";
+      label = text.replace("{number}", numberOfResults.toLocaleString());
     }
   } else if (searchValue.length > 0 && searchValue.length < 3) {
     label = "";
