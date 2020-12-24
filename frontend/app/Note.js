@@ -3,6 +3,7 @@ import NoteListItem from "./NoteListItem.js";
 import * as Editor from "./lib/editor.js";
 import NoteStats from "./NoteStats.js";
 import isEqual from "react-fast-compare";
+import NoteControls from "./NoteControls.js";
 
 const Note = ({
   note,
@@ -11,6 +12,10 @@ const Note = ({
   onLinkRemoval,
   setUnsavedChanges,
   databaseProvider,
+  createNewNote,
+  saveNote,
+  removeActiveNote,
+  unsavedChanges,
 }) => {
   const previousEditorData = useRef(null);
   const editorData = note?.editorData;
@@ -39,33 +44,34 @@ const Note = ({
   }, [editorData]);
 
   return <section id="note">
+    <NoteControls
+      activeNote={note}
+      createNewNote={createNewNote}
+      saveNote={saveNote}
+      removeActiveNote={removeActiveNote}
+      unsavedChanges={unsavedChanges}
+    />
     <div id="editor"></div>
     <div id="links">
       <h2>Links</h2>
       {
         displayedLinkedNotes.length === 0
-          ? <p
-            style={{
-              "marginLeft": "10px",
-            }}
+          ? <p className="note-meta-paragraph"
           >This note has no links yet.</p>
           : null
       }
-      <table id="links-table">
-        <tbody>
-          {
-            displayedLinkedNotes.map((displayedLinkedNote, i) => <NoteListItem
-              note={displayedLinkedNote}
-              index={i + 1}
-              showLinksIndicator={false}
-              key={"note-link-list-item-" + displayedLinkedNote.id}
-              onClick={() => loadNote(displayedLinkedNote.id)}
-              isActive={false}
-              onDelete={() => onLinkRemoval(displayedLinkedNote.id)}
-            />)
-          }
-        </tbody>
-      </table>
+      <div id="links">
+        {
+          displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
+            note={displayedLinkedNote}
+            key={"note-link-list-item-" + displayedLinkedNote.id}
+            onSelect={() => loadNote(displayedLinkedNote.id)}
+            isActive={false}
+            isLinked={true}
+            onLinkChange={() => onLinkRemoval(displayedLinkedNote.id)}
+          />)
+        }
+      </div>
     </div>
     {
       (!note.isUnsaved)

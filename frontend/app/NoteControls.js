@@ -52,7 +52,10 @@ const NoteControls = ({
       />
     </div>
     <div id="note-controls-right">
-      <UnsavedChangesIndicator unsavedChanges={unsavedChanges} />
+      <UnsavedChangesIndicator
+        isUnsaved={activeNote.isUnsaved}
+        unsavedChanges={unsavedChanges}
+      />
     </div>
   </section>;
 };

@@ -6,6 +6,7 @@ const SearchInput = ({
   onChange,
   label,
   placeholder,
+  inputStyle,
 }) => {
   return <>
     {
@@ -21,6 +22,7 @@ const SearchInput = ({
     <input
       style={{
         "fontSize": "24px",
+        ...inputStyle,
       }}
       id="search-input"
       type="text"

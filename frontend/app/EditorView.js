@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditorViewHeader from "./EditorViewHeader.js";
-import NoteControls from "./NoteControls.js";
 import NotesList from "./NotesList.js";
 import NoteListControls from "./NoteListControls.js";
 import Note from "./Note.js";
@@ -96,7 +95,13 @@ const EditorView = ({
             updateTime: note.updateTime,
           },
         },
-      ],
+      );
+    }
+
+    setActiveNote({
+      ...activeNote,
+      editorData: await Editor.save(),
+      changes: newChanges,
     });
 
     setUnsavedChanges(true);
@@ -342,6 +347,7 @@ const EditorView = ({
           activeNote={activeNote}
           displayedLinkedNotes={displayedLinkedNotes}
           onLinkAddition={handleLinkAddition}
+          onLinkRemoval={handleLinkRemoval}
           isBusy={isBusy}
           searchValue={searchValue}
           scrollTop={noteListScrollTop}
@@ -353,13 +359,6 @@ const EditorView = ({
         />
       </div>
       <div id="right-view">
-        <NoteControls
-          activeNote={activeNote}
-          createNewNote={createNewNote}
-          saveNote={saveNote}
-          removeActiveNote={removeActiveNote}
-          unsavedChanges={unsavedChanges}
-        />
         <Note
           note={activeNote}
           loadNote={loadNote}
@@ -367,6 +366,10 @@ const EditorView = ({
           displayedLinkedNotes={displayedLinkedNotes}
           setUnsavedChanges={setUnsavedChanges}
           databaseProvider={databaseProvider}
+          createNewNote={createNewNote}
+          saveNote={saveNote}
+          removeActiveNote={removeActiveNote}
+          unsavedChanges={unsavedChanges}
         />
       </div>
 

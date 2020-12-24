@@ -11,6 +11,7 @@ const NotesList = ({
   loadNote,
   activeNote,
   onLinkAddition,
+  onLinkRemoval,
   displayedLinkedNotes,
   isBusy,
   searchValue,
@@ -74,9 +75,7 @@ const NotesList = ({
     />;
   }
 
-  const startNote = page * searchResultsPerPage - 100;
-
-  return <section ref={containerRef} id="list">
+  return <section ref={containerRef} id="section_list">
     <Pagination
       numberOfResults={numberOfResults}
       page={page}
@@ -88,39 +87,37 @@ const NotesList = ({
       numberOfResults={numberOfResults}
       stats={stats}
     />
-    <table id="list-table">
-      <tbody>
-        {
-          notes.map((note, i) => {
-            const isActive
-              = (!activeNote.isUnsaved) && (note.id === activeNote.id);
-            const isLinked
-              = displayedLinkedNotes.some(
-                (linkedNote) => {
-                  return linkedNote.id === note.id;
-                },
-              );
+    <div id="note-list">
+      {
+        notes.map((note) => {
+          const isActive
+            = (!activeNote.isUnsaved) && (note.id === activeNote.id);
+          const isLinked
+            = displayedLinkedNotes.some(
+              (linkedNote) => {
+                return linkedNote.id === note.id;
+              },
+            );
 
-            return <NoteListItem
-              note={note}
-              index={startNote + 1 + i}
-              showLinksIndicator={true}
-              isActive={isActive}
-              isLinked={isLinked}
-              key={"notes-list-item-" + note.id}
-              onClick={() => loadNote(note.id)}
-              onAdd={
-                (!isActive) && (!isLinked)
-                  ? () => {
-                    onLinkAddition(note);
-                  }
-                  : null
+          return <NoteListItem
+            note={note}
+            isActive={isActive}
+            isLinked={isLinked}
+            key={"main-notes-list-item-" + note.id}
+            onSelect={() => loadNote(note.id)}
+            onLinkChange={() => {
+              if (isActive) return;
+
+              if (!isLinked) {
+                onLinkAddition(note);
+              } else {
+                onLinkRemoval(note.id);
               }
-            />;
-          })
-        }
-      </tbody>
-    </table>
+            }}
+          />;
+        })
+      }
+    </div>
   </section>;
 };
 

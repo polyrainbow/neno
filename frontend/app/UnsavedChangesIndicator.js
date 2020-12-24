@@ -4,15 +4,20 @@ import {
 } from "react-tippy";
 
 const UnsavedChangesIndicator = ({
+  isUnsaved,
   unsavedChanges,
 }) => {
-  const title = unsavedChanges
-    ? "Unsaved changes"
-    : "No unsaved changes";
+  const title = isUnsaved
+    ? "This note has not been saved yet"
+    : unsavedChanges
+      ? "Unsaved changes"
+      : "No unsaved changes";
 
-  const symbol = unsavedChanges
-    ? "✳️"
-    : "✔️";
+  const symbol = isUnsaved
+    ? "🆕"
+    : unsavedChanges
+      ? "✳️"
+      : "✔️";
 
   return <Tooltip
     title={title}

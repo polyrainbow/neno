@@ -1,18 +1,19 @@
 import React from "react";
+import { Tooltip } from "react-tippy";
 import { yyyymmdd } from "./lib/utils.js";
-import NoteListItemButton from "./NoteListItemButton.js";
 
 const NoteListItem = ({
   note,
   isActive,
   isLinked,
-  index,
-  showLinksIndicator,
-  onClick,
-  onAdd,
-  onDelete,
+  onSelect,
+  onLinkChange,
 }) => {
-  const isHub = note.numberOfLinkedNotes >= 5;
+  const isHub = (
+    typeof note.numberOfLinkedNotes === "number"
+    && !isNaN(note.numberOfLinkedNotes)
+    && note.numberOfLinkedNotes >= 5
+  );
 
   const trClassList = ["note-list-item"];
   if (isHub) {
@@ -25,81 +26,91 @@ const NoteListItem = ({
     trClassList.push("linked");
   }
 
-  return <tr
+  const linkControlLabel
+    = isActive
+      ? "This is the currently selected note. It cannot be linked to itself."
+      : isLinked
+        ? "Remove link to this note"
+        : "Add as link to selected note";
+
+
+  return <div
     className={trClassList.join(" ")}
-    onClick={onClick}
   >
-    <td
-      className="index"
-      style={{ "textAlign": "right" }}
+    <div
+      className="note-list-item-main"
+      onClick={onSelect}
     >
-      {index}
-    </td>
-    <td
-      className="title"
-    >
-      {note.title}
-    </td>
-    {
-      note.features
-        ? <td
+      <div
+        className="title"
+      >
+        {note.title}
+      </div>
+      <div className="note-list-item-second-row">
+        <div
+          className="update-time"
+        >
+          {yyyymmdd(new Date(note.updateTime))}
+        </div>
+        <div
           className="note-features"
           style={{
-            width: "45px",
             textAlign: "right",
           }}
         >
-          {note.features.containsText ? "✏️" : ""}
-          {note.features.containsWeblink ? "🌍" : ""}
-          {note.features.containsCode ? "🤖" : ""}
-          {note.features.containsImages ? "🖼️" : ""}
-          {note.features.containsAttachements ? "📎" : ""}
-        </td>
-        : null
-    }
-    <td
-      className="noteListItemControls"
+          {note.features?.containsText ? "✏️" : ""}
+          {note.features?.containsWeblink ? "🌍" : ""}
+          {note.features?.containsCode ? "🤖" : ""}
+          {note.features?.containsImages ? "🖼️" : ""}
+          {note.features?.containsAttachements ? "📎" : ""}
+        </div>
+      </div>
+    </div>
+    <Tooltip
+      title={linkControlLabel}
+      position="bottom"
+      trigger="mouseenter focus"
+      style={{
+        display: "flex",
+      }}
     >
-      {
-        onAdd
-          ? <NoteListItemButton
-            icon="link"
-            title="Add as link to current note"
-            onClick={onAdd}
-          />
-          : null
-      }
-      {
-        onDelete
-          ? <NoteListItemButton
-            icon="link_off"
-            title="Remove link to this note"
-            onClick={onDelete}
-          />
-          : null
-      }
-    </td>
-    {
-      showLinksIndicator
-        ? <td
-          className="linkedNotesIndicator"
-        >
-          {
-            note.numberOfLinkedNotes > 0
-              ? <span title={note.numberOfLinkedNotes + " Links"}>
-                {note.numberOfLinkedNotes}
-              </span>
-              : <span title="Not linked">🔴</span>
+      <div
+        className="link-control"
+        onClick={
+          (e) => {
+            (!isActive) && onLinkChange();
+            e.stopPropagation();
           }
-        </td>
-        : null
-    }
-    <td
-      className="update-time"
-    >
-      {yyyymmdd(new Date(note.updateTime))}
-    </td>
-  </tr>;
+        }
+      >
+        <div>
+          <img
+            style={{ "verticalAlign": "bottom" }}
+            src={
+              "/assets/icons/" + (isLinked ? "link_off" : "link") + "-24px.svg"
+            }
+            alt={linkControlLabel}
+          />
+          <div
+            className="linkedNotesIndicator"
+          >
+            {
+              (
+                typeof note.numberOfLinkedNotes === "number"
+                && !isNaN(note.numberOfLinkedNotes)
+              )
+                ? note.numberOfLinkedNotes > 0
+                  ? <span title={note.numberOfLinkedNotes + " Links"}>
+                    {note.numberOfLinkedNotes}
+                  </span>
+                  : <span title="Not linked">🔴</span>
+                : ""
+            }
+          </div>
+        </div>
+      </div>
+    </Tooltip>
+  </div>;
 };
 
 export default NoteListItem;

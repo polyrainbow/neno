@@ -1,25 +1,39 @@
 :root {
   --main-font: 'Open Sans', sans-serif;
   --input-border-width: 2px;
+
+  --default-box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1),
+    0px 2px 2px rgba(0, 0, 0, 0.1);
+  --border-radius: 10px;
+  --default-margin: 15px;
+
+  --xl-list-width: 720px;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
+    --accent-color-1: lightskyblue;
+    --accent-color-2: lightpink;
+    --accent-color-interactible: #e0e0e0;
+
     --background-color: white;
     --font-color: black;
     --link-color: rgb(0, 40, 216);
-    --header-background-color: lightskyblue;
-    --subheader-1-background-color: lightpink;
+    --header-background-color: var(--accent-color-1);
+    --subheader-1-background-color: var(--accent-color-2);
     --subheader-2-background-color: blanchedalmond;
-    --table-row-background-color-odd: white;
-    --table-row-background-color-even: #f2f2f2;
-    --table-row-background-color-hover: aqua;
-    --table-row-background-color-active: chartreuse;
-    --table-row-background-color-linked: yellow;
-    --buton-background-color: rgb(239, 239, 239);
+    --nli-color: var(--accent-color-interactible);
+    --nli-color-hover: var(--subheader-2-background-color);
+    --nli-color-active: var(--accent-color-1);
+    --nli-color-linked: var(--accent-color-2);
+    --nli-color-unlinked: #a7a7a7;
+    --buton-background-color: var(--accent-color-interactible);
     --button-border-color: black;
     --separator-color: black;
-    --button-background-color-active: chartreuse;
+    --button-background-color-active: var(--accent-color-1);
+
+    --table-row-background-color-odd: white;
+    --table-row-background-color-even: var(--accent-color-interactible);
   }
 
   input, select {
@@ -35,15 +49,17 @@
     --header-background-color: black;
     --subheader-1-background-color: #3d3d3d;
     --subheader-2-background-color: #3b0101;
-    --table-row-background-color-odd: black;
-    --table-row-background-color-even: #3d3d3d;
-    --table-row-background-color-hover: rgb(0, 139, 139);
-    --table-row-background-color-active: rgb(70, 139, 0);
-    --table-row-background-color-linked: rgb(167, 167, 0);
+    --nli-color: #3d3d3d;
+    --nli-color-hover: rgb(0, 139, 139);
+    --nli-color-active: rgb(70, 139, 0);
+    --nli-color-linked:  rgb(167, 167, 0);
     --buton-background-color: rgb(59, 59, 59);
     --button-border-color: white;
     --separator-color: white;
     --button-background-color-active: rgb(70, 139, 0);
+
+    --table-row-background-color-odd: black;
+    --table-row-background-color-even: #3d3d3d;
   }
 
   button img, .noteListStatus img {
@@ -55,12 +71,14 @@
   }
 }
 
+
 body, #app {
   margin: 0;
   margin: 0;
   padding: 0;
   background-color: var(--background-color);
   color: var(--font-color);
+  font-family: var(--main-font);
 }
 
 input, select {
@@ -71,19 +89,6 @@ input, select {
 
 a {
   color: var(--link-color);
-}
-
-header,
-#controls,
-#left-view,
-#list,
-#links,
-#stats {
-  font-family: var(--main-font);
-}
-
-.tippy-popper{
-  font-family: var(--main-font);
 }
 
 header {
@@ -100,7 +105,8 @@ header {
   top: 0;
   left: 0;
   z-index: 5;
-  font-family: var(--main-font);
+
+  box-shadow: var(--default-box-shadow);
 }
 
 header h1 {
@@ -223,22 +229,48 @@ button[disabled]{
   font-weight: bold;
 }
 
-table {
+#note-list {
   border-collapse: collapse;
   width: 100%;
 }
 
-.note-list-item.hub{
-  font-weight: bold;
+.note-list-item {
+  text-align: left;
+  display: flex;
+  background-color: var(--nli-color);
+  margin: 15px;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  user-select: none;
 }
 
-th, td {
+.note-list-item-main {
+  cursor: pointer;
+  padding: 15px;
+  width: calc(100% - 70px);
+}
+
+.note-list-item-second-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.note-list-item .link-control {
   text-align: left;
   padding: 5px;
+  width: 30px;
+  background-color: var(--nli-color-unlinked);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.note-list-item {
+.note-list-item:not(.active) .link-control {
   cursor: pointer;
+}
+
+.note-list-item .title{
+  font-weight: bold;
 }
 
 .note-list-item .index {
@@ -257,33 +289,25 @@ th, td {
 }
 
 .note-list-item .linkedNotesIndicator {
-  width: 32px;
-  text-align: right;
+  text-align: center;
+  display: block;
+  font-weight: bold;
 }
 
 .note-list-item .update-time{
-  width: 92px;
+  display: inline;
 }
 
-.note-list-item:hover, .note-list-item:nth-child(even):hover {
-  background-color: var(--table-row-background-color-hover);
-}
-
-tr:nth-child(odd) {
-  background-color: var(--table-row-background-color-odd);
-}
-
-tr:nth-child(even) {
-  background-color: var(--table-row-background-color-even);
+.note-list-item:not(.active) .note-list-item-main:hover {
+  background-color: var(--nli-color-hover);
 }
 
 .note-list-item[class*="active"]{
-  font-weight: bold;
-  background-color: var(--table-row-background-color-active);
+  background-color: var(--nli-color-active) !important;
 }
 
-.note-list-item[class*="linked"]{
-  background-color: var(--table-row-background-color-linked);
+.note-list-item[class*="linked"] .link-control{
+  background-color: var(--nli-color-linked);
 }
 
 
@@ -291,7 +315,6 @@ tr:nth-child(even) {
   background-color: var(--background-color);
   color: var(--font-color);
   border: 2px solid var(--font-color);
-  font-family: var(--main-font);
 }
 
 .import-link-dialog textarea {
@@ -309,9 +332,33 @@ tr:nth-child(even) {
   margin-right: 5px;
 }
 
+table {
+  border-collapse: collapse;
+  margin: var(--default-margin);
+  width: calc(100% - 20px);
+}
+
+
+tr:nth-child(odd) {
+  background-color: var(--table-row-background-color-odd);
+}
+
+tr:nth-child(even) {
+  background-color: var(--table-row-background-color-even);
+}
+
+th, td {
+  text-align: left;
+  padding: 5px;
+}
+
+
+.note-meta-paragraph {
+  margin: 0px var(--default-margin);
+}
+
 
 #section_login {
-  font-family: var(--main-font);
   font-size: 20px;
   padding: 20px;
   width: 100%;
@@ -320,7 +367,6 @@ tr:nth-child(even) {
 }
 
 #section_login input {
-  font-family: var(--main-font);
   font-size: 20px;
   padding: 5px;
   color: var(--font-color);
@@ -333,7 +379,7 @@ tr:nth-child(even) {
   }
   
   main {
-    grid-template-columns: auto auto;
+    grid-template-columns: var(--xl-list-width) auto;
     grid-template-rows: 100%;
     position: fixed;
     bottom: 0px;
@@ -343,7 +389,8 @@ tr:nth-child(even) {
 
   #left-view{
     grid-area: 1 / 1 / 2 / 2;
-    width: calc(100vw - 800px);
+    width: var(--xl-list-width);
+    box-shadow: var(--default-box-shadow);
   }
 
   #note-controls, #section-search-input {
@@ -356,7 +403,7 @@ tr:nth-child(even) {
     overflow: hidden;
   }
 
-  #list{
+  #section_list{
     overflow-y: scroll;
     padding: 0px;
     height: calc(100vh - 100px);
@@ -364,18 +411,20 @@ tr:nth-child(even) {
 
   #right-view{
     grid-area: 1 / 2 / 2 / 3;
-    width: 800px;
   }
 
   #note{
-    overflow-y: auto;
-    min-width: 720px;
+    margin: 20px;
     padding: 0;
-    height: calc(100vh - 100px);
+    padding-bottom: 15px;
+    border-radius: var(--border-radius);
+    overflow-y: auto;
+    height: calc(100vh - 105px);
+    box-shadow: var(--default-box-shadow);
   }
 
   #links h2, #stats h2{
-    padding: 0px 10px;
+    padding: 0px var(--default-margin);
   }
 }
 

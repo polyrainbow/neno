@@ -18,6 +18,9 @@ const NoteListControls = ({
         placeholder="Search notes..."
         value={value}
         onChange={onChange}
+        inputStyle={{
+          width: "200px",
+        }}
       />
     </div>
     <div
