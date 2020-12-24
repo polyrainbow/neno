@@ -16,7 +16,7 @@ const NoteSearchDisclaimer = ({
       const text = numberOfResults === 1
         ? "{number} note found"
         : "{number} notes found";
-      label = text.replace("{number}", numberOfResults.toLocaleString());
+      label = text.replace("{number}", numberOfResults.toLocaleString("en"));
     }
   } else if (searchValue.length > 0 && searchValue.length < 3) {
     label = "";

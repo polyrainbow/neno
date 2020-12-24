@@ -37,19 +37,19 @@ const AppStats = ({
       <AppStatsItem
         icon="📝"
         label="Number of notes"
-        value={stats.numberOfAllNotes.toLocaleString()}
+        value={stats.numberOfAllNotes.toLocaleString("en")}
       />
       <AppStatsItem
         icon="🔗"
         label="Number of links"
-        value={stats.numberOfLinks.toLocaleString()}
+        value={stats.numberOfLinks.toLocaleString("en")}
       />
       <AppStatsItem
         icon="🔴"
         label="Unlinked notes"
         value={
-          `${stats.numberOfUnlinkedNotes.toLocaleString()} `
-          + `(${percentageOfUnlinkedNotes.toLocaleString()} %)`
+          `${stats.numberOfUnlinkedNotes.toLocaleString("en")} `
+          + `(${percentageOfUnlinkedNotes.toLocaleString("en")} %)`
         }
       />
     </div>
