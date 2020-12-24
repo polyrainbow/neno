@@ -59,6 +59,7 @@ const EditorView = ({
   };
 
   const handleLinkAddition = async (note) => {
+    // return if linked note has already been added
     if (activeNote.changes.some((change) => {
       return (
         change.type === "LINKED_NOTE_ADDED"
@@ -68,16 +69,24 @@ const EditorView = ({
       return;
     }
 
-    setActiveNote({
-      ...activeNote,
-      editorData: await Editor.save(),
-      changes: [
-        ...activeNote.changes.filter((change) => {
-          return !(
-            change.type === "LINKED_NOTE_DELETED"
-            && change.noteId === note.id
-          );
-        }),
+    // remove possible LINKED_NOTE_DELETED changes
+    const newChanges = [
+      ...activeNote.changes.filter((change) => {
+        return !(
+          change.type === "LINKED_NOTE_DELETED"
+          && change.noteId === note.id
+        );
+      }),
+    ];
+
+    // if linkedNote is NOT already there and saved,
+    // let's add a LINKED_NOTE_ADDED change
+    if (
+      !activeNote.linkedNotes.find((linkedNote) => {
+        return linkedNote.id === note.id;
+      })
+    ) {
+      newChanges.push(
         {
           type: "LINKED_NOTE_ADDED",
           noteId: note.id,
