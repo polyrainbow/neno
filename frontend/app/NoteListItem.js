@@ -83,7 +83,11 @@ const NoteListItem = ({
           }
         }
       >
-        <div>
+        <div
+          style={{
+            textAlign: "center",
+          }}
+        >
           <img
             style={{ "verticalAlign": "bottom" }}
             src={

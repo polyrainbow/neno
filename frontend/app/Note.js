@@ -53,11 +53,11 @@ const Note = ({
     />
     <div id="editor"></div>
     <div id="links">
-      <h2>Links</h2>
+      <h2>Linked notes</h2>
       {
         displayedLinkedNotes.length === 0
           ? <p className="note-meta-paragraph"
-          >This note has no links yet.</p>
+          >There are no notes linked to this one yet.</p>
           : null
       }
       <div id="links">
