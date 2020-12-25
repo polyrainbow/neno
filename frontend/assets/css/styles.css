@@ -71,7 +71,6 @@ input, select {
   font-size: var(--main-ui-font-size);
   background: var(--background-color);
   color: var(--font-color);
-  font-family: var(--main-font);
 }
 
 
@@ -81,6 +80,9 @@ body, #app {
   padding: 0;
   background-color: var(--background-color);
   color: var(--font-color);
+}
+
+body, #app, input, select, button {
   font-family: var(--main-font);
 }
 
