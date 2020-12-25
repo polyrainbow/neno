@@ -715,7 +715,7 @@ class Graph {
       return null;
     }
 
-    return thisGraph.#selection.value;
+    return thisGraph.#selection.value.id;
   }
 
 
