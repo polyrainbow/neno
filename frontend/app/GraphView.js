@@ -14,7 +14,7 @@ const GraphView = ({
   setUnsavedChanges,
   setInitialNoteId,
 }) => {
-  const DEFAULT_STATUS = "Hold shift to draw links";
+  const DEFAULT_STATUS = "Press and hold shift to create links";
   const mainElement = useRef(null);
   const graphInstance = useRef(null);
   const [status, setStatus] = useState(DEFAULT_STATUS);
