@@ -196,6 +196,7 @@ const createNoteToTransmit = (
     updateTime: databaseNote.updateTime,
     linkedNotes: getLinkedNotes(db, databaseNote.id),
     position: databaseNote.position,
+    numberOfCharacters: getNumberOfCharacters(databaseNote),
   };
 
   return noteToTransmit;
@@ -261,9 +262,23 @@ const getSortFunction = (
       if (!aHasFiles && bHasFiles) return 1;
       return 0;
     },
+    [NoteListSortMode.NUMBER_OF_CHARACTERS_DESCENDING]: (a, b) => {
+      return b.numberOfCharacters - a.numberOfCharacters;
+    },
   };
 
   return sortFunctions[sortMode] ?? sortFunctions.UPDATE_DATE_ASCENDING;
+};
+
+
+const getNumberOfCharacters = (note:DatabaseNote):number => {
+  return note.editorData.blocks.reduce((accumulator, block) => {
+    if (["paragraph", "header"].includes(block.type) && block.data?.text) {
+      return accumulator + block.data.text.length;
+    } else {
+      return accumulator;
+    }
+  }, 0);
 };
 
 
@@ -283,4 +298,5 @@ export {
   createNoteToTransmit,
   getNoteFeatures,
   getSortFunction,
+  getNumberOfCharacters,
 };

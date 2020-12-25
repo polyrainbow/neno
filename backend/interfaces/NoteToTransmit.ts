@@ -10,4 +10,5 @@ export default interface NoteToTransmit extends Note {
     readonly updateTime: number,
     readonly linkedNotes: LinkedNote[],
     readonly position: NodePosition,
+    readonly numberOfCharacters: number,
 }

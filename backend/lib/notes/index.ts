@@ -17,6 +17,7 @@ import {
   getNoteFeatures,
   getSortFunction,
   getNumberOfLinkedNotes,
+  getNumberOfCharacters,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "../../interfaces/DatabaseMainData.js";
@@ -118,6 +119,7 @@ const getNotesList = (
         updateTime: note.updateTime,
         features: getNoteFeatures(note),
         numberOfLinkedNotes: getNumberOfLinkedNotes(db, note.id),
+        numberOfCharacters: getNumberOfCharacters(note),
       };
 
       return noteListItem;

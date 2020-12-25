@@ -1,7 +1,6 @@
 import React from "react";
 import {
   makeTimestampHumanReadable,
-  getNumberOfCharacters,
 } from "./lib/utils.js";
 
 const NoteStats = ({
@@ -35,7 +34,7 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>Number of characters</td>
-          <td>{getNumberOfCharacters(note)}</td>
+          <td>{note.numberOfCharacters}</td>
         </tr>
         <tr>
           <td>Images</td>
