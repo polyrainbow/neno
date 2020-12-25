@@ -3,9 +3,9 @@
     --default-box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1),
     0px 2px 2px rgba(0, 0, 0, 0.1);
 
-    --accent-color-1: lightskyblue;
-    --accent-color-2: lightpink;
-    --accent-color-3: blanchedalmond;
+    --accent-color-1: rgb(70, 184, 255);
+    --accent-color-1-light: rgb(168, 222, 255);
+    --accent-color-2: rgb(255, 133, 152);
     --accent-color-interactible: #e0e0e0;
     --accent-color-interactible-2: #a7a7a7;
 
@@ -21,9 +21,9 @@
     --default-box-shadow: 0px 8px 24px rgba(255, 255, 255, 0.25),
     0px 2px 2px rgba(255, 255, 255, 0.25);
 
-    --accent-color-1: rgb(25, 65, 175);
-    --accent-color-2: #3b0101;
-    --accent-color-3: rgb(83, 74, 60);
+    --accent-color-1: rgb(11, 48, 97);
+    --accent-color-1-light: rgb(9, 29, 56);
+    --accent-color-2: #550000;
     --accent-color-interactible: #303030;
     --accent-color-interactible-2: #3d3d3d;
 
@@ -43,9 +43,9 @@
   --font-color: var(--main-content-color);
   --header-background-color: var(--accent-color-1);
   --subheader-1-background-color: var(--accent-color-2);
-  --subheader-2-background-color: var(--accent-color-3);
+  --subheader-2-background-color: var(--accent-color-1);
   --nli-color: var(--accent-color-interactible);
-  --nli-color-hover: var(--accent-color-3);
+  --nli-color-hover: var(--accent-color-1-light);
   --nli-color-active: var(--accent-color-1);
   --nli-color-linked: var(--accent-color-2);
   --nli-color-unlinked: var(--accent-color-interactible-2);
