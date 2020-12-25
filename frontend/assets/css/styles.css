@@ -7,7 +7,6 @@
     --accent-color-1-light: rgb(168, 222, 255);
     --accent-color-2: rgb(255, 133, 152);
     --accent-color-interactible: #e0e0e0;
-    --accent-color-interactible-2: #a7a7a7;
 
     --background-color: white;
     --main-content-color: black;
@@ -21,14 +20,13 @@
     --default-box-shadow: 0px 8px 24px rgba(255, 255, 255, 0.25),
     0px 2px 2px rgba(255, 255, 255, 0.25);
 
-    --accent-color-1: rgb(11, 48, 97);
-    --accent-color-1-light: rgb(9, 29, 56);
-    --accent-color-2: #550000;
+    --accent-color-1: rgb(11, 73, 92);
+    --accent-color-1-light: rgb(4, 53, 65);
+    --accent-color-2: #6d2433;
     --accent-color-interactible: #303030;
-    --accent-color-interactible-2: #3d3d3d;
 
     --background-color: black;
-    --main-content-color: white;
+    --main-content-color: rgb(224, 224, 224);
 
     --link-color: rgb(122, 146, 255);
   }
@@ -48,7 +46,7 @@
   --nli-color-hover: var(--accent-color-1-light);
   --nli-color-active: var(--accent-color-1);
   --nli-color-linked: var(--accent-color-2);
-  --nli-color-unlinked: var(--accent-color-interactible-2);
+  --nli-color-unlinked: var(--accent-color-1-light);
   --buton-background-color: var(--accent-color-interactible);
   --input-element-border-color: var(--main-content-color);
   --separator-color: var(--main-content-color);
@@ -303,6 +301,10 @@ button[disabled]{
 
 .note-list-item[class*="active"]{
   background-color: var(--nli-color-active) !important;
+}
+
+.note-list-item.active .link-control {
+  background-color: var(--nli-color-active);
 }
 
 .note-list-item[class*="linked"] .link-control{
