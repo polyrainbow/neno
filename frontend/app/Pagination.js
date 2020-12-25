@@ -51,18 +51,20 @@ const Pagination = (props) => {
           fontSize: "22px",
           justifyContent: "center",
           flexWrap: "wrap",
+          marginTop: "15px",
         }}>
           {items.map(({ page, type, selected, ...item }, index) => {
             let children = null;
 
             if (type === "start-ellipsis" || type === "end-ellipsis") {
-              children = "…";
+              children = <span className="pagination-ellipsis">…</span>;
             } else if (type === "page") {
               children = (
                 <button
                   type="button"
                   className={
-                    "pagination-button" + (selected ? " selected" : "")
+                    "default-button"
+                    + (selected ? " pagination-button-selected" : "")
                   }
                   {...item}
                 >
@@ -73,7 +75,7 @@ const Pagination = (props) => {
               children = (
                 <button
                   type="button"
-                  className="pagination-button pagination-button-special"
+                  className="default-button pagination-button-special"
                   title={type === "previous" ? "Previous page" : "Next page"}
                   {...item}
                 >

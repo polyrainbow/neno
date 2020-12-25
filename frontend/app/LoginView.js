@@ -79,7 +79,7 @@ const LoginView = ({
             ? "Trying to log in ..."
             : <button
               type="button"
-              className="dialog-box-button"
+              className="dialog-box-button default-action"
               onClick={startLoginAttempt}
             >Login</button>
         }

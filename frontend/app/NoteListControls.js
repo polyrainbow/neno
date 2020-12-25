@@ -37,10 +37,6 @@ const NoteListControls = ({
       >Sort by</label>
       <select
         id="sortModeSelect"
-        style={{
-          fontSize: "24px",
-          border: "none",
-        }}
         value={sortMode}
         onChange={(e) => setSortMode(e.target.value)}
       >

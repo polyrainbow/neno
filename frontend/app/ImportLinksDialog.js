@@ -41,11 +41,11 @@ const ImportLinksDialog = ({
                 setIsBusy(true);
                 importLinksAsNotes(text.split("\n"));
               }}
-              className="dialog-box-button"
+              className="default-button default-action"
             >Import as notes</button>
             <button
               onClick={onCancel}
-              className="dialog-box-button"
+              className="default-button"
             >Cancel</button>
           </>
       }

@@ -62,10 +62,15 @@
   --default-margin: 15px;
 
   --xl-list-width: 720px;
+
+  --main-ui-font-size: 24px;
 }
 
 input, select {
   border: var(--input-border-width) solid var(--main-content-color) !important;
+  font-size: var(--main-ui-font-size);
+  background: var(--background-color);
+  color: var(--font-color);
 }
 
 
@@ -78,11 +83,6 @@ body, #app {
   font-family: var(--main-font);
 }
 
-input, select {
-  background: var(--background-color);
-  color: var(--font-color);
-  border: none;
-}
 
 a {
   color: var(--link-color);
@@ -138,15 +138,13 @@ header h1 {
 #header-right input {
   width: 240px;
   height: 24px;
-  font-size: 16px;
-  border: none;
 }
 
 
 #heading {
   margin: 8px;
   margin-left: 0px;
-  font-size: 24px;
+  font-size: var(--main-ui-font-size);
   white-space: pre;
 }
 
@@ -195,8 +193,8 @@ main {
 }
 
 button {
-  border-radius: 0;
-  border: var(--input-border-width) solid var(--input-element-border-color);
+  border-radius: var(--border-radius);
+  border: none;
   cursor: pointer;
   background-color: var(--buton-background-color);
   color: var(--font-color);
@@ -206,22 +204,19 @@ button[disabled]{
   color: grey;
   fill: grey;
   cursor: inherit;
-  border: var(--input-border-width) solid rgb(100, 100, 100);
+  border: none;
 }
 
-.pagination-button {
-  margin: 10px 5px;
-  padding: 5px 15px;
-  font-size: 22px;
-}
 
 .pagination-button-special {
   width: 80px;
-  padding: 5px 15px;
-  font-size: 22px;
 }
 
-.pagination-button.selected {
+.pagination-ellipsis {
+  margin-right: 10px;
+}
+
+.pagination-button-selected {
   background-color: var(--button-background-color-active);
   font-weight: bold;
 }
@@ -321,16 +316,21 @@ button[disabled]{
 .import-link-dialog textarea {
   background-color: var(--background-color);
   color: var(--font-color);
+  margin-bottom: 15px;
 }
 
 .import-link-dialog h1 {
   margin-top: 0px;
 }
 
-.dialog-box-button {
-  font-size: 20px;
-  margin-top: 5px;
-  margin-right: 5px;
+.default-button {
+  font-size: var(--main-ui-font-size);
+  margin-right: 10px;
+  padding: 10px 20px;
+}
+
+.default-button.default-action {
+  background-color: var(--accent-color-1);
 }
 
 table {
@@ -360,7 +360,7 @@ th, td {
 
 
 #section_login {
-  font-size: 20px;
+  font-size: var(--main-ui-font-size);
   padding: 20px;
   width: 100%;
   margin: auto;
@@ -368,7 +368,7 @@ th, td {
 }
 
 #section_login input {
-  font-size: 20px;
+  font-size: var(--main-ui-font-size);
   padding: 5px;
   color: var(--font-color);
 }
