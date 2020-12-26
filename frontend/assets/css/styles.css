@@ -109,8 +109,6 @@ header {
   top: 0;
   left: 0;
   z-index: 5;
-
-  box-shadow: var(--default-box-shadow);
 }
 
 header h1 {
@@ -381,6 +379,32 @@ th, td {
 }
 
 
+#overlay {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: var(--overlay-gradient);
+  display: grid;
+  align-items: center;
+  z-index: 100;
+}
+
+
+#links h2, #stats h2{
+  padding: 0px var(--default-margin);
+}
+
+
+#note-controls, #section-search-input {
+  padding: 0px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+
 @media only screen and (min-width: 1201px) {
   body, #app{
     overflow: hidden;
@@ -402,13 +426,7 @@ th, td {
   }
 
   #note-controls, #section-search-input {
-    padding: 0px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     height: 50px;
-    max-width: 100vw;
-    overflow: hidden;
   }
 
   #section_list{
@@ -430,27 +448,11 @@ th, td {
     height: calc(100vh - 105px);
     box-shadow: var(--default-box-shadow);
   }
-
-  #links h2, #stats h2{
-    padding: 0px var(--default-margin);
-  }
 }
 
 
 
-#overlay {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  background: var(--overlay-gradient);
-  display: grid;
-  align-items: center;
-  z-index: 100;
-}
-
-
-
-@media only screen and (max-width: 1200px) and (min-width: 711px){
+@media only screen and (max-width: 1200px){
   main {
     grid-template-columns: 1fr;
   }
@@ -460,18 +462,7 @@ th, td {
   }
 
   #note-controls, #section-search-input {
-    padding: 0px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     flex-wrap: wrap;
-    max-width: 100vw;
-    overflow: hidden;
-  }
-
-  #list{
-    margin: auto;
-    padding: 20px;
   }
 
   #right-view{
@@ -488,47 +479,6 @@ th, td {
 @media only screen and (max-width: 710px) {
   #app-stats{
     display: none;
-  }
-
-  main {
-    grid-template-columns: 1fr;
-  }
-
-  #left-view{
-    grid-area: 2 / 1 / 3 / 2;
-  }
-
-  #note-controls, #section-search-input {
-    padding: 0px 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    max-width: 100vw;
-    overflow: hidden;
-  }
-
-  #list{
-    margin: auto;
-    padding: 0px;
-  }
-
-  #right-view{
-    grid-area: 1 / 1 / 2 / 2;
-  }
-
-  #note{
-    border-bottom: 15px solid var(--separator-color);
-    padding: 0;
-  }
-
-  #editor{
-    grid-area: 1 / 1 / 2 / 2;
-    padding: 0px 10px;
-  }
-
-  #links h2, #stats h2{
-    padding: 0px 10px;
   }
 }
 
