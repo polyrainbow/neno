@@ -11,7 +11,7 @@ const EditorViewHeaderControls = ({
     <IconButton
       id="button_graph"
       title="Graph view"
-      icon="account_tree"
+      icon="scatter_plot"
       onClick={() => {
         setActiveView("GRAPH");
       }}
