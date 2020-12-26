@@ -2,6 +2,7 @@ import React from "react";
 import {
   Tooltip,
 } from "react-tippy";
+import { emojis } from "./lib/config";
 
 const UnsavedChangesIndicator = ({
   isUnsaved,
@@ -14,10 +15,10 @@ const UnsavedChangesIndicator = ({
       : "No unsaved changes";
 
   const symbol = isUnsaved
-    ? "🆕"
+    ? emojis.new
     : unsavedChanges
-      ? "✳️"
-      : "✔️";
+      ? emojis.unsavedChanges
+      : emojis.noUnsavedChanges;
 
   return <Tooltip
     title={title}

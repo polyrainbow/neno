@@ -43,10 +43,20 @@ const texts = {
 
 const MINIMUM_SEARCH_QUERY_LENGTH = 3;
 
+const emojis = {
+  "note": "📝",
+  "link": "🔗",
+  "unlinked": "🔴",
+  "new": "🆕",
+  "unsavedChanges": "✳️",
+  "noUnsavedChanges": "✔️",
+};
+
 export {
   DEFAULT_NOTE_TITLE,
   newEditorDataObject,
   API_URL,
   texts,
   MINIMUM_SEARCH_QUERY_LENGTH,
+  emojis,
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import { Tooltip } from "react-tippy";
+import { emojis } from "./lib/config.js";
 
 const AppStatsItem = ({
   icon,
@@ -35,17 +36,17 @@ const AppStats = ({
   return (
     <div id="app-stats">
       <AppStatsItem
-        icon="📝"
+        icon={emojis.note}
         label="Number of notes"
         value={stats.numberOfAllNotes.toLocaleString("en")}
       />
       <AppStatsItem
-        icon="🔗"
+        icon={emojis.link}
         label="Number of links"
         value={stats.numberOfLinks.toLocaleString("en")}
       />
       <AppStatsItem
-        icon="🔴"
+        icon={emojis.unlinked}
         label="Unlinked notes"
         value={
           `${stats.numberOfUnlinkedNotes.toLocaleString("en")} `

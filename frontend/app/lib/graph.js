@@ -1,6 +1,7 @@
 /* eslint-disable no-invalid-this */
 import * as d3 from "d3";
 import { binaryArrayIncludes } from "./utils.js";
+import { emojis } from "./config.js";
 
 
 class Graph {
@@ -62,7 +63,8 @@ class Graph {
       .on("mouseover", function() {
         thisGraph.#onHighlight(
           true,
-          "Initial position for new nodes (drag and drop to move)",
+          emojis.new
+          + " Initial position for new nodes (drag and drop to move)",
         );
       })
       .on("mouseout", function() {
@@ -518,7 +520,10 @@ class Graph {
         + "L" + d.target.position.x + "," + d.target.position.y;
       })
       .on("mouseover", function(e, d) {
-        thisGraph.#onHighlight(true, d.source.title + " - " + d.target.title);
+        thisGraph.#onHighlight(
+          true,
+          emojis.link + " " + d.source.title + " - " + d.target.title,
+        );
       })
       .on("mouseout", function() {
         thisGraph.#onHighlight(false);
@@ -608,7 +613,7 @@ class Graph {
         if (thisGraph.#shiftDragInProgress) {
           d3.select(this).classed(consts.connectClass, true);
         }
-        thisGraph.#onHighlight(true, d.title);
+        thisGraph.#onHighlight(true, emojis.note + " " + d.title);
       })
       .on("mouseout", function() {
         d3.select(this).classed(consts.connectClass, false);
