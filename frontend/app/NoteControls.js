@@ -2,6 +2,7 @@ import React from "react";
 import * as Config from "./lib/config.js";
 import IconButton from "./IconButton.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
+import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 
 const NoteControls = ({
   activeNote,
@@ -10,6 +11,8 @@ const NoteControls = ({
   removeActiveNote,
   unsavedChanges,
 }) => {
+  const confirm = React.useContext(ConfirmationServiceContext);
+
   return <section id="note-controls">
     <div id="note-controls-left">
       <IconButton
@@ -22,18 +25,23 @@ const NoteControls = ({
         id="button_upload"
         title="Save note"
         icon="save"
-        onClick={() => {
-          saveNote({ ignoreDuplicateTitles: false }).catch((e) => {
+        onClick={async () => {
+          try {
+            await saveNote({ ignoreDuplicateTitles: false });
+          } catch (e) {
             if (e.message === "NOTE_WITH_SAME_TITLE_EXISTS") {
-              if (confirm(
-                Config.texts.titleAlreadyExistsConfirmation,
-              )) {
-                saveNote({ ignoreDuplicateTitles: true }).catch((e) => {
-                  alert(e);
-                });
-              }
+              await confirm({
+                text: Config.texts.titleAlreadyExistsConfirmation,
+                confirmText: "Save anyway",
+                cancelText: "Cancel",
+                encourageConfirmation: false,
+              });
+
+              saveNote({ ignoreDuplicateTitles: true }).catch((e) => {
+                alert(e);
+              });
             }
-          });
+          }
         }}
       />
       <IconButton
@@ -44,10 +52,15 @@ const NoteControls = ({
           ? "delete_disabled"
           : "delete"
         }
-        onClick={() => {
-          if (confirm("Do you really want to remove this note?")) {
-            removeActiveNote();
-          }
+        onClick={async () => {
+          await confirm({
+            text: "Do you really want to remove this note?",
+            confirmText: "Remove note",
+            cancelText: "Cancel",
+            encourageConfirmation: false,
+          });
+
+          removeActiveNote();
         }}
       />
     </div>

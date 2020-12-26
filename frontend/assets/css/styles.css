@@ -310,20 +310,20 @@ button[disabled]{
 }
 
 
-.import-link-dialog {
+.dialog-box {
   background-color: var(--background-color);
   color: var(--font-color);
   border: 2px solid var(--font-color);
+}
+
+.dialog-box h1 {
+  margin-top: 0px;
 }
 
 .import-link-dialog textarea {
   background-color: var(--background-color);
   color: var(--font-color);
   margin-bottom: 15px;
-}
-
-.import-link-dialog h1 {
-  margin-top: 0px;
 }
 
 .default-button {

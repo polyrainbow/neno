@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Overlay from "./Overlay.js";
+import Dialog from "./Dialog.js";
 
 const ImportLinksDialog = ({
   importLinksAsNotes,
@@ -9,48 +9,38 @@ const ImportLinksDialog = ({
   const [isBusy, setIsBusy] = useState(false);
 
 
-  return <Overlay
-    onClick={onCancel}
+  return <Dialog
+    onClickOnOverlay={onCancel}
+    className="import-link-dialog"
   >
-    <div
+    <h1>Import links as notes</h1>
+    <p>Separate links by line breaks</p>
+    <textarea
       style={{
-        "width": "400px",
+        "width": "100%",
         "display": "block",
-        "padding": "20px",
-        "margin": "auto",
+        "height": "200px",
       }}
-      className="import-link-dialog"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <h1>Import links as notes</h1>
-      <p>Separate links by line breaks</p>
-      <textarea
-        style={{
-          "width": "100%",
-          "display": "block",
-          "height": "200px",
-        }}
-        onChange={(e) => setText(e.target.value)}
-      ></textarea>
-      {
-        isBusy
-          ? <p>Please wait while links are imported ...</p>
-          : <>
-            <button
-              onClick={() => {
-                setIsBusy(true);
-                importLinksAsNotes(text.split("\n"));
-              }}
-              className="default-button default-action"
-            >Import as notes</button>
-            <button
-              onClick={onCancel}
-              className="default-button"
-            >Cancel</button>
-          </>
-      }
-    </div>
-  </Overlay>;
+      onChange={(e) => setText(e.target.value)}
+    ></textarea>
+    {
+      isBusy
+        ? <p>Please wait while links are imported ...</p>
+        : <>
+          <button
+            onClick={() => {
+              setIsBusy(true);
+              importLinksAsNotes(text.split("\n"));
+            }}
+            className="default-button default-action"
+          >Import as notes</button>
+          <button
+            onClick={onCancel}
+            className="default-button"
+          >Cancel</button>
+        </>
+    }
+  </Dialog>;
 };
 
 export default ImportLinksDialog;

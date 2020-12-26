@@ -4,6 +4,8 @@ import GraphView from "./GraphView.js";
 import LoginView from "./LoginView.js";
 import BusyView from "./BusyView.js";
 import databaseProvider from "./lib/database.js";
+import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
+
 
 const App = () => {
   const [activeView, setActiveView] = useState("BUSY");
@@ -18,8 +20,10 @@ const App = () => {
     }
   }, []);
 
+  let content;
+
   if (activeView === "EDITOR") {
-    return <EditorView
+    content = <EditorView
       databaseProvider={databaseProvider}
       setActiveView={(view) => {
         setUnsavedChanges(false);
@@ -32,11 +36,11 @@ const App = () => {
   }
 
   if (activeView === "BUSY") {
-    return <BusyView />;
+    content = <BusyView />;
   }
 
   if (activeView === "LOGIN") {
-    return <LoginView
+    content = <LoginView
       setActiveView={(view) => {
         setUnsavedChanges(false);
         setActiveView(view);
@@ -46,7 +50,7 @@ const App = () => {
   }
 
   if (activeView === "GRAPH") {
-    return <GraphView
+    content = <GraphView
       setActiveView={(view) => {
         setUnsavedChanges(false);
         setActiveView(view);
@@ -57,6 +61,10 @@ const App = () => {
       databaseProvider={databaseProvider}
     />;
   }
+
+  return <ConfirmationServiceProvider>
+    {content}
+  </ConfirmationServiceProvider>;
 };
 
 export default App;

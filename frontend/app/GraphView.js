@@ -5,6 +5,7 @@ import IconButton from "./IconButton.js";
 import { initGraph } from "./lib/graph.js";
 import * as Config from "./lib/config.js";
 import SearchInput from "./SearchInput.js";
+import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 
 
 const GraphView = ({
@@ -19,6 +20,8 @@ const GraphView = ({
   const graphInstance = useRef(null);
   const [status, setStatus] = useState(DEFAULT_STATUS);
   const [searchValue, setSearchValue] = useState("");
+
+  const confirm = React.useContext(ConfirmationServiceContext);
 
   const beforeUnload = function(e) {
     if (unsavedChanges) {
@@ -92,13 +95,17 @@ const GraphView = ({
           <IconButton
             icon="create"
             title="Editor View"
-            onClick={() => {
-              if (
-                (!unsavedChanges)
-                || confirm(Config.texts.discardGraphChangesConfirmation)
-              ) {
-                setActiveView("EDITOR");
+            onClick={async () => {
+              if (unsavedChanges) {
+                await confirm({
+                  text: Config.texts.discardGraphChangesConfirmation,
+                  confirmText: "Discard changes",
+                  cancelText: "Cancel",
+                  encourageConfirmation: false,
+                });
               }
+
+              setActiveView("EDITOR");
             }}
           />
           <IconButton
@@ -109,18 +116,22 @@ const GraphView = ({
           <IconButton
             icon="open_in_browser"
             title="Show note"
-            onClick={() => {
+            onClick={async () => {
               if (!graphInstance.current) return;
               const id = graphInstance.current.getSelectedNodeId();
               if (typeof id !== "number") return;
 
-              if (
-                (!unsavedChanges)
-                || confirm(Config.texts.discardGraphChangesConfirmation)
-              ) {
-                setInitialNoteId(id);
-                setActiveView("EDITOR");
+              if (unsavedChanges) {
+                await confirm({
+                  text: Config.texts.discardGraphChangesConfirmation,
+                  confirmText: "Discard changes",
+                  cancelText: "Cancel",
+                  encourageConfirmation: false,
+                });
               }
+
+              setInitialNoteId(id);
+              setActiveView("EDITOR");
             }}
           />
           <p id="status">{status}</p>

@@ -7,7 +7,9 @@ import Note from "./Note.js";
 import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
+import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import ImportLinksDialog from "./ImportLinksDialog.js";
+
 
 const EditorView = ({
   databaseProvider,
@@ -28,6 +30,8 @@ const EditorView = ({
   const [searchValue, setSearchValue] = useState("");
   const [isImportLinksDialogOpen, setIsImportLinksDialogOpen]
     = useState(false);
+
+  const confirm = React.useContext(ConfirmationServiceContext);
 
   const displayedLinkedNotes = [
     ...(!activeNote.isUnsaved)
@@ -141,11 +145,12 @@ const EditorView = ({
 
   const loadNote = async (noteId) => {
     if (unsavedChanges) {
-      const confirmed = confirm(Config.texts.discardChangesConfirmation);
-
-      if (!confirmed) {
-        return;
-      }
+      await confirm({
+        text: Config.texts.discardChangesConfirmation,
+        confirmText: "Discard unsaved changes",
+        cancelText: "Cancel",
+        encourageConfirmation: false,
+      });
 
       setUnsavedChanges(false);
     }
@@ -372,7 +377,6 @@ const EditorView = ({
           unsavedChanges={unsavedChanges}
         />
       </div>
-
     </main>
   </>;
 };
