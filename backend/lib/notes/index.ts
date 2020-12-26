@@ -1,4 +1,4 @@
-import * as DB from "./database.js";
+import * as DB from "./io.js";
 import * as Utils from "../utils.js";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -37,7 +37,6 @@ import UrlMetadataResponse from "../../interfaces/UrlMetadataResponse.js";
 import ImportLinkAsNoteFailure from "../../interfaces/ImportLinkAsNoteFailure.js";
 import getUrlMetadata from "./getUrlMetadata.js";
 import * as config from "./config.js";
-import { File } from "../../interfaces/File.js";
 import { Readable } from "stream";
 import NoteListPage from "../../interfaces/NoteListPage.js";
 import { NoteListSortMode } from "../../interfaces/NoteListSortMode.js";
@@ -48,23 +47,23 @@ import { NoteListSortMode } from "../../interfaces/NoteListSortMode.js";
 **/
 
 
-const init = (dataFolderPath:string):void => {
+const init = async (storageProvider):Promise<void> => {
   console.log("Initializing notes module...");
 
   DB.init({
-    dataFolderPath,
+    storageProvider,
   });
 
   console.log("Cleaning data...");
-  cleanUpData();
+  await cleanUpData();
 };
 
 
-const get = (noteId: NoteId, userId: UserId):NoteToTransmit | null => {
-  const db = DB.getMainData(userId);
+const get = async (noteId: NoteId, userId: UserId):Promise<NoteToTransmit> => {
+  const db = await DB.getMainData(userId);
   const noteFromDB:DatabaseNote | null = findNote(db, noteId);
   if (!noteFromDB) {
-    return null;
+    throw new Error("NOTE_NOT_FOUND");
   }
 
   const noteToTransmit:NoteToTransmit = createNoteToTransmit(noteFromDB, db);
@@ -72,17 +71,17 @@ const get = (noteId: NoteId, userId: UserId):NoteToTransmit | null => {
 };
 
 
-const getNotesList = (
+const getNotesList = async (
   userId: UserId,
   options,
-): NoteListPage => {
+): Promise<NoteListPage> => {
   const query = options.query;
   const caseSensitiveQuery = options.caseSensitiveQuery;
   const page = Math.max(options.page, 1) || 1;
   const sortMode
     = options.sortMode || NoteListSortMode.CREATION_DATE_DESCENDING;
 
-  const db: Database = DB.getMainData(userId);
+  const db: Database = await DB.getMainData(userId);
   const matchingNotes = db.notes
     // filter notes that match the search query
     .filter((note:DatabaseNote) => {
@@ -144,8 +143,8 @@ const getNotesList = (
 };
 
 
-const getGraph = (userId: UserId):Graph => {
-  const db = DB.getMainData(userId);
+const getGraph = async (userId: UserId):Promise<Graph> => {
+  const db = await DB.getMainData(userId);
 
   const graphNodes:GraphNode[] = db.notes.map((note) => {
     const graphNode:GraphNode = {
@@ -169,8 +168,8 @@ const getGraph = (userId: UserId):Graph => {
 };
 
 
-const getStats = (userId:UserId):Stats => {
-  const db = DB.getMainData(userId);
+const getStats = async (userId:UserId):Promise<Stats> => {
+  const db = await DB.getMainData(userId);
 
   const numberOfUnlinkedNotes = db.notes.filter((note) => {
     return getNumberOfLinkedNotes(db, note.id) === 0;
@@ -186,8 +185,11 @@ const getStats = (userId:UserId):Stats => {
 };
 
 
-const setGraph = (graphFromUser:GraphFromUser, userId:UserId):boolean => {
-  const db:Database = DB.getMainData(userId);
+const setGraph = async (
+  graphFromUser:GraphFromUser,
+  userId:UserId,
+):Promise<void> => {
+  const db:Database = await DB.getMainData(userId);
   graphFromUser.nodePositionUpdates.forEach(
     (nodePositionUpdate:GraphNodePositionUpdate):void => {
       updateNotePosition(db, nodePositionUpdate);
@@ -196,16 +198,15 @@ const setGraph = (graphFromUser:GraphFromUser, userId:UserId):boolean => {
   db.links = graphFromUser.links;
   db.screenPosition = graphFromUser.screenPosition;
   db.initialNodePosition = graphFromUser.initialNodePosition;
-  DB.flushChanges(db);
-  return true;
+  await DB.flushChanges(db);
 };
 
 
-const put = (
+const put = async (
   noteFromUser:NoteFromUser,
   userId:UserId,
   options
-):NoteToTransmit => {
+):Promise<NoteToTransmit> => {
   let ignoreDuplicateTitles = true;
   if (
     (typeof options === "object")
@@ -214,7 +215,7 @@ const put = (
     ignoreDuplicateTitles = false;
   }
 
-  const db:Database = DB.getMainData(userId);
+  const db:Database = await DB.getMainData(userId);
 
   if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, db)) {
     throw new Error("NOTE_WITH_SAME_TITLE_EXISTS");
@@ -225,7 +226,7 @@ const put = (
   if (
     typeof noteFromUser.id === "number"
   ) {
-    databaseNote = findNote(db, noteFromUser.id);
+    databaseNote = await findNote(db, noteFromUser.id);
   }
 
   if (databaseNote === null) {
@@ -247,7 +248,7 @@ const put = (
   removeEmptyLinks(databaseNote);
   incorporateUserChangesIntoNote(noteFromUser.changes, databaseNote, db);
 
-  DB.flushChanges(db);
+  await DB.flushChanges(db);
 
   const noteToTransmit:NoteToTransmit
     = createNoteToTransmit(databaseNote, db);
@@ -255,15 +256,15 @@ const put = (
 };
 
 
-const remove = (noteId, userId) => {
-  const db = DB.getMainData(userId);
+const remove = async (noteId, userId):Promise<void> => {
+  const db = await DB.getMainData(userId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
   if (noteIndex === -1) {
-    return false;
+    throw new Error("Note not found");
   }
   const note = db.notes[noteIndex];
   if (noteIndex === null) {
-    return false;
+    throw new Error("Note not found");
   }
   db.notes.splice(noteIndex, 1);
   removeLinksOfNote(db, noteId);
@@ -274,8 +275,7 @@ const remove = (noteId, userId) => {
       DB.deleteFile(userId, fileId);
     });
 
-  DB.flushChanges(db);
-  return true;
+  await DB.flushChanges(db);
 };
 
 
@@ -287,20 +287,22 @@ const importDB = (db, userId) => {
 };
 
 
-const addFile = (userId:UserId, file:File):FileId => {
+const addFile = async (
+  userId:UserId,
+  readable:Readable,
+  mimeType: string,
+):Promise<FileId> => {
   const fileType = config.ALLOWED_FILE_TYPES
     .find((filetype) => {
-      return filetype.mimeType === file.type;
+      return filetype.mimeType === mimeType;
     });
 
   if (!fileType) {
-    throw new Error("Invalid MIME type: " + file.type);
+    throw new Error("Invalid MIME type: " + mimeType);
   }
 
-  const sourcePath = file.path;
-
   const fileId:FileId = uuidv4() + "." + fileType.ending;
-  DB.addFile(userId, fileId, sourcePath);
+  await DB.addFile(userId, fileId, readable);
   return fileId;
 };
 
@@ -310,8 +312,8 @@ const getReadableFileStream = (userId: UserId, fileId:FileId):Readable => {
 };
 
 
-const getReadableDatabaseStream = (userId, withUploads) => {
-  return DB.getReadableDatabaseStream(userId, withUploads);
+const getReadableDatabaseStream = async (userId, withUploads) => {
+  return await DB.getReadableDatabaseStream(userId, withUploads);
 };
 
 
@@ -365,9 +367,11 @@ const importLinksAsNotes = async (userId, links) => {
   const notesToTransmit:NoteToTransmit[] = [];
   const failures:ImportLinkAsNoteFailure[] = [];
 
-  notesFromUser.forEach((noteFromUser:NoteFromUser) => {
+  for (let i = 0; i < notesFromUser.length; i++) {
+    const noteFromUser:NoteFromUser = notesFromUser[i];
+
     try {
-      const noteToTransmit:NoteToTransmit = put(
+      const noteToTransmit:NoteToTransmit = await put(
         noteFromUser,
         userId,
         {
@@ -383,7 +387,7 @@ const importLinksAsNotes = async (userId, links) => {
       };
       failures.push(failure);
     }
-  });
+  }
 
   return {
     notesToTransmit,

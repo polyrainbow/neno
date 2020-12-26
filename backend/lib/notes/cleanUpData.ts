@@ -6,7 +6,7 @@ import {
   removeDefaultTextParagraphs,
   removeEmptyLinks,
 } from "./noteUtils.js";
-import * as DB from "./database.js";
+import * as DB from "./io.js";
 
 const convertLinksFromLegacyFormat = (db) => {
   db.links = db.links.map((link) => {
@@ -77,8 +77,9 @@ const cleanUpLinks = (db) => {
 
 // this function must always be indempotent, so that there is only one
 // canonical data structure
-const cleanUpData = () => {
-  DB.forEach((db) => {
+const cleanUpData = async () => {
+  await DB.forEach((db) => {
+    console.log("Cleaning db " + db.id + " ...");
 
     // each database should have an initialNodePosition
     if (!db.initialNodePosition) {

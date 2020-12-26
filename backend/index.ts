@@ -16,7 +16,7 @@ const program = getProgramArguments(VERSION);
 
 const users: User[] = getUsers(program.dataFolderPath);
 
-const app = startApp({
+const app = await startApp({
   users,
   dataPath: program.dataFolderPath,
   frontendPath: path.join(REPO_PATH, "frontend"),

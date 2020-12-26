@@ -15,15 +15,20 @@ import { File } from "./interfaces/File.js";
 import cookieParser from "cookie-parser";
 import AppStartOptions from "./interfaces/AppStartOptions.js";
 import NoteListPage from "./interfaces/NoteListPage.js";
+import FileSystemStorageProvider from "./lib/FileSystemStorageProvider.js";
+import fs from "fs";
 
 
-const startApp = ({
+const startApp = async ({
   users,
   dataPath,
   frontendPath,
   jwtSecret,
-}:AppStartOptions):Express.Application => {
-  Notes.init(dataPath);
+}:AppStartOptions):Promise<Express.Application> => {
+  const storageProvider = new FileSystemStorageProvider(dataPath);
+  console.log("File system storage ready at " + dataPath);
+
+  await Notes.init(storageProvider);
   const app = express();
 
   const mapAuthCookieToHeader = (function(req, res, next) {
@@ -86,10 +91,10 @@ const startApp = ({
   app.get(
     config.API_PATH + "database",
     verifyJWT,
-    function(req, res) {
+    async function(req, res) {
       const withUploads = req.query.withUploads === "true";
 
-      const databaseStream = Notes.getReadableDatabaseStream(
+      const databaseStream = await Notes.getReadableDatabaseStream(
         req.userId,
         withUploads,
       );
@@ -133,8 +138,8 @@ const startApp = ({
   app.get(
     config.API_PATH + "graph",
     verifyJWT,
-    function(req, res) {
-      const graph = Notes.getGraph(req.userId);
+    async function(req, res) {
+      const graph = await Notes.getGraph(req.userId);
       const response:APIResponse = {
         success: true,
         payload: graph,
@@ -147,8 +152,8 @@ const startApp = ({
   app.get(
     config.API_PATH + "stats",
     verifyJWT,
-    function(req, res) {
-      const stats:Stats = Notes.getStats(req.userId);
+    async function(req, res) {
+      const stats:Stats = await Notes.getStats(req.userId)
       const response:APIResponse = {
         success: true,
         payload: stats,
@@ -162,15 +167,20 @@ const startApp = ({
     config.API_PATH + "graph",
     verifyJWT,
     express.json(),
-    function(req, res) {
-      const success = Notes.setGraph(req.body, req.userId);
-      const response:APIResponse = {
-        success,
-      };
-      if (!success) {
-        response.error = APIError.INTERNAL_SERVER_ERROR;
+    async function(req, res) {
+      try {
+        await Notes.setGraph(req.body, req.userId);
+        const response:APIResponse = {
+          success: true,
+        };
+        res.json(response);
+      } catch (e) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INTERNAL_SERVER_ERROR,
+        };
+        res.json(response);
       }
-      res.json(response);
     },
   );
 
@@ -178,14 +188,14 @@ const startApp = ({
   app.get(
     config.API_PATH + "notes",
     verifyJWT,
-    function(req, res) {
+    async function(req, res) {
       const query = req.query.q || "";
       const caseSensitiveQuery = req.query.caseSensitive === "true";
       const page = req.query.page || 1;
       const sortMode = req.query.sortMode;
       const includeLinkedNotes = true;
 
-      const notesListPage:NoteListPage = Notes.getNotesList(req.userId, {
+      const notesListPage:NoteListPage = await Notes.getNotesList(req.userId, {
         includeLinkedNotes,
         query,
         caseSensitiveQuery,
@@ -205,17 +215,23 @@ const startApp = ({
   app.get(
     config.API_PATH + "note/:noteId",
     verifyJWT,
-    function(req, res) {
+    async function(req, res) {
       const noteId:NoteId = parseInt(req.params.noteId);
-      const note:NoteToTransmit | null = Notes.get(noteId, req.userId);
-      const response:APIResponse = {
-        success: !!note,
-        payload: note,
-      };
-      if (!note) {
-        response.error = APIError.NOTE_NOT_FOUND;
+
+      try {
+        const note:NoteToTransmit = await Notes.get(noteId, req.userId);
+        const response:APIResponse = {
+          success: true,
+          payload: note,
+        };
+        res.json(response);
+      } catch (e) {
+        const response:APIResponse = {
+          success: false,
+          error: e,
+        };
+        res.json(response);
       }
-      res.json(response);
     },
   );
 
@@ -224,11 +240,15 @@ const startApp = ({
     config.API_PATH + "note",
     verifyJWT,
     express.json(),
-    function(req, res) {
+    async function(req, res) {
       const reqBody = req.body;
+
       try {
-        const noteToTransmit:NoteToTransmit
-          = Notes.put(reqBody.note, req.userId, reqBody.options);
+        const noteToTransmit:NoteToTransmit = await Notes.put(
+          reqBody.note,
+          req.userId,
+          reqBody.options,
+        );
 
         const response:APIResponse = {
           success: true,
@@ -250,18 +270,17 @@ const startApp = ({
     config.API_PATH + "import-links-as-notes",
     verifyJWT,
     express.json(),
-    function(req, res) {
+    async function(req, res) {
       const reqBody = req.body;
       const links:string[] = reqBody.links;
 
-      Notes.importLinksAsNotes(req.userId, links)
-        .then((result) => {
-          const response:APIResponse = {
-            payload: result,
-            success: true,
-          };
-          res.json(response);
-        });
+      const result = await Notes.importLinksAsNotes(req.userId, links);
+
+      const response:APIResponse = {
+        payload: result,
+        success: true,
+      };
+      res.json(response);
     },
   );
 
@@ -269,12 +288,20 @@ const startApp = ({
   app.delete(
     config.API_PATH + "note/:noteId",
     verifyJWT,
-    function(req, res) {
-      const success = Notes.remove(parseInt(req.params.noteId), req.userId);
-      const response:APIResponse = {
-        success,
-      };
-      res.json(response);
+    async function(req, res) {
+      try {
+        await Notes.remove(parseInt(req.params.noteId), req.userId);
+        const response:APIResponse = {
+          success: true,
+        };
+        res.json(response);
+      } catch (e) {
+        const response:APIResponse = {
+          success: false,
+          error: e.message,
+        };
+        res.json(response);
+      }
     },
   );
 
@@ -282,7 +309,7 @@ const startApp = ({
   app.post(
     config.API_PATH + "file",
     verifyJWT,
-    function(req, res) {
+    async function(req, res) {
       const form = new formidable.IncomingForm();
       form.parse(req, (err, fields, files) => {
         if (err) {
@@ -307,22 +334,33 @@ const startApp = ({
           return;
         }
 
-        try {
-          const fileId = Notes.addFile(req.userId, file);
+        const readable = fs.createReadStream(file.path);
+        const mimeType = file.type;
 
-          const response:APIResponse = {
-            success: true,
-            payload: fileId,
-          };
-          res.json(response);
-        } catch (e) {
+        if (!mimeType) {
           const response:APIResponse = {
             success: false,
-            error: e.message,
+            error: APIError.INVALID_REQUEST,
           };
-          res.json(response);
+          res.status(406).json(response);
+          return;
         }
 
+        Notes.addFile(req.userId, readable, mimeType)
+          .then((fileId) => {
+            const response:APIResponse = {
+              success: true,
+              payload: fileId,
+            };
+            res.json(response);
+          })
+          .catch((e) => {
+            const response:APIResponse = {
+              success: false,
+              error: e.message,
+            };
+            res.json(response);
+          });
       });
     },
   );
@@ -353,20 +391,19 @@ const startApp = ({
   app.get(
     config.API_PATH + "link-data",
     verifyJWT,
-    (req, res) => {
+    async (req, res) => {
       const url = req.query.url;
 
-      Notes.getUrlMetadata(url as string)
-        .then((metadata) => {
-          res.end(JSON.stringify(metadata));
-        })
-        .catch((e) => {
-          const response = {
-            "success": 0,
-            "error": e,
-          };
-          res.json(response);
-        });
+      try {
+        const metadata = await Notes.getUrlMetadata(url as string);
+        res.end(JSON.stringify(metadata));
+      } catch (e) {
+        const response = {
+          "success": 0,
+          "error": e,
+        };
+        res.json(response);
+      }
     },
   );
 
