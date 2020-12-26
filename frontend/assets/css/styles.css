@@ -12,6 +12,8 @@
     --main-content-color: black;
 
     --link-color: rgb(0, 40, 216);
+
+    --overlay-gradient: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(9,9,121,0.5) 35%, rgba(0,212,255,1) 100%);
   }
 }
 
@@ -29,6 +31,8 @@
     --main-content-color: rgb(224, 224, 224);
 
     --link-color: rgb(122, 146, 255);
+
+    --overlay-gradient: linear-gradient(45deg, rgb(17 10 146) 0%, rgba(9, 9, 121, 0.5) 35%, rgb(0 125 151) 100%);
   }
 
   button img, .noteListStatus img, .note-list-item img {
@@ -430,6 +434,18 @@ th, td {
   #links h2, #stats h2{
     padding: 0px var(--default-margin);
   }
+}
+
+
+
+#overlay {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: var(--overlay-gradient);
+  display: grid;
+  align-items: center;
+  z-index: 100;
 }
 
 
