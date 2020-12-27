@@ -27,7 +27,7 @@ const AppStats = ({
   }
 
   let percentageOfUnlinkedNotes = null;
-  if (showStats) {
+  if (showStats && (stats.numberOfAllNotes > 0)) {
     percentageOfUnlinkedNotes = Math.round(
       (stats.numberOfUnlinkedNotes / stats.numberOfAllNotes) * 100 * 100,
     ) / 100;
@@ -49,8 +49,12 @@ const AppStats = ({
         icon={emojis.unlinked}
         label="Unlinked notes"
         value={
-          `${stats.numberOfUnlinkedNotes.toLocaleString("en")} `
-          + `(${percentageOfUnlinkedNotes.toLocaleString("en")} %)`
+          `${stats.numberOfUnlinkedNotes.toLocaleString("en")}`
+          + (
+            percentageOfUnlinkedNotes
+              ? ` (${percentageOfUnlinkedNotes.toLocaleString("en")} %)`
+              : ""
+          )
         }
       />
     </div>
