@@ -52,6 +52,9 @@ const emojis = {
   "noUnsavedChanges": "✔️",
 };
 
+// session token expire time in seconds
+const MAX_SESSION_AGE = 60 * 60 * 24 * 30; // 30 days
+
 export {
   DEFAULT_NOTE_TITLE,
   newEditorDataObject,
@@ -59,4 +62,5 @@ export {
   texts,
   MINIMUM_SEARCH_QUERY_LENGTH,
   emojis,
+  MAX_SESSION_AGE,
 };

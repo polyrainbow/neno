@@ -471,7 +471,7 @@ const startApp = async ({
           userId: user.id,
         },
         jwtSecret,
-        { expiresIn: '10d' }
+        { expiresIn: config.MAX_SESSION_AGE.toString() + 'd' }
       );
 
       const response:APIResponse = {

@@ -12,7 +12,11 @@ const DEFAULT_USERS:User[] = [
   },
 ];
 
+// in days
+const MAX_SESSION_AGE = 30;
+
 export {
   API_PATH,
   DEFAULT_USERS,
+  MAX_SESSION_AGE,
 }
