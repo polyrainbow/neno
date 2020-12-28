@@ -2,6 +2,7 @@ import React from "react";
 import HeaderContainer from "./HeaderContainer";
 import EditorViewHeaderControls from "./EditorViewHeaderControls";
 import AppStats from "./AppStats";
+import AppTitle from "./AppTitle.js";
 
 const EditorViewHeader = ({
   databaseProvider,
@@ -13,7 +14,7 @@ const EditorViewHeader = ({
     <HeaderContainer
       leftContent={
         <>
-          <h1 id="heading">NeNo</h1>
+          <AppTitle />
           <EditorViewHeaderControls
             setActiveView={setActiveView}
             openImportLinksDialog={openImportLinksDialog}

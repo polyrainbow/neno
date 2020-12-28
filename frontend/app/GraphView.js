@@ -6,6 +6,7 @@ import { initGraph } from "./lib/graph.js";
 import * as Config from "./lib/config.js";
 import SearchInput from "./SearchInput.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
+import AppTitle from "./AppTitle.js";
 
 
 const GraphView = ({
@@ -90,8 +91,7 @@ const GraphView = ({
     <HeaderContainer
       leftContent={
         <>
-          <h1 id="heading">NeNo</h1>
-
+          <AppTitle />
           <IconButton
             icon="create"
             title="Editor View"

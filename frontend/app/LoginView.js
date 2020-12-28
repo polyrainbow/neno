@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AppTitle from "./AppTitle.js";
 import HeaderContainer from "./HeaderContainer.js";
 
 
@@ -31,9 +32,7 @@ const LoginView = ({
   return <>
     <HeaderContainer
       leftContent={
-        <>
-          <h1 id="heading">NeNo</h1>
-        </>
+        <AppTitle />
       }
       rightContent={null}
     />

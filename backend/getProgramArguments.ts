@@ -25,7 +25,7 @@ const getArguments = (version) => {
     .option(
       '-d, --data-folder-path <value>',
       "path to data folder",
-      path.join(REPO_PATH, "..", "network-notes-data"),
+      path.join(REPO_PATH, "..", "neno-data"),
     )
     .option(
       '--use-https',

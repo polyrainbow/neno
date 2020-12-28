@@ -1,14 +1,13 @@
 import React from "react";
 import HeaderContainer from "./HeaderContainer.js";
+import AppTitle from "./AppTitle.js";
 
 
 const BusyView = () => {
   return <>
     <HeaderContainer
       leftContent={
-        <>
-          <h1 id="heading">NeNo</h1>
-        </>
+        <AppTitle />
       }
       rightContent={null}
     />
