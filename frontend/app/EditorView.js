@@ -147,7 +147,7 @@ const EditorView = ({
     if (unsavedChanges) {
       await confirm({
         text: Config.texts.discardChangesConfirmation,
-        confirmText: "Discard unsaved changes",
+        confirmText: "Discard changes",
         cancelText: "Cancel",
         encourageConfirmation: false,
       });
