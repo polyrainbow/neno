@@ -51,33 +51,36 @@ const Note = ({
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}
     />
-    <div id="editor"></div>
-    <div id="links">
-      <h2>Linked notes</h2>
-      {
-        displayedLinkedNotes.length === 0
-          ? <p className="note-meta-paragraph"
-          >There are no notes linked to this one yet.</p>
-          : null
-      }
+    <div id="note-content">
+      <div id="editor"></div>
+      <hr/>
       <div id="links">
+        <h2>Linked notes</h2>
         {
-          displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
-            note={displayedLinkedNote}
-            key={"note-link-list-item-" + displayedLinkedNote.id}
-            onSelect={() => loadNote(displayedLinkedNote.id)}
-            isActive={false}
-            isLinked={true}
-            onLinkChange={() => onLinkRemoval(displayedLinkedNote.id)}
-          />)
+          displayedLinkedNotes.length === 0
+            ? <p className="note-meta-paragraph"
+            >There are no notes linked to this one yet.</p>
+            : null
         }
+        <div id="links">
+          {
+            displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
+              note={displayedLinkedNote}
+              key={"note-link-list-item-" + displayedLinkedNote.id}
+              onSelect={() => loadNote(displayedLinkedNote.id)}
+              isActive={false}
+              isLinked={true}
+              onLinkChange={() => onLinkRemoval(displayedLinkedNote.id)}
+            />)
+          }
+        </div>
       </div>
+      {
+        (!note.isUnsaved)
+          ? <NoteStats note={note} />
+          : ""
+      }
     </div>
-    {
-      (!note.isUnsaved)
-        ? <NoteStats note={note} />
-        : ""
-    }
   </section>;
 };
 

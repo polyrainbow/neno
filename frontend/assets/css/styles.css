@@ -174,6 +174,12 @@ main {
   display: flex;
 }
 
+#note-content {
+  padding: 0px var(--default-margin);
+  max-width: 1100px;
+  margin: auto;
+}
+
 .icon-button {
   height: 50px;
   display: inline-block;
@@ -235,7 +241,7 @@ button[disabled]{
   text-align: left;
   display: flex;
   background-color: var(--nli-color);
-  margin: 15px;
+  margin-bottom: var(--default-margin);
   border-radius: var(--border-radius);
   overflow: hidden;
   user-select: none;
@@ -332,6 +338,7 @@ button[disabled]{
   font-size: var(--main-ui-font-size);
   margin-right: 10px;
   padding: 10px 20px;
+  margin-bottom: var(--default-margin);
 }
 
 .default-button.default-action {
@@ -340,8 +347,8 @@ button[disabled]{
 
 table {
   border-collapse: collapse;
-  margin: var(--default-margin);
-  width: calc(100% - 20px);
+  margin: var(--default-margin) 0px;
+  width: 100%;
 }
 
 
@@ -356,11 +363,6 @@ tr:nth-child(even) {
 th, td {
   text-align: left;
   padding: 5px;
-}
-
-
-.note-meta-paragraph {
-  margin: 0px var(--default-margin);
 }
 
 
@@ -390,11 +392,6 @@ th, td {
 }
 
 
-#links h2, #stats h2{
-  padding: 0px var(--default-margin);
-}
-
-
 #note-controls, #section-search-input {
   padding: 0px 10px;
   display: flex;
@@ -402,6 +399,11 @@ th, td {
   align-items: center;
   max-width: 100vw;
   overflow: hidden;
+}
+
+
+#section_list {
+  padding: 0px var(--default-margin);
 }
 
 
@@ -431,7 +433,6 @@ th, td {
 
   #section_list{
     overflow-y: scroll;
-    padding: 0px;
     height: calc(100vh - 100px);
   }
 
@@ -471,7 +472,6 @@ th, td {
 
   #note{
     border-bottom: 15px solid var(--separator-color);
-    padding: 0px 10px;
   }
 }
 

@@ -92,7 +92,12 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
         class: List,
         inlineToolbar: true,
       },
-      code: Code,
+      code: {
+        class: Code,
+        config: {
+          placeholder: "Enter your code here",
+        },
+      },
       attaches: {
         class: Attaches,
         config: {
