@@ -296,7 +296,7 @@ button[disabled]{
   font-weight: bold;
 }
 
-.note-list-item .update-time{
+.note-list-item .info{
   display: inline;
 }
 

@@ -48,9 +48,14 @@ const NoteListItem = ({
       </div>
       <div className="note-list-item-second-row">
         <div
-          className="update-time"
+          className="info"
         >
           {yyyymmdd(new Date(note.updateTime))}
+          {
+            isHub
+              ? " · 🐙 Hub"
+              : ""
+          }
         </div>
         <div
           className="note-features"
