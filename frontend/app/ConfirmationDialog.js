@@ -24,13 +24,15 @@ const ConfirmationDialog = ({
     <button
       onClick={onConfirm}
       className={
-        "default-button " + (encourageConfirmation ? "default-action" : "")
+        "default-button dialog-box-button "
+        + (encourageConfirmation ? "default-action" : "")
       }
     >{confirmText}</button>
     <button
       onClick={onCancel}
       className={
-        "default-button " + (!encourageConfirmation ? "default-action" : "")
+        "default-button dialog-box-button "
+        + (!encourageConfirmation ? "default-action" : "")
       }
     >{cancelText}</button>
   </Dialog>;

@@ -16,11 +16,6 @@ const ImportLinksDialog = ({
     <h1>Import links as notes</h1>
     <p>Separate links by line breaks</p>
     <textarea
-      style={{
-        "width": "100%",
-        "display": "block",
-        "height": "200px",
-      }}
       onChange={(e) => setText(e.target.value)}
     ></textarea>
     {
@@ -32,11 +27,11 @@ const ImportLinksDialog = ({
               setIsBusy(true);
               importLinksAsNotes(text.split("\n"));
             }}
-            className="default-button default-action"
+            className="default-button dialog-box-button default-action"
           >Import as notes</button>
           <button
             onClick={onCancel}
-            className="default-button"
+            className="default-button dialog-box-button"
           >Cancel</button>
         </>
     }

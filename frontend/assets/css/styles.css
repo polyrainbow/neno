@@ -80,7 +80,6 @@ input, select {
 
 body, #app {
   margin: 0;
-  margin: 0;
   padding: 0;
   background-color: var(--background-color);
   color: var(--font-color);
@@ -321,7 +320,12 @@ button[disabled]{
 .dialog-box {
   background-color: var(--background-color);
   color: var(--font-color);
-  border: 2px solid var(--font-color);
+  max-width: 400px;
+  display: block;
+  padding: var(--default-margin);
+  margin: auto;
+  border-radius: var(--border-radius);
+  box-shadow: var(--default-box-shadow);
 }
 
 .dialog-box h1 {
@@ -332,6 +336,9 @@ button[disabled]{
   background-color: var(--background-color);
   color: var(--font-color);
   margin-bottom: 15px;
+  width: calc(100% - 5px);
+  display: block;
+  height: 200px;
 }
 
 .default-button {
@@ -343,6 +350,10 @@ button[disabled]{
 
 .default-button.default-action {
   background-color: var(--accent-color-1);
+}
+
+.default-button.dialog-box-button {
+  margin-bottom: 0px;
 }
 
 table {
