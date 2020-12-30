@@ -10,7 +10,8 @@ const load = async ({ data, parent, onChange, databaseProvider }) => {
   if (instanceQueue === null) {
     instanceQueue = loadInstance({ data, parent, onChange, databaseProvider });
   } else {
-    instanceQueue = instanceQueue.then(() => {
+    instanceQueue = instanceQueue.then((instance) => {
+      instance.destroy();
       return loadInstance({ data, parent, onChange, databaseProvider });
     });
   }
@@ -40,12 +41,6 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
     Code,
     Attaches,
   ] = modules.map((module) => module.default);
-
-  // destroy does currently not work
-  // https://github.com/codex-team/editor.js/issues/1400
-  // https://github.com/codex-team/editor.js/issues/1380
-  // instance && instance.destroy();
-  parent.innerHTML = "";
 
   const instance = new EditorJS({
     holder: parent,
