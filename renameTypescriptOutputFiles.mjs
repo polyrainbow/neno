@@ -40,12 +40,3 @@ foundFiles.forEach((f) => {
   fs.renameSync(f.oldSrc, f.newSrc);
   replaceImports(f.newSrc);
 });
-
-
-/*
-TODO:
-replace
-import***.js"
-with
-import***.mjs"
-*/
