@@ -14,7 +14,7 @@ const randomTitles = fs.readFileSync(
 )
   .replace(/\r/g, "")
   .split("\n")
-  .map(t => t.trim());
+  .map((t) => t.trim());
 
 let noteTitleIndex = 0;
 const getNoteTitle = () => {
@@ -23,7 +23,8 @@ const getNoteTitle = () => {
   return title;
 };
 
-const LOREM_IMPSUM_TEXT = `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.`;
+// eslint-disable-next-line
+const LOREM_IMPSUM_TEXT = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
 
 const mainDB = JSON.parse(
   fs.readFileSync(path.join(dbFolder, "main.db.json"), "utf8"),
@@ -38,7 +39,7 @@ mainDB.notes.forEach((note) => {
   note.editorData.blocks = note.editorData.blocks.filter((block) => {
     return ["header", "paragraph", "linkTool"].includes(block.type);
   });
-  
+
   note.editorData.blocks.forEach((block) => {
     if (block.type === "paragraph") {
       block.data.text = LOREM_IMPSUM_TEXT;
@@ -48,7 +49,7 @@ mainDB.notes.forEach((note) => {
       block.data = {
         link: "https://www.youtube.com/watch?v=Vw4KVoEVcr0",
         meta: {
-          description: "thanks to dailypicksandflicks.com for being the first to write about this video and to reddit.com for making it viral. And for all nice comments as well. :)l...",
+          description: "This is really cool cat content!",
           image: {
             url: "https://i.ytimg.com/vi/Vw4KVoEVcr0/hqdefault.jpg",
           },

@@ -6,17 +6,17 @@ import { v4 as uuidv4 } from "uuid";
 const users = [];
 
 const numberOfUsers
-  = readlineSync.question('How many users do you wish to create? ') || 1;
+  = readlineSync.question("How many users do you wish to create? ") || 1;
 
 for (let i = 0; i < numberOfUsers; i++) {
   console.log("Gathering info for user " + (i + 1));
-  const username = readlineSync.question('User name: ');
+  const username = readlineSync.question("User name: ");
 
-  var password = readlineSync.question('Password: ', {
+  const password = readlineSync.question("Password: ", {
     hideEchoBack: true, // The typed text on screen is hidden by `*` (default).
     mask: "",
   });
-  
+
   const salt = bcrypt.genSaltSync(12);
   const passwordHash = bcrypt.hashSync(password, salt);
 

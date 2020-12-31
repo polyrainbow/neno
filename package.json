@@ -65,8 +65,8 @@
     "webpack-cli": "^4.2.0"
   },
   "scripts": {
-    "lint": "npx eslint .",
-    "lint-fix": "npx eslint . --fix",
+    "lint": "npx eslint . --ext .mjs,.js",
+    "lint-fix": "npx eslint . --ext .mjs,.js --fix",
     "visualize-bundles": "npx webpack --config frontend/webpack.production.js --profile --json > stats.json && npx webpack-bundle-analyzer stats.json frontend/assets",
     "compile-typescript": "npx tsc && node renameTypescriptOutputFiles.mjs",
     "start-server": "node dist/index.mjs --port 8080",

@@ -1,8 +1,11 @@
 {
   "env": {
+    "browser": true,
+    "commonjs": true,
     "es6": true,
     "jest": true
   },
+  "parser": "@babel/eslint-parser",
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -11,15 +14,22 @@
     "ecmaVersion": 2021,
     "sourceType": "module"
   },
-  "ignorePatterns": [
-    "node_modules",
-    "dist"
-  ],
+  "ignorePatterns": ["assets"],
   "extends": [
     "standard",
     "eslint:recommended",
+    "plugin:react/recommended",
+    "standard-react",
     "google"
   ],
+  "plugins": [
+    "react-hooks"
+  ],
+  "settings": {
+    "react": {
+      "version": "17.1"
+    }
+  },
   "rules": {
     "indent": [
       "error",
@@ -62,6 +72,19 @@
     "prefer-const": ["error"],
     "operator-linebreak": ["error", "before"],
     "no-console": [0],
-    "require-jsdoc": [0]
+    "require-jsdoc": [0],
+
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": [0],
+
+    "jsx-quotes": ["error", "prefer-double"],
+
+    "react/jsx-pascal-case": "error",
+    "react/prop-types": [0],
+    "react/jsx-closing-bracket-location": [0],
+    "react/jsx-closing-tag-location": [0],
+    "react/jsx-handler-names": [0],
+    "react/jsx-indent": [0],
+    "react/jsx-uses-vars": ["error"]
   }
 }
