@@ -1,7 +1,7 @@
 import React from "react";
-import HeaderContainer from "./HeaderContainer";
-import EditorViewHeaderControls from "./EditorViewHeaderControls";
-import AppStats from "./AppStats";
+import HeaderContainer from "./HeaderContainer.js";
+import EditorViewHeaderControls from "./EditorViewHeaderControls.js";
+import AppStats from "./AppStats.js";
 import AppTitle from "./AppTitle.js";
 
 const EditorViewHeader = ({

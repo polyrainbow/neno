@@ -2,7 +2,7 @@ import React from "react";
 import {
   Tooltip,
 } from "react-tippy";
-import { emojis } from "./lib/config";
+import { emojis } from "./lib/config.js";
 
 const UnsavedChangesIndicator = ({
   isUnsaved,

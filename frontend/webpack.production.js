@@ -1,6 +1,9 @@
-const path = require("path");
+import * as path from "path";
+import * as url from "url";
 
-module.exports = {
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+
+export default {
   mode: "production",
   entry: path.join(__dirname, "app", "index.js"),
   output: {
