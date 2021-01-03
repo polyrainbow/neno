@@ -15,8 +15,12 @@ const DEFAULT_USERS:User[] = [
 // in days
 const MAX_SESSION_AGE = 30;
 
+// in bytes
+const MAX_UPLOAD_FILE_SIZE = 524_288_000; // 500 MB
+
 export {
   API_PATH,
   DEFAULT_USERS,
   MAX_SESSION_AGE,
+  MAX_UPLOAD_FILE_SIZE,
 }

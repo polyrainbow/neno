@@ -340,6 +340,15 @@ const startApp = async ({
         const mimeType = file.type;
         const size = file.size;
 
+        if (size > config.MAX_UPLOAD_FILE_SIZE) {
+          const response:APIResponse = {
+            success: false,
+            error: APIError.RESOURCE_EXCEEDS_FILE_SIZE,
+          };
+          res.status(406).json(response);
+          return;
+        }
+
         if (!mimeType) {
           const response:APIResponse = {
             success: false,
@@ -392,6 +401,15 @@ const startApp = async ({
       const handleResourceResponse = (resourceResponse) => {
         const mimeType = resourceResponse.headers['content-type'];
         const size = parseInt(resourceResponse.headers['content-length']);
+
+        if (size > config.MAX_UPLOAD_FILE_SIZE) {
+          const response:APIResponse = {
+            success: false,
+            error: APIError.RESOURCE_EXCEEDS_FILE_SIZE,
+          };
+          res.status(406).json(response);
+          return;
+        }
 
         if (!mimeType) {
           const response:APIResponse = {
