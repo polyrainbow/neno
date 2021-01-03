@@ -51,7 +51,6 @@ const Pagination = (props) => {
           fontSize: "22px",
           justifyContent: "center",
           flexWrap: "wrap",
-          marginTop: "15px",
         }}>
           {items.map(({ page, type, selected, ...item }, index) => {
             let children = null;

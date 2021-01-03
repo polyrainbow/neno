@@ -28,6 +28,7 @@ const NoteSearchDisclaimer = ({
 
   return <p style={{
     fontSize: "16px",
+    marginTop: "0",
     textAlign: "center",
   }}>{label}</p>;
 };

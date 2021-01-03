@@ -414,7 +414,8 @@ th, td {
 
 
 #section_list {
-  padding: 0px var(--default-margin);
+  padding: var(--default-margin);
+  padding-bottom: 0;
 }
 
 
@@ -444,7 +445,9 @@ th, td {
 
   #section_list{
     overflow-y: scroll;
-    height: calc(100vh - 100px);
+    /* height is 100vh minus 2 headers of 50px height and minus top padding of
+    this element */
+    height: calc(100vh - 100px - var(--default-margin));
   }
 
   #right-view{
