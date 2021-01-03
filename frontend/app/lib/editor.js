@@ -64,21 +64,28 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
         config: {
           uploader: {
             uploadByFile: async (file) => {
-              const fileId = await databaseProvider.uploadFile(file);
+              const fileInfo = await databaseProvider.uploadFile(file);
               return {
                 success: 1,
                 file: {
-                  "url": Config.API_URL + "file/" + fileId,
-                  "size": file.size,
-                  "name": file.name,
-                  "fileId": fileId,
+                  "url": Config.API_URL + "file/" + fileInfo.id,
+                  "size": fileInfo.size,
+                  "fileId": fileInfo.id,
                 },
               };
             },
-            uploadByUrl: function() {
-              console.log(
-                "that mysterious upload by URL feature was finally triggered",
-              );
+            uploadByUrl: async (url) => {
+              const fileInfo = await databaseProvider.uploadFileByUrl({
+                url,
+              });
+              return {
+                success: 1,
+                file: {
+                  "url": Config.API_URL + "file/" + fileInfo.id,
+                  "size": fileInfo.size,
+                  "fileId": fileInfo.id,
+                },
+              };
             },
           },
         },

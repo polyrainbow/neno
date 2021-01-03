@@ -54,6 +54,10 @@ export default class ServerDatabaseProvider {
     return API.uploadFile(file);
   }
 
+  uploadFileByUrl(data) {
+    return API.uploadFileByUrl(data);
+  }
+
   fetchURLMetadata(url) {
     return API.fetchURLMetadata(url);
   }

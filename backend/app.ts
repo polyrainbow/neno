@@ -17,6 +17,8 @@ import AppStartOptions from "./interfaces/AppStartOptions.js";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import FileSystemStorageProvider from "./lib/FileSystemStorageProvider.js";
 import fs from "fs";
+import http from "http";
+import https from "https";
 
 
 const startApp = async ({
@@ -336,6 +338,7 @@ const startApp = async ({
 
         const readable = fs.createReadStream(file.path);
         const mimeType = file.type;
+        const size = file.size;
 
         if (!mimeType) {
           const response:APIResponse = {
@@ -350,7 +353,10 @@ const startApp = async ({
           .then((fileId) => {
             const response:APIResponse = {
               success: true,
-              payload: fileId,
+              payload: {
+                id: fileId,
+                size,
+              }, 
             };
             res.json(response);
           })
@@ -362,6 +368,72 @@ const startApp = async ({
             res.json(response);
           });
       });
+    },
+  );
+
+
+  app.post(
+    config.API_PATH + "file-by-url",
+    verifyJWT,
+    express.json(),
+    async function(req, res) {
+      const reqBody = req.body;
+      const url = reqBody.url;
+
+      if (!url) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.status(406).json(response);
+        return;
+      }
+
+      const handleResourceResponse = (resourceResponse) => {
+        const mimeType = resourceResponse.headers['content-type'];
+        const size = parseInt(resourceResponse.headers['content-length']);
+
+        if (!mimeType) {
+          const response:APIResponse = {
+            success: false,
+            error: APIError.INVALID_REQUEST,
+          };
+          res.status(406).json(response);
+          return;
+        }
+
+        Notes.addFile(req.userId, resourceResponse, mimeType)
+          .then((fileId) => {
+            const response:APIResponse = {
+              success: true,
+              payload: {
+                id: fileId,
+                size,
+              },
+            };
+            res.json(response);
+          })
+          .catch((e) => {
+            const response:APIResponse = {
+              success: false,
+              error: e.message,
+            };
+            res.json(response);
+          });
+      }
+
+      if (url.startsWith("http://")) {
+        http.get(url, handleResourceResponse);
+      } else if (url.startsWith("https://")) {
+        https.get(url, handleResourceResponse);
+      } else {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.UNSUPPORTED_URL_SCHEME,
+        };
+        res.status(406).json(response);
+        return;
+      }
     },
   );
 

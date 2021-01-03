@@ -185,6 +185,17 @@ const uploadFile = async (file) => {
 };
 
 
+const uploadFileByUrl = async (data) => {
+  const response = await callAPI("POST", "file-by-url", data);
+
+  if (!response.success) {
+    throw new Error(response.error);
+  }
+
+  return response.payload;
+};
+
+
 const fetchURLMetadata = async (url) => {
   const requestUrl = "link-data?url=" + url;
   const response = await callAPI("GET", requestUrl, null, "json");
@@ -205,6 +216,7 @@ export {
   getReadableDatabaseStream,
   importLinksAsNotes,
   uploadFile,
+  uploadFileByUrl,
   fetchURLMetadata,
 };
 
