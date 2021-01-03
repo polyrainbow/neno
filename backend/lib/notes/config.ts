@@ -12,6 +12,10 @@ const ALLOWED_FILE_TYPES = [
     ending: "webp",
   },
   {
+    mimeType: "image/gif",
+    ending: "gif",
+  },
+  {
     mimeType: "application/pdf",
     ending: "pdf",
   },
