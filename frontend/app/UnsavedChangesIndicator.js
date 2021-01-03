@@ -8,25 +8,34 @@ const UnsavedChangesIndicator = ({
   isUnsaved,
   unsavedChanges,
 }) => {
-  const title = isUnsaved
-    ? "This note has not been saved yet"
-    : unsavedChanges
-      ? "Unsaved changes"
-      : "No unsaved changes";
+  const unsavedChangesText = unsavedChanges
+    ? "Unsaved changes"
+    : "No unsaved changes";
 
-  const symbol = isUnsaved
-    ? emojis.new
-    : unsavedChanges
-      ? emojis.unsavedChanges
-      : emojis.noUnsavedChanges;
+  const unsavedChangesSymbol = unsavedChanges
+    ? emojis.unsavedChanges
+    : emojis.noUnsavedChanges;
 
-  return <Tooltip
-    title={title}
-    position="bottom"
-    trigger="mouseenter focus"
-  >
-    <span>{symbol}</span>
-  </Tooltip>;
+  return <>
+    {
+      isUnsaved
+        ? <Tooltip
+          title="This note has not been saved yet"
+          position="bottom"
+          trigger="mouseenter focus"
+        >
+          <span>{emojis.new}</span>
+        </Tooltip>
+        : ""
+    }
+    <Tooltip
+      title={unsavedChangesText}
+      position="bottom"
+      trigger="mouseenter focus"
+    >
+      <span>{unsavedChangesSymbol}</span>
+    </Tooltip>
+  </>;
 };
 
 export default UnsavedChangesIndicator;
