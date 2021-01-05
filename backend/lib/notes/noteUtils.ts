@@ -230,7 +230,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
 };
 
 
-const normalizeTitle = (title) => {
+const getSortKeyForTitle = (title) => {
   return title
     .toLowerCase()
     .replace(/(["'.“”„‘’—\-»#*[\]/])/g, "")
@@ -254,14 +254,14 @@ const getSortFunction = (
       return b.updateTime - a.updateTime;
     },
     [NoteListSortMode.TITLE_ASCENDING]: (a, b) => {
-      const aNormalized = normalizeTitle(a.title);
-      const bNormalized = normalizeTitle(b.title);
+      const aNormalized = getSortKeyForTitle(a.title);
+      const bNormalized = getSortKeyForTitle(b.title);
 
       return aNormalized.localeCompare(bNormalized);
     },
     [NoteListSortMode.TITLE_DESCENDING]: (a, b) => {
-      const aNormalized = normalizeTitle(a.title);
-      const bNormalized = normalizeTitle(b.title);
+      const aNormalized = getSortKeyForTitle(a.title);
+      const bNormalized = getSortKeyForTitle(b.title);
 
       return bNormalized.localeCompare(aNormalized);
     },
