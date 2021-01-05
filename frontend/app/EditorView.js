@@ -359,7 +359,10 @@ const EditorView = ({
           setScrollTop={setNoteListScrollTop}
           sortMode={sortMode}
           page={page}
-          setPage={setPage}
+          setPage={(page) => {
+            setPage(page);
+            setNoteListScrollTop(0);
+          }}
           stats={stats}
         />
       </div>

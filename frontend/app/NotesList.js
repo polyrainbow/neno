@@ -118,6 +118,16 @@ const NotesList = ({
         })
       }
     </div>
+    {
+      notes.length >= 20
+        ? <Pagination
+          numberOfResults={numberOfResults}
+          page={page}
+          searchResultsPerPage={searchResultsPerPage}
+          onChange={(newPage) => setPage(newPage)}
+        />
+        : ""
+    }
   </section>;
 };
 
