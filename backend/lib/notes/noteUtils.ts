@@ -257,17 +257,13 @@ const getSortFunction = (
       const aNormalized = normalizeTitle(a.title);
       const bNormalized = normalizeTitle(b.title);
 
-      if(aNormalized < bNormalized) { return -1; }
-      if(aNormalized > bNormalized) { return 1; }
-      return 0;
+      return aNormalized.localeCompare(bNormalized);
     },
     [NoteListSortMode.TITLE_DESCENDING]: (a, b) => {
       const aNormalized = normalizeTitle(a.title);
       const bNormalized = normalizeTitle(b.title);
 
-      if(aNormalized < bNormalized) { return 1; }
-      if(aNormalized > bNormalized) { return -1; }
-      return 0;
+      return bNormalized.localeCompare(aNormalized);
     },
     [NoteListSortMode.NUMBER_OF_LINKS_ASCENDING]: (a, b) => {
       return a.numberOfLinkedNotes - b.numberOfLinkedNotes;
