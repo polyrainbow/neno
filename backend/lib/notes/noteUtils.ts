@@ -18,10 +18,10 @@ import * as Utils from "../utils.js";
 const getNoteTitle = (note:Note):string => {
   if (typeof note?.editorData?.blocks?.[0]?.data?.text === "string") {
     let title
-      = Utils.unescapeHTML(note.editorData.blocks[0].data.text);
+      = Utils.unescapeHTML(note.editorData.blocks[0].data.text).trim();
 
     if (title.length > 800) {
-      title = title.substr(0, 800) + " ...";
+      title = title.trim().substr(0, 800) + " ...";
     }
 
     return title;
@@ -230,6 +230,13 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
 };
 
 
+const normalizeTitle = (title) => {
+  return title
+    .toLowerCase()
+    .replace(/(["'.“”„‘’—\-»#*[\]/])/g, "")
+    .trim();
+}
+
 const getSortFunction = (
   sortMode:NoteListSortMode,
 ):((a:NoteListItem, b:NoteListItem) => number) => {
@@ -245,6 +252,22 @@ const getSortFunction = (
     },
     [NoteListSortMode.UPDATE_DATE_DESCENDING]: (a, b) => {
       return b.updateTime - a.updateTime;
+    },
+    [NoteListSortMode.TITLE_ASCENDING]: (a, b) => {
+      const aNormalized = normalizeTitle(a.title);
+      const bNormalized = normalizeTitle(b.title);
+
+      if(aNormalized < bNormalized) { return -1; }
+      if(aNormalized > bNormalized) { return 1; }
+      return 0;
+    },
+    [NoteListSortMode.TITLE_DESCENDING]: (a, b) => {
+      const aNormalized = normalizeTitle(a.title);
+      const bNormalized = normalizeTitle(b.title);
+
+      if(aNormalized < bNormalized) { return 1; }
+      if(aNormalized > bNormalized) { return -1; }
+      return 0;
     },
     [NoteListSortMode.NUMBER_OF_LINKS_ASCENDING]: (a, b) => {
       return a.numberOfLinkedNotes - b.numberOfLinkedNotes;

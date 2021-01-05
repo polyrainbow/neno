@@ -179,6 +179,13 @@ const cleanUpData = async () => {
         });
 
 
+      // trim heading if present
+      if (note.editorData.blocks[0]?.type === "header") {
+        note.editorData.blocks[0].data.text
+          = note.editorData.blocks[0].data.text.trim();
+      }
+
+
       // new NodePosition format
       if (typeof note.x === "number") {
         note.position = {

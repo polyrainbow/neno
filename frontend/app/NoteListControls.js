@@ -53,6 +53,12 @@ const NoteListControls = ({
           value="UPDATE_DATE_DESCENDING"
         >Update date (descending)</option>
         <option
+          value="TITLE_ASCENDING"
+        >Title (A-Z)</option>
+        <option
+          value="TITLE_DESCENDING"
+        >Title (Z-A)</option>
+        <option
           value="NUMBER_OF_LINKS_ASCENDING"
         >Number of links (ascending)</option>
         <option
