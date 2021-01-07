@@ -33,10 +33,8 @@ class Graph {
   #justScaleTransGraph = false;
   #lastKeyDown = -1;
   #shiftDragInProgress = false;
-  #selection = {
-    type: "null",
-    value: null,
-  };
+  #selection = [];
+  #connectedNodeIdsOfSelection = [];
 
   constructor(svg, graphObject, onHighlight, onChange) {
     const thisGraph = this;
@@ -106,7 +104,7 @@ class Graph {
       })
       .on("end", function(e, d) {
         if (e.shiftKey) return;
-        thisGraph.#select(d);
+        thisGraph.#select([d], false);
         thisGraph.#updatedNodes.add(d);
       });
 
@@ -240,26 +238,38 @@ class Graph {
   };
 
 
-  #select(value) {
-    const thisGraph = this;
-    if (!value) {
-      thisGraph.#selection = {
-        type: "null",
-        value: null,
-      };
-      return;
-    }
-    thisGraph.#selection = {
-      type: (value.source && value.target) ? "edge" : "node",
-      value: value,
-    };
+  #getConnectedNodeIdsOfSelection(selection) {
+    return selection.reduce((accumulator, newValue) => {
+      if (this.#isEdge(newValue)) {
+        accumulator.push(newValue.source.id, newValue.target.id);
+      } else {
+        const linkedNoteIds = newValue.linkedNotes.map((node) => node.id);
+        accumulator.push(...linkedNoteIds);
+      }
 
-    if (thisGraph.#selection.type !== "null") {
-      thisGraph.#selection.connectedNodeIds
-        = thisGraph.#selection.type === "node"
-          ? thisGraph.#selection.value.linkedNotes.map((node) => node.id)
-          : [value.source.id, value.target.id];
+      return accumulator;
+    }, []);
+  }
+
+
+  #isEdge(value) {
+    return !!(value.source && value.target);
+  }
+
+
+  #select(values, addToExistingSelection = false) {
+    const thisGraph = this;
+
+    if (!addToExistingSelection) {
+      thisGraph.#selection = values;
+    } else {
+      thisGraph.#selection.push(...values);
     }
+
+    thisGraph.#connectedNodeIdsOfSelection
+      = this.#getConnectedNodeIdsOfSelection(
+        thisGraph.#selection,
+      );
 
     thisGraph.#updateGraph();
   };
@@ -269,16 +279,7 @@ class Graph {
     const thisGraph = this;
     e.stopPropagation();
 
-    if (thisGraph.#selection) {
-      thisGraph.#select(null);
-    }
-
-    const prevEdge = thisGraph.#selection.value;
-    if (!prevEdge || prevEdge !== d) {
-      thisGraph.#select(d);
-    } else {
-      thisGraph.#select(null);
-    }
+    thisGraph.#select([d]);
   };
 
 
@@ -346,7 +347,7 @@ class Graph {
         // dragged, not clicked
         thisGraph.#justDragged = false;
       } else {
-        thisGraph.#select(mouseUpNode);
+        thisGraph.#select([mouseUpNode]);
       }
     }
     thisGraph.#mouseDownNode = null;
@@ -385,23 +386,26 @@ class Graph {
 
     thisGraph.#lastKeyDown = e.keyCode;
 
-    const selection = thisGraph.#selection;
-
     switch (e.keyCode) {
     case consts.BACKSPACE_KEY:
     case consts.DELETE_KEY:
       // we cannot prevent default because then we cannot delete values from
       // search input
       // e.preventDefault();
-      if (selection.type === "node") {
-        // right now, we don't support deleting nodes from the graph view
-      } else if (selection.type === "edge") {
-        thisGraph.#links.splice(thisGraph.#links.indexOf(selection.value), 1);
-        thisGraph.#onChange();
-        thisGraph.#select(null);
-        thisGraph.#updateConnectedNodeIds();
-        thisGraph.#updateGraph();
-      }
+
+      // right now, we don't support deleting nodes from the graph view
+      // so let's consider only edges
+      this.#selection
+        .filter(thisGraph.#isEdge)
+        .forEach((edge) => {
+          thisGraph.#links.splice(thisGraph.#links.indexOf(edge), 1);
+        });
+
+      thisGraph.#onChange();
+      thisGraph.#select([]);
+      thisGraph.#updateConnectedNodeIds();
+      thisGraph.#updateGraph();
+
       break;
     }
   };
@@ -489,23 +493,23 @@ class Graph {
     // update existing links
     thisGraph.linkElements
       .classed(consts.selectedClass, function(edge) {
-        if (!thisGraph.#selection) return false;
-        return edge === thisGraph.#selection.value;
+        return thisGraph.#selection.includes(edge);
       })
       .attr("d", function(d) {
         return "M" + d.source.position.x + "," + d.source.position.y
           + "L" + d.target.position.x + "," + d.target.position.y;
       })
-      .classed("selected", (edge) => {
-        if (thisGraph.#selection.type !== "edge") return false;
-        return thisGraph.#selection.value === edge;
-      })
       .classed("connected-to-selected", (edge) => {
-        if (thisGraph.#selection.type !== "node") return false;
-        const selectedNodeId = thisGraph.#selection.value.id;
+        // only nodes can be connected to a link, links cannot be connected to
+        // other links
+
+        const idsOfSelectedNodes = this.#selection
+          .filter((val) => !thisGraph.#isEdge(val))
+          .map((val) => val.id);
+
         return (
-          edge.source.id === selectedNodeId
-          || edge.target.id === selectedNodeId
+          idsOfSelectedNodes.includes(edge.source.id)
+          || idsOfSelectedNodes.includes(edge.target.id)
         );
       });
 
@@ -576,12 +580,10 @@ class Graph {
         );
       })
       .classed("selected", (node) => {
-        if (thisGraph.#selection.type !== "node") return false;
-        return thisGraph.#selection.value.id === node.id;
+        return thisGraph.#selection.includes(node);
       })
       .classed("connected-to-selected", (node) => {
-        if (thisGraph.#selection.type === "null") return false;
-        return thisGraph.#selection.connectedNodeIds.includes(node.id);
+        return thisGraph.#connectedNodeIdsOfSelection.includes(node.id);
       });
 
 
@@ -709,18 +711,12 @@ class Graph {
   }
 
 
-  getSelectedNodeId() {
+  getSelectedNodeIds() {
     const thisGraph = this;
 
-    if (!thisGraph.#selection) {
-      return null;
-    }
-
-    if (thisGraph.#selection.type !== "node") {
-      return null;
-    }
-
-    return thisGraph.#selection.value.id;
+    return thisGraph.#selection
+      .filter((val) => !thisGraph.#isEdge(val))
+      .map((val) => val.id);
   }
 
 
