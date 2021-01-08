@@ -7,6 +7,7 @@ import * as Config from "./lib/config.js";
 import SearchInput from "./SearchInput.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import AppTitle from "./AppTitle.js";
+import GraphViewStatusIndicator from "./GraphViewStatusIndicator.js";
 
 
 const GraphView = ({
@@ -60,12 +61,8 @@ const GraphView = ({
 
 
   useEffect(() => {
-    const onHighlight = (isOn, value) => {
-      if (isOn) {
-        setStatus(value);
-      } else {
-        setStatus(DEFAULT_STATUS);
-      }
+    const onHighlight = (highlightDetails) => {
+      setStatus(highlightDetails);
     };
 
     databaseProvider.getGraphObject()
@@ -134,7 +131,6 @@ const GraphView = ({
               setActiveView("EDITOR");
             }}
           />
-          <p id="status">{status}</p>
         </>
       }
       rightContent={
@@ -149,6 +145,7 @@ const GraphView = ({
       }
     />
     <main id="main" className="main-graph" ref={mainElement}></main>
+    <GraphViewStatusIndicator status={status} />
   </>;
 };
 

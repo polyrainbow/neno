@@ -1,3 +1,9 @@
+.emoji {
+  font-family: apple color emoji,segoe ui emoji,noto color emoji,android emoji,emojisymbols,emojione mozilla,twemoji mozilla,segoe ui symbol;
+  font-weight: 400;
+}
+
+
 @media (prefers-color-scheme: light) {
   :root {
     --default-box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1),

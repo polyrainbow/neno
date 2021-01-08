@@ -1,7 +1,6 @@
 /* eslint-disable no-invalid-this */
 import * as d3 from "d3";
 import { binaryArrayIncludes } from "./utils.js";
-import { emojis } from "./config.js";
 
 
 class Graph {
@@ -66,14 +65,15 @@ class Graph {
       .attr("rx", 4)
       .attr("ry", 4)
       .on("mouseover", function() {
-        thisGraph.#onHighlight(
-          true,
-          emojis.new
-          + " Initial position for new nodes (drag and drop to move)",
-        );
+        thisGraph.#onHighlight({
+          active: true,
+          type: "new-nodes-position-indicator",
+        });
       })
       .on("mouseout", function() {
-        thisGraph.#onHighlight(false);
+        thisGraph.#onHighlight({
+          active: false,
+        });
       });
 
     thisGraph.nodeHighlighterContainer = mainSVGGroup.append("g")
@@ -562,13 +562,16 @@ class Graph {
         + "L" + d.target.position.x + "," + d.target.position.y;
       })
       .on("mouseover", function(e, d) {
-        thisGraph.#onHighlight(
-          true,
-          emojis.link + " " + d.source.title + " - " + d.target.title,
-        );
+        thisGraph.#onHighlight({
+          active: true,
+          type: "edge",
+          titles: [d.source.title, d.target.title],
+        });
       })
       .on("mouseout", function() {
-        thisGraph.#onHighlight(false);
+        thisGraph.#onHighlight({
+          active: false,
+        });
       })
       .on("mousedown", function(e, d) {
         thisGraph.#handleMouseDownOnEdge(e, d3.select(this), d);
@@ -654,11 +657,17 @@ class Graph {
         if (thisGraph.#newLinkCreationInProgress) {
           d3.select(this).classed(consts.connectClass, true);
         }
-        thisGraph.#onHighlight(true, emojis.note + " " + d.title);
+        thisGraph.#onHighlight({
+          active: true,
+          type: "node",
+          title: d.title,
+        });
       })
       .on("mouseout", function() {
         d3.select(this).classed(consts.connectClass, false);
-        thisGraph.#onHighlight(false);
+        thisGraph.#onHighlight({
+          active: false,
+        });
       })
       .on("mousedown", function(e, d) {
         thisGraph.#handleMouseDownOnNode(e, d3.select(this), d);
