@@ -33,7 +33,7 @@ class Graph {
   #justScaleTransGraph = false;
   #lastKeyDown = -1;
   #shiftDragInProgress = false;
-  #selection = [];
+  #selection = new Set();
   #connectedNodeIdsOfSelection = [];
 
   constructor(svg, graphObject, onHighlight, onChange) {
@@ -261,14 +261,16 @@ class Graph {
     const thisGraph = this;
 
     if (!addToExistingSelection) {
-      thisGraph.#selection = values;
+      thisGraph.#selection = new Set(values);
     } else {
-      thisGraph.#selection.push(...values);
+      values.forEach((value) => {
+        thisGraph.#selection.add(value);
+      });
     }
 
     thisGraph.#connectedNodeIdsOfSelection
       = this.#getConnectedNodeIdsOfSelection(
-        thisGraph.#selection,
+        Array.from(thisGraph.#selection),
       );
 
     thisGraph.#updateGraph();
@@ -395,7 +397,7 @@ class Graph {
 
       // right now, we don't support deleting nodes from the graph view
       // so let's consider only edges
-      this.#selection
+      Array.from(this.#selection)
         .filter(thisGraph.#isEdge)
         .forEach((edge) => {
           thisGraph.#links.splice(thisGraph.#links.indexOf(edge), 1);
@@ -493,7 +495,7 @@ class Graph {
     // update existing links
     thisGraph.linkElements
       .classed(consts.selectedClass, function(edge) {
-        return thisGraph.#selection.includes(edge);
+        return thisGraph.#selection.has(edge);
       })
       .attr("d", function(d) {
         return "M" + d.source.position.x + "," + d.source.position.y
@@ -503,7 +505,7 @@ class Graph {
         // only nodes can be connected to a link, links cannot be connected to
         // other links
 
-        const idsOfSelectedNodes = this.#selection
+        const idsOfSelectedNodes = Array.from(this.#selection)
           .filter((val) => !thisGraph.#isEdge(val))
           .map((val) => val.id);
 
@@ -580,7 +582,7 @@ class Graph {
         );
       })
       .classed("selected", (node) => {
-        return thisGraph.#selection.includes(node);
+        return thisGraph.#selection.has(node);
       })
       .classed("connected-to-selected", (node) => {
         return thisGraph.#connectedNodeIdsOfSelection.includes(node.id);
@@ -714,7 +716,7 @@ class Graph {
   getSelectedNodeIds() {
     const thisGraph = this;
 
-    return thisGraph.#selection
+    return Array.from(thisGraph.#selection)
       .filter((val) => !thisGraph.#isEdge(val))
       .map((val) => val.id);
   }
