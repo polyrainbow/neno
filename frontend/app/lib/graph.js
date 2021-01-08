@@ -18,7 +18,7 @@ class Graph {
     C_KEY: 67,
     S_KEY: 83,
     nodeRadius: 50,
-    newNodeIndicatorSize: 3 * 50,
+    newNodeIndicatorSize: 4 * 50,
   };
 
   #searchValue = "";
