@@ -14,6 +14,9 @@ class Graph {
     BACKSPACE_KEY: 8,
     DELETE_KEY: 46,
     ENTER_KEY: 13,
+    ESCAPE_KEY: 27,
+    C_KEY: 67,
+    S_KEY: 83,
     nodeRadius: 50,
     newNodeIndicatorSize: 3 * 50,
   };
@@ -32,9 +35,13 @@ class Graph {
   #justDragged = false;
   #justScaleTransGraph = false;
   #lastKeyDown = -1;
-  #shiftDragInProgress = false;
+  #newLinkCreationInProgress = false;
   #selection = new Set();
   #connectedNodeIdsOfSelection = [];
+
+  #shiftKeyIsPressed = false;
+  #ctrlKeyIsPressed = false;
+  #sKeyIsPressed = false;
 
   constructor(svg, graphObject, onHighlight, onChange) {
     const thisGraph = this;
@@ -89,23 +96,38 @@ class Graph {
     // drag single nodes, but not, if shift key is pressed
     thisGraph.nodeDrag = d3.drag()
       .subject(function(event) {
-        return { x: event.x, y: event.y };
+        return {
+          x: event.x,
+          y: event.y,
+        };
       })
       .filter(() => {
-        return (!thisGraph.shiftKeyIsPressed) && (!thisGraph.ctrlKeyIsPressed);
+        return (!thisGraph.#shiftKeyIsPressed)
+          && (!thisGraph.#ctrlKeyIsPressed)
+          && (!thisGraph.#sKeyIsPressed);
       })
       .on("drag", (e, d) => {
         const thisGraph = this;
         thisGraph.#justDragged = true;
-        d.position.x += e.dx;
-        d.position.y += e.dy;
+
+        const nodesToDrag = Array.from(thisGraph.#selection)
+          .filter((value) => !thisGraph.#isEdge(value));
+
+        // also drag mouse down node, regardless of if it's selected or not
+        if (!nodesToDrag.includes(d)) {
+          nodesToDrag.push(d);
+        }
+
+        nodesToDrag
+          .forEach((node) => {
+            node.position.x += e.dx;
+            node.position.y += e.dy;
+
+            thisGraph.#updatedNodes.add(node);
+          });
+
         thisGraph.#updateGraph(d);
         thisGraph.#onChange();
-      })
-      .on("end", function(e, d) {
-        if (e.shiftKey) return;
-        thisGraph.#select([d], false);
-        thisGraph.#updatedNodes.add(d);
       });
 
     // drag intitial node position indicator
@@ -205,7 +227,7 @@ class Graph {
 
   #newPathMove(e, originNode) {
     const thisGraph = this;
-    if (!thisGraph.#shiftDragInProgress) {
+    if (!thisGraph.#newLinkCreationInProgress) {
       return;
     }
 
@@ -281,7 +303,9 @@ class Graph {
     const thisGraph = this;
     e.stopPropagation();
 
-    thisGraph.#select([d]);
+    // when shift key is pressed down during mousedown,
+    // add edge to current selection
+    thisGraph.#select([d], e.shiftKey);
   };
 
 
@@ -290,7 +314,7 @@ class Graph {
     e.stopPropagation();
     thisGraph.#mouseDownNode = d;
     if (e.shiftKey) {
-      thisGraph.#shiftDragInProgress = e.shiftKey;
+      thisGraph.#newLinkCreationInProgress = true;
       // reposition dragged directed edge
       thisGraph.newLinkLine
         .classed("hidden", false)
@@ -299,16 +323,18 @@ class Graph {
           "M" + d.position.x + "," + d.position.y
           + "L" + d.position.x + "," + d.position.y,
         );
+    } else if (thisGraph.#sKeyIsPressed) {
+      thisGraph.#select([d], true);
     }
   };
 
 
   // mouseup on nodes
-  #handleMouseUpOnNode(d3node, mouseUpNode) {
+  #handleMouseUpOnNode(e, d3node, mouseUpNode) {
     const thisGraph = this;
     const consts = Graph.#consts;
     // reset the states
-    thisGraph.#shiftDragInProgress = false;
+    thisGraph.#newLinkCreationInProgress = false;
     d3node.classed(consts.connectClass, false);
 
     const mouseDownNode = thisGraph.#mouseDownNode;
@@ -348,8 +374,6 @@ class Graph {
       if (thisGraph.#justDragged) {
         // dragged, not clicked
         thisGraph.#justDragged = false;
-      } else {
-        thisGraph.#select([mouseUpNode]);
       }
     }
     thisGraph.#mouseDownNode = null;
@@ -364,8 +388,8 @@ class Graph {
       thisGraph.#justScaleTransGraph = false;
     }
 
-    // on mouse up, shift drag is always over
-    thisGraph.#shiftDragInProgress = false;
+    // on mouse up, new link creation process is always over
+    thisGraph.#newLinkCreationInProgress = false;
     thisGraph.newLinkLine.classed("hidden", true);
   };
 
@@ -376,11 +400,15 @@ class Graph {
     const consts = Graph.#consts;
 
     if (e.shiftKey) {
-      thisGraph.shiftKeyIsPressed = true;
+      thisGraph.#shiftKeyIsPressed = true;
     }
 
     if (e.ctrlKey) {
-      thisGraph.ctrlKeyIsPressed = true;
+      thisGraph.#ctrlKeyIsPressed = true;
+    }
+
+    if (e.keyCode === consts.S_KEY) {
+      thisGraph.#sKeyIsPressed = true;
     }
 
     // make sure repeated key presses don't register for each keydown
@@ -409,14 +437,22 @@ class Graph {
       thisGraph.#updateGraph();
 
       break;
+    case consts.ESCAPE_KEY:
+    case consts.C_KEY:
+      thisGraph.#select([]);
+      break;
     }
   };
 
 
   #svgKeyUp(e) {
     const thisGraph = this;
-    thisGraph.shiftKeyIsPressed = e.shiftKey;
-    thisGraph.ctrlKeyIsPressed = e.ctrlKey;
+    thisGraph.#shiftKeyIsPressed = e.shiftKey;
+    thisGraph.#ctrlKeyIsPressed = e.ctrlKey;
+
+    if (e.keyCode === Graph.#consts.S_KEY) {
+      thisGraph.#sKeyIsPressed = false;
+    }
 
     this.#lastKeyDown = -1;
   };
@@ -556,9 +592,16 @@ class Graph {
         function(d) {return d.id;},
       );
 
+    // update node positions of moved/dragged nodes
     thisGraph.nodeElements
       .filter((d) => {
-        return (draggedNode && (d.id === draggedNode.id));
+        const selectedNodeIds = Array.from(thisGraph.#selection)
+          .filter((value) => {
+            return !thisGraph.#isEdge(value);
+          })
+          .map((node) => node.id);
+
+        return draggedNode || selectedNodeIds.includes(d.id);
       })
       .attr(
         "transform",
@@ -566,12 +609,6 @@ class Graph {
           return "translate(" + d.position.x + "," + d.position.y + ")";
         },
       );
-
-    // if this function was called when dragging a node, then we need
-    // to deal neither with changing node colors nor with creating new nodes
-    if (draggedNode) {
-      return;
-    }
 
     // update existing nodes
     thisGraph.nodeElements
@@ -614,7 +651,7 @@ class Graph {
         },
       )
       .on("mouseover", function(e, d) {
-        if (thisGraph.#shiftDragInProgress) {
+        if (thisGraph.#newLinkCreationInProgress) {
           d3.select(this).classed(consts.connectClass, true);
         }
         thisGraph.#onHighlight(true, emojis.note + " " + d.title);
@@ -627,7 +664,7 @@ class Graph {
         thisGraph.#handleMouseDownOnNode(e, d3.select(this), d);
       })
       .on("mouseup", function(e, d) {
-        thisGraph.#handleMouseUpOnNode(d3.select(this), d);
+        thisGraph.#handleMouseUpOnNode(e, d3.select(this), d);
       })
       .on("click", function(e, d) {
         if (e.ctrlKey) {
