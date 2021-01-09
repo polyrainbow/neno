@@ -9,6 +9,7 @@ import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import ImportLinksDialog from "./ImportLinksDialog.js";
+import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 
 
 const EditorView = ({
@@ -28,8 +29,7 @@ const EditorView = ({
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
   const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
-  const [isImportLinksDialogOpen, setIsImportLinksDialogOpen]
-    = useState(false);
+  const [openDialog, setOpenDialog] = useState(null);
 
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -311,24 +311,32 @@ const EditorView = ({
 
   const importLinksAsNotes = async (links) => {
     await databaseProvider.importLinksAsNotes(links);
-    setIsImportLinksDialogOpen(false);
+    setOpenDialog(null);
     refreshNotesList();
   };
 
 
   return <>
     {
-      isImportLinksDialogOpen
+      openDialog === "IMPORT_LINKS"
         ? <ImportLinksDialog
           importLinksAsNotes={importLinksAsNotes}
-          onCancel={() => setIsImportLinksDialogOpen(false)}
+          onCancel={() => setOpenDialog(null)}
+        />
+        : null
+    }
+    {
+      openDialog === "EXPORT_DATABASE"
+        ? <ExportDatabaseDialog
+          onCancel={() => setOpenDialog(null)}
+          databaseProvider={databaseProvider}
         />
         : null
     }
     <EditorViewHeader
-      databaseProvider={databaseProvider}
       stats={stats}
-      openImportLinksDialog={() => setIsImportLinksDialogOpen(true)}
+      openExportDatabaseDialog={() => setOpenDialog("EXPORT_DATABASE")}
+      openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
       setActiveView={setActiveView}
     />
     <main>

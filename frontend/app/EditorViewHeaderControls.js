@@ -3,8 +3,8 @@ import IconButton from "./IconButton.js";
 import * as tokenManager from "./lib/tokenManager.js";
 
 const EditorViewHeaderControls = ({
-  databaseProvider,
   openImportLinksDialog,
+  openExportDatabaseDialog,
   setActiveView,
 }) => {
   return <section id="header-controls">
@@ -18,47 +18,9 @@ const EditorViewHeaderControls = ({
     />
     <IconButton
       id="button_archive"
-      title="Save database (without images and files)"
-      icon="save_alt"
-      onClick={async () => {
-        // create a new handle
-
-        const opts = {
-          types: [{
-            description: "JSON database file",
-            accept: { "application/json": [".json"] },
-          }],
-        };
-        const newHandle = await window.showSaveFilePicker(opts);
-        // create a FileSystemWritableFileStream to write to
-        const writableStream = await newHandle.createWritable();
-
-        const readableStream
-          = await databaseProvider.getReadableDatabaseStream(false);
-        await readableStream.pipeTo(writableStream);
-      }}
-    />
-    <IconButton
-      id="button_archive-with-uploads"
-      title="Save database (including images and files)"
+      title="Export database"
       icon="archive"
-      onClick={async () => {
-        // create a new handle
-
-        const opts = {
-          types: [{
-            description: "ZIP database file",
-            accept: { "application/zip": [".zip"] },
-          }],
-        };
-        const newHandle = await window.showSaveFilePicker(opts);
-        // create a FileSystemWritableFileStream to write to
-        const writableStream = await newHandle.createWritable();
-
-        const readableStream
-          = await databaseProvider.getReadableDatabaseStream(true);
-        await readableStream.pipeTo(writableStream);
-      }}
+      onClick={openExportDatabaseDialog}
     />
     <IconButton
       id="button_import_links_as_notes"

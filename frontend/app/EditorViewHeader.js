@@ -5,9 +5,9 @@ import AppStats from "./AppStats.js";
 import AppTitle from "./AppTitle.js";
 
 const EditorViewHeader = ({
-  databaseProvider,
   stats,
   openImportLinksDialog,
+  openExportDatabaseDialog,
   setActiveView,
 }) => {
   return (
@@ -18,7 +18,7 @@ const EditorViewHeader = ({
           <EditorViewHeaderControls
             setActiveView={setActiveView}
             openImportLinksDialog={openImportLinksDialog}
-            databaseProvider={databaseProvider}
+            openExportDatabaseDialog={openExportDatabaseDialog}
           />
         </>
       }
