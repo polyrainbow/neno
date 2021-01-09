@@ -2,18 +2,34 @@ import React, { useState } from "react";
 import Dialog from "./Dialog.js";
 import RadioGroup from "./RadioGroup.js";
 
+
 const ExportDatabaseDialog = ({
   databaseProvider,
   onCancel,
 }) => {
   const [withUploads, setWithUploads] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
+  const [bytesWritten, setBytesWritten] = useState(0);
 
 
   const exportDatabase = async (writableStream, withUploads) => {
     const readableStream
       = await databaseProvider.getReadableDatabaseStream(withUploads);
-    await readableStream.pipeTo(writableStream);
+
+    const reader = readableStream.getReader();
+    const writer = writableStream.getWriter();
+
+    console.log(reader);
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      const newBytesWritten = bytesWritten + value.length;
+      setBytesWritten(newBytesWritten);
+      await writer.write(value);
+    }
+
+    writer.close();
   };
 
 
@@ -34,7 +50,11 @@ const ExportDatabaseDialog = ({
     <h1>Export database</h1>
     {
       isBusy
-        ? <p>Please wait while the database is being exported ...</p>
+        ? <p>
+            Please wait while the database is being exported ...
+          <br />
+          {bytesWritten} bytes written.
+        </p>
         : <>
           <RadioGroup
             id="radioGroup_withUploads"
