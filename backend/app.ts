@@ -168,7 +168,7 @@ const startApp = async ({
   app.post(
     config.API_PATH + "graph",
     verifyJWT,
-    express.json(),
+    express.json({ limit: "1mb" }), // posting a graph can be somewhat larger
     async function(req, res) {
       try {
         await Notes.setGraph(req.body, req.userId);
