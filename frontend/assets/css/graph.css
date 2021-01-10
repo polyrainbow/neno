@@ -69,7 +69,7 @@ marker{
 g.node circle{
   fill: var(--node-fill-color);
   stroke: var(--node-stroke-color);
-  stroke-width: 2px;
+  stroke-width: 6px;
 }
 
 g.node.unconnected circle{
@@ -109,7 +109,7 @@ g.node-highlighter circle{
 path.link {
   fill: none;
   stroke: var(--link-stroke-color);
-  stroke-width: 6px;
+  stroke-width: 4px;
   cursor: default;
 }
 
