@@ -119,7 +119,7 @@ const GraphView = ({
               if (ids.length === 0) {
                 alert("Please select one note before opening it.");
                 return;
-              };
+              }
               if (ids.length > 1) {
                 alert("Please select only one note to open it.");
                 return;
