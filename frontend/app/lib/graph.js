@@ -126,7 +126,7 @@ class Graph {
             thisGraph.#updatedNodes.add(node);
           });
 
-        thisGraph.#updateGraph(d);
+        thisGraph.#updateGraph({ type: "NODE_DRAG", node: d });
         thisGraph.#onChange();
       });
 
@@ -459,7 +459,7 @@ class Graph {
 
 
   // call to propagate changes to graph
-  #updateGraph(draggedNode) {
+  #updateGraph(event) {
     const thisGraph = this;
     const consts = Graph.#consts;
 
@@ -598,6 +598,10 @@ class Graph {
     // update node positions of moved/dragged nodes
     thisGraph.nodeElements
       .filter((d) => {
+        if (event?.type === "INFLATION") return true;
+
+        const draggedNode = event?.type === "NODE_DRAG" && event.node;
+
         const selectedNodeIds = Array.from(thisGraph.#selection)
           .filter((value) => {
             return !thisGraph.#isEdge(value);
@@ -774,6 +778,22 @@ class Graph {
       thisGraph.#searchValue = newSearchValue;
     }
     thisGraph.#updateGraph();
+  }
+
+
+  inflateGraph(factor) {
+    const thisGraph = this;
+
+    thisGraph.#nodes
+      .forEach((node) => {
+        node.position.x *= factor;
+        node.position.y *= factor;
+
+        thisGraph.#updatedNodes.add(node);
+      });
+
+    thisGraph.#updateGraph({ type: "INFLATION" });
+    thisGraph.#onChange();
   }
 }
 

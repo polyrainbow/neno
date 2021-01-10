@@ -131,6 +131,14 @@ const GraphView = ({
               setActiveView("EDITOR");
             }}
           />
+          <IconButton
+            icon="zoom_out_map"
+            title="Inflate graph by 10%"
+            onClick={async () => {
+              if (!graphInstance.current) return;
+              graphInstance.current.inflateGraph(1.1);
+            }}
+          />
         </>
       }
       rightContent={

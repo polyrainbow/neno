@@ -23,8 +23,6 @@ const ExportDatabaseDialog = ({
     const reader = readableStream.getReader();
     const writer = writableStream.getWriter();
 
-    console.log(reader);
-
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
