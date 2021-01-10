@@ -1,4 +1,4 @@
-import { cloneObject } from "../utils.js";
+import { cloneObject, humanFileSize } from "../utils.js";
 import { FileId } from "../../interfaces/FileId.js";
 import { DatabaseId } from "../../interfaces/DatabaseId.js";
 import { Readable } from "stream";
@@ -206,7 +206,8 @@ const getReadableDatabaseStream = async (
   // on stream closed we can end the request
   archive.on("end", function() {
     const size = archive.pointer();
-    console.log(`Archive for ${databaseId} created. Size: ${size} bytes`);
+    const humanSize = humanFileSize(size);
+    console.log(`Archive for ${databaseId} created. Size: ${humanSize}`);
   });
 
   const mainDataStream = await getReadableMainDataStream(databaseId);
