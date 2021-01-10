@@ -9,10 +9,12 @@ const yyyymmdd = (date) => {
   );
 };
 
+
 const htmlDecode = (input) => {
   const doc = new DOMParser().parseFromString(input, "text/html");
   return doc.documentElement.textContent;
 };
+
 
 const getParameterByName = (name, url) => {
   if (!url) url = window.location.href;
@@ -163,6 +165,15 @@ function humanFileSize(bytes, si = false, dp = 1) {
 }
 
 
+const shortenText = (text, maxLength) => {
+  if (text.length > maxLength) {
+    return text.trim().substr(0, maxLength) + "…";
+  } else {
+    return text;
+  }
+};
+
+
 export {
   yyyymmdd,
   htmlDecode,
@@ -173,4 +184,5 @@ export {
   binaryArrayFind,
   binaryArrayIncludes,
   humanFileSize,
+  shortenText,
 };

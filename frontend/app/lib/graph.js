@@ -1,6 +1,6 @@
 /* eslint-disable no-invalid-this */
 import * as d3 from "d3";
-import { binaryArrayIncludes } from "./utils.js";
+import { binaryArrayIncludes, shortenText } from "./utils.js";
 
 
 class Graph {
@@ -18,6 +18,7 @@ class Graph {
     S_KEY: 83,
     nodeRadius: 50,
     newNodeIndicatorSize: 4 * 50,
+    MAX_NODE_TEXT_LENGTH: 55,
   };
 
   #searchValue = "";
@@ -247,7 +248,11 @@ class Graph {
   // insert svg line breaks: taken from
   // http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts
   #insertTitleLinebreaks(gEl, title) {
-    const words = (title && title.split(/\s+/g)) || "";
+    const titleShortened = shortenText(
+      title,
+      Graph.#consts.MAX_NODE_TEXT_LENGTH,
+    );
+    const words = (titleShortened && titleShortened.split(/\s+/g)) || "";
     const nwords = words.length;
     const el = gEl.append("text")
       .attr("text-anchor", "middle")
