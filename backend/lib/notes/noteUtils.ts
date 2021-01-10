@@ -15,13 +15,13 @@ import UserNoteChange from "../../interfaces/UserNoteChange.js";
 import { UserNoteChangeType } from "../../interfaces/UserNoteChangeType.js";
 import * as Utils from "../utils.js";
 
-const getNoteTitle = (note:Note):string => {
+const getNoteTitle = (note:Note, maxLength = 800):string => {
   if (typeof note?.editorData?.blocks?.[0]?.data?.text === "string") {
     let title
       = Utils.unescapeHTML(note.editorData.blocks[0].data.text).trim();
 
-    if (title.length > 800) {
-      title = title.trim().substr(0, 800) + " ...";
+    if (title.length > maxLength) {
+      title = title.trim().substr(0, maxLength) + " …";
     }
 
     return title;

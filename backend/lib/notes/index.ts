@@ -149,7 +149,7 @@ const getGraph = async (userId: UserId):Promise<Graph> => {
   const graphNodes:GraphNode[] = db.notes.map((note) => {
     const graphNode:GraphNode = {
       id: note.id,
-      title: getNoteTitle(note),
+      title: getNoteTitle(note, 55),
       position: note.position,
       linkedNotes: getLinkedNotes(db, note.id),
       creationTime: note.creationTime,
