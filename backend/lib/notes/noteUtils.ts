@@ -301,6 +301,17 @@ const getNumberOfCharacters = (note:DatabaseNote):number => {
 };
 
 
+const getURLsOfNote = (note:DatabaseNote):string[] => {
+  return note.editorData.blocks
+    .filter((block) => {
+      return block.type === "linkTool";
+    })
+    .map((block) => {
+      return block.data.link;
+    });
+}
+
+
 export {
   getNoteTitle,
   removeDefaultTextParagraphs,
@@ -318,4 +329,5 @@ export {
   getNoteFeatures,
   getSortFunction,
   getNumberOfCharacters,
+  getURLsOfNote,
 };

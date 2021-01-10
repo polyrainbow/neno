@@ -338,6 +338,9 @@ const EditorView = ({
       openExportDatabaseDialog={() => setOpenDialog("EXPORT_DATABASE")}
       openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
       setActiveView={setActiveView}
+      showNotesWithDuplicateURLs={() => handleSearchInputChange(
+        "special:DUPLICATE_URLS",
+      )}
     />
     <main>
       <div id="left-view">

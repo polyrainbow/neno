@@ -18,6 +18,7 @@ import {
   getSortFunction,
   getNumberOfLinkedNotes,
   getNumberOfCharacters,
+  getURLsOfNote,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "../../interfaces/DatabaseMainData.js";
@@ -82,30 +83,50 @@ const getNotesList = async (
     = options.sortMode || NoteListSortMode.CREATION_DATE_DESCENDING;
 
   const db: Database = await DB.getMainData(userId);
-  const matchingNotes = db.notes
+
+  let matchingNotes;
+
+  if (query.includes("special:DUPLICATE_URLS")){
+    matchingNotes = db.notes
     // filter notes that match the search query
-    .filter((note:DatabaseNote) => {
-      if (query.length === 0) {
-        return true;
-      }
+    .filter((n1:DatabaseNote, i:number, notes:DatabaseNote[]) => {
+      const n1URLs = getURLsOfNote(n1);
 
-      if (query.length > 0 && query.length < 3) {
-        return false;
-      }
 
-      const title = getNoteTitle(note);
-      const queryTokens = query.split(" ");
+      const duplicate = notes.find((n2:DatabaseNote, n2_i:number):boolean => {
+        if (n2_i === i) return false;
+        const n2URLs = getURLsOfNote(n2);
+        return n1URLs.some((n1Link) => n2URLs.includes(n1Link));
+      });
+      
+      return !!duplicate;
+    });
+  } else {
+    matchingNotes = db.notes
+      // filter notes that match the search query
+      .filter((note:DatabaseNote) => {
+        if (query.length === 0) {
+          return true;
+        }
 
-      if (caseSensitiveQuery) {
-        return queryTokens.every((queryToken) => {
-          return title.includes(queryToken);
-        });
-      } else {
-        return queryTokens.every((queryToken) => {
-          return title.toLowerCase().includes(queryToken.toLowerCase());
-        });
-      }
-    })
+        if (query.length > 0 && query.length < 3) {
+          return false;
+        }
+
+        const title = getNoteTitle(note);
+        const queryTokens = query.split(" ");
+
+        if (caseSensitiveQuery) {
+          return queryTokens.every((queryToken) => {
+            return title.includes(queryToken);
+          });
+        } else {
+          return queryTokens.every((queryToken) => {
+            return title.toLowerCase().includes(queryToken.toLowerCase());
+          });
+        }
+      });
+  }
 
   // now we need to transform all notes into NoteListItems before we can
   // sort those

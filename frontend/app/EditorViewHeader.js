@@ -9,6 +9,7 @@ const EditorViewHeader = ({
   openImportLinksDialog,
   openExportDatabaseDialog,
   setActiveView,
+  showNotesWithDuplicateURLs,
 }) => {
   return (
     <HeaderContainer
@@ -19,6 +20,7 @@ const EditorViewHeader = ({
             setActiveView={setActiveView}
             openImportLinksDialog={openImportLinksDialog}
             openExportDatabaseDialog={openExportDatabaseDialog}
+            showNotesWithDuplicateURLs={showNotesWithDuplicateURLs}
           />
         </>
       }

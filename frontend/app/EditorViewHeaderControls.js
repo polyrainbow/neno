@@ -6,6 +6,7 @@ const EditorViewHeaderControls = ({
   openImportLinksDialog,
   openExportDatabaseDialog,
   setActiveView,
+  showNotesWithDuplicateURLs,
 }) => {
   return <section id="header-controls">
     <IconButton
@@ -27,6 +28,12 @@ const EditorViewHeaderControls = ({
       title="Import links as notes"
       icon="dynamic_feed"
       onClick={openImportLinksDialog}
+    />
+    <IconButton
+      id="button_show_notes_with_duplicate_urls"
+      title="Show notes with same URLs"
+      icon="search"
+      onClick={showNotesWithDuplicateURLs}
     />
     <IconButton
       id="button_logout"
