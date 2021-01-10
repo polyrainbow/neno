@@ -112,11 +112,18 @@ const GraphView = ({
           />
           <IconButton
             icon="open_in_browser"
-            title="Show note"
+            title="Open note in editor"
             onClick={async () => {
               if (!graphInstance.current) return;
-              const id = graphInstance.current.getSelectedNodeId();
-              if (typeof id !== "number") return;
+              const ids = graphInstance.current.getSelectedNodeIds();
+              if (ids.length === 0) {
+                alert("Please select one note before opening it.");
+                return;
+              };
+              if (ids.length > 1) {
+                alert("Please select only one note to open it.");
+                return;
+              }
 
               if (unsavedChanges) {
                 await confirm({
@@ -127,7 +134,7 @@ const GraphView = ({
                 });
               }
 
-              setInitialNoteId(id);
+              setInitialNoteId(ids[0]);
               setActiveView("EDITOR");
             }}
           />
