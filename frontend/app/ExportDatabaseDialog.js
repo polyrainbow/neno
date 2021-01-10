@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Dialog from "./Dialog.js";
 import RadioGroup from "./RadioGroup.js";
+import { humanFileSize } from "./lib/utils.js";
 
 
 const ExportDatabaseDialog = ({
@@ -8,8 +9,11 @@ const ExportDatabaseDialog = ({
   onCancel,
 }) => {
   const [withUploads, setWithUploads] = useState(false);
-  const [isBusy, setIsBusy] = useState(false);
-  const [bytesWritten, setBytesWritten] = useState(0);
+  // status can be READY, BUSY, DONE
+  const [status, setStatus] = useState("READY");
+  const bytesWrittenContainer = useRef(0);
+  const [bytesWrittenDisplayed, setBytesWrittenDisplayed] = useState(0);
+  const animationFrameRequestContainer = useRef();
 
 
   const exportDatabase = async (writableStream, withUploads) => {
@@ -24,8 +28,8 @@ const ExportDatabaseDialog = ({
     while (true) {
       const { value, done } = await reader.read();
       if (done) break;
-      const newBytesWritten = bytesWritten + value.length;
-      setBytesWritten(newBytesWritten);
+      const newBytesWritten = bytesWrittenContainer.current + value.length;
+      bytesWrittenContainer.current = newBytesWritten;
       await writer.write(value);
     }
 
@@ -41,21 +45,56 @@ const ExportDatabaseDialog = ({
   };
 
 
+  const animate = () => {
+    setBytesWrittenDisplayed(bytesWrittenContainer.current);
+    requestAnimationFrame(animate);
+  };
+
+
+  useEffect(() => {
+    animationFrameRequestContainer.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrameRequestContainer.current);
+  });
+
+
+  const fileSizeWritten = humanFileSize(bytesWrittenDisplayed, false, 1);
+
+
   return <Dialog
     onClickOnOverlay={() => {
-      if (!isBusy) onCancel();
+      if (status !== "BUSY") onCancel();
     }}
     className="import-link-dialog"
   >
     <h1>Export database</h1>
     {
-      isBusy
-        ? <p>
-            Please wait while the database is being exported ...
-          <br />
-          {bytesWritten} bytes written.
-        </p>
-        : <>
+      status === "DONE"
+        ? <>
+          <p>Finished exporting database.
+            <br/>
+            {fileSizeWritten} written.
+          </p>
+          <button
+            onClick={onCancel}
+            className="default-button dialog-box-button default-action"
+          >Close</button>
+        </>
+        : ""
+    }
+    {
+      status === "BUSY"
+        ? <>
+          <p>
+              Please wait while the database is being exported ...
+            <br />
+            {fileSizeWritten} written.
+          </p>
+        </>
+        : ""
+    }
+    {
+      status === "READY"
+        ? <>
           <RadioGroup
             id="radioGroup_withUploads"
             options={[
@@ -90,10 +129,9 @@ const ExportDatabaseDialog = ({
 
               const writableStream = await getWritableStream(opts);
 
-              setIsBusy(true);
+              setStatus("BUSY");
               await exportDatabase(writableStream, withUploads);
-              setIsBusy(false);
-              onCancel();
+              setStatus("DONE");
             }}
             className="default-button dialog-box-button default-action"
           >Export</button>
@@ -102,6 +140,7 @@ const ExportDatabaseDialog = ({
             className="default-button dialog-box-button"
           >Cancel</button>
         </>
+        : ""
     }
   </Dialog>;
 };
