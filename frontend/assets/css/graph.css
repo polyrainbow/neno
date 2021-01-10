@@ -5,10 +5,11 @@
     --node-fill-color: #F6FBFF;
     --hub-color: rgb(90, 156, 255);
     --new-node-color: rgb(28, 255, 115);
-    --node-text-color: black;
+    --main-text-color: black;
     --link-stroke-color: #333;
     --status-color: rgb(250, 113, 255);
     --hover-color: rgb(134, 228, 105);
+    --connected-to-selected-color: rgb(255, 213, 28);
   }
 }
 
@@ -19,9 +20,10 @@
     --node-fill-color: #555555;
     --hub-color: #0043ff;
     --new-node-color: #00a23e;
-    --node-text-color: white;
+    --main-text-color: white;
     --link-stroke-color: #9e9e9e;
-    --hover-color: rgb(134, 228, 105);
+    --hover-color: rgb(62, 160, 32);
+    --connected-to-selected-color: rgb(129, 109, 17);
   }
 }
 
@@ -52,7 +54,7 @@
 
 .node text{
   pointer-events: none;
-  fill: var(--node-text-color);
+  fill: var(--main-text-color);
 }
 
 .node text tspan {
@@ -83,7 +85,7 @@ g.node.new circle{
 }
 
 g.node.connected-to-selected circle{
-  fill: rgb(255, 213, 28);
+  fill: var(--connected-to-selected-color);
 }
 
 g.node.selected circle{
@@ -134,7 +136,7 @@ path.link.selected {
 }
 
 g.new-node-position-indicator rect {
-  fill: rgb(134, 228, 105);
+  fill: var(--hover-color);
   stroke-width: 5;
   stroke: rgb(40, 170, 0)
 }
@@ -145,4 +147,5 @@ g.new-node-position-indicator rect {
   bottom: 0px;
   left: 0px;
   padding: 15px;
+  color: var(--main-text-color);
 }
