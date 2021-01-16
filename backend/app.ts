@@ -398,7 +398,7 @@ const startApp = async ({
         return;
       }
 
-      const handleResourceResponse = (resourceResponse) => {
+      const handleResourceResponse = async (resourceResponse) => {
         const mimeType = resourceResponse.headers['content-type'];
         const size = parseInt(resourceResponse.headers['content-length']);
 
@@ -420,24 +420,28 @@ const startApp = async ({
           return;
         }
 
-        Notes.addFile(req.userId, resourceResponse, mimeType)
-          .then((fileId) => {
-            const response:APIResponse = {
-              success: true,
-              payload: {
-                id: fileId,
-                size,
-              },
-            };
-            res.json(response);
-          })
-          .catch((e) => {
-            const response:APIResponse = {
-              success: false,
-              error: e.message,
-            };
-            res.json(response);
-          });
+        try {
+          const fileId = await Notes.addFile(
+            req.userId,
+            resourceResponse,
+            mimeType,
+          );
+
+          const response:APIResponse = {
+            success: true,
+            payload: {
+              id: fileId,
+              size,
+            },
+          };
+          res.json(response);
+        } catch (e) {
+          const response:APIResponse = {
+            success: false,
+            error: e.message,
+          };
+          res.status(406).json(response);
+        }
       }
 
       if (url.startsWith("http://")) {
