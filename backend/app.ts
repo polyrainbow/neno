@@ -445,9 +445,27 @@ const startApp = async ({
       }
 
       if (url.startsWith("http://")) {
-        http.get(url, handleResourceResponse);
+        http
+          .get(url, handleResourceResponse)
+          // handle possible ECONNRESET errors
+          .on("error", (e) => {
+            const response:APIResponse = {
+              success: false,
+              error: e.message as APIError,
+            };
+            res.status(406).json(response);
+          });
       } else if (url.startsWith("https://")) {
-        https.get(url, handleResourceResponse);
+        https
+          .get(url, handleResourceResponse)
+          // handle possible ECONNRESET errors
+          .on("error", (e) => {
+            const response:APIResponse = {
+              success: false,
+              error: e.message as APIError,
+            };
+            res.status(406).json(response);
+          });
       } else {
         const response:APIResponse = {
           success: false,
