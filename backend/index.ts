@@ -7,12 +7,23 @@ import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
 import User from "./interfaces/User.js";
 import getUsers from "./users.js";
+import { getUrlMetadata } from "./lib/notes/index.js";
 
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REPO_PATH = path.join(__dirname, "..");
 const VERSION = "1.0.0";
 const program = getProgramArguments(VERSION);
+
+if (program.urlMetadata.length > 0) {
+  console.log("Grabbing url metadata for " + program.urlMetadata);
+  try {
+    await getUrlMetadata(program.urlMetadata, true);
+  } catch (e) {
+    console.log(e);
+  }
+  process.exit(0);
+}
 
 const users: User[] = getUsers(program.dataFolderPath);
 

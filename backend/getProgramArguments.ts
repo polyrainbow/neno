@@ -46,6 +46,11 @@ const getArguments = (version) => {
       '--jwt-secret <value>',
       "secret for signing JSON web tokens for authentication",
       uuidv4(),
+    )
+    .option(
+      '--url-metadata <value>',
+      "don't start server, only grab url metadata for given url",
+      "",
     );
   
   program.parse(process.argv);
