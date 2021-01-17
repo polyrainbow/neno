@@ -199,7 +199,12 @@ const uploadFileByUrl = async (data) => {
 const fetchURLMetadata = async (url) => {
   const requestUrl = "link-data?url=" + url;
   const response = await callAPI("GET", requestUrl, null, "json");
-  return response;
+
+  if (!response.success) {
+    throw new Error(response.error);
+  }
+
+  return response.payload;
 };
 
 

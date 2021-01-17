@@ -3,20 +3,26 @@ import UrlMetadataResponse from "../../interfaces/UrlMetadataResponse.js";
 
 const getUrlMetadata = async (
   url:string,
+  verbose = false,
 ):Promise<UrlMetadataResponse> => {
   const metadata = await urlMetadata(url);
 
-  const response:UrlMetadataResponse = {
-    "success": 1,
-    "url": url,
-    "meta": {
-      "title": metadata.title,
-      "description": metadata.description,
-      "image": {
-        "url": metadata.image,
-      },
-    },
+  if (verbose) {
+    console.log("URL METADATA RECEIVED:");
+    console.log(metadata);
+  }
+
+  const response = {
+    url,
+    title: metadata.title,
+    description: metadata.description,
+    image: metadata.image,
   };
+
+  if (verbose) {
+    console.log("URL METADATA RESPONSE OBJECT:");
+    console.log(response);
+  }
 
   return response;
 };

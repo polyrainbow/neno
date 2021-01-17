@@ -498,8 +498,6 @@ const startApp = async ({
   );
 
 
-  // currently returns a custom response style required by the editor.js
-  // link plugin
   app.get(
     config.API_PATH + "link-data",
     verifyJWT,
@@ -508,11 +506,16 @@ const startApp = async ({
 
       try {
         const metadata = await Notes.getUrlMetadata(url as string);
-        res.end(JSON.stringify(metadata));
+
+        const response:APIResponse = {
+          success: true,
+          payload: metadata,
+        };
+        res.json(response);
       } catch (e) {
-        const response = {
-          "success": 0,
-          "error": e,
+        const response:APIResponse = {
+          "success": false,
+          "error": e.message,
         };
         res.json(response);
       }

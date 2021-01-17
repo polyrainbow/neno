@@ -366,7 +366,7 @@ const importLinksAsNotes = async (userId, links) => {
           {
             "type": "header",
             "data": {
-              "text": urlMetadataObject.meta.title,
+              "text": urlMetadataObject.title,
               "level": 1,
             },
           },
@@ -374,7 +374,13 @@ const importLinksAsNotes = async (userId, links) => {
             "type": "linkTool",
             "data": {
               "link": urlMetadataObject.url,
-              "meta": urlMetadataObject.meta,
+              "meta": {
+                "title": urlMetadataObject.title,
+                "description": urlMetadataObject.description,
+                "image": {
+                  "url": urlMetadataObject.image,
+                },
+              }
             },
           },
         ],
