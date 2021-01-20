@@ -8,8 +8,6 @@ import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
-import ImportLinksDialog from "./ImportLinksDialog.js";
-import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 
 
 const EditorView = ({
@@ -18,6 +16,8 @@ const EditorView = ({
   unsavedChanges,
   setUnsavedChanges,
   initialNoteId,
+  toggleAppMenu,
+  setOpenDialog,
 }) => {
   const currentRequestId = useRef(null);
   const [noteListItems, setNoteListItems] = useState([]);
@@ -29,7 +29,6 @@ const EditorView = ({
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
   const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
-  const [openDialog, setOpenDialog] = useState(null);
 
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -309,38 +308,15 @@ const EditorView = ({
   }, [searchValue, page, sortMode]);
 
 
-  const importLinksAsNotes = async (links) => {
-    await databaseProvider.importLinksAsNotes(links);
-    setOpenDialog(null);
-    refreshNotesList();
-  };
-
-
   return <>
-    {
-      openDialog === "IMPORT_LINKS"
-        ? <ImportLinksDialog
-          importLinksAsNotes={importLinksAsNotes}
-          onCancel={() => setOpenDialog(null)}
-        />
-        : null
-    }
-    {
-      openDialog === "EXPORT_DATABASE"
-        ? <ExportDatabaseDialog
-          onCancel={() => setOpenDialog(null)}
-          databaseProvider={databaseProvider}
-        />
-        : null
-    }
     <EditorViewHeader
       stats={stats}
-      openExportDatabaseDialog={() => setOpenDialog("EXPORT_DATABASE")}
       openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
       setActiveView={setActiveView}
       showNotesWithDuplicateURLs={() => handleSearchInputChange(
         "special:DUPLICATE_URLS",
       )}
+      toggleAppMenu={toggleAppMenu}
     />
     <main>
       <div id="left-view">

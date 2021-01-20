@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import AppTitle from "./AppTitle.js";
 import HeaderContainer from "./HeaderContainer.js";
 
 
@@ -30,12 +29,7 @@ const LoginView = ({
 
 
   return <>
-    <HeaderContainer
-      leftContent={
-        <AppTitle />
-      }
-      rightContent={null}
-    />
+    <HeaderContainer />
     <section id="section_login">
       <h1>Login</h1>
       {

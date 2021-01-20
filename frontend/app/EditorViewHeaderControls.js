@@ -1,10 +1,8 @@
 import React from "react";
 import IconButton from "./IconButton.js";
-import * as tokenManager from "./lib/tokenManager.js";
 
 const EditorViewHeaderControls = ({
   openImportLinksDialog,
-  openExportDatabaseDialog,
   setActiveView,
   showNotesWithDuplicateURLs,
 }) => {
@@ -18,12 +16,6 @@ const EditorViewHeaderControls = ({
       }}
     />
     <IconButton
-      id="button_archive"
-      title="Export database"
-      icon="archive"
-      onClick={openExportDatabaseDialog}
-    />
-    <IconButton
       id="button_import_links_as_notes"
       title="Import links as notes"
       icon="dynamic_feed"
@@ -34,15 +26,6 @@ const EditorViewHeaderControls = ({
       title="Show notes with same URLs"
       icon="search"
       onClick={showNotesWithDuplicateURLs}
-    />
-    <IconButton
-      id="button_logout"
-      title="Logout"
-      icon="lock"
-      onClick={() => {
-        tokenManager.remove();
-        setActiveView("LOGIN");
-      }}
     />
   </section>;
 };

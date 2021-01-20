@@ -76,6 +76,14 @@
   --main-ui-font-size: 24px;
 }
 
+#app-menu {
+  background-color: var(--header-background-color);
+}
+
+.app-menu-item:hover{
+  background-color: var(--accent-color-1-light);
+}
+
 input, select {
   border: var(--input-border-width) solid var(--main-content-color) !important;
   font-size: var(--main-ui-font-size);

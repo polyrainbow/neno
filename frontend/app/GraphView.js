@@ -6,7 +6,6 @@ import { initGraph } from "./lib/graph.js";
 import * as Config from "./lib/config.js";
 import SearchInput from "./SearchInput.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
-import AppTitle from "./AppTitle.js";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator.js";
 
 
@@ -16,6 +15,7 @@ const GraphView = ({
   unsavedChanges,
   setUnsavedChanges,
   setInitialNoteId,
+  toggleAppMenu,
 }) => {
   const DEFAULT_STATUS = "";
   const mainElement = useRef(null);
@@ -86,9 +86,9 @@ const GraphView = ({
 
   return <>
     <HeaderContainer
+      toggleAppMenu={toggleAppMenu}
       leftContent={
         <>
-          <AppTitle />
           <IconButton
             icon="create"
             title="Editor View"

@@ -2,7 +2,6 @@ import React from "react";
 import HeaderContainer from "./HeaderContainer.js";
 import EditorViewHeaderControls from "./EditorViewHeaderControls.js";
 import AppStats from "./AppStats.js";
-import AppTitle from "./AppTitle.js";
 
 const EditorViewHeader = ({
   stats,
@@ -10,17 +9,19 @@ const EditorViewHeader = ({
   openExportDatabaseDialog,
   setActiveView,
   showNotesWithDuplicateURLs,
+  toggleAppMenu,
 }) => {
   return (
     <HeaderContainer
+      toggleAppMenu={toggleAppMenu}
+      openExportDatabaseDialog={openExportDatabaseDialog}
       leftContent={
         <>
-          <AppTitle />
           <EditorViewHeaderControls
             setActiveView={setActiveView}
             openImportLinksDialog={openImportLinksDialog}
-            openExportDatabaseDialog={openExportDatabaseDialog}
             showNotesWithDuplicateURLs={showNotesWithDuplicateURLs}
+            toggleAppMenu={toggleAppMenu}
           />
         </>
       }

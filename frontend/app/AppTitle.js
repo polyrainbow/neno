@@ -1,8 +1,14 @@
 import React from "react";
 
 
-const AppTitle = () => {
-  return <h1 id="heading">NENO</h1>;
+const AppTitle = ({ toggleAppMenu }) => {
+  return <h1
+    onClick={toggleAppMenu}
+    id="heading"
+    style={{
+      cursor: toggleAppMenu ? "pointer" : "inherit",
+    }}
+  >NENO</h1>;
 };
 
 export default AppTitle;
