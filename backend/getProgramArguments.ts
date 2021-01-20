@@ -55,7 +55,9 @@ const getArguments = (version) => {
   
   program.parse(process.argv);
 
-  return program;
+  const opts = program.opts();
+
+  return opts;
 }
 
 export default getArguments;

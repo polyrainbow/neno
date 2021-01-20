@@ -13,59 +13,60 @@ import { getUrlMetadata } from "./lib/notes/index.js";
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REPO_PATH = path.join(__dirname, "..");
 const VERSION = "1.0.0";
-const program = getProgramArguments(VERSION);
+const programArguments = getProgramArguments(VERSION);
 
-if (program.urlMetadata.length > 0) {
-  console.log("Grabbing url metadata for " + program.urlMetadata);
+if (programArguments.urlMetadata.length > 0) {
+  console.log("Grabbing url metadata for " + programArguments.urlMetadata);
   try {
-    await getUrlMetadata(program.urlMetadata, true);
+    await getUrlMetadata(programArguments.urlMetadata, true);
   } catch (e) {
     console.log(e);
   }
   process.exit(0);
 }
 
-const users: User[] = getUsers(program.dataFolderPath);
+const users: User[] = getUsers(programArguments.dataFolderPath);
 
 const app = await startApp({
   users,
-  dataPath: program.dataFolderPath,
+  dataPath: programArguments.dataFolderPath,
   frontendPath: path.join(REPO_PATH, "frontend"),
-  jwtSecret: program.jwtSecret,
+  jwtSecret: programArguments.jwtSecret,
 });
 
 
-if (program.useHttps) {
+if (programArguments.useHttps) {
   const httpsServer = https.createServer(
     {
-      key: fs.readFileSync(program.certKeyPath),
-      cert: fs.readFileSync(program.certPath)
+      key: fs.readFileSync(programArguments.certKeyPath),
+      cert: fs.readFileSync(programArguments.certPath)
     },
     app as RequestListener,
   );
 
-  httpsServer.listen(parseInt(program.httpsPort));
+  httpsServer.listen(parseInt(programArguments.httpsPort));
 
-  console.log("HTTPS access ready on port " + program.httpsPort);
+  console.log("HTTPS access ready on port " + programArguments.httpsPort);
   
-  if (program.port == "80" && program.httpsPort == "443") {
+  if (programArguments.port == "80" && programArguments.httpsPort == "443") {
     // redirect http requests to https
     http.createServer(function (req, res) {
       res.writeHead(301, {
         "Location": "https://" + req.headers['host'] + req.url,
       });
       res.end();
-    }).listen(program.port);
+    }).listen(programArguments.port);
 
     console.log(
-      "HTTP requests to port " + program.port + " will be redirected to HTTPS.",
+      "HTTP requests to port "
+      + programArguments.port + " will be redirected to HTTPS.",
     );
   }
 } else {
   const httpServer = http.createServer(app);
-  httpServer.listen(parseInt(program.port));
+  httpServer.listen(parseInt(programArguments.port));
 
-  console.log("HTTP access ready on port " + program.port);
+  console.log("HTTP access ready on port " + programArguments.port);
 }
 
 
