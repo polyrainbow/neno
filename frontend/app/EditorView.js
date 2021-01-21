@@ -288,7 +288,7 @@ const EditorView = ({
 
 
   // startup
-  useEffect(() => {
+  useEffect(async () => {
     if (typeof initialNoteId === "number") {
       loadNote(initialNoteId);
       return;
@@ -303,6 +303,9 @@ const EditorView = ({
     }
 
     loadNote(null);
+
+    const pinnedNotes = await databaseProvider.getPins();
+    setPinnedNotes(pinnedNotes);
   }, []);
 
 

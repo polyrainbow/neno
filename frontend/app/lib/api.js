@@ -230,6 +230,17 @@ const unpinNote = async (noteId) => {
 };
 
 
+const getPins = async () => {
+  const response = await callAPI("GET", "pins");
+
+  if (!response.success) {
+    throw new Error("Error getting pins!");
+  }
+
+  return response.payload;
+};
+
+
 export {
   login,
   getNote,
@@ -247,5 +258,6 @@ export {
   fetchURLMetadata,
   pinNote,
   unpinNote,
+  getPins,
 };
 

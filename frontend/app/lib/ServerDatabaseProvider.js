@@ -69,4 +69,8 @@ export default class ServerDatabaseProvider {
   unpinNote(noteId) {
     return API.unpinNote(noteId);
   }
+
+  getPins() {
+    return API.getPins();
+  }
 }

@@ -2,6 +2,7 @@ import React from "react";
 import HeaderContainer from "./HeaderContainer.js";
 import EditorViewHeaderControls from "./EditorViewHeaderControls.js";
 import AppStats from "./AppStats.js";
+import { shortenText } from "./lib/utils.js";
 
 const PinnedNote = ({
   note,
@@ -9,7 +10,7 @@ const PinnedNote = ({
 }) => {
   return <div
     style={{
-      borderLeft: "5px solid black",
+      margin: "0px 10px",
       display: "flex",
       alignItems: "center",
       cursor: "pointer",
@@ -23,7 +24,7 @@ const PinnedNote = ({
       height="24"
       className="svg-icon"
     />
-    <p>{note.title}</p>
+    <p>{shortenText(note.title, 35)}</p>
   </div>;
 };
 

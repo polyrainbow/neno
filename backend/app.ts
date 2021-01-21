@@ -560,6 +560,22 @@ const startApp = async ({
     },
   );
 
+
+  app.get(
+    config.API_PATH + "pins",
+    verifyJWT,
+    express.json(),
+    async function(req, res) {
+      const pinnedNotes = await Notes.getPins(req.userId);
+
+      const response:APIResponse = {
+        payload: pinnedNotes,
+        success: true,
+      };
+      res.json(response);
+    },
+  );
+
   /* ***************
     Endpoints with NO authentication required
   *****************/

@@ -452,6 +452,20 @@ const unpin = async (userId, noteId):Promise<NoteToTransmit[]> => {
 };
 
 
+const getPins = async (userId):Promise<NoteToTransmit[]> => {
+  const db = await DB.getMainData(userId);
+
+  const pinnedNotes = await Promise.all(
+    db.pinnedNotes
+      .map((noteId) => {
+        return get(noteId, userId);
+      })
+  );
+
+  return pinnedNotes;
+};
+
+
 export {
   init,
   get,
@@ -469,4 +483,5 @@ export {
   getUrlMetadata,
   pin,
   unpin,
+  getPins,
 };
