@@ -211,6 +211,24 @@ const createNoteToTransmit = (
 }
 
 
+const createNoteListItem = (
+  databaseNote:NonNullable<DatabaseNote>,
+  db: NonNullable<DatabaseMainData>,
+):NoteListItem => {
+  const noteListItem:NoteListItem = {
+    id: databaseNote.id,
+    title: getNoteTitle(databaseNote),
+    creationTime: databaseNote.creationTime,
+    updateTime: databaseNote.updateTime,
+    features: getNoteFeatures(databaseNote),
+    numberOfLinkedNotes: getNumberOfLinkedNotes(db, databaseNote.id),
+    numberOfCharacters: getNumberOfCharacters(databaseNote),
+  };
+
+  return noteListItem;
+};
+
+
 const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
   let containsText = false;
   let containsWeblink = false;
@@ -338,4 +356,5 @@ export {
   getSortFunction,
   getNumberOfCharacters,
   getURLsOfNote,
+  createNoteListItem,
 };

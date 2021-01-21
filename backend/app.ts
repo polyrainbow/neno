@@ -523,6 +523,43 @@ const startApp = async ({
   );
 
 
+  app.put(
+    config.API_PATH + "pins",
+    verifyJWT,
+    express.json(),
+    async function(req, res) {
+      const reqBody = req.body;
+      const noteId = reqBody.noteId;
+
+      const pinnedNotes = await Notes.pin(req.userId, noteId);
+
+      const response:APIResponse = {
+        payload: pinnedNotes,
+        success: true,
+      };
+      res.json(response);
+    },
+  );
+
+
+  app.delete(
+    config.API_PATH + "pins",
+    verifyJWT,
+    express.json(),
+    async function(req, res) {
+      const reqBody = req.body;
+      const noteId = reqBody.noteId;
+
+      const pinnedNotes = await Notes.unpin(req.userId, noteId);
+
+      const response:APIResponse = {
+        payload: pinnedNotes,
+        success: true,
+      };
+      res.json(response);
+    },
+  );
+
   /* ***************
     Endpoints with NO authentication required
   *****************/

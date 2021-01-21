@@ -89,6 +89,11 @@ const cleanUpData = async () => {
       };
     }
 
+    // add array for pinned notes if not existent
+    if (!db.pinnedNotes) {
+      db.pinnedNotes = [];
+    }
+
     convertLinksFromLegacyFormat(db);
 
     // remove invalid links

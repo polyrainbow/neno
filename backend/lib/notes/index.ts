@@ -14,11 +14,10 @@ import {
   getFilesOfNote,
   incorporateUserChangesIntoNote,
   createNoteToTransmit,
-  getNoteFeatures,
   getSortFunction,
   getNumberOfLinkedNotes,
-  getNumberOfCharacters,
   getURLsOfNote,
+  createNoteListItem,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "../../interfaces/DatabaseMainData.js";
@@ -131,19 +130,7 @@ const getNotesList = async (
   // now we need to transform all notes into NoteListItems before we can
   // sort those
   const noteListItems:NoteListItem[] = matchingNotes
-    .map((note:DatabaseNote):NoteListItem => {
-      const noteListItem:NoteListItem = {
-        id: note.id,
-        title: getNoteTitle(note),
-        creationTime: note.creationTime,
-        updateTime: note.updateTime,
-        features: getNoteFeatures(note),
-        numberOfLinkedNotes: getNumberOfLinkedNotes(db, note.id),
-        numberOfCharacters: getNumberOfCharacters(note),
-      };
-
-      return noteListItem;
-    })
+    .map((note) => createNoteListItem(note, db))
     .sort(getSortFunction(sortMode));
 
   const numberOfResults = noteListItems.length;
@@ -423,6 +410,48 @@ const importLinksAsNotes = async (userId, links) => {
 };
 
 
+const pin = async (userId, noteId):Promise<NoteToTransmit[]> => {
+  const db = await DB.getMainData(userId);
+  const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
+  if (noteIndex === -1) {
+    throw new Error("Note not found");
+  }
+
+  db.pinnedNotes = Array.from(
+    new Set([...db.pinnedNotes, noteId]),
+  );
+
+  await DB.flushChanges(db);
+
+  const pinnedNotes = await Promise.all(
+    db.pinnedNotes
+      .map((noteId) => {
+        return get(noteId, userId);
+      })
+  );
+
+  return pinnedNotes;
+};
+
+
+const unpin = async (userId, noteId):Promise<NoteToTransmit[]> => {
+  const db = await DB.getMainData(userId);
+
+  db.pinnedNotes = db.pinnedNotes.filter((nId) => nId !== noteId);
+
+  await DB.flushChanges(db);
+
+  const pinnedNotes = await Promise.all(
+    db.pinnedNotes
+      .map((noteId) => {
+        return get(noteId, userId);
+      })
+  );
+
+  return pinnedNotes;
+};
+
+
 export {
   init,
   get,
@@ -438,4 +467,6 @@ export {
   getReadableDatabaseStream,
   importLinksAsNotes,
   getUrlMetadata,
+  pin,
+  unpin,
 };
