@@ -309,9 +309,15 @@ const EditorView = ({
   }, []);
 
 
-  const pinNote = async () => {
-    const pinnedNotes = await databaseProvider.pinNote(activeNote.id);
-    setPinnedNotes(pinnedNotes);
+  const pinOrUnpinNote = async () => {
+    let newPinnedNotes;
+    if (pinnedNotes.find((pinnedNote) => pinnedNote.id === activeNote.id)) {
+      newPinnedNotes = await databaseProvider.unpinNote(activeNote.id);
+    } else {
+      newPinnedNotes = await databaseProvider.pinNote(activeNote.id);
+    }
+
+    setPinnedNotes(newPinnedNotes);
   };
 
 
@@ -371,6 +377,7 @@ const EditorView = ({
             setNoteListScrollTop(0);
           }}
           stats={stats}
+          pinOrUnpinNote={pinOrUnpinNote}
         />
       </div>
       <div id="right-view">
@@ -385,7 +392,7 @@ const EditorView = ({
           saveNote={saveNote}
           removeActiveNote={removeActiveNote}
           unsavedChanges={unsavedChanges}
-          pinNote={pinNote}
+          pinOrUnpinNote={pinOrUnpinNote}
         />
       </div>
     </main>

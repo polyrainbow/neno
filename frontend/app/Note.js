@@ -16,7 +16,7 @@ const Note = ({
   saveNote,
   removeActiveNote,
   unsavedChanges,
-  pinNote,
+  pinOrUnpinNote,
 }) => {
   const previousEditorData = useRef(null);
   const editorData = note?.editorData;
@@ -51,7 +51,7 @@ const Note = ({
       saveNote={saveNote}
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}
-      pinNote={pinNote}
+      pinOrUnpinNote={pinOrUnpinNote}
     />
     <div id="note-content">
       <div id="editor"></div>
