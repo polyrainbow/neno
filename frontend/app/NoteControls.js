@@ -68,7 +68,10 @@ const NoteControls = ({
         id="button_pin"
         disabled={activeNote.isUnsaved}
         title="Pin note"
-        icon="push_pin"
+        icon={activeNote.isUnsaved
+          ? "push_pin_disabled"
+          : "push_pin"
+        }
         onClick={pinOrUnpinNote}
       />
     </div>
