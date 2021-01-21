@@ -8,6 +8,7 @@ import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
+import ImportLinksDialog from "./ImportLinksDialog.js";
 
 
 const EditorView = ({
@@ -18,6 +19,7 @@ const EditorView = ({
   initialNoteId,
   toggleAppMenu,
   setOpenDialog,
+  openDialog,
 }) => {
   const currentRequestId = useRef(null);
   const [noteListItems, setNoteListItems] = useState([]);
@@ -303,6 +305,13 @@ const EditorView = ({
   }, []);
 
 
+  const importLinksAsNotes = async (links) => {
+    await databaseProvider.importLinksAsNotes(links);
+    setOpenDialog(null);
+    refreshNotesList();
+  };
+
+
   useEffect(() => {
     refreshNotesList();
   }, [searchValue, page, sortMode]);
@@ -368,6 +377,14 @@ const EditorView = ({
         />
       </div>
     </main>
+    {
+      openDialog === "IMPORT_LINKS"
+        ? <ImportLinksDialog
+          importLinksAsNotes={importLinksAsNotes}
+          onCancel={() => setOpenDialog(null)}
+        />
+        : null
+    }
   </>;
 };
 

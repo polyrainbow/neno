@@ -6,7 +6,6 @@ import BusyView from "./BusyView.js";
 import databaseProvider from "./lib/database.js";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
 import AppMenu from "./AppMenu.js";
-import ImportLinksDialog from "./ImportLinksDialog.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 
 
@@ -44,6 +43,7 @@ const App = () => {
       initialNoteId={initialNoteId}
       toggleAppMenu={toggleAppMenu}
       setOpenDialog={setOpenDialog}
+      openDialog={openDialog}
     />;
   }
 
@@ -78,11 +78,6 @@ const App = () => {
     />;
   }
 
-  const importLinksAsNotes = async (links) => {
-    await databaseProvider.importLinksAsNotes(links);
-    setOpenDialog(null);
-    refreshNotesList();
-  };
 
   return <ConfirmationServiceProvider>
     {content}
@@ -94,14 +89,6 @@ const App = () => {
           onClose={() => setIsAppMenuOpen(false)}
         />
         : ""
-    }
-    {
-      openDialog === "IMPORT_LINKS"
-        ? <ImportLinksDialog
-          importLinksAsNotes={importLinksAsNotes}
-          onCancel={() => setOpenDialog(null)}
-        />
-        : null
     }
     {
       openDialog === "EXPORT_DATABASE"
