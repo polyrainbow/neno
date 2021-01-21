@@ -208,6 +208,28 @@ const fetchURLMetadata = async (url) => {
 };
 
 
+const pinNote = async (noteId) => {
+  const response = await callAPI("PUT", "pins", { noteId });
+
+  if (!response.success) {
+    throw new Error("Error pinning note!");
+  }
+
+  return response.payload;
+};
+
+
+const unpinNote = async (noteId) => {
+  const response = await callAPI("DELETE", "pins", { noteId });
+
+  if (!response.success) {
+    throw new Error("Error unpinning note!");
+  }
+
+  return response.payload;
+};
+
+
 export {
   login,
   getNote,
@@ -223,5 +245,7 @@ export {
   uploadFile,
   uploadFileByUrl,
   fetchURLMetadata,
+  pinNote,
+  unpinNote,
 };
 

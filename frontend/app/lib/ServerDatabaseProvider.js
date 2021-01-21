@@ -61,4 +61,12 @@ export default class ServerDatabaseProvider {
   fetchURLMetadata(url) {
     return API.fetchURLMetadata(url);
   }
+
+  pinNote(noteId) {
+    return API.pinNote(noteId);
+  }
+
+  unpinNote(noteId) {
+    return API.unpinNote(noteId);
+  }
 }
