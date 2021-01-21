@@ -283,6 +283,8 @@ const remove = async (noteId, userId):Promise<void> => {
       DB.deleteFile(userId, fileId);
     });
 
+  db.pinnedNotes = db.pinnedNotes.filter((nId) => nId !== noteId);
+
   await DB.flushChanges(db);
 };
 
