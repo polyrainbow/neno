@@ -15,6 +15,7 @@ const BusyView = () => {
           }}
           src={"/assets/icons/pending-24px.svg"}
           alt={"Loading ..."}
+          className="svg-icon"
         />
         <p>Loading ...</p>
       </section>

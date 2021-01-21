@@ -27,6 +27,7 @@ const NoteListItemButton = ({
           style={{ "verticalAlign": "bottom" }}
           src={"/assets/icons/" + icon + "-24px.svg"}
           alt={title}
+          className="svg-icon"
         />
       </button>
     </Tooltip>

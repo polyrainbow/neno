@@ -21,6 +21,7 @@ const PinnedNote = ({
       alt={"Pinned note"}
       width="24"
       height="24"
+      className="svg-icon"
     />
     <p>{note.title}</p>
   </div>;

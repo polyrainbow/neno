@@ -21,6 +21,7 @@ const AppMenuItem = ({
       alt={label}
       width="24"
       height="24"
+      className="svg-icon"
     />
     <p style={{
       margin: "0",

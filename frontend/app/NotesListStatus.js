@@ -35,6 +35,7 @@ const NotesListStatus = ({
       }}
       src={"/assets/icons/" + activeState.icon + "-24px.svg"}
       alt={activeState.label}
+      className="svg-icon"
     />
     <p>{activeState.label}</p>
   </div>;

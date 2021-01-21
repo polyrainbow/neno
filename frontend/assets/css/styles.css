@@ -41,7 +41,7 @@
     --overlay-gradient: linear-gradient(45deg, rgb(17 10 146) 0%, rgba(9, 9, 121, 0.5) 35%, rgb(0 125 151) 100%);
   }
 
-  button img, .noteListStatus img, .note-list-item img {
+  img.svg-icon {
     filter: invert(1);
   }
 }

@@ -99,6 +99,7 @@ const NoteListItem = ({
               "/assets/icons/" + (isLinked ? "link_off" : "link") + "-24px.svg"
             }
             alt={linkControlLabel}
+            className="svg-icon"
           />
           <div
             className="linkedNotesIndicator"
