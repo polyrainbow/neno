@@ -125,11 +125,19 @@ const ExportDatabaseDialog = ({
                   }],
                 };
 
-              const writableStream = await getWritableStream(opts);
-
-              setStatus("BUSY");
-              await exportDatabase(writableStream, withUploads);
-              setStatus("DONE");
+              try {
+                const writableStream = await getWritableStream(opts);
+                setStatus("BUSY");
+                await exportDatabase(writableStream, withUploads);
+                setStatus("DONE");
+              } catch (e) {
+                if (
+                  // if user aborted the request, it's fine
+                  !e.message.includes("The user aborted a request.")
+                ) {
+                  throw new Error(e);
+                }
+              }
             }}
             className="default-button dialog-box-button default-action"
           >Export</button>
