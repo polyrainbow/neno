@@ -7,7 +7,6 @@ const EditorViewHeader = ({
   stats,
   openImportLinksDialog,
   openExportDatabaseDialog,
-  setActiveView,
   showNotesWithDuplicateURLs,
   toggleAppMenu,
 }) => {
@@ -18,7 +17,6 @@ const EditorViewHeader = ({
       leftContent={
         <>
           <EditorViewHeaderControls
-            setActiveView={setActiveView}
             openImportLinksDialog={openImportLinksDialog}
             showNotesWithDuplicateURLs={showNotesWithDuplicateURLs}
             toggleAppMenu={toggleAppMenu}

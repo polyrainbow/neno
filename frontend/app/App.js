@@ -85,8 +85,11 @@ const App = () => {
       isAppMenuOpen
         ? <AppMenu
           setActiveView={setActiveView}
+          activeView={activeView}
           openExportDatabaseDialog={() => setOpenDialog("EXPORT_DATABASE")}
           onClose={() => setIsAppMenuOpen(false)}
+          unsavedChanges={unsavedChanges}
+          setUnsavedChanges={setUnsavedChanges}
         />
         : ""
     }

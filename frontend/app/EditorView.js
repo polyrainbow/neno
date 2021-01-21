@@ -321,7 +321,6 @@ const EditorView = ({
     <EditorViewHeader
       stats={stats}
       openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
-      setActiveView={setActiveView}
       showNotesWithDuplicateURLs={() => handleSearchInputChange(
         "special:DUPLICATE_URLS",
       )}

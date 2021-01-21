@@ -3,18 +3,9 @@ import IconButton from "./IconButton.js";
 
 const EditorViewHeaderControls = ({
   openImportLinksDialog,
-  setActiveView,
   showNotesWithDuplicateURLs,
 }) => {
   return <section id="header-controls">
-    <IconButton
-      id="button_graph"
-      title="Graph view"
-      icon="scatter_plot"
-      onClick={() => {
-        setActiveView("GRAPH");
-      }}
-    />
     <IconButton
       id="button_import_links_as_notes"
       title="Import links as notes"

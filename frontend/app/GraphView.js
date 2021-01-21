@@ -90,22 +90,6 @@ const GraphView = ({
       leftContent={
         <>
           <IconButton
-            icon="create"
-            title="Editor View"
-            onClick={async () => {
-              if (unsavedChanges) {
-                await confirm({
-                  text: Config.texts.discardGraphChangesConfirmation,
-                  confirmText: "Discard changes",
-                  cancelText: "Cancel",
-                  encourageConfirmation: false,
-                });
-              }
-
-              setActiveView("EDITOR");
-            }}
-          />
-          <IconButton
             icon="save"
             title="Save"
             onClick={saveGraphObject}

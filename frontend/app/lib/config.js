@@ -34,9 +34,6 @@ const texts = {
     "A note with this title already exists. Do you want to save this note "
     + "with the same title?",
   discardChangesConfirmation:
-    "There are unsaved changes. Do you really want to discard them "
-    + "and load another note?",
-  discardGraphChangesConfirmation:
     "There are unsaved changes. Do you really want to discard them? "
     + "If not, click cancel and save them first.",
 };
