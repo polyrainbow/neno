@@ -203,6 +203,11 @@ const cleanUpData = async () => {
       }
     });
   });
+
+  // remove invalid note ids from pins
+  db.pinnedNotes = db.pinnedNotes.filter((pinnedNoteId) => {
+    return ids.includes(pinnedNoteId);
+  });
 };
 
 export default cleanUpData;
