@@ -202,11 +202,11 @@ const cleanUpData = async () => {
         delete note.y;
       }
     });
-  });
 
-  // remove invalid note ids from pins
-  db.pinnedNotes = db.pinnedNotes.filter((pinnedNoteId) => {
-    return ids.includes(pinnedNoteId);
+    // remove invalid note ids from pins
+    db.pinnedNotes = db.pinnedNotes.filter((pinnedNoteId) => {
+      return ids.includes(pinnedNoteId);
+    });
   });
 };
 
