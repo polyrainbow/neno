@@ -31,6 +31,7 @@ const EditorView = ({
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
   const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
+  const [pinnedNotes, setPinnedNotes] = useState([]);
 
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -305,6 +306,12 @@ const EditorView = ({
   }, []);
 
 
+  const pinNote = async () => {
+    const pinnedNotes = await databaseProvider.pinNote(activeNote.id);
+    setPinnedNotes(pinnedNotes);
+  };
+
+
   const importLinksAsNotes = async (links) => {
     await databaseProvider.importLinksAsNotes(links);
     setOpenDialog(null);
@@ -325,6 +332,8 @@ const EditorView = ({
         "special:DUPLICATE_URLS",
       )}
       toggleAppMenu={toggleAppMenu}
+      pinnedNotes={pinnedNotes}
+      loadNote={loadNote}
     />
     <main>
       <div id="left-view">
@@ -373,6 +382,7 @@ const EditorView = ({
           saveNote={saveNote}
           removeActiveNote={removeActiveNote}
           unsavedChanges={unsavedChanges}
+          pinNote={pinNote}
         />
       </div>
     </main>

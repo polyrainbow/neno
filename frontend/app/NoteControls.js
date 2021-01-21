@@ -10,6 +10,7 @@ const NoteControls = ({
   saveNote,
   removeActiveNote,
   unsavedChanges,
+  pinNote,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -62,6 +63,13 @@ const NoteControls = ({
 
           removeActiveNote();
         }}
+      />
+      <IconButton
+        id="button_pin"
+        disabled={activeNote.isUnsaved}
+        title="Pin note"
+        icon="push_pin"
+        onClick={pinNote}
       />
     </div>
     <div id="note-controls-right">

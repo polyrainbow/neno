@@ -68,7 +68,8 @@ const createDatabase = async (
     initialNodePosition: {
       x: 0,
       y: 0,
-    }
+    },
+    pinnedNotes: [],
   };
   await writeMainDataFile(databaseId, newMainData);
 
