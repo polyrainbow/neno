@@ -234,6 +234,9 @@ const EditorView = ({
           throw new Error(e);
         }
       }
+
+      const pinnedNotes = await databaseProvider.getPins();
+      setPinnedNotes(pinnedNotes);
     },
     [searchValue, page, sortMode],
   );
@@ -303,9 +306,6 @@ const EditorView = ({
     }
 
     loadNote(null);
-
-    const pinnedNotes = await databaseProvider.getPins();
-    setPinnedNotes(pinnedNotes);
   }, []);
 
 
