@@ -57,6 +57,15 @@ const GraphView = ({
 
 
   useEffect(() => {
+    window.addEventListener("beforeunload", beforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnload);
+    };
+  }, [beforeUnload]);
+
+
+  useEffect(() => {
     const onHighlight = (highlightDetails) => {
       setStatus(highlightDetails);
     };
@@ -66,13 +75,6 @@ const GraphView = ({
         graphInstance.current
           = initGraph(mainElement.current, graph, onHighlight, onChange);
       });
-
-    // warn the user when leaving
-    window.addEventListener("beforeunload", beforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnload);
-    };
   }, []);
 
   useEffect(() => {
