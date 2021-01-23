@@ -304,10 +304,9 @@ const EditorView = ({
     );
     if (typeof initialId === "number" && !isNaN(initialId)) {
       loadNote(initialId);
-      return;
+    } else {
+      loadNote(null);
     }
-
-    loadNote(null);
   }, []);
 
 
