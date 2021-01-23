@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, {
+  useEffect, useState, useCallback, useRef, useMemo,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditorViewHeader from "./EditorViewHeader.js";
 import NotesList from "./NotesList.js";
@@ -35,7 +37,7 @@ const EditorView = ({
 
   const confirm = React.useContext(ConfirmationServiceContext);
 
-  const displayedLinkedNotes = [
+  const displayedLinkedNotes = useMemo(() => [
     ...(!activeNote.isUnsaved)
       ? activeNote.linkedNotes.filter((note) => {
         const isRemoved = activeNote.changes.some((change) => {
@@ -54,7 +56,7 @@ const EditorView = ({
       .map((change) => {
         return change.note;
       }),
-  ];
+  ], [activeNote]);
 
 
   const handleSearchInputChange = (value) => {
