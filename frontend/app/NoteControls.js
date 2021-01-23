@@ -1,5 +1,4 @@
 import React from "react";
-import * as Config from "./lib/config.js";
 import IconButton from "./IconButton.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
@@ -7,7 +6,7 @@ import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 const NoteControls = ({
   activeNote,
   createNewNote,
-  saveNote,
+  handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges,
   pinOrUnpinNote,
@@ -27,24 +26,7 @@ const NoteControls = ({
         id="button_upload"
         title="Save note"
         icon="save"
-        onClick={async () => {
-          try {
-            await saveNote({ ignoreDuplicateTitles: false });
-          } catch (e) {
-            if (e.message === "NOTE_WITH_SAME_TITLE_EXISTS") {
-              await confirm({
-                text: Config.texts.titleAlreadyExistsConfirmation,
-                confirmText: "Save anyway",
-                cancelText: "Cancel",
-                encourageConfirmation: false,
-              });
-
-              saveNote({ ignoreDuplicateTitles: true }).catch((e) => {
-                alert(e);
-              });
-            }
-          }
-        }}
+        onClick={handleNoteSaveRequest}
       />
       <IconButton
         id="button_remove"

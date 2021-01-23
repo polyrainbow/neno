@@ -13,7 +13,7 @@ const Note = ({
   setUnsavedChanges,
   databaseProvider,
   createNewNote,
-  saveNote,
+  handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges,
   pinOrUnpinNote,
@@ -49,7 +49,7 @@ const Note = ({
     <NoteControls
       activeNote={note}
       createNewNote={createNewNote}
-      saveNote={saveNote}
+      handleNoteSaveRequest={handleNoteSaveRequest}
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}
       pinOrUnpinNote={pinOrUnpinNote}

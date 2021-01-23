@@ -277,7 +277,7 @@ const EditorView = ({
   };
 
 
-  const saveNote = async (options) => {
+  const saveActiveNote = async (options) => {
     const noteToTransmit = await prepareNoteToTransmit();
     const noteFromServer = await databaseProvider.putNote(
       noteToTransmit, options,
@@ -290,6 +290,45 @@ const EditorView = ({
     setUnsavedChanges(false);
     refreshNotesList();
   };
+
+
+  const handleNoteSaveRequest = useCallback(async () => {
+    try {
+      await saveActiveNote({ ignoreDuplicateTitles: false });
+    } catch (e) {
+      if (e.message === "NOTE_WITH_SAME_TITLE_EXISTS") {
+        await confirm({
+          text: Config.texts.titleAlreadyExistsConfirmation,
+          confirmText: "Save anyway",
+          cancelText: "Cancel",
+          encourageConfirmation: false,
+        });
+
+        saveActiveNote({ ignoreDuplicateTitles: true }).catch((e) => {
+          alert(e);
+        });
+      }
+    }
+  });
+
+
+  const handleKeydown = (e) => {
+    if (
+      (window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
+      && e.key === "s"
+    ) {
+      handleNoteSaveRequest();
+      e.preventDefault();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, [handleKeydown]);
 
 
   // startup
@@ -389,7 +428,7 @@ const EditorView = ({
           setUnsavedChanges={setUnsavedChanges}
           databaseProvider={databaseProvider}
           createNewNote={createNewNote}
-          saveNote={saveNote}
+          handleNoteSaveRequest={handleNoteSaveRequest}
           removeActiveNote={removeActiveNote}
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}

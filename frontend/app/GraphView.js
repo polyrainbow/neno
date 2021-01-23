@@ -56,6 +56,26 @@ const GraphView = ({
   };
 
 
+  const handleKeydown = (e) => {
+    if (
+      (window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
+      && e.key === "s"
+    ) {
+      saveGraphObject();
+      e.preventDefault();
+    }
+  };
+
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeydown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeydown);
+    };
+  }, [handleKeydown]);
+
+
   useEffect(() => {
     window.addEventListener("beforeunload", beforeUnload);
 
