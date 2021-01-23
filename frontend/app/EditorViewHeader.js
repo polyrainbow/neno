@@ -26,7 +26,11 @@ const PinnedNote = ({
         marginRight: "3px",
       }}
     />
-    <p>{shortenText(note.title, 35)}</p>
+    <p
+      style={{
+        whiteSpace: "pre",
+      }}
+    >{shortenText(note.title, 35)}</p>
   </div>;
 };
 
@@ -43,7 +47,14 @@ const EditorViewHeader = ({
       toggleAppMenu={toggleAppMenu}
       openExportDatabaseDialog={openExportDatabaseDialog}
       leftContent={
-        <>
+        <div
+          id="pinned-notes"
+          style={{
+            display: "flex",
+            height: "100%",
+            overflow: "auto",
+          }}
+        >
           {
             pinnedNotes.map((pinnedNote) => {
               return <PinnedNote
@@ -53,7 +64,7 @@ const EditorViewHeader = ({
               />;
             })
           }
-        </>
+        </div>
       }
       rightContent={
         <AppStats stats={stats} />

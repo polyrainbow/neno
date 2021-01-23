@@ -78,6 +78,7 @@
 
 #app-menu {
   background-color: var(--header-background-color);
+  z-index: 1;
 }
 
 .app-menu-item:hover{
@@ -456,6 +457,10 @@ th, td {
     width: 100%;
   }
 
+  #pinned-notes{
+    width: calc(100vw - 380px);
+  }
+
   #left-view{
     grid-area: 1 / 1 / 2 / 2;
     width: var(--xl-list-width);
@@ -493,6 +498,10 @@ th, td {
 @media only screen and (max-width: 1200px){
   main {
     grid-template-columns: 1fr;
+  }
+
+  #pinned-notes{
+    width: calc(100vw - 110px);
   }
 
   #left-view{
