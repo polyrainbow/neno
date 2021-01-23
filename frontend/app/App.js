@@ -7,6 +7,7 @@ import databaseProvider from "./lib/database.js";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
 import AppMenu from "./AppMenu.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
+import StatsDialog from "./StatsDialog.js";
 
 
 const App = () => {
@@ -90,12 +91,21 @@ const App = () => {
           onClose={() => setIsAppMenuOpen(false)}
           unsavedChanges={unsavedChanges}
           setUnsavedChanges={setUnsavedChanges}
+          showStats={() => setOpenDialog("STATS")}
         />
         : ""
     }
     {
       openDialog === "EXPORT_DATABASE"
         ? <ExportDatabaseDialog
+          onCancel={() => setOpenDialog(null)}
+          databaseProvider={databaseProvider}
+        />
+        : null
+    }
+    {
+      openDialog === "STATS"
+        ? <StatsDialog
           onCancel={() => setOpenDialog(null)}
           databaseProvider={databaseProvider}
         />

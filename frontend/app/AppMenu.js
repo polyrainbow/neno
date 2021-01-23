@@ -12,6 +12,7 @@ const AppMenu = ({
   onClose,
   unsavedChanges,
   setUnsavedChanges,
+  showStats,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -75,6 +76,11 @@ const AppMenu = ({
         label="Export database"
         icon="archive"
         onClick={openExportDatabaseDialog}
+      />
+      <AppMenuItem
+        label="Show stats"
+        icon="query_stats"
+        onClick={showStats}
       />
       {
         tokenManager.get()

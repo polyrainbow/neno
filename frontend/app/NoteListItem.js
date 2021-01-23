@@ -1,6 +1,7 @@
 import React from "react";
 import { Tooltip } from "react-tippy";
 import { yyyymmdd } from "./lib/utils.js";
+import { emojis } from "./lib/config.js";
 
 const NoteListItem = ({
   note,
@@ -64,10 +65,10 @@ const NoteListItem = ({
           }}
         >
           {note.features?.containsText ? "✏️" : ""}
-          {note.features?.containsWeblink ? "🌍" : ""}
-          {note.features?.containsCode ? "🤖" : ""}
-          {note.features?.containsImages ? "🖼️" : ""}
-          {note.features?.containsAttachements ? "📎" : ""}
+          {note.features?.containsWeblink ? emojis.weblink : ""}
+          {note.features?.containsCode ? emojis.code : ""}
+          {note.features?.containsImages ? emojis.image : ""}
+          {note.features?.containsAttachements ? emojis.file : ""}
         </div>
       </div>
     </div>
@@ -113,7 +114,7 @@ const NoteListItem = ({
                   ? <span title={note.numberOfLinkedNotes + " Links"}>
                     {note.numberOfLinkedNotes}
                   </span>
-                  : <span title="Not linked">🔴</span>
+                  : <span title="Not linked">{emojis.unlinked}</span>
                 : ""
             }
           </div>

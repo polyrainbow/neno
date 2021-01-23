@@ -47,6 +47,10 @@ const emojis = {
   "new": "🆕",
   "unsavedChanges": "✳️",
   "noUnsavedChanges": "✔️",
+  "weblink": "🌍",
+  "file": "📎",
+  "image": "🖼️",
+  "code": "🤖",
 };
 
 // session token expire time in seconds
