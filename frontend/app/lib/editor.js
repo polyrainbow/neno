@@ -118,14 +118,14 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
         class: Attaches,
         config: {
           uploader: async (file) => {
-            const fileId = await databaseProvider.uploadFile(file);
+            const fileInfo = await databaseProvider.uploadFile(file);
             return {
               success: 1,
               file: {
-                "url": Config.API_URL + "file/" + fileId,
-                "size": file.size,
+                "url": Config.API_URL + "file/" + fileInfo.id,
+                "size": fileInfo.size,
                 "name": file.name,
-                "fileId": fileId,
+                "fileId": fileInfo.id,
               },
             };
           },
