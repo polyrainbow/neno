@@ -486,6 +486,14 @@ const startApp = async ({
       try {
         const fileStream
           = Notes.getReadableFileStream(req.userId, req.params.fileId);
+        
+        fileStream.on("error", () => {
+          const response:APIResponse = {
+            success: false,
+            error: APIError.FILE_NOT_FOUND,
+          };
+          res.json(response);
+        });
         fileStream.pipe(res);
       } catch (e) {
         const response:APIResponse = {
