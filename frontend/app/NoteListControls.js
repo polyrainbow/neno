@@ -1,11 +1,13 @@
 import React from "react";
 import SearchInput from "./SearchInput.js";
+import IconButton from "./IconButton.js";
 
 const NoteListControls = ({
   value,
   onChange,
   sortMode,
   setSortMode,
+  showNotesWithDuplicateURLs,
 }) => {
   return <section id="section-search-input">
     <div
@@ -21,6 +23,12 @@ const NoteListControls = ({
         inputStyle={{
           width: "200px",
         }}
+      />
+      <IconButton
+        id="button_show_notes_with_duplicate_urls"
+        title="Show notes with same URLs"
+        icon="view_agenda"
+        onClick={showNotesWithDuplicateURLs}
       />
     </div>
     <div
@@ -39,6 +47,9 @@ const NoteListControls = ({
         id="sortModeSelect"
         value={sortMode}
         onChange={(e) => setSortMode(e.target.value)}
+        style={{
+          width: "320px",
+        }}
       >
         <option
           value="CREATION_DATE_ASCENDING"

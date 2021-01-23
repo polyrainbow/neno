@@ -1,6 +1,5 @@
 import React from "react";
 import HeaderContainer from "./HeaderContainer.js";
-import EditorViewHeaderControls from "./EditorViewHeaderControls.js";
 import AppStats from "./AppStats.js";
 import { shortenText } from "./lib/utils.js";
 
@@ -23,6 +22,9 @@ const PinnedNote = ({
       width="24"
       height="24"
       className="svg-icon"
+      style={{
+        marginRight: "3px",
+      }}
     />
     <p>{shortenText(note.title, 35)}</p>
   </div>;
@@ -31,9 +33,7 @@ const PinnedNote = ({
 
 const EditorViewHeader = ({
   stats,
-  openImportLinksDialog,
   openExportDatabaseDialog,
-  showNotesWithDuplicateURLs,
   toggleAppMenu,
   pinnedNotes,
   loadNote,
@@ -44,11 +44,6 @@ const EditorViewHeader = ({
       openExportDatabaseDialog={openExportDatabaseDialog}
       leftContent={
         <>
-          <EditorViewHeaderControls
-            openImportLinksDialog={openImportLinksDialog}
-            showNotesWithDuplicateURLs={showNotesWithDuplicateURLs}
-            toggleAppMenu={toggleAppMenu}
-          />
           {
             pinnedNotes.map((pinnedNote) => {
               return <PinnedNote

@@ -17,6 +17,7 @@ const Note = ({
   removeActiveNote,
   unsavedChanges,
   pinOrUnpinNote,
+  openImportLinksDialog,
 }) => {
   const previousEditorData = useRef(null);
   const editorData = note?.editorData;
@@ -52,6 +53,7 @@ const Note = ({
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}
       pinOrUnpinNote={pinOrUnpinNote}
+      openImportLinksDialog={openImportLinksDialog}
     />
     <div id="note-content">
       <div id="editor"></div>

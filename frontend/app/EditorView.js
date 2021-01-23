@@ -336,10 +336,6 @@ const EditorView = ({
   return <>
     <EditorViewHeader
       stats={stats}
-      openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
-      showNotesWithDuplicateURLs={() => handleSearchInputChange(
-        "special:DUPLICATE_URLS",
-      )}
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
       loadNote={loadNote}
@@ -357,6 +353,9 @@ const EditorView = ({
             setSortMode(sortMode);
             setPage(1);
           }}
+          showNotesWithDuplicateURLs={() => handleSearchInputChange(
+            "special:DUPLICATE_URLS",
+          )}
         />
         <NotesList
           notes={noteListItems}
@@ -393,6 +392,7 @@ const EditorView = ({
           removeActiveNote={removeActiveNote}
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}
+          openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
         />
       </div>
     </main>

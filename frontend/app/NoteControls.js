@@ -11,6 +11,7 @@ const NoteControls = ({
   removeActiveNote,
   unsavedChanges,
   pinOrUnpinNote,
+  openImportLinksDialog,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -73,6 +74,12 @@ const NoteControls = ({
           : "push_pin"
         }
         onClick={pinOrUnpinNote}
+      />
+      <IconButton
+        id="button_import_links_as_notes"
+        title="Import links as notes"
+        icon="dynamic_feed"
+        onClick={openImportLinksDialog}
       />
     </div>
     <div id="note-controls-right">
