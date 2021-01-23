@@ -44,14 +44,10 @@ const GraphView = ({
     const graphObject = graphInstance.current.getSaveData();
     try {
       await databaseProvider.saveGraph(graphObject);
-      setStatus("Graph saved");
-      setTimeout(() => {
-        setStatus(DEFAULT_STATUS);
-      }, 2000);
       setUnsavedChanges(false);
     } catch (e) {
-      setStatus("Error saving graph!");
       console.error(e);
+      alert(e);
     }
   };
 
