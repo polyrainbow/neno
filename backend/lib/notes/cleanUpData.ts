@@ -165,6 +165,22 @@ const cleanUpData = async () => {
           }
         });
 
+      
+      // a bug lead to a corrupt attaches block
+      note.editorData.blocks
+        .forEach((block) => {
+          if (
+            block.type === "attaches"
+            && block.data.file.url.includes("[object Object]")
+          ) {
+            const fileId = block.data.file.fileId.id;
+            block.data.file.url = block.data.file.url
+              .replace("[object Object]", fileId);
+            block.data.file.fileId = fileId;
+          }
+        });
+
+
       // because of https://github.com/editor-js/attaches/issues/15
       // it was not possible to save the fileId as such in the
       // attaches block object. that's why we have to make sure that it is
