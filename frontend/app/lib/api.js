@@ -106,8 +106,11 @@ const deleteNote = async (noteId) => {
 };
 
 
-const getStats = async () => {
-  const response = await callAPI("GET", "stats");
+const getStats = async (exhaustive) => {
+  const response = await callAPI(
+    "GET",
+    "stats?exhaustive=" + exhaustive.toString(),
+  );
   if (!response.success) {
     throw new Error(response.error);
   }

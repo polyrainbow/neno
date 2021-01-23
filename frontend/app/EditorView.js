@@ -172,7 +172,7 @@ const EditorView = ({
 
 
   const refreshStats = () => {
-    databaseProvider.getStats()
+    databaseProvider.getStats(false)
       .then((stats) => {
         setStats(stats);
       })

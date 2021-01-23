@@ -22,8 +22,8 @@ export default class ServerDatabaseProvider {
     return API.getNotes(options);
   }
 
-  getStats() {
-    return API.getStats();
+  getStats(exhaustive) {
+    return API.getStats(exhaustive);
   }
 
   deleteNote(noteId) {

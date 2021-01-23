@@ -252,6 +252,15 @@ function humanFileSize(bytes, si = false, dp = 1) {
   return bytes.toFixed(dp) + " " + units[u];
 }
 
+
+const stringContainsUUID = (string) => {
+  return Array.isArray(
+    string.match(
+      /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/g,
+    )
+  );
+}
+
 export {
   getKeySortFunction,
   binaryArrayFind,
@@ -265,4 +274,5 @@ export {
   isNotFalse,
   getPagedMatches,
   humanFileSize,
+  stringContainsUUID,
 };

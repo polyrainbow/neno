@@ -1,4 +1,4 @@
-import { cloneObject, humanFileSize } from "../utils.js";
+import { cloneObject, humanFileSize, stringContainsUUID } from "../utils.js";
 import { FileId } from "../../interfaces/FileId.js";
 import { DatabaseId } from "../../interfaces/DatabaseId.js";
 import { Readable } from "stream";
@@ -223,6 +223,11 @@ const getReadableDatabaseStream = async (
   const files = await storageProvider.listDirectory(fileFolderPath);
   for (let i = 0; i < files.length; i++) {
     const fileId = files[i];
+
+    if (!stringContainsUUID(fileId)) {
+      continue;
+    }
+
     const readableStream = getReadableFileStream(databaseId, fileId);
     archive.append(
       readableStream,
@@ -238,6 +243,17 @@ const getReadableDatabaseStream = async (
 };
 
 
+const getNumberOfFiles = async (
+  databaseId: DatabaseId,
+) => {
+  const fileFolderPath = getFileFolderPath(databaseId);
+  const files = (await storageProvider.listDirectory(fileFolderPath))
+    .filter(stringContainsUUID);
+
+  return files.length;
+};
+
+
 export {
   init,
   getMainData,
@@ -248,4 +264,5 @@ export {
   getReadableMainDataStream,
   getReadableFileStream,
   getReadableDatabaseStream,
+  getNumberOfFiles,
 };

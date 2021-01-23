@@ -176,7 +176,7 @@ const getGraph = async (userId: UserId):Promise<Graph> => {
 };
 
 
-const getStats = async (userId:UserId):Promise<Stats> => {
+const getStats = async (userId:UserId, exhaustive:boolean):Promise<Stats> => {
   const db = await DB.getMainData(userId);
 
   const numberOfUnlinkedNotes = db.notes.filter((note) => {
@@ -188,6 +188,10 @@ const getStats = async (userId:UserId):Promise<Stats> => {
     numberOfLinks: db.links.length,
     numberOfUnlinkedNotes,
   };
+
+  if (exhaustive) {
+    stats.numberOfFiles = await DB.getNumberOfFiles(userId);
+  }
 
   return stats;
 };

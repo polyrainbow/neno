@@ -155,7 +155,8 @@ const startApp = async ({
     config.API_PATH + "stats",
     verifyJWT,
     async function(req, res) {
-      const stats:Stats = await Notes.getStats(req.userId)
+      const exhaustive = req.query.exhaustive === "true";
+      const stats:Stats = await Notes.getStats(req.userId, exhaustive);
       const response:APIResponse = {
         success: true,
         payload: stats,
