@@ -56,13 +56,15 @@ const EditorViewHeader = ({
           }}
         >
           {
-            pinnedNotes.map((pinnedNote) => {
-              return <PinnedNote
-                key={"pinnedNote_" + pinnedNote.id}
-                note={pinnedNote}
-                onClick={() => loadNote(pinnedNote.id)}
-              />;
-            })
+            pinnedNotes.length > 0
+              ? pinnedNotes.map((pinnedNote) => {
+                return <PinnedNote
+                  key={"pinnedNote_" + pinnedNote.id}
+                  note={pinnedNote}
+                  onClick={() => loadNote(pinnedNote.id)}
+                />;
+              })
+              : <p>Your pinned notes will appear here</p>
           }
         </div>
       }
