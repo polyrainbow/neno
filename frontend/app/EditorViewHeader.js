@@ -5,6 +5,7 @@ import { shortenText } from "./lib/utils.js";
 
 const PinnedNote = ({
   note,
+  isActive,
   onClick,
 }) => {
   return <div
@@ -14,7 +15,7 @@ const PinnedNote = ({
       alignItems: "center",
       cursor: "pointer",
     }}
-    className="pinned-note"
+    className={"pinned-note " + (isActive ? "active" : "")}
     onClick={onClick}
   >
     <img
@@ -42,6 +43,7 @@ const EditorViewHeader = ({
   toggleAppMenu,
   pinnedNotes,
   loadNote,
+  note,
 }) => {
   return (
     <HeaderContainer
@@ -63,6 +65,7 @@ const EditorViewHeader = ({
                   key={"pinnedNote_" + pinnedNote.id}
                   note={pinnedNote}
                   onClick={() => loadNote(pinnedNote.id)}
+                  isActive={pinnedNote.id === note.id}
                 />;
               })
               : <p>Your pinned notes will appear here</p>

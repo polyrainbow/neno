@@ -94,6 +94,10 @@
   background-color: var(--nli-color-hover);
 }
 
+.pinned-note.active {
+  background-color: var(--accent-color-2);
+}
+
 
 input, select {
   border: var(--input-border-width) solid var(--main-content-color) !important;

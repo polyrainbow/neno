@@ -379,6 +379,7 @@ const EditorView = ({
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
       loadNote={loadNote}
+      note={activeNote}
     />
     <main>
       <div id="left-view">
