@@ -458,7 +458,7 @@ th, td {
   }
 
   #pinned-notes{
-    width: calc(100vw - 380px);
+    width: calc(100vw - 420px);
   }
 
   #left-view{
@@ -500,6 +500,10 @@ th, td {
     grid-template-columns: 1fr;
   }
 
+  #app-stats{
+    display: none;
+  }
+
   #pinned-notes{
     width: calc(100vw - 110px);
   }
@@ -521,10 +525,4 @@ th, td {
   }
 }
 
-
-@media only screen and (max-width: 710px) {
-  #app-stats{
-    display: none;
-  }
-}
 
