@@ -1,5 +1,5 @@
 import React from "react";
-import HeaderContainer from "./HeaderContainer.js";
+import AppTitle from "./AppTitle.js";
 import AppStats from "./AppStats.js";
 import { shortenText } from "./lib/utils.js";
 
@@ -39,43 +39,41 @@ const PinnedNote = ({
 
 const EditorViewHeader = ({
   stats,
-  openExportDatabaseDialog,
   toggleAppMenu,
   pinnedNotes,
   loadNote,
   note,
 }) => {
   return (
-    <HeaderContainer
-      toggleAppMenu={toggleAppMenu}
-      openExportDatabaseDialog={openExportDatabaseDialog}
-      leftContent={
-        <div
-          id="pinned-notes"
-          style={{
-            display: "flex",
-            height: "100%",
-            overflow: "auto",
-          }}
-        >
-          {
-            pinnedNotes.length > 0
-              ? pinnedNotes.map((pinnedNote) => {
-                return <PinnedNote
-                  key={"pinnedNote_" + pinnedNote.id}
-                  note={pinnedNote}
-                  onClick={() => loadNote(pinnedNote.id)}
-                  isActive={pinnedNote.id === note.id}
-                />;
-              })
-              : <p>Your pinned notes will appear here</p>
-          }
-        </div>
-      }
-      rightContent={
-        <AppStats stats={stats} />
-      }
-    />
+    <header>
+      <AppTitle
+        toggleAppMenu={toggleAppMenu}
+      />
+      <div
+        id="pinned-notes"
+        style={{
+          display: "flex",
+          height: "100%",
+          overflow: "auto",
+          justifyContent: "flex-start",
+          width: "100vw",
+        }}
+      >
+        {
+          pinnedNotes.length > 0
+            ? pinnedNotes.map((pinnedNote) => {
+              return <PinnedNote
+                key={"pinnedNote_" + pinnedNote.id}
+                note={pinnedNote}
+                onClick={() => loadNote(pinnedNote.id)}
+                isActive={pinnedNote.id === note.id}
+              />;
+            })
+            : <p>Your pinned notes will appear here</p>
+        }
+      </div>
+      <AppStats stats={stats} />
+    </header>
   );
 };
 

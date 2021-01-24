@@ -138,7 +138,8 @@ header {
   height: 50px;
   user-select: none;
 
-  width: 100%;
+  width: 100vw;
+  box-sizing: border-box;
   top: 0;
   left: 0;
   z-index: 5;
@@ -163,8 +164,6 @@ header h1 {
 
 #header-right {
   display: flex;
-  padding-right: 10px;
-  margin-right: 10px;
   height: 50px;
   align-items: center;
 }
@@ -457,6 +456,11 @@ th, td {
 }
 
 
+#app-stats {
+  white-space: pre;
+}
+
+
 @media only screen and (min-width: 1201px) {
   body, #app{
     overflow: hidden;
@@ -469,10 +473,6 @@ th, td {
     bottom: 0px;
     top: 50px;
     width: 100%;
-  }
-
-  #pinned-notes{
-    width: calc(100vw - 420px);
   }
 
   #left-view{
@@ -516,10 +516,6 @@ th, td {
 
   #app-stats{
     display: none;
-  }
-
-  #pinned-notes{
-    width: calc(100vw - 110px);
   }
 
   #left-view{

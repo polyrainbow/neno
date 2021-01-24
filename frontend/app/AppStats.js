@@ -23,7 +23,7 @@ const AppStats = ({
   const showStats = !!stats;
 
   if (!showStats) {
-    return "Loading stats ...";
+    return <div id="app-stats">Loading stats ...</div>;
   }
 
   let percentageOfUnlinkedNotes = null;
