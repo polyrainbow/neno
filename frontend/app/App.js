@@ -17,6 +17,32 @@ const App = () => {
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(null);
 
+
+  const beforeUnload = function(e) {
+    if (unsavedChanges) {
+      // Cancel the event
+      e.preventDefault();
+      // If you prevent default behavior in Mozilla Firefox prompt will
+      // always be shown
+      // Chrome requires returnValue to be set
+      e.returnValue = "";
+    } else {
+      // the absence of a returnValue property on the event will guarantee
+      // the browser unload happens
+      delete e.returnValue;
+    }
+  };
+
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", beforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", beforeUnload);
+    };
+  }, [beforeUnload]);
+
+
   const toggleAppMenu = () => {
     setIsAppMenuOpen(!isAppMenuOpen);
   };
