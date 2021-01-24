@@ -3,4 +3,5 @@ export default interface Stats {
     readonly numberOfLinks: number,
     readonly numberOfUnlinkedNotes: number,
     numberOfFiles?: number,
+    numberOfPins?: number,
 }

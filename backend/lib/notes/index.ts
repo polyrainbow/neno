@@ -191,6 +191,7 @@ const getStats = async (userId:UserId, exhaustive:boolean):Promise<Stats> => {
 
   if (exhaustive) {
     stats.numberOfFiles = await DB.getNumberOfFiles(userId);
+    stats.numberOfPins = db.pinnedNotes.length;
   }
 
   return stats;

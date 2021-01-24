@@ -43,6 +43,10 @@ const StatsDialog = ({
               <td>{emojis.image}{emojis.file} Number of files</td>
               <td>{stats.numberOfFiles.toLocaleString("en")}</td>
             </tr>
+            <tr>
+              <td>{emojis.pin} Number of pins</td>
+              <td>{stats.numberOfPins.toLocaleString("en")}</td>
+            </tr>
           </tbody>
         </table>
         : <p>Fetching stats...</p>
