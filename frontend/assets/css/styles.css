@@ -85,6 +85,16 @@
   background-color: var(--accent-color-1-light);
 }
 
+
+#pinned-notes::-webkit-scrollbar {
+  display: none;
+}
+
+.pinned-note:hover {
+  background-color: var(--nli-color-hover);
+}
+
+
 input, select {
   border: var(--input-border-width) solid var(--main-content-color) !important;
   font-size: var(--main-ui-font-size);
