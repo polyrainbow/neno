@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import NotesListStatus from "./NotesListStatus.js";
+import NoteListStatus from "./NoteListStatus.js";
 import NoteListItem from "./NoteListItem.js";
 import Pagination from "./Pagination.js";
 import NoteSearchDisclaimer from "./NoteSearchDisclaimer.js";
 
 
-const NotesList = ({
+const NoteList = ({
   notes,
   numberOfResults,
   loadNote,
@@ -64,13 +64,13 @@ const NotesList = ({
   }, [notes, status, sortMode]);
 
   if (status === "BUSY" || status === "SEARCH_VALUE_TOO_SHORT") {
-    return <NotesListStatus
+    return <NoteListStatus
       status={status}
     />;
   }
 
   if (!Array.isArray(notes) || (notes.length === 0)) {
-    return <NotesListStatus
+    return <NoteListStatus
       status="NO_NOTES_FOUND"
     />;
   }
@@ -131,4 +131,4 @@ const NotesList = ({
   </section>;
 };
 
-export default NotesList;
+export default NoteList;

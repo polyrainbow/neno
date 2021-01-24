@@ -3,7 +3,7 @@ import React, {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditorViewHeader from "./EditorViewHeader.js";
-import NotesList from "./NotesList.js";
+import NoteList from "./NoteList.js";
 import NoteListControls from "./NoteListControls.js";
 import Note from "./Note.js";
 import * as Utils from "./lib/utils.js";
@@ -397,7 +397,7 @@ const EditorView = ({
             "special:DUPLICATE_URLS",
           )}
         />
-        <NotesList
+        <NoteList
           notes={noteListItems}
           numberOfResults={numberOfResults}
           loadNote={loadNote}

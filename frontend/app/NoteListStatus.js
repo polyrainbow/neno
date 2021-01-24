@@ -1,7 +1,7 @@
 import React from "react";
 
 
-const NotesListStatus = ({
+const NoteListStatus = ({
   status,
 }) => {
   const map = {
@@ -41,4 +41,4 @@ const NotesListStatus = ({
   </div>;
 };
 
-export default NotesListStatus;
+export default NoteListStatus;
