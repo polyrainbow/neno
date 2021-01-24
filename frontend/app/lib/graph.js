@@ -58,6 +58,25 @@ class Graph {
       .classed(Graph.#consts.graphClass, true);
     const mainSVGGroup = thisGraph.mainSVGGroup;
 
+    thisGraph.gridLines = mainSVGGroup.append("g")
+      .classed("grid-lines", true);
+
+    thisGraph.gridLines
+      .append("rect")
+      .attr("width", 100)
+      .attr("height", 40000)
+      .attr("x", -50)
+      .attr("y", -20000)
+      .classed("grid-line", true);
+
+    thisGraph.gridLines
+      .append("rect")
+      .attr("width", 40000)
+      .attr("height", 100)
+      .attr("x", -20000)
+      .attr("y", -50)
+      .classed("grid-line", true);
+
     thisGraph.initialNodePositionIndicator = mainSVGGroup.append("g")
       .classed("new-node-position-indicator", true)
       .append("rect")
