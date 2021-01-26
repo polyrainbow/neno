@@ -124,6 +124,14 @@ const GraphView = ({
               graphInstance.current.inflateGraph(1.1);
             }}
           />
+          <IconButton
+            icon="title"
+            title="Toggle text rendering"
+            onClick={async () => {
+              if (!graphInstance.current) return;
+              graphInstance.current.toggleTextRendering();
+            }}
+          />
         </>
       }
       rightContent={

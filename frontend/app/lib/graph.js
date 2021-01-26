@@ -38,6 +38,7 @@ class Graph {
   #newLinkCreationInProgress = false;
   #selection = new Set();
   #connectedNodeIdsOfSelection = [];
+  #titleRenderingEnabled = false;
 
   #shiftKeyIsPressed = false;
   #ctrlKeyIsPressed = false;
@@ -229,6 +230,11 @@ class Graph {
     thisGraph.#updateConnectedNodeIds();
 
     thisGraph.#updateGraph();
+
+    // by default, text rendering is activated, if the number of nodes is <= 500
+    if (thisGraph.#nodes.length <= 500) {
+      thisGraph.toggleTextRendering();
+    }
   }
 
 
@@ -713,10 +719,6 @@ class Graph {
     nodeG.append("circle")
       .attr("r", String(consts.nodeRadius));
 
-    nodeG.each(function(d) {
-      thisGraph.#insertTitleLinebreaks(d3.select(this), d.title);
-    });
-
     // currently it's not possible to remove nodes in Graph View
     /*
     // remove old nodes
@@ -818,6 +820,22 @@ class Graph {
 
     thisGraph.#updateGraph({ type: "INFLATION" });
     thisGraph.#onChange();
+  }
+
+
+  toggleTextRendering() {
+    const thisGraph = this;
+
+    if (!thisGraph.#titleRenderingEnabled) {
+      thisGraph.#titleRenderingEnabled = true;
+      d3.selectAll("g." + Graph.#consts.nodeClassName)
+        .each(function(d) {
+          thisGraph.#insertTitleLinebreaks(d3.select(this), d.title);
+        });
+    } else {
+      d3.selectAll("text").remove();
+      thisGraph.#titleRenderingEnabled = false;
+    }
   }
 }
 
