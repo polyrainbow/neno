@@ -105,7 +105,7 @@ const GraphView = ({
 
               if (unsavedChanges) {
                 await confirm({
-                  text: Config.texts.discardGraphChangesConfirmation,
+                  text: Config.texts.discardChangesConfirmation,
                   confirmText: "Discard changes",
                   cancelText: "Cancel",
                   encourageConfirmation: false,
