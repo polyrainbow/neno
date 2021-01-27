@@ -100,6 +100,16 @@ const getNotesList = async (
       
       return !!duplicate;
     });
+  } else if (query.includes("exact:")) {
+    const startOfExactQuery = query.indexOf("exact:") + "exact:".length;
+    const exactQuery = query.substr(startOfExactQuery);
+
+    matchingNotes = db.notes
+      // filter notes that match the search query
+      .filter((note:DatabaseNote) => {
+        const title = getNoteTitle(note);
+        return title.toLowerCase() === exactQuery.toLowerCase();
+      });
   } else {
     matchingNotes = db.notes
       // filter notes that match the search query
