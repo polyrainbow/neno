@@ -480,7 +480,11 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "file/:fileId",
+    // the public name parameter is optionally given but is not used by the API.
+    // it's only there for the browser to save/display the file with a custom
+    // name with a url like
+    // /api/file/ae62787f-4344-4124-8026-3839543fde70.png/my-pic.png
+    config.API_PATH + "file/:fileId/:publicName*?",
     mapAuthCookieToHeader, // some files are requested via <img src=""> tag
     verifyJWT,
     function(req, res) {
