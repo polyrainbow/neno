@@ -1,9 +1,8 @@
-import { cloneObject, humanFileSize, stringContainsUUID } from "../utils.js";
+import { cloneObject, stringContainsUUID } from "../utils.js";
 import { FileId } from "./interfaces/FileId.js";
 import { DatabaseId } from "./interfaces/DatabaseId.js";
 import { Readable } from "stream";
 import DatabaseMainData from "./interfaces/DatabaseMainData.js";
-import archiver from "archiver";
 
 let storageProvider;
 
@@ -198,48 +197,7 @@ const getReadableDatabaseStream = async (
     return await getReadableMainDataStream(databaseId);
   }
 
-  const archive = archiver("zip");
-
-  archive.on("error", function(err) {
-    throw new Error(err);
-  });
-
-  // on stream closed we can end the request
-  archive.on("end", function() {
-    const size = archive.pointer();
-    const humanSize = humanFileSize(size);
-    console.log(`Archive for ${databaseId} created. Size: ${humanSize}`);
-  });
-
-  const mainDataStream = await getReadableMainDataStream(databaseId);
-  archive.append(
-    mainDataStream,
-    {
-      name: MAIN_DATA_FILE_NAME,
-    },
-  );
-
-  const fileFolderPath = getFileFolderPath(databaseId);
-  const files = await storageProvider.listDirectory(fileFolderPath);
-  for (let i = 0; i < files.length; i++) {
-    const fileId = files[i];
-
-    if (!stringContainsUUID(fileId)) {
-      continue;
-    }
-
-    const readableStream = getReadableFileStream(databaseId, fileId);
-    archive.append(
-      readableStream,
-      {
-        name: NAME_OF_FILE_FOLDERS + "/" + fileId,
-      },
-    );
-  }
-
-  archive.finalize();
-
-  return archive;
+  return storageProvider.getArchiveStreamOfFolder(databaseId);
 };
 
 

@@ -3,6 +3,7 @@ import fsClassic from "fs";
 import * as path from "path";
 import mkdirp from "mkdirp";
 import { Readable } from "stream";
+import archiver from "archiver";
 
 
 async function asyncFilter<T>(
@@ -103,6 +104,20 @@ export default class FileSystemStorageProvider {
     const finalPath = this.joinPath(this.#dataPath, requestPath);
     const filenames = await fs.readdir(finalPath);
     return filenames;
+  }
+
+
+  getArchiveStreamOfFolder(requestPath) {
+    const archive = archiver("zip");
+  
+    archive.on("error", function(err) {
+      throw new Error(err);
+    });
+
+    const finalPath = this.joinPath(this.#dataPath, requestPath);
+    archive.directory(finalPath, false);
+    archive.finalize();
+    return archive;
   }
 
   joinPath(...args) {
