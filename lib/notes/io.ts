@@ -169,12 +169,14 @@ const deleteFile = async (
 };
 
 
-const getReadableMainDataStream = async (id:DatabaseId):Promise<Readable> => {
-  const db = await getMainData(id);
-  const readable = new Readable();
-  readable.push(JSON.stringify(db));    // the string you want
-  readable.push(null); // indicates end-of-file - the end of the stream
-  return readable;
+const getReadableMainDataStream = async (
+  databaseId:DatabaseId,
+):Promise<Readable> => {
+  const filename = storageProvider.joinPath(
+    databaseId,
+    MAIN_DATA_FILE_NAME,
+  );
+  return storageProvider.getReadableStream(filename);
 };
 
 
