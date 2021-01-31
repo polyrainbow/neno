@@ -1,6 +1,6 @@
-import NoteToTransmit from "./interfaces/NoteToTransmit.js";
-import { NoteId } from "./interfaces/NoteId.js";
-import Stats from "./interfaces/Stats.js";
+import NoteToTransmit from "./lib/notes/interfaces/NoteToTransmit.js";
+import { NoteId } from "./lib/notes/interfaces/NoteId.js";
+import Stats from "./lib/notes/interfaces/Stats.js";
 import formidable from "formidable";
 import { yyyymmdd } from "./lib/utils.js";
 import * as config from "./config.js";
@@ -14,7 +14,7 @@ import { APIError } from "./interfaces/APIError.js";
 import { File } from "./interfaces/File.js";
 import cookieParser from "cookie-parser";
 import AppStartOptions from "./interfaces/AppStartOptions.js";
-import NoteListPage from "./interfaces/NoteListPage.js";
+import NoteListPage from "./lib/notes/interfaces/NoteListPage.js";
 import FileSystemStorageProvider from "./lib/FileSystemStorageProvider.js";
 import fs from "fs";
 import http from "http";

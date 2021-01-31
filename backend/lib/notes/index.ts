@@ -20,26 +20,26 @@ import {
   createNoteListItem,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
-import Database from "../../interfaces/DatabaseMainData.js";
-import NoteListItem from "../../interfaces/NoteListItem.js";
-import Graph from "../../interfaces/Graph.js";
-import { DatabaseId } from "../../interfaces/DatabaseId.js";
-import { NoteId } from "../../interfaces/NoteId.js";
-import NoteToTransmit from "../../interfaces/NoteToTransmit.js";
-import GraphNode from "../../interfaces/GraphNode.js";
-import DatabaseNote from "../../interfaces/DatabaseNote.js";
-import NoteFromUser from "../../interfaces/NoteFromUser.js";
-import Stats from "../../interfaces/Stats.js";
-import GraphFromUser from "../../interfaces/GraphFromUser.js";
-import GraphNodePositionUpdate from "../../interfaces/GraphNodePositionUpdate.js";
-import { FileId } from "../../interfaces/FileId.js";
-import UrlMetadataResponse from "../../interfaces/UrlMetadataResponse.js";
-import ImportLinkAsNoteFailure from "../../interfaces/ImportLinkAsNoteFailure.js";
+import Database from "./interfaces/DatabaseMainData.js";
+import NoteListItem from "./interfaces/NoteListItem.js";
+import Graph from "./interfaces/Graph.js";
+import { DatabaseId } from "./interfaces/DatabaseId.js";
+import { NoteId } from "./interfaces/NoteId.js";
+import NoteToTransmit from "./interfaces/NoteToTransmit.js";
+import GraphNode from "./interfaces/GraphNode.js";
+import DatabaseNote from "./interfaces/DatabaseNote.js";
+import NoteFromUser from "./interfaces/NoteFromUser.js";
+import Stats from "./interfaces/Stats.js";
+import GraphFromUser from "./interfaces/GraphFromUser.js";
+import GraphNodePositionUpdate from "./interfaces/GraphNodePositionUpdate.js";
+import { FileId } from "./interfaces/FileId.js";
+import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
+import ImportLinkAsNoteFailure from "./interfaces/ImportLinkAsNoteFailure.js";
 import getUrlMetadata from "./getUrlMetadata.js";
 import * as config from "./config.js";
 import { Readable } from "stream";
-import NoteListPage from "../../interfaces/NoteListPage.js";
-import { NoteListSortMode } from "../../interfaces/NoteListSortMode.js";
+import NoteListPage from "./interfaces/NoteListPage.js";
+import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 
 
 /**

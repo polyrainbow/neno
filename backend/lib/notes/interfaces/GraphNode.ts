@@ -1,6 +1,6 @@
-import LinkedNote from "./LinkedNote";
-import NodePosition from "./NodePosition";
-import { NoteId } from "./NoteId";
+import LinkedNote from "./LinkedNote.js";
+import NodePosition from "./NodePosition.js";
+import { NoteId } from "./NoteId.js";
 
 export default interface GraphNode {
     id: NoteId,

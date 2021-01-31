@@ -1,18 +1,18 @@
-import DatabaseMainData from "../../interfaces/DatabaseMainData.js";
-import DatabaseNote from "../../interfaces/DatabaseNote.js";
-import { FileId } from "../../interfaces/FileId.js";
-import GraphNodePositionUpdate from "../../interfaces/GraphNodePositionUpdate.js";
-import { Link } from "../../interfaces/Link.js";
-import LinkedNote from "../../interfaces/LinkedNote.js";
-import Note from "../../interfaces/Note.js";
-import NoteFromUser from "../../interfaces/NoteFromUser.js";
-import { NoteId } from "../../interfaces/NoteId.js";
-import NoteListItem from "../../interfaces/NoteListItem.js";
-import NoteListItemFeatures from "../../interfaces/NoteListItemFeatures.js";
-import { NoteListSortMode } from "../../interfaces/NoteListSortMode.js";
-import NoteToTransmit from "../../interfaces/NoteToTransmit.js";
-import UserNoteChange from "../../interfaces/UserNoteChange.js";
-import { UserNoteChangeType } from "../../interfaces/UserNoteChangeType.js";
+import DatabaseMainData from "./interfaces/DatabaseMainData.js";
+import DatabaseNote from "./interfaces/DatabaseNote.js";
+import { FileId } from "./interfaces/FileId.js";
+import GraphNodePositionUpdate from "./interfaces/GraphNodePositionUpdate.js";
+import { Link } from "./interfaces/Link.js";
+import LinkedNote from "./interfaces/LinkedNote.js";
+import Note from "./interfaces/Note.js";
+import NoteFromUser from "./interfaces/NoteFromUser.js";
+import { NoteId } from "./interfaces/NoteId.js";
+import NoteListItem from "./interfaces/NoteListItem.js";
+import NoteListItemFeatures from "./interfaces/NoteListItemFeatures.js";
+import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
+import NoteToTransmit from "./interfaces/NoteToTransmit.js";
+import UserNoteChange from "./interfaces/UserNoteChange.js";
+import { UserNoteChangeType } from "./interfaces/UserNoteChangeType.js";
 import * as Utils from "../utils.js";
 
 

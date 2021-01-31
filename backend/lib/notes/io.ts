@@ -1,8 +1,8 @@
 import { cloneObject, humanFileSize, stringContainsUUID } from "../utils.js";
-import { FileId } from "../../interfaces/FileId.js";
-import { DatabaseId } from "../../interfaces/DatabaseId.js";
+import { FileId } from "./interfaces/FileId.js";
+import { DatabaseId } from "./interfaces/DatabaseId.js";
 import { Readable } from "stream";
-import DatabaseMainData from "../../interfaces/DatabaseMainData.js";
+import DatabaseMainData from "./interfaces/DatabaseMainData.js";
 import archiver from "archiver";
 
 let storageProvider;
