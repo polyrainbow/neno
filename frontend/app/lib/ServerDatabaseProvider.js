@@ -2,6 +2,12 @@ import * as API from "./api.js";
 import * as tokenManager from "./tokenManager.js";
 
 export default class ServerDatabaseProvider {
+  static features = [
+    "EXPORT_DATABASE",
+    "AUTHENTICATION",
+    "FETCH_URL_METADATA",
+  ];
+
   isAuthorized() {
     return !!tokenManager.get();
   }

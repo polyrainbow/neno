@@ -18,8 +18,13 @@ export default {
     // `publicPath` is where Webpack will load your bundles from (optional)
     publicPath: "/assets/",
   },
+  resolve: {
+    // Add .ts and .tsx as a resolvable extension.
+    extensions: [".ts", ".tsx", ".js"],
+  },
   module: {
     rules: [
+      { test: /\.tsx?$/, loader: "ts-loader" },
       {
         test: /\.js?$/,
         include: [
@@ -28,9 +33,7 @@ export default {
         loader: "babel-loader",
         options: {
           presets: [
-            [
-              "@babel/preset-react", {},
-            ],
+            "@babel/preset-react",
           ],
           plugins: [
             // we need these two plugins because webpack does not support

@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import EditorView from "./EditorView.js";
 import GraphView from "./GraphView.js";
 import LoginView from "./LoginView.js";
 import BusyView from "./BusyView.js";
-import databaseProvider from "./lib/database.js";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
 import AppMenu from "./AppMenu.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 import StatsDialog from "./StatsDialog.js";
+import ServerDatabaseProvider from "./lib/ServerDatabaseProvider.js";
+import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
 
 
 const App = () => {
@@ -47,8 +48,12 @@ const App = () => {
     setIsAppMenuOpen(!isAppMenuOpen);
   };
 
+  const databaseProviderRef = useRef(null);
+  const databaseProvider = databaseProviderRef.current;
 
   useEffect(() => {
+    databaseProviderRef.current = new ServerDatabaseProvider();
+
     if (databaseProvider.isAuthorized()) {
       setActiveView("EDITOR");
     } else {
