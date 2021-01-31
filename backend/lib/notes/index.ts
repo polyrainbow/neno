@@ -440,7 +440,7 @@ const pin = async (userId, noteId):Promise<NoteToTransmit[]> => {
 
   await DB.flushChanges(db);
 
-  const pinnedNotes = await Promise.all(
+  const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes
       .map((noteId) => {
         return get(noteId, userId);
@@ -458,7 +458,7 @@ const unpin = async (userId, noteId):Promise<NoteToTransmit[]> => {
 
   await DB.flushChanges(db);
 
-  const pinnedNotes = await Promise.all(
+  const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes
       .map((noteId) => {
         return get(noteId, userId);
@@ -472,7 +472,7 @@ const unpin = async (userId, noteId):Promise<NoteToTransmit[]> => {
 const getPins = async (userId):Promise<NoteToTransmit[]> => {
   const db = await DB.getMainData(userId);
 
-  const pinnedNotes = await Promise.all(
+  const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes
       .map((noteId) => {
         return get(noteId, userId);
