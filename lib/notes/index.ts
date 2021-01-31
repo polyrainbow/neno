@@ -35,20 +35,34 @@ import GraphNodePositionUpdate from "./interfaces/GraphNodePositionUpdate.js";
 import { FileId } from "./interfaces/FileId.js";
 import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
 import ImportLinkAsNoteFailure from "./interfaces/ImportLinkAsNoteFailure.js";
-import getUrlMetadata from "./getUrlMetadata.js";
 import * as config from "./config.js";
 import { Readable } from "stream";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 
 
+/* this is the fallback getUrlMetadata function that is used if the initializer
+does not provide a better one */
+let getUrlMetadata = (url) => {
+  return Promise.resolve({
+    "url": url,
+    "title": url,
+    "description": "",
+    "image": "",
+  });
+};
+
 /**
   EXPORTS
 **/
 
 
-const init = async (storageProvider):Promise<void> => {
+const init = async (storageProvider, _getUrlMetadata):Promise<void> => {
   console.log("Initializing notes module...");
+
+  if (typeof _getUrlMetadata === "function") {
+    getUrlMetadata = _getUrlMetadata;
+  }
 
   DB.init({
     storageProvider,

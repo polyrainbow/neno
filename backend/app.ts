@@ -19,6 +19,7 @@ import FileSystemStorageProvider from "./lib/FileSystemStorageProvider.js";
 import fs from "fs";
 import http from "http";
 import https from "https";
+import getUrlMetadata from "./lib/getUrlMetadata.js";
 
 
 const startApp = async ({
@@ -30,7 +31,7 @@ const startApp = async ({
   const storageProvider = new FileSystemStorageProvider(dataPath);
   console.log("File system storage ready at " + dataPath);
 
-  await Notes.init(storageProvider);
+  await Notes.init(storageProvider, getUrlMetadata);
   const app = express();
 
   const mapAuthCookieToHeader = (function(req, res, next) {

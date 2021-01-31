@@ -7,7 +7,7 @@ import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
 import User from "./interfaces/User.js";
 import getUsers from "./users.js";
-import { getUrlMetadata } from "./lib/notes/index.js";
+import getUrlMetadata from "./lib/getUrlMetadata.js";
 
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
