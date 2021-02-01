@@ -69,6 +69,6 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
   joinPath(...args) {
-    return args.split("/");
+    return args.join("/");
   }
 }
