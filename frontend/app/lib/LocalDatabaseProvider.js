@@ -1,16 +1,53 @@
+import * as IDB from "idb-keyval";
 import FileSystemAccessAPIStorageProvider
   from "./FileSystemAccessAPIStorageProvider.js";
 
 export default class LocalDatabaseProvider {
-  static #localStorageKey = "LOCAL_DB_FOLDER_HANDLE";
+  static #handleStorageKey = "LOCAL_DB_FOLDER_HANDLE";
+  #isDatabaseInitialized = false;
+
+  /* PUBLIC */
+
   static features = ["DATABASE_FOLDER"];
+  static type = "LOCAL";
+
+  // when we return that we have an access token, the app switches to editor
+  // mode and the editor will start fetching data, so we need to be prepared
+  // and initialize the database
+  async hasAccessToken() {
+    const folderHandle = await IDB.get(LocalDatabaseProvider.#handleStorageKey);
+    if (typeof folderHandle !== "undefined") {
+      await this.initializeDatabase(folderHandle);
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   /* when using a local db folder, we'll always call this db the same */
   static dbId = "local";
 
   #notesModule;
 
-  async initDatabase(folderHandle) { console.log(folderHandle)
+  async login(folderHandle) {
+    await IDB.set(
+      LocalDatabaseProvider.#handleStorageKey,
+      folderHandle,
+    );
+
+    await this.initializeDatabase(folderHandle);
+  }
+
+
+  async removeAccess() {
+    await IDB.del(LocalDatabaseProvider.#handleStorageKey);
+  }
+
+
+  async initializeDatabase(folderHandle) {
+    if (this.#isDatabaseInitialized) {
+      return;
+    }
     this.#notesModule = await import("../../../lib/notes/index.ts");
 
     const storageProvider
@@ -18,14 +55,9 @@ export default class LocalDatabaseProvider {
 
     await this.#notesModule.init(storageProvider);
 
-    // TODO: replace localStorage with idb-keyval
-    // https://stackoverflow.com/questions/65928613/file-system-access-api-is-it-possible-to-store-the-filehandle-of-a-saved-or-loa
-
-    localStorage.setItem(
-      LocalDatabaseProvider.#localStorageKey,
-      folderHandle.toString(),
-    );
+    this.#isDatabaseInitialized = true;
   }
+
 
   getNote(noteId) {
     return this.#notesModule.get(noteId, LocalDatabaseProvider.dbId);
@@ -84,10 +116,6 @@ export default class LocalDatabaseProvider {
       file.stream(),
       file.type,
     );
-  }
-
-  hasAccess() {
-    return !!localStorage.getItem(LocalDatabaseProvider.#localStorageKey);
   }
 
 

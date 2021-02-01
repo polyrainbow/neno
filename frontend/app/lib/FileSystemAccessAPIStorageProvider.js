@@ -1,6 +1,8 @@
 export default class FileSystemAccessAPIStorageProvider {
   #directoryHandle;
 
+  DS = "/";
+
   constructor(directoryHandle) {
     this.#directoryHandle = directoryHandle;
   }
@@ -9,11 +11,11 @@ export default class FileSystemAccessAPIStorageProvider {
     requestPath,
     data,
   ) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf("/"));
+    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
     const subDir = this.#directoryHandle.getDirectoryHandle(subDirName,
       { create: true },
     );
-    const filename = requestPath.substr(requestPath.indexOf("/") + 1);
+    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
     const fileHandle = subDir.getFileHandle(filename, { create: true });
     const writable = fileHandle.createWritable();
     await writable.write(data);
@@ -24,29 +26,40 @@ export default class FileSystemAccessAPIStorageProvider {
     requestPath,
     readableStream,
   ) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf("/"));
+    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
     const subDir = this.#directoryHandle.getDirectoryHandle(subDirName,
       { create: true },
     );
-    const filename = requestPath.substr(requestPath.indexOf("/") + 1);
+    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
     const fileHandle = subDir.getFileHandle(filename, { create: true });
     const writable = fileHandle.createWritable();
     await readableStream.pipeTo(writable);
   }
 
-  async readObject(requestPath) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf("/"));
-    const subDir = this.#directoryHandle.getDirectoryHandle(subDirName);
-    const filename = requestPath.substr(requestPath.indexOf("/") + 1);
-    const fileHandle = subDir.getFileHandle(filename);
-    const file = fileHandle.getFile();
-    return file;
+  async readObjectAsString(requestPath) { console.log("rpath", requestPath)
+    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
+    console.log("subdirname", subDirName)
+    console.log("dir handle", this.#directoryHandle)
+    const subDir = await this.#directoryHandle.getDirectoryHandle(
+      subDirName,
+      {
+        create: true,
+      },
+    );
+    console.log("subdir", subDir)
+    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
+    console.log("filename", filename)
+    const fileHandle = await subDir.getFileHandle(filename);
+    console.log("fileHandle", fileHandle)
+    const file = await fileHandle.getFile(); console.log("File", file)
+    const string = await file.text();
+    return string;
   }
 
   getReadableStream(requestPath) {
     const subDirName = requestPath.substr(0, requestPath.indexOf("/"));
     const subDir = this.#directoryHandle.getDirectoryHandle(subDirName);
-    const filename = requestPath.substr(requestPath.indexOf("/") + 1);
+    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
     const fileHandle = subDir.getFileHandle(filename);
     const file = fileHandle.getFile();
     const readable = file.stream();
@@ -54,9 +67,9 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
   async removeObject(requestPath) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf("/"));
+    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
     const subDir = this.#directoryHandle.getDirectoryHandle(subDirName);
-    const filename = requestPath.substr(requestPath.indexOf("/") + 1);
+    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
     await subDir.removeEntry(filename);
   }
 
@@ -69,6 +82,6 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
   joinPath(...args) {
-    return args.join("/");
+    return args.join(this.DS);
   }
 }

@@ -56,12 +56,16 @@ const App = () => {
 
   const databaseProvider = databaseMode === "LOCAL"
     ? localDatabaseProvider
-    : serverDatabaseProvider;
+    : (
+      databaseMode === "SERVER"
+        ? serverDatabaseProvider
+        : null
+    );
 
-  useEffect(() => {
+  useEffect(async () => {
     localDatabaseProviderRef.current = new LocalDatabaseProvider();
 
-    if (localDatabaseProviderRef.current.hasAccess()) {
+    if (await localDatabaseProviderRef.current.hasAccessToken()) {
       setDatabaseMode("LOCAL");
       setActiveView("EDITOR");
       return;
@@ -69,7 +73,7 @@ const App = () => {
 
     serverDatabaseProviderRef.current = new ServerDatabaseProvider();
 
-    if (serverDatabaseProviderRef.current.hasAccess()) {
+    if (await serverDatabaseProviderRef.current.hasAccessToken()) {
       setDatabaseMode("SERVER");
       setActiveView("EDITOR");
       return;
@@ -142,6 +146,7 @@ const App = () => {
           unsavedChanges={unsavedChanges}
           setUnsavedChanges={setUnsavedChanges}
           showStats={() => setOpenDialog("STATS")}
+          databaseProvider={databaseProvider}
         />
         : ""
     }

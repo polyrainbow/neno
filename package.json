@@ -28,6 +28,7 @@
     "d3": "^6.3.1",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
+    "idb-keyval": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
     "mkdirp": "^1.0.4",
     "react": "^17.0.1",

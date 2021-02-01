@@ -30,8 +30,7 @@ const readMainDataFile = async (
   );
 
   try {
-    const fileBuffer = await storageProvider.readObject(filename);
-    const json = fileBuffer.toString();
+    const json = await storageProvider.readObjectAsString(filename);
     const object:DatabaseMainData = JSON.parse(json);
     return object;
   } catch (e) {

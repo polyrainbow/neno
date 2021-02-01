@@ -1,6 +1,5 @@
 import React from "react";
 import AppMenuItem from "./AppMenuItem.js";
-import * as tokenManager from "./lib/tokenManager.js";
 import * as Config from "./lib/config.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import OutsideAlerter from "./OutsideAlerter.js";
@@ -13,6 +12,7 @@ const AppMenu = ({
   unsavedChanges,
   setUnsavedChanges,
   showStats,
+  databaseProvider,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -83,13 +83,13 @@ const AppMenu = ({
         onClick={showStats}
       />
       {
-        tokenManager.get()
+        ["EDITOR", "GRAPH"].includes(activeView)
           ? <AppMenuItem
             id="button_logout"
             label="Logout"
             icon="lock"
             onClick={() => {
-              tokenManager.remove();
+              databaseProvider.removeAccess();
               setActiveView("LOGIN");
             }}
           />

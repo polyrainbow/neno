@@ -89,7 +89,7 @@ const getNotesList = async (
   dbId: DatabaseId,
   options,
 ): Promise<NoteListPage> => {
-  const query = options.query;
+  const query = options.query || "";
   const caseSensitiveQuery = options.caseSensitiveQuery;
   const page = Math.max(options.page, 1) || 1;
   const sortMode

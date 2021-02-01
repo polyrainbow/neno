@@ -89,7 +89,7 @@ const LoginView = ({
           // get folder handle
           try {
             const folderHandle = await window.showDirectoryPicker();
-            await localDatabaseProvider.initDatabase(folderHandle);
+            await localDatabaseProvider.login(folderHandle);
             setDatabaseMode("LOCAL");
             setActiveView("EDITOR");
           } catch (e) {

@@ -8,7 +8,9 @@ export default class ServerDatabaseProvider {
     "FETCH_URL_METADATA",
   ];
 
-  hasAccess() {
+  static type = "SERVER";
+
+  async hasAccessToken() {
     return !!tokenManager.get();
   }
 
@@ -18,6 +20,10 @@ export default class ServerDatabaseProvider {
 
   login(username, password) {
     return API.login(username, password);
+  }
+
+  async removeAccess() {
+    return tokenManager.remove();
   }
 
   getNote(noteId) {

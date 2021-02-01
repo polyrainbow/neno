@@ -68,10 +68,11 @@ export default class FileSystemStorageProvider {
     })
   }
 
-  async readObject(requestPath:string):Promise<Buffer> {
+  async readObjectAsString(requestPath:string):Promise<string> {
     const finalPath = this.joinPath(this.#dataPath, requestPath);
     const content = await fs.readFile(finalPath);
-    return content;
+    const string = content.toString();
+    return string;
   }
 
   getReadableStream(requestPath:string):Readable {
