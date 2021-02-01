@@ -17,7 +17,12 @@ export default class FileSystemAccessAPIStorageProvider {
       },
     );
     const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
-    const fileHandle = await subDir.getFileHandle(filename);
+    const fileHandle = await subDir.getFileHandle(
+      filename,
+      {
+        create: true,
+      },
+    );
     return fileHandle;
   }
 
@@ -25,12 +30,7 @@ export default class FileSystemAccessAPIStorageProvider {
     requestPath,
     data,
   ) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
-    const subDir = this.#directoryHandle.getDirectoryHandle(subDirName,
-      { create: true },
-    );
-    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
-    const fileHandle = subDir.getFileHandle(filename, { create: true });
+    const fileHandle = await this.getFileHandle(requestPath);
     const writable = fileHandle.createWritable();
     await writable.write(data);
     await writable.close();
