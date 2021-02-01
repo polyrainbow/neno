@@ -346,7 +346,10 @@ const addFile = async (
 };
 
 
-const getReadableFileStream = (dbId: DatabaseId, fileId:FileId):Readable => {
+const getReadableFileStream = (
+  dbId: DatabaseId,
+  fileId:FileId,
+):Promise<Readable> => {
   return DB.getReadableFileStream(dbId, fileId);
 };
 
@@ -441,8 +444,11 @@ const importLinksAsNotes = async (dbId, links) => {
 };
 
 
-const pin = async (userId, noteId):Promise<NoteToTransmit[]> => {
-  const db = await DB.getMainData(userId);
+const pin = async (
+  dbId:DatabaseId,
+  noteId:NoteId,
+):Promise<NoteToTransmit[]> => {
+  const db = await DB.getMainData(dbId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
   if (noteIndex === -1) {
     throw new Error("Note not found");
@@ -457,7 +463,7 @@ const pin = async (userId, noteId):Promise<NoteToTransmit[]> => {
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes
       .map((noteId) => {
-        return get(noteId, userId);
+        return get(noteId, dbId);
       })
   );
 
@@ -465,8 +471,11 @@ const pin = async (userId, noteId):Promise<NoteToTransmit[]> => {
 };
 
 
-const unpin = async (userId, noteId):Promise<NoteToTransmit[]> => {
-  const db = await DB.getMainData(userId);
+const unpin = async (
+  dbId:DatabaseId,
+  noteId:NoteId,
+):Promise<NoteToTransmit[]> => {
+  const db = await DB.getMainData(dbId);
 
   db.pinnedNotes = db.pinnedNotes.filter((nId) => nId !== noteId);
 
@@ -475,7 +484,7 @@ const unpin = async (userId, noteId):Promise<NoteToTransmit[]> => {
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes
       .map((noteId) => {
-        return get(noteId, userId);
+        return get(noteId, dbId);
       })
   );
 
@@ -483,13 +492,13 @@ const unpin = async (userId, noteId):Promise<NoteToTransmit[]> => {
 };
 
 
-const getPins = async (userId):Promise<NoteToTransmit[]> => {
-  const db = await DB.getMainData(userId);
+const getPins = async (dbId:DatabaseId):Promise<NoteToTransmit[]> => {
+  const db = await DB.getMainData(dbId);
 
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes
       .map((noteId) => {
-        return get(noteId, userId);
+        return get(noteId, dbId);
       })
   );
 

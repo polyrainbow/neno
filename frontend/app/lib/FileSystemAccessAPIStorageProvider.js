@@ -7,6 +7,20 @@ export default class FileSystemAccessAPIStorageProvider {
     this.#directoryHandle = directoryHandle;
   }
 
+
+  async getFileHandle(requestPath) {
+    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
+    const subDir = await this.#directoryHandle.getDirectoryHandle(
+      subDirName,
+      {
+        create: true,
+      },
+    );
+    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
+    const fileHandle = await subDir.getFileHandle(filename);
+    return fileHandle;
+  }
+
   async writeObject(
     requestPath,
     data,
@@ -26,41 +40,20 @@ export default class FileSystemAccessAPIStorageProvider {
     requestPath,
     readableStream,
   ) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
-    const subDir = this.#directoryHandle.getDirectoryHandle(subDirName,
-      { create: true },
-    );
-    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
-    const fileHandle = subDir.getFileHandle(filename, { create: true });
+    const fileHandle = await this.getFileHandle(requestPath);
     const writable = fileHandle.createWritable();
     await readableStream.pipeTo(writable);
   }
 
-  async readObjectAsString(requestPath) { console.log("rpath", requestPath)
-    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
-    console.log("subdirname", subDirName)
-    console.log("dir handle", this.#directoryHandle)
-    const subDir = await this.#directoryHandle.getDirectoryHandle(
-      subDirName,
-      {
-        create: true,
-      },
-    );
-    console.log("subdir", subDir)
-    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
-    console.log("filename", filename)
-    const fileHandle = await subDir.getFileHandle(filename);
-    console.log("fileHandle", fileHandle)
-    const file = await fileHandle.getFile(); console.log("File", file)
+  async readObjectAsString(requestPath) {
+    const fileHandle = await this.getFileHandle(requestPath);
+    const file = await fileHandle.getFile();
     const string = await file.text();
     return string;
   }
 
-  getReadableStream(requestPath) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf("/"));
-    const subDir = this.#directoryHandle.getDirectoryHandle(subDirName);
-    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
-    const fileHandle = subDir.getFileHandle(filename);
+  async getReadableStream(requestPath) {
+    const fileHandle = await this.getFileHandle(requestPath);
     const file = fileHandle.getFile();
     const readable = file.stream();
     return readable;

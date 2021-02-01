@@ -75,7 +75,7 @@ export default class FileSystemStorageProvider {
     return string;
   }
 
-  getReadableStream(requestPath:string):Readable {
+  async getReadableStream(requestPath:string):Promise<Readable> {
     const finalPath = this.joinPath(this.#dataPath, requestPath);
     const readableStream = fsClassic.createReadStream(finalPath);
     return readableStream;

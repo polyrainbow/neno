@@ -85,11 +85,11 @@ const init = (config):void => {
 };
 
 
-const getMainData = async (id: DatabaseId):Promise<DatabaseMainData> => {
+const getMainData = async (dbId: DatabaseId):Promise<DatabaseMainData> => {
   // 1. try to get from loaded objects
   const mainDataFromLoadedObjects:DatabaseMainData | undefined
     = loadedMainDataObjects.find(
-      (db) => db.id === id,
+      (db) => db.id === dbId,
     );
 
   if (mainDataFromLoadedObjects) {
@@ -98,14 +98,14 @@ const getMainData = async (id: DatabaseId):Promise<DatabaseMainData> => {
 
   // 2. try to get from file
   const mainDataFromFile:DatabaseMainData | null
-    = await readMainDataFile(id);
+    = await readMainDataFile(dbId);
   if (mainDataFromFile) {
     loadedMainDataObjects.push(mainDataFromFile);
     return mainDataFromFile;
   }
 
   // 3. create new database and return main data
-  const mainDataFromNewDB:DatabaseMainData = await createDatabase(id);
+  const mainDataFromNewDB:DatabaseMainData = await createDatabase(dbId);
   return mainDataFromNewDB;
 };
 
@@ -137,8 +137,8 @@ const forEach = async (
   const databases = await storageProvider.listSubDirectories("")
   
   for (let i = 0; i < databases.length; i++) {
-    const databaseId:DatabaseId = databases[i];
-    const mainData:DatabaseMainData = await getMainData(databaseId);
+    const dbId:DatabaseId = databases[i];
+    const mainData:DatabaseMainData = await getMainData(dbId);
     const mainDataCopy:DatabaseMainData = cloneObject(mainData);
     handler(mainDataCopy);
     await flushChanges(mainDataCopy);
@@ -175,17 +175,19 @@ const getReadableMainDataStream = async (
     databaseId,
     MAIN_DATA_FILE_NAME,
   );
-  return storageProvider.getReadableStream(filename);
+  const stream = await storageProvider.getReadableStream(filename);
+  return stream;
 };
 
 
-const getReadableFileStream = (
+const getReadableFileStream = async (
   databaseId: DatabaseId,
   fileId:FileId,
-):Readable => {
+):Promise<Readable> => {
   const fileFolderPath = getFileFolderPath(databaseId);
   const filepath = storageProvider.joinPath(fileFolderPath, fileId);
-  return storageProvider.getReadableStream(filepath);
+  const stream = await storageProvider.getReadableStream(filepath);
+  return stream;
 };
 
 

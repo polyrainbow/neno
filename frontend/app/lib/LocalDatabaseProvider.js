@@ -120,14 +120,14 @@ export default class LocalDatabaseProvider {
 
 
   pinNote(noteId) {
-    return this.#notesModule.pinNote(noteId);
+    return this.#notesModule.pin(LocalDatabaseProvider.dbId, noteId);
   }
 
   unpinNote(noteId) {
-    return this.#notesModule.unpinNote(noteId);
+    return this.#notesModule.unpin(LocalDatabaseProvider.dbId, noteId);
   }
 
   getPins() {
-    return this.#notesModule.getPins();
+    return this.#notesModule.getPins(LocalDatabaseProvider.dbId);
   }
 }

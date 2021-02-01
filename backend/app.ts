@@ -488,10 +488,10 @@ const startApp = async ({
     config.API_PATH + "file/:fileId/:publicName*?",
     mapAuthCookieToHeader, // some files are requested via <img src=""> tag
     verifyJWT,
-    function(req, res) {
+    async function(req, res) {
       try {
         const fileStream
-          = Notes.getReadableFileStream(req.userId, req.params.fileId);
+          = await Notes.getReadableFileStream(req.userId, req.params.fileId);
         
         fileStream.on("error", () => {
           const response:APIResponse = {
