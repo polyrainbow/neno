@@ -24,7 +24,13 @@ export default {
   },
   module: {
     rules: [
-      { test: /\.tsx?$/, loader: "ts-loader" },
+      {
+        test: /\.tsx?$/,
+        use: [
+          "ts-loader",
+          path.resolve(__dirname, "ts-loader-preparation.cjs"),
+        ],
+      },
       {
         test: /\.js?$/,
         include: [
