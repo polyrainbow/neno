@@ -1,15 +1,11 @@
 import * as path from "path";
-import * as url from "url";
 import { v4 as uuidv4 } from "uuid";
 import { Command } from "commander";
 const program = new Command();
+import { REPO_PATH } from "./config.js";
 
 const getArguments = (version) => {
   program.version(version);
-
-  const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-  
-  const REPO_PATH = path.join(__dirname, "..");
   
   program
     .option(
