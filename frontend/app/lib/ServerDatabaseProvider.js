@@ -8,7 +8,7 @@ export default class ServerDatabaseProvider {
     "FETCH_URL_METADATA",
   ];
 
-  isAuthorized() {
+  hasAccess() {
     return !!tokenManager.get();
   }
 

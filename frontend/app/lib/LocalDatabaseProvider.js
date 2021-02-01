@@ -76,4 +76,8 @@ export default class LocalDatabaseProvider {
       file.type,
     );
   }
+
+  hasAccess() {
+    return false;
+  }
 }

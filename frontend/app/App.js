@@ -17,6 +17,7 @@ const App = () => {
   const [initialNoteId, setInitialNoteId] = useState(null);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(null);
+  const [databaseMode, setDatabaseMode] = useState("NONE");
 
 
   const beforeUnload = function(e) {
@@ -48,17 +49,33 @@ const App = () => {
     setIsAppMenuOpen(!isAppMenuOpen);
   };
 
-  const databaseProviderRef = useRef(null);
-  const databaseProvider = databaseProviderRef.current;
+  const serverDatabaseProviderRef = useRef(null);
+  const serverDatabaseProvider = serverDatabaseProviderRef.current;
+  const localDatabaseProviderRef = useRef(null);
+  const localDatabaseProvider = localDatabaseProviderRef.current;
+
+  const databaseProvider = databaseMode === "local"
+    ? localDatabaseProvider
+    : serverDatabaseProvider;
 
   useEffect(() => {
-    databaseProviderRef.current = new ServerDatabaseProvider();
+    localDatabaseProviderRef.current = new LocalDatabaseProvider();
 
-    if (databaseProvider.isAuthorized()) {
+    if (localDatabaseProviderRef.current.hasAccess()) {
+      setDatabaseMode("LOCAL");
       setActiveView("EDITOR");
-    } else {
-      setActiveView("LOGIN");
+      return;
     }
+
+    serverDatabaseProviderRef.current = new ServerDatabaseProvider();
+
+    if (serverDatabaseProviderRef.current.hasAccess()) {
+      setDatabaseMode("SERVER");
+      setActiveView("EDITOR");
+      return;
+    }
+
+    setActiveView("LOGIN");
   }, []);
 
   let content;
@@ -91,7 +108,9 @@ const App = () => {
         setUnsavedChanges(false);
         setActiveView(view);
       }}
-      databaseProvider={databaseProvider}
+      setDatabaseMode={setDatabaseMode}
+      serverDatabaseProvider={serverDatabaseProvider}
+      localDatabaseProvider={localDatabaseProvider}
       toggleAppMenu={toggleAppMenu}
     />;
   }

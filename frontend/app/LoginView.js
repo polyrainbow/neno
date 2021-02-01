@@ -4,7 +4,9 @@ import HeaderContainer from "./HeaderContainer.js";
 
 const LoginView = ({
   setActiveView,
-  databaseProvider,
+  serverDatabaseProvider,
+  localDatabaseProvider,
+  setDatabaseMode,
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -16,9 +18,10 @@ const LoginView = ({
 
   const startLoginAttempt = () => {
     setIsBusy(true);
-    databaseProvider.login(username, password)
+    serverDatabaseProvider.login(username, password)
       .then((success) => {
         if (success) {
+          setDatabaseMode("SERVER");
           setActiveView("EDITOR");
         } else {
           setWrongPasswordDisclaimer(true);
@@ -77,6 +80,18 @@ const LoginView = ({
             >Login</button>
         }
       </p>
+
+      <h1>Local database</h1>
+      <button
+        type="button"
+        className="default-button default-action"
+        onClick={async () => {
+          // get folder handle
+          const folderHandle = await window.showDirectoryPicker();
+          await localDatabaseProvider.initDatabase(folderHandle);
+          setDatabaseMode("LOCAL");
+        }}
+      >Select database folder</button>
     </section>
   </>;
 };
