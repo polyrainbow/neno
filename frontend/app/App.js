@@ -54,7 +54,7 @@ const App = () => {
   const localDatabaseProviderRef = useRef(null);
   const localDatabaseProvider = localDatabaseProviderRef.current;
 
-  const databaseProvider = databaseMode === "local"
+  const databaseProvider = databaseMode === "LOCAL"
     ? localDatabaseProvider
     : serverDatabaseProvider;
 

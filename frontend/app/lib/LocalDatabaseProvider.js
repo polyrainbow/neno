@@ -15,7 +15,7 @@ export default class LocalDatabaseProvider {
     const storageProvider
       = new FileSystemAccessAPIStorageProvider(folderHandle);
 
-    this.#notesModule.init(storageProvider);
+    await this.#notesModule.init(storageProvider);
   }
 
   getNote(noteId) {
@@ -79,5 +79,18 @@ export default class LocalDatabaseProvider {
 
   hasAccess() {
     return false;
+  }
+
+
+  pinNote(noteId) {
+    return this.#notesModule.pinNote(noteId);
+  }
+
+  unpinNote(noteId) {
+    return this.#notesModule.unpinNote(noteId);
+  }
+
+  getPins() {
+    return this.#notesModule.getPins();
   }
 }

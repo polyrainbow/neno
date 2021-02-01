@@ -87,9 +87,14 @@ const LoginView = ({
         className="default-button default-action"
         onClick={async () => {
           // get folder handle
-          const folderHandle = await window.showDirectoryPicker();
-          await localDatabaseProvider.initDatabase(folderHandle);
-          setDatabaseMode("LOCAL");
+          try {
+            const folderHandle = await window.showDirectoryPicker();
+            await localDatabaseProvider.initDatabase(folderHandle);
+            setDatabaseMode("LOCAL");
+            setActiveView("EDITOR");
+          } catch (e) {
+            console.error(e);
+          }
         }}
       >Select database folder</button>
     </section>
