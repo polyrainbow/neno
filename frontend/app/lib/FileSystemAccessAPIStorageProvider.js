@@ -31,7 +31,7 @@ export default class FileSystemAccessAPIStorageProvider {
     data,
   ) {
     const fileHandle = await this.getFileHandle(requestPath);
-    const writable = fileHandle.createWritable();
+    const writable = await fileHandle.createWritable();
     await writable.write(data);
     await writable.close();
   }
@@ -41,7 +41,7 @@ export default class FileSystemAccessAPIStorageProvider {
     readableStream,
   ) {
     const fileHandle = await this.getFileHandle(requestPath);
-    const writable = fileHandle.createWritable();
+    const writable = await fileHandle.createWritable();
     await readableStream.pipeTo(writable);
   }
 
