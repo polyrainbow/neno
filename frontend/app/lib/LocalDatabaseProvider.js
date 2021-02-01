@@ -2,6 +2,7 @@ import FileSystemAccessAPIStorageProvider
   from "./FileSystemAccessAPIStorageProvider.js";
 
 export default class LocalDatabaseProvider {
+  static #localStorageKey = "LOCAL_DB_FOLDER_HANDLE";
   static features = ["DATABASE_FOLDER"];
 
   /* when using a local db folder, we'll always call this db the same */
@@ -9,13 +10,21 @@ export default class LocalDatabaseProvider {
 
   #notesModule;
 
-  async initDatabase(folderHandle) {
+  async initDatabase(folderHandle) { console.log(folderHandle)
     this.#notesModule = await import("../../../lib/notes/index.ts");
 
     const storageProvider
       = new FileSystemAccessAPIStorageProvider(folderHandle);
 
     await this.#notesModule.init(storageProvider);
+
+    // TODO: replace localStorage with idb-keyval
+    // https://stackoverflow.com/questions/65928613/file-system-access-api-is-it-possible-to-store-the-filehandle-of-a-saved-or-loa
+
+    localStorage.setItem(
+      LocalDatabaseProvider.#localStorageKey,
+      folderHandle.toString(),
+    );
   }
 
   getNote(noteId) {
@@ -78,7 +87,7 @@ export default class LocalDatabaseProvider {
   }
 
   hasAccess() {
-    return false;
+    return !!localStorage.getItem(LocalDatabaseProvider.#localStorageKey);
   }
 
 
