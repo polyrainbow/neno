@@ -8,6 +8,17 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
+  async getSubFolderHandle(folderHandle, subDirName) {
+    const subDir = await folderHandle.getDirectoryHandle(
+      subDirName,
+      {
+        create: true,
+      },
+    );
+    return subDir;
+  }
+
+
   async getFileHandle(requestPath) {
     const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
     const subDir = await this.#directoryHandle.getDirectoryHandle(
@@ -67,14 +78,76 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
   async listSubDirectories(requestPath) {
-    return this.#directoryHandle.values();
+    let dirHandle = this.#directoryHandle;
+
+    if (requestPath.length > 0) {
+      const subfolders = this.splitPath(requestPath);
+
+      for (let i = 0; i < subfolders.length; i++) {
+        dirHandle = await this.getSubFolderHandle(
+          dirHandle,
+          subfolders[i],
+        );
+      }
+    }
+
+    const iterator = dirHandle.values();
+    const values = [];
+    let done = false;
+
+    while (!done) {
+      const iteration = await iterator.next();
+      if (!iteration.done) {
+        values.push(iteration.value);
+      } else {
+        done = true;
+      }
+    }
+
+    const directoryNames = values
+      .filter((value) => value.kind === "directory")
+      .map((dirHandle) => dirHandle.name);
+
+    return directoryNames;
   }
 
+
   async listDirectory(requestPath) {
-    return this.#directoryHandle.values();
+    const subfolders = this.splitPath(requestPath);
+
+    let dirHandle = this.#directoryHandle;
+
+    for (let i = 0; i < subfolders.length; i++) {
+      dirHandle = await this.getSubFolderHandle(
+        dirHandle,
+        subfolders[i],
+      );
+    }
+
+    const iterator = dirHandle.values();
+    const values = [];
+    let done = false;
+
+    while (!done) {
+      const iteration = await iterator.next();
+      if (!iteration.done) {
+        values.push(iteration.value);
+      } else {
+        done = true;
+      }
+    }
+
+    const entryNames = values
+      .map((dirHandle) => dirHandle.name);
+
+    return entryNames;
   }
 
   joinPath(...args) {
     return args.join(this.DS);
+  }
+
+  splitPath(path) {
+    return path.split(this.DS);
   }
 }

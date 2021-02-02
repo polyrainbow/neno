@@ -115,9 +115,13 @@ const LoginView = ({
               console.error(e);
             }
           } else {
-            await localDatabaseProvider.initializeDatabase();
-            setDatabaseMode("LOCAL");
-            setActiveView("EDITOR");
+            try {
+              await localDatabaseProvider.initializeDatabase();
+              setDatabaseMode("LOCAL");
+              setActiveView("EDITOR");
+            } catch (e) {
+              console.error(e);
+            }
           }
         }}
       >
