@@ -20,15 +20,19 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async getFileHandle(requestPath) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
-    const subDir = await this.#directoryHandle.getDirectoryHandle(
-      subDirName,
-      {
-        create: true,
-      },
-    );
-    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
-    const fileHandle = await subDir.getFileHandle(
+    const pathSegments = this.splitPath(requestPath);
+
+    let dirHandle = this.#directoryHandle;
+
+    for (let i = 0; i < pathSegments.length - 1; i++) {
+      dirHandle = await this.getSubFolderHandle(
+        dirHandle,
+        pathSegments[i],
+      );
+    }
+
+    const filename = pathSegments[pathSegments.length - 1];
+    const fileHandle = await dirHandle.getFileHandle(
       filename,
       {
         create: true,
@@ -36,6 +40,7 @@ export default class FileSystemAccessAPIStorageProvider {
     );
     return fileHandle;
   }
+
 
   async writeObject(
     requestPath,
@@ -47,14 +52,18 @@ export default class FileSystemAccessAPIStorageProvider {
     await writable.close();
   }
 
+
   async writeObjectFromReadable(
     requestPath,
     readableStream,
   ) {
-    const fileHandle = await this.getFileHandle(requestPath);
+    const fileHandle = await this.getFileHandle(requestPath, {
+      create: true,
+    });
     const writable = await fileHandle.createWritable();
     await readableStream.pipeTo(writable);
   }
+
 
   async readObjectAsString(requestPath) {
     const fileHandle = await this.getFileHandle(requestPath);
@@ -63,6 +72,7 @@ export default class FileSystemAccessAPIStorageProvider {
     return string;
   }
 
+
   async getReadableStream(requestPath) {
     const fileHandle = await this.getFileHandle(requestPath);
     const file = fileHandle.getFile();
@@ -70,12 +80,14 @@ export default class FileSystemAccessAPIStorageProvider {
     return readable;
   }
 
+
   async removeObject(requestPath) {
     const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
     const subDir = this.#directoryHandle.getDirectoryHandle(subDirName);
     const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
     await subDir.removeEntry(filename);
   }
+
 
   async listSubDirectories(requestPath) {
     let dirHandle = this.#directoryHandle;

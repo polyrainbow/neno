@@ -150,6 +150,7 @@ export default class LocalDatabaseProvider {
     );
   }
 
+
   uploadFile(file) {
     return this.#notesModule.addFile(
       LocalDatabaseProvider.dbId,
