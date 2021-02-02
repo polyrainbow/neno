@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import HeaderContainer from "./HeaderContainer.js";
 
 
@@ -12,6 +12,10 @@ const LoginView = ({
   const [password, setPassword] = useState("");
   const [wrongPasswordDisclaimer, setWrongPasswordDisclaimer]
     = useState(false);
+  const [
+    localDatabaseFolderHandleExists,
+    setLocalDatabaseFolderHandleExists,
+  ] = useState(false);
 
   const [isBusy, setIsBusy] = useState(false);
 
@@ -29,6 +33,12 @@ const LoginView = ({
         }
       });
   };
+
+  useEffect(async () => {
+    if (await localDatabaseProvider.hasFolderHandle()) {
+      setLocalDatabaseFolderHandleExists(true);
+    }
+  }, []);
 
 
   return <>
@@ -82,11 +92,19 @@ const LoginView = ({
       </p>
 
       <h1>Local database</h1>
+      <p>
+        {
+          localDatabaseFolderHandleExists
+            ? "You have already created a local "
+            + "database that you can just open."
+            : ""
+        }
+      </p>
       <button
         type="button"
         className="default-button default-action"
         onClick={async () => {
-          if (!(await localDatabaseProvider.hasFolderHandle())) {
+          if (!localDatabaseFolderHandleExists) {
             // get folder handle
             try {
               const folderHandle = await window.showDirectoryPicker();
@@ -102,7 +120,13 @@ const LoginView = ({
             setActiveView("EDITOR");
           }
         }}
-      >Select database folder</button>
+      >
+        {
+          localDatabaseFolderHandleExists
+            ? "Open database"
+            : "Select database folder"
+        }
+      </button>
     </section>
   </>;
 };
