@@ -65,19 +65,19 @@
     "eslint-plugin-standard": "^5.0.0",
     "style-loader": "^2.0.0",
     "webpack-bundle-analyzer": "^4.2.0",
-    "webpack-cli": "^4.3.1"
+    "webpack-cli": "^4.5.0"
   },
   "scripts": {
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
-    "visualize-bundles": "DISABLE_V8_COMPILE_CACHE=true npx webpack --config frontend/webpack.production.js --profile --json > stats.json && npx webpack-bundle-analyzer stats.json frontend/assets",
+    "visualize-bundles": "npx webpack --config frontend/webpack.production.js --profile --json > stats.json && npx webpack-bundle-analyzer stats.json frontend/assets",
     "compile-typescript": "npx tsc",
     "start-server": "node dist/backend/index.js --port 8080",
     "start-server-tls": "node dist/backend/index.js --https-port 8080 --use-https --cert-path ~/.neno/server.cert --cert-key-path ~/.neno/server.key",
-    "build-frontend-production": "DISABLE_V8_COMPILE_CACHE=true npx webpack --config frontend/webpack.production.js",
-    "build-frontend-development": "DISABLE_V8_COMPILE_CACHE=true npx webpack --config frontend/webpack.development.js",
+    "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
+    "build-frontend-development": "npx webpack --config frontend/webpack.development.js",
     "build": "npm run compile-typescript && npm run build-frontend-production",
-    "start-dev-server-frontend": "DISABLE_V8_COMPILE_CACHE=true npx webpack serve --config frontend/webpack.development.js",
+    "start-dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
     "start": "npm run build && npm run start-server",
     "start-tls": "npm run build && npm run start-server-tls",
     "dev": "concurrently --kill-others \"npm run compile-typescript && npm run start-server\" \"npm run build-frontend-development\""
