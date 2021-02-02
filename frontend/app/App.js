@@ -63,15 +63,8 @@ const App = () => {
     );
 
   useEffect(async () => {
-    localDatabaseProviderRef.current = new LocalDatabaseProvider();
-
-    if (await localDatabaseProviderRef.current.hasAccessToken()) {
-      setDatabaseMode("LOCAL");
-      setActiveView("EDITOR");
-      return;
-    }
-
     serverDatabaseProviderRef.current = new ServerDatabaseProvider();
+    localDatabaseProviderRef.current = new LocalDatabaseProvider();
 
     if (await serverDatabaseProviderRef.current.hasAccessToken()) {
       setDatabaseMode("SERVER");
@@ -97,6 +90,7 @@ const App = () => {
       toggleAppMenu={toggleAppMenu}
       setOpenDialog={setOpenDialog}
       openDialog={openDialog}
+      setDatabaseMode={setDatabaseMode}
     />;
   }
 

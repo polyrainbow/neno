@@ -22,6 +22,7 @@ const EditorView = ({
   toggleAppMenu,
   setOpenDialog,
   openDialog,
+  setDatabaseMode,
 }) => {
   const currentRequestId = useRef(null);
   const [noteListItems, setNoteListItems] = useState([]);
@@ -231,6 +232,8 @@ const EditorView = ({
       } catch (e) {
         // if credentials are invalid, go to LoginView. If not, throw.
         if (e.message === "INVALID_CREDENTIALS") {
+          await databaseProvider.removeAccess();
+          setDatabaseMode("NONE");
           setActiveView("LOGIN");
         } else {
           throw new Error(e);
