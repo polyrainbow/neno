@@ -162,6 +162,13 @@ const getReadableDatabaseStream = async (withUploads) => {
 };
 
 
+const getReadableFileStream = async (fileId) => {
+  const apiEndpoint = "file/" + fileId;
+  const response = await callAPI("GET", apiEndpoint, null, "body");
+  return response;
+};
+
+
 const importLinksAsNotes = async (links) => {
   const response = await callAPI("PUT", "import-links-as-notes", { links });
 
@@ -258,6 +265,7 @@ export {
   importLinksAsNotes,
   uploadFile,
   uploadFileByUrl,
+  getReadableFileStream,
   fetchURLMetadata,
   pinNote,
   unpinNote,

@@ -1,4 +1,5 @@
 import * as Config from "./config.js";
+import { streamToBlob } from "./utils.js";
 
 // this instance queue makes sure that there are not several editor instances
 // loaded in parallel and thus become visible on the screen. it queues all
@@ -21,7 +22,12 @@ const load = async ({ data, parent, onChange, databaseProvider }) => {
 };
 
 
-const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
+const loadInstance = async ({
+  data,
+  parent,
+  onChange,
+  databaseProvider,
+}) => {
   const modules = await Promise.all([
     import("@editorjs/editorjs"),
     import("@editorjs/header"),
@@ -78,29 +84,41 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
         config: {
           uploader: {
             uploadByFile: async (file) => {
-              const fileInfo = await databaseProvider.uploadFile(file);
+              const fileId = await databaseProvider.uploadFile(file);
               return {
                 success: 1,
                 file: {
-                  "url": Config.API_URL + "file/" + fileInfo.id,
-                  "size": fileInfo.size,
-                  "fileId": fileInfo.id,
+                  "url": Config.API_URL + "file/" + fileId,
+                  "size": file.size,
+                  "fileId": fileId,
                 },
               };
             },
             uploadByUrl: async (url) => {
-              const fileInfo = await databaseProvider.uploadFileByUrl({
+              const fileId = await databaseProvider.uploadFileByUrl({
                 url,
               });
               return {
                 success: 1,
                 file: {
-                  "url": Config.API_URL + "file/" + fileInfo.id,
-                  "size": fileInfo.size,
-                  "fileId": fileInfo.id,
+                  "url": Config.API_URL + "file/" + fileId,
+                  "fileId": fileId,
                 },
               };
             },
+          },
+          getUrl: async (file) => {
+            const fileId = file.fileId;
+            let url;
+            if (databaseProvider.type === "LOCAL") {
+              const readable
+                = await databaseProvider.getReadableFileStream(fileId);
+              const blob = await streamToBlob(readable);
+              url = URL.createObjectURL(blob);
+            } else {
+              url = Config.API_URL + "file/" + fileId;
+            }
+            return url;
           },
         },
       },
@@ -118,16 +136,28 @@ const loadInstance = async ({ data, parent, onChange, databaseProvider }) => {
         class: Attaches,
         config: {
           uploader: async (file) => {
-            const fileInfo = await databaseProvider.uploadFile(file);
+            const fileId = await databaseProvider.uploadFile(file);
             return {
               success: 1,
               file: {
-                "url": Config.API_URL + "file/" + fileInfo.id,
-                "size": fileInfo.size,
+                "size": file.size,
                 "name": file.name,
-                "fileId": fileInfo.id,
+                "fileId": fileId,
               },
             };
+          },
+          onDownload: async (file) => {
+            const fileId = file.fileId;
+            let url;
+            if (databaseProvider.type === "LOCAL") {
+              const readable
+                = await databaseProvider.getReadableFileStream(fileId);
+              const blob = await streamToBlob(readable);
+              url = URL.createObjectURL(blob);
+            } else {
+              url = Config.API_URL + "file/" + fileId;
+            }
+            window.open(url, "_blank");
           },
           field: "file",
           types: "application/pdf",

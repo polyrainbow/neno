@@ -160,6 +160,14 @@ export default class LocalDatabaseProvider {
   }
 
 
+  getReadableFileStream(fileId) {
+    return this.#notesModule.getReadableFileStream(
+      LocalDatabaseProvider.dbId,
+      fileId,
+    );
+  }
+
+
   pinNote(noteId) {
     return this.#notesModule.pin(LocalDatabaseProvider.dbId, noteId);
   }

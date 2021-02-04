@@ -364,10 +364,7 @@ const startApp = async ({
           .then((fileId) => {
             const response:APIResponse = {
               success: true,
-              payload: {
-                id: fileId,
-                size,
-              }, 
+              payload: fileId, 
             };
             res.json(response);
           })
@@ -431,10 +428,7 @@ const startApp = async ({
 
           const response:APIResponse = {
             success: true,
-            payload: {
-              id: fileId,
-              size,
-            },
+            payload: fileId,
           };
           res.json(response);
         } catch (e) {

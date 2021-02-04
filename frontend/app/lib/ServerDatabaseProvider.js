@@ -66,6 +66,10 @@ export default class ServerDatabaseProvider {
     return API.uploadFile(file);
   }
 
+  getReadableFileStream(fileId) {
+    return API.getReadableFileStream(fileId);
+  }
+
   uploadFileByUrl(data) {
     return API.uploadFileByUrl(data);
   }
