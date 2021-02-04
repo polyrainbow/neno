@@ -39,6 +39,7 @@ import * as config from "./config.js";
 import { Readable } from "stream";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
+import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
 
 
 /* this is the fallback getUrlMetadata function that is used if the initializer
@@ -349,7 +350,7 @@ const addFile = async (
 const getReadableFileStream = (
   dbId: DatabaseId,
   fileId:FileId,
-):Promise<Readable> => {
+):Promise<ReadableWithType> => {
   return DB.getReadableFileStream(dbId, fileId);
 };
 

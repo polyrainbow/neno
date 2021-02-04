@@ -171,7 +171,7 @@ const cleanUpData = async () => {
         .forEach((block) => {
           if (
             block.type === "attaches"
-            && block.data.file.url.includes("[object Object]")
+            && block.data.file.url?.includes("[object Object]")
           ) {
             const fileId = block.data.file.fileId.id;
             block.data.file.url = block.data.file.url

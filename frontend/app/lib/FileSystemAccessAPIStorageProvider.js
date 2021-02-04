@@ -75,7 +75,7 @@ export default class FileSystemAccessAPIStorageProvider {
 
   async getReadableStream(requestPath) {
     const fileHandle = await this.getFileHandle(requestPath);
-    const file = fileHandle.getFile();
+    const file = await fileHandle.getFile();
     const readable = file.stream();
     return readable;
   }

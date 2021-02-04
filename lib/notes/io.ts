@@ -3,6 +3,8 @@ import { FileId } from "./interfaces/FileId.js";
 import { DatabaseId } from "./interfaces/DatabaseId.js";
 import { Readable } from "stream";
 import DatabaseMainData from "./interfaces/DatabaseMainData.js";
+import ReadableWithMimeType from "./interfaces/ReadableWithMimeType.js";
+import * as config from "./config.js";
 
 let storageProvider;
 
@@ -183,11 +185,31 @@ const getReadableMainDataStream = async (
 const getReadableFileStream = async (
   databaseId: DatabaseId,
   fileId:FileId,
-):Promise<Readable> => {
+):Promise<ReadableWithMimeType> => {
   const fileFolderPath = getFileFolderPath(databaseId);
   const filepath = storageProvider.joinPath(fileFolderPath, fileId);
   const stream = await storageProvider.getReadableStream(filepath);
-  return stream;
+
+  const fileEnding = fileId.substr(fileId.lastIndexOf(".") + 1)
+    .toLocaleLowerCase();
+
+  const fileInfo = config.ALLOWED_FILE_TYPES
+    .find((filetype) => {
+      return filetype.ending === fileEnding;
+    });
+
+  if (!fileInfo) {
+    throw Error(
+      "The requested object has an unknown file ending: " + fileEnding
+    );
+  }
+
+  const mimeType = fileInfo.mimeType;
+
+  return {
+    readable: stream,
+    mimeType,
+  };
 };
 
 

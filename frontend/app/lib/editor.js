@@ -88,7 +88,6 @@ const loadInstance = async ({
               return {
                 success: 1,
                 file: {
-                  "url": Config.API_URL + "file/" + fileId,
                   "size": file.size,
                   "fileId": fileId,
                 },
@@ -101,7 +100,6 @@ const loadInstance = async ({
               return {
                 success: 1,
                 file: {
-                  "url": Config.API_URL + "file/" + fileId,
                   "fileId": fileId,
                 },
               };
@@ -110,14 +108,15 @@ const loadInstance = async ({
           getUrl: async (file) => {
             const fileId = file.fileId;
             let url;
-            if (databaseProvider.type === "LOCAL") {
-              const readable
+            if (databaseProvider.constructor.type === "LOCAL") {
+              const { readable, mimeType }
                 = await databaseProvider.getReadableFileStream(fileId);
-              const blob = await streamToBlob(readable);
+
+              const blob = await streamToBlob(readable, mimeType);
               url = URL.createObjectURL(blob);
             } else {
               url = Config.API_URL + "file/" + fileId;
-            }
+            } console.log(url);
             return url;
           },
         },
@@ -149,10 +148,10 @@ const loadInstance = async ({
           onDownload: async (file) => {
             const fileId = file.fileId;
             let url;
-            if (databaseProvider.type === "LOCAL") {
-              const readable
+            if (databaseProvider.constructor.type === "LOCAL") {
+              const { readable, mimeType }
                 = await databaseProvider.getReadableFileStream(fileId);
-              const blob = await streamToBlob(readable);
+              const blob = await streamToBlob(readable, mimeType);
               url = URL.createObjectURL(blob);
             } else {
               url = Config.API_URL + "file/" + fileId;
