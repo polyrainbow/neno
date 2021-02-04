@@ -116,7 +116,7 @@ const loadInstance = async ({
               url = URL.createObjectURL(blob);
             } else {
               url = Config.API_URL + "file/" + fileId;
-            } console.log(url);
+            }
             return url;
           },
         },
