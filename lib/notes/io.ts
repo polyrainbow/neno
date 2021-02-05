@@ -228,7 +228,7 @@ const getReadableDatabaseStream = async (
 
 const getNumberOfFiles = async (
   databaseId: DatabaseId,
-) => {
+):Promise<number> => {
   const fileFolderPath = getFileFolderPath(databaseId);
   const files = (await storageProvider.listDirectory(fileFolderPath))
     .filter(stringContainsUUID);
