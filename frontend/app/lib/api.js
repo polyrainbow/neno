@@ -1,5 +1,4 @@
 import { API_URL } from "./config.js";
-import { htmlDecode } from "./utils.js";
 import * as tokenManager from "./tokenManager.js";
 
 
@@ -124,26 +123,6 @@ const getGraph = async () => {
 };
 
 
-const getGraphObject = async () => {
-  // initial node data
-  const graph = await getGraph();
-
-  graph.nodes = graph.nodes.map((node) => {
-    node.title = htmlDecode(node.title);
-    return node;
-  });
-
-  graph.links = graph.links.map((link) => {
-    return {
-      source: graph.nodes.find((node) => node.id === link[0]),
-      target: graph.nodes.find((node) => node.id === link[1]),
-    };
-  });
-
-  return graph;
-};
-
-
 const saveGraph = async (graphObject) => {
   const response = await callAPI("POST", "graph", graphObject);
 
@@ -259,7 +238,6 @@ export {
   deleteNote,
   getStats,
   getGraph,
-  getGraphObject,
   saveGraph,
   getReadableDatabaseStream,
   importLinksAsNotes,

@@ -66,7 +66,7 @@ const GraphView = ({
       setStatus(highlightDetails);
     };
 
-    databaseProvider.getGraphObject()
+    databaseProvider.getGraph()
       .then((graph) => {
         graphInstance.current
           = initGraph(mainElement.current, graph, onHighlight, onChange);

@@ -54,8 +54,8 @@ export default class ServerDatabaseProvider {
     return API.saveGraph(graphObject);
   }
 
-  getGraphObject() {
-    return API.getGraphObject();
+  getGraph() {
+    return API.getGraph();
   }
 
   getReadableDatabaseStream(includingImagesAndFiles) {

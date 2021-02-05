@@ -137,7 +137,7 @@ export default class LocalDatabaseProvider {
     );
   }
 
-  getGraphObject() {
+  getGraph() {
     return this.#notesModule.getGraph(
       LocalDatabaseProvider.dbId,
     );

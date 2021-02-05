@@ -1,6 +1,6 @@
 /* eslint-disable no-invalid-this */
 import * as d3 from "d3";
-import { binaryArrayIncludes, shortenText } from "./utils.js";
+import { binaryArrayIncludes, shortenText, htmlDecode } from "./utils.js";
 
 
 class Graph {
@@ -29,7 +29,7 @@ class Graph {
   #screenPosition = null;
   #initialNodePosition = null;
   svg = null;
-  #idsOfAllNodesWithLinkedNote = null;
+  #idsOfAllNodesWithLinkedNote = [];
   #updatedNodes = new Set();
   #mouseDownNode = null;
   #justDragged = false;
@@ -840,6 +840,27 @@ class Graph {
 }
 
 
+const prepareGraphObject = (graph) => {
+  const preparedGraphObject = {
+    ...graph,
+  };
+
+  preparedGraphObject.nodes = graph.nodes.map((node) => {
+    node.title = htmlDecode(node.title);
+    return node;
+  });
+
+  preparedGraphObject.links = graph.links.map((link) => {
+    return {
+      source: graph.nodes.find((node) => node.id === link[0]),
+      target: graph.nodes.find((node) => node.id === link[1]),
+    };
+  });
+
+  return preparedGraphObject;
+};
+
+
 const initGraph = (parent, graphObject, onHighlight, onChange) => {
   const docEl = document.documentElement;
   const bodyEl = document.getElementsByTagName("body")[0];
@@ -858,8 +879,10 @@ const initGraph = (parent, graphObject, onHighlight, onChange) => {
     .attr("width", width)
     .attr("height", height);
 
+  const preparedGraphObject = prepareGraphObject(graphObject);
+
   const graphInstance = new Graph(
-    svg, graphObject, onHighlight, onChange,
+    svg, preparedGraphObject, onHighlight, onChange,
   );
 
   return graphInstance;
