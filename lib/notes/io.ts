@@ -61,8 +61,8 @@ const createDatabase = async (
     links: [],
     idCounter: 0,
     screenPosition: {
-      translateX: 0,
-      translateY: 0,
+      translateX: 200, // good value to see INPI completely
+      translateY: 200, // good value to see INPI completely
       scale: 1,
     },
     initialNodePosition: {
