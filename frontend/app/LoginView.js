@@ -13,8 +13,8 @@ const LoginView = ({
   const [wrongPasswordDisclaimer, setWrongPasswordDisclaimer]
     = useState(false);
   const [
-    localDatabaseFolderHandleExists,
-    setLocalDatabaseFolderHandleExists,
+    localDatabaseFolderHandleName,
+    setLocalDatabaseFolderHandleName,
   ] = useState(false);
 
   const [isBusy, setIsBusy] = useState(false);
@@ -35,16 +35,15 @@ const LoginView = ({
   };
 
   useEffect(async () => {
-    if (await localDatabaseProvider.hasFolderHandle()) {
-      setLocalDatabaseFolderHandleExists(true);
-    }
+    const folderHandleName = await localDatabaseProvider.getFolderHandleName();
+    setLocalDatabaseFolderHandleName(folderHandleName);
   }, []);
 
 
   return <>
     <HeaderContainer />
     <section id="section_login">
-      <h1>Login</h1>
+      <h1>Server database</h1>
       {
         wrongPasswordDisclaimer
           ? <p style={{ color: "red" }}>
@@ -92,44 +91,49 @@ const LoginView = ({
       </p>
 
       <h1>Local database</h1>
+      {
+        typeof localDatabaseFolderHandleName === "string"
+          ? <>
+            <p>
+              You have already created a local database that you can just open.
+            </p>
+            <button
+              type="button"
+              className="default-button default-action"
+              onClick={async () => {
+                try {
+                  await localDatabaseProvider.initializeDatabase();
+                  setDatabaseMode("LOCAL");
+                  setActiveView("EDITOR");
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
+            >
+              Open database {localDatabaseFolderHandleName}
+            </button>
+          </>
+          : ""
+      }
       <p>
-        {
-          localDatabaseFolderHandleExists
-            ? "You have already created a local "
-            + "database that you can just open."
-            : ""
-        }
+        Select a folder to be used as database
+        (if no database in that folder exists yet, a new one will be created)
       </p>
       <button
         type="button"
         className="default-button default-action"
         onClick={async () => {
-          if (!localDatabaseFolderHandleExists) {
-            // get folder handle
-            try {
-              const folderHandle = await window.showDirectoryPicker();
-              await localDatabaseProvider.login(folderHandle);
-              setDatabaseMode("LOCAL");
-              setActiveView("EDITOR");
-            } catch (e) {
-              console.error(e);
-            }
-          } else {
-            try {
-              await localDatabaseProvider.initializeDatabase();
-              setDatabaseMode("LOCAL");
-              setActiveView("EDITOR");
-            } catch (e) {
-              console.error(e);
-            }
+          try {
+            const folderHandle = await window.showDirectoryPicker();
+            await localDatabaseProvider.login(folderHandle);
+            setDatabaseMode("LOCAL");
+            setActiveView("EDITOR");
+          } catch (e) {
+            console.error(e);
           }
         }}
       >
-        {
-          localDatabaseFolderHandleExists
-            ? "Open database"
-            : "Select database folder"
-        }
+        Select database folder
       </button>
     </section>
   </>;

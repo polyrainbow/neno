@@ -34,18 +34,18 @@ export default class LocalDatabaseProvider {
   // when we return that we have an access token, the app switches to editor
   // mode and the editor will start fetching data, so we need to be prepared
   // and initialize the database
-  async hasFolderHandle() {
+  async getFolderHandleName() {
     if (this.#folderHandle) {
-      return true;
+      return this.#folderHandle.name;
     }
 
     const folderHandle = await IDB.get(LocalDatabaseProvider.#handleStorageKey);
     if (typeof folderHandle === "undefined") {
-      return false;
+      return null;
     }
 
     this.#folderHandle = folderHandle;
-    return true;
+    return this.#folderHandle.name;
   }
 
 
@@ -67,6 +67,7 @@ export default class LocalDatabaseProvider {
 
 
   async removeAccess() {
+    this.#folderHandle = null;
     await IDB.del(LocalDatabaseProvider.#handleStorageKey);
   }
 
