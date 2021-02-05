@@ -137,10 +137,14 @@ export default class LocalDatabaseProvider {
     );
   }
 
-  getGraph() {
-    return this.#notesModule.getGraph(
+  async getGraph() {
+    const graph = await this.#notesModule.getGraph(
       LocalDatabaseProvider.dbId,
     );
+
+    // necessary, because the graph module would not work correctly otherwise
+    // node dragging would do weird things with INPI
+    return JSON.parse(JSON.stringify(graph));
   }
 
   getReadableDatabaseStream(includingImagesAndFiles) {
