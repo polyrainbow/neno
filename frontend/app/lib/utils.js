@@ -186,6 +186,24 @@ const streamToBlob = async (stream, mimeType) => {
 };
 
 
+const getUrlForFileId = async (fileId, databaseProvider) => {
+  let url;
+
+  if (databaseProvider.constructor.type === "LOCAL") {
+    const { readable, mimeType }
+      = await databaseProvider.getReadableFileStream(
+        fileId,
+      );
+    const blob = await streamToBlob(readable, mimeType);
+    url = URL.createObjectURL(blob);
+  } else {
+    url = Config.API_URL + "file/" + fileId;
+  }
+
+  return url;
+};
+
+
 export {
   yyyymmdd,
   htmlDecode,
@@ -198,4 +216,5 @@ export {
   humanFileSize,
   shortenText,
   streamToBlob,
+  getUrlForFileId,
 };

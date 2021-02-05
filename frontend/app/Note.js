@@ -81,7 +81,7 @@ const Note = ({
       </div>
       {
         (!note.isUnsaved)
-          ? <NoteStats note={note} />
+          ? <NoteStats note={note} databaseProvider={databaseProvider} />
           : ""
       }
     </div>

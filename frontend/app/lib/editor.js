@@ -1,5 +1,4 @@
-import * as Config from "./config.js";
-import { streamToBlob } from "./utils.js";
+import { getUrlForFileId } from "./utils.js";
 
 // this instance queue makes sure that there are not several editor instances
 // loaded in parallel and thus become visible on the screen. it queues all
@@ -107,16 +106,7 @@ const loadInstance = async ({
           },
           getUrl: async (file) => {
             const fileId = file.fileId;
-            let url;
-            if (databaseProvider.constructor.type === "LOCAL") {
-              const { readable, mimeType }
-                = await databaseProvider.getReadableFileStream(fileId);
-
-              const blob = await streamToBlob(readable, mimeType);
-              url = URL.createObjectURL(blob);
-            } else {
-              url = Config.API_URL + "file/" + fileId;
-            }
+            const url = await getUrlForFileId(fileId, databaseProvider);
             return url;
           },
         },
@@ -147,15 +137,7 @@ const loadInstance = async ({
           },
           onDownload: async (file) => {
             const fileId = file.fileId;
-            let url;
-            if (databaseProvider.constructor.type === "LOCAL") {
-              const { readable, mimeType }
-                = await databaseProvider.getReadableFileStream(fileId);
-              const blob = await streamToBlob(readable, mimeType);
-              url = URL.createObjectURL(blob);
-            } else {
-              url = Config.API_URL + "file/" + fileId;
-            }
+            const url = await getUrlForFileId(fileId, databaseProvider);
             window.open(url, "_blank");
           },
           field: "file",

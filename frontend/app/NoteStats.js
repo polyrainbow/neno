@@ -1,10 +1,12 @@
 import React from "react";
 import {
   makeTimestampHumanReadable,
+  getUrlForFileId,
 } from "./lib/utils.js";
 
 const NoteStats = ({
   note,
+  databaseProvider,
 }) => {
   return <div
     id="stats"
@@ -70,12 +72,20 @@ const NoteStats = ({
               ? note.editorData.blocks
                 .filter((block) => block.type === "attaches")
                 .map((block, i, array) => {
-                  return <React.Fragment key={block.data.file.url + note.id}>
+                  return <React.Fragment key={block.data.file.fileId + note.id}>
                     <a
-                      key={block.data.file.url + note.id}
-                      href={block.data.file.url}
-                      target="_blank"
-                      rel="noreferrer"
+                      key={block.data.file.fileId + note.id}
+                      style={{
+                        "cursor": "pointer",
+                      }}
+                      onClick={async () => {
+                        const fileId = block.data.file.fileId;
+                        const url = await getUrlForFileId(
+                          fileId,
+                          databaseProvider,
+                        );
+                        window.open(url, "_blank");
+                      }}
                     >
                       {block.data.file.name}
                     </a>
