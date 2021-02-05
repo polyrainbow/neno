@@ -25,7 +25,7 @@ const StatsDialog = ({
     <h1>Stats</h1>
     {
       status === "READY"
-        ? <table>
+        ? <table className="data-table">
           <tbody>
             <tr>
               <td>{emojis.note} Number of notes</td>

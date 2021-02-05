@@ -389,22 +389,22 @@ button[disabled]{
   margin-bottom: 0px;
 }
 
-table {
+.data-table {
   border-collapse: collapse;
   margin: var(--default-margin) 0px;
   width: 100%;
 }
 
 
-tr:nth-child(odd) {
+.data-table tr:nth-child(odd) {
   background-color: var(--table-row-background-color-odd);
 }
 
-tr:nth-child(even) {
+.data-table tr:nth-child(even) {
   background-color: var(--table-row-background-color-even);
 }
 
-th, td {
+.data-table th, .data-table td {
   text-align: left;
   padding: 5px;
 }

@@ -12,7 +12,7 @@ const NoteStats = ({
     id="stats"
   >
     <h2>Stats</h2>
-    <table>
+    <table className="data-table">
       <tbody>
         <tr>
           <td>ID</td>
