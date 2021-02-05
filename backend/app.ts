@@ -484,17 +484,19 @@ const startApp = async ({
     verifyJWT,
     async function(req, res) {
       try {
-        const fileStream
+        const { readable, mimeType }
           = await Notes.getReadableFileStream(req.userId, req.params.fileId);
         
-        fileStream.on("error", () => {
+        readable.on("error", () => {
           const response:APIResponse = {
             success: false,
             error: APIError.FILE_NOT_FOUND,
           };
           res.json(response);
         });
-        fileStream.pipe(res);
+
+        res.set('Content-Type', mimeType);
+        readable.pipe(res);
       } catch (e) {
         const response:APIResponse = {
           success: false,
