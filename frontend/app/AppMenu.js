@@ -72,11 +72,15 @@ const AppMenu = ({
           />
           : ""
       }
-      <AppMenuItem
-        label="Export database"
-        icon="archive"
-        onClick={openExportDatabaseDialog}
-      />
+      {
+        databaseProvider.constructor.features.includes("EXPORT_DATABASE")
+          ? <AppMenuItem
+            label="Export database"
+            icon="archive"
+            onClick={openExportDatabaseDialog}
+          />
+          : ""
+      }
       <AppMenuItem
         label="Show stats"
         icon="query_stats"
