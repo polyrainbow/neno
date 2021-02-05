@@ -62,7 +62,7 @@ const loadInstance = async ({
         class: Link,
         config: {
           customRequestFunction: async (url) => {
-            const metadata = await databaseProvider.fetchURLMetadata(url);
+            const metadata = await databaseProvider.getUrlMetadata(url);
 
             return {
               "success": 1,

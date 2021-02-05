@@ -164,6 +164,11 @@ export default class LocalDatabaseProvider {
   }
 
 
+  getUrlMetadata(url) {
+    return this.#notesModule.getUrlMetadata(url);
+  }
+
+
   getReadableFileStream(fileId) {
     return this.#notesModule.getReadableFileStream(
       LocalDatabaseProvider.dbId,

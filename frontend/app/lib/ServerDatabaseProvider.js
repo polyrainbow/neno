@@ -5,7 +5,7 @@ export default class ServerDatabaseProvider {
   static features = [
     "EXPORT_DATABASE",
     "AUTHENTICATION",
-    "FETCH_URL_METADATA",
+    "GET_URL_METADATA",
   ];
 
   static type = "SERVER";
@@ -74,8 +74,8 @@ export default class ServerDatabaseProvider {
     return API.uploadFileByUrl(data);
   }
 
-  fetchURLMetadata(url) {
-    return API.fetchURLMetadata(url);
+  getUrlMetadata(url) {
+    return API.getUrlMetadata(url);
   }
 
   pinNote(noteId) {

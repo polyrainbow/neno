@@ -509,7 +509,7 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "link-data",
+    config.API_PATH + "url-metadata",
     verifyJWT,
     async (req, res) => {
       const url = req.query.url;

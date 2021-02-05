@@ -185,8 +185,8 @@ const uploadFileByUrl = async (data) => {
 };
 
 
-const fetchURLMetadata = async (url) => {
-  const requestUrl = "link-data?url=" + url;
+const getUrlMetadata = async (url) => {
+  const requestUrl = "url-metadata?url=" + url;
   const response = await callAPI("GET", requestUrl, null, "json");
 
   if (!response.success) {
@@ -244,7 +244,7 @@ export {
   uploadFile,
   uploadFileByUrl,
   getReadableFileStream,
-  fetchURLMetadata,
+  getUrlMetadata,
   pinNote,
   unpinNote,
   getPins,
