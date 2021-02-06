@@ -15,11 +15,20 @@ export default {
     chunkFilename: "[name].bundle.js",
     // `path` is the folder where Webpack will place your bundles
     path: path.resolve(__dirname, "assets"),
-    // `publicPath` is where Webpack will load your bundles from (optional)
-    publicPath: "/assets/",
+  },
+  resolve: {
+    // Add .ts and .tsx as a resolvable extension.
+    extensions: [".ts", ".tsx", ".js"],
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        use: [
+          "ts-loader",
+          path.resolve(__dirname, "ts-loader-preparation.cjs"),
+        ],
+      },
       {
         test: /\.js?$/,
         include: [
@@ -28,9 +37,7 @@ export default {
         loader: "babel-loader",
         options: {
           presets: [
-            [
-              "@babel/preset-react", {},
-            ],
+            "@babel/preset-react",
           ],
           plugins: [
             // we need these two plugins because webpack does not support
@@ -58,7 +65,6 @@ export default {
     },
     disableHostCheck: true,
     contentBase: __dirname,
-    publicPath: "/assets/",
   },
   watchOptions: {
     ignored: /node_modules/,

@@ -1,6 +1,6 @@
 import React from "react";
 import HeaderContainer from "./HeaderContainer.js";
-
+import { ICON_PATH } from "./lib/config.js";
 
 const BusyView = () => {
   return <>
@@ -13,7 +13,7 @@ const BusyView = () => {
           style={{
             width: "100px",
           }}
-          src={"/assets/icons/pending-24px.svg"}
+          src={ICON_PATH + "pending-24px.svg"}
           alt={"Loading ..."}
           className="svg-icon"
         />

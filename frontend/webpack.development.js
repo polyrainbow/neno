@@ -15,8 +15,6 @@ export default {
     chunkFilename: "[name].bundle.js",
     // `path` is the folder where Webpack will place your bundles
     path: path.resolve(__dirname, "assets"),
-    // `publicPath` is where Webpack will load your bundles from (optional)
-    publicPath: "/assets/",
   },
   resolve: {
     // Add .ts and .tsx as a resolvable extension.
@@ -68,7 +66,6 @@ export default {
     },
     disableHostCheck: true,
     contentBase: __dirname,
-    publicPath: "/assets/",
   },
   watchOptions: {
     ignored: /node_modules/,

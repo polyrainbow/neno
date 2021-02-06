@@ -2,6 +2,7 @@ import React from "react";
 import AppTitle from "./AppTitle.js";
 import AppStats from "./AppStats.js";
 import { shortenText } from "./lib/utils.js";
+import { ICON_PATH } from "./lib/config.js";
 
 const PinnedNote = ({
   note,
@@ -19,7 +20,7 @@ const PinnedNote = ({
     onClick={onClick}
   >
     <img
-      src={"/assets/icons/push_pin-24px.svg"}
+      src={ICON_PATH + "push_pin-24px.svg"}
       alt={"Pinned note"}
       width="24"
       height="24"

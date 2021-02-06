@@ -1,5 +1,5 @@
 import React from "react";
-
+import { ICON_PATH } from "./lib/config.js";
 
 const NoteListStatus = ({
   status,
@@ -33,7 +33,7 @@ const NoteListStatus = ({
       style={{
         width: "100px",
       }}
-      src={"/assets/icons/" + activeState.icon + "-24px.svg"}
+      src={ICON_PATH + activeState.icon + "-24px.svg"}
       alt={activeState.label}
       className="svg-icon"
     />

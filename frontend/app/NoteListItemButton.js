@@ -2,6 +2,7 @@ import React from "react";
 import {
   Tooltip,
 } from "react-tippy";
+import { ICON_PATH } from "./lib/config.js";
 
 const NoteListItemButton = ({
   icon,
@@ -25,7 +26,7 @@ const NoteListItemButton = ({
       >
         <img
           style={{ "verticalAlign": "bottom" }}
-          src={"/assets/icons/" + icon + "-24px.svg"}
+          src={ICON_PATH + icon + "-24px.svg"}
           alt={title}
           className="svg-icon"
         />

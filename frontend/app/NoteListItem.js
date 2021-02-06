@@ -1,7 +1,8 @@
 import React from "react";
 import { Tooltip } from "react-tippy";
 import { yyyymmdd } from "./lib/utils.js";
-import { emojis } from "./lib/config.js";
+import { emojis, ICON_PATH } from "./lib/config.js";
+
 
 const NoteListItem = ({
   note,
@@ -97,7 +98,7 @@ const NoteListItem = ({
           <img
             style={{ "verticalAlign": "bottom" }}
             src={
-              "/assets/icons/" + (isLinked ? "link_off" : "link") + "-24px.svg"
+              ICON_PATH + (isLinked ? "link_off" : "link") + "-24px.svg"
             }
             alt={linkControlLabel}
             className="svg-icon"

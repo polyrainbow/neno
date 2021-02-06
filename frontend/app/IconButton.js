@@ -2,6 +2,7 @@ import React from "react";
 import {
   Tooltip,
 } from "react-tippy";
+import { ICON_PATH } from "./lib/config.js";
 
 const IconButton = ({
   id,
@@ -23,7 +24,7 @@ const IconButton = ({
       disabled={disabled}
     >
       <img
-        src={"/assets/icons/" + icon + "-24px.svg"}
+        src={ICON_PATH + icon + "-24px.svg"}
         alt={title}
         width="24"
         height="24"
