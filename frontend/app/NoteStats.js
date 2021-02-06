@@ -1,8 +1,8 @@
 import React from "react";
 import {
   makeTimestampHumanReadable,
-  getUrlForFileId,
 } from "./lib/utils.js";
+import NoteStatsFileLink from "./NoteStatsFileLink.js";
 
 const NoteStats = ({
   note,
@@ -46,14 +46,11 @@ const NoteStats = ({
               ? note.editorData.blocks
                 .filter((block) => block.type === "image")
                 .map((block, i, array) => {
-                  return <React.Fragment key={block.data.file.url + note.id}>
-                    <a
-                      href={block.data.file.url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {block.data.file.fileId}
-                    </a>
+                  return <React.Fragment key={block.data.file.fileId + note.id}>
+                    <NoteStatsFileLink
+                      fileId={block.data.file.fileId}
+                      databaseProvider={databaseProvider}
+                    />
                     {
                       i < array.length - 1
                         ? <br />
@@ -73,22 +70,11 @@ const NoteStats = ({
                 .filter((block) => block.type === "attaches")
                 .map((block, i, array) => {
                   return <React.Fragment key={block.data.file.fileId + note.id}>
-                    <a
-                      key={block.data.file.fileId + note.id}
-                      style={{
-                        "cursor": "pointer",
-                      }}
-                      onClick={async () => {
-                        const fileId = block.data.file.fileId;
-                        const url = await getUrlForFileId(
-                          fileId,
-                          databaseProvider,
-                        );
-                        window.open(url, "_blank");
-                      }}
-                    >
-                      {block.data.file.name}
-                    </a>
+                    <NoteStatsFileLink
+                      fileId={block.data.file.fileId}
+                      name={block.data.file.name}
+                      databaseProvider={databaseProvider}
+                    />
                     {
                       i < array.length - 1
                         ? <br />
