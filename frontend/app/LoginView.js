@@ -10,8 +10,8 @@ const LoginView = ({
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [wrongPasswordDisclaimer, setWrongPasswordDisclaimer]
-    = useState(false);
+  const [disclaimer, setDisclaimer]
+    = useState(null);
   const [
     localDatabaseFolderHandleName,
     setLocalDatabaseFolderHandleName,
@@ -28,9 +28,14 @@ const LoginView = ({
           setDatabaseMode("SERVER");
           setActiveView("EDITOR");
         } else {
-          setWrongPasswordDisclaimer(true);
+          setDisclaimer("INVALID_CREDENTIALS");
           setIsBusy(false);
         }
+      })
+      .catch((e) => {
+        console.error(e);
+        setDisclaimer("SERVER_ERROR");
+        setIsBusy(false);
       });
   };
 
@@ -45,10 +50,18 @@ const LoginView = ({
     <section id="section_login">
       <h1>Server database</h1>
       {
-        wrongPasswordDisclaimer
+        disclaimer === "INVALID_CREDENTIALS"
           ? <p style={{ color: "red" }}>
             Your username and password do not seem to be correct.
             Please try again.
+          </p>
+          : ""
+      }
+      {
+        disclaimer === "SERVER_ERROR"
+          ? <p style={{ color: "red" }}>
+            Something is wrong with the server. How about creating a
+            local database instead?
           </p>
           : ""
       }

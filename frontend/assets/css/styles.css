@@ -413,9 +413,11 @@ button[disabled]{
 #section_login {
   font-size: var(--main-ui-font-size);
   padding: 20px;
-  width: 100%;
+  box-sizing: border-box;
+  width: 100vw;
   margin: auto;
   height: calc(100vh - 50px);
+  overflow: auto;
 }
 
 #section_login input {
