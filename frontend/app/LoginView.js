@@ -10,12 +10,14 @@ const LoginView = ({
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [disclaimer, setDisclaimer]
+  const [serverDisclaimer, setServerDisclaimer]
+    = useState(null);
+  const [localDisclaimer, setLocalDisclaimer]
     = useState(null);
   const [
     localDatabaseFolderHandleName,
     setLocalDatabaseFolderHandleName,
-  ] = useState(false);
+  ] = useState(null);
 
   const [isBusy, setIsBusy] = useState(false);
 
@@ -28,13 +30,13 @@ const LoginView = ({
           setDatabaseMode("SERVER");
           setActiveView("EDITOR");
         } else {
-          setDisclaimer("INVALID_CREDENTIALS");
+          setServerDisclaimer("INVALID_CREDENTIALS");
           setIsBusy(false);
         }
       })
       .catch((e) => {
         console.error(e);
-        setDisclaimer("SERVER_ERROR");
+        setServerDisclaimer("SERVER_ERROR");
         setIsBusy(false);
       });
   };
@@ -50,7 +52,7 @@ const LoginView = ({
     <section id="section_login">
       <h1>Server database</h1>
       {
-        disclaimer === "INVALID_CREDENTIALS"
+        serverDisclaimer === "INVALID_CREDENTIALS"
           ? <p style={{ color: "red" }}>
             Your username and password do not seem to be correct.
             Please try again.
@@ -58,7 +60,7 @@ const LoginView = ({
           : ""
       }
       {
-        disclaimer === "SERVER_ERROR"
+        serverDisclaimer === "SERVER_ERROR"
           ? <p style={{ color: "red" }}>
             Something is wrong with the server. How about creating a
             local database instead?
@@ -105,6 +107,14 @@ const LoginView = ({
 
       <h1>Local database</h1>
       {
+        localDisclaimer === "INVALID_FOLDER_HANDLE"
+          ? <p style={{ color: "red" }}>
+            There was a problem accessing the database folder.
+            Have you moved or deleted it?
+          </p>
+          : ""
+      }
+      {
         typeof localDatabaseFolderHandleName === "string"
           ? <>
             <p>
@@ -120,6 +130,11 @@ const LoginView = ({
                   setActiveView("EDITOR");
                 } catch (e) {
                   console.error(e);
+
+                  // it could be that the folder is not there anymore but we
+                  // still have a handle
+                  setLocalDatabaseFolderHandleName(null);
+                  setLocalDisclaimer("INVALID_FOLDER_HANDLE");
                 }
               }}
             >

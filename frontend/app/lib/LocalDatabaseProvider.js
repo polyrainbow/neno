@@ -94,7 +94,16 @@ export default class LocalDatabaseProvider {
     const storageProvider
       = new FileSystemAccessAPIStorageProvider(this.#folderHandle);
 
-    await this.#notesModule.init(storageProvider);
+    try {
+      await this.#notesModule.init(storageProvider);
+    } catch (e) {
+      console.error(
+        "Initializing notes module not possible. "
+        + "Removing folder handle because it could be outdated",
+      );
+      await this.removeAccess();
+      throw new Error(e);
+    }
 
     this.#isDatabaseInitialized = true;
   }
