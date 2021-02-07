@@ -1,4 +1,4 @@
-import * as DB from "./io.js";
+import * as IO from "./io.js";
 import * as Utils from "../utils.js";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -65,7 +65,7 @@ const init = async (storageProvider, _getUrlMetadata):Promise<void> => {
     getUrlMetadata = _getUrlMetadata;
   }
 
-  DB.init({
+  IO.init({
     storageProvider,
   });
 
@@ -75,7 +75,7 @@ const init = async (storageProvider, _getUrlMetadata):Promise<void> => {
 
 
 const get = async (noteId: NoteId, dbId: DatabaseId):Promise<NoteToTransmit> => {
-  const db = await DB.getMainData(dbId);
+  const db = await IO.getMainData(dbId);
   const noteFromDB:DatabaseNote | null = findNote(db, noteId);
   if (!noteFromDB) {
     throw new Error("NOTE_NOT_FOUND");
@@ -96,7 +96,7 @@ const getNotesList = async (
   const sortMode
     = options.sortMode || NoteListSortMode.CREATION_DATE_DESCENDING;
 
-  const db: Database = await DB.getMainData(dbId);
+  const db: Database = await IO.getMainData(dbId);
 
   let matchingNotes;
 
@@ -177,7 +177,7 @@ const getNotesList = async (
 
 
 const getGraph = async (dbId: DatabaseId):Promise<Graph> => {
-  const db = await DB.getMainData(dbId);
+  const db = await IO.getMainData(dbId);
 
   const graphNodes:GraphNode[] = db.notes.map((note) => {
     const graphNode:GraphNode = {
@@ -202,7 +202,7 @@ const getGraph = async (dbId: DatabaseId):Promise<Graph> => {
 
 
 const getStats = async (dbId:DatabaseId, exhaustive:boolean):Promise<Stats> => {
-  const db = await DB.getMainData(dbId);
+  const db = await IO.getMainData(dbId);
 
   const numberOfUnlinkedNotes = db.notes.filter((note) => {
     return getNumberOfLinkedNotes(db, note.id) === 0;
@@ -215,7 +215,7 @@ const getStats = async (dbId:DatabaseId, exhaustive:boolean):Promise<Stats> => {
   };
 
   if (exhaustive) {
-    stats.numberOfFiles = await DB.getNumberOfFiles(dbId);
+    stats.numberOfFiles = await IO.getNumberOfFiles(dbId);
     stats.numberOfPins = db.pinnedNotes.length;
   }
 
@@ -227,7 +227,7 @@ const setGraph = async (
   graphFromUser:GraphFromUser,
   dbId:DatabaseId,
 ):Promise<void> => {
-  const db:Database = await DB.getMainData(dbId);
+  const db:Database = await IO.getMainData(dbId);
   graphFromUser.nodePositionUpdates.forEach(
     (nodePositionUpdate:GraphNodePositionUpdate):void => {
       updateNotePosition(db, nodePositionUpdate);
@@ -236,7 +236,7 @@ const setGraph = async (
   db.links = graphFromUser.links;
   db.screenPosition = graphFromUser.screenPosition;
   db.initialNodePosition = graphFromUser.initialNodePosition;
-  await DB.flushChanges(db);
+  await IO.flushChanges(db);
 };
 
 
@@ -253,7 +253,7 @@ const put = async (
     ignoreDuplicateTitles = false;
   }
 
-  const db:Database = await DB.getMainData(dbId);
+  const db:Database = await IO.getMainData(dbId);
 
   if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, db)) {
     throw new Error("NOTE_WITH_SAME_TITLE_EXISTS");
@@ -286,7 +286,7 @@ const put = async (
   removeEmptyLinks(databaseNote);
   incorporateUserChangesIntoNote(noteFromUser.changes, databaseNote, db);
 
-  await DB.flushChanges(db);
+  await IO.flushChanges(db);
 
   const noteToTransmit:NoteToTransmit
     = createNoteToTransmit(databaseNote, db);
@@ -295,7 +295,7 @@ const put = async (
 
 
 const remove = async (noteId, dbId):Promise<void> => {
-  const db = await DB.getMainData(dbId);
+  const db = await IO.getMainData(dbId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
   if (noteIndex === -1) {
     throw new Error("Note not found");
@@ -310,12 +310,12 @@ const remove = async (noteId, dbId):Promise<void> => {
   // remove files used in this note
   getFilesOfNote(note)
     .forEach((fileId) => {
-      DB.deleteFile(dbId, fileId);
+      IO.deleteFile(dbId, fileId);
     });
 
   db.pinnedNotes = db.pinnedNotes.filter((nId) => nId !== noteId);
 
-  await DB.flushChanges(db);
+  await IO.flushChanges(db);
 };
 
 
@@ -323,7 +323,7 @@ const importDB = (db, dbId) => {
   if (db.id !== dbId) {
     throw new Error("UNAUTHORIZED: You are not allowed to update another DB");
   }
-  return DB.flushChanges(db);
+  return IO.flushChanges(db);
 };
 
 
@@ -342,7 +342,7 @@ const addFile = async (
   }
 
   const fileId:FileId = uuidv4() + "." + fileType.ending;
-  await DB.addFile(dbId, fileId, readable);
+  await IO.addFile(dbId, fileId, readable);
   return fileId;
 };
 
@@ -351,12 +351,12 @@ const getReadableFileStream = (
   dbId: DatabaseId,
   fileId:FileId,
 ):Promise<ReadableWithType> => {
-  return DB.getReadableFileStream(dbId, fileId);
+  return IO.getReadableFileStream(dbId, fileId);
 };
 
 
 const getReadableDatabaseStream = async (dbId, withUploads) => {
-  return await DB.getReadableDatabaseStream(dbId, withUploads);
+  return await IO.getReadableDatabaseStream(dbId, withUploads);
 };
 
 
@@ -449,7 +449,7 @@ const pin = async (
   dbId:DatabaseId,
   noteId:NoteId,
 ):Promise<NoteToTransmit[]> => {
-  const db = await DB.getMainData(dbId);
+  const db = await IO.getMainData(dbId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
   if (noteIndex === -1) {
     throw new Error("Note not found");
@@ -459,7 +459,7 @@ const pin = async (
     new Set([...db.pinnedNotes, noteId]),
   );
 
-  await DB.flushChanges(db);
+  await IO.flushChanges(db);
 
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes
@@ -476,11 +476,11 @@ const unpin = async (
   dbId:DatabaseId,
   noteId:NoteId,
 ):Promise<NoteToTransmit[]> => {
-  const db = await DB.getMainData(dbId);
+  const db = await IO.getMainData(dbId);
 
   db.pinnedNotes = db.pinnedNotes.filter((nId) => nId !== noteId);
 
-  await DB.flushChanges(db);
+  await IO.flushChanges(db);
 
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes
@@ -494,7 +494,7 @@ const unpin = async (
 
 
 const getPins = async (dbId:DatabaseId):Promise<NoteToTransmit[]> => {
-  const db = await DB.getMainData(dbId);
+  const db = await IO.getMainData(dbId);
 
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
     db.pinnedNotes

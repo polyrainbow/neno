@@ -6,7 +6,7 @@ import {
   removeDefaultTextParagraphs,
   removeEmptyLinks,
 } from "./noteUtils.js";
-import * as DB from "./io.js";
+import * as IO from "./io.js";
 
 
 const removeLinksOfNonExistingNotes = (db) => {
@@ -68,7 +68,7 @@ const cleanUpLinks = (db) => {
 // this function must always be indempotent, so that there is only one
 // canonical data structure
 const cleanUpData = async () => {
-  await DB.forEach((db) => {
+  await IO.forEach((db) => {
     console.log("Cleaning db " + db.id + " ...");
 
     // each database should have an initialNodePosition
