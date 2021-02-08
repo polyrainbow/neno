@@ -1,6 +1,6 @@
 # NENO
 
-NENO is a note-taking app that helps you creating your personal knowledge graph. With NENO, you retain full control over your data because you decide, where it is stored: On your local machine, on a cloud storage of your choice, or even on a server under your control.
+NENO is a note-taking app that helps you creating your personal knowledge graph. With NENO, you retain full control over your data because you decide where it is stored: On your local machine, on a cloud storage of your choice, or even on a server under your control.
 
 ![NENO Editor view](./docs/img/editor%20view.png)
 ![NENO Graph view](./docs/img/graph%20view.png)
