@@ -4,4 +4,8 @@ export default interface Stats {
     readonly numberOfUnlinkedNotes: number,
     numberOfFiles?: number,
     numberOfPins?: number,
+    numberOfComponents?: number,
+    numberOfComponentsWithMoreThanOneNode?: number,
+    numberOfHubs?: number,
+    maxNumberOfLinksOnANode?: number,
 }

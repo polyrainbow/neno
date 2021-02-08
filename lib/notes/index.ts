@@ -18,6 +18,7 @@ import {
   getNumberOfLinkedNotes,
   getURLsOfNote,
   createNoteListItem,
+  getNumberOfComponents,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "./interfaces/DatabaseMainData.js";
@@ -217,6 +218,16 @@ const getStats = async (dbId:DatabaseId, exhaustive:boolean):Promise<Stats> => {
   if (exhaustive) {
     stats.numberOfFiles = await IO.getNumberOfFiles(dbId);
     stats.numberOfPins = db.pinnedNotes.length;
+    stats.numberOfComponents = getNumberOfComponents(db.notes, db.links);
+    stats.numberOfComponentsWithMoreThanOneNode
+      = stats.numberOfComponents - numberOfUnlinkedNotes;
+    stats.numberOfHubs = db.notes
+      .filter((note) => getNumberOfLinkedNotes(db, note.id) >= 5)
+      .length;
+    stats.maxNumberOfLinksOnANode = db.notes.reduce((accumulator, note) => {
+      const numberOfLinks = getNumberOfLinkedNotes(db, note.id);
+      return numberOfLinks > accumulator ? numberOfLinks : accumulator
+    }, 0);
   }
 
   return stats;

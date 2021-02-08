@@ -410,6 +410,11 @@ button[disabled]{
 }
 
 
+.stats-table tr td:nth-of-type(2) {
+  text-align: right;
+}
+
+
 #section_login {
   font-size: var(--main-ui-font-size);
   padding: 20px;

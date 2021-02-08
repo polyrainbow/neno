@@ -25,26 +25,52 @@ const StatsDialog = ({
     <h1>Stats</h1>
     {
       status === "READY"
-        ? <table className="data-table">
+        ? <table className="data-table stats-table">
           <tbody>
             <tr>
-              <td>{emojis.note} Number of notes</td>
+              <td>{emojis.note} Notes</td>
               <td>{stats.numberOfAllNotes.toLocaleString("en")}</td>
             </tr>
             <tr>
-              <td>{emojis.link} Number of links</td>
+              <td>{emojis.link} Links</td>
               <td>{stats.numberOfLinks.toLocaleString("en")}</td>
             </tr>
             <tr>
-              <td>{emojis.unlinked} Number of unlinked notes</td>
+              <td>{emojis.unlinked} Unlinked notes</td>
               <td>{stats.numberOfUnlinkedNotes.toLocaleString("en")}</td>
             </tr>
             <tr>
-              <td>{emojis.image}{emojis.file} Number of files</td>
+              <td><a
+                href="https://en.wikipedia.org/wiki/Component_(graph_theory)"
+                target="_blank"
+                rel="noreferrer noopener"
+              >Components</a></td>
+              <td>{stats.numberOfComponents.toLocaleString("en")}</td>
+            </tr>
+            <tr>
+              <td>Components with more than one node</td>
+              <td>{
+                stats.numberOfComponentsWithMoreThanOneNode.toLocaleString("en")
+              }</td>
+            </tr>
+            <tr>
+              <td>Hubs (nodes with more than 4 links)</td>
+              <td>{
+                stats.numberOfHubs.toLocaleString("en")
+              }</td>
+            </tr>
+            <tr>
+              <td>Maximum number of links on a node</td>
+              <td>{
+                stats.maxNumberOfLinksOnANode.toLocaleString("en")
+              }</td>
+            </tr>
+            <tr>
+              <td>{emojis.image}{emojis.file} Files</td>
               <td>{stats.numberOfFiles.toLocaleString("en")}</td>
             </tr>
             <tr>
-              <td>{emojis.pin} Number of pins</td>
+              <td>{emojis.pin} Pins</td>
               <td>{stats.numberOfPins.toLocaleString("en")}</td>
             </tr>
           </tbody>
