@@ -338,6 +338,62 @@ const getURLsOfNote = (note:DatabaseNote):string[] => {
 }
 
 
+// https://en.wikipedia.org/wiki/Breadth-first_search
+const breadthFirstSearch = (nodes, links, root: DatabaseNote) => {
+  const queue:DatabaseNote[] = [];
+  const discovered:DatabaseNote[] = [];
+  discovered.push(root);
+  queue.push(root);
+
+  while (queue.length > 0) {
+    const v = queue.shift() as DatabaseNote;
+    const connectedNodes = links
+      .filter((link:Link):boolean => {
+        return (link[0] === v.id) || (link[1] === v.id);
+      })
+      .map((link:Link):DatabaseNote => {
+        const linkedNoteId = (link[0] === v.id) ? link[1] : link[0];
+        // we are sure that the notes we are retrieving from noteIds in links
+        // really exist. that's why we cast the result of findNote as
+        // DatabaseNote
+        return nodes.find((n) => (n.id === linkedNoteId));
+      });
+    for (let i = 0; i < connectedNodes.length; i++){
+      const w = connectedNodes[i];
+      if (!discovered.includes(w)){
+        discovered.push(w);
+        queue.push(w);
+      }
+    }
+  }
+
+  return discovered;
+}
+
+
+// https://en.wikipedia.org/wiki/Component_(graph_theory)#Algorithms
+const getNumberOfComponents = (nodes:DatabaseNote[], links:Link[]) => {
+  let totallyDiscovered:DatabaseNote[] = [];
+  let numberOfComponents = 0;
+
+  let i = 0;
+
+  while (totallyDiscovered.length < nodes.length)  {
+    let root = nodes[i];
+    while (totallyDiscovered.includes(root)) {
+      i++;
+      root = nodes[i];
+    }
+    const inComponent = breadthFirstSearch(nodes, links, root);
+    totallyDiscovered = [...totallyDiscovered, ...inComponent] as DatabaseNote[];
+    numberOfComponents++;
+    i++;
+  }
+
+  return numberOfComponents;
+}
+
+
 export {
   getNoteTitle,
   removeDefaultTextParagraphs,
@@ -357,4 +413,5 @@ export {
   getNumberOfCharacters,
   getURLsOfNote,
   createNoteListItem,
+  getNumberOfComponents,
 };
