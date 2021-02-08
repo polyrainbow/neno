@@ -67,7 +67,7 @@ node dist/backend/index.js --use-https \
 
 ### --jwt-secret \<value>
 * secret for signing JSON web tokens for authentication
-* Default value: A random uuid created on server startup
+* Default value: A random uuid automatically created at server startup
 
 ### --url-metadata \<url>
 * don't start server, only grab url metadata for given url"
