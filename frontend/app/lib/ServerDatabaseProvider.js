@@ -11,11 +11,15 @@ export default class ServerDatabaseProvider {
   static type = "SERVER";
 
   async hasAccessToken() {
-    return !!tokenManager.get();
+    return !!tokenManager.get().token;
   }
 
   getAuthToken() {
-    return tokenManager.get();
+    return tokenManager.get().token;
+  }
+
+  async getDbId() {
+    return tokenManager.get().dbId;
   }
 
   login(username, password) {

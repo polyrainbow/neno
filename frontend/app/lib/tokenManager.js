@@ -1,21 +1,30 @@
 import { MAX_SESSION_AGE } from "./config.js";
 
-let token = localStorage.getItem("token") || null;
+const tokenKey = "NENO_token";
+const dbIdKey = "NENO_dbId";
 
-const set = (newToken) => {
-  token = newToken;
-  localStorage.setItem("token", newToken);
-  document.cookie = `token=${token};max-age=${MAX_SESSION_AGE.toString()}`;
+let token = localStorage.getItem(tokenKey) || null;
+let dbId = localStorage.getItem("token") || null;
+
+const set = (options) => {
+  token = options.token;
+  dbId = options.dbId;
+  localStorage.setItem(tokenKey, token);
+  localStorage.setItem(dbIdKey, dbId);
+  document.cookie
+    = `${tokenKey}=${token};max-age=${MAX_SESSION_AGE.toString()}`;
 };
 
 const get = () => {
-  return token;
+  return { token, dbId };
 };
 
 const remove = () => {
   token = null;
-  localStorage.removeItem("token");
-  document.cookie = "token=;";
+  dbId = null;
+  localStorage.removeItem(tokenKey);
+  localStorage.removeItem(dbIdKey);
+  document.cookie = tokenKey + "=;";
 };
 
 export {

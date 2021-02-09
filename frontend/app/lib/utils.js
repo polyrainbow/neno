@@ -1,6 +1,8 @@
 import * as Config from "./config.js";
 
 const yyyymmdd = (date) => {
+  if (!date) date = new Date();
+
   const yyyy = date.getFullYear().toString();
   const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
   const dd = date.getDate().toString();

@@ -25,18 +25,15 @@ const LoginView = ({
   const startLoginAttempt = () => {
     setIsBusy(true);
     serverDatabaseProvider.login(username, password)
-      .then((success) => {
-        if (success) {
-          setDatabaseMode("SERVER");
-          setActiveView("EDITOR");
-        } else {
-          setServerDisclaimer("INVALID_CREDENTIALS");
-          setIsBusy(false);
-        }
+      .then(() => {
+        setDatabaseMode("SERVER");
+        setActiveView("EDITOR");
       })
       .catch((e) => {
-        console.error(e);
-        setServerDisclaimer("SERVER_ERROR");
+        const disclaimer = (e.message === "INVALID_CREDENTIALS")
+          ? "INVALID_CREDENTIALS"
+          : "SERVER_ERROR";
+        setServerDisclaimer(disclaimer);
         setIsBusy(false);
       });
   };

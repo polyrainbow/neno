@@ -12,7 +12,7 @@ const callAPI = async (
   const fetchOptions = {
     method,
     headers: {
-      "authorization": "Bearer " + tokenManager.get(),
+      "authorization": "Bearer " + tokenManager.get().token,
     },
   };
 
@@ -47,12 +47,16 @@ const callAPI = async (
 
 const login = async (username, password) => {
   const response = await callAPI("POST", "login", { username, password });
-  if (response.success) {
-    tokenManager.set(response.token);
-    return true;
+
+  if (!response.success) {
+    throw new Error(response.error);
   }
 
-  return false;
+  tokenManager.set({
+    token: response.payload.token,
+    dbId: response.payload.dbId,
+  });
+  return response.payload;
 };
 
 

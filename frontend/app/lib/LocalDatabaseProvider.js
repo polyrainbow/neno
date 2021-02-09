@@ -66,6 +66,11 @@ export default class LocalDatabaseProvider {
   }
 
 
+  async getDbId() {
+    return LocalDatabaseProvider.dbId;
+  }
+
+
   async removeAccess() {
     this.#folderHandle = null;
     await IDB.del(LocalDatabaseProvider.#handleStorageKey);

@@ -654,7 +654,10 @@ const startApp = async ({
 
       const response:APIResponse = {
         success: true,
-        token: accessToken,
+        payload: {
+          token: accessToken,
+          dbId: user.id,
+        },
       };
 
       return res.status(200).json(response);

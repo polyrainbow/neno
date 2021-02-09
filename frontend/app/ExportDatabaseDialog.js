@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Dialog from "./Dialog.js";
 import RadioGroup from "./RadioGroup.js";
-import { humanFileSize } from "./lib/utils.js";
+import { humanFileSize, yyyymmdd } from "./lib/utils.js";
 
 
 const ExportDatabaseDialog = ({
@@ -111,14 +111,18 @@ const ExportDatabaseDialog = ({
           />
           <button
             onClick={async () => {
+              const dbId = await databaseProvider.getDbId();
+
               const opts = withUploads
                 ? {
+                  suggestedName: dbId + "-" + yyyymmdd() + ".neno-db.zip",
                   types: [{
                     description: "ZIP database file",
                     accept: { "application/zip": [".zip"] },
                   }],
                 }
                 : {
+                  suggestedName: dbId + "-" + yyyymmdd() + ".neno-db.json",
                   types: [{
                     description: "JSON database file",
                     accept: { "application/json": [".json"] },
