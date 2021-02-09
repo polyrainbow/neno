@@ -16,6 +16,13 @@ const StatsDialog = ({
     setStatus("READY");
   }, []);
 
+  let percentageOfUnlinkedNotes = null;
+  if (stats && (stats.numberOfAllNotes > 0)) {
+    percentageOfUnlinkedNotes = Math.round(
+      (stats.numberOfUnlinkedNotes / stats.numberOfAllNotes) * 100 * 100,
+    ) / 100;
+  }
+
   return <Dialog
     onClickOnOverlay={() => {
       if (status !== "BUSY") onCancel();
@@ -37,7 +44,10 @@ const StatsDialog = ({
             </tr>
             <tr>
               <td>{emojis.unlinked} Unlinked notes</td>
-              <td>{stats.numberOfUnlinkedNotes.toLocaleString("en")}</td>
+              <td>{
+                stats.numberOfUnlinkedNotes.toLocaleString("en")
+                + ` (${percentageOfUnlinkedNotes.toLocaleString("en")} %)`
+              }</td>
             </tr>
             <tr>
               <td><a
