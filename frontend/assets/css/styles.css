@@ -131,7 +131,8 @@ a {
 header {
   background: var(--header-background-color);
   margin: 0;
-  padding: 0px 10px;
+  padding: 0px;
+  padding-right: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -179,10 +180,14 @@ header h1 {
 
 
 #heading {
-  margin: 8px;
-  margin-left: 0px;
+  margin: 0px;
+  padding: 11px 10px;
   font-size: var(--main-ui-font-size);
   white-space: pre;
+}
+
+#heading:hover {
+  background-color: var(--nli-color-hover);
 }
 
 #header-controls {
