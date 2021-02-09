@@ -54,13 +54,13 @@ const StatsDialog = ({
               }</td>
             </tr>
             <tr>
-              <td>Hubs (nodes with more than 4 links)</td>
+              <td>{emojis.hub} Hubs (nodes with more than 4 links)</td>
               <td>{
                 stats.numberOfHubs.toLocaleString("en")
               }</td>
             </tr>
             <tr>
-              <td>Maximum number of links on a node</td>
+              <td>🔥 Maximum number of links on a node</td>
               <td>{
                 stats.maxNumberOfLinksOnANode.toLocaleString("en")
               }</td>

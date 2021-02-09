@@ -52,6 +52,7 @@ const emojis = {
   "image": "🖼️",
   "code": "🤖",
   "pin": "📌",
+  "hub": "🐙",
 };
 
 // session token expire time in seconds

@@ -55,7 +55,7 @@ const NoteListItem = ({
           {yyyymmdd(new Date(note.updateTime))}
           {
             isHub
-              ? " · 🐙 Hub"
+              ? " · " + emojis.hub + " Hub"
               : ""
           }
         </div>
