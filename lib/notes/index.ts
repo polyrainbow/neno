@@ -41,6 +41,7 @@ import { Readable } from "stream";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
+import StatsExhaustive from "./interfaces/StatsExhaustive.js";
 
 
 /* this is the fallback getUrlMetadata function that is used if the initializer
@@ -202,32 +203,40 @@ const getGraph = async (dbId: DatabaseId):Promise<Graph> => {
 };
 
 
-const getStats = async (dbId:DatabaseId, exhaustive:boolean):Promise<Stats> => {
+const getStats = async (dbId:DatabaseId, exhaustive:boolean):Promise<Stats | StatsExhaustive> => {
   const db = await IO.getMainData(dbId);
 
   const numberOfUnlinkedNotes = db.notes.filter((note) => {
     return getNumberOfLinkedNotes(db, note.id) === 0;
   }).length;
+  
 
-  const stats:Stats = {
+  let stats:Stats | StatsExhaustive = {
     numberOfAllNotes: db.notes.length,
     numberOfLinks: db.links.length,
     numberOfUnlinkedNotes,
   };
 
   if (exhaustive) {
-    stats.numberOfFiles = await IO.getNumberOfFiles(dbId);
-    stats.numberOfPins = db.pinnedNotes.length;
-    stats.numberOfComponents = getNumberOfComponents(db.notes, db.links);
-    stats.numberOfComponentsWithMoreThanOneNode
-      = stats.numberOfComponents - numberOfUnlinkedNotes;
-    stats.numberOfHubs = db.notes
-      .filter((note) => getNumberOfLinkedNotes(db, note.id) >= 5)
-      .length;
-    stats.maxNumberOfLinksOnANode = db.notes.reduce((accumulator, note) => {
-      const numberOfLinks = getNumberOfLinkedNotes(db, note.id);
-      return numberOfLinks > accumulator ? numberOfLinks : accumulator
-    }, 0);
+    const numberOfComponents = getNumberOfComponents(db.notes, db.links);
+
+    stats = {
+      ...stats,
+      numberOfFiles: await IO.getNumberOfFiles(dbId),
+      numberOfPins: db.pinnedNotes.length,
+      numberOfComponents,
+      numberOfComponentsWithMoreThanOneNode:
+        numberOfComponents - numberOfUnlinkedNotes,
+      numberOfHubs: db.notes
+        .filter((note) => getNumberOfLinkedNotes(db, note.id) >= 5)
+        .length,
+      maxNumberOfLinksOnANode: db.notes.reduce((accumulator, note) => {
+        const numberOfLinks = getNumberOfLinkedNotes(db, note.id);
+        return numberOfLinks > accumulator ? numberOfLinks : accumulator
+      }, 0),
+      dbCreationTime: db.creationTime,
+      dbUpdateTime: db.updateTime,
+    }
   }
 
   return stats;

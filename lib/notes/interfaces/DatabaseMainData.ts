@@ -7,7 +7,8 @@ import ScreenPosition from "./ScreenPosition.js";
 
 export default interface DatabaseMainData {
     readonly id: DatabaseId,
-    timestamp: number,
+    readonly creationTime: number,
+    updateTime: number,
     notes: DatabaseNote[],
     links: Link[],
     idCounter: number,

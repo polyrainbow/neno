@@ -55,7 +55,8 @@ const createDatabase = async (
   databaseId: DatabaseId,
 ): Promise<DatabaseMainData> => {
   const newMainData:DatabaseMainData = {
-    timestamp: Date.now(),
+    creationTime: Date.now(),
+    updateTime: Date.now(),
     id: databaseId,
     notes: [],
     links: [],
@@ -115,7 +116,7 @@ const getMainData = async (dbId: DatabaseId):Promise<DatabaseMainData> => {
 // written to the disk and thus are persistent. it should always be called
 // after any operations on the main data object have been performed.
 const flushChanges = async (db:DatabaseMainData):Promise<boolean> => {
-  db.timestamp = Date.now();
+  db.updateTime = Date.now();
 
   const mdFromLoadedMDOsIndex:number
     = loadedMainDataObjects.findIndex((loadedDB) => {
@@ -230,10 +231,16 @@ const getNumberOfFiles = async (
   databaseId: DatabaseId,
 ):Promise<number> => {
   const fileFolderPath = getFileFolderPath(databaseId);
-  const files = (await storageProvider.listDirectory(fileFolderPath))
-    .filter(stringContainsUUID);
 
-  return files.length;
+  // it could be that the directory does not exist yet
+  try {
+    const files = (await storageProvider.listDirectory(fileFolderPath))
+      .filter(stringContainsUUID);
+
+    return files.length;
+  } catch (e) {
+    return 0;
+  }
 };
 
 

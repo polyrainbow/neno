@@ -71,6 +71,13 @@ const cleanUpData = async () => {
   await IO.forEach((db) => {
     console.log("Cleaning db " + db.id + " ...");
 
+    // remove old db date key
+    if (db.timestamp) {
+      db.creationTime = db.notes[0]?.creationTime || db.timestamp;
+      db.updateTime = db.timestamp;
+      delete db.timestamp;
+    }
+
     // each database should have an initialNodePosition
     if (!db.initialNodePosition) {
       db.initialNodePosition = {
