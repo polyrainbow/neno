@@ -2,7 +2,7 @@ const tokenKey = "NENO_token";
 const dbIdKey = "NENO_dbId";
 
 let token = localStorage.getItem(tokenKey) || null;
-let dbId = localStorage.getItem("token") || null;
+let dbId = localStorage.getItem(dbIdKey) || null;
 
 const set = (options) => {
   token = options.token;

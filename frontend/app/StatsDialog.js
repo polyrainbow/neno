@@ -12,6 +12,7 @@ const StatsDialog = ({
 
   useEffect(async () => {
     const stats = await databaseProvider.getStats(true);
+    stats.dbId = await databaseProvider.getDbId();
     setStats(stats);
     setStatus("READY");
   }, []);
@@ -34,6 +35,10 @@ const StatsDialog = ({
       status === "READY"
         ? <table className="data-table stats-table">
           <tbody>
+            <tr>
+              <td>Database ID</td>
+              <td>{stats.dbId}</td>
+            </tr>
             <tr>
               <td>{emojis.note} Notes</td>
               <td>{stats.numberOfAllNotes.toLocaleString("en")}</td>
