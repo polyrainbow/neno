@@ -50,9 +50,7 @@ const callAPI = async (
 };
 
 
-const login = async (username, password) => {
-  const response = await callAPI("POST", "login", { username, password });
-
+const getJSONResponsePayloadIfSuccessful = (response) => {
   if (!response.success) {
     throw new Error(response.error);
   }
@@ -61,9 +59,15 @@ const login = async (username, password) => {
 };
 
 
+const login = async (username, password) => {
+  const response = await callAPI("POST", "login", { username, password });
+  return getJSONResponsePayloadIfSuccessful(response);
+};
+
+
 const getNote = async (noteId) => {
   const response = await callAPI("GET", "note/" + noteId);
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
@@ -82,10 +86,7 @@ const getNotes = async (options) => {
   }
 
   const response = await callAPI("GET", url);
-  if (!response.success) {
-    throw new Error(response.error);
-  }
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
@@ -96,17 +97,13 @@ const putNote = async (note, options) => {
       options,
     },
   );
-
-  if (response.success === false) {
-    throw new Error(response.error);
-  }
-
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const deleteNote = async (noteId) => {
-  await callAPI("DELETE", "note/" + noteId);
+  const response = await callAPI("DELETE", "note/" + noteId);
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
@@ -115,27 +112,19 @@ const getStats = async (exhaustive) => {
     "GET",
     "stats?exhaustive=" + exhaustive.toString(),
   );
-  if (!response.success) {
-    throw new Error(response.error);
-  }
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getGraph = async () => {
   const response = await callAPI("GET", "graph");
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const saveGraph = async (graphObject) => {
   const response = await callAPI("POST", "graph", graphObject);
-
-  if (!response.success) {
-    throw new Error("Error saving graph!");
-  }
-
-  return true;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
@@ -155,12 +144,7 @@ const getReadableFileStream = async (fileId) => {
 
 const importLinksAsNotes = async (links) => {
   const response = await callAPI("PUT", "import-links-as-notes", { links });
-
-  if (response.success === false) {
-    throw new Error(response.error);
-  }
-
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
@@ -170,68 +154,38 @@ const uploadFile = async (file) => {
   const response = await callAPI(
     "POST", "file", data, "json", "form-data",
   );
-
-  if (!response.success) {
-    throw new Error(response.error);
-  }
-
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const uploadFileByUrl = async (data) => {
   const response = await callAPI("POST", "file-by-url", data);
-
-  if (!response.success) {
-    throw new Error(response.error);
-  }
-
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getUrlMetadata = async (url) => {
   const requestUrl = "url-metadata?url=" + url;
   const response = await callAPI("GET", requestUrl, null, "json");
-
-  if (!response.success) {
-    throw new Error(response.error);
-  }
-
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const pinNote = async (noteId) => {
   const response = await callAPI("PUT", "pins", { noteId });
-
-  if (!response.success) {
-    throw new Error("Error pinning note!");
-  }
-
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const unpinNote = async (noteId) => {
   const response = await callAPI("DELETE", "pins", { noteId });
-
-  if (!response.success) {
-    throw new Error("Error unpinning note!");
-  }
-
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getPins = async () => {
   const response = await callAPI("GET", "pins");
-
-  if (!response.success) {
-    throw new Error("Error getting pins!");
-  }
-
-  return response.payload;
+  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
