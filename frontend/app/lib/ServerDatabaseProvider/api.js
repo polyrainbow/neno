@@ -7,13 +7,13 @@ const setAPIUrl = (_API_URL) => {
 };
 
 
-const callAPI = async (
-  method,
+const callAPI = async ({
+  method = "GET",
   endpoint,
   body,
   outputType = "json",
   bodyType = "json",
-) => {
+}) => {
   const fetchOptions = {
     method,
     headers: {
@@ -60,13 +60,19 @@ const getJSONResponsePayloadIfSuccessful = (response) => {
 
 
 const login = async (username, password) => {
-  const response = await callAPI("POST", "login", { username, password });
+  const response = await callAPI({
+    method: "POST",
+    endpoint: "login",
+    body: { username, password },
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getNote = async (noteId) => {
-  const response = await callAPI("GET", "note/" + noteId);
+  const response = await callAPI({
+    endpoint: "note/" + noteId,
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
@@ -85,65 +91,87 @@ const getNotes = async (options) => {
       + "&caseSensitive=" + caseSensitive;
   }
 
-  const response = await callAPI("GET", url);
+  const response = await callAPI({
+    endpoint: url,
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const putNote = async (note, options) => {
-  const response = await callAPI("PUT", "note",
-    {
+  const response = await callAPI({
+    method: "PUT",
+    endpoint: "note",
+    body: {
       note,
       options,
     },
-  );
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const deleteNote = async (noteId) => {
-  const response = await callAPI("DELETE", "note/" + noteId);
+  const response = await callAPI({
+    method: "DELETE",
+    endpoint: "note/" + noteId,
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getStats = async (exhaustive) => {
-  const response = await callAPI(
-    "GET",
-    "stats?exhaustive=" + exhaustive.toString(),
-  );
+  const response = await callAPI({
+    endpoint: "stats?exhaustive=" + exhaustive.toString(),
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getGraph = async () => {
-  const response = await callAPI("GET", "graph");
+  const response = await callAPI({
+    endpoint: "graph",
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const saveGraph = async (graphObject) => {
-  const response = await callAPI("POST", "graph", graphObject);
+  const response = await callAPI({
+    method: "POST",
+    endpoint: "graph",
+    body: graphObject,
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getReadableDatabaseStream = async (withUploads) => {
   const apiEndpoint = "database?withUploads=" + withUploads.toString();
-  const response = await callAPI("GET", apiEndpoint, null, "body");
+  const response = await callAPI({
+    endpoint: apiEndpoint,
+    outputType: "body",
+  });
   return response;
 };
 
 
 const getReadableFileStream = async (fileId) => {
   const apiEndpoint = "file/" + fileId;
-  const response = await callAPI("GET", apiEndpoint, null, "body");
+  const response = await callAPI({
+    endpoint: apiEndpoint,
+    outputType: "body",
+  });
   return response;
 };
 
 
 const importLinksAsNotes = async (links) => {
-  const response = await callAPI("PUT", "import-links-as-notes", { links });
+  const response = await callAPI({
+    method: "PUT",
+    endpoint: "import-links-as-notes",
+    body: { links },
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
@@ -151,40 +179,59 @@ const importLinksAsNotes = async (links) => {
 const uploadFile = async (file) => {
   const data = new FormData();
   data.append("file", file);
-  const response = await callAPI(
-    "POST", "file", data, "json", "form-data",
-  );
+  const response = await callAPI({
+    method: "POST",
+    endpoint: "file",
+    body: data,
+    bodyType: "form-data",
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const uploadFileByUrl = async (data) => {
-  const response = await callAPI("POST", "file-by-url", data);
+  const response = await callAPI({
+    method: "POST",
+    endpoint: "file-by-url",
+    body: data,
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getUrlMetadata = async (url) => {
   const requestUrl = "url-metadata?url=" + url;
-  const response = await callAPI("GET", requestUrl, null, "json");
+  const response = await callAPI({
+    endpoint: requestUrl,
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const pinNote = async (noteId) => {
-  const response = await callAPI("PUT", "pins", { noteId });
+  const response = await callAPI({
+    method: "PUT",
+    endpoint: "pins",
+    body: { noteId },
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const unpinNote = async (noteId) => {
-  const response = await callAPI("DELETE", "pins", { noteId });
+  const response = await callAPI({
+    method: "DELETE",
+    endpoint: "pins",
+    body: { noteId },
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const getPins = async () => {
-  const response = await callAPI("GET", "pins");
+  const response = await callAPI({
+    endpoint: "pins",
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
