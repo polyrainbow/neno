@@ -7,8 +7,9 @@ import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
 import AppMenu from "./AppMenu.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 import StatsDialog from "./StatsDialog.js";
-import ServerDatabaseProvider from "./lib/ServerDatabaseProvider.js";
+import ServerDatabaseProvider from "./lib/ServerDatabaseProvider/index.js";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
+import { API_URL, MAX_SESSION_AGE } from "./lib/config.js";
 
 
 const App = () => {
@@ -63,7 +64,10 @@ const App = () => {
     );
 
   useEffect(async () => {
-    serverDatabaseProviderRef.current = new ServerDatabaseProvider();
+    serverDatabaseProviderRef.current = new ServerDatabaseProvider(
+      API_URL,
+      MAX_SESSION_AGE,
+    );
     localDatabaseProviderRef.current = new LocalDatabaseProvider();
 
     if (await serverDatabaseProviderRef.current.hasAccessToken()) {

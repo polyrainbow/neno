@@ -1,5 +1,10 @@
-import { API_URL } from "./config.js";
 import * as tokenManager from "./tokenManager.js";
+
+let API_URL;
+
+const setAPIUrl = (_API_URL) => {
+  API_URL = _API_URL;
+};
 
 
 const callAPI = async (
@@ -52,10 +57,6 @@ const login = async (username, password) => {
     throw new Error(response.error);
   }
 
-  tokenManager.set({
-    token: response.payload.token,
-    dbId: response.payload.dbId,
-  });
   return response.payload;
 };
 
@@ -235,6 +236,7 @@ const getPins = async () => {
 
 
 export {
+  setAPIUrl,
   login,
   getNote,
   getNotes,

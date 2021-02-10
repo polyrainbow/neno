@@ -1,5 +1,3 @@
-import { MAX_SESSION_AGE } from "./config.js";
-
 const tokenKey = "NENO_token";
 const dbIdKey = "NENO_dbId";
 
@@ -12,7 +10,7 @@ const set = (options) => {
   localStorage.setItem(tokenKey, token);
   localStorage.setItem(dbIdKey, dbId);
   document.cookie
-    = `${tokenKey}=${token};max-age=${MAX_SESSION_AGE.toString()}`;
+    = `${tokenKey}=${token};max-age=${options.maxSessionAge.toString()}`;
 };
 
 const get = () => {

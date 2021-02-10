@@ -10,6 +10,13 @@ export default class ServerDatabaseProvider {
 
   static type = "SERVER";
 
+  #MAX_SESSION_AGE = null;
+
+  constructor(API_URL, MAX_SESSION_AGE) {
+    this.#MAX_SESSION_AGE = MAX_SESSION_AGE;
+    API.setAPIUrl(API_URL);
+  }
+
   async hasAccessToken() {
     return !!tokenManager.get().token;
   }
@@ -22,8 +29,14 @@ export default class ServerDatabaseProvider {
     return tokenManager.get().dbId;
   }
 
-  login(username, password) {
-    return API.login(username, password);
+  async login(username, password) {
+    const response = await API.login(username, password);
+    tokenManager.set({
+      token: response.token,
+      dbId: response.dbId,
+      maxSessionAge: this.#MAX_SESSION_AGE,
+    });
+    return response;
   }
 
   async removeAccess() {
