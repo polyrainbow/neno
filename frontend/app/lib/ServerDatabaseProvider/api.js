@@ -65,11 +65,11 @@ const callAPIAndGetJSONPayload = async (options) => {
 };
 
 
-const login = (username, password) => {
+const login = (username, password, mfaToken) => {
   return callAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "login",
-    body: { username, password },
+    body: { username, password, mfaToken },
   });
 };
 

@@ -29,8 +29,8 @@ export default class ServerDatabaseProvider {
     return tokenManager.get().dbId;
   }
 
-  async login(username, password) {
-    const response = await API.login(username, password);
+  async login(username, password, mfaToken) {
+    const response = await API.login(username, password, mfaToken);
     tokenManager.set({
       token: response.token,
       dbId: response.dbId,

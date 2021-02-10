@@ -20,6 +20,7 @@ import fs from "fs";
 import http from "http";
 import https from "https";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
+import twofactor from "node-2fa";
 
 
 const startApp = async ({
@@ -607,8 +608,13 @@ const startApp = async ({
       // read username and password from request body
       const submittedUsername = req.body.username;
       const submittedPassword = req.body.password;
+      const submittedMfaToken = req.body.mfaToken;
 
-      if ((!submittedUsername) || (!submittedPassword)) {
+      if (
+        (!submittedUsername)
+        || (!submittedPassword)
+        || (!submittedMfaToken)
+      ) {
         // Access denied...
         const response:APIResponse = {
           success: false,
@@ -622,6 +628,21 @@ const startApp = async ({
       });
 
       if (!user) {
+        // Access denied...
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_CREDENTIALS,
+        };
+        return res.status(401).json(response);
+      }
+
+      const mfaTokenIsValid
+        = twofactor.verifyToken(
+          user.mfaSecret,
+          submittedMfaToken,
+        )?.delta === 0;
+
+      if (!mfaTokenIsValid) {
         // Access denied...
         const response:APIResponse = {
           success: false,

@@ -10,6 +10,7 @@ const LoginView = ({
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [mfaToken, setMfaToken] = useState("");
   const [serverDisclaimer, setServerDisclaimer]
     = useState(null);
   const [localDisclaimer, setLocalDisclaimer]
@@ -24,7 +25,7 @@ const LoginView = ({
 
   const startLoginAttempt = () => {
     setIsBusy(true);
-    serverDatabaseProvider.login(username, password)
+    serverDatabaseProvider.login(username, password, mfaToken)
       .then(() => {
         setDatabaseMode("SERVER");
         setActiveView("EDITOR");
@@ -51,8 +52,8 @@ const LoginView = ({
       {
         serverDisclaimer === "INVALID_CREDENTIALS"
           ? <p style={{ color: "red" }}>
-            Your username and password do not seem to be correct.
-            Please try again.
+            Your combination of username, password, and 2FA token does not
+            seem to be correct. Please try again.
           </p>
           : ""
       }
@@ -83,6 +84,20 @@ const LoginView = ({
         <input id="login_input_password" type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onKeyUp={(e) => {
+            if (e.key === "Enter") {
+              startLoginAttempt();
+            }
+          }}
+        />
+      </p>
+      <p>
+        <label htmlFor="login_input_mfa-token">2FA Token</label>
+        <br />
+        <input id="login_input_mfa-token"
+          type="number"
+          value={mfaToken}
+          onChange={(e) => setMfaToken(e.target.value)}
           onKeyUp={(e) => {
             if (e.key === "Enter") {
               startLoginAttempt();
