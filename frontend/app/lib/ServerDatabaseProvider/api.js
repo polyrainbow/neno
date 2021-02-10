@@ -59,25 +59,29 @@ const getJSONResponsePayloadIfSuccessful = (response) => {
 };
 
 
-const login = async (username, password) => {
-  const response = await callAPI({
+const callAPIAndGetJSONPayload = async (options) => {
+  const response = await callAPI(options);
+  return getJSONResponsePayloadIfSuccessful(response);
+};
+
+
+const login = (username, password) => {
+  return callAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "login",
     body: { username, password },
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const getNote = async (noteId) => {
-  const response = await callAPI({
+const getNote = (noteId) => {
+  return callAPIAndGetJSONPayload({
     endpoint: "note/" + noteId,
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const getNotes = async (options) => {
+const getNotes = (options) => {
   const query = options?.query;
   const caseSensitive = options?.caseSensitive;
   const page = options?.page || 1;
@@ -91,15 +95,14 @@ const getNotes = async (options) => {
       + "&caseSensitive=" + caseSensitive;
   }
 
-  const response = await callAPI({
+  return callAPIAndGetJSONPayload({
     endpoint: url,
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const putNote = async (note, options) => {
-  const response = await callAPI({
+const putNote = (note, options) => {
+  return callAPIAndGetJSONPayload({
     method: "PUT",
     endpoint: "note",
     body: {
@@ -107,42 +110,37 @@ const putNote = async (note, options) => {
       options,
     },
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const deleteNote = async (noteId) => {
-  const response = await callAPI({
+const deleteNote = (noteId) => {
+  return callAPIAndGetJSONPayload({
     method: "DELETE",
     endpoint: "note/" + noteId,
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const getStats = async (exhaustive) => {
-  const response = await callAPI({
+const getStats = (exhaustive) => {
+  return callAPIAndGetJSONPayload({
     endpoint: "stats?exhaustive=" + exhaustive.toString(),
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const getGraph = async () => {
-  const response = await callAPI({
+const getGraph = () => {
+  return callAPIAndGetJSONPayload({
     endpoint: "graph",
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const saveGraph = async (graphObject) => {
-  const response = await callAPI({
+const saveGraph = (graphObject) => {
+  return callAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "graph",
     body: graphObject,
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
@@ -166,73 +164,66 @@ const getReadableFileStream = async (fileId) => {
 };
 
 
-const importLinksAsNotes = async (links) => {
-  const response = await callAPI({
+const importLinksAsNotes = (links) => {
+  return callAPIAndGetJSONPayload({
     method: "PUT",
     endpoint: "import-links-as-notes",
     body: { links },
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const uploadFile = async (file) => {
+const uploadFile = (file) => {
   const data = new FormData();
   data.append("file", file);
-  const response = await callAPI({
+  return callAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "file",
     body: data,
     bodyType: "form-data",
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const uploadFileByUrl = async (data) => {
-  const response = await callAPI({
+const uploadFileByUrl = (data) => {
+  return callAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "file-by-url",
     body: data,
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const getUrlMetadata = async (url) => {
+const getUrlMetadata = (url) => {
   const requestUrl = "url-metadata?url=" + url;
-  const response = await callAPI({
+  return callAPIAndGetJSONPayload({
     endpoint: requestUrl,
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const pinNote = async (noteId) => {
-  const response = await callAPI({
+const pinNote = (noteId) => {
+  return callAPIAndGetJSONPayload({
     method: "PUT",
     endpoint: "pins",
     body: { noteId },
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const unpinNote = async (noteId) => {
-  const response = await callAPI({
+const unpinNote = (noteId) => {
+  return callAPIAndGetJSONPayload({
     method: "DELETE",
     endpoint: "pins",
     body: { noteId },
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const getPins = async () => {
-  const response = await callAPI({
+const getPins = () => {
+  return callAPIAndGetJSONPayload({
     endpoint: "pins",
   });
-  return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
