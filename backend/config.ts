@@ -14,9 +14,13 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 // above to arrive at the repo directory
 const REPO_PATH = path.join(__dirname, "..", "..");
 
+// the name of the cookie in which the auth token is stored
+const TOKEN_COOKIE_NAME = "NENO_token";
+
 export {
   API_PATH,
   MAX_SESSION_AGE,
   MAX_UPLOAD_FILE_SIZE,
   REPO_PATH,
+  TOKEN_COOKIE_NAME,
 }

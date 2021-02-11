@@ -36,10 +36,15 @@ const startApp = async ({
   const app = express();
 
   const mapAuthCookieToHeader = (function(req, res, next) {
-    if(req.cookies && req.headers &&
-       !Object.prototype.hasOwnProperty.call(req.headers, 'authorization') &&
-       Object.prototype.hasOwnProperty.call(req.cookies, 'token') &&
-       req.cookies.token.length > 0
+    if(
+      req.cookies
+      && req.headers
+      && !Object.prototype.hasOwnProperty.call(req.headers, 'authorization')
+      && Object.prototype.hasOwnProperty.call(
+        req.cookies,
+        config.TOKEN_COOKIE_NAME,
+      )
+      && req.cookies.token.length > 0
      ) {
       // req.cookies has no hasOwnProperty function,
       // likely created with Object.create(null)
