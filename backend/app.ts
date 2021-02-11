@@ -44,12 +44,16 @@ const startApp = async ({
         req.cookies,
         config.TOKEN_COOKIE_NAME,
       )
-      && req.cookies.token.length > 0
+      && req.cookies[config.TOKEN_COOKIE_NAME].length > 0
      ) {
       // req.cookies has no hasOwnProperty function,
       // likely created with Object.create(null)
+
+      const cookieValue = req.cookies[config.TOKEN_COOKIE_NAME];
       req.headers.authorization
-        = 'Bearer ' + req.cookies.token.slice(0, req.cookies.token.length);
+        = 'Bearer ' + cookieValue.slice(
+          0, cookieValue.length,
+        );
     }
     next();
   });
