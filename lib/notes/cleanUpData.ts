@@ -6,7 +6,6 @@ import {
   removeDefaultTextParagraphs,
   removeEmptyLinks,
 } from "./noteUtils.js";
-import * as IO from "./io.js";
 
 
 const removeLinksOfNonExistingNotes = (db) => {
@@ -67,8 +66,8 @@ const cleanUpLinks = (db) => {
 
 // this function must always be indempotent, so that there is only one
 // canonical data structure
-const cleanUpData = async () => {
-  await IO.forEach((db) => {
+const cleanUpData = async (io) => {
+  await io.forEach((db) => {
     console.log("Cleaning db " + db.id + " ...");
 
     // remove old db date key
