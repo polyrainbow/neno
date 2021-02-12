@@ -46,7 +46,8 @@
     "url-metadata": "^2.5.0",
     "uuid": "^8.3.2",
     "webpack": "^5.11.1",
-    "webpack-dev-server": "^3.11.1"
+    "webpack-dev-server": "^3.11.1",
+    "webpack-merge": "^5.7.3"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.12.1",
@@ -77,6 +78,7 @@
     "start-server": "node dist/backend/index.js --port 8080",
     "start-server-tls": "node dist/backend/index.js --https-port 8080 --use-https --cert-path ~/.neno/server.cert --cert-key-path ~/.neno/server.key",
     "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
+    "build-frontend-production-local-only": "npx webpack --config frontend/webpack.production.local-only.js",
     "build-frontend-development": "npx webpack --config frontend/webpack.development.js",
     "build": "npm run compile-typescript && npm run build-frontend-production",
     "start-dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
