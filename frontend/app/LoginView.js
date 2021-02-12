@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HeaderContainer from "./HeaderContainer.js";
-
+import LoginViewServer from "./LoginViewServer.js";
 
 const LoginView = ({
   setActiveView,
@@ -8,11 +8,6 @@ const LoginView = ({
   localDatabaseProvider,
   setDatabaseMode,
 }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [mfaToken, setMfaToken] = useState("");
-  const [serverDisclaimer, setServerDisclaimer]
-    = useState(null);
   const [localDisclaimer, setLocalDisclaimer]
     = useState(null);
   const [
@@ -20,103 +15,20 @@ const LoginView = ({
     setLocalDatabaseFolderHandleName,
   ] = useState(null);
 
-  const [isBusy, setIsBusy] = useState(false);
-
-
-  const startLoginAttempt = () => {
-    setIsBusy(true);
-    serverDatabaseProvider.login(username, password, mfaToken)
-      .then(() => {
-        setDatabaseMode("SERVER");
-        setActiveView("EDITOR");
-      })
-      .catch((e) => {
-        const disclaimer = (e.message === "INVALID_CREDENTIALS")
-          ? "INVALID_CREDENTIALS"
-          : "SERVER_ERROR";
-        setServerDisclaimer(disclaimer);
-        setIsBusy(false);
-      });
-  };
 
   useEffect(async () => {
     const folderHandleName = await localDatabaseProvider.getFolderHandleName();
     setLocalDatabaseFolderHandleName(folderHandleName);
   }, []);
 
-
   return <>
     <HeaderContainer />
     <section id="section_login">
-      <h1>Server database</h1>
-      {
-        serverDisclaimer === "INVALID_CREDENTIALS"
-          ? <p style={{ color: "red" }}>
-            Your combination of username, password, and 2FA token does not
-            seem to be correct. Please try again.
-          </p>
-          : ""
-      }
-      {
-        serverDisclaimer === "SERVER_ERROR"
-          ? <p style={{ color: "red" }}>
-            Something is wrong with the server. How about creating a
-            local database instead?
-          </p>
-          : ""
-      }
-      <p>
-        <label htmlFor="login_input_username">Username</label>
-        <br />
-        <input id="login_input_username" type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          onKeyUp={(e) => {
-            if (e.key === "Enter") {
-              startLoginAttempt();
-            }
-          }}
-        />
-      </p>
-      <p>
-        <label htmlFor="login_input_password">Password</label>
-        <br />
-        <input id="login_input_password" type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onKeyUp={(e) => {
-            if (e.key === "Enter") {
-              startLoginAttempt();
-            }
-          }}
-        />
-      </p>
-      <p>
-        <label htmlFor="login_input_mfa-token">2FA Token</label>
-        <br />
-        <input id="login_input_mfa-token"
-          type="number"
-          value={mfaToken}
-          onChange={(e) => setMfaToken(e.target.value)}
-          onKeyUp={(e) => {
-            if (e.key === "Enter") {
-              startLoginAttempt();
-            }
-          }}
-        />
-      </p>
-      <p>
-        {
-          isBusy
-            ? "Trying to log in ..."
-            : <button
-              type="button"
-              className="default-button default-action"
-              onClick={startLoginAttempt}
-            >Login</button>
-        }
-      </p>
-
+      <LoginViewServer
+        setActiveView={setActiveView}
+        serverDatabaseProvider={serverDatabaseProvider}
+        setDatabaseMode={setDatabaseMode}
+      />
       <h1>Local database</h1>
       {
         localDisclaimer === "INVALID_FOLDER_HANDLE"

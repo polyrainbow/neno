@@ -82,6 +82,7 @@
     "build-frontend-development": "npx webpack --config frontend/webpack.development.js",
     "build": "npm run compile-typescript && npm run build-frontend-production",
     "start-dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
+    "start-dev-server-frontend-local-only": "npx webpack serve --config frontend/webpack.development.local-only.js",
     "start": "npm run build && npm run start-server",
     "start-tls": "npm run build && npm run start-server-tls",
     "dev": "concurrently --kill-others \"npm run compile-typescript && npm run start-server\" \"npm run build-frontend-development\""

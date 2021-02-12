@@ -6,7 +6,7 @@ const config = {
   mode: "production",
   plugins: [
     new webpack.DefinePlugin({
-      "ENABLE_SERVER_DATABASE": JSON.stringify(true),
+      "ENABLE_SERVER_DATABASE": JSON.stringify(false),
     }),
   ],
 };

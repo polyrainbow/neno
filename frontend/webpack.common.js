@@ -64,6 +64,7 @@ export default {
     },
     disableHostCheck: true,
     contentBase: __dirname,
+    port: 8080,
   },
   watchOptions: {
     ignored: /node_modules/,

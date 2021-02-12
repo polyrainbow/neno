@@ -7,7 +7,6 @@ import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
 import AppMenu from "./AppMenu.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 import StatsDialog from "./StatsDialog.js";
-import ServerDatabaseProvider from "./lib/ServerDatabaseProvider/index.js";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
 import { API_URL, MAX_SESSION_AGE } from "./lib/config.js";
 
@@ -64,18 +63,28 @@ const App = () => {
     );
 
   useEffect(async () => {
-    serverDatabaseProviderRef.current = new ServerDatabaseProvider(
-      API_URL,
-      MAX_SESSION_AGE,
-    );
-    localDatabaseProviderRef.current = new LocalDatabaseProvider();
+    // ENABLE_SERVER_DATABASE defined via webpack.DefinePlugin
+    // eslint-disable-next-line no-undef
+    if (ENABLE_SERVER_DATABASE) {
+      const ServerDatabaseProvider = (await import(
+        "./lib/ServerDatabaseProvider/index.js"
+      )).default;
 
-    if (await serverDatabaseProviderRef.current.hasAccessToken()) {
-      setDatabaseMode("SERVER");
-      setActiveView("EDITOR");
-      return;
+      serverDatabaseProviderRef.current = new ServerDatabaseProvider(
+        API_URL,
+        MAX_SESSION_AGE,
+      );
+
+      if (await serverDatabaseProviderRef.current.hasAccessToken()) {
+        setDatabaseMode("SERVER");
+        setActiveView("EDITOR");
+        return;
+      }
+    } else {
+      serverDatabaseProviderRef.current = "NOT_SUPPORTED";
     }
 
+    localDatabaseProviderRef.current = new LocalDatabaseProvider();
     setActiveView("LOGIN");
   }, []);
 
