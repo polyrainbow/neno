@@ -1,4 +1,36 @@
 /* eslint-disable no-invalid-this */
+
+/*
+@license
+Parts of the code in this file are based loosely on code from this repository:
+https://github.com/gaguri777/d3--directed-graph-creator
+
+In the repository, it is stated that the code is licensed under the
+MIT/X license. However, the repository does not include a copyright notice
+typical for the MIT license. This is my best attempt at creating one myself,
+in good faith, on behalf of the code creators, using the Open Source Intiative's
+MIT license text:
+
+Copyright (c) 2013-2014 Colorado Reed, Andreas Stuhlmüller
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 import * as d3 from "d3";
 import { binaryArrayIncludes, shortenText, htmlDecode } from "./utils.js";
 
