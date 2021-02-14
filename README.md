@@ -72,6 +72,13 @@ node dist/backend/index.js --use-https \
 ### --url-metadata \<url>
 * don't start server, only grab url metadata for given url"
 
+## Docker demo
+
+The repository also contains a Dockerfile to set up a NENO server for demo
+purposes. When you run the image, the console outputs a QR code for your 2FA
+app. Also, a demo user is created with username `test` and password `0000`.
+You should not use this in production.
+
 ## Further reading
 
 * [How to use the Graph view](./docs/GraphViewManual.md)
