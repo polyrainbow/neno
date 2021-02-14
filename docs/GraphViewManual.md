@@ -1,8 +1,20 @@
 # Graph View Manual
+![NENO Graph view example](./img/graph%20view%20simple.png)
+
 In the Graph View, your notes are shown as a network graph in which notes are
 displayed as graph nodes and links between notes are displayed as graph edges.
-You can move notes and add and delete links. Please note, that you have to save
+You can zoom in and out with the mouse wheel, move notes and add/remove links. Please note, that you have to save
 the current state to make your modifications to the graph permanent.
+
+## 🟩 The INPI (Initial Node Position Indicator)
+
+New notes will appear at the INPI (Initial Node Position Indicator). It is the green square. You can move the nodes from there to another position. You can also drag and drop the INPI itself.
+
+## Node background colors and what they mean
+⚪ White: Normal nodes
+🟢 Green: New nodes that have been created within the last few days
+🔵 Blue: Hubs (nodes with more than 4 links)
+🔴 Red: Nodes with no links
 
 ## Move a node
 Just drag a node and drop it where you want it to be.
