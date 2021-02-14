@@ -36,7 +36,9 @@ Requirements: You need to have node>=15 and npm>=6 installed.
 Run the following commands:
 
 `npm cache clean --force`
+
 `npm update`
+
 `npm i`
 
 Sometimes, npm does not correctly install **all** modules. `npm cache clean --force` and `npm update` make sure it does.
@@ -116,7 +118,9 @@ To deploy NENO for local mode usage, you need a web space capable of serving sta
 Run the following commands:
 
 `npm cache clean --force`
+
 `npm update`
+
 `npm i`
 
 Sometimes, npm does not correctly install **all** modules. `npm cache clean --force` and `npm update` make sure it does.
@@ -139,3 +143,5 @@ Copy the following files/folders to your filespace:
 ## Further reading
 
 * [How to use the Graph view](./docs/GraphViewManual.md)
+
+* [Tips and tricks for working with NENO](./docs/TipsAndTricks.md)

@@ -38,3 +38,13 @@ new edge is displayed now.
 ## Remove an edge
 
 Select the edge by pressing and holding `S` and a clicking on the edge. Press `Del` or `Backspace` to remove it.
+
+## Inflate the graph
+
+When you have a graph with a lot of nodes but do not have enough real estate to put more notes in between, you can inflate the graph by 10% by clicking on the button in the title bar.
+
+Don't use this function too often for it will quickly result in a graph which is not well overseeable anymore. Use it only if  absolutely necessary.
+
+## User interface performance
+
+When you have a lot of notes in your graph (> 1000), the graph can become unresponsive. If that is the case, you can disable rendering the note titles by clicking  the `Toggle text rendering` button in the title bar. If your graph has at  least 500 nodes, text rendering is disabled by default and must be enabled manually by clicking the button.
