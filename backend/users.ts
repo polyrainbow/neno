@@ -15,6 +15,13 @@ const getUsers = (dataFolderPath) => {
   console.log("Loading existing users file...");
   const json = fs.readFileSync(usersFile).toString();
   const users:User[] = JSON.parse(json);
+
+  if (users[0].login === "test") {
+    console.log("WARNING: You have created a users file which is only suitable for testing");
+    console.log("Do not use this in production.");
+    console.log("Scan this QR code with your favorite 2FA app:");
+    console.log(users[0].qrCode);
+  }
   return users;
 }
 
