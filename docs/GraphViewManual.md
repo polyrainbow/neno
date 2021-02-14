@@ -1,4 +1,12 @@
 # Graph View Manual
+
+## Accessing the Graph view. 
+
+Click on the NENO logo on the top left corner and you should be able to toggle between Graph view and Editor view. 
+![NENO Locating Graph view example](./img/graph%20view%20locate.png)
+
+
+
 ![NENO Graph view example](./img/graph%20view%20simple.png)
 
 In the Graph View, your notes are shown as a network graph in which notes are
