@@ -141,8 +141,8 @@ const loadInstance = async ({
             window.open(url, "_blank");
           },
           field: "file",
-          types: "application/pdf",
-          buttonText: "Select PDF file",
+          types: "application/pdf, audio/mp3, audio/mpeg",
+          buttonText: "Select file",
           errorMessage: "File upload failed",
         },
       },

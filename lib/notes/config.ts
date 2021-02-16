@@ -19,6 +19,14 @@ const ALLOWED_FILE_TYPES = [
     mimeType: "application/pdf",
     ending: "pdf",
   },
+  {
+    mimeType: "audio/mp3",
+    ending: "mp3",
+  },
+  {
+    mimeType: "audio/mpeg",
+    ending: "mp3",
+  },
 ];
 
 const NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE = 100;
