@@ -35,6 +35,7 @@ const loadInstance = async ({
     import("@editorjs/list"),
     import("@editorjs/code"),
     import("@editorjs/attaches"),
+    import("./editor-js-audio-plugin/index.js"),
   ]);
 
   const [
@@ -45,6 +46,7 @@ const loadInstance = async ({
     List,
     Code,
     Attaches,
+    Audio,
   ] = modules.map((module) => module.default);
 
   const instance = new EditorJS({
@@ -141,8 +143,38 @@ const loadInstance = async ({
             window.open(url, "_blank");
           },
           field: "file",
-          types: "application/pdf, audio/mp3, audio/mpeg",
-          buttonText: "Select file",
+          types: "application/pdf",
+          buttonText: "Select PDF file",
+          errorMessage: "File upload failed",
+        },
+      },
+      audio: {
+        class: Audio,
+        config: {
+          uploader: async (file) => {
+            const fileId = await databaseProvider.uploadFile(file);
+            return {
+              success: 1,
+              file: {
+                "size": file.size,
+                "name": file.name,
+                "fileId": fileId,
+              },
+            };
+          },
+          onDownload: async (file) => {
+            const fileId = file.fileId;
+            const url = await getUrlForFileId(fileId, databaseProvider);
+            window.open(url, "_blank");
+          },
+          getUrl: async (file) => {
+            const fileId = file.fileId;
+            const url = await getUrlForFileId(fileId, databaseProvider);
+            return url;
+          },
+          field: "file",
+          types: "audio/mp3, audio/mpeg",
+          buttonText: "Select MP3 file",
           errorMessage: "File upload failed",
         },
       },

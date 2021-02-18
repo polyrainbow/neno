@@ -64,6 +64,18 @@ const cleanUpLinks = (db) => {
 };
 
 
+const transformDeprecatedAttachBlocksWithAudioContent = (note) => {
+  note.editorData.blocks.forEach((block) => {
+    if (
+      (block.type === "attaches")
+      && (block.data.file.fileId.endsWith(".mp3"))
+    ) {
+      block.type = "audio";
+    }
+  });
+}
+
+
 // this function must always be indempotent, so that there is only one
 // canonical data structure
 const cleanUpData = async (io) => {
@@ -110,6 +122,8 @@ const cleanUpData = async (io) => {
         note.editorData.blocks[0].data.text
           = note.editorData.blocks[0].data.text.trim();
       }
+
+      transformDeprecatedAttachBlocksWithAudioContent(note);
     });
 
     // remove invalid note ids from pins

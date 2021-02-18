@@ -17,3 +17,11 @@
 .ce-toolbox--opened {
     left: 32px !important;
 }
+
+.cdx-notify, .cdx-notify--error {
+    background: none !important;
+}
+
+.cdx-button {
+    background: none !important;
+}
