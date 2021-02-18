@@ -41,6 +41,7 @@ import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
 import StatsExhaustive from "./interfaces/StatsExhaustive.js";
+import DatabaseMainData from "./interfaces/DatabaseMainData.js";
 
 let io;
 
@@ -75,7 +76,10 @@ const init = async (storageProvider, _getUrlMetadata):Promise<void> => {
 };
 
 
-const get = async (noteId: NoteId, dbId: DatabaseId):Promise<NoteToTransmit> => {
+const get = async (
+  noteId: NoteId,
+  dbId: DatabaseId,
+):Promise<NoteToTransmit> => {
   const db = await io.getMainData(dbId);
   const noteFromDB:DatabaseNote | null = findNote(db, noteId);
   if (!noteFromDB) {
@@ -202,7 +206,10 @@ const getGraph = async (dbId: DatabaseId):Promise<Graph> => {
 };
 
 
-const getStats = async (dbId:DatabaseId, exhaustive:boolean):Promise<Stats | StatsExhaustive> => {
+const getStats = async (
+  dbId:DatabaseId,
+  exhaustive:boolean,
+):Promise<Stats | StatsExhaustive> => {
   const db = await io.getMainData(dbId);
 
   const numberOfUnlinkedNotes = db.notes.filter((note) => {
@@ -313,7 +320,10 @@ const put = async (
 };
 
 
-const remove = async (noteId, dbId):Promise<void> => {
+const remove = async (
+  noteId:NoteId,
+  dbId:DatabaseId,
+):Promise<void> => {
   const db = await io.getMainData(dbId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
   if ((noteIndex === -1) || (noteIndex === null)) {
@@ -333,7 +343,10 @@ const remove = async (noteId, dbId):Promise<void> => {
 };
 
 
-const importDB = (db, dbId) => {
+const importDB = (
+  db:DatabaseMainData,
+  dbId:DatabaseId,
+):Promise<boolean> => {
   if (db.id !== dbId) {
     throw new Error("UNAUTHORIZED: You are not allowed to update another DB");
   }
