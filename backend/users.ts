@@ -16,6 +16,19 @@ const getUsers = (dataFolderPath) => {
   const json = fs.readFileSync(usersFile).toString();
   const users:User[] = JSON.parse(json);
 
+  if (!users.every((user) => {
+    const isValidUser = (
+      typeof user.id === "string"
+      && typeof user.login === "string"
+      && typeof user.passwordHash === "string"
+      && typeof user.mfaSecret === "string"
+    );
+
+    return isValidUser;
+  })){
+    throw new Error("Invalid users file.");
+  }
+
   if (users[0].login === "test") {
     console.log("WARNING: You have created a users file which is only suitable for testing");
     console.log("Do not use this in production.");
