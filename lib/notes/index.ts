@@ -370,8 +370,17 @@ const addFile = async (
 const getReadableFileStream = (
   dbId: DatabaseId,
   fileId:FileId,
+  range?,
 ):Promise<ReadableWithType> => {
-  return io.getReadableFileStream(dbId, fileId);
+  return io.getReadableFileStream(dbId, fileId, range);
+};
+
+
+const getFileSize = (
+  dbId: DatabaseId,
+  fileId:FileId,
+):Promise<number> => {
+  return io.getFileSize(dbId, fileId);
 };
 
 
@@ -539,6 +548,7 @@ export {
   importDB,
   addFile,
   getReadableFileStream,
+  getFileSize,
   getReadableDatabaseStream,
   importLinksAsNotes,
   getUrlMetadata,

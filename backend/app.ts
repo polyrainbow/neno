@@ -494,19 +494,83 @@ const startApp = async ({
     verifyJWT,
     async function(req, res) {
       try {
-        const { readable, mimeType }
-          = await Notes.getReadableFileStream(req.userId, req.params.fileId);
-        
-        readable.on("error", () => {
-          const response:APIResponse = {
-            success: false,
-            error: APIError.FILE_NOT_FOUND,
-          };
-          res.json(response);
-        });
 
-        res.set('Content-Type', mimeType);
-        readable.pipe(res);
+        /** Calculate Size of file */
+        const size = await Notes.getFileSize(req.userId, req.params.fileId);
+        const range = req.headers.range;
+
+        /** Check for Range header */
+        if (range) {
+          /** Extracting Start and End value from Range Header */
+          const [startString, endString] = range.replace(/bytes=/, "")
+            .split("-");
+
+          let start = parseInt(startString, 10);
+          let end = endString ? parseInt(endString, 10) : size - 1;
+
+          if (!isNaN(start) && isNaN(end)) {
+            // eslint-disable-next-line no-self-assign
+            start = start;
+            end = size - 1;
+          }
+          if (isNaN(start) && !isNaN(end)) {
+            start = size - end;
+            end = size - 1;
+          }
+
+          // Handle unavailable range request
+          if (start >= size || end >= size) {
+            // Return the 416 Range Not Satisfiable.
+            res.writeHead(416, {
+              "Content-Range": `bytes */${size}`
+            });
+            return res.end();
+          }
+
+          const { readable, mimeType }
+            = await Notes.getReadableFileStream(
+              req.userId,
+              req.params.fileId,
+              { start: start, end: end },
+            );
+
+          readable.on("error", () => {
+            const response:APIResponse = {
+              success: false,
+              error: APIError.FILE_NOT_FOUND,
+            };
+            res.json(response);
+          });
+
+          /** Sending Partial Content With HTTP Code 206 */
+          res.writeHead(206, {
+            "Content-Range": `bytes ${start}-${end}/${size}`,
+            "Accept-Ranges": "bytes",
+            "Content-Length": end - start + 1,
+            "Content-Type": mimeType,
+          });
+
+          readable.pipe(res);
+
+        } else { // no range request
+          const { readable, mimeType }
+            = await Notes.getReadableFileStream(req.userId, req.params.fileId);
+
+          readable.on("error", () => {
+            const response:APIResponse = {
+              success: false,
+              error: APIError.FILE_NOT_FOUND,
+            };
+            res.json(response);
+          });
+
+          res.writeHead(200, {
+            "Content-Length": size,
+            "Content-Type": mimeType
+          });
+
+          readable.pipe(res);
+        }
       } catch (e) {
         const response:APIResponse = {
           success: false,

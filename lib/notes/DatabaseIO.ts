@@ -188,10 +188,12 @@ export default class DatabaseIO {
   async getReadableFileStream(
     databaseId: DatabaseId,
     fileId:FileId,
+    range,
   ):Promise<ReadableWithMimeType> {
     const fileFolderPath = this.getFileFolderPath(databaseId);
     const filepath = this.#storageProvider.joinPath(fileFolderPath, fileId);
-    const stream = await this.#storageProvider.getReadableStream(filepath);
+    const stream
+      = await this.#storageProvider.getReadableStream(filepath, range);
 
     const fileEnding = fileId.substr(fileId.lastIndexOf(".") + 1)
       .toLocaleLowerCase();
@@ -213,6 +215,19 @@ export default class DatabaseIO {
       readable: stream,
       mimeType,
     };
+  }
+
+
+  async getFileSize(
+    databaseId: DatabaseId,
+    fileId:FileId,
+  ):Promise<number> {
+    const fileFolderPath = this.getFileFolderPath(databaseId);
+    const filepath = this.#storageProvider.joinPath(fileFolderPath, fileId);
+    const fileSize
+      = await this.#storageProvider.getFileSize(filepath);
+
+    return fileSize;
   }
 
 

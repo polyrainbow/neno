@@ -75,10 +75,17 @@ export default class FileSystemStorageProvider {
     return string;
   }
 
-  async getReadableStream(requestPath:string):Promise<Readable> {
+  async getReadableStream(requestPath:string, range):Promise<Readable> {
     const finalPath = this.joinPath(this.#dataPath, requestPath);
-    const readableStream = fsClassic.createReadStream(finalPath);
+    const readableStream = fsClassic.createReadStream(finalPath, range);
     return readableStream;
+  }
+
+  async getFileSize(requestPath:string):Promise<number> {
+    const finalPath = this.joinPath(this.#dataPath, requestPath);
+    const stats = await fs.stat(finalPath);
+    const size = stats.size;
+    return size;
   }
 
   async removeObject(requestPath:string):Promise<void> {
