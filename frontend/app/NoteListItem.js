@@ -70,6 +70,7 @@ const NoteListItem = ({
           {note.features?.containsCode ? emojis.code : ""}
           {note.features?.containsImages ? emojis.image : ""}
           {note.features?.containsAttachements ? emojis.file : ""}
+          {note.features?.containsAudio ? emojis.audio : ""}
         </div>
       </div>
     </div>

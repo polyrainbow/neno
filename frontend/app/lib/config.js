@@ -51,6 +51,7 @@ const emojis = {
   "file": "📎",
   "image": "🖼️",
   "code": "🤖",
+  "audio": "🎧",
   "pin": "📌",
   "hub": "🐙",
 };

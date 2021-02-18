@@ -235,6 +235,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
   let containsCode = false;
   let containsImages = false;
   let containsAttachements = false;
+  let containsAudio = false;
 
   note.editorData.blocks.forEach((block) => {
     if (block.type === "paragraph") containsText = true;
@@ -242,6 +243,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
     if (block.type === "code") containsCode = true;
     if (block.type === "image") containsImages = true;
     if (block.type === "attaches") containsAttachements = true;
+    if (block.type === "audio") containsAudio = true;
   });
 
   const features:NoteListItemFeatures = {
@@ -250,6 +252,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
     containsCode,
     containsImages,
     containsAttachements,
+    containsAudio,
   };
 
   return features;
