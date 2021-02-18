@@ -117,6 +117,32 @@ const EditorView = ({
   };
 
 
+  const duplicateNote = async () => {
+    if (activeNote.isUnsaved) return;
+
+    const noteToTransmit = {
+      id: null,
+      editorData: activeNote.editorData,
+      changes: activeNote.linkedNotes.map((linkedNote) => {
+        return {
+          type: "LINKED_NOTE_ADDED",
+          noteId: linkedNote.id,
+        };
+      }),
+    };
+    const noteFromServer = await databaseProvider.putNote(
+      noteToTransmit, { ignoreDuplicateTitles: true },
+    );
+    setActiveNote({
+      ...noteFromServer,
+      isUnsaved: false,
+      changes: [],
+    });
+    setUnsavedChanges(false);
+    refreshNotesList();
+  };
+
+
   const handleLinkRemoval = async (linkedNoteId) => {
     if (activeNote.changes.some((change) => {
       return (
@@ -437,6 +463,7 @@ const EditorView = ({
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}
           openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
+          duplicateNote={duplicateNote}
         />
       </div>
     </main>

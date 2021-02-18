@@ -11,7 +11,6 @@ import {
   updateNotePosition,
   getLinkedNotes,
   removeLinksOfNote,
-  getFilesOfNote,
   incorporateUserChangesIntoNote,
   createNoteToTransmit,
   getSortFunction,
@@ -317,23 +316,18 @@ const put = async (
 const remove = async (noteId, dbId):Promise<void> => {
   const db = await io.getMainData(dbId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
-  if (noteIndex === -1) {
+  if ((noteIndex === -1) || (noteIndex === null)) {
     throw new Error("Note not found");
   }
-  const note = db.notes[noteIndex];
-  if (noteIndex === null) {
-    throw new Error("Note not found");
-  }
+
   db.notes.splice(noteIndex, 1);
   removeLinksOfNote(db, noteId);
-
-  // remove files used in this note
-  getFilesOfNote(note)
-    .forEach((fileId) => {
-      io.deleteFile(dbId, fileId);
-    });
-
   db.pinnedNotes = db.pinnedNotes.filter((nId) => nId !== noteId);
+
+  /*
+    we do not remove files used in this note, because they could be used in
+    other notes. unused files should be deleted in the clean up process.
+  */
 
   await io.flushChanges(db);
 };

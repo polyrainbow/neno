@@ -11,6 +11,7 @@ const NoteControls = ({
   unsavedChanges,
   pinOrUnpinNote,
   openImportLinksDialog,
+  duplicateNote,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -46,6 +47,16 @@ const NoteControls = ({
 
           removeActiveNote();
         }}
+      />
+      <IconButton
+        id="button_duplicate"
+        disabled={activeNote.isUnsaved}
+        title="Duplicate note"
+        icon={activeNote.isUnsaved
+          ? "content_copy_disabled"
+          : "content_copy"
+        }
+        onClick={duplicateNote}
       />
       <IconButton
         id="button_pin"
