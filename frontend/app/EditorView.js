@@ -18,7 +18,7 @@ const EditorView = ({
   setActiveView,
   unsavedChanges,
   setUnsavedChanges,
-  initialNoteId,
+  initialNoteIdRef,
   toggleAppMenu,
   setOpenDialog,
   openDialog,
@@ -362,6 +362,8 @@ const EditorView = ({
 
   // startup
   useEffect(async () => {
+    const initialNoteId = initialNoteIdRef.current;
+
     if (typeof initialNoteId === "number") {
       loadNote(initialNoteId);
       return;
@@ -375,6 +377,8 @@ const EditorView = ({
     } else {
       loadNote(null);
     }
+
+    initialNoteIdRef.current = null;
   }, []);
 
 
@@ -464,6 +468,10 @@ const EditorView = ({
           pinOrUnpinNote={pinOrUnpinNote}
           openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
           duplicateNote={duplicateNote}
+          openInGraphView={() => {
+            initialNoteIdRef.current = activeNote.id;
+            setActiveView("GRAPH");
+          }}
         />
       </div>
     </main>

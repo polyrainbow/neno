@@ -19,6 +19,7 @@ const Note = ({
   pinOrUnpinNote,
   openImportLinksDialog,
   duplicateNote,
+  openInGraphView,
 }) => {
   const previousEditorData = useRef(null);
   const editorData = note?.editorData;
@@ -56,6 +57,7 @@ const Note = ({
       pinOrUnpinNote={pinOrUnpinNote}
       openImportLinksDialog={openImportLinksDialog}
       duplicateNote={duplicateNote}
+      openInGraphView={openInGraphView}
     />
     <div id="note-content">
       <div id="editor"></div>

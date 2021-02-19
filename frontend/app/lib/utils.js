@@ -206,6 +206,14 @@ const getUrlForFileId = async (fileId, databaseProvider) => {
 };
 
 
+const getWindowDimensions = () => {
+  const docEl = document.documentElement;
+  const width = window.innerWidth || docEl.clientWidth;
+  const height = window.innerHeight || docEl.clientHeight;
+  return { width, height };
+};
+
+
 export {
   yyyymmdd,
   htmlDecode,
@@ -219,4 +227,5 @@ export {
   shortenText,
   streamToBlob,
   getUrlForFileId,
+  getWindowDimensions,
 };

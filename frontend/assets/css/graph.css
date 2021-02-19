@@ -46,7 +46,7 @@
 
   position: fixed;
   width: 100vw;
-  height: calc(100vw - 50px);
+  height: calc(100vh - 50px);
   top: 50px;
   bottom: 0px;
   left: 0px;

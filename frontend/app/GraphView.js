@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import HeaderContainer from "./HeaderContainer.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import IconButton from "./IconButton.js";
-import { initGraph } from "./lib/graph.js";
+import Graph from "./lib/Graph.js";
 import * as Config from "./lib/config.js";
 import SearchInput from "./SearchInput.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
@@ -14,7 +14,7 @@ const GraphView = ({
   setActiveView,
   unsavedChanges,
   setUnsavedChanges,
-  setInitialNoteId,
+  initialNoteIdRef,
   toggleAppMenu,
 }) => {
   const DEFAULT_STATUS = "";
@@ -67,9 +67,15 @@ const GraphView = ({
     };
 
     databaseProvider.getGraph()
-      .then((graph) => {
+      .then((graphObject) => {
         graphInstance.current
-          = initGraph(mainElement.current, graph, onHighlight, onChange);
+          = new Graph({
+            parent: mainElement.current,
+            graphObject,
+            onHighlight,
+            onChange,
+            initialNoteId: initialNoteIdRef.current,
+          });
       });
   }, []);
 
@@ -112,7 +118,7 @@ const GraphView = ({
                 });
               }
 
-              setInitialNoteId(ids[0]);
+              initialNoteIdRef.current = ids[0];
               setActiveView("EDITOR");
             }}
           />

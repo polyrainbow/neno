@@ -12,6 +12,7 @@ const NoteControls = ({
   pinOrUnpinNote,
   openImportLinksDialog,
   duplicateNote,
+  openInGraphView,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext);
 
@@ -67,6 +68,16 @@ const NoteControls = ({
           : "push_pin"
         }
         onClick={pinOrUnpinNote}
+      />
+      <IconButton
+        id="button_open-in-graph-view"
+        disabled={activeNote.isUnsaved}
+        title="Reveal note in Graph View"
+        icon={activeNote.isUnsaved
+          ? "center_focus_strong_disabled"
+          : "center_focus_strong"
+        }
+        onClick={openInGraphView}
       />
       <IconButton
         id="button_import_links_as_notes"

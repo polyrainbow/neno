@@ -14,7 +14,7 @@ import { API_URL, MAX_SESSION_AGE } from "./lib/config.js";
 const App = () => {
   const [activeView, setActiveView] = useState("BUSY");
   const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [initialNoteId, setInitialNoteId] = useState(null);
+  const initialNoteIdRef = useRef(null);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(null);
   const [databaseMode, setDatabaseMode] = useState("NONE");
@@ -99,7 +99,7 @@ const App = () => {
       }}
       unsavedChanges={unsavedChanges}
       setUnsavedChanges={setUnsavedChanges}
-      initialNoteId={initialNoteId}
+      initialNoteIdRef={initialNoteIdRef}
       toggleAppMenu={toggleAppMenu}
       setOpenDialog={setOpenDialog}
       openDialog={openDialog}
@@ -134,7 +134,7 @@ const App = () => {
       }}
       unsavedChanges={unsavedChanges}
       setUnsavedChanges={setUnsavedChanges}
-      setInitialNoteId={setInitialNoteId}
+      initialNoteIdRef={initialNoteIdRef}
       databaseProvider={databaseProvider}
       toggleAppMenu={toggleAppMenu}
     />;

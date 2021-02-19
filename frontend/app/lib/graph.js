@@ -32,10 +32,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import * as d3 from "d3";
-import { binaryArrayIncludes, shortenText, htmlDecode } from "./utils.js";
+import {
+  binaryArrayIncludes,
+  shortenText,
+  htmlDecode,
+} from "./utils.js";
 
 
-class Graph {
+const prepareGraphObject = (graph) => {
+  const preparedGraphObject = {
+    ...graph,
+  };
+
+  preparedGraphObject.nodes = graph.nodes.map((node) => {
+    node.title = htmlDecode(node.title);
+    return node;
+  });
+
+  preparedGraphObject.links = graph.links.map((link) => {
+    return {
+      source: graph.nodes.find((node) => node.id === link[0]),
+      target: graph.nodes.find((node) => node.id === link[1]),
+    };
+  });
+
+  return preparedGraphObject;
+};
+
+
+export default class Graph {
   static #consts = {
     selectedClass: "selected",
     connectClass: "connect-node",
@@ -60,6 +85,7 @@ class Graph {
   #links = null;
   #screenPosition = null;
   #initialNodePosition = null;
+  #parent = null;
   svg = null;
   #idsOfAllNodesWithLinkedNote = [];
   #updatedNodes = new Set();
@@ -76,17 +102,46 @@ class Graph {
   #ctrlKeyIsPressed = false;
   #sKeyIsPressed = false;
 
-  constructor(svg, graphObject, onHighlight, onChange) {
+  constructor({
+    parent,
+    graphObject,
+    onHighlight,
+    onChange,
+    initialNoteId,
+  }) {
+    const graphObjectPrepared = prepareGraphObject(graphObject);
     const thisGraph = this;
+    thisGraph.#parent = parent;
+    const { width, height } = thisGraph.#parent.getBoundingClientRect();
+
+    /** MAIN SVG **/
+    const svg = d3.select(parent)
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    thisGraph.svg = svg;
     thisGraph.#onHighlight = onHighlight;
     thisGraph.#onChange = onChange;
 
-    thisGraph.#nodes = graphObject.nodes;
-    thisGraph.#links = graphObject.links;
-    thisGraph.#screenPosition = graphObject.screenPosition;
-    thisGraph.#initialNodePosition = graphObject.initialNodePosition;
+    thisGraph.#nodes = graphObjectPrepared.nodes;
+    thisGraph.#links = graphObjectPrepared.links;
 
-    thisGraph.svg = svg;
+    if (typeof initialNoteId === "number") {
+      // set initial node in the center of the screen
+      const node = thisGraph.#nodes.find((node) => node.id === initialNoteId);
+      const { width, height } = thisGraph.svg.node().getBoundingClientRect();
+      const SCALE = 1.5;
+      thisGraph.#screenPosition = {
+        translateX: (-node.position.x * SCALE) + (width / 2),
+        translateY: (-node.position.y * SCALE) + (height / 2),
+        scale: SCALE,
+      };
+    } else {
+      thisGraph.#screenPosition = graphObjectPrepared.screenPosition;
+    }
+    thisGraph.#initialNodePosition = graphObjectPrepared.initialNodePosition;
+
     thisGraph.mainSVGGroup = svg.append("g")
       .classed(Graph.#consts.graphClass, true);
     const mainSVGGroup = thisGraph.mainSVGGroup;
@@ -783,11 +838,8 @@ class Graph {
 
 
   #updateWindow(svg) {
-    const docEl = document.documentElement;
-    const bodyEl = document.getElementsByTagName("body")[0];
-    const x = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
-    const y = window.innerHeight || docEl.clientHeight || bodyEl.clientHeight;
-    svg.attr("width", x).attr("height", y);
+    const { width, height } = this.#parent.getBoundingClientRect();
+    svg.attr("width", width).attr("height", height);
   };
 
 
@@ -874,59 +926,4 @@ class Graph {
     }
   }
 }
-
-
-const prepareGraphObject = (graph) => {
-  const preparedGraphObject = {
-    ...graph,
-  };
-
-  preparedGraphObject.nodes = graph.nodes.map((node) => {
-    node.title = htmlDecode(node.title);
-    return node;
-  });
-
-  preparedGraphObject.links = graph.links.map((link) => {
-    return {
-      source: graph.nodes.find((node) => node.id === link[0]),
-      target: graph.nodes.find((node) => node.id === link[1]),
-    };
-  });
-
-  return preparedGraphObject;
-};
-
-
-const initGraph = (parent, graphObject, onHighlight, onChange) => {
-  const docEl = document.documentElement;
-  const bodyEl = document.getElementsByTagName("body")[0];
-
-  const width = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth;
-  const height = (
-    window.innerHeight
-    || docEl.clientHeight
-    || bodyEl.clientHeight
-  ) - 50;
-
-
-  /** MAIN SVG **/
-  const svg = d3.select(parent)
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-  const preparedGraphObject = prepareGraphObject(graphObject);
-
-  const graphInstance = new Graph(
-    svg, preparedGraphObject, onHighlight, onChange,
-  );
-
-  return graphInstance;
-};
-
-
-export {
-  initGraph,
-};
-
 
