@@ -341,14 +341,18 @@ class Graph {
   }
 
 
-  #select(values, addToExistingSelection = false) {
+  #select(values, addToOrRemoveFromExistingSelection = false) {
     const thisGraph = this;
 
-    if (!addToExistingSelection) {
+    if (!addToOrRemoveFromExistingSelection) {
       thisGraph.#selection = new Set(values);
     } else {
       values.forEach((value) => {
-        thisGraph.#selection.add(value);
+        if (thisGraph.#selection.has(value)) {
+          thisGraph.#selection.delete(value);
+        } else {
+          thisGraph.#selection.add(value);
+        }
       });
     }
 
