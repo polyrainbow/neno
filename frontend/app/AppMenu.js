@@ -92,8 +92,8 @@ const AppMenu = ({
             id="button_logout"
             label="Logout"
             icon="lock"
-            onClick={() => {
-              databaseProvider.removeAccess();
+            onClick={async () => {
+              await databaseProvider.removeAccess();
               setActiveView("LOGIN");
             }}
           />

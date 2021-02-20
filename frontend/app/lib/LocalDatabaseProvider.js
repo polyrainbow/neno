@@ -74,6 +74,15 @@ export default class LocalDatabaseProvider {
   async removeAccess() {
     this.#folderHandle = null;
     await IDB.del(LocalDatabaseProvider.#handleStorageKey);
+
+    /*
+      When we initialize a local db a 2nd time during runtime, it could be
+      another db in another directory. It is important that we then also
+      reinitialize the Notes module with an up-to-date storageProvider.
+      On removing access, we make sure that we forget about the 1st db
+      initialization.
+    */
+    this.#isDatabaseInitialized = false;
   }
 
 
