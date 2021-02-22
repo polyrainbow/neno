@@ -28,7 +28,7 @@ web space capable of serving static files via HTTPS.
 
 ## Setting up a NENO server
 
-Requirements: You need to have node>=15 and npm>=6 installed.
+Requirements: You need to have Node.js (>=15) and npm (>=6) installed.
 
 ### 1. Clone this repository
 
@@ -80,8 +80,7 @@ node dist/backend/index.js --use-https \
 
 #### -d, --data-folder-path \<value>
 * path to data folder
-* Default value: `path.join(REPO_PATH, "..", "neno-data")
-
+* Default value: `path.join(REPO_PATH, "..", "neno-data")`
 
 #### --use-https
 * create a https server (valid cert and key must be passed as parameters)",

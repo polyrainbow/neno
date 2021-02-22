@@ -166,8 +166,12 @@ export default class LocalDatabaseProvider {
       LocalDatabaseProvider.dbId,
     );
 
-    // necessary, because the graph module would not work correctly otherwise
-    // node dragging would do weird things with INPI
+    /*
+      It's necessary to make the returned object from the notes module
+      mutation-resistant, because the graph module would not work correctly
+      otherwise: Node dragging would do weird things with INPI.
+      So let's serialize and re-parse
+    */
     return JSON.parse(JSON.stringify(graph));
   }
 

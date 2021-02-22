@@ -1,12 +1,5 @@
 # Graph View Manual
 
-## Accessing the Graph view. 
-
-Click on the NENO logo on the top left corner and you should be able to toggle between Graph view and Editor view. 
-![NENO Locating Graph view example](./img/graph%20view%20locate.png)
-
-
-
 ![NENO Graph view example](./img/graph%20view%20simple.png)
 
 In the Graph View, your notes are shown as a network graph in which notes are
@@ -14,12 +7,18 @@ displayed as graph nodes and links between notes are displayed as graph edges.
 You can zoom in and out with the mouse wheel, move notes and add/remove links. Please note, that you have to save
 the current state to make your modifications to the graph permanent.
 
+## Accessing the Graph view
+
+Click on the NENO logo in the top left corner and you should be able to toggle between Graph view and Editor view.
+
+![NENO Locating Graph view example](./img/graph%20view%20locate.png)
+
 ## 🟩 The INPI (Initial Node Position Indicator)
 
 New notes will appear at the INPI (Initial Node Position Indicator). It is the green square. You can move the nodes from there to another position. You can also drag and drop the INPI itself to another position.
 
 ## Node background colors and what they mean
-* ⚪ White: Normal nodes
+* ⚪ White (or default node color): Normal nodes
 * 🟢 Green: New nodes that have been created within the last few days
 * 🔵 Blue: Hubs (nodes with more than 4 links)
 * 🔴 Red: Nodes with no links
@@ -30,7 +29,9 @@ Just drag a node and drop it where you want it to be.
 ## Move several nodes at once
 To move several nodes at once, first select the nodes which you want to
 move. To do this, press and hold the `S` key and click on the nodes you
-want to select. After that, drag one of the selected nodes and drop it where
+want to select. If you want to unselect a node, press and hold `S` and click on the selected node again.
+
+After you have finished your selection, drag one of the selected nodes and drop it where
 you want it to be. All selected nodes will follow. Please note that the node
 you drag is always included in the movement, regardless of whether it is
 selected or not.
@@ -55,4 +56,6 @@ Don't use this function too often for it will quickly result in a graph which is
 
 ## User interface performance
 
-When you have a lot of notes in your graph (> 1000), the graph can become unresponsive. If that is the case, you can disable rendering the note titles by clicking  the `Toggle text rendering` button in the title bar. If your graph has at  least 500 nodes, text rendering is disabled by default and must be enabled manually by clicking the button.
+When you have a lot of notes in your graph (> 1000), dragging the graph and zooming in and out may become laggy. If that is the case, you can disable rendering the note titles by clicking  the `Toggle text rendering` button in the title bar. If your graph has at least 500 nodes, text rendering is disabled by default and must be enabled manually by clicking the button.
+
+When text rendering is disabled, note titles are still be displayed in the bottom-left corner when hovering over a node.
