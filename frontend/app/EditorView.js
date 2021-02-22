@@ -11,6 +11,7 @@ import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import ImportLinksDialog from "./ImportLinksDialog.js";
+import View from "./enum/View.js";
 
 
 const EditorView = ({
@@ -260,7 +261,7 @@ const EditorView = ({
         if (e.message === "INVALID_CREDENTIALS") {
           await databaseProvider.removeAccess();
           setDatabaseMode("NONE");
-          setActiveView("LOGIN");
+          setActiveView(View.LOGIN);
         } else {
           throw new Error(e);
         }
@@ -470,7 +471,7 @@ const EditorView = ({
           duplicateNote={duplicateNote}
           openInGraphView={() => {
             initialNoteIdRef.current = activeNote.id;
-            setActiveView("GRAPH");
+            setActiveView(View.GRAPH);
           }}
         />
       </div>

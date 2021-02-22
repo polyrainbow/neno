@@ -9,10 +9,11 @@ import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 import StatsDialog from "./StatsDialog.js";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
 import { API_URL, MAX_SESSION_AGE } from "./lib/config.js";
+import View from "./enum/View.js";
 
 
 const App = () => {
-  const [activeView, setActiveView] = useState("BUSY");
+  const [activeView, setActiveView] = useState(View.BUSY);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const initialNoteIdRef = useRef(null);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
@@ -77,7 +78,7 @@ const App = () => {
 
       if (await serverDatabaseProviderRef.current.hasAccessToken()) {
         setDatabaseMode("SERVER");
-        setActiveView("EDITOR");
+        setActiveView(View.EDITOR);
         return;
       }
     } else {
@@ -85,12 +86,12 @@ const App = () => {
     }
 
     localDatabaseProviderRef.current = new LocalDatabaseProvider();
-    setActiveView("LOGIN");
+    setActiveView(View.LOGIN);
   }, []);
 
   let content;
 
-  if (activeView === "EDITOR") {
+  if (activeView === View.EDITOR) {
     content = <EditorView
       databaseProvider={databaseProvider}
       setActiveView={(view) => {
@@ -107,13 +108,13 @@ const App = () => {
     />;
   }
 
-  if (activeView === "BUSY") {
+  if (activeView === View.BUSY) {
     content = <BusyView
       toggleAppMenu={toggleAppMenu}
     />;
   }
 
-  if (activeView === "LOGIN") {
+  if (activeView === View.LOGIN) {
     content = <LoginView
       setActiveView={(view) => {
         setUnsavedChanges(false);
@@ -126,7 +127,7 @@ const App = () => {
     />;
   }
 
-  if (activeView === "GRAPH") {
+  if (activeView === View.GRAPH) {
     content = <GraphView
       setActiveView={(view) => {
         setUnsavedChanges(false);

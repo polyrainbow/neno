@@ -7,6 +7,7 @@ import * as Config from "./lib/config.js";
 import SearchInput from "./SearchInput.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator.js";
+import View from "./enum/View.js";
 
 
 const GraphView = ({
@@ -119,7 +120,7 @@ const GraphView = ({
               }
 
               initialNoteIdRef.current = ids[0];
-              setActiveView("EDITOR");
+              setActiveView(View.EDITOR);
             }}
           />
           <IconButton

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import HeaderContainer from "./HeaderContainer.js";
 import LoginViewServer from "./LoginViewServer.js";
+import View from "./enum/View.js";
 
 const LoginView = ({
   setActiveView,
@@ -51,7 +52,7 @@ const LoginView = ({
                 try {
                   await localDatabaseProvider.initializeDatabase();
                   setDatabaseMode("LOCAL");
-                  setActiveView("EDITOR");
+                  setActiveView(View.EDITOR);
                 } catch (e) {
                   console.error(e);
 
@@ -79,7 +80,7 @@ const LoginView = ({
             const folderHandle = await window.showDirectoryPicker();
             await localDatabaseProvider.login(folderHandle);
             setDatabaseMode("LOCAL");
-            setActiveView("EDITOR");
+            setActiveView(View.EDITOR);
           } catch (e) {
             console.error(e);
           }
