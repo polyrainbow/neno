@@ -144,6 +144,31 @@ const getNumberOfLinkedNotes = (db:DatabaseMainData, noteId:NoteId):number => {
 }
 
 
+const getNumberOfUnlinkedNotes = (db:DatabaseMainData):number => {
+  /*
+  We could do it like this but then the links array is traversed as many times
+  as there are notes. So we don't do it like this. We do it faster.
+
+  const numberOfUnlinkedNotes = db.notes.filter((note) => {
+    return getNumberOfLinkedNotes(db, note.id) === 0;
+  }).length;
+  */
+
+  const linkedNotes = new Set();
+
+  db.links.forEach((link) => {
+    linkedNotes.add(link[0]);
+    linkedNotes.add(link[1]);
+  });
+
+  const numberOfAllNotes = db.notes.length;
+  const numberOfLinkedNotes = Array.from(linkedNotes).length;
+  const numberOfUnlinkedNotes = numberOfAllNotes - numberOfLinkedNotes;
+
+  return numberOfUnlinkedNotes;
+};
+
+
 const removeLinksOfNote = (db: DatabaseMainData, noteId: NoteId):true => {
   db.links = db.links.filter((link) => {
     return (link[0] !== noteId) && (link[1] !== noteId);
@@ -417,4 +442,5 @@ export {
   getURLsOfNote,
   createNoteListItem,
   getNumberOfComponents,
+  getNumberOfUnlinkedNotes,
 };

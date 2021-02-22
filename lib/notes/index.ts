@@ -18,6 +18,7 @@ import {
   getURLsOfNote,
   createNoteListItem,
   getNumberOfComponents,
+  getNumberOfUnlinkedNotes,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "./interfaces/DatabaseMainData.js";
@@ -212,10 +213,7 @@ const getStats = async (
 ):Promise<Stats | StatsExhaustive> => {
   const db = await io.getMainData(dbId);
 
-  const numberOfUnlinkedNotes = db.notes.filter((note) => {
-    return getNumberOfLinkedNotes(db, note.id) === 0;
-  }).length;
-  
+  const numberOfUnlinkedNotes = getNumberOfUnlinkedNotes(db);  
 
   let stats:Stats | StatsExhaustive = {
     numberOfAllNotes: db.notes.length,
