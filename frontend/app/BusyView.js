@@ -7,19 +7,28 @@ const BusyView = () => {
     <HeaderContainer
       rightContent={null}
     />
-    <main>
-      <section id="section_busy">
+    <section
+      id="section_busy"
+      style={{
+        "display": "flex",
+        "justifyContent": "center",
+        "padding": "15px",
+      }}
+    >
+      <div style={{
+        "textAlign": "center",
+      }}>
         <img
           style={{
-            width: "100px",
+            width: "120px",
           }}
           src={ICON_PATH + "pending-24px.svg"}
           alt={"Loading ..."}
           className="svg-icon"
         />
         <p>Loading ...</p>
-      </section>
-    </main>
+      </div>
+    </section>
   </>;
 };
 
