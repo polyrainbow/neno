@@ -16,7 +16,7 @@ import {
   getSortFunction,
   getNumberOfLinkedNotes,
   getURLsOfNote,
-  createNoteListItem,
+  createNoteListItems,
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
 } from "./noteUtils.js";
@@ -160,8 +160,7 @@ const getNotesList = async (
 
   // now we need to transform all notes into NoteListItems before we can
   // sort those
-  const noteListItems:NoteListItem[] = matchingNotes
-    .map((note) => createNoteListItem(note, db))
+  const noteListItems:NoteListItem[] = createNoteListItems(matchingNotes, db)
     .sort(getSortFunction(sortMode));
 
   const numberOfResults = noteListItems.length;

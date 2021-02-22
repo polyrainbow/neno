@@ -144,6 +144,30 @@ const getNumberOfLinkedNotes = (db:DatabaseMainData, noteId:NoteId):number => {
 }
 
 
+const getNumberOfLinkedNotesForSeveralNotes = (
+  db:DatabaseMainData,
+  noteIds:NoteId[],
+):any => {
+
+  const numbersOfLinkedNotes = {};
+  noteIds.forEach((noteId) => {
+    numbersOfLinkedNotes[noteId] = 0;
+  });
+
+  db.links.forEach((link) => {
+    if (typeof numbersOfLinkedNotes[link[0]] === "number"){
+      numbersOfLinkedNotes[link[0]]++;
+    }
+
+    if (typeof numbersOfLinkedNotes[link[1]] === "number"){
+      numbersOfLinkedNotes[link[1]]++;
+    }
+  });
+
+  return numbersOfLinkedNotes;
+}
+
+
 const getNumberOfUnlinkedNotes = (db:DatabaseMainData):number => {
   /*
   We could do it like this but then the links array is traversed as many times
@@ -239,6 +263,10 @@ const createNoteToTransmit = (
 const createNoteListItem = (
   databaseNote:NonNullable<DatabaseNote>,
   db: NonNullable<DatabaseMainData>,
+  // for performance reasons, numberOfLinkedNotes can be given as argument,
+  // so that this function does not have to find it out by itself for each
+  // NoteListItem to be created
+  numberOfLinkedNotes?:number,
 ):NoteListItem => {
   const noteListItem:NoteListItem = {
     id: databaseNote.id,
@@ -246,11 +274,38 @@ const createNoteListItem = (
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
     features: getNoteFeatures(databaseNote),
-    numberOfLinkedNotes: getNumberOfLinkedNotes(db, databaseNote.id),
+    numberOfLinkedNotes: typeof numberOfLinkedNotes === "number"
+      ? numberOfLinkedNotes
+      : getNumberOfLinkedNotes(db, databaseNote.id),
     numberOfCharacters: getNumberOfCharacters(databaseNote),
   };
 
   return noteListItem;
+};
+
+
+const createNoteListItems = (
+  databaseNotes:DatabaseNote[],
+  db: DatabaseMainData,
+):NoteListItem[] => {
+  /*
+    Before we transform every DatabaseNote to a NoteListItem, we get the
+    number of linked notes for every note in one batch. This is more performant
+    than traversing all links again and again for every single note.
+  */
+  const noteIds = databaseNotes.map((note) => note.id);
+  const numbersOfLinkedNotes
+    = getNumberOfLinkedNotesForSeveralNotes(db, noteIds);
+
+  const noteListItems = databaseNotes.map((databaseNote) => {
+    return createNoteListItem(
+      databaseNote,
+      db,
+      numbersOfLinkedNotes[databaseNote.id],
+    );
+  })
+
+  return noteListItems;
 };
 
 
@@ -441,6 +496,7 @@ export {
   getNumberOfCharacters,
   getURLsOfNote,
   createNoteListItem,
+  createNoteListItems,
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
 };
