@@ -64,6 +64,11 @@ const App = () => {
     );
 
   useEffect(async () => {
+    // LocalDatabaseProvider must be initialized before we check and go for the
+    // server database so in case we log out from server, we have a
+    // functioning LocalDatabaseProvider instance
+    localDatabaseProviderRef.current = new LocalDatabaseProvider();
+
     // ENABLE_SERVER_DATABASE defined via webpack.DefinePlugin
     // eslint-disable-next-line no-undef
     if (ENABLE_SERVER_DATABASE) {
@@ -85,7 +90,6 @@ const App = () => {
       serverDatabaseProviderRef.current = "NOT_SUPPORTED";
     }
 
-    localDatabaseProviderRef.current = new LocalDatabaseProvider();
     setActiveView(View.LOGIN);
   }, []);
 
