@@ -106,6 +106,7 @@ const getNotesList = async (
 
   let matchingNotes;
 
+  // search for note pairs containing identical urls
   if (query.includes("special:DUPLICATE_URLS")){
     matchingNotes = db.notes
     // filter notes that match the search query
@@ -121,6 +122,8 @@ const getNotesList = async (
       
       return !!duplicate;
     });
+
+  // search for exact title
   } else if (query.includes("exact:")) {
     const startOfExactQuery = query.indexOf("exact:") + "exact:".length;
     const exactQuery = query.substr(startOfExactQuery);
@@ -131,6 +134,41 @@ const getNotesList = async (
         const title = getNoteTitle(note);
         return title.toLowerCase() === exactQuery.toLowerCase();
       });
+
+  // full-text search
+  } else if (query.includes("ft:")) {
+    const startOfFtQuery = query.indexOf("ft:") + "ft:".length;
+    const ftQuery = query.substr(startOfFtQuery);
+    const queryTokens = ftQuery.split(" ");
+
+    matchingNotes = db.notes
+      .filter((note:DatabaseNote) => {
+
+        //grab all available text from the note
+        const noteText = note.editorData.blocks.reduce((accumulator, block) => {
+          if (block.type === "paragraph") {
+            return accumulator + " " + block.data.text;
+          } else if (block.type === "header") {
+            return accumulator + " " + block.data.text;
+          } else if (block.type === "code") {
+            return accumulator + " " + block.data.code;
+          } else if (block.type === "list") {
+            const itemsConcatenated = block.data.items.join(" ");
+            return accumulator + " " + itemsConcatenated;
+          } else {
+            return accumulator;
+          }
+        }, "");
+  
+        // the note text must include every query token to be a positive
+        return queryTokens.every((queryToken) => {
+          return caseSensitiveQuery
+            ? noteText.includes(queryToken)
+            : noteText.toLowerCase().includes(queryToken.toLowerCase());
+        });
+      });
+
+  // default mode: check if all query tokens are included in note title
   } else {
     matchingNotes = db.notes
       // filter notes that match the search query
