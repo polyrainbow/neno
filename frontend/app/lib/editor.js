@@ -36,6 +36,7 @@ const loadInstance = async ({
     import("@editorjs/code"),
     import("@editorjs/attaches"),
     import("./editor-js-audio-plugin/index.js"),
+    import("./editor-js-video-plugin/index.js"),
   ]);
 
   const [
@@ -47,6 +48,7 @@ const loadInstance = async ({
     Code,
     Attaches,
     Audio,
+    Video,
   ] = modules.map((module) => module.default);
 
   const instance = new EditorJS({
@@ -175,6 +177,36 @@ const loadInstance = async ({
           field: "file",
           types: "audio/mp3, audio/mpeg",
           buttonText: "Select MP3 file",
+          errorMessage: "File upload failed",
+        },
+      },
+      video: {
+        class: Video,
+        config: {
+          uploader: async (file) => {
+            const fileId = await databaseProvider.uploadFile(file);
+            return {
+              success: 1,
+              file: {
+                "size": file.size,
+                "name": file.name,
+                "fileId": fileId,
+              },
+            };
+          },
+          onDownload: async (file) => {
+            const fileId = file.fileId;
+            const url = await getUrlForFileId(fileId, databaseProvider);
+            window.open(url, "_blank");
+          },
+          getUrl: async (file) => {
+            const fileId = file.fileId;
+            const url = await getUrlForFileId(fileId, databaseProvider);
+            return url;
+          },
+          field: "file",
+          types: "video/mp4, video/webm",
+          buttonText: "Select video file",
           errorMessage: "File upload failed",
         },
       },

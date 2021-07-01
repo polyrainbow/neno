@@ -27,6 +27,14 @@ const ALLOWED_FILE_TYPES = [
     mimeType: "audio/mpeg",
     ending: "mp3",
   },
+  {
+    mimeType: "video/mp4",
+    ending: "mp4",
+  },
+  {
+    mimeType: "video/webm",
+    ending: "webm",
+  },
 ];
 
 const NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE = 100;

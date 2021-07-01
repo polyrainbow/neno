@@ -324,7 +324,9 @@ const startApp = async ({
     config.API_PATH + "file",
     verifyJWT,
     async function(req, res) {
-      const form = new formidable.IncomingForm();
+      const form = new formidable.IncomingForm({
+        maxFileSize: config.MAX_UPLOAD_FILE_SIZE,
+      });
       form.parse(req, (err, fields, files) => {
         if (err) {
           console.log("error")

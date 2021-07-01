@@ -1,0 +1,70 @@
+.cdx-video--with-file {
+  display: block;
+  padding: 13px 20px;
+  border: 1px solid #7e7e7e;
+  border-radius: 3px;
+}
+.cdx-video-first-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.cdx-video--with-file__file-info {
+  flex-grow: 8;
+  max-width: calc(100% - 80px);
+}
+.cdx-video--with-file__download-button {
+  display: flex;
+  align-items: center;
+}
+.cdx-video--with-file__download-button svg {
+  fill: #7b7e89;
+}
+.cdx-video--with-file__file-icon {
+  margin-right: 20px;
+  position: relative;
+}
+.cdx-video--with-file__file-icon::before {
+  position: absolute;
+  bottom: 7px;
+  left: 8.5px;
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 150%;
+  content: attr(data-extension);
+}
+.cdx-video--with-file__file-icon svg {
+  fill: currentColor;
+}
+.cdx-video--with-file__size {
+  color: #7b7e89;
+}
+.cdx-video--with-file__size::after {
+  content: attr(data-size);
+  margin-left: 0.2em;
+}
+.cdx-video--with-file__title {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  outline: none;
+  max-width: 90%;
+}
+.cdx-video--loading__title, .cdx-video--loading__file-icon, .cdx-video--loading__size, .cdx-video--loading__download-button, .cdx-video--loading__button {
+  opacity: 0;
+  font-size: 0;
+}
+.cdx-video__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cdx-video__button svg {
+  height: 14px;
+  margin-top: 0;
+  margin-right: 8px;
+}
+.cdx-video__button:hover {
+  color: #393f52;
+}
