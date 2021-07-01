@@ -335,7 +335,7 @@ export default class Graph {
         return accumulator;
       }, [])
       .sort((a, b) => a - b);
-  };
+  }
 
 
   #newPathMove(e, originNode) {
@@ -354,7 +354,7 @@ export default class Graph {
       "M" + originNode.position.x + "," + originNode.position.y
       + "L" + newLinkEnd.x + "," + newLinkEnd.y,
     );
-  };
+  }
 
 
   // insert svg line breaks: taken from
@@ -374,7 +374,7 @@ export default class Graph {
       const tspan = el.append("tspan").text(words[i]);
       if (i > 0) {tspan.attr("x", 0).attr("dy", "15");}
     }
-  };
+  }
 
 
   #getConnectedNodeIdsOfSelection(selection) {
@@ -417,7 +417,7 @@ export default class Graph {
       );
 
     thisGraph.#updateGraph();
-  };
+  }
 
 
   #handleMouseDownOnEdge(e, d3path, d) {
@@ -427,7 +427,7 @@ export default class Graph {
     // when shift key is pressed down during mousedown,
     // add edge to current selection
     thisGraph.#select([d], e.shiftKey);
-  };
+  }
 
 
   #handleMouseDownOnNode(e, d3node, d) {
@@ -447,7 +447,7 @@ export default class Graph {
     } else if (thisGraph.#sKeyIsPressed) {
       thisGraph.#select([d], true);
     }
-  };
+  }
 
 
   // mouseup on nodes
@@ -498,7 +498,7 @@ export default class Graph {
       }
     }
     thisGraph.#mouseDownNode = null;
-  };
+  }
 
 
   // mouseup on main svg
@@ -512,7 +512,7 @@ export default class Graph {
     // on mouse up, new link creation process is always over
     thisGraph.#newLinkCreationInProgress = false;
     thisGraph.newLinkLine.classed("hidden", true);
-  };
+  }
 
 
   // keydown on main svg
@@ -563,7 +563,7 @@ export default class Graph {
       thisGraph.#select([]);
       break;
     }
-  };
+  }
 
 
   #svgKeyUp(e) {
@@ -576,7 +576,7 @@ export default class Graph {
     }
 
     this.#lastKeyDown = -1;
-  };
+  }
 
 
   // call to propagate changes to graph
@@ -816,7 +816,7 @@ export default class Graph {
     const nodeExitSelection = thisGraph.nodeElements.exit();
     nodeExitSelection.remove();
   */
-  };
+  }
 
 
   #zoomed(e) {
@@ -834,13 +834,13 @@ export default class Graph {
     thisGraph.#screenPosition.translateX = e.transform.x;
     thisGraph.#screenPosition.translateY = e.transform.y;
     thisGraph.#screenPosition.scale = e.transform.k;
-  };
+  }
 
 
   #updateWindow(svg) {
     const { width, height } = this.#parent.getBoundingClientRect();
     svg.attr("width", width).attr("height", height);
-  };
+  }
 
 
   /** *****************
