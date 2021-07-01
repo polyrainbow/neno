@@ -38,12 +38,7 @@ export default {
           presets: [
             "@babel/preset-react",
           ],
-          plugins: [
-            // we need these two plugins because webpack does not support
-            // that syntax yet, even though Chrome does already.
-            ["@babel/plugin-proposal-class-properties"],
-            ["@babel/plugin-proposal-private-methods"],
-          ],
+          plugins: [],
           cacheDirectory: true,
           cacheCompression: false,
         },
