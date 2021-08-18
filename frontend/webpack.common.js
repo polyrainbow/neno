@@ -57,8 +57,10 @@ export default {
       "Access-Control-Allow-Headers":
         "X-Requested-With, content-type, Authorization",
     },
-    disableHostCheck: true,
-    contentBase: __dirname,
+    allowedHosts: "all",
+    static: {
+      directory: __dirname,
+    },
     port: 8080,
   },
   watchOptions: {
