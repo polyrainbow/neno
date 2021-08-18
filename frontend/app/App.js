@@ -124,6 +124,7 @@ const App = () => {
         setUnsavedChanges={setUnsavedChanges}
         databaseProvider={databaseProvider}
         toggleAppMenu={toggleAppMenu}
+        setDatabaseMode={setDatabaseMode}
       />
     </Route>
     {

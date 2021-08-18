@@ -200,12 +200,23 @@ const EditorView = ({
       history.replace("/editor/new");
       setActiveNote(Utils.getNewNoteObject());
     } else {
-      const noteFromServer = await databaseProvider.getNote(noteIdNumber);
-      setActiveNote({
-        ...noteFromServer,
-        isUnsaved: false,
-        changes: [],
-      });
+      try {
+        const noteFromServer = await databaseProvider.getNote(noteIdNumber);
+        setActiveNote({
+          ...noteFromServer,
+          isUnsaved: false,
+          changes: [],
+        });
+      } catch (e) {
+        // if credentials are invalid, go to LoginView. If not, throw.
+        if (e.message === "INVALID_CREDENTIALS") {
+          await databaseProvider.removeAccess();
+          setDatabaseMode("NONE");
+          history.push("/login");
+        } else {
+          throw new Error(e);
+        }
+      }
     }
   };
 
@@ -269,6 +280,9 @@ const EditorView = ({
           setNumberOfResults(numberOfResults);
           setIsBusy(false);
         }
+
+        const pinnedNotes = await databaseProvider.getPins();
+        setPinnedNotes(pinnedNotes);
       } catch (e) {
         // if credentials are invalid, go to LoginView. If not, throw.
         if (e.message === "INVALID_CREDENTIALS") {
@@ -279,9 +293,6 @@ const EditorView = ({
           throw new Error(e);
         }
       }
-
-      const pinnedNotes = await databaseProvider.getPins();
-      setPinnedNotes(pinnedNotes);
     },
     [searchValue, page, sortMode, databaseProvider, activeNoteId],
   );

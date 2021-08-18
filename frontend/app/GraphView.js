@@ -17,6 +17,7 @@ const GraphView = ({
   unsavedChanges,
   setUnsavedChanges,
   toggleAppMenu,
+  setDatabaseMode,
 }) => {
   const DEFAULT_STATUS = "";
   const mainElement = useRef(null);
@@ -67,24 +68,34 @@ const GraphView = ({
   }, [handleKeydown]);
 
 
-  useEffect(() => {
+  useEffect(async () => {
     if (!databaseProvider) return;
 
     const onHighlight = (highlightDetails) => {
       setStatus(highlightDetails);
     };
 
-    databaseProvider.getGraph()
-      .then((graphObject) => {
-        graphInstance.current
-          = new Graph({
-            parent: mainElement.current,
-            graphObject,
-            onHighlight,
-            onChange,
-            initialFocusNoteId: focusNoteId,
-          });
-      });
+    try {
+      const graphObject = await databaseProvider.getGraph();
+
+      graphInstance.current
+        = new Graph({
+          parent: mainElement.current,
+          graphObject,
+          onHighlight,
+          onChange,
+          initialFocusNoteId: focusNoteId,
+        });
+      } catch (e) {
+        // if credentials are invalid, go to LoginView. If not, throw.
+        if (e.message === "INVALID_CREDENTIALS") {
+          await databaseProvider.removeAccess();
+          setDatabaseMode("NONE");
+          history.push("/login");
+        } else {
+          throw new Error(e);
+        }
+      }
   }, [databaseProvider]);
 
   useEffect(() => {
