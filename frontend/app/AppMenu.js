@@ -3,10 +3,12 @@ import AppMenuItem from "./AppMenuItem.js";
 import * as Config from "./lib/config.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import OutsideAlerter from "./OutsideAlerter.js";
+import {
+  useHistory,
+  useLocation,
+} from "react-router-dom";
 
 const AppMenu = ({
-  setActiveView,
-  activeView,
   openExportDatabaseDialog,
   onClose,
   unsavedChanges,
@@ -15,6 +17,9 @@ const AppMenu = ({
   databaseProvider,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext);
+
+  const location = useLocation();
+  const history = useHistory();
 
   return <OutsideAlerter
     onOutsideClick={onClose}
@@ -31,7 +36,7 @@ const AppMenu = ({
       }
     >
       {
-        activeView === "EDITOR"
+        location.pathname.startsWith("/editor")
           ? <AppMenuItem
             label="Switch to Graph view"
             icon="scatter_plot"
@@ -46,13 +51,13 @@ const AppMenu = ({
               }
 
               setUnsavedChanges(false);
-              setActiveView("GRAPH");
+              history.push("/graph");
             }}
           />
           : ""
       }
       {
-        activeView === "GRAPH"
+        location.pathname.startsWith("/graph")
           ? <AppMenuItem
             label="Switch to editor view"
             icon="create"
@@ -67,7 +72,7 @@ const AppMenu = ({
               }
 
               setUnsavedChanges(false);
-              setActiveView("EDITOR");
+              history.push("/editor");
             }}
           />
           : ""
@@ -87,14 +92,17 @@ const AppMenu = ({
         onClick={showStats}
       />
       {
-        ["EDITOR", "GRAPH"].includes(activeView)
+        (
+          location.pathname.startsWith("/editor")
+          || location.pathname.startsWith("/graph")
+        )
           ? <AppMenuItem
             id="button_logout"
             label="Logout"
             icon="lock"
             onClick={async () => {
               await databaseProvider.removeAccess();
-              setActiveView("LOGIN");
+              history.push("/login");
             }}
           />
           : ""

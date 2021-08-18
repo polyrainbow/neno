@@ -59,7 +59,7 @@ const emojis = {
 // session token expire time in seconds
 const MAX_SESSION_AGE = 60 * 60 * 24 * 30; // 30 days
 
-const ICON_PATH = "assets/icons/";
+const ICON_PATH = "/assets/icons/";
 
 export {
   DEFAULT_NOTE_TITLE,

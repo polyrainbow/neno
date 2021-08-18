@@ -21,7 +21,8 @@ import http from "http";
 import https from "https";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
 import twofactor from "node-2fa";
-
+import fallback from "express-history-api-fallback";
+import * as path from "path";
 
 const startApp = async ({
   users,
@@ -760,6 +761,15 @@ const startApp = async ({
     },
   );
 
+
+  app.use(
+    fallback(
+      'index.html',
+      {
+        root: path.resolve(frontendPath),
+      },
+    ),
+  );
 
   return app;
 };

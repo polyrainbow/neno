@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-
+import {
+  useHistory,
+} from "react-router-dom";
 
 const LoginViewServer = ({
-  setActiveView,
   serverDatabaseProvider,
   setDatabaseMode,
 }) => {
@@ -14,12 +15,14 @@ const LoginViewServer = ({
 
   const [isBusy, setIsBusy] = useState(false);
 
+  const history = useHistory();
+
   const startLoginAttempt = () => {
     setIsBusy(true);
     serverDatabaseProvider.login(username, password, mfaToken)
       .then(() => {
         setDatabaseMode("SERVER");
-        setActiveView("EDITOR");
+        history.push("/editor");
       })
       .catch((e) => {
         const disclaimer = (e.message === "INVALID_CREDENTIALS")

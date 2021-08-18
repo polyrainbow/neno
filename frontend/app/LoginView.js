@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import HeaderContainer from "./HeaderContainer.js";
 import LoginViewServer from "./LoginViewServer.js";
-import View from "./enum/View.js";
+import {
+  useHistory,
+} from "react-router-dom";
 
 const LoginView = ({
-  setActiveView,
   serverDatabaseProvider,
   localDatabaseProvider,
   setDatabaseMode,
@@ -16,17 +17,18 @@ const LoginView = ({
     setLocalDatabaseFolderHandleName,
   ] = useState(null);
 
+  const history = useHistory();
 
   useEffect(async () => {
+    if (!localDatabaseProvider) return;
     const folderHandleName = await localDatabaseProvider.getFolderHandleName();
     setLocalDatabaseFolderHandleName(folderHandleName);
-  }, []);
+  }, [localDatabaseProvider]);
 
   return <>
     <HeaderContainer />
     <section id="section_login">
       <LoginViewServer
-        setActiveView={setActiveView}
         serverDatabaseProvider={serverDatabaseProvider}
         setDatabaseMode={setDatabaseMode}
       />
@@ -52,7 +54,7 @@ const LoginView = ({
                 try {
                   await localDatabaseProvider.initializeDatabase();
                   setDatabaseMode("LOCAL");
-                  setActiveView(View.EDITOR);
+                  history.push("/editor");
                 } catch (e) {
                   console.error(e);
 
@@ -80,7 +82,7 @@ const LoginView = ({
             const folderHandle = await window.showDirectoryPicker();
             await localDatabaseProvider.login(folderHandle);
             setDatabaseMode("LOCAL");
-            setActiveView(View.EDITOR);
+            history.push("/editor");
           } catch (e) {
             console.error(e);
           }

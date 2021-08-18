@@ -3,12 +3,13 @@ import NoteListStatus from "./NoteListStatus.js";
 import NoteListItem from "./NoteListItem.js";
 import Pagination from "./Pagination.js";
 import NoteSearchDisclaimer from "./NoteSearchDisclaimer.js";
-
+import {
+  useHistory,
+} from "react-router-dom";
 
 const NoteList = ({
   notes,
   numberOfResults,
-  loadNote,
   activeNote,
   onLinkAddition,
   onLinkRemoval,
@@ -25,6 +26,8 @@ const NoteList = ({
   const containerRef = useRef(null);
 
   const searchResultsPerPage = 100;
+
+  const history = useHistory();
 
   let status = "DEFAULT";
 
@@ -103,8 +106,8 @@ const NoteList = ({
             note={note}
             isActive={isActive}
             isLinked={isLinked}
-            key={"main-notes-list-item-" + note.id}
-            onSelect={() => loadNote(note.id)}
+            key={`main-notes-list-item-${note.id}`}
+            onSelect={() => history.push(`/editor/${note.id}`)}
             onLinkChange={() => {
               if (isActive) return;
 

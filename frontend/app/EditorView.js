@@ -11,15 +11,16 @@ import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import ImportLinksDialog from "./ImportLinksDialog.js";
-import View from "./enum/View.js";
+import {
+  useHistory,
+  useParams,
+} from "react-router-dom";
 
 
 const EditorView = ({
   databaseProvider,
-  setActiveView,
   unsavedChanges,
   setUnsavedChanges,
-  initialNoteIdRef,
   toggleAppMenu,
   setOpenDialog,
   openDialog,
@@ -37,6 +38,8 @@ const EditorView = ({
   const [searchValue, setSearchValue] = useState("");
   const [pinnedNotes, setPinnedNotes] = useState([]);
 
+  const history = useHistory();
+  const { activeNoteId } = useParams();
   const confirm = React.useContext(ConfirmationServiceContext);
 
   const displayedLinkedNotes = useMemo(() => [
@@ -187,21 +190,29 @@ const EditorView = ({
       setUnsavedChanges(false);
     }
 
-    if (typeof noteId !== "number" || isNaN(noteId)) {
-      setActiveNote(Utils.getNewNoteObject());
-      return;
+    let noteIdNumber = noteId;
+
+    if (typeof noteIdNumber !== "number") {
+      noteIdNumber = parseInt(noteIdNumber);
     }
 
-    const noteFromServer = await databaseProvider.getNote(noteId);
-    setActiveNote({
-      ...noteFromServer,
-      isUnsaved: false,
-      changes: [],
-    });
+    if (isNaN(noteIdNumber)) {
+      history.replace("/editor/new");
+      setActiveNote(Utils.getNewNoteObject());
+    } else {
+      const noteFromServer = await databaseProvider.getNote(noteIdNumber);
+      setActiveNote({
+        ...noteFromServer,
+        isUnsaved: false,
+        changes: [],
+      });
+    }
   };
 
 
   const refreshStats = () => {
+    if (!databaseProvider) return;
+
     databaseProvider.getStats(false)
       .then((stats) => {
         setStats(stats);
@@ -218,6 +229,8 @@ const EditorView = ({
 
   const refreshNotesList = useCallback(
     async () => {
+      if (!databaseProvider) return;
+
       refreshStats();
       setNoteListItems([]);
 
@@ -261,7 +274,7 @@ const EditorView = ({
         if (e.message === "INVALID_CREDENTIALS") {
           await databaseProvider.removeAccess();
           setDatabaseMode("NONE");
-          setActiveView(View.LOGIN);
+          history.push("/login");
         } else {
           throw new Error(e);
         }
@@ -270,13 +283,12 @@ const EditorView = ({
       const pinnedNotes = await databaseProvider.getPins();
       setPinnedNotes(pinnedNotes);
     },
-    [searchValue, page, sortMode],
+    [searchValue, page, sortMode, databaseProvider, activeNoteId],
   );
 
 
   const createNewNote = () => {
-    loadNote(null);
-    refreshNotesList();
+    history.push("/editor/new");
   };
 
 
@@ -286,8 +298,7 @@ const EditorView = ({
     }
 
     await databaseProvider.deleteNote(activeNote.id);
-    loadNote(null);
-    refreshNotesList();
+    history.push("/editor/new");
   };
 
 
@@ -361,26 +372,9 @@ const EditorView = ({
   }, [handleKeydown]);
 
 
-  // startup
   useEffect(async () => {
-    const initialNoteId = initialNoteIdRef.current;
-
-    if (typeof initialNoteId === "number") {
-      loadNote(initialNoteId);
-      return;
-    }
-
-    const initialId = parseInt(
-      Utils.getParameterByName("id", window.location.href),
-    );
-    if (typeof initialId === "number" && !isNaN(initialId)) {
-      loadNote(initialId);
-    } else {
-      loadNote(null);
-    }
-
-    initialNoteIdRef.current = null;
-  }, []);
+    loadNote(activeNoteId);
+  }, [activeNoteId]);
 
 
   const pinOrUnpinNote = async () => {
@@ -404,7 +398,7 @@ const EditorView = ({
 
   useEffect(() => {
     refreshNotesList();
-  }, [searchValue, page, sortMode]);
+  }, [searchValue, page, sortMode, databaseProvider]);
 
 
   return <>
@@ -412,7 +406,6 @@ const EditorView = ({
       stats={stats}
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
-      loadNote={loadNote}
       note={activeNote}
     />
     <main>
@@ -470,8 +463,7 @@ const EditorView = ({
           openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
           duplicateNote={duplicateNote}
           openInGraphView={() => {
-            initialNoteIdRef.current = activeNote.id;
-            setActiveView(View.GRAPH);
+            history.push(`/graph?focusNote=${activeNote.id}`);
           }}
         />
       </div>

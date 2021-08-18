@@ -107,7 +107,7 @@ export default class Graph {
     graphObject,
     onHighlight,
     onChange,
-    initialNoteId,
+    initialFocusNoteId,
   }) {
     const graphObjectPrepared = prepareGraphObject(graphObject);
     const thisGraph = this;
@@ -127,19 +127,27 @@ export default class Graph {
     thisGraph.#nodes = graphObjectPrepared.nodes;
     thisGraph.#links = graphObjectPrepared.links;
 
-    if (typeof initialNoteId === "number") {
+    // by default, we're using the screenPosition from the given data object ...
+    thisGraph.#screenPosition = graphObjectPrepared.screenPosition;
+
+    // ... we'll overwrite it if a valid note to focus is given
+    if (typeof initialFocusNoteId === "number" && !isNaN(initialFocusNoteId)) {
       // set initial node in the center of the screen
-      const node = thisGraph.#nodes.find((node) => node.id === initialNoteId);
-      const { width, height } = thisGraph.svg.node().getBoundingClientRect();
-      const SCALE = 1.5;
-      thisGraph.#screenPosition = {
-        translateX: (-node.position.x * SCALE) + (width / 2),
-        translateY: (-node.position.y * SCALE) + (height / 2),
-        scale: SCALE,
-      };
-    } else {
-      thisGraph.#screenPosition = graphObjectPrepared.screenPosition;
+      const node = thisGraph.#nodes.find(
+        (node) => node.id === initialFocusNoteId,
+      );
+
+      if (typeof note === "object") {
+        const { width, height } = thisGraph.svg.node().getBoundingClientRect();
+        const SCALE = 1.5;
+        thisGraph.#screenPosition = {
+          translateX: (-node.position.x * SCALE) + (width / 2),
+          translateY: (-node.position.y * SCALE) + (height / 2),
+          scale: SCALE,
+        };
+      }
     }
+
     thisGraph.#initialNodePosition = graphObjectPrepared.initialNodePosition;
 
     thisGraph.mainSVGGroup = svg.append("g")

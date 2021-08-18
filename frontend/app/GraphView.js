@@ -7,15 +7,15 @@ import * as Config from "./lib/config.js";
 import SearchInput from "./SearchInput.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator.js";
-import View from "./enum/View.js";
-
+import {
+  useLocation,
+  useHistory,
+} from "react-router-dom";
 
 const GraphView = ({
   databaseProvider,
-  setActiveView,
   unsavedChanges,
   setUnsavedChanges,
-  initialNoteIdRef,
   toggleAppMenu,
 }) => {
   const DEFAULT_STATUS = "";
@@ -25,6 +25,11 @@ const GraphView = ({
   const [searchValue, setSearchValue] = useState("");
 
   const confirm = React.useContext(ConfirmationServiceContext);
+
+  const history = useHistory();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const focusNoteId = parseInt(searchParams.get("focusNote"));
 
   const saveGraphObject = async () => {
     const graphObject = graphInstance.current.getSaveData();
@@ -63,6 +68,8 @@ const GraphView = ({
 
 
   useEffect(() => {
+    if (!databaseProvider) return;
+
     const onHighlight = (highlightDetails) => {
       setStatus(highlightDetails);
     };
@@ -75,10 +82,10 @@ const GraphView = ({
             graphObject,
             onHighlight,
             onChange,
-            initialNoteId: initialNoteIdRef.current,
+            initialFocusNoteId: focusNoteId,
           });
       });
-  }, []);
+  }, [databaseProvider]);
 
   useEffect(() => {
     if (!graphInstance.current) return;
@@ -119,8 +126,8 @@ const GraphView = ({
                 });
               }
 
-              initialNoteIdRef.current = ids[0];
-              setActiveView(View.EDITOR);
+              const noteIdToBeOpened = ids[0];
+              history.push(`/editor/${noteIdToBeOpened}`);
             }}
           />
           <IconButton

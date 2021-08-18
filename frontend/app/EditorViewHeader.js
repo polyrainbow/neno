@@ -1,50 +1,20 @@
 import React from "react";
 import AppTitle from "./AppTitle.js";
 import AppStats from "./AppStats.js";
-import { shortenText } from "./lib/utils.js";
-import { ICON_PATH } from "./lib/config.js";
-
-const PinnedNote = ({
-  note,
-  isActive,
-  onClick,
-}) => {
-  return <div
-    style={{
-      padding: "0px 10px",
-      display: "flex",
-      alignItems: "center",
-      cursor: "pointer",
-    }}
-    className={"pinned-note " + (isActive ? "active" : "")}
-    onClick={onClick}
-  >
-    <img
-      src={ICON_PATH + "push_pin-24px.svg"}
-      alt={"Pinned note"}
-      width="24"
-      height="24"
-      className="svg-icon"
-      style={{
-        marginRight: "3px",
-      }}
-    />
-    <p
-      style={{
-        whiteSpace: "pre",
-      }}
-    >{shortenText(note.title, 35)}</p>
-  </div>;
-};
+import {
+  useHistory,
+} from "react-router-dom";
+import EditorViewHeaderPinnedNote from "./EditorViewHeaderPinnedNote.js";
 
 
 const EditorViewHeader = ({
   stats,
   toggleAppMenu,
   pinnedNotes,
-  loadNote,
   note,
 }) => {
+  const history = useHistory();
+
   return (
     <header>
       <AppTitle
@@ -63,10 +33,10 @@ const EditorViewHeader = ({
         {
           pinnedNotes.length > 0
             ? pinnedNotes.map((pinnedNote) => {
-              return <PinnedNote
-                key={"pinnedNote_" + pinnedNote.id}
+              return <EditorViewHeaderPinnedNote
+                key={`pinnedNote_${pinnedNote.id}`}
                 note={pinnedNote}
-                onClick={() => loadNote(pinnedNote.id)}
+                onClick={() => history.push(`/editor/${pinnedNote.id}`)}
                 isActive={pinnedNote.id === note.id}
               />;
             })

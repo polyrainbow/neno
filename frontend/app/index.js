@@ -2,6 +2,9 @@
 // bundles
 
 import "react-tippy/dist/tippy.css";
+import {
+  BrowserRouter as Router,
+} from "react-router-dom";
 
 Promise.all([
   import("react"),
@@ -16,5 +19,5 @@ Promise.all([
     ] = modules.map((module) => module.default);
 
     const appContainer = document.getElementById("app");
-    ReactDOM.render(<App />, appContainer);
+    ReactDOM.render(<Router><App /></Router>, appContainer);
   });
