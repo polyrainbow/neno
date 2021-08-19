@@ -6,7 +6,7 @@
 */
 
 module.exports = function(source) {
-  const newSource = source.replace(/^(.*)(\.js";)$/gm, "$1.ts\";");
+  const newSource = source.replace(/^(.*)(\.js";)$/gm, "$1\";");
   return newSource;
 };
 
