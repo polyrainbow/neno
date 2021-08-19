@@ -342,6 +342,7 @@ const EditorView = ({
     });
     setUnsavedChanges(false);
     refreshNotesList();
+    history.replace(`/editor/${noteFromServer.id}`);
   };
 
 
