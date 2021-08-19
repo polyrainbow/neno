@@ -40,7 +40,11 @@ const EditorViewHeader = ({
                 isActive={pinnedNote.id === note.id}
               />;
             })
-            : <p>Your pinned notes will appear here</p>
+            : <p
+              style={{
+                padding: "0px 10px",
+              }}
+            >Your pinned notes will appear here</p>
         }
       </div>
       <AppStats stats={stats} />

@@ -309,6 +309,7 @@ const EditorView = ({
     }
 
     await databaseProvider.deleteNote(activeNote.id);
+    refreshNotesList();
     history.push("/editor/new");
   };
 
