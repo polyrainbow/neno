@@ -137,7 +137,7 @@ export default class Graph {
         (node) => node.id === initialFocusNoteId,
       );
 
-      if (typeof note === "object") {
+      if (typeof node === "object") {
         const { width, height } = thisGraph.svg.node().getBoundingClientRect();
         const SCALE = 1.5;
         thisGraph.#screenPosition = {
