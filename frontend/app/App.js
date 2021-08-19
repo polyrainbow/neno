@@ -83,7 +83,10 @@ const App = () => {
       setServerDatabaseProvider(serverDatabaseProvider);
       if (await serverDatabaseProvider.hasAccessToken()) {
         setDatabaseMode("SERVER");
-        if (location.pathname.startsWith("/login")) {
+        if (
+          location.pathname.startsWith("/login")
+          || location.pathname === "/"
+        ) {
           history.push("/editor/new");
         }
         return;
