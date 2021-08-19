@@ -86,16 +86,16 @@ const GraphView = ({
           onChange,
           initialFocusNoteId: focusNoteId,
         });
-      } catch (e) {
-        // if credentials are invalid, go to LoginView. If not, throw.
-        if (e.message === "INVALID_CREDENTIALS") {
-          await databaseProvider.removeAccess();
-          setDatabaseMode("NONE");
-          history.push("/login");
-        } else {
-          throw new Error(e);
-        }
+    } catch (e) {
+      // if credentials are invalid, go to LoginView. If not, throw.
+      if (e.message === "INVALID_CREDENTIALS") {
+        await databaseProvider.removeAccess();
+        setDatabaseMode("NONE");
+        history.push("/login");
+      } else {
+        throw new Error(e);
       }
+    }
   }, [databaseProvider]);
 
   useEffect(() => {
