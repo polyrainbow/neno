@@ -10,7 +10,7 @@
     "@babel/preset-typescript": "^7.15.0",
     "@editorjs/attaches": "github:SebastianZimmer/attaches#ab6819fe43e7aedf274bd2d391921962f7557359",
     "@editorjs/code": "^2.7.0",
-    "@editorjs/editorjs": "2.19.1",
+    "@editorjs/editorjs": "2.22.2",
     "@editorjs/header": "^2.6.0",
     "@editorjs/image": "github:SebastianZimmer/image#421a176830dc9eea8759e09f16866aa959176843",
     "@editorjs/link": "github:SebastianZimmer/link#016b6eb007d70ef3d47bd6bf6b3769b22c5a82e3",
