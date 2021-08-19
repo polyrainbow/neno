@@ -135,6 +135,8 @@ const GraphView = ({
                   cancelText: "Cancel",
                   encourageConfirmation: false,
                 });
+
+                setUnsavedChanges(false);
               }
 
               const noteIdToBeOpened = ids[0];
