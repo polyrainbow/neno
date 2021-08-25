@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   useHistory,
 } from "react-router-dom";
+import { paths } from "./lib/config.js";
 
 const LoginViewServer = ({
   serverDatabaseProvider,
@@ -22,7 +23,7 @@ const LoginViewServer = ({
     serverDatabaseProvider.login(username, password, mfaToken)
       .then(() => {
         setDatabaseMode("SERVER");
-        history.push("/editor");
+        history.push(paths.editor);
       })
       .catch((e) => {
         const disclaimer = (e.message === "INVALID_CREDENTIALS")

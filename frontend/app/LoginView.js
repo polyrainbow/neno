@@ -4,6 +4,7 @@ import LoginViewServer from "./LoginViewServer.js";
 import {
   useHistory,
 } from "react-router-dom";
+import { paths } from "./lib/config.js";
 
 const LoginView = ({
   serverDatabaseProvider,
@@ -54,7 +55,7 @@ const LoginView = ({
                 try {
                   await localDatabaseProvider.initializeDatabase();
                   setDatabaseMode("LOCAL");
-                  history.push("/editor");
+                  history.push(paths.editor);
                 } catch (e) {
                   console.error(e);
 
@@ -82,7 +83,7 @@ const LoginView = ({
             const folderHandle = await window.showDirectoryPicker();
             await localDatabaseProvider.login(folderHandle);
             setDatabaseMode("LOCAL");
-            history.push("/editor");
+            history.push(paths.editor);
           } catch (e) {
             console.error(e);
           }

@@ -200,7 +200,7 @@ const EditorView = ({
     }
 
     if (isNaN(noteIdNumber)) {
-      history.replace("/editor/new");
+      history.replace(Config.paths.newNote);
       setActiveNote(Utils.getNewNoteObject());
     } else {
       try {
@@ -302,7 +302,7 @@ const EditorView = ({
 
 
   const createNewNote = () => {
-    history.push("/editor/new");
+    history.push(Config.paths.newNote);
   };
 
 
@@ -313,7 +313,7 @@ const EditorView = ({
 
     await databaseProvider.deleteNote(activeNote.id);
     refreshNotesList();
-    history.push("/editor/new");
+    history.push(Config.paths.newNote);
   };
 
 
@@ -483,7 +483,7 @@ const EditorView = ({
           openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
           duplicateNote={duplicateNote}
           openInGraphView={() => {
-            history.push(`/graph?focusNote=${activeNote.id}`);
+            history.push(`${Config.paths.graph}?focusNote=${activeNote.id}`);
           }}
         />
       </div>

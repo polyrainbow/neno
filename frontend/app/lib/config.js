@@ -63,6 +63,14 @@ const ICON_PATH = "/assets/icons/";
 
 const MAX_WIDTH_SMALL_SCREEN = 1200;
 
+const paths = {
+  editor: "/editor",
+  newNote: "/editor/new",
+  list: "/list",
+  graph: "/graph",
+  login: "/login",
+};
+
 export {
   DEFAULT_NOTE_TITLE,
   newEditorDataObject,
@@ -73,4 +81,5 @@ export {
   MAX_SESSION_AGE,
   ICON_PATH,
   MAX_WIDTH_SMALL_SCREEN,
+  paths,
 };

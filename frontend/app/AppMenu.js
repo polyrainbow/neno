@@ -38,8 +38,8 @@ const AppMenu = ({
       }
     >
       {
-        location.pathname.startsWith("/editor")
-        || location.pathname.startsWith("/list")
+        location.pathname.startsWith(Config.paths.editor)
+        || location.pathname.startsWith(Config.paths.list)
           ? <AppMenuItem
             label="Show graph"
             icon="scatter_plot"
@@ -54,13 +54,13 @@ const AppMenu = ({
               }
 
               setUnsavedChanges(false);
-              history.push("/graph");
+              history.push(Config.paths.graph);
             }}
           />
           : ""
       }
       {
-        location.pathname.startsWith("/graph")
+        location.pathname.startsWith(Config.paths.graph)
           ? <AppMenuItem
             label={isSmallScreen ? "Go to list" : "Go to editor"}
             icon={isSmallScreen ? "list" : "create"}
@@ -75,7 +75,9 @@ const AppMenu = ({
               }
 
               setUnsavedChanges(false);
-              history.push(isSmallScreen ? "/list" : "/editor");
+              history.push(
+                isSmallScreen ? Config.paths.list : Config.paths.editor,
+              );
             }}
           />
           : ""
@@ -96,9 +98,9 @@ const AppMenu = ({
       />
       {
         (
-          location.pathname.startsWith("/editor")
-          || location.pathname.startsWith("/graph")
-          || location.pathname.startsWith("/list")
+          location.pathname.startsWith(Config.paths.editor)
+          || location.pathname.startsWith(Config.paths.graph)
+          || location.pathname.startsWith(Config.paths.list)
         )
           ? <AppMenuItem
             id="button_logout"

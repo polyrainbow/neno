@@ -165,7 +165,7 @@ const ListView = ({
     }
 
     if (isNaN(noteIdNumber)) {
-      history.replace("/editor/new");
+      history.replace(Config.paths.newNote);
       setActiveNote(Utils.getNewNoteObject());
     } else {
       try {

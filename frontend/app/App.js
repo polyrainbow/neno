@@ -8,7 +8,7 @@ import AppMenu from "./AppMenu.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 import StatsDialog from "./StatsDialog.js";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
-import { API_URL, MAX_SESSION_AGE } from "./lib/config.js";
+import { API_URL, MAX_SESSION_AGE, paths } from "./lib/config.js";
 import {
   Route,
   useHistory,
@@ -88,10 +88,10 @@ const App = () => {
       if (await serverDatabaseProvider.hasAccessToken()) {
         setDatabaseMode("SERVER");
         if (
-          location.pathname.startsWith("/login")
+          location.pathname.startsWith(paths.login)
           || location.pathname === "/"
         ) {
-          history.push(isSmallScreen ? "/list" : "/editor/new");
+          history.push(isSmallScreen ? paths.list : paths.newNote);
         }
         return;
       }
@@ -125,7 +125,7 @@ const App = () => {
           : ""
       }
     </Route>
-    <Route path="/list">
+    <Route path={paths.list}>
       {
         databaseProvider
           ? <>
@@ -139,13 +139,13 @@ const App = () => {
             <FloatingActionButton
               title="New note"
               icon="note_add"
-              onClick={() => history.push("/editor/new")}
+              onClick={() => history.push(paths.newNote)}
             ></FloatingActionButton>
           </>
           : ""
       }
     </Route>
-    <Route path="/graph">
+    <Route path={paths.graph}>
       <GraphView
         unsavedChanges={unsavedChanges}
         setUnsavedChanges={setUnsavedChanges}

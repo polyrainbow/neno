@@ -4,6 +4,7 @@ import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import { useHistory } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
+import { paths } from "./lib/config.js";
 
 const NoteControls = ({
   activeNote,
@@ -28,7 +29,7 @@ const NoteControls = ({
             id="button_list"
             title="Go to list"
             icon="list"
-            onClick={() => history.push("/list")}
+            onClick={() => history.push(paths.list)}
           />
           : ""
       }
