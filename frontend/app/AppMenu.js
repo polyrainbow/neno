@@ -7,6 +7,7 @@ import {
   useHistory,
   useLocation,
 } from "react-router-dom";
+import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
 
 const AppMenu = ({
   openExportDatabaseDialog,
@@ -20,6 +21,7 @@ const AppMenu = ({
 
   const location = useLocation();
   const history = useHistory();
+  const isSmallScreen = useIsSmallScreen();
 
   return <OutsideAlerter
     onOutsideClick={onClose}
@@ -37,8 +39,9 @@ const AppMenu = ({
     >
       {
         location.pathname.startsWith("/editor")
+        || location.pathname.startsWith("/list")
           ? <AppMenuItem
-            label="Switch to Graph view"
+            label="Show graph"
             icon="scatter_plot"
             onClick={async () => {
               if (unsavedChanges) {
@@ -59,8 +62,8 @@ const AppMenu = ({
       {
         location.pathname.startsWith("/graph")
           ? <AppMenuItem
-            label="Switch to editor view"
-            icon="create"
+            label={isSmallScreen ? "Go to list" : "Go to editor"}
+            icon={isSmallScreen ? "list" : "create"}
             onClick={async () => {
               if (unsavedChanges) {
                 await confirm({
@@ -72,7 +75,7 @@ const AppMenu = ({
               }
 
               setUnsavedChanges(false);
-              history.push("/editor");
+              history.push(isSmallScreen ? "/list" : "/editor");
             }}
           />
           : ""
@@ -95,12 +98,22 @@ const AppMenu = ({
         (
           location.pathname.startsWith("/editor")
           || location.pathname.startsWith("/graph")
+          || location.pathname.startsWith("/list")
         )
           ? <AppMenuItem
             id="button_logout"
             label="Logout"
             icon="lock"
             onClick={async () => {
+              if (unsavedChanges) {
+                await confirm({
+                  text: Config.texts.discardChangesConfirmation,
+                  confirmText: "Discard changes",
+                  cancelText: "Cancel",
+                  encourageConfirmation: false,
+                });
+              }
+
               await databaseProvider.removeAccess();
               history.push("/login");
             }}
