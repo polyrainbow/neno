@@ -38,6 +38,8 @@ const getArguments = (version) => {
       "path to private key of TLS certificate",
       path.join(REPO_PATH, "..", "server.key"),
     )
+    // by default, we generate a new secret with each app start. this can be
+    // overridden with this option
     .option(
       '--jwt-secret <value>',
       "secret for signing JSON web tokens for authentication",
