@@ -240,6 +240,22 @@ main {
   vertical-align: middle;
 }
 
+.icon-button-floating {
+  display: block;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border: none;
+  cursor: pointer;
+  min-width: 50px;
+  padding: 18px;
+  background: var(--accent-color-2);
+  text-align: center;
+  border-radius: 100px;
+  width: 60px;
+  height: 60px;
+}
+
 button {
   border-radius: var(--border-radius);
   border: none;
