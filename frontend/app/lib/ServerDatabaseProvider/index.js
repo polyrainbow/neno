@@ -1,5 +1,4 @@
 import * as API from "./api.js";
-import * as tokenManager from "./tokenManager.js";
 
 export default class ServerDatabaseProvider {
   static features = [
@@ -10,37 +9,20 @@ export default class ServerDatabaseProvider {
 
   static type = "SERVER";
 
-  #MAX_SESSION_AGE = null;
-
-  constructor(API_URL, MAX_SESSION_AGE) {
-    this.#MAX_SESSION_AGE = MAX_SESSION_AGE;
+  constructor(API_URL) {
     API.setAPIUrl(API_URL);
   }
 
-  async hasAccessToken() {
-    return !!tokenManager.get().token;
-  }
-
-  getAuthToken() {
-    return tokenManager.get().token;
-  }
-
   async getDbId() {
-    return tokenManager.get().dbId;
+    // TODO
   }
 
-  async login(username, password, mfaToken) {
-    const response = await API.login(username, password, mfaToken);
-    tokenManager.set({
-      token: response.token,
-      dbId: response.dbId,
-      maxSessionAge: this.#MAX_SESSION_AGE,
-    });
-    return response;
+  login(username, password, mfaToken) {
+    return API.login(username, password, mfaToken);
   }
 
   async removeAccess() {
-    return tokenManager.remove();
+    // TODO
   }
 
   getNote(noteId) {

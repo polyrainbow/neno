@@ -8,7 +8,7 @@ import AppMenu from "./AppMenu.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 import StatsDialog from "./StatsDialog.js";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
-import { API_URL, MAX_SESSION_AGE, paths } from "./lib/config.js";
+import { API_URL, paths } from "./lib/config.js";
 import {
   Route,
   useHistory,
@@ -81,20 +81,18 @@ const App = () => {
 
       const serverDatabaseProvider = new ServerDatabaseProvider(
         API_URL,
-        MAX_SESSION_AGE,
       );
 
       setServerDatabaseProvider(serverDatabaseProvider);
-      if (await serverDatabaseProvider.hasAccessToken()) {
-        setDatabaseMode("SERVER");
-        if (
-          location.pathname.startsWith(paths.login)
-          || location.pathname === "/"
-        ) {
-          history.push(isSmallScreen ? paths.list : paths.newNote);
-        }
-        return;
+
+      setDatabaseMode("SERVER");
+      if (
+        location.pathname.startsWith(paths.login)
+        || location.pathname === "/"
+      ) {
+        history.push(isSmallScreen ? paths.list : paths.newNote);
       }
+      return;
     }
 
     history.push("/login");

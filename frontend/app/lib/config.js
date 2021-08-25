@@ -56,9 +56,6 @@ const emojis = {
   "hub": "🐙",
 };
 
-// session token expire time in seconds
-const MAX_SESSION_AGE = 60 * 60 * 24 * 30; // 30 days
-
 const ICON_PATH = "/assets/icons/";
 
 const MAX_WIDTH_SMALL_SCREEN = 1200;
@@ -78,7 +75,6 @@ export {
   texts,
   MINIMUM_SEARCH_QUERY_LENGTH,
   emojis,
-  MAX_SESSION_AGE,
   ICON_PATH,
   MAX_WIDTH_SMALL_SCREEN,
   paths,

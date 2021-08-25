@@ -1,5 +1,3 @@
-import * as tokenManager from "./tokenManager.js";
-
 let API_URL;
 
 const setAPIUrl = (_API_URL) => {
@@ -16,9 +14,7 @@ const callAPI = async ({
 }) => {
   const fetchOptions = {
     method,
-    headers: {
-      "authorization": "Bearer " + tokenManager.get().token,
-    },
+    headers: {},
   };
 
   // do NOT set content-type header if content is form data

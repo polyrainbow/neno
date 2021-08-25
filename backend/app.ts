@@ -36,11 +36,11 @@ const startApp = async ({
   await Notes.init(storageProvider, getUrlMetadata);
   const app = express();
 
-  const mapAuthCookieToHeader = (function(req, res, next) {
+
+  const verifyJWT = (req, res, next) => {
     if(
       req.cookies
       && req.headers
-      && !Object.prototype.hasOwnProperty.call(req.headers, 'authorization')
       && Object.prototype.hasOwnProperty.call(
         req.cookies,
         config.TOKEN_COOKIE_NAME,
@@ -50,42 +50,28 @@ const startApp = async ({
       // req.cookies has no hasOwnProperty function,
       // likely created with Object.create(null)
 
-      const cookieValue = req.cookies[config.TOKEN_COOKIE_NAME];
-      req.headers.authorization
-        = 'Bearer ' + cookieValue.slice(
-          0, cookieValue.length,
-        );
-    }
-    next();
-  });
+      const token = req.cookies[config.TOKEN_COOKIE_NAME];
 
+      jwt.verify(token, jwtSecret, (err, jwtPayload) => {
+        if (err) {
+          const response:APIResponse = {
+            success: false,
+            error: APIError.INVALID_CREDENTIALS,
+          };
+          return res.status(403).json(response);
+        }
+  
+        req.userId = jwtPayload.userId;
+        return next();
+      });
 
-  const verifyJWT = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
+    } else {
       const response:APIResponse = {
         success: false,
         error: APIError.INVALID_CREDENTIALS,
       };
       return res.status(401).json(response);
     }
-
-    const token = authHeader.split(' ')[1];
-
-    jwt.verify(token, jwtSecret, (err, jwtPayload) => {
-      if (err) {
-        const response:APIResponse = {
-          success: false,
-          error: APIError.INVALID_CREDENTIALS,
-        };
-        return res.status(403).json(response);
-      }
-
-      req.userId = jwtPayload.userId;
-      return next();
-    });
-
   };
 
   app.use("/", express.static(frontendPath));
@@ -493,7 +479,6 @@ const startApp = async ({
     // name with a url like
     // /api/file/ae62787f-4344-4124-8026-3839543fde70.png/my-pic.png
     config.API_PATH + "file/:fileId/:publicName*?",
-    mapAuthCookieToHeader, // some files are requested via <img src=""> tag
     verifyJWT,
     async function(req, res) {
       try {
@@ -746,18 +731,27 @@ const startApp = async ({
           userId: user.id,
         },
         jwtSecret,
-        { expiresIn: config.MAX_SESSION_AGE.toString() + 'd' }
+        { expiresIn: config.MAX_SESSION_AGE_DAYS.toString() + 'd' }
       );
 
       const response:APIResponse = {
         success: true,
         payload: {
-          token: accessToken,
           dbId: user.id,
         },
       };
 
-      return res.status(200).json(response);
+      return res
+        .status(200)
+        .cookie(
+          config.TOKEN_COOKIE_NAME,
+          accessToken,
+          {
+            maxAge: config.MAX_SESSION_AGE_DAYS * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+          }
+        )
+        .json(response);
     },
   );
 
