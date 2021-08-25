@@ -59,7 +59,6 @@
   --nli-color-unlinked: var(--accent-color-1-light);
   --buton-background-color: var(--accent-color-interactible);
   --input-element-border-color: var(--main-content-color);
-  --separator-color: var(--main-content-color);
   --button-background-color-active: var(--accent-color-1);
 
   --table-row-background-color-odd: var(--background-color);
@@ -556,10 +555,6 @@ button[disabled]{
 
   #right-view{
     grid-area: 1 / 1 / 2 / 2;
-  }
-
-  #note{
-    border-bottom: 15px solid var(--separator-color);
   }
 }
 
