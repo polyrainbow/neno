@@ -2,6 +2,8 @@ import React from "react";
 import IconButton from "./IconButton.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
+import { useHistory } from "react-router-dom";
+import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
 
 const NoteControls = ({
   activeNote,
@@ -15,15 +17,31 @@ const NoteControls = ({
   openInGraphView,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext);
+  const history = useHistory();
+  const isSmallScreen = useIsSmallScreen();
 
   return <section id="note-controls">
     <div id="note-controls-left">
-      <IconButton
-        id="button_new"
-        title="New note"
-        icon="note_add"
-        onClick={createNewNote}
-      />
+      {
+        isSmallScreen
+          ? <IconButton
+            id="button_list"
+            title="Go to list"
+            icon="list"
+            onClick={() => history.push("/list")}
+          />
+          : ""
+      }
+      {
+        !isSmallScreen
+          ? <IconButton
+            id="button_new"
+            title="New note"
+            icon="note_add"
+            onClick={createNewNote}
+          />
+          : ""
+      }
       <IconButton
         id="button_upload"
         title="Save note"

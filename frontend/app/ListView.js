@@ -5,26 +5,20 @@ import { v4 as uuidv4 } from "uuid";
 import EditorViewHeader from "./EditorViewHeader.js";
 import NoteList from "./NoteList.js";
 import NoteListControls from "./NoteListControls.js";
-import Note from "./Note.js";
 import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
-import ImportLinksDialog from "./ImportLinksDialog.js";
 import {
   useHistory,
-  useParams,
 } from "react-router-dom";
-import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
 
 
-const EditorView = ({
+const ListView = ({
   databaseProvider,
   unsavedChanges,
   setUnsavedChanges,
   toggleAppMenu,
-  setOpenDialog,
-  openDialog,
   setDatabaseMode,
 }) => {
   const currentRequestId = useRef(null);
@@ -39,10 +33,7 @@ const EditorView = ({
   const [searchValue, setSearchValue] = useState("");
   const [pinnedNotes, setPinnedNotes] = useState([]);
 
-  const isSmallScreen = useIsSmallScreen();
-
   const history = useHistory();
-  const { activeNoteId } = useParams();
   const confirm = React.useContext(ConfirmationServiceContext);
 
   const displayedLinkedNotes = useMemo(() => [
@@ -121,32 +112,6 @@ const EditorView = ({
     });
 
     setUnsavedChanges(true);
-  };
-
-
-  const duplicateNote = async () => {
-    if (activeNote.isUnsaved) return;
-
-    const noteToTransmit = {
-      id: null,
-      editorData: activeNote.editorData,
-      changes: activeNote.linkedNotes.map((linkedNote) => {
-        return {
-          type: "LINKED_NOTE_ADDED",
-          noteId: linkedNote.id,
-        };
-      }),
-    };
-    const noteFromServer = await databaseProvider.putNote(
-      noteToTransmit, { ignoreDuplicateTitles: true },
-    );
-    setActiveNote({
-      ...noteFromServer,
-      isUnsaved: false,
-      changes: [],
-    });
-    setUnsavedChanges(false);
-    refreshNotesList();
   };
 
 
@@ -297,24 +262,7 @@ const EditorView = ({
         }
       }
     },
-    [searchValue, page, sortMode, databaseProvider, activeNoteId],
   );
-
-
-  const createNewNote = () => {
-    history.push("/editor/new");
-  };
-
-
-  const removeActiveNote = async () => {
-    if (activeNote.isUnsaved) {
-      return;
-    }
-
-    await databaseProvider.deleteNote(activeNote.id);
-    refreshNotesList();
-    history.push("/editor/new");
-  };
 
 
   const prepareNoteToTransmit = async () => {
@@ -388,11 +336,6 @@ const EditorView = ({
   }, [handleKeydown]);
 
 
-  useEffect(async () => {
-    loadNote(activeNoteId);
-  }, [activeNoteId]);
-
-
   const pinOrUnpinNote = async () => {
     let newPinnedNotes;
     if (pinnedNotes.find((pinnedNote) => pinnedNote.id === activeNote.id)) {
@@ -402,13 +345,6 @@ const EditorView = ({
     }
 
     setPinnedNotes(newPinnedNotes);
-  };
-
-
-  const importLinksAsNotes = async (links) => {
-    await databaseProvider.importLinksAsNotes(links);
-    setOpenDialog(null);
-    refreshNotesList();
   };
 
 
@@ -424,79 +360,43 @@ const EditorView = ({
       pinnedNotes={pinnedNotes}
       note={activeNote}
     />
-    <main>
-      {
-        !isSmallScreen
-          ? <div id="left-view">
-            <NoteListControls
-              onChange={handleSearchInputChange}
-              value={searchValue}
-              displayedNotes={noteListItems}
-              stats={stats}
-              sortMode={sortMode}
-              setSortMode={(sortMode) => {
-                setNoteListScrollTop(0);
-                setSortMode(sortMode);
-                setPage(1);
-              }}
-              showNotesWithDuplicateURLs={() => handleSearchInputChange(
-                "special:DUPLICATE_URLS",
-              )}
-            />
-            <NoteList
-              notes={noteListItems}
-              numberOfResults={numberOfResults}
-              loadNote={loadNote}
-              activeNote={activeNote}
-              displayedLinkedNotes={displayedLinkedNotes}
-              onLinkAddition={handleLinkAddition}
-              onLinkRemoval={handleLinkRemoval}
-              isBusy={isBusy}
-              searchValue={searchValue}
-              scrollTop={noteListScrollTop}
-              setScrollTop={setNoteListScrollTop}
-              sortMode={sortMode}
-              page={page}
-              setPage={(page) => {
-                setPage(page);
-                setNoteListScrollTop(0);
-              }}
-              stats={stats}
-              pinOrUnpinNote={pinOrUnpinNote}
-            />
-          </div>
-          : ""
-      }
-      <div id="right-view">
-        <Note
-          note={activeNote}
-          loadNote={loadNote}
-          onLinkRemoval={handleLinkRemoval}
-          displayedLinkedNotes={displayedLinkedNotes}
-          setUnsavedChanges={setUnsavedChanges}
-          databaseProvider={databaseProvider}
-          createNewNote={createNewNote}
-          handleNoteSaveRequest={handleNoteSaveRequest}
-          removeActiveNote={removeActiveNote}
-          unsavedChanges={unsavedChanges}
-          pinOrUnpinNote={pinOrUnpinNote}
-          openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
-          duplicateNote={duplicateNote}
-          openInGraphView={() => {
-            history.push(`/graph?focusNote=${activeNote.id}`);
-          }}
-        />
-      </div>
-    </main>
-    {
-      openDialog === "IMPORT_LINKS"
-        ? <ImportLinksDialog
-          importLinksAsNotes={importLinksAsNotes}
-          onCancel={() => setOpenDialog(null)}
-        />
-        : null
-    }
+    <NoteListControls
+      onChange={handleSearchInputChange}
+      value={searchValue}
+      displayedNotes={noteListItems}
+      stats={stats}
+      sortMode={sortMode}
+      setSortMode={(sortMode) => {
+        setNoteListScrollTop(0);
+        setSortMode(sortMode);
+        setPage(1);
+      }}
+      showNotesWithDuplicateURLs={() => handleSearchInputChange(
+        "special:DUPLICATE_URLS",
+      )}
+    />
+    <NoteList
+      notes={noteListItems}
+      numberOfResults={numberOfResults}
+      loadNote={loadNote}
+      activeNote={activeNote}
+      displayedLinkedNotes={displayedLinkedNotes}
+      onLinkAddition={handleLinkAddition}
+      onLinkRemoval={handleLinkRemoval}
+      isBusy={isBusy}
+      searchValue={searchValue}
+      scrollTop={noteListScrollTop}
+      setScrollTop={setNoteListScrollTop}
+      sortMode={sortMode}
+      page={page}
+      setPage={(page) => {
+        setPage(page);
+        setNoteListScrollTop(0);
+      }}
+      stats={stats}
+      pinOrUnpinNote={pinOrUnpinNote}
+    />
   </>;
 };
 
-export default EditorView;
+export default ListView;

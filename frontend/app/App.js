@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import EditorView from "./EditorView.js";
+import ListView from "./ListView.js";
 import GraphView from "./GraphView.js";
 import LoginView from "./LoginView.js";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
@@ -12,6 +13,8 @@ import {
   Route,
   useHistory,
 } from "react-router-dom";
+import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
+import FloatingActionButton from "./FloatingActionButton.js";
 
 
 const App = () => {
@@ -21,6 +24,7 @@ const App = () => {
   const [databaseMode, setDatabaseMode] = useState("NONE");
 
   const history = useHistory();
+  const isSmallScreen = useIsSmallScreen();
 
   const beforeUnload = function(e) {
     if (unsavedChanges) {
@@ -87,7 +91,7 @@ const App = () => {
           location.pathname.startsWith("/login")
           || location.pathname === "/"
         ) {
-          history.push("/editor/new");
+          history.push(isSmallScreen ? "/list" : "/editor/new");
         }
         return;
       }
@@ -118,6 +122,26 @@ const App = () => {
             openDialog={openDialog}
             setDatabaseMode={setDatabaseMode}
           />
+          : ""
+      }
+    </Route>
+    <Route path="/list">
+      {
+        databaseProvider
+          ? <>
+            <ListView
+              databaseProvider={databaseProvider}
+              toggleAppMenu={toggleAppMenu}
+              setOpenDialog={setOpenDialog}
+              openDialog={openDialog}
+              setDatabaseMode={setDatabaseMode}
+            />
+            <FloatingActionButton
+              title="New note"
+              icon="note_add"
+              onClick={() => history.push("/editor/new")}
+            ></FloatingActionButton>
+          </>
           : ""
       }
     </Route>
