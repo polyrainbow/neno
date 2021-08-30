@@ -70,6 +70,14 @@ const login = (username, password, mfaToken) => {
 };
 
 
+const logout = () => {
+  return callAPIAndGetJSONPayload({
+    method: "POST",
+    endpoint: "logout",
+  });
+};
+
+
 const getNote = (noteId) => {
   return callAPIAndGetJSONPayload({
     endpoint: "note/" + noteId,
@@ -226,6 +234,7 @@ const getPins = () => {
 export {
   setAPIUrl,
   login,
+  logout,
   getNote,
   getNotes,
   putNote,

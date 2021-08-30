@@ -27,7 +27,16 @@ export default class ServerDatabaseProvider {
 
   async removeAccess() {
     this.#dbId = null;
-    // TODO
+
+    // we try to logout from the server but if the server fails to do this and
+    // throws an INVALID_CREDENTIALS error, we assume we are already logged out
+    try {
+      await API.logout();
+    } catch (e) {
+      if (e.message !== "INVALID_CREDENTIALS") {
+        throw new Error(e);
+      }
+    }
   }
 
   getNote(noteId) {

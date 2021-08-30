@@ -24,6 +24,8 @@ import twofactor from "node-2fa";
 import fallback from "express-history-api-fallback";
 import * as path from "path";
 
+const outdatedTokens:string[] = [];
+
 const startApp = async ({
   users,
   dataPath,
@@ -52,6 +54,14 @@ const startApp = async ({
 
       const token = req.cookies[config.TOKEN_COOKIE_NAME];
 
+      if (outdatedTokens.includes(token)){
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_CREDENTIALS,
+        };
+        return res.status(403).json(response);
+      }
+
       jwt.verify(token, jwtSecret, (err, jwtPayload) => {
         if (err) {
           const response:APIResponse = {
@@ -62,6 +72,7 @@ const startApp = async ({
         }
   
         req.userId = jwtPayload.userId;
+        req.token = token;
         return next();
       });
 
@@ -645,6 +656,26 @@ const startApp = async ({
         success: true,
       };
       res.json(response);
+    },
+  );
+
+  app.post(
+    config.API_PATH + "logout",
+    verifyJWT,
+    express.json(),
+    async function(req, res) {
+      const response:APIResponse = {
+        success: true,
+      };
+
+      outdatedTokens.push(req.token);
+
+      return res
+        .status(200)
+        .clearCookie(
+          config.TOKEN_COOKIE_NAME,
+        )
+        .json(response);
     },
   );
 
