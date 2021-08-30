@@ -9,19 +9,24 @@ export default class ServerDatabaseProvider {
 
   static type = "SERVER";
 
+  #dbId = null;
+
   constructor(API_URL) {
     API.setAPIUrl(API_URL);
   }
 
   async getDbId() {
-    // TODO
+    return this.#dbId;
   }
 
-  login(username, password, mfaToken) {
-    return API.login(username, password, mfaToken);
+  async login(username, password, mfaToken) {
+    const response = await API.login(username, password, mfaToken);
+    this.#dbId = response.dbId;
+    return response;
   }
 
   async removeAccess() {
+    this.#dbId = null;
     // TODO
   }
 
