@@ -277,6 +277,7 @@ const getStats = async (
       }, 0),
       dbCreationTime: db.creationTime,
       dbUpdateTime: db.updateTime,
+      dbId: db.id,
     }
   }
 

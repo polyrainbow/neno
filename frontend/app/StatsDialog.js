@@ -15,7 +15,6 @@ const StatsDialog = ({
 
   useEffect(async () => {
     const stats = await databaseProvider.getStats(true);
-    stats.dbId = await databaseProvider.getDbId();
     setStats(stats);
     setStatus("READY");
   }, []);

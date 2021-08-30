@@ -9,4 +9,5 @@ export default interface StatsExhaustive extends Stats{
     readonly maxNumberOfLinksOnANode: number,
     readonly dbCreationTime: number,
     readonly dbUpdateTime: number,
+    readonly dbId: string,
 }
