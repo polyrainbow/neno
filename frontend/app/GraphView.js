@@ -17,7 +17,7 @@ const GraphView = ({
   unsavedChanges,
   setUnsavedChanges,
   toggleAppMenu,
-  setDatabaseMode,
+  handleInvalidCredentialsError,
 }) => {
   const DEFAULT_STATUS = "";
   const mainElement = useRef(null);
@@ -89,9 +89,7 @@ const GraphView = ({
     } catch (e) {
       // if credentials are invalid, go to LoginView. If not, throw.
       if (e.message === "INVALID_CREDENTIALS") {
-        await databaseProvider.removeAccess();
-        setDatabaseMode("NONE");
-        history.push("/login");
+        await handleInvalidCredentialsError();
       } else {
         throw new Error(e);
       }

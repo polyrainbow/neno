@@ -25,7 +25,7 @@ const EditorView = ({
   toggleAppMenu,
   setOpenDialog,
   openDialog,
-  setDatabaseMode,
+  handleInvalidCredentialsError,
 }) => {
   const currentRequestId = useRef(null);
   const [noteListItems, setNoteListItems] = useState([]);
@@ -213,9 +213,7 @@ const EditorView = ({
       } catch (e) {
         // if credentials are invalid, go to LoginView. If not, throw.
         if (e.message === "INVALID_CREDENTIALS") {
-          await databaseProvider.removeAccess();
-          setDatabaseMode("NONE");
-          history.push("/login");
+          await handleInvalidCredentialsError();
         } else {
           throw new Error(e);
         }
@@ -289,9 +287,7 @@ const EditorView = ({
       } catch (e) {
         // if credentials are invalid, go to LoginView. If not, throw.
         if (e.message === "INVALID_CREDENTIALS") {
-          await databaseProvider.removeAccess();
-          setDatabaseMode("NONE");
-          history.push("/login");
+          await handleInvalidCredentialsError();
         } else {
           throw new Error(e);
         }

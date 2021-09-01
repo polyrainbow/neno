@@ -99,6 +99,13 @@ const App = () => {
   }, []);
 
 
+  const handleInvalidCredentialsError = async () => {
+    await databaseProvider.removeAccess();
+    setDatabaseMode("NONE");
+    history.push("/login");
+  };
+
+
   return <ConfirmationServiceProvider>
     <Route path="/login">
       <LoginView
@@ -118,7 +125,7 @@ const App = () => {
             toggleAppMenu={toggleAppMenu}
             setOpenDialog={setOpenDialog}
             openDialog={openDialog}
-            setDatabaseMode={setDatabaseMode}
+            handleInvalidCredentialsError={handleInvalidCredentialsError}
           />
           : ""
       }
@@ -132,7 +139,7 @@ const App = () => {
               toggleAppMenu={toggleAppMenu}
               setOpenDialog={setOpenDialog}
               openDialog={openDialog}
-              setDatabaseMode={setDatabaseMode}
+              handleInvalidCredentialsError={handleInvalidCredentialsError}
             />
             <FloatingActionButton
               title="New note"
@@ -149,7 +156,7 @@ const App = () => {
         setUnsavedChanges={setUnsavedChanges}
         databaseProvider={databaseProvider}
         toggleAppMenu={toggleAppMenu}
-        setDatabaseMode={setDatabaseMode}
+        handleInvalidCredentialsError={handleInvalidCredentialsError}
       />
     </Route>
     {
