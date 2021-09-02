@@ -43,6 +43,10 @@ const StatsDialog = ({
                 <td>{stats.dbId}</td>
               </tr>
               <tr>
+                <td>Database type</td>
+                <td>{databaseProvider.constructor.type}</td>
+              </tr>
+              <tr>
                 <td>Database creation time</td>
                 <td>{makeTimestampHumanReadable(stats.dbCreationTime)}</td>
               </tr>
