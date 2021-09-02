@@ -66,4 +66,7 @@ export default {
   watchOptions: {
     ignored: /node_modules/,
   },
+  experiments: {
+    topLevelAwait: true,
+  },
 };

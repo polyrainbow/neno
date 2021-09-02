@@ -80,12 +80,14 @@
     "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
     "build-frontend-production-local-only": "npx webpack --config frontend/webpack.production.local-only.js",
     "build-frontend-development": "npx webpack --config frontend/webpack.development.js",
+    "build-frontend-development-local-only": "npx webpack --config frontend/webpack.development.local-only.js",
     "build": "npm run compile-typescript && npm run build-frontend-production",
     "start-dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
     "start-dev-server-frontend-local-only": "npx webpack serve --config frontend/webpack.development.local-only.js",
     "start": "npm run build && npm run start-server-dev",
     "start-tls": "npm run build && npm run start-server-dev-tls",
-    "dev": "concurrently --kill-others \"npm run compile-typescript && npm run start-server-dev\" \"npm run build-frontend-development\""
+    "dev": "concurrently --kill-others \"npm run compile-typescript && npm run start-server-dev\" \"npm run build-frontend-development\"",
+    "dev-local-only": "concurrently --kill-others \"npm run compile-typescript && npm run start-server-dev\" \"npm run build-frontend-development-local-only\""
   },
   "author": "Sebastian Zimmer",
   "license": "ISC"

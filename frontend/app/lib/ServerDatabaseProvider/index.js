@@ -25,6 +25,16 @@ export default class ServerDatabaseProvider {
     return response;
   }
 
+  async isAuthenticated() {
+    try {
+      const response = await API.isAuthenticated();
+      this.#dbId = response.dbId;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   async removeAccess() {
     this.#dbId = null;
 

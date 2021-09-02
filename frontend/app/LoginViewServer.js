@@ -3,6 +3,7 @@ import {
   useHistory,
 } from "react-router-dom";
 import { paths } from "./lib/config.js";
+import DatabaseModes from "./enum/DatabaseModes.js";
 
 const LoginViewServer = ({
   serverDatabaseProvider,
@@ -22,7 +23,7 @@ const LoginViewServer = ({
     setIsBusy(true);
     serverDatabaseProvider.login(username, password, mfaToken)
       .then(() => {
-        setDatabaseMode("SERVER");
+        setDatabaseMode(DatabaseModes.SERVER);
         history.push(paths.editor);
       })
       .catch((e) => {
@@ -34,7 +35,7 @@ const LoginViewServer = ({
       });
   };
 
-  if (serverDatabaseProvider === "NOT_SUPPORTED") {
+  if (!serverDatabaseProvider) {
     return <>
       <h1>Server database</h1>
       <p>

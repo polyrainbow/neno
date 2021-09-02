@@ -3,6 +3,7 @@ import {
   useHistory,
 } from "react-router-dom";
 import { paths } from "./lib/config.js";
+import DatabaseModes from "./enum/DatabaseModes.js";
 
 const LoginViewLocal = ({
   localDatabaseProvider,
@@ -45,7 +46,7 @@ const LoginViewLocal = ({
             onClick={async () => {
               try {
                 await localDatabaseProvider.initializeDatabase();
-                setDatabaseMode("LOCAL");
+                setDatabaseMode(DatabaseModes.LOCAL);
                 history.push(paths.editor);
               } catch (e) {
                 console.error(e);
@@ -73,7 +74,7 @@ const LoginViewLocal = ({
         try {
           const folderHandle = await window.showDirectoryPicker();
           await localDatabaseProvider.login(folderHandle);
-          setDatabaseMode("LOCAL");
+          setDatabaseMode(DatabaseModes.LOCAL);
           history.push(paths.editor);
         } catch (e) {
           console.error(e);

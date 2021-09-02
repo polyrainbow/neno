@@ -78,6 +78,13 @@ const logout = () => {
 };
 
 
+const isAuthenticated = () => {
+  return callAPIAndGetJSONPayload({
+    endpoint: "authenticated",
+  });
+};
+
+
 const getNote = (noteId) => {
   return callAPIAndGetJSONPayload({
     endpoint: "note/" + noteId,
@@ -235,6 +242,7 @@ export {
   setAPIUrl,
   login,
   logout,
+  isAuthenticated,
   getNote,
   getNotes,
   putNote,

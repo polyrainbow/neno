@@ -98,6 +98,20 @@ const startApp = async ({
     Endpoints with authentication required
   *****************/
 
+  app.get(
+    config.API_PATH + "authenticated",
+    verifyJWT,
+    async function(req, res) {
+      const response:APIResponse = {
+        success: true,
+        payload: {
+          dbId: req.userId,
+        },
+      };
+      res.json(response);
+    },
+  );
+
 
   app.get(
     config.API_PATH + "database",

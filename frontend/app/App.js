@@ -7,21 +7,24 @@ import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
 import AppMenu from "./AppMenu.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
 import StatsDialog from "./StatsDialog.js";
-import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
-import { API_URL, paths } from "./lib/config.js";
+import { paths } from "./lib/config.js";
 import {
   Route,
   useHistory,
 } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
 import FloatingActionButton from "./FloatingActionButton.js";
+import DatabaseModes from "./enum/DatabaseModes.js";
 
 
-const App = () => {
+const App = ({
+  localDatabaseProvider,
+  serverDatabaseProvider,
+}) => {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(null);
-  const [databaseMode, setDatabaseMode] = useState("NONE");
+  const [databaseMode, setDatabaseMode] = useState(DatabaseModes.NONE);
 
   const history = useHistory();
   const isSmallScreen = useIsSmallScreen();
@@ -55,54 +58,34 @@ const App = () => {
     setIsAppMenuOpen(!isAppMenuOpen);
   };
 
-  const [serverDatabaseProvider, setServerDatabaseProvider] = useState(null);
-  const [localDatabaseProvider, setLocalDatabaseProvider] = useState(null);
 
-  const databaseProvider = databaseMode === "LOCAL"
+  const databaseProvider = databaseMode === DatabaseModes.LOCAL
     ? localDatabaseProvider
     : (
-      databaseMode === "SERVER"
+      databaseMode === DatabaseModes.SERVER
         ? serverDatabaseProvider
         : null
     );
 
   useEffect(async () => {
-    // LocalDatabaseProvider must be initialized before we check and go for the
-    // server database so in case we log out from server, we have a
-    // functioning LocalDatabaseProvider instance
-    setLocalDatabaseProvider(new LocalDatabaseProvider());
-
-    // ENABLE_SERVER_DATABASE defined via webpack.DefinePlugin
-    // eslint-disable-next-line no-undef
-    if (ENABLE_SERVER_DATABASE) {
-      const ServerDatabaseProvider = (await import(
-        "./lib/ServerDatabaseProvider/index.js"
-      )).default;
-
-      const serverDatabaseProvider = new ServerDatabaseProvider(
-        API_URL,
-      );
-
-      setServerDatabaseProvider(serverDatabaseProvider);
-
-      setDatabaseMode("SERVER");
+    if (await serverDatabaseProvider?.isAuthenticated()) {
+      setDatabaseMode(DatabaseModes.SERVER);
       if (
         location.pathname.startsWith(paths.login)
         || location.pathname === "/"
       ) {
         history.push(isSmallScreen ? paths.list : paths.newNote);
       }
-      return;
+    } else {
+      history.push(paths.login);
     }
-
-    history.push("/login");
   }, []);
 
 
   const handleInvalidCredentialsError = async () => {
     await databaseProvider.removeAccess();
-    setDatabaseMode("NONE");
-    history.push("/login");
+    setDatabaseMode(DatabaseModes.NONE);
+    history.push(paths.login);
   };
 
 
