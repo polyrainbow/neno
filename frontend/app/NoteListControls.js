@@ -37,12 +37,6 @@ const NoteListControls = ({
         alignItems: "center",
       }}
     >
-      <label
-        htmlFor="sortModeSelect"
-        style={{
-          margin: "0px 5px",
-        }}
-      >Sort by</label>
       <select
         id="sortModeSelect"
         value={sortMode}
