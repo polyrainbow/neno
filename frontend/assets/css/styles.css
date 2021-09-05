@@ -253,7 +253,7 @@ main {
   border-radius: 100px;
   width: 60px;
   height: 60px;
-  box-shadow: 2px 12px 0px #000000;
+  box-shadow: 5px 5px 25px #000000;
 }
 
 button {
