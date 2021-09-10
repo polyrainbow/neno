@@ -28,7 +28,7 @@ const app = await startApp({
   users,
   dataPath: programArguments.dataFolderPath,
   frontendPath: path.join(REPO_PATH, "frontend"),
-  jwtSecret: programArguments.jwtSecret,
+  sessionSecret: programArguments.sessionSecret,
 });
 
 

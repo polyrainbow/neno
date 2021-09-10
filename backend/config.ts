@@ -15,12 +15,12 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REPO_PATH = path.join(__dirname, "..", "..");
 
 // the name of the cookie in which the auth token is stored
-const TOKEN_COOKIE_NAME = "NENO_token";
+const SESSION_COOKIE_NAME = "NENO_token";
 
 export {
   API_PATH,
   MAX_SESSION_AGE_DAYS,
   MAX_UPLOAD_FILE_SIZE,
   REPO_PATH,
-  TOKEN_COOKIE_NAME,
+  SESSION_COOKIE_NAME,
 }

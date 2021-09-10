@@ -8,7 +8,6 @@ import compression from "compression";
 import express from "express";
 import * as Notes from "../lib/notes/index.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
 import { File } from "./interfaces/File.js";
@@ -23,14 +22,13 @@ import getUrlMetadata from "./lib/getUrlMetadata.js";
 import twofactor from "node-2fa";
 import fallback from "express-history-api-fallback";
 import * as path from "path";
-
-const outdatedTokens:string[] = [];
+import session from "express-session";
 
 const startApp = async ({
   users,
   dataPath,
   frontendPath,
-  jwtSecret,
+  sessionSecret,
 }:AppStartOptions):Promise<Express.Application> => {
   const storageProvider = new FileSystemStorageProvider(dataPath);
   console.log("File system storage ready at " + dataPath);
@@ -38,44 +36,26 @@ const startApp = async ({
   await Notes.init(storageProvider, getUrlMetadata);
   const app = express();
 
+  const sessionMiddleware = session({
+    secret: sessionSecret,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: config.MAX_SESSION_AGE_DAYS * 24 * 60 * 60 * 1000, // days to ms
+      path: '/',
+      httpOnly: true,
+      secure: "auto",
+    },
+    resave: false,
+    name: config.SESSION_COOKIE_NAME,
+    unset: "keep",
+  });
 
-  const verifyJWT = (req, res, next) => {
-    if(
-      req.cookies
-      && req.headers
-      && Object.prototype.hasOwnProperty.call(
-        req.cookies,
-        config.TOKEN_COOKIE_NAME,
-      )
-      && req.cookies[config.TOKEN_COOKIE_NAME].length > 0
-     ) {
-      // req.cookies has no hasOwnProperty function,
-      // likely created with Object.create(null)
 
-      const token = req.cookies[config.TOKEN_COOKIE_NAME];
-
-      if (outdatedTokens.includes(token)){
-        const response:APIResponse = {
-          success: false,
-          error: APIError.INVALID_CREDENTIALS,
-        };
-        return res.status(403).json(response);
-      }
-
-      jwt.verify(token, jwtSecret, (err, jwtPayload) => {
-        if (err) {
-          const response:APIResponse = {
-            success: false,
-            error: APIError.INVALID_CREDENTIALS,
-          };
-          return res.status(403).json(response);
-        }
-  
-        req.userId = jwtPayload.userId;
-        req.token = token;
-        return next();
-      });
-
+  const verifySession = (req, res, next) => {
+    if (req.session.userId) {
+      // make the user id available in the req object for easier access
+      req.userId = req.session.userId;
+      next();
     } else {
       const response:APIResponse = {
         success: false,
@@ -100,7 +80,8 @@ const startApp = async ({
 
   app.get(
     config.API_PATH + "authenticated",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       const response:APIResponse = {
         success: true,
@@ -115,7 +96,8 @@ const startApp = async ({
 
   app.get(
     config.API_PATH + "database",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       const withUploads = req.query.withUploads === "true";
 
@@ -139,7 +121,8 @@ const startApp = async ({
 
   app.put(
     config.API_PATH + "database",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json(),
     function(req, res) {
       const response:APIResponse = {
@@ -162,7 +145,8 @@ const startApp = async ({
 
   app.get(
     config.API_PATH + "graph",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       const graph = await Notes.getGraph(req.userId);
       const response:APIResponse = {
@@ -176,7 +160,8 @@ const startApp = async ({
 
   app.get(
     config.API_PATH + "stats",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       const exhaustive = req.query.exhaustive === "true";
       const stats:Stats = await Notes.getStats(req.userId, exhaustive);
@@ -191,7 +176,8 @@ const startApp = async ({
 
   app.post(
     config.API_PATH + "graph",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json({ limit: "1mb" }), // posting a graph can be somewhat larger
     async function(req, res) {
       try {
@@ -213,7 +199,8 @@ const startApp = async ({
 
   app.get(
     config.API_PATH + "notes",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       const query = req.query.q || "";
       const caseSensitiveQuery = req.query.caseSensitive === "true";
@@ -240,7 +227,8 @@ const startApp = async ({
 
   app.get(
     config.API_PATH + "note/:noteId",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       const noteId:NoteId = parseInt(req.params.noteId);
 
@@ -264,7 +252,8 @@ const startApp = async ({
 
   app.put(
     config.API_PATH + "note",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -294,7 +283,8 @@ const startApp = async ({
 
   app.put(
     config.API_PATH + "import-links-as-notes",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -313,7 +303,8 @@ const startApp = async ({
 
   app.delete(
     config.API_PATH + "note/:noteId",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       try {
         await Notes.remove(parseInt(req.params.noteId), req.userId);
@@ -334,7 +325,8 @@ const startApp = async ({
 
   app.post(
     config.API_PATH + "file",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       const form = new formidable.IncomingForm({
         maxFileSize: config.MAX_UPLOAD_FILE_SIZE,
@@ -406,7 +398,8 @@ const startApp = async ({
 
   app.post(
     config.API_PATH + "file-by-url",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -504,7 +497,8 @@ const startApp = async ({
     // name with a url like
     // /api/file/ae62787f-4344-4124-8026-3839543fde70.png/my-pic.png
     config.API_PATH + "file/:fileId/:publicName*?",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async function(req, res) {
       try {
 
@@ -597,7 +591,8 @@ const startApp = async ({
 
   app.get(
     config.API_PATH + "url-metadata",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     async (req, res) => {
       const url = req.query.url;
 
@@ -622,7 +617,8 @@ const startApp = async ({
 
   app.put(
     config.API_PATH + "pins",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -641,7 +637,8 @@ const startApp = async ({
 
   app.delete(
     config.API_PATH + "pins",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -660,7 +657,8 @@ const startApp = async ({
 
   app.get(
     config.API_PATH + "pins",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json(),
     async function(req, res) {
       const pinnedNotes = await Notes.getPins(req.userId);
@@ -675,19 +673,28 @@ const startApp = async ({
 
   app.post(
     config.API_PATH + "logout",
-    verifyJWT,
+    sessionMiddleware,
+    verifySession,
     express.json(),
     async function(req, res) {
       const response:APIResponse = {
         success: true,
       };
 
-      outdatedTokens.push(req.token);
+      await new Promise((resolve, reject) => {
+        req.session.destroy(function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(null);
+          }
+        })
+      })
 
       return res
         .status(200)
         .clearCookie(
-          config.TOKEN_COOKIE_NAME,
+          config.SESSION_COOKIE_NAME,
         )
         .json(response);
     },
@@ -709,6 +716,7 @@ const startApp = async ({
 
   app.post(
     config.API_PATH + 'login',
+    sessionMiddleware,
     express.json(),
     (req, res) => {
       // read username and password from request body
@@ -769,15 +777,9 @@ const startApp = async ({
         return res.status(401).json(response);
       }
 
-      // generate an access token
-      const accessToken = jwt.sign(
-        {
-          userLogin: user.login,
-          userId: user.id,
-        },
-        jwtSecret,
-        { expiresIn: config.MAX_SESSION_AGE_DAYS.toString() + 'd' }
-      );
+      // this modification of the session object initializes the session and
+      // makes express-session set the cookie
+      req.session.userId = user.id;
 
       const response:APIResponse = {
         success: true,
@@ -786,17 +788,7 @@ const startApp = async ({
         },
       };
 
-      return res
-        .status(200)
-        .cookie(
-          config.TOKEN_COOKIE_NAME,
-          accessToken,
-          {
-            maxAge: config.MAX_SESSION_AGE_DAYS * 24 * 60 * 60 * 1000,
-            httpOnly: true,
-          }
-        )
-        .json(response);
+      return res.status(200).json(response);
     },
   );
 

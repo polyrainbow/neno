@@ -41,8 +41,8 @@ const getArguments = (version) => {
     // by default, we generate a new secret with each app start. this can be
     // overridden with this option
     .option(
-      '--jwt-secret <value>',
-      "secret for signing JSON web tokens for authentication",
+      '--session-secret <value>',
+      "secret for session authentication",
       uuidv4(),
     )
     .option(
