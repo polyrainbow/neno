@@ -442,7 +442,6 @@ const EditorView = ({
             <NoteList
               notes={noteListItems}
               numberOfResults={numberOfResults}
-              loadNote={loadNote}
               activeNote={activeNote}
               displayedLinkedNotes={displayedLinkedNotes}
               onLinkAddition={handleLinkAddition}
@@ -466,7 +465,6 @@ const EditorView = ({
       <div id="right-view">
         <Note
           note={activeNote}
-          loadNote={loadNote}
           onLinkRemoval={handleLinkRemoval}
           displayedLinkedNotes={displayedLinkedNotes}
           setUnsavedChanges={setUnsavedChanges}
