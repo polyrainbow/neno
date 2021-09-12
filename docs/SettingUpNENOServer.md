@@ -65,7 +65,7 @@ node dist/backend/index.js --use-https \
 * path to private key of TLS certificate
 * Default value: `path.join(REPO_PATH, "..", "server.key")`
 
-### --jwt-secret \<value>
+### --session-secret \<value>
 * secret for signing JSON web tokens for authentication
 * Default value: A random uuid automatically created at server startup
 
