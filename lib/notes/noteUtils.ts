@@ -422,7 +422,7 @@ const getURLsOfNote = (note:DatabaseNote):string[] => {
 
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
-const breadthFirstSearch = (nodes, links, root: DatabaseNote) => {
+const breadthFirstSearch = (nodes, links, root: DatabaseNote):DatabaseNote[] => {
   const queue:DatabaseNote[] = [];
   const discovered:DatabaseNote[] = [];
   discovered.push(root);
@@ -455,7 +455,7 @@ const breadthFirstSearch = (nodes, links, root: DatabaseNote) => {
 
 
 // https://en.wikipedia.org/wiki/Component_(graph_theory)#Algorithms
-const getNumberOfComponents = (nodes:DatabaseNote[], links:Link[]) => {
+const getNumberOfComponents = (nodes:DatabaseNote[], links:Link[]):number => {
   let totallyDiscovered:DatabaseNote[] = [];
   let numberOfComponents = 0;
 
@@ -474,6 +474,106 @@ const getNumberOfComponents = (nodes:DatabaseNote[], links:Link[]) => {
   }
 
   return numberOfComponents;
+}
+
+// this returns all notes that contain a url that is used in another note too
+const getNotesWithDuplicateUrls = (notes:DatabaseNote[]):DatabaseNote[] => {
+  return notes.filter((n1:DatabaseNote, i:number, notes:DatabaseNote[]) => {
+    const n1URLs = getURLsOfNote(n1);
+
+
+    const duplicate = notes.find((n2:DatabaseNote, n2_i:number):boolean => {
+      if (n2_i === i) return false;
+      const n2URLs = getURLsOfNote(n2);
+      return n1URLs.some((n1Link) => n2URLs.includes(n1Link));
+    });
+    
+    return !!duplicate;
+  });
+};
+
+
+const getNotesByTitle = (
+  notes:DatabaseNote[],
+  query: string,
+  caseSensitive: boolean,
+):DatabaseNote[] => {
+  return notes.filter((note:DatabaseNote) => {
+    const title = getNoteTitle(note);
+
+    return caseSensitive
+      ? title === query
+      : title.toLowerCase() === query.toLowerCase();
+  });
+}
+
+
+const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
+  return note.editorData.blocks.reduce((accumulator, block) => {
+    if (block.type === "paragraph") {
+      return accumulator + " " + block.data.text;
+    } else if (block.type === "header") {
+      return accumulator + " " + block.data.text;
+    } else if (block.type === "code") {
+      return accumulator + " " + block.data.code;
+    } else if (block.type === "list") {
+      const itemsConcatenated = block.data.items.join(" ");
+      return accumulator + " " + itemsConcatenated;
+    } else {
+      return accumulator;
+    }
+  }, "");
+};
+
+
+const getNotesWithTitleContainingTokens = (
+  notes: DatabaseNote[],
+  query: string,
+  caseSensitive: boolean
+):DatabaseNote[] => {
+  return notes.filter((note:DatabaseNote) => {
+    if (query.length === 0) {
+      return true;
+    }
+
+    if (query.length > 0 && query.length < 3) {
+      return false;
+    }
+
+    const title = getNoteTitle(note);
+    const queryTokens = query.split(" ");
+
+    if (caseSensitive) {
+      return queryTokens.every((queryToken) => {
+        return title.includes(queryToken);
+      });
+    } else {
+      return queryTokens.every((queryToken) => {
+        return title.toLowerCase().includes(queryToken.toLowerCase());
+      });
+    }
+  });
+}
+
+
+const getNotesThatContainTokens = (
+  notes:DatabaseNote[],
+  query: string,
+  caseSensitive: boolean,
+):DatabaseNote[] => {
+  const queryTokens = query.split(" ");
+
+  return notes
+    .filter((note:DatabaseNote) => {
+      const noteText = getConcatenatedTextOfNote(note);
+
+      // the note text must include every query token to be a positive
+      return queryTokens.every((queryToken) => {
+        return caseSensitive
+          ? noteText.includes(queryToken)
+          : noteText.toLowerCase().includes(queryToken.toLowerCase());
+      });
+    });
 }
 
 
@@ -499,4 +599,9 @@ export {
   createNoteListItems,
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
+  getNotesWithDuplicateUrls,
+  getNotesByTitle,
+  getConcatenatedTextOfNote,
+  getNotesWithTitleContainingTokens,
+  getNotesThatContainTokens,
 };
