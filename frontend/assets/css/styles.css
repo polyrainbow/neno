@@ -380,6 +380,8 @@ button[disabled]{
   margin: auto;
   border-radius: var(--border-radius);
   box-shadow: var(--default-box-shadow);
+  max-height: calc(100vh - (2 * var(--default-margin)));
+  overflow: auto;
 }
 
 .dialog-box h1 {
