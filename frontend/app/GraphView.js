@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import HeaderContainer from "./HeaderContainer.js";
-import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
-import IconButton from "./IconButton.js";
 import Graph from "./lib/Graph.js";
 import * as Config from "./lib/config.js";
-import SearchInput from "./SearchInput.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator.js";
 import {
   useLocation,
   useHistory,
 } from "react-router-dom";
+import GraphViewHeader from "./GraphViewHeader.js";
 
 const GraphView = ({
   databaseProvider,
@@ -41,6 +38,39 @@ const GraphView = ({
       console.error(e);
       alert(e);
     }
+  };
+
+
+  const openNoteInEditor = async (noteId) => {
+    if (unsavedChanges) {
+      await confirm({
+        text: Config.texts.discardChangesConfirmation,
+        confirmText: "Discard changes",
+        cancelText: "Cancel",
+        encourageConfirmation: false,
+      });
+
+      setUnsavedChanges(false);
+    }
+
+    history.push(`/editor/${noteId}`);
+  };
+
+
+  const openSelectedNoteInEditor = async () => {
+    if (!graphInstance.current) return;
+    const ids = graphInstance.current.getSelectedNodeIds();
+    if (ids.length === 0) {
+      alert("Please select one note before opening it.");
+      return;
+    }
+    if (ids.length > 1) {
+      alert("Please select only one note to open it.");
+      return;
+    }
+
+    const noteIdToBeOpened = ids[0];
+    await openNoteInEditor(noteIdToBeOpened);
   };
 
   const onChange = () => {
@@ -85,6 +115,7 @@ const GraphView = ({
           onHighlight,
           onChange,
           initialFocusNoteId: focusNoteId,
+          openNote: openNoteInEditor,
         });
     } catch (e) {
       // if credentials are invalid, go to LoginView. If not, throw.
@@ -102,73 +133,14 @@ const GraphView = ({
   }, [searchValue]);
 
   return <>
-    <HeaderContainer
+    <GraphViewHeader
+      unsavedChanges={unsavedChanges}
       toggleAppMenu={toggleAppMenu}
-      leftContent={
-        <>
-          <IconButton
-            icon="save"
-            title="Save"
-            onClick={saveGraphObject}
-          />
-          <IconButton
-            icon="open_in_browser"
-            title="Open note in editor"
-            onClick={async () => {
-              if (!graphInstance.current) return;
-              const ids = graphInstance.current.getSelectedNodeIds();
-              if (ids.length === 0) {
-                alert("Please select one note before opening it.");
-                return;
-              }
-              if (ids.length > 1) {
-                alert("Please select only one note to open it.");
-                return;
-              }
-
-              if (unsavedChanges) {
-                await confirm({
-                  text: Config.texts.discardChangesConfirmation,
-                  confirmText: "Discard changes",
-                  cancelText: "Cancel",
-                  encourageConfirmation: false,
-                });
-
-                setUnsavedChanges(false);
-              }
-
-              const noteIdToBeOpened = ids[0];
-              history.push(`/editor/${noteIdToBeOpened}`);
-            }}
-          />
-          <IconButton
-            icon="zoom_out_map"
-            title="Inflate graph by 10%"
-            onClick={async () => {
-              if (!graphInstance.current) return;
-              graphInstance.current.inflateGraph(1.1);
-            }}
-          />
-          <IconButton
-            icon="title"
-            title="Toggle text rendering"
-            onClick={async () => {
-              if (!graphInstance.current) return;
-              graphInstance.current.toggleTextRendering();
-            }}
-          />
-        </>
-      }
-      rightContent={
-        <>
-          <SearchInput
-            placeholder="Search..."
-            value={searchValue}
-            onChange={(value) => setSearchValue(value)}
-          />
-          <UnsavedChangesIndicator unsavedChanges={unsavedChanges} />
-        </>
-      }
+      searchValue={searchValue}
+      setSearchValue={setSearchValue}
+      openSelectedNoteInEditor={openSelectedNoteInEditor}
+      saveGraphObject={saveGraphObject}
+      graphInstance={graphInstance}
     />
     <main id="main" className="main-graph" ref={mainElement}></main>
     <GraphViewStatusIndicator status={status} />

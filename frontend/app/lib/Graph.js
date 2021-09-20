@@ -81,6 +81,7 @@ export default class Graph {
   #searchValue = "";
   #onHighlight = null;
   #onChange = null;
+  #openNote = null;
   #nodes = null;
   #links = null;
   #screenPosition = null;
@@ -108,6 +109,7 @@ export default class Graph {
     onHighlight,
     onChange,
     initialFocusNoteId,
+    openNote,
   }) {
     const graphObjectPrepared = prepareGraphObject(graphObject);
     const thisGraph = this;
@@ -123,6 +125,7 @@ export default class Graph {
     thisGraph.svg = svg;
     thisGraph.#onHighlight = onHighlight;
     thisGraph.#onChange = onChange;
+    thisGraph.#openNote = openNote;
 
     thisGraph.#nodes = graphObjectPrepared.nodes;
     thisGraph.#links = graphObjectPrepared.links;
@@ -810,7 +813,7 @@ export default class Graph {
       })
       .on("click", function(e, d) {
         if (e.ctrlKey) {
-          window.open("/?id=" + d.id, "_blank");
+          thisGraph.#openNote(d.id);
         }
       })
       .call(thisGraph.nodeDrag);
