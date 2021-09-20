@@ -82,6 +82,7 @@ const Note = ({
               isActive={false}
               isLinked={true}
               onLinkChange={() => onLinkRemoval(displayedLinkedNote.id)}
+              isLinkable={true}
             />)
           }
         </div>

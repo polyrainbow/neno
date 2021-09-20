@@ -22,6 +22,7 @@ const NoteList = ({
   page,
   setPage,
   stats,
+  itemsAreLinkable,
 }) => {
   const containerRef = useRef(null);
 
@@ -96,7 +97,7 @@ const NoteList = ({
           const isActive
             = (!activeNote.isUnsaved) && (note.id === activeNote.id);
           const isLinked
-            = displayedLinkedNotes.some(
+            = itemsAreLinkable && displayedLinkedNotes.some(
               (linkedNote) => {
                 return linkedNote.id === note.id;
               },
@@ -108,6 +109,7 @@ const NoteList = ({
             isLinked={isLinked}
             key={`main-notes-list-item-${note.id}`}
             onSelect={() => history.push(`/editor/${note.id}`)}
+            isLinkable={itemsAreLinkable}
             onLinkChange={() => {
               if (isActive) return;
 

@@ -1,7 +1,9 @@
 import React from "react";
-import { Tooltip } from "react-tippy";
 import { yyyymmdd } from "./lib/utils.js";
-import { emojis, ICON_PATH } from "./lib/config.js";
+import { emojis } from "./lib/config.js";
+import NoteListItemLinkedNotesIndicator
+  from "./NoteListItemLinkedNotesIndicator.js";
+import NoteListItemFeatures from "./NoteListItemFeatures.js";
 
 
 const NoteListItem = ({
@@ -10,6 +12,7 @@ const NoteListItem = ({
   isLinked,
   onSelect,
   onLinkChange,
+  isLinkable,
 }) => {
   const isHub = (
     typeof note.numberOfLinkedNotes === "number"
@@ -27,20 +30,16 @@ const NoteListItem = ({
   if (isLinked) {
     trClassList.push("linked");
   }
-
-  const linkControlLabel
-    = isActive
-      ? "This is the currently selected note. It cannot be linked to itself."
-      : isLinked
-        ? "Remove link to this note"
-        : "Add as link to selected note";
+  trClassList.push(isLinkable ? "linkable" : "not-linkable");
 
 
   return <div
     className={trClassList.join(" ")}
   >
     <div
-      className="note-list-item-main"
+      className={
+        "note-list-item-main"
+      }
       onClick={onSelect}
     >
       <div
@@ -59,70 +58,18 @@ const NoteListItem = ({
               : ""
           }
         </div>
-        <div
-          className="note-features"
-          style={{
-            textAlign: "right",
-          }}
-        >
-          {note.features?.containsText ? "✏️" : ""}
-          {note.features?.containsWeblink ? emojis.weblink : ""}
-          {note.features?.containsCode ? emojis.code : ""}
-          {note.features?.containsImages ? emojis.image : ""}
-          {note.features?.containsAttachements ? emojis.file : ""}
-          {note.features?.containsAudio ? emojis.audio : ""}
-        </div>
+        <NoteListItemFeatures
+          features={note.features}
+        />
       </div>
     </div>
-    <Tooltip
-      title={linkControlLabel}
-      position="bottom"
-      trigger="mouseenter focus"
-      style={{
-        display: "flex",
-      }}
-    >
-      <div
-        className="link-control"
-        onClick={
-          (e) => {
-            (!isActive) && onLinkChange();
-            e.stopPropagation();
-          }
-        }
-      >
-        <div
-          style={{
-            textAlign: "center",
-          }}
-        >
-          <img
-            style={{ "verticalAlign": "bottom" }}
-            src={
-              ICON_PATH + (isLinked ? "link_off" : "link") + "-24px.svg"
-            }
-            alt={linkControlLabel}
-            className="svg-icon"
-          />
-          <div
-            className="linkedNotesIndicator"
-          >
-            {
-              (
-                typeof note.numberOfLinkedNotes === "number"
-                && !isNaN(note.numberOfLinkedNotes)
-              )
-                ? note.numberOfLinkedNotes > 0
-                  ? <span title={note.numberOfLinkedNotes + " Links"}>
-                    {note.numberOfLinkedNotes}
-                  </span>
-                  : <span title="Not linked">{emojis.unlinked}</span>
-                : ""
-            }
-          </div>
-        </div>
-      </div>
-    </Tooltip>
+    <NoteListItemLinkedNotesIndicator
+      isLinked={isLinked}
+      isLinkable={isLinkable}
+      isActive={isActive}
+      numberOfLinkedNotes={note.numberOfLinkedNotes}
+      onLinkChange={onLinkChange}
+    />
   </div>;
 };
 

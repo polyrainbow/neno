@@ -1,5 +1,5 @@
 import React, {
-  useEffect, useState, useCallback, useRef, useMemo,
+  useEffect, useState, useCallback, useRef,
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditorViewHeader from "./EditorViewHeader.js";
@@ -7,7 +7,6 @@ import NoteList from "./NoteList.js";
 import NoteListControls from "./NoteListControls.js";
 import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
-import * as Editor from "./lib/editor.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import {
   useHistory,
@@ -36,113 +35,11 @@ const ListView = ({
   const history = useHistory();
   const confirm = React.useContext(ConfirmationServiceContext);
 
-  const displayedLinkedNotes = useMemo(() => [
-    ...(!activeNote.isUnsaved)
-      ? activeNote.linkedNotes.filter((note) => {
-        const isRemoved = activeNote.changes.some((change) => {
-          return (
-            change.type === "LINKED_NOTE_DELETED"
-            && change.noteId === note.id
-          );
-        });
-        return !isRemoved;
-      })
-      : [],
-    ...activeNote.changes
-      .filter((change) => {
-        return change.type === "LINKED_NOTE_ADDED";
-      })
-      .map((change) => {
-        return change.note;
-      }),
-  ], [activeNote]);
-
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
     setNoteListScrollTop(0);
     setPage(1);
-  };
-
-  const handleLinkAddition = async (note) => {
-    // return if linked note has already been added
-    if (activeNote.changes.some((change) => {
-      return (
-        change.type === "LINKED_NOTE_ADDED"
-        && change.noteId === note.id
-      );
-    })) {
-      return;
-    }
-
-    // remove possible LINKED_NOTE_DELETED changes
-    const newChanges = [
-      ...activeNote.changes.filter((change) => {
-        return !(
-          change.type === "LINKED_NOTE_DELETED"
-          && change.noteId === note.id
-        );
-      }),
-    ];
-
-    // if linkedNote is NOT already there and saved,
-    // let's add a LINKED_NOTE_ADDED change
-    if (
-      !activeNote.linkedNotes.find((linkedNote) => {
-        return linkedNote.id === note.id;
-      })
-    ) {
-      newChanges.push(
-        {
-          type: "LINKED_NOTE_ADDED",
-          noteId: note.id,
-          note: {
-            id: note.id,
-            title: note.title,
-            updateTime: note.updateTime,
-          },
-        },
-      );
-    }
-
-    setActiveNote({
-      ...activeNote,
-      editorData: await Editor.save(),
-      changes: newChanges,
-    });
-
-    setUnsavedChanges(true);
-  };
-
-
-  const handleLinkRemoval = async (linkedNoteId) => {
-    if (activeNote.changes.some((change) => {
-      return (
-        change.type === "LINKED_NOTE_DELETED"
-        && change.noteId === linkedNoteId
-      );
-    })) {
-      return;
-    }
-
-    setActiveNote({
-      ...activeNote,
-      editorData: await Editor.save(),
-      changes: [
-        ...activeNote.changes.filter((change) => {
-          return !(
-            change.type === "LINKED_NOTE_ADDED"
-            && change.noteId === linkedNoteId
-          );
-        }),
-        {
-          type: "LINKED_NOTE_DELETED",
-          noteId: linkedNoteId,
-        },
-      ],
-    });
-
-    setUnsavedChanges(true);
   };
 
 
@@ -261,18 +158,6 @@ const ListView = ({
   );
 
 
-  const pinOrUnpinNote = async () => {
-    let newPinnedNotes;
-    if (pinnedNotes.find((pinnedNote) => pinnedNote.id === activeNote.id)) {
-      newPinnedNotes = await databaseProvider.unpinNote(activeNote.id);
-    } else {
-      newPinnedNotes = await databaseProvider.pinNote(activeNote.id);
-    }
-
-    setPinnedNotes(newPinnedNotes);
-  };
-
-
   useEffect(() => {
     refreshNotesList();
   }, [searchValue, page, sortMode, databaseProvider]);
@@ -305,9 +190,6 @@ const ListView = ({
       numberOfResults={numberOfResults}
       loadNote={loadNote}
       activeNote={activeNote}
-      displayedLinkedNotes={displayedLinkedNotes}
-      onLinkAddition={handleLinkAddition}
-      onLinkRemoval={handleLinkRemoval}
       isBusy={isBusy}
       searchValue={searchValue}
       scrollTop={noteListScrollTop}
@@ -319,7 +201,7 @@ const ListView = ({
         setNoteListScrollTop(0);
       }}
       stats={stats}
-      pinOrUnpinNote={pinOrUnpinNote}
+      itemsAreLinkable={false}
     />
   </>;
 };

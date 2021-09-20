@@ -310,7 +310,7 @@ button[disabled]{
   justify-content: center;
 }
 
-.note-list-item:not(.active) .link-control {
+.note-list-item:not(.active) .link-control.linkable {
   cursor: pointer;
 }
 
@@ -333,7 +333,7 @@ button[disabled]{
   cursor: pointer;
 }
 
-.note-list-item .linkedNotesIndicator {
+.note-list-item .linkedNotesIndicatorNumber {
   text-align: center;
   display: block;
   font-weight: bold;

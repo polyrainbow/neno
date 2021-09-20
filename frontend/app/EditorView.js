@@ -458,6 +458,7 @@ const EditorView = ({
               }}
               stats={stats}
               pinOrUnpinNote={pinOrUnpinNote}
+              itemsAreLinkable={true}
             />
           </div>
           : ""

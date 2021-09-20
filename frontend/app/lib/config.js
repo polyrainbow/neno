@@ -54,6 +54,7 @@ const emojis = {
   "audio": "🎧",
   "pin": "📌",
   "hub": "🐙",
+  "text": "✏️",
 };
 
 const ICON_PATH = "/assets/icons/";
