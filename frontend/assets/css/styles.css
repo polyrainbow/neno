@@ -6,38 +6,26 @@
 
 @media (prefers-color-scheme: light) {
   :root {
-    --default-box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1),
-    0px 2px 2px rgba(0, 0, 0, 0.1);
-
     --accent-color-1: rgb(70, 184, 255);
     --accent-color-1-light: rgb(168, 222, 255);
     --accent-color-2: rgb(255, 133, 152);
     --accent-color-interactible: #e0e0e0;
-
     --background-color: white;
     --main-content-color: black;
-
     --link-color: rgb(0, 40, 216);
-
     --overlay-gradient: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(9,9,121,0.5) 35%, rgba(0,212,255,1) 100%);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --default-box-shadow: 0px 8px 24px rgba(255, 255, 255, 0.25),
-    0px 2px 2px rgba(255, 255, 255, 0.25);
-
     --accent-color-1: rgb(11, 73, 92);
     --accent-color-1-light: rgb(4, 53, 65);
     --accent-color-2: #6d2433;
     --accent-color-interactible: #303030;
-
     --background-color: black;
     --main-content-color: rgb(255, 255, 255);
-
     --link-color: rgb(122, 146, 255);
-
     --overlay-gradient: linear-gradient(45deg, rgb(17 10 146) 0%, rgba(9, 9, 121, 0.5) 35%, rgb(0 125 151) 100%);
   }
 
@@ -60,19 +48,20 @@
   --buton-background-color: var(--accent-color-interactible);
   --input-element-border-color: var(--main-content-color);
   --button-background-color-active: var(--accent-color-1);
-
   --table-row-background-color-odd: var(--background-color);
   --table-row-background-color-even: var(--accent-color-interactible);
-
   --main-font: 'Rubik', sans-serif;
   --input-border-width: 2px;
-
   --border-radius: 10px;
   --default-margin: 15px;
-
   --xl-list-width: 720px;
-
   --main-ui-font-size: 24px;
+  --default-box-shadow:
+    0 1px 1px hsl(0deg 0% 0% / 0.075),
+    0 2px 2px hsl(0deg 0% 0% / 0.075),
+    0 4px 4px hsl(0deg 0% 0% / 0.075),
+    0 8px 8px hsl(0deg 0% 0% / 0.075),
+    0 16px 16px hsl(0deg 0% 0% / 0.075);
 }
 
 #app-menu {
@@ -253,7 +242,7 @@ main {
   border-radius: 100px;
   width: 60px;
   height: 60px;
-  box-shadow: 5px 5px 25px #000000;
+  box-shadow: var(--default-box-shadow);
 }
 
 button {
