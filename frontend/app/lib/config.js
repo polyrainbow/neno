@@ -1,31 +1,27 @@
 const DEFAULT_NOTE_TITLE = "Note title";
 
-const newEditorDataObject = {
-  "time": 1582493003964,
-  "blocks": [
-    {
-      "type": "header",
-      "data": {
-        "text": DEFAULT_NOTE_TITLE,
-        "level": 1,
-      },
+const DEFAULT_NOTE_BLOCKS = [
+  {
+    "type": "header",
+    "data": {
+      "text": DEFAULT_NOTE_TITLE,
+      "level": 1,
     },
-    {
-      "type": "paragraph",
-      "data": {
-        "text": "Note text",
-      },
+  },
+  {
+    "type": "paragraph",
+    "data": {
+      "text": "Note text",
     },
-    {
-      "type": "linkTool",
-      "data": {
-        "link": "",
-        "meta": {},
-      },
+  },
+  {
+    "type": "linkTool",
+    "data": {
+      "link": "",
+      "meta": {},
     },
-  ],
-  "version": "2.16.1",
-};
+  },
+];
 
 const API_URL = "/api/";
 
@@ -71,7 +67,7 @@ const paths = {
 
 export {
   DEFAULT_NOTE_TITLE,
-  newEditorDataObject,
+  DEFAULT_NOTE_BLOCKS,
   API_URL,
   texts,
   MINIMUM_SEARCH_QUERY_LENGTH,

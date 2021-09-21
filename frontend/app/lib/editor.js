@@ -53,7 +53,11 @@ const loadInstance = async ({
 
   const instance = new EditorJS({
     holder: parent,
-    data,
+    data: {
+      blocks: data,
+      version: "2.17.1",
+      time: Date.now(),
+    },
     autofocus: true,
     placeholder: "Let's write an awesome note!",
     hideToolbar: false,
@@ -224,7 +228,7 @@ const save = async () => {
   const instance = await instanceQueue;
   await instance.isReady;
   const editorData = await instance.save();
-  return editorData;
+  return editorData.blocks;
 };
 
 

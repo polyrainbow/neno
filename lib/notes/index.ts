@@ -274,13 +274,13 @@ const put = async (
     databaseNote = {
       id: noteId,
       position: db.initialNodePosition,
-      editorData: noteFromUser.editorData,
+      blocks: noteFromUser.blocks,
       creationTime: Date.now(),
       updateTime: Date.now(),
     };
     db.notes.push(databaseNote);
   } else {
-    databaseNote.editorData = noteFromUser.editorData;
+    databaseNote.blocks = noteFromUser.blocks;
     databaseNote.updateTime = Date.now();
   }
 
@@ -394,32 +394,28 @@ const importLinksAsNotes = async (dbId, links) => {
   const notesFromUser:NoteFromUser[]
     = urlMetadataResults.map((urlMetadataObject) => {
     const noteFromUser:NoteFromUser = {
-      editorData: {
-        "time": Date.now(),
-        "blocks": [
-          {
-            "type": "header",
-            "data": {
-              "text": urlMetadataObject.title,
-              "level": 1,
-            },
+      blocks: [
+        {
+          "type": "header",
+          "data": {
+            "text": urlMetadataObject.title,
+            "level": 1,
           },
-          {
-            "type": "linkTool",
-            "data": {
-              "link": urlMetadataObject.url,
-              "meta": {
-                "title": urlMetadataObject.title,
-                "description": urlMetadataObject.description,
-                "image": {
-                  "url": urlMetadataObject.image,
-                },
-              }
-            },
+        },
+        {
+          "type": "linkTool",
+          "data": {
+            "link": urlMetadataObject.url,
+            "meta": {
+              "title": urlMetadataObject.title,
+              "description": urlMetadataObject.description,
+              "image": {
+                "url": urlMetadataObject.image,
+              },
+            }
           },
-        ],
-        "version": "2.16.1",
-      },
+        },
+      ],
     };
 
     return noteFromUser;

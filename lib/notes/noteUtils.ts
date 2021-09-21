@@ -26,9 +26,9 @@ const shortenText = (text:string, maxLength:number):string => {
 
 
 const getNoteTitle = (note:Note, maxLength = 800):string => {
-  if (typeof note?.editorData?.blocks?.[0]?.data?.text === "string") {
+  if (typeof note?.blocks?.[0]?.data?.text === "string") {
     const title
-      = Utils.unescapeHTML(note.editorData.blocks[0].data.text).trim();
+      = Utils.unescapeHTML(note.blocks[0].data.text).trim();
 
     const titleShortened = shortenText(title, maxLength);
 
@@ -40,7 +40,7 @@ const getNoteTitle = (note:Note, maxLength = 800):string => {
 
 
 const removeDefaultTextParagraphs = (note:Note):void => {
-  note.editorData.blocks = note.editorData.blocks.filter((block) => {
+  note.blocks = note.blocks.filter((block) => {
     const isDefaultTextParagraph = (
       block.type === "paragraph"
       && block.data.text === "Note text"
@@ -51,7 +51,7 @@ const removeDefaultTextParagraphs = (note:Note):void => {
 };
 
 const removeEmptyLinks = (note:Note):void => {
-  note.editorData.blocks = note.editorData.blocks.filter((block) => {
+  note.blocks = note.blocks.filter((block) => {
     const isEmptyLink = (
       block.type === "linkTool"
       && block.data.link === ""
@@ -202,7 +202,7 @@ const removeLinksOfNote = (db: DatabaseMainData, noteId: NoteId):true => {
 
 
 const getFilesOfNote = (note:DatabaseNote):FileId[] => {
-  return note.editorData.blocks
+  return note.blocks
     .filter((block) => {
       const blockHasFileOrImage = (
         ((block.type === "image") || (block.type === "attaches"))
@@ -247,7 +247,7 @@ const createNoteToTransmit = (
 ):NoteToTransmit => {
   const noteToTransmit:NoteToTransmit = {
     id: databaseNote.id,
-    editorData: databaseNote.editorData,
+    blocks: databaseNote.blocks,
     title: getNoteTitle(databaseNote),
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
@@ -317,7 +317,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
   let containsAttachements = false;
   let containsAudio = false;
 
-  note.editorData.blocks.forEach((block) => {
+  note.blocks.forEach((block) => {
     if (block.type === "paragraph") containsText = true;
     if (block.type === "linkTool") containsWeblink = true;
     if (block.type === "code") containsCode = true;
@@ -400,7 +400,7 @@ const getSortFunction = (
 
 
 const getNumberOfCharacters = (note:DatabaseNote):number => {
-  return note.editorData.blocks.reduce((accumulator, block) => {
+  return note.blocks.reduce((accumulator, block) => {
     if (["paragraph", "header"].includes(block.type) && block.data?.text) {
       return accumulator + block.data.text.length;
     } else {
@@ -411,7 +411,7 @@ const getNumberOfCharacters = (note:DatabaseNote):number => {
 
 
 const getURLsOfNote = (note:DatabaseNote):string[] => {
-  return note.editorData.blocks
+  return note.blocks
     .filter((block) => {
       return block.type === "linkTool";
     })
@@ -509,7 +509,7 @@ const getNotesByTitle = (
 
 
 const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
-  return note.editorData.blocks.reduce((accumulator, block) => {
+  return note.blocks.reduce((accumulator, block) => {
     if (block.type === "paragraph") {
       return accumulator + " " + block.data.text;
     } else if (block.type === "header") {

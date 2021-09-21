@@ -27,6 +27,7 @@ const EditorView = ({
   openDialog,
   handleInvalidCredentialsError,
 }) => {
+  const newNoteObject = Utils.getNewNoteObject();
   const currentRequestId = useRef(null);
   const [noteListItems, setNoteListItems] = useState([]);
   const [numberOfResults, setNumberOfResults] = useState([]);
@@ -35,7 +36,7 @@ const EditorView = ({
   const [isBusy, setIsBusy] = useState(true);
   const [stats, setStats] = useState(null);
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
-  const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
+  const [activeNote, setActiveNote] = useState(newNoteObject);
   const [searchValue, setSearchValue] = useState("");
   const [pinnedNotes, setPinnedNotes] = useState([]);
 
@@ -116,7 +117,7 @@ const EditorView = ({
 
     setActiveNote({
       ...activeNote,
-      editorData: await Editor.save(),
+      blocks: await Editor.save(),
       changes: newChanges,
     });
 
@@ -129,7 +130,7 @@ const EditorView = ({
 
     const noteToTransmit = {
       id: null,
-      editorData: activeNote.editorData,
+      blocks: activeNote.blocks,
       changes: activeNote.linkedNotes.map((linkedNote) => {
         return {
           type: "LINKED_NOTE_ADDED",
@@ -162,7 +163,7 @@ const EditorView = ({
 
     setActiveNote({
       ...activeNote,
-      editorData: await Editor.save(),
+      blocks: await Editor.save(),
       changes: [
         ...activeNote.changes.filter((change) => {
           return !(
@@ -315,7 +316,7 @@ const EditorView = ({
 
   const prepareNoteToTransmit = async () => {
     const noteToTransmit = {
-      editorData: await Editor.save(),
+      blocks: await Editor.save(),
       changes: activeNote.changes,
       id: activeNote.isUnsaved ? null : activeNote.id,
     };

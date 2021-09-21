@@ -1,5 +1,5 @@
-import EditorData from "./EditorData.js";
+import NoteContentBlock from "./NoteContentBlock.js";
 
 export default interface Note {
-    editorData: EditorData,
+    blocks: NoteContentBlock[],
 }

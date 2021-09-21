@@ -28,7 +28,7 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>Number of blocks</td>
-          <td>{note.editorData.blocks.length}</td>
+          <td>{note.blocks.length}</td>
         </tr>
         <tr>
           <td>Number of links</td>
@@ -41,9 +41,9 @@ const NoteStats = ({
         <tr>
           <td>Images</td>
           <td>{
-            note.editorData.blocks
+            note.blocks
               .filter((block) => block.type === "image").length > 0
-              ? note.editorData.blocks
+              ? note.blocks
                 .filter((block) => block.type === "image")
                 .map((block, i, array) => {
                   return <React.Fragment key={block.data.file.fileId + note.id}>
@@ -64,9 +64,9 @@ const NoteStats = ({
         <tr>
           <td>File attachements</td>
           <td>{
-            note.editorData.blocks
+            note.blocks
               .filter((block) => block.type === "attaches").length > 0
-              ? note.editorData.blocks
+              ? note.blocks
                 .filter((block) => block.type === "attaches")
                 .map((block, i, array) => {
                   return <React.Fragment key={block.data.file.fileId + note.id}>

@@ -36,11 +36,11 @@ mainDB.notes.forEach((note) => {
   note.creationTime = 1584709669753;
   note.updateTime = 1584709669753;
 
-  note.editorData.blocks = note.editorData.blocks.filter((block) => {
+  note.blocks = note.blocks.filter((block) => {
     return ["header", "paragraph", "linkTool"].includes(block.type);
   });
 
-  note.editorData.blocks.forEach((block) => {
+  note.blocks.forEach((block) => {
     if (block.type === "paragraph") {
       block.data.text = LOREM_IMPSUM_TEXT;
     }

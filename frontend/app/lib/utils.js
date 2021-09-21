@@ -38,7 +38,7 @@ const getNewNoteObject = () => {
   const note = {
     changes: [],
     creationTime: null,
-    editorData: Config.newEditorDataObject,
+    blocks: Config.DEFAULT_NOTE_BLOCKS,
     id: null,
     isUnsaved: true,
     linkedNotes: [],
@@ -56,18 +56,18 @@ const getNewNoteObject = () => {
 
 const setNoteTitleByLinkTitleIfUnset = (note, defaultNoteTitle) => {
   // if the note has no title yet, take the title of the link metadata
-  const firstLinkBlock = note.editorData.blocks.find(
+  const firstLinkBlock = note.blocks.find(
     (block) => block.type === "linkTool",
   );
 
   if (
-    (note.editorData?.blocks?.[0]?.data?.text
+    (note.blocks?.[0]?.data?.text
       === defaultNoteTitle)
     && firstLinkBlock
     && typeof firstLinkBlock.data.meta.title === "string"
     && firstLinkBlock.data.meta.title.length > 0
   ) {
-    note.editorData.blocks[0].data.text
+    note.blocks[0].data.text
       = firstLinkBlock.data.meta.title;
   }
 };

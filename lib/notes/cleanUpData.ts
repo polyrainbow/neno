@@ -82,15 +82,19 @@ const cleanUpData = async (io) => {
       }
       ids.push(note.id);
 
-      removeDefaultTextParagraphs(note);
-      removeEmptyLinks(note);
-
-      // trim heading if present
-      if (note.editorData.blocks[0]?.type === "header") {
-        note.editorData.blocks[0].data.text
-          = note.editorData.blocks[0].data.text.trim();
+      if (note.editorData) {
+        note.blocks = note.editorData.blocks;
+        delete note.editorData;
       }
 
+      // trim heading if present
+      if (note.blocks[0]?.type === "header") {
+        note.blocks[0].data.text
+          = note.blocks[0].data.text.trim();
+      }
+
+      removeDefaultTextParagraphs(note);
+      removeEmptyLinks(note);
     });
 
     // remove invalid note ids from pins

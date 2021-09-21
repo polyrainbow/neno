@@ -23,32 +23,32 @@ const Note = ({
   duplicateNote,
   openInGraphView,
 }) => {
-  const previousEditorData = useRef(null);
-  const editorData = note?.editorData;
+  const previousBlocks = useRef(null);
+  const blocks = note?.blocks;
   const history = useHistory();
 
   useEffect(() => {
     const parent = document.getElementById("editor");
     if (!parent) return;
 
-    if (isEqual(editorData?.blocks, previousEditorData.current?.blocks)) {
+    if (isEqual(blocks, previousBlocks.current)) {
       return;
     }
 
     Editor.load({
-      data: editorData,
+      data: blocks,
       parent,
       onChange: () => setUnsavedChanges(true),
       databaseProvider,
     })
       .then(() => {
-        previousEditorData.current = editorData;
+        previousBlocks.current = blocks;
       });
 
-  // it is important that we only perform this effect when editorData changes,
-  // because otherwise it is executed more often and editor loading takes some
-  // time
-  }, [editorData]);
+  // it is important that we only perform this effect when the block content
+  // changes, because otherwise it is executed more often and editor loading
+  // takes some time
+  }, [blocks]);
 
   return <section id="note">
     <NoteControls
