@@ -64,43 +64,11 @@ const cleanUpLinks = (db) => {
 };
 
 
-const transformDeprecatedAttachBlocksWithAudioContent = (note) => {
-  note.editorData.blocks.forEach((block) => {
-    if (
-      (block.type === "attaches")
-      && (block.data.file.fileId.endsWith(".mp3"))
-    ) {
-      block.type = "audio";
-    }
-  });
-}
-
-
 // this function must always be indempotent, so that there is only one
 // canonical data structure
 const cleanUpData = async (io) => {
   await io.forEach((db) => {
     console.log("Cleaning db " + db.id + " ...");
-
-    // remove old db date key
-    if (db.timestamp) {
-      db.creationTime = db.notes[0]?.creationTime || db.timestamp;
-      db.updateTime = db.timestamp;
-      delete db.timestamp;
-    }
-
-    // each database should have an initialNodePosition
-    if (!db.initialNodePosition) {
-      db.initialNodePosition = {
-        x: 0,
-        y: 0,
-      };
-    }
-
-    // add array for pinned notes if not existent
-    if (!db.pinnedNotes) {
-      db.pinnedNotes = [];
-    }
 
     // remove invalid links
     cleanUpLinks(db);
@@ -123,7 +91,6 @@ const cleanUpData = async (io) => {
           = note.editorData.blocks[0].data.text.trim();
       }
 
-      transformDeprecatedAttachBlocksWithAudioContent(note);
     });
 
     // remove invalid note ids from pins
