@@ -7,6 +7,7 @@ import {
   useHistory,
 } from "react-router-dom";
 
+
 const NoteList = ({
   notes,
   numberOfResults,
@@ -24,7 +25,7 @@ const NoteList = ({
   stats,
   itemsAreLinkable,
 }) => {
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const searchResultsPerPage = 100;
 
@@ -44,7 +45,7 @@ const NoteList = ({
     const container = containerRef.current;
 
     const onScroll = () => {
-      setScrollTop(container.scrollTop);
+      container && setScrollTop(container.scrollTop);
     };
 
     if (!container) {

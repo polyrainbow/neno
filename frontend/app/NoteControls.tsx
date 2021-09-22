@@ -17,7 +17,7 @@ const NoteControls = ({
   duplicateNote,
   openInGraphView,
 }) => {
-  const confirm = React.useContext(ConfirmationServiceContext);
+  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
   const history = useHistory();
   const isSmallScreen = useIsSmallScreen();
 

@@ -4,7 +4,7 @@ import * as url from "url";
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default {
-  entry: path.join(__dirname, "app", "index.js"),
+  entry: path.join(__dirname, "app", "index.tsx"),
   output: {
     // `filename` provides a template for naming your bundles (remember to use
     // `[name]`)

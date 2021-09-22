@@ -2,15 +2,15 @@ import React, {
   useEffect, useState, useCallback, useRef, useMemo,
 } from "react";
 import { v4 as uuidv4 } from "uuid";
-import EditorViewHeader from "./EditorViewHeader.js";
+import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList.js";
-import NoteListControls from "./NoteListControls.js";
-import Note from "./Note.js";
+import NoteListControls from "./NoteListControls";
+import Note from "./Note";
 import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
-import ImportLinksDialog from "./ImportLinksDialog.js";
+import ImportLinksDialog from "./ImportLinksDialog";
 import {
   useHistory,
   useParams,
@@ -38,13 +38,13 @@ const EditorView = ({
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
   const [activeNote, setActiveNote] = useState(newNoteObject);
   const [searchValue, setSearchValue] = useState("");
-  const [pinnedNotes, setPinnedNotes] = useState([]);
+  const [pinnedNotes, setPinnedNotes] = useState<any[]>([]);
 
   const isSmallScreen = useIsSmallScreen();
 
   const history = useHistory();
   const { activeNoteId } = useParams();
-  const confirm = React.useContext(ConfirmationServiceContext);
+  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
   const displayedLinkedNotes = useMemo(() => [
     ...(!activeNote.isUnsaved)
@@ -261,11 +261,12 @@ const EditorView = ({
       const options = {
         page,
         sortMode,
+        query: "",
+        caseSensitive: false,
       };
 
       if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
         options.query = searchValue;
-        options.caseSensitive = false;
       }
 
       const requestId = uuidv4();
@@ -346,7 +347,7 @@ const EditorView = ({
   };
 
 
-  const handleNoteSaveRequest = useCallback(async () => {
+  const handleNoteSaveRequest = async () => {
     try {
       await saveActiveNote({ ignoreDuplicateTitles: false });
     } catch (e) {
@@ -363,7 +364,7 @@ const EditorView = ({
         });
       }
     }
-  });
+  };
 
 
   const handleKeydown = (e) => {
@@ -385,7 +386,7 @@ const EditorView = ({
   }, [handleKeydown]);
 
 
-  useEffect(async () => {
+  useEffect(() => {
     loadNote(activeNoteId);
   }, [activeNoteId]);
 
@@ -428,8 +429,6 @@ const EditorView = ({
             <NoteListControls
               onChange={handleSearchInputChange}
               value={searchValue}
-              displayedNotes={noteListItems}
-              stats={stats}
               sortMode={sortMode}
               setSortMode={(sortMode) => {
                 setNoteListScrollTop(0);
@@ -458,7 +457,6 @@ const EditorView = ({
                 setNoteListScrollTop(0);
               }}
               stats={stats}
-              pinOrUnpinNote={pinOrUnpinNote}
               itemsAreLinkable={true}
             />
           </div>

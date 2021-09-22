@@ -15,14 +15,14 @@ const [
 ] = (await Promise.all([
   import("react"),
   import("react-dom"),
-  import("./App.js"),
+  import("./App"),
 ])).map((module) => module.default);
 
 const localDatabaseProvider = new LocalDatabaseProvider();
 let serverDatabaseProvider = null;
 
 // ENABLE_SERVER_DATABASE defined via webpack.DefinePlugin
-// eslint-disable-next-line no-undef
+// @ts-ignore
 if (ENABLE_SERVER_DATABASE) {
   const ServerDatabaseProvider = (await import(
     "./lib/ServerDatabaseProvider/index.js"

@@ -13,7 +13,7 @@ const LoginViewServer = ({
   const [password, setPassword] = useState("");
   const [mfaToken, setMfaToken] = useState("");
   const [disclaimer, setDisclaimer]
-    = useState(null);
+    = useState<string | null>(null);
 
   const [isBusy, setIsBusy] = useState(false);
 

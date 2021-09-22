@@ -1,5 +1,5 @@
 import React from "react";
-import AppMenuItem from "./AppMenuItem.js";
+import AppMenuItem from "./AppMenuItem";
 import * as Config from "./lib/config.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import OutsideAlerter from "./OutsideAlerter.js";
@@ -17,7 +17,7 @@ const AppMenu = ({
   showStats,
   databaseProvider,
 }) => {
-  const confirm = React.useContext(ConfirmationServiceContext);
+  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
   const location = useLocation();
   const history = useHistory();
@@ -103,7 +103,6 @@ const AppMenu = ({
           || location.pathname.startsWith(Config.paths.list)
         )
           ? <AppMenuItem
-            id="button_logout"
             label="Logout"
             icon="lock"
             onClick={async () => {

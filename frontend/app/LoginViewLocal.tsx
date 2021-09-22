@@ -10,7 +10,7 @@ const LoginViewLocal = ({
   setDatabaseMode,
 }) => {
   const [localDisclaimer, setLocalDisclaimer]
-    = useState(null);
+    = useState<string | null>(null);
   const [
     localDatabaseFolderHandleName,
     setLocalDatabaseFolderHandleName,
@@ -18,10 +18,14 @@ const LoginViewLocal = ({
 
   const history = useHistory();
 
-  useEffect(async () => {
-    if (!localDatabaseProvider) return;
-    const folderHandleName = await localDatabaseProvider.getFolderHandleName();
-    setLocalDatabaseFolderHandleName(folderHandleName);
+  useEffect(() => {
+    const retrieveLocalDatabaseFolderHandle = async () => {
+      if (!localDatabaseProvider) return;
+      const folderHandleName = await localDatabaseProvider.getFolderHandleName();
+      setLocalDatabaseFolderHandleName(folderHandleName);
+    }
+
+    retrieveLocalDatabaseFolderHandle();
   }, [localDatabaseProvider]);
 
   return <>
@@ -72,6 +76,7 @@ const LoginViewLocal = ({
       className="default-button default-action"
       onClick={async () => {
         try {
+          // @ts-ignore (window.showDirectoryPicker is not in types yet)
           const folderHandle = await window.showDirectoryPicker();
           await localDatabaseProvider.login(folderHandle);
           setDatabaseMode(DatabaseModes.LOCAL);

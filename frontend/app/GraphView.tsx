@@ -7,7 +7,7 @@ import {
   useLocation,
   useHistory,
 } from "react-router-dom";
-import GraphViewHeader from "./GraphViewHeader.js";
+import GraphViewHeader from "./GraphViewHeader";
 
 const GraphView = ({
   databaseProvider,
@@ -18,16 +18,16 @@ const GraphView = ({
 }) => {
   const DEFAULT_STATUS = "";
   const mainElement = useRef(null);
-  const graphInstance = useRef(null);
+  const graphInstance = useRef<any>(null);
   const [status, setStatus] = useState(DEFAULT_STATUS);
   const [searchValue, setSearchValue] = useState("");
 
-  const confirm = React.useContext(ConfirmationServiceContext);
+  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const focusNoteId = parseInt(searchParams.get("focusNote"));
+  const focusNoteId = parseInt(searchParams.get("focusNote") || "");
 
   const saveGraphObject = async () => {
     const graphObject = graphInstance.current.getSaveData();
@@ -98,7 +98,7 @@ const GraphView = ({
   }, [handleKeydown]);
 
 
-  useEffect(async () => {
+  const initializeGraphInstance = async () => {
     if (!databaseProvider) return;
 
     const onHighlight = (highlightDetails) => {
@@ -125,6 +125,10 @@ const GraphView = ({
         throw new Error(e);
       }
     }
+  };
+  
+  useEffect(() => {
+    initializeGraphInstance();
   }, [databaseProvider]);
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import AppStats from "./AppStats.js";
 import {
   useHistory,
 } from "react-router-dom";
-import EditorViewHeaderPinnedNote from "./EditorViewHeaderPinnedNote.js";
+import EditorViewHeaderPinnedNote from "./EditorViewHeaderPinnedNote";
 
 
 const EditorViewHeader = ({

@@ -1,7 +1,7 @@
 import React from "react";
 import HeaderContainer from "./HeaderContainer.js";
-import LoginViewServer from "./LoginViewServer.js";
-import LoginViewLocal from "./LoginViewLocal.js";
+import LoginViewServer from "./LoginViewServer";
+import LoginViewLocal from "./LoginViewLocal";
 
 const LoginView = ({
   serverDatabaseProvider,

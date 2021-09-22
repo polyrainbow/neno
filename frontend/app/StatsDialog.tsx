@@ -9,22 +9,26 @@ const StatsDialog = ({
   databaseProvider,
   onCancel,
 }) => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState<any>(null);
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
 
-  useEffect(async () => {
-    const stats = await databaseProvider.getStats(true);
-    setStats(stats);
-    setStatus("READY");
+  useEffect(() => {
+    const updateStats = async () => {
+      const stats = await databaseProvider.getStats(true);
+      setStats(stats);
+      setStatus("READY");
+    }
+
+    updateStats();
   }, []);
 
-  let percentageOfUnlinkedNotes = null;
-  if (stats && (stats.numberOfAllNotes > 0)) {
-    percentageOfUnlinkedNotes = Math.round(
-      (stats.numberOfUnlinkedNotes / stats.numberOfAllNotes) * 100 * 100,
-    ) / 100;
-  }
+  const percentageOfUnlinkedNotes
+    = (stats && (stats.numberOfAllNotes > 0))
+      ? Math.round(
+        (stats.numberOfUnlinkedNotes / stats.numberOfAllNotes) * 100 * 100,
+      ) / 100
+      : NaN;
 
   return <Dialog
     onClickOnOverlay={() => {

@@ -3,7 +3,7 @@ import NoteListItem from "./NoteListItem.js";
 import * as Editor from "./lib/editor.js";
 import NoteStats from "./NoteStats.js";
 import isEqual from "react-fast-compare";
-import NoteControls from "./NoteControls.js";
+import NoteControls from "./NoteControls";
 import {
   useHistory,
 } from "react-router-dom";

@@ -33,7 +33,7 @@ const ListView = ({
   const [pinnedNotes, setPinnedNotes] = useState([]);
 
   const history = useHistory();
-  const confirm = React.useContext(ConfirmationServiceContext);
+  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
 
   const handleSearchInputChange = (value) => {
@@ -101,61 +101,60 @@ const ListView = ({
   };
 
 
-  const refreshNotesList = useCallback(
-    async () => {
-      if (!databaseProvider) return;
+  const refreshNotesList = async () => {
+    if (!databaseProvider) return;
 
-      refreshStats();
-      setNoteListItems([]);
+    refreshStats();
+    setNoteListItems([]);
 
-      // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
-      // we don't do anything and leave the note list empty
-      if (
-        searchValue.length > 0
-        && searchValue.length < Config.MINIMUM_SEARCH_QUERY_LENGTH
-      ) {
-        return;
+    // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
+    // we don't do anything and leave the note list empty
+    if (
+      searchValue.length > 0
+      && searchValue.length < Config.MINIMUM_SEARCH_QUERY_LENGTH
+    ) {
+      return;
+    }
+
+    setIsBusy(true);
+
+    const options = {
+      page,
+      sortMode,
+      query: "",
+      caseSensitive: false,
+    };
+
+    if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
+      options.query = searchValue;
+    }
+
+    const requestId = uuidv4();
+    currentRequestId.current = requestId;
+    try {
+      const {
+        results,
+        numberOfResults,
+      } = await databaseProvider.getNotes(options);
+
+      // ... some time later - check if this is the current request
+      if (currentRequestId.current === requestId) {
+        setNoteListItems(results);
+        setNumberOfResults(numberOfResults);
+        setIsBusy(false);
       }
 
-      setIsBusy(true);
-
-      const options = {
-        page,
-        sortMode,
-      };
-
-      if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
-        options.query = searchValue;
-        options.caseSensitive = false;
+      const pinnedNotes = await databaseProvider.getPins();
+      setPinnedNotes(pinnedNotes);
+    } catch (e) {
+      // if credentials are invalid, go to LoginView. If not, throw.
+      if (e.message === "INVALID_CREDENTIALS") {
+        await handleInvalidCredentialsError();
+      } else {
+        throw new Error(e);
       }
-
-      const requestId = uuidv4();
-      currentRequestId.current = requestId;
-      try {
-        const {
-          results,
-          numberOfResults,
-        } = await databaseProvider.getNotes(options);
-
-        // ... some time later - check if this is the current request
-        if (currentRequestId.current === requestId) {
-          setNoteListItems(results);
-          setNumberOfResults(numberOfResults);
-          setIsBusy(false);
-        }
-
-        const pinnedNotes = await databaseProvider.getPins();
-        setPinnedNotes(pinnedNotes);
-      } catch (e) {
-        // if credentials are invalid, go to LoginView. If not, throw.
-        if (e.message === "INVALID_CREDENTIALS") {
-          await handleInvalidCredentialsError();
-        } else {
-          throw new Error(e);
-        }
-      }
-    },
-  );
+    }
+  };
 
 
   useEffect(() => {
@@ -173,8 +172,6 @@ const ListView = ({
     <NoteListControls
       onChange={handleSearchInputChange}
       value={searchValue}
-      displayedNotes={noteListItems}
-      stats={stats}
       sortMode={sortMode}
       setSortMode={(sortMode) => {
         setNoteListScrollTop(0);
@@ -188,7 +185,6 @@ const ListView = ({
     <NoteList
       notes={noteListItems}
       numberOfResults={numberOfResults}
-      loadNote={loadNote}
       activeNote={activeNote}
       isBusy={isBusy}
       searchValue={searchValue}
@@ -202,6 +198,9 @@ const ListView = ({
       }}
       stats={stats}
       itemsAreLinkable={false}
+      onLinkAddition={null}
+      onLinkRemoval={null}
+      displayedLinkedNotes={null}
     />
   </>;
 };

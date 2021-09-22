@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import EditorView from "./EditorView.js";
-import ListView from "./ListView.js";
-import GraphView from "./GraphView.js";
-import LoginView from "./LoginView.js";
+import EditorView from "./EditorView";
+import ListView from "./ListView";
+import GraphView from "./GraphView";
+import LoginView from "./LoginView";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
 import AppMenu from "./AppMenu.js";
 import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
-import StatsDialog from "./StatsDialog.js";
+import StatsDialog from "./StatsDialog";
 import { paths } from "./lib/config.js";
 import {
   Route,
@@ -15,6 +15,7 @@ import {
 import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
 import FloatingActionButton from "./FloatingActionButton.js";
 import DatabaseModes from "./enum/DatabaseModes.js";
+import { Dialog } from "./enum/Dialog";
 
 
 const App = ({
@@ -23,7 +24,7 @@ const App = ({
 }) => {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
-  const [openDialog, setOpenDialog] = useState(null);
+  const [openDialog, setOpenDialog] = useState<Dialog | null>(null);
   const [databaseMode, setDatabaseMode] = useState(DatabaseModes.NONE);
 
   const history = useHistory();
@@ -67,7 +68,7 @@ const App = ({
         : null
     );
 
-  useEffect(async () => {
+  const startApp = async () => {
     if (await serverDatabaseProvider?.isAuthenticated()) {
       setDatabaseMode(DatabaseModes.SERVER);
       if (
@@ -79,6 +80,10 @@ const App = ({
     } else {
       history.push(paths.login);
     }
+  }
+
+  useEffect(() => {
+    startApp();
   }, []);
 
 
@@ -95,7 +100,6 @@ const App = ({
         setDatabaseMode={setDatabaseMode}
         serverDatabaseProvider={serverDatabaseProvider}
         localDatabaseProvider={localDatabaseProvider}
-        toggleAppMenu={toggleAppMenu}
       />
     </Route>
     <Route path="/editor/:activeNoteId?">
@@ -119,9 +123,9 @@ const App = ({
           ? <>
             <ListView
               databaseProvider={databaseProvider}
+              unsavedChanges={unsavedChanges}
+              setUnsavedChanges={setUnsavedChanges}
               toggleAppMenu={toggleAppMenu}
-              setOpenDialog={setOpenDialog}
-              openDialog={openDialog}
               handleInvalidCredentialsError={handleInvalidCredentialsError}
             />
             <FloatingActionButton
@@ -145,17 +149,17 @@ const App = ({
     {
       isAppMenuOpen
         ? <AppMenu
-          openExportDatabaseDialog={() => setOpenDialog("EXPORT_DATABASE")}
+          openExportDatabaseDialog={() => setOpenDialog(Dialog.EXPORT_DATABASE)}
           onClose={() => setIsAppMenuOpen(false)}
           unsavedChanges={unsavedChanges}
           setUnsavedChanges={setUnsavedChanges}
-          showStats={() => setOpenDialog("STATS")}
+          showStats={() => setOpenDialog(Dialog.STATS)}
           databaseProvider={databaseProvider}
         />
         : ""
     }
     {
-      openDialog === "EXPORT_DATABASE"
+      openDialog === Dialog.EXPORT_DATABASE
         ? <ExportDatabaseDialog
           onCancel={() => setOpenDialog(null)}
           databaseProvider={databaseProvider}
@@ -163,7 +167,7 @@ const App = ({
         : null
     }
     {
-      openDialog === "STATS"
+      openDialog === Dialog.STATS
         ? <StatsDialog
           onCancel={() => setOpenDialog(null)}
           databaseProvider={databaseProvider}
