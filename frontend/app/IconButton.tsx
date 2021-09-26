@@ -4,22 +4,30 @@ import {
 } from "react-tippy";
 import { ICON_PATH } from "./lib/config.js";
 
-const FloatingActionButton = ({
+interface IconButtonProps {
+  id?: string,
+  title: string,
+  icon: string,
+  onClick: any,
+  disabled?: boolean,
+};
+
+const IconButton = ({
   id,
   title,
   icon,
   onClick,
-  disabled,
-}) => {
+  disabled = false,
+}:IconButtonProps) => {
   return <Tooltip
     title={title}
     position="bottom"
+    // @ts-ignore types are incorrect
     trigger="mouseenter focus"
   >
     <button
-      className="icon-button-floating"
+      className="icon-button"
       id={id}
-      alt={title}
       onClick={onClick}
       disabled={disabled}
     >
@@ -34,4 +42,4 @@ const FloatingActionButton = ({
   </Tooltip>;
 };
 
-export default FloatingActionButton;
+export default IconButton;

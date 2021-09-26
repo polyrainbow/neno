@@ -1,13 +1,21 @@
 import React from "react";
 import IconButton from "./IconButton.js";
 
+interface SearchInputProps {
+  value: string,
+  onChange: any,
+  label?: string,
+  placeholder?: string,
+  inputStyle?: any,
+}
+
 const SearchInput = ({
   value,
   onChange,
   label,
   placeholder,
-  inputStyle,
-}) => {
+  inputStyle = {},
+}:SearchInputProps) => {
   return <>
     {
       label

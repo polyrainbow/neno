@@ -5,7 +5,7 @@ const GraphViewStatusIndicator = ({
   status,
 }) => {
   if (!status.active) {
-    return "";
+    return null;
   }
 
   let statusSpan;

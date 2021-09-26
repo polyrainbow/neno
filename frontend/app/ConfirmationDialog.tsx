@@ -1,5 +1,5 @@
 import React from "react";
-import Dialog from "./Dialog.js";
+import Dialog from "./Dialog";
 
 const ConfirmationDialog = ({
   isOpen,
@@ -10,7 +10,7 @@ const ConfirmationDialog = ({
   cancelText,
   encourageConfirmation,
 }) => {
-  if (!isOpen) return "";
+  if (!isOpen) return null;
 
   return <Dialog
     onClickOnOverlay={onCancel}

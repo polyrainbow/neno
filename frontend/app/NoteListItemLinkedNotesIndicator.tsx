@@ -1,5 +1,5 @@
 import React from "react";
-import Tooltip from "./Tooltip.js";
+import Tooltip from "./Tooltip";
 import { emojis, ICON_PATH } from "./lib/config.js";
 
 
@@ -31,7 +31,7 @@ const NoteListItemLinkedNotesIndicator = ({
             onLinkChange();
             e.stopPropagation();
           }
-          : null
+          : undefined
       }
     >
       <div

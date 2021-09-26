@@ -1,8 +1,8 @@
 import React from "react";
-import HeaderContainer from "./HeaderContainer.js";
-import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
-import IconButton from "./IconButton.js";
-import SearchInput from "./SearchInput.js";
+import HeaderContainer from "./HeaderContainer";
+import UnsavedChangesIndicator from "./UnsavedChangesIndicator";
+import IconButton from "./IconButton";
+import SearchInput from "./SearchInput";
 
 const GraphViewHeader = ({
   unsavedChanges,

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import Dialog from "./Dialog.js";
-import RadioGroup from "./RadioGroup.js";
+import Dialog from "./Dialog";
+import RadioGroup from "./RadioGroup";
 import { humanFileSize, yyyymmdd } from "./lib/utils.js";
 
 
@@ -13,7 +13,7 @@ const ExportDatabaseDialog = ({
   const [status, setStatus] = useState("READY");
   const bytesWrittenContainer = useRef(0);
   const [bytesWrittenDisplayed, setBytesWrittenDisplayed] = useState(0);
-  const animationFrameRequestContainer = useRef();
+  const animationFrameRequestContainer = useRef<number>(NaN);
 
 
   const exportDatabase = async (writableStream, withUploads) => {
@@ -36,6 +36,7 @@ const ExportDatabaseDialog = ({
 
 
   const getWritableStream = async (opts) => {
+    // @ts-ignore method is not yet in types
     const newHandle = await window.showSaveFilePicker(opts);
     // create a FileSystemWritableFileStream to write to
     const writableStream = await newHandle.createWritable();

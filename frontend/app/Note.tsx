@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import NoteListItem from "./NoteListItem.js";
+import NoteListItem from "./NoteListItem";
 import * as Editor from "./lib/editor.js";
-import NoteStats from "./NoteStats.js";
+import NoteStats from "./NoteStats";
 import isEqual from "react-fast-compare";
 import NoteControls from "./NoteControls";
 import {

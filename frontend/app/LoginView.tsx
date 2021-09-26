@@ -1,5 +1,5 @@
 import React from "react";
-import HeaderContainer from "./HeaderContainer.js";
+import HeaderContainer from "./HeaderContainer";
 import LoginViewServer from "./LoginViewServer";
 import LoginViewLocal from "./LoginViewLocal";
 

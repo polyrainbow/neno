@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Graph from "./lib/Graph.js";
 import * as Config from "./lib/config.js";
-import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
-import GraphViewStatusIndicator from "./GraphViewStatusIndicator.js";
+import ConfirmationServiceContext from "./ConfirmationServiceContext";
+import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {
   useLocation,
   useHistory,

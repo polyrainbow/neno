@@ -2,8 +2,8 @@ import React from "react";
 import { yyyymmdd } from "./lib/utils.js";
 import { emojis } from "./lib/config.js";
 import NoteListItemLinkedNotesIndicator
-  from "./NoteListItemLinkedNotesIndicator.js";
-import NoteListItemFeatures from "./NoteListItemFeatures.js";
+  from "./NoteListItemLinkedNotesIndicator";
+import NoteListItemFeatures from "./NoteListItemFeatures";
 
 
 const NoteListItem = ({

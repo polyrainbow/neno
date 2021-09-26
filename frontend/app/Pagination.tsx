@@ -53,7 +53,7 @@ const Pagination = (props) => {
           flexWrap: "wrap",
         }}>
           {items.map(({ page, type, selected, ...item }, index) => {
-            let children = null;
+            let children: JSX.Element | null = null;
 
             if (type === "start-ellipsis" || type === "end-ellipsis") {
               children = <span className="pagination-ellipsis">…</span>;

@@ -3,9 +3,9 @@ import EditorView from "./EditorView";
 import ListView from "./ListView";
 import GraphView from "./GraphView";
 import LoginView from "./LoginView";
-import ConfirmationServiceProvider from "./ConfirmationServiceProvider.js";
-import AppMenu from "./AppMenu.js";
-import ExportDatabaseDialog from "./ExportDatabaseDialog.js";
+import ConfirmationServiceProvider from "./ConfirmationServiceProvider";
+import AppMenu from "./AppMenu";
+import ExportDatabaseDialog from "./ExportDatabaseDialog";
 import StatsDialog from "./StatsDialog";
 import { paths } from "./lib/config.js";
 import {
@@ -13,7 +13,7 @@ import {
   useHistory,
 } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
-import FloatingActionButton from "./FloatingActionButton.js";
+import FloatingActionButton from "./FloatingActionButton";
 import DatabaseModes from "./enum/DatabaseModes.js";
 import { Dialog } from "./enum/Dialog";
 

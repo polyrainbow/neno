@@ -1,16 +1,16 @@
 import React from "react";
-import Overlay from "./Overlay.js";
+import Overlay from "./Overlay";
 
 const Dialog = ({
   children,
   onClickOnOverlay,
-  className,
+  className = "",
 }) => {
   return <Overlay
     onClick={onClickOnOverlay}
   >
     <div
-      className={"dialog-box " + (className || "")}
+      className={"dialog-box " + className}
       onClick={(e) => e.stopPropagation()}
     >
       {children}

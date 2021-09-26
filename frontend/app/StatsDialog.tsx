@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Dialog from "./Dialog.js";
+import Dialog from "./Dialog";
 import { emojis } from "./lib/config.js";
 import {
   makeTimestampHumanReadable,

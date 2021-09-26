@@ -1,11 +1,17 @@
 import React from "react";
 import AppTitle from "./AppTitle.js";
 
+interface HeaderContainerProps {
+  leftContent?: JSX.Element,
+  rightContent?: JSX.Element,
+  toggleAppMenu?: any,
+}
+
 const HeaderContainer = ({
   leftContent,
   rightContent,
   toggleAppMenu,
-}) => {
+}:HeaderContainerProps) => {
   return (
     <header>
       <div id="header-left">

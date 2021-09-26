@@ -9,7 +9,7 @@ import Note from "./Note";
 import * as Utils from "./lib/utils.js";
 import * as Config from "./lib/config.js";
 import * as Editor from "./lib/editor.js";
-import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
+import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import ImportLinksDialog from "./ImportLinksDialog";
 import {
   useHistory,

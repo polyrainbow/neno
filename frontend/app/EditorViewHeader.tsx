@@ -1,6 +1,6 @@
 import React from "react";
-import AppTitle from "./AppTitle.js";
-import AppStats from "./AppStats.js";
+import AppTitle from "./AppTitle";
+import AppStats from "./AppStats";
 import {
   useHistory,
 } from "react-router-dom";

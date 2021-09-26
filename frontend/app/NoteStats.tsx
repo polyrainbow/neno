@@ -2,7 +2,7 @@ import React from "react";
 import {
   makeTimestampHumanReadable,
 } from "./lib/utils.js";
-import NoteStatsFileLink from "./NoteStatsFileLink.js";
+import NoteStatsFileLink from "./NoteStatsFileLink";
 
 const NoteStats = ({
   note,
@@ -49,6 +49,7 @@ const NoteStats = ({
                   return <React.Fragment key={block.data.file.fileId + note.id}>
                     <NoteStatsFileLink
                       fileId={block.data.file.fileId}
+                      name={null}
                       databaseProvider={databaseProvider}
                     />
                     {

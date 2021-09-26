@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import NoteListStatus from "./NoteListStatus.js";
-import NoteListItem from "./NoteListItem.js";
-import Pagination from "./Pagination.js";
-import NoteSearchDisclaimer from "./NoteSearchDisclaimer.js";
+import NoteListStatus from "./NoteListStatus";
+import NoteListItem from "./NoteListItem";
+import Pagination from "./Pagination";
+import NoteSearchDisclaimer from "./NoteSearchDisclaimer";
 import {
   useHistory,
 } from "react-router-dom";

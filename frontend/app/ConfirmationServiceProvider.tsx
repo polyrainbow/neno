@@ -1,6 +1,6 @@
 import React from "react";
-import ConfirmationDialog from "./ConfirmationDialog.js";
-import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
+import ConfirmationDialog from "./ConfirmationDialog";
+import ConfirmationServiceContext from "./ConfirmationServiceContext";
 
 const ConfirmationServiceProvider = ({
   children,
@@ -8,9 +8,9 @@ const ConfirmationServiceProvider = ({
   const [
     confirmationState,
     setConfirmationState,
-  ] = React.useState(null);
+  ] = React.useState<any>(null);
 
-  const awaitingPromiseRef = React.useRef();
+  const awaitingPromiseRef = React.useRef<any>();
 
   const openConfirmation = (options) => {
     setConfirmationState(options);
@@ -43,6 +43,7 @@ const ConfirmationServiceProvider = ({
       {...confirmationState}
     />
     <ConfirmationServiceContext.Provider
+      // @ts-ignore
       value={openConfirmation}
     >
       {children}

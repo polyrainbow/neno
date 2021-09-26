@@ -1,8 +1,8 @@
 import React from "react";
 import AppMenuItem from "./AppMenuItem";
 import * as Config from "./lib/config.js";
-import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
-import OutsideAlerter from "./OutsideAlerter.js";
+import ConfirmationServiceContext from "./ConfirmationServiceContext";
+import OutsideAlerter from "./OutsideAlerter";
 import {
   useHistory,
   useLocation,

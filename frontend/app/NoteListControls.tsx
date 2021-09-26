@@ -1,6 +1,6 @@
 import React from "react";
 import SearchInput from "./SearchInput.js";
-import IconButton from "./IconButton.js";
+import IconButton from "./IconButton";
 
 const NoteListControls = ({
   value,
