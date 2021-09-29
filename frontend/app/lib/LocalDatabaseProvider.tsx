@@ -6,6 +6,7 @@ import FileSystemAccessAPIStorageProvider
 async function verifyPermission(fileHandle, readWrite) {
   const options = {};
   if (readWrite) {
+    // @ts-ignore
     options.mode = "readwrite";
   }
   // Check if permission was already granted. If so, return true.
@@ -36,6 +37,7 @@ export default class LocalDatabaseProvider {
   // and initialize the database
   async getFolderHandleName() {
     if (this.#folderHandle) {
+      //@ts-ignore
       return this.#folderHandle.name;
     }
 
@@ -45,6 +47,7 @@ export default class LocalDatabaseProvider {
     }
 
     this.#folderHandle = folderHandle;
+    //@ts-ignore
     return this.#folderHandle.name;
   }
 
@@ -103,7 +106,7 @@ export default class LocalDatabaseProvider {
       return false;
     }
 
-    this.#notesModule = await import("../../../lib/notes/index.ts");
+    this.#notesModule = await import("../../../lib/notes/index");
 
     const storageProvider
       = new FileSystemAccessAPIStorageProvider(this.#folderHandle);

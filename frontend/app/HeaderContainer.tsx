@@ -1,5 +1,5 @@
 import React from "react";
-import AppTitle from "./AppTitle.js";
+import AppTitle from "./AppTitle";
 
 interface HeaderContainerProps {
   leftContent?: JSX.Element,

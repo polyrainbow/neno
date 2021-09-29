@@ -1,6 +1,6 @@
 import React from "react";
-import { shortenText } from "./lib/utils.js";
-import { ICON_PATH } from "./lib/config.js";
+import { shortenText } from "./lib/utils";
+import { ICON_PATH } from "./lib/config";
 
 const EditorViewHeaderPinnedNote = ({
   note,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Tooltip } from "react-tippy";
-import { emojis } from "./lib/config.js";
+import { emojis } from "./lib/config";
 
 const AppStatsItem = ({
   icon,

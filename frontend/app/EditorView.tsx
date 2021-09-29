@@ -3,20 +3,24 @@ import React, {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditorViewHeader from "./EditorViewHeader";
-import NoteList from "./NoteList.js";
+import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import Note from "./Note";
-import * as Utils from "./lib/utils.js";
-import * as Config from "./lib/config.js";
-import * as Editor from "./lib/editor.js";
+import * as Utils from "./lib/utils";
+import * as Config from "./lib/config";
+import * as Editor from "./lib/editor";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import ImportLinksDialog from "./ImportLinksDialog";
 import {
   useHistory,
   useParams,
 } from "react-router-dom";
-import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
-
+import useIsSmallScreen from "./hooks/useIsSmallScreen";
+import {
+  UserNoteChangeType,
+} from "../../lib/notes/interfaces/UserNoteChangeType";
+import ActiveNote from "./interfaces/ActiveNote";
+import FrontendUserNoteChange from "./interfaces/FrontendUserNoteChange";
 
 const EditorView = ({
   databaseProvider,
@@ -27,7 +31,7 @@ const EditorView = ({
   openDialog,
   handleInvalidCredentialsError,
 }) => {
-  const newNoteObject = Utils.getNewNoteObject();
+  const newNoteObject:ActiveNote = Utils.getNewNoteObject();
   const currentRequestId = useRef(null);
   const [noteListItems, setNoteListItems] = useState([]);
   const [numberOfResults, setNumberOfResults] = useState([]);
@@ -36,8 +40,8 @@ const EditorView = ({
   const [isBusy, setIsBusy] = useState(true);
   const [stats, setStats] = useState(null);
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
-  const [activeNote, setActiveNote] = useState(newNoteObject);
-  const [searchValue, setSearchValue] = useState("");
+  const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
+  const [searchValue, setSearchValue] = useState<string>("");
   const [pinnedNotes, setPinnedNotes] = useState<any[]>([]);
 
   const isSmallScreen = useIsSmallScreen();
@@ -51,7 +55,7 @@ const EditorView = ({
       ? activeNote.linkedNotes.filter((note) => {
         const isRemoved = activeNote.changes.some((change) => {
           return (
-            change.type === "LINKED_NOTE_DELETED"
+            change.type === UserNoteChangeType.LINKED_NOTE_DELETED
             && change.noteId === note.id
           );
         });
@@ -60,7 +64,7 @@ const EditorView = ({
       : [],
     ...activeNote.changes
       .filter((change) => {
-        return change.type === "LINKED_NOTE_ADDED";
+        return change.type === UserNoteChangeType.LINKED_NOTE_ADDED;
       })
       .map((change) => {
         return change.note;
@@ -78,7 +82,7 @@ const EditorView = ({
     // return if linked note has already been added
     if (activeNote.changes.some((change) => {
       return (
-        change.type === "LINKED_NOTE_ADDED"
+        change.type === UserNoteChangeType.LINKED_NOTE_ADDED
         && change.noteId === note.id
       );
     })) {
@@ -89,7 +93,7 @@ const EditorView = ({
     const newChanges = [
       ...activeNote.changes.filter((change) => {
         return !(
-          change.type === "LINKED_NOTE_DELETED"
+          change.type === UserNoteChangeType.LINKED_NOTE_DELETED
           && change.noteId === note.id
         );
       }),
@@ -104,7 +108,7 @@ const EditorView = ({
     ) {
       newChanges.push(
         {
-          type: "LINKED_NOTE_ADDED",
+          type: UserNoteChangeType.LINKED_NOTE_ADDED,
           noteId: note.id,
           note: {
             id: note.id,
@@ -133,7 +137,7 @@ const EditorView = ({
       blocks: activeNote.blocks,
       changes: activeNote.linkedNotes.map((linkedNote) => {
         return {
-          type: "LINKED_NOTE_ADDED",
+          type: UserNoteChangeType.LINKED_NOTE_ADDED,
           noteId: linkedNote.id,
         };
       }),
@@ -154,7 +158,7 @@ const EditorView = ({
   const handleLinkRemoval = async (linkedNoteId) => {
     if (activeNote.changes.some((change) => {
       return (
-        change.type === "LINKED_NOTE_DELETED"
+        change.type === UserNoteChangeType.LINKED_NOTE_DELETED
         && change.noteId === linkedNoteId
       );
     })) {
@@ -165,14 +169,16 @@ const EditorView = ({
       ...activeNote,
       blocks: await Editor.save(),
       changes: [
-        ...activeNote.changes.filter((change) => {
-          return !(
-            change.type === "LINKED_NOTE_ADDED"
-            && change.noteId === linkedNoteId
-          );
-        }),
+        ...activeNote.changes.filter(
+          (change:FrontendUserNoteChange):boolean => {
+            return !(
+              change.type === UserNoteChangeType.LINKED_NOTE_ADDED
+              && change.noteId === linkedNoteId
+            );
+          }
+        ),
         {
-          type: "LINKED_NOTE_DELETED",
+          type: UserNoteChangeType.LINKED_NOTE_DELETED,
           noteId: linkedNoteId,
         },
       ],

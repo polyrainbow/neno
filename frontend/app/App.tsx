@@ -7,12 +7,12 @@ import ConfirmationServiceProvider from "./ConfirmationServiceProvider";
 import AppMenu from "./AppMenu";
 import ExportDatabaseDialog from "./ExportDatabaseDialog";
 import StatsDialog from "./StatsDialog";
-import { paths } from "./lib/config.js";
+import { paths } from "./lib/config";
 import {
   Route,
   useHistory,
 } from "react-router-dom";
-import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
+import useIsSmallScreen from "./hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
 import DatabaseModes from "./enum/DatabaseModes.js";
 import { Dialog } from "./enum/Dialog";

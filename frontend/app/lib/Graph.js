@@ -36,7 +36,7 @@ import {
   binaryArrayIncludes,
   shortenText,
   htmlDecode,
-} from "./utils.js";
+} from "./utils.tsx";
 
 
 const prepareGraphObject = (graph) => {

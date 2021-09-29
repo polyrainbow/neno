@@ -2,7 +2,7 @@ import React from "react";
 import {
   Tooltip,
 } from "react-tippy";
-import { ICON_PATH } from "./lib/config.js";
+import { ICON_PATH } from "./lib/config";
 
 const FloatingActionButton = ({
   title,

@@ -1,10 +1,10 @@
-import { getUrlForFileId } from "./utils.js";
+import { getUrlForFileId } from "./utils";
 
 // this instance queue makes sure that there are not several editor instances
 // loaded in parallel and thus become visible on the screen. it queues all
 // incoming promises and executes them only when their previous promise has
 // fulfilled
-let instanceQueue = null;
+let instanceQueue:Promise<any> | null = null;
 
 const load = async ({ data, parent, onChange, databaseProvider }) => {
   if (instanceQueue === null) {

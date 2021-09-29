@@ -1,5 +1,5 @@
 import React from "react";
-import { ICON_PATH } from "./lib/config.js";
+import { ICON_PATH } from "./lib/config";
 
 
 const AppMenuItem = ({

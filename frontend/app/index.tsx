@@ -6,7 +6,7 @@ import {
   BrowserRouter as Router,
 } from "react-router-dom";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
-import { API_URL } from "./lib/config.js";
+import { API_URL } from "./lib/config";
 
 const [
   React,

@@ -1,13 +1,13 @@
 import React from "react";
 import AppMenuItem from "./AppMenuItem";
-import * as Config from "./lib/config.js";
+import * as Config from "./lib/config";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import OutsideAlerter from "./OutsideAlerter";
 import {
   useHistory,
   useLocation,
 } from "react-router-dom";
-import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
+import useIsSmallScreen from "./hooks/useIsSmallScreen";
 
 const AppMenu = ({
   openExportDatabaseDialog,

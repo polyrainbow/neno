@@ -1,8 +1,7 @@
-import * as Config from "./config.js";
+import ActiveNote from "../interfaces/ActiveNote";
+import * as Config from "./config";
 
-const yyyymmdd = (date) => {
-  if (!date) date = new Date();
-
+const yyyymmdd = (date = new Date()) => {
   const yyyy = date.getFullYear().toString();
   const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
   const dd = date.getDate().toString();
@@ -34,19 +33,13 @@ const makeTimestampHumanReadable = (timestamp) => {
 };
 
 
-const getNewNoteObject = () => {
-  const note = {
+const getNewNoteObject = ():ActiveNote => {
+  const note:ActiveNote = {
     changes: [],
-    creationTime: null,
     blocks: Config.DEFAULT_NOTE_BLOCKS,
-    id: null,
+    id: NaN,
     isUnsaved: true,
     linkedNotes: [],
-    updateTime: null,
-    position: {
-      x: null,
-      y: null,
-    },
   };
 
   Object.seal(note);

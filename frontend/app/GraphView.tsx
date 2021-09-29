@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Graph from "./lib/Graph.js";
-import * as Config from "./lib/config.js";
+import * as Config from "./lib/config";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {

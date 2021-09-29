@@ -2,12 +2,12 @@ import React, {
   useEffect, useState, useCallback, useRef,
 } from "react";
 import { v4 as uuidv4 } from "uuid";
-import EditorViewHeader from "./EditorViewHeader.js";
-import NoteList from "./NoteList.js";
-import NoteListControls from "./NoteListControls.js";
-import * as Utils from "./lib/utils.js";
-import * as Config from "./lib/config.js";
-import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
+import EditorViewHeader from "./EditorViewHeader";
+import NoteList from "./NoteList";
+import NoteListControls from "./NoteListControls";
+import * as Utils from "./lib/utils";
+import * as Config from "./lib/config";
+import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import {
   useHistory,
 } from "react-router-dom";
