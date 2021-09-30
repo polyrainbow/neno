@@ -25,3 +25,9 @@
 .cdx-button {
     background: none !important;
 }
+
+.ce-conversion-toolbar,
+.ce-inline-toolbar__dropdown-content,
+.icon.icon--toggler-down {
+    color: black !important;
+}
