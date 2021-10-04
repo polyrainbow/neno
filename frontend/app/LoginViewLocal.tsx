@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import {
   useHistory,
 } from "react-router-dom";
-import { paths } from "./lib/config.js";
-import DatabaseModes from "./enum/DatabaseModes.js";
+import { paths } from "./lib/config";
+import { DatabaseMode } from "./enum/DatabaseMode";
 
 const LoginViewLocal = ({
   localDatabaseProvider,
@@ -50,7 +50,7 @@ const LoginViewLocal = ({
             onClick={async () => {
               try {
                 await localDatabaseProvider.initializeDatabase();
-                setDatabaseMode(DatabaseModes.LOCAL);
+                setDatabaseMode(DatabaseMode.LOCAL);
                 history.push(paths.editor);
               } catch (e) {
                 console.error(e);
@@ -79,7 +79,7 @@ const LoginViewLocal = ({
           // @ts-ignore (window.showDirectoryPicker is not in types yet)
           const folderHandle = await window.showDirectoryPicker();
           await localDatabaseProvider.login(folderHandle);
-          setDatabaseMode(DatabaseModes.LOCAL);
+          setDatabaseMode(DatabaseMode.LOCAL);
           history.push(paths.editor);
         } catch (e) {
           console.error(e);

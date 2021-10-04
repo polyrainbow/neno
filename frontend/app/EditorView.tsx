@@ -21,6 +21,7 @@ import {
 } from "../../lib/notes/interfaces/UserNoteChangeType";
 import ActiveNote from "./interfaces/ActiveNote";
 import FrontendUserNoteChange from "./interfaces/FrontendUserNoteChange";
+import { Dialog } from "./enum/Dialog";
 
 const EditorView = ({
   databaseProvider,
@@ -466,7 +467,7 @@ const EditorView = ({
               itemsAreLinkable={true}
             />
           </div>
-          : ""
+          : null
       }
       <div id="right-view">
         <Note
@@ -480,7 +481,7 @@ const EditorView = ({
           removeActiveNote={removeActiveNote}
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}
-          openImportLinksDialog={() => setOpenDialog("IMPORT_LINKS")}
+          openImportLinksDialog={() => setOpenDialog(Dialog.IMPORT_LINKS)}
           duplicateNote={duplicateNote}
           openInGraphView={() => {
             history.push(`${Config.paths.graph}?focusNote=${activeNote.id}`);
@@ -489,7 +490,7 @@ const EditorView = ({
       </div>
     </main>
     {
-      openDialog === "IMPORT_LINKS"
+      openDialog === Dialog.IMPORT_LINKS
         ? <ImportLinksDialog
           importLinksAsNotes={importLinksAsNotes}
           onCancel={() => setOpenDialog(null)}

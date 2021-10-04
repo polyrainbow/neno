@@ -14,7 +14,7 @@ import {
 } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
-import DatabaseModes from "./enum/DatabaseModes.js";
+import { DatabaseMode } from "./enum/DatabaseMode.js";
 import { Dialog } from "./enum/Dialog";
 
 
@@ -24,8 +24,9 @@ const App = ({
 }) => {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
-  const [openDialog, setOpenDialog] = useState<Dialog | null>(null);
-  const [databaseMode, setDatabaseMode] = useState(DatabaseModes.NONE);
+  const [openDialog, setOpenDialog] = useState<Dialog>(Dialog.NONE);
+  const [databaseMode, setDatabaseMode]
+    = useState<DatabaseMode>(DatabaseMode.NONE);
 
   const history = useHistory();
   const isSmallScreen = useIsSmallScreen();
@@ -60,17 +61,17 @@ const App = ({
   };
 
 
-  const databaseProvider = databaseMode === DatabaseModes.LOCAL
+  const databaseProvider = databaseMode === DatabaseMode.LOCAL
     ? localDatabaseProvider
     : (
-      databaseMode === DatabaseModes.SERVER
+      databaseMode === DatabaseMode.SERVER
         ? serverDatabaseProvider
         : null
     );
 
   const startApp = async () => {
     if (await serverDatabaseProvider?.isAuthenticated()) {
-      setDatabaseMode(DatabaseModes.SERVER);
+      setDatabaseMode(DatabaseMode.SERVER);
       if (
         location.pathname.startsWith(paths.login)
         || location.pathname === "/"
@@ -89,20 +90,20 @@ const App = ({
 
   const handleInvalidCredentialsError = async () => {
     await databaseProvider.removeAccess();
-    setDatabaseMode(DatabaseModes.NONE);
+    setDatabaseMode(DatabaseMode.NONE);
     history.push(paths.login);
   };
 
 
   return <ConfirmationServiceProvider>
-    <Route path="/login">
+    <Route path={paths.login}>
       <LoginView
         setDatabaseMode={setDatabaseMode}
         serverDatabaseProvider={serverDatabaseProvider}
         localDatabaseProvider={localDatabaseProvider}
       />
     </Route>
-    <Route path="/editor/:activeNoteId?">
+    <Route path={paths.editor + "/:activeNoteId?"}>
       {
         databaseProvider
           ? <EditorView
@@ -114,7 +115,7 @@ const App = ({
             openDialog={openDialog}
             handleInvalidCredentialsError={handleInvalidCredentialsError}
           />
-          : ""
+          : null
       }
     </Route>
     <Route path={paths.list}>
@@ -134,7 +135,7 @@ const App = ({
               onClick={() => history.push(paths.newNote)}
             ></FloatingActionButton>
           </>
-          : ""
+          : null
       }
     </Route>
     <Route path={paths.graph}>
@@ -161,7 +162,7 @@ const App = ({
     {
       openDialog === Dialog.EXPORT_DATABASE
         ? <ExportDatabaseDialog
-          onCancel={() => setOpenDialog(null)}
+          onCancel={() => setOpenDialog(Dialog.NONE)}
           databaseProvider={databaseProvider}
         />
         : null
@@ -169,7 +170,7 @@ const App = ({
     {
       openDialog === Dialog.STATS
         ? <StatsDialog
-          onCancel={() => setOpenDialog(null)}
+          onCancel={() => setOpenDialog(Dialog.NONE)}
           databaseProvider={databaseProvider}
         />
         : null
