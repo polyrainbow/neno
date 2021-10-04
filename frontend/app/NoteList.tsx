@@ -3,9 +3,8 @@ import NoteListStatus from "./NoteListStatus";
 import NoteListItem from "./NoteListItem";
 import Pagination from "./Pagination";
 import NoteSearchDisclaimer from "./NoteSearchDisclaimer";
-import {
-  useHistory,
-} from "react-router-dom";
+import useGoToNote from "./hooks/useGoToNote";
+import { SEARCH_RESULTS_PER_PAGE } from "./lib/config";
 
 
 const NoteList = ({
@@ -26,10 +25,7 @@ const NoteList = ({
   itemsAreLinkable,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const searchResultsPerPage = 100;
-
-  const history = useHistory();
+  const goToNote = useGoToNote();
 
   let status = "DEFAULT";
 
@@ -84,7 +80,7 @@ const NoteList = ({
     <Pagination
       numberOfResults={numberOfResults}
       page={page}
-      searchResultsPerPage={searchResultsPerPage}
+      searchResultsPerPage={SEARCH_RESULTS_PER_PAGE}
       onChange={(newPage) => setPage(newPage)}
     />
     <NoteSearchDisclaimer
@@ -111,7 +107,7 @@ const NoteList = ({
             isActive={isActive}
             isLinked={isLinked}
             key={`main-notes-list-item-${note.id}`}
-            onSelect={() => history.push(`/editor/${note.id}`)}
+            onSelect={() => goToNote(note.id)}
             isLinkable={itemsAreLinkable}
             onLinkChange={() => {
               if (isActive) return;
@@ -131,7 +127,7 @@ const NoteList = ({
         ? <Pagination
           numberOfResults={numberOfResults}
           page={page}
-          searchResultsPerPage={searchResultsPerPage}
+          searchResultsPerPage={SEARCH_RESULTS_PER_PAGE}
           onChange={(newPage) => setPage(newPage)}
         />
         : ""

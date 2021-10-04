@@ -4,9 +4,7 @@ import * as Editor from "./lib/editor";
 import NoteStats from "./NoteStats";
 import isEqual from "react-fast-compare";
 import NoteControls from "./NoteControls";
-import {
-  useHistory,
-} from "react-router-dom";
+import useGoToNote from "./hooks/useGoToNote";
 
 const Note = ({
   note,
@@ -25,7 +23,7 @@ const Note = ({
 }) => {
   const previousBlocks = useRef(null);
   const blocks = note?.blocks;
-  const history = useHistory();
+  const goToNote = useGoToNote();
 
   useEffect(() => {
     const parent = document.getElementById("editor");
@@ -79,7 +77,7 @@ const Note = ({
             displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
               note={displayedLinkedNote}
               key={"note-link-list-item-" + displayedLinkedNote.id}
-              onSelect={() => history.push(`/editor/${displayedLinkedNote.id}`)}
+              onSelect={() => goToNote(displayedLinkedNote.id)}
               isActive={false}
               isLinked={true}
               onLinkChange={() => onLinkRemoval(displayedLinkedNote.id)}

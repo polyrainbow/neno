@@ -1,11 +1,8 @@
 import React from "react";
 import AppTitle from "./AppTitle";
 import AppStats from "./AppStats";
-import {
-  useHistory,
-} from "react-router-dom";
 import EditorViewHeaderPinnedNote from "./EditorViewHeaderPinnedNote";
-
+import useGoToNote from "./hooks/useGoToNote";
 
 const EditorViewHeader = ({
   stats,
@@ -13,7 +10,7 @@ const EditorViewHeader = ({
   pinnedNotes,
   activeNote,
 }) => {
-  const history = useHistory();
+  const goToNote = useGoToNote();
 
   return (
     <header>
@@ -36,7 +33,7 @@ const EditorViewHeader = ({
               return <EditorViewHeaderPinnedNote
                 key={`pinnedNote_${pinnedNote.id}`}
                 note={pinnedNote}
-                onClick={() => history.push(`/editor/${pinnedNote.id}`)}
+                onClick={() => goToNote(pinnedNote.id)}
                 isActive={activeNote && (pinnedNote.id === activeNote.id)}
               />;
             })

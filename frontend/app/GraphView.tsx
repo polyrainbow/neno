@@ -9,6 +9,7 @@ import {
 import GraphViewHeader from "./GraphViewHeader";
 import useConfirmDiscardingUnsavedChangesDialog
   from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
+import useGoToNote from "./hooks/useGoToNote";
 
 const GraphView = ({
   databaseProvider,
@@ -26,7 +27,7 @@ const GraphView = ({
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
-  const history = useHistory();
+  const goToNote = useGoToNote();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const focusNoteId = parseInt(searchParams.get("focusNote") || "");
@@ -49,7 +50,7 @@ const GraphView = ({
       setUnsavedChanges(false);
     }
 
-    history.push(`/editor/${noteId}`);
+    goToNote(noteId);
   };
 
 

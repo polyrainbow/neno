@@ -59,11 +59,15 @@ const MAX_WIDTH_SMALL_SCREEN = 1200;
 
 const paths = {
   editor: "/editor",
+  editorWithNote: "/editor/%NOTE_ID%",
   newNote: "/editor/new",
   list: "/list",
   graph: "/graph",
+  graphWithFocusNote: "/graph?focusNote=%FOCUS_NOTE_ID%",
   login: "/login",
 };
+
+const SEARCH_RESULTS_PER_PAGE = 100;
 
 export {
   DEFAULT_NOTE_TITLE,
@@ -75,4 +79,5 @@ export {
   ICON_PATH,
   MAX_WIDTH_SMALL_SCREEN,
   paths,
+  SEARCH_RESULTS_PER_PAGE,
 };

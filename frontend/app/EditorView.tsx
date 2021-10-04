@@ -24,6 +24,7 @@ import FrontendUserNoteChange from "./interfaces/FrontendUserNoteChange";
 import { Dialog } from "./enum/Dialog";
 import useConfirmDiscardingUnsavedChangesDialog
   from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
+import useGoToNote from "./hooks/useGoToNote";
 
 const EditorView = ({
   databaseProvider,
@@ -50,6 +51,7 @@ const EditorView = ({
   const isSmallScreen = useIsSmallScreen();
 
   const history = useHistory();
+  const goToNote = useGoToNote();
   const { activeNoteId } = useParams();
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
   const confirmDiscardingUnsavedChanges
@@ -348,7 +350,7 @@ const EditorView = ({
     });
     setUnsavedChanges(false);
     refreshNotesList();
-    history.replace(`/editor/${noteFromServer.id}`);
+    goToNote(noteFromServer.id, true);
   };
 
 
@@ -482,7 +484,12 @@ const EditorView = ({
           openImportLinksDialog={() => setOpenDialog(Dialog.IMPORT_LINKS)}
           duplicateNote={duplicateNote}
           openInGraphView={() => {
-            history.push(`${Config.paths.graph}?focusNote=${activeNote.id}`);
+            history.push(
+              Config.paths.graphWithFocusNote.replace(
+                "%FOCUS_NOTE_ID%",
+                activeNote.id.toString(),
+              ),
+            );
           }}
         />
       </div>
