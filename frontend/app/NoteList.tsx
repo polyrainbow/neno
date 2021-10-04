@@ -96,7 +96,9 @@ const NoteList = ({
       {
         notes.map((note) => {
           const isActive
-            = (!activeNote.isUnsaved) && (note.id === activeNote.id);
+            = activeNote
+              && (!activeNote.isUnsaved)
+              && (note.id === activeNote.id);
           const isLinked
             = itemsAreLinkable && displayedLinkedNotes.some(
               (linkedNote) => {

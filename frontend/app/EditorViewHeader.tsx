@@ -11,7 +11,7 @@ const EditorViewHeader = ({
   stats,
   toggleAppMenu,
   pinnedNotes,
-  note,
+  activeNote,
 }) => {
   const history = useHistory();
 
@@ -37,7 +37,7 @@ const EditorViewHeader = ({
                 key={`pinnedNote_${pinnedNote.id}`}
                 note={pinnedNote}
                 onClick={() => history.push(`/editor/${pinnedNote.id}`)}
-                isActive={pinnedNote.id === note.id}
+                isActive={activeNote && (pinnedNote.id === activeNote.id)}
               />;
             })
             : <p

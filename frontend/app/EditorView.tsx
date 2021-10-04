@@ -22,6 +22,8 @@ import {
 import ActiveNote from "./interfaces/ActiveNote";
 import FrontendUserNoteChange from "./interfaces/FrontendUserNoteChange";
 import { Dialog } from "./enum/Dialog";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const EditorView = ({
   databaseProvider,
@@ -50,6 +52,8 @@ const EditorView = ({
   const history = useHistory();
   const { activeNoteId } = useParams();
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
 
   const displayedLinkedNotes = useMemo(() => [
     ...(!activeNote.isUnsaved)
@@ -191,13 +195,7 @@ const EditorView = ({
 
   const loadNote = async (noteId) => {
     if (unsavedChanges) {
-      await confirm({
-        text: Config.texts.discardChangesConfirmation,
-        confirmText: "Discard changes",
-        cancelText: "Cancel",
-        encourageConfirmation: false,
-      });
-
+      await confirmDiscardingUnsavedChanges();
       setUnsavedChanges(false);
     }
 
@@ -427,7 +425,7 @@ const EditorView = ({
       stats={stats}
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
-      note={activeNote}
+      activeNote={activeNote}
     />
     <main>
       {

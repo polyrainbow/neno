@@ -1,10 +1,12 @@
 import React from "react";
 import IconButton from "./IconButton.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
-import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import { useHistory } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
-import { paths, texts } from "./lib/config.js";
+import { paths } from "./lib/config.js";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
+import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 
 const NoteControls = ({
   activeNote,
@@ -18,9 +20,11 @@ const NoteControls = ({
   duplicateNote,
   openInGraphView,
 }) => {
-  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
   const history = useHistory();
   const isSmallScreen = useIsSmallScreen();
+  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
   return <section id="note-controls">
     <div id="note-controls-left">
@@ -32,12 +36,7 @@ const NoteControls = ({
             icon="list"
             onClick={async () => {
               if (unsavedChanges) {
-                await confirm({
-                  text: texts.discardChangesConfirmation,
-                  confirmText: "Discard changes",
-                  cancelText: "Cancel",
-                  encourageConfirmation: false,
-                });
+                await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
               history.push(paths.list);

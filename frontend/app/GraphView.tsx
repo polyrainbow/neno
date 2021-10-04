@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import Graph from "./lib/Graph.js";
-import * as Config from "./lib/config";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {
@@ -8,6 +7,8 @@ import {
   useHistory,
 } from "react-router-dom";
 import GraphViewHeader from "./GraphViewHeader";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const GraphView = ({
   databaseProvider,
@@ -22,7 +23,8 @@ const GraphView = ({
   const [status, setStatus] = useState(DEFAULT_STATUS);
   const [searchValue, setSearchValue] = useState("");
 
-  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
 
   const history = useHistory();
   const location = useLocation();
@@ -43,13 +45,7 @@ const GraphView = ({
 
   const openNoteInEditor = async (noteId) => {
     if (unsavedChanges) {
-      await confirm({
-        text: Config.texts.discardChangesConfirmation,
-        confirmText: "Discard changes",
-        cancelText: "Cancel",
-        encourageConfirmation: false,
-      });
-
+      await confirmDiscardingUnsavedChanges();
       setUnsavedChanges(false);
     }
 

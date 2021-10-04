@@ -1,13 +1,14 @@
 import React from "react";
 import AppMenuItem from "./AppMenuItem";
 import * as Config from "./lib/config";
-import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import OutsideAlerter from "./OutsideAlerter";
 import {
   useHistory,
   useLocation,
 } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const AppMenu = ({
   openExportDatabaseDialog,
@@ -17,7 +18,8 @@ const AppMenu = ({
   showStats,
   databaseProvider,
 }) => {
-  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
 
   const location = useLocation();
   const history = useHistory();
@@ -45,19 +47,13 @@ const AppMenu = ({
             icon="scatter_plot"
             onClick={async () => {
               if (unsavedChanges) {
-                await confirm({
-                  text: Config.texts.discardChangesConfirmation,
-                  confirmText: "Discard changes",
-                  cancelText: "Cancel",
-                  encourageConfirmation: false,
-                });
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
               }
-
-              setUnsavedChanges(false);
               history.push(Config.paths.graph);
             }}
           />
-          : ""
+          : null
       }
       {
         location.pathname.startsWith(Config.paths.graph)
@@ -66,21 +62,16 @@ const AppMenu = ({
             icon={isSmallScreen ? "list" : "create"}
             onClick={async () => {
               if (unsavedChanges) {
-                await confirm({
-                  text: Config.texts.discardChangesConfirmation,
-                  confirmText: "Discard changes",
-                  cancelText: "Cancel",
-                  encourageConfirmation: false,
-                });
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
               }
 
-              setUnsavedChanges(false);
               history.push(
                 isSmallScreen ? Config.paths.list : Config.paths.editor,
               );
             }}
           />
-          : ""
+          : null
       }
       {
         databaseProvider.constructor.features.includes("EXPORT_DATABASE")
@@ -107,19 +98,15 @@ const AppMenu = ({
             icon="lock"
             onClick={async () => {
               if (unsavedChanges) {
-                await confirm({
-                  text: Config.texts.discardChangesConfirmation,
-                  confirmText: "Discard changes",
-                  cancelText: "Cancel",
-                  encourageConfirmation: false,
-                });
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
               }
 
               await databaseProvider.removeAccess();
-              history.push("/login");
+              history.push(Config.paths.login);
             }}
           />
-          : ""
+          : null
       }
     </div>
   </OutsideAlerter>;

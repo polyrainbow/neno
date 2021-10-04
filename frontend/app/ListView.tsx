@@ -1,22 +1,15 @@
 import React, {
-  useEffect, useState, useCallback, useRef,
+  useEffect, useState, useRef,
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
-import * as Utils from "./lib/utils";
 import * as Config from "./lib/config";
-import ConfirmationServiceContext from "./ConfirmationServiceContext";
-import {
-  useHistory,
-} from "react-router-dom";
 
 
 const ListView = ({
   databaseProvider,
-  unsavedChanges,
-  setUnsavedChanges,
   toggleAppMenu,
   handleInvalidCredentialsError,
 }) => {
@@ -28,59 +21,13 @@ const ListView = ({
   const [isBusy, setIsBusy] = useState(true);
   const [stats, setStats] = useState(null);
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
-  const [activeNote, setActiveNote] = useState(Utils.getNewNoteObject());
   const [searchValue, setSearchValue] = useState("");
   const [pinnedNotes, setPinnedNotes] = useState([]);
-
-  const history = useHistory();
-  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
-
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
     setNoteListScrollTop(0);
     setPage(1);
-  };
-
-
-  const loadNote = async (noteId) => {
-    if (unsavedChanges) {
-      await confirm({
-        text: Config.texts.discardChangesConfirmation,
-        confirmText: "Discard changes",
-        cancelText: "Cancel",
-        encourageConfirmation: false,
-      });
-
-      setUnsavedChanges(false);
-    }
-
-    let noteIdNumber = noteId;
-
-    if (typeof noteIdNumber !== "number") {
-      noteIdNumber = parseInt(noteIdNumber);
-    }
-
-    if (isNaN(noteIdNumber)) {
-      history.replace(Config.paths.newNote);
-      setActiveNote(Utils.getNewNoteObject());
-    } else {
-      try {
-        const noteFromServer = await databaseProvider.getNote(noteIdNumber);
-        setActiveNote({
-          ...noteFromServer,
-          isUnsaved: false,
-          changes: [],
-        });
-      } catch (e) {
-        // if credentials are invalid, go to LoginView. If not, throw.
-        if (e.message === "INVALID_CREDENTIALS") {
-          await handleInvalidCredentialsError();
-        } else {
-          throw new Error(e);
-        }
-      }
-    }
   };
 
 
@@ -167,7 +114,7 @@ const ListView = ({
       stats={stats}
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
-      note={activeNote}
+      activeNote={null} /* in list view, no note is active */
     />
     <NoteListControls
       onChange={handleSearchInputChange}
@@ -185,7 +132,7 @@ const ListView = ({
     <NoteList
       notes={noteListItems}
       numberOfResults={numberOfResults}
-      activeNote={activeNote}
+      activeNote={null} /* in list view, no note is active */
       isBusy={isBusy}
       searchValue={searchValue}
       scrollTop={noteListScrollTop}

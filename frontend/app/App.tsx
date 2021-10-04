@@ -124,8 +124,6 @@ const App = ({
           ? <>
             <ListView
               databaseProvider={databaseProvider}
-              unsavedChanges={unsavedChanges}
-              setUnsavedChanges={setUnsavedChanges}
               toggleAppMenu={toggleAppMenu}
               handleInvalidCredentialsError={handleInvalidCredentialsError}
             />
