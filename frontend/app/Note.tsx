@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import NoteListItem from "./NoteListItem";
-import * as Editor from "./lib/editor.js";
+import * as Editor from "./lib/editor";
 import NoteStats from "./NoteStats";
 import isEqual from "react-fast-compare";
 import NoteControls from "./NoteControls";
@@ -57,6 +57,7 @@ const Note = ({
       handleNoteSaveRequest={handleNoteSaveRequest}
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}
+      setUnsavedChanges={setUnsavedChanges}
       pinOrUnpinNote={pinOrUnpinNote}
       openImportLinksDialog={openImportLinksDialog}
       duplicateNote={duplicateNote}
@@ -90,7 +91,7 @@ const Note = ({
       {
         (!note.isUnsaved)
           ? <NoteStats note={note} databaseProvider={databaseProvider} />
-          : ""
+          : null
       }
     </div>
   </section>;

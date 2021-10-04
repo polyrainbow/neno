@@ -4,7 +4,7 @@ import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 import { useHistory } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
-import { paths } from "./lib/config.js";
+import { paths, texts } from "./lib/config.js";
 
 const NoteControls = ({
   activeNote,
@@ -12,6 +12,7 @@ const NoteControls = ({
   handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges,
+  setUnsavedChanges,
   pinOrUnpinNote,
   openImportLinksDialog,
   duplicateNote,
@@ -29,9 +30,20 @@ const NoteControls = ({
             id="button_list"
             title="Go to list"
             icon="list"
-            onClick={() => history.push(paths.list)}
+            onClick={async () => {
+              if (unsavedChanges) {
+                await confirm({
+                  text: texts.discardChangesConfirmation,
+                  confirmText: "Discard changes",
+                  cancelText: "Cancel",
+                  encourageConfirmation: false,
+                });
+                setUnsavedChanges(false);
+              }
+              history.push(paths.list);
+            }}
           />
-          : ""
+          : null
       }
       {
         !isSmallScreen
@@ -41,7 +53,7 @@ const NoteControls = ({
             icon="note_add"
             onClick={createNewNote}
           />
-          : ""
+          : null
       }
       <IconButton
         id="button_upload"
