@@ -22,8 +22,22 @@ const AppMenu = ({
     = useConfirmDiscardingUnsavedChangesDialog();
 
   const location = useLocation();
+  const pathname = location.pathname;
   const history = useHistory();
   const isSmallScreen = useIsSmallScreen();
+
+  const showGraphButton:boolean
+    = pathname.startsWith(Config.paths.editor)
+    || pathname.startsWith(Config.paths.list);
+
+  const showNoteListOrEditorButton:boolean
+    = pathname.startsWith(Config.paths.graph);
+
+  const showLogoutButton:boolean = (
+    pathname.startsWith(Config.paths.editor)
+    || pathname.startsWith(Config.paths.graph)
+    || pathname.startsWith(Config.paths.list)
+  );
 
   return <OutsideAlerter
     onOutsideClick={onClose}
@@ -40,10 +54,9 @@ const AppMenu = ({
       }
     >
       {
-        location.pathname.startsWith(Config.paths.editor)
-        || location.pathname.startsWith(Config.paths.list)
+        showGraphButton
           ? <AppMenuItem
-            label="Show graph"
+            label="Graph"
             icon="scatter_plot"
             onClick={async () => {
               if (unsavedChanges) {
@@ -56,9 +69,9 @@ const AppMenu = ({
           : null
       }
       {
-        location.pathname.startsWith(Config.paths.graph)
+        showNoteListOrEditorButton
           ? <AppMenuItem
-            label={isSmallScreen ? "Go to list" : "Go to editor"}
+            label={isSmallScreen ? "Note list" : "Editor"}
             icon={isSmallScreen ? "list" : "create"}
             onClick={async () => {
               if (unsavedChanges) {
@@ -80,19 +93,15 @@ const AppMenu = ({
             icon="archive"
             onClick={openExportDatabaseDialog}
           />
-          : ""
+          : null
       }
       <AppMenuItem
-        label="Show stats"
+        label="Stats"
         icon="query_stats"
         onClick={showStats}
       />
       {
-        (
-          location.pathname.startsWith(Config.paths.editor)
-          || location.pathname.startsWith(Config.paths.graph)
-          || location.pathname.startsWith(Config.paths.list)
-        )
+        showLogoutButton
           ? <AppMenuItem
             label="Logout"
             icon="lock"

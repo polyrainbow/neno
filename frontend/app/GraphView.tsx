@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Graph from "./lib/Graph.js";
-import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {
   useLocation,
-  useHistory,
 } from "react-router-dom";
 import GraphViewHeader from "./GraphViewHeader";
 import useConfirmDiscardingUnsavedChangesDialog
@@ -18,11 +16,11 @@ const GraphView = ({
   toggleAppMenu,
   handleInvalidCredentialsError,
 }) => {
-  const DEFAULT_STATUS = "";
-  const mainElement = useRef(null);
-  const graphInstance = useRef<any>(null);
-  const [status, setStatus] = useState(DEFAULT_STATUS);
-  const [searchValue, setSearchValue] = useState("");
+  const DEFAULT_STATUS:string = "";
+  const mainElement = useRef<HTMLElement | null>(null);
+  const graphInstance = useRef<Graph | null>(null);
+  const [status, setStatus] = useState<string>(DEFAULT_STATUS);
+  const [searchValue, setSearchValue] = useState<string>("");
 
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -33,6 +31,9 @@ const GraphView = ({
   const focusNoteId = parseInt(searchParams.get("focusNote") || "");
 
   const saveGraphObject = async () => {
+    if (!graphInstance.current) {
+      throw new Error("Error saving graph. Graph instance undefined.");
+    }
     const graphObject = graphInstance.current.getSaveData();
     try {
       await databaseProvider.saveGraph(graphObject);
