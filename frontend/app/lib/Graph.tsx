@@ -87,7 +87,7 @@ export default class Graph {
   #screenPosition;
   #initialNodePosition;
   #parent;
-  svg;
+  #svg;
   #idsOfAllNodesWithLinkedNote = [];
   #updatedNodes = new Set();
   #mouseDownNode = null;
@@ -99,19 +99,18 @@ export default class Graph {
   #connectedNodeIdsOfSelection:number[] = [];
   #titleRenderingEnabled = false;
 
-  mainSVGGroup;
-  gridLines;
-  initialNodePositionIndicator;
-  initialNodePositionIndicatorElement;
-  nodeHighlighterContainer;
-  newLinkLine;
-  linksContainer;
-  nodesContainer;
-  nodeDrag;
-  inpIndicatorDrag;
-  nodeHighlighterElements;
-  nodeElements;
-  linkElements;
+  #mainSVGGroup;
+  #gridLines;
+  #initialNodePositionIndicator;
+  #nodeHighlighterContainer;
+  #newLinkLine;
+  #linksContainer;
+  #nodesContainer;
+  #nodeDrag;
+  #inpIndicatorDrag;
+  #nodeHighlighterElements;
+  #nodeElements;
+  #linkElements;
 
   #shiftKeyIsPressed = false;
   #ctrlKeyIsPressed = false;
@@ -136,7 +135,7 @@ export default class Graph {
       .attr("width", width)
       .attr("height", height);
 
-    thisGraph.svg = svg;
+    thisGraph.#svg = svg;
     thisGraph.#onHighlight = onHighlight;
     thisGraph.#onChange = onChange;
     thisGraph.#openNote = openNote;
@@ -155,7 +154,7 @@ export default class Graph {
       );
 
       if (typeof node === "object") {
-        const { width, height } = thisGraph.svg.node().getBoundingClientRect();
+        const { width, height } = thisGraph.#svg.node().getBoundingClientRect();
         const SCALE = 1.5;
         thisGraph.#screenPosition = {
           translateX: (-node.position.x * SCALE) + (width / 2),
@@ -167,14 +166,14 @@ export default class Graph {
 
     thisGraph.#initialNodePosition = graphObjectPrepared.initialNodePosition;
 
-    thisGraph.mainSVGGroup = svg.append("g")
+    thisGraph.#mainSVGGroup = svg.append("g")
       .classed(Graph.#consts.graphClass, true);
-    const mainSVGGroup = thisGraph.mainSVGGroup;
+    const mainSVGGroup = thisGraph.#mainSVGGroup;
 
-    thisGraph.gridLines = mainSVGGroup.append("g")
+    thisGraph.#gridLines = mainSVGGroup.append("g")
       .classed("grid-lines", true);
 
-    thisGraph.gridLines
+    thisGraph.#gridLines
       .append("rect")
       .attr("width", 100)
       .attr("height", 40000)
@@ -182,7 +181,7 @@ export default class Graph {
       .attr("y", -20000)
       .classed("grid-line", true);
 
-    thisGraph.gridLines
+    thisGraph.#gridLines
       .append("rect")
       .attr("width", 40000)
       .attr("height", 100)
@@ -190,7 +189,7 @@ export default class Graph {
       .attr("y", -50)
       .classed("grid-line", true);
 
-    thisGraph.initialNodePositionIndicator = mainSVGGroup.append("g")
+    thisGraph.#initialNodePositionIndicator = mainSVGGroup.append("g")
       .classed("new-node-position-indicator", true)
       .append("rect")
       .attr("width", String(Graph.#consts.newNodeIndicatorSize))
@@ -209,25 +208,25 @@ export default class Graph {
         });
       });
 
-    thisGraph.nodeHighlighterContainer = mainSVGGroup.append("g")
+    thisGraph.#nodeHighlighterContainer = mainSVGGroup.append("g")
       .classed("note-highlighters", true);
 
     // displayed when dragging between nodes - should be rendered in front of
     // node highlighter circles, so this code is placed after node highlighter g
     // creation code
-    thisGraph.newLinkLine = mainSVGGroup.append("svg:path")
+    thisGraph.#newLinkLine = mainSVGGroup.append("svg:path")
       .attr("class", "link newLinkLine hidden")
       .attr("d", "M0,0L0,0");
 
     // svg nodes and links
-    thisGraph.linksContainer = mainSVGGroup.append("g")
+    thisGraph.#linksContainer = mainSVGGroup.append("g")
       .classed("links", true);
 
-    thisGraph.nodesContainer = mainSVGGroup.append("g")
+    thisGraph.#nodesContainer = mainSVGGroup.append("g")
       .classed("notes", true);
 
     // drag single nodes, but not, if shift key is pressed
-    thisGraph.nodeDrag = d3.drag()
+    thisGraph.#nodeDrag = d3.drag()
       .subject(function(event) {
         return {
           x: event.x,
@@ -264,7 +263,7 @@ export default class Graph {
       });
 
     // drag intitial node position indicator
-    thisGraph.inpIndicatorDrag = d3.drag()
+    thisGraph.#inpIndicatorDrag = d3.drag()
       .subject(function(event) {
         return { x: event.x, y: event.y };
       })
@@ -370,11 +369,11 @@ export default class Graph {
     }
 
     const newLinkEnd = {
-      x: d3.pointer(e, thisGraph.mainSVGGroup.node())[0] - 1,
-      y: d3.pointer(e, thisGraph.mainSVGGroup.node())[1] - 1,
+      x: d3.pointer(e, thisGraph.#mainSVGGroup.node())[0] - 1,
+      y: d3.pointer(e, thisGraph.#mainSVGGroup.node())[1] - 1,
     };
 
-    thisGraph.newLinkLine.attr(
+    thisGraph.#newLinkLine.attr(
       "d",
       "M" + originNode.position.x + "," + originNode.position.y
       + "L" + newLinkEnd.x + "," + newLinkEnd.y,
@@ -462,7 +461,7 @@ export default class Graph {
     if (e.shiftKey) {
       thisGraph.#newLinkCreationInProgress = true;
       // reposition dragged directed edge
-      thisGraph.newLinkLine
+      thisGraph.#newLinkLine
         .classed("hidden", false)
         .attr(
           "d",
@@ -487,7 +486,7 @@ export default class Graph {
 
     if (!mouseDownNode) return;
 
-    thisGraph.newLinkLine.classed("hidden", true);
+    thisGraph.#newLinkLine.classed("hidden", true);
 
     if (mouseDownNode !== mouseUpNode) {
       // we're in a different node:
@@ -496,7 +495,7 @@ export default class Graph {
 
       // check if such an edge is already there ...
       const edgeAlreadyExists = thisGraph
-        .linksContainer
+        .#linksContainer
         .selectAll("path.link")
         .filter(
           function(d) {
@@ -536,7 +535,7 @@ export default class Graph {
 
     // on mouse up, new link creation process is always over
     thisGraph.#newLinkCreationInProgress = false;
-    thisGraph.newLinkLine.classed("hidden", true);
+    thisGraph.#newLinkLine.classed("hidden", true);
   }
 
 
@@ -609,25 +608,24 @@ export default class Graph {
     const thisGraph = this;
     const consts = Graph.#consts;
 
-    thisGraph.initialNodePositionIndicatorElement
-      = thisGraph.initialNodePositionIndicator
-        .attr("x",
-          thisGraph.#initialNodePosition.x - (consts.newNodeIndicatorSize / 2),
-        )
-        .attr("y",
-          thisGraph.#initialNodePosition.y - (consts.newNodeIndicatorSize / 2),
-        )
-        .call(thisGraph.inpIndicatorDrag);
+    thisGraph.#initialNodePositionIndicator
+      .attr("x",
+        thisGraph.#initialNodePosition.x - (consts.newNodeIndicatorSize / 2),
+      )
+      .attr("y",
+        thisGraph.#initialNodePosition.y - (consts.newNodeIndicatorSize / 2),
+      )
+      .call(thisGraph.#inpIndicatorDrag);
 
     /** ********************
       node highlighter circles
     ***********************/
 
     // create selection
-    thisGraph.nodeHighlighterElements = thisGraph.nodeHighlighterContainer
+    thisGraph.#nodeHighlighterElements = thisGraph.#nodeHighlighterContainer
       .selectAll("g.node-highlighter");
     // append new node data
-    thisGraph.nodeHighlighterElements = thisGraph.nodeHighlighterElements
+    thisGraph.#nodeHighlighterElements = thisGraph.#nodeHighlighterElements
       .data(
         // append only the nodes that are search hits
         thisGraph.#nodes.filter((node) => {
@@ -645,7 +643,7 @@ export default class Graph {
       );
 
     // add new node highlighters
-    const nodeHighlighterEnter = thisGraph.nodeHighlighterElements
+    const nodeHighlighterEnter = thisGraph.#nodeHighlighterElements
       .enter();
 
     nodeHighlighterEnter
@@ -662,7 +660,7 @@ export default class Graph {
 
     // remove old node highlighters
     const nodeHighlighterExitSelection
-      = thisGraph.nodeHighlighterElements.exit();
+      = thisGraph.#nodeHighlighterElements.exit();
     nodeHighlighterExitSelection.remove();
 
     /** ********************
@@ -670,12 +668,12 @@ export default class Graph {
     ***********************/
 
     // create link selection
-    thisGraph.linkElements = thisGraph.linksContainer
+    thisGraph.#linkElements = thisGraph.#linksContainer
       .selectAll("path.link")
       .data(thisGraph.#links);
 
     // update existing links
-    thisGraph.linkElements
+    thisGraph.#linkElements
       .classed(consts.selectedClass, function(edge) {
         return thisGraph.#selection.has(edge);
       })
@@ -699,7 +697,7 @@ export default class Graph {
 
 
     // add new links
-    thisGraph.linkElements
+    thisGraph.#linkElements
       .enter()
       .append("path")
       .classed("link", true)
@@ -724,25 +722,25 @@ export default class Graph {
       });
 
     // remove old links
-    thisGraph.linkElements
-      = thisGraph.linkElements.exit().remove();
+    thisGraph.#linkElements
+      = thisGraph.#linkElements.exit().remove();
 
     /** ********************
       nodes
     ***********************/
 
     // create node selection
-    thisGraph.nodeElements = thisGraph.nodesContainer.selectAll("g.node");
+    thisGraph.#nodeElements = thisGraph.#nodesContainer.selectAll("g.node");
 
     // append new node data
-    thisGraph.nodeElements = thisGraph.nodeElements
+    thisGraph.#nodeElements = thisGraph.#nodeElements
       .data(
         thisGraph.#nodes,
         function(d) {return d.id;},
       );
 
     // update node positions of moved/dragged nodes
-    thisGraph.nodeElements
+    thisGraph.#nodeElements
       .filter((d) => {
         if (event?.type === "INFLATION") return true;
 
@@ -764,7 +762,7 @@ export default class Graph {
       );
 
     // update existing nodes
-    thisGraph.nodeElements
+    thisGraph.#nodeElements
       .classed("unconnected", function(d) {
         return !binaryArrayIncludes(
           thisGraph.#idsOfAllNodesWithLinkedNote,
@@ -780,7 +778,7 @@ export default class Graph {
 
 
     // add new nodes
-    const nodeG = thisGraph.nodeElements
+    const nodeG = thisGraph.#nodeElements
       .enter()
       .append("g")
       .classed(consts.nodeClassName, true)
@@ -830,7 +828,7 @@ export default class Graph {
           thisGraph.#openNote(d.id);
         }
       })
-      .call(thisGraph.nodeDrag);
+      .call(thisGraph.#nodeDrag);
 
     nodeG.append("circle")
       .attr("r", String(consts.nodeRadius));
