@@ -25,6 +25,7 @@ import { Dialog } from "./enum/Dialog";
 import useConfirmDiscardingUnsavedChangesDialog
   from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useGoToNote from "./hooks/useGoToNote";
+import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
 
 const EditorView = ({
   databaseProvider,
@@ -36,12 +37,12 @@ const EditorView = ({
   handleInvalidCredentialsError,
 }) => {
   const newNoteObject:ActiveNote = Utils.getNewNoteObject();
-  const currentRequestId = useRef(null);
-  const [noteListItems, setNoteListItems] = useState([]);
-  const [numberOfResults, setNumberOfResults] = useState([]);
-  const [noteListScrollTop, setNoteListScrollTop] = useState(0);
-  const [page, setPage] = useState(1);
-  const [isBusy, setIsBusy] = useState(true);
+  const currentRequestId = useRef<string>("");
+  const [noteListItems, setNoteListItems] = useState<NoteListItemType[]>([]);
+  const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
+  const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [isBusy, setIsBusy] = useState<boolean>(true);
   const [stats, setStats] = useState(null);
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);

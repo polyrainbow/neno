@@ -6,6 +6,7 @@ import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import * as Config from "./lib/config";
+import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
 
 
 const ListView = ({
@@ -13,15 +14,15 @@ const ListView = ({
   toggleAppMenu,
   handleInvalidCredentialsError,
 }) => {
-  const currentRequestId = useRef(null);
-  const [noteListItems, setNoteListItems] = useState([]);
-  const [numberOfResults, setNumberOfResults] = useState([]);
-  const [noteListScrollTop, setNoteListScrollTop] = useState(0);
-  const [page, setPage] = useState(1);
-  const [isBusy, setIsBusy] = useState(true);
+  const currentRequestId = useRef<string>("");
+  const [noteListItems, setNoteListItems] = useState<NoteListItemType[]>([]);
+  const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
+  const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [isBusy, setIsBusy] = useState<boolean>(true);
   const [stats, setStats] = useState(null);
   const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<string>("");
   const [pinnedNotes, setPinnedNotes] = useState([]);
 
   const handleSearchInputChange = (value) => {

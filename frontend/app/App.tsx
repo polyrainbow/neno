@@ -22,8 +22,8 @@ const App = ({
   localDatabaseProvider,
   serverDatabaseProvider,
 }) => {
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
-  const [isAppMenuOpen, setIsAppMenuOpen] = useState(false);
+  const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+  const [isAppMenuOpen, setIsAppMenuOpen] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<Dialog>(Dialog.NONE);
   const [databaseMode, setDatabaseMode]
     = useState<DatabaseMode>(DatabaseMode.NONE);
@@ -155,7 +155,7 @@ const App = ({
           showStats={() => setOpenDialog(Dialog.STATS)}
           databaseProvider={databaseProvider}
         />
-        : ""
+        : null
     }
     {
       openDialog === Dialog.EXPORT_DATABASE
