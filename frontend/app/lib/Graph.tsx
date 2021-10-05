@@ -36,7 +36,7 @@ import {
   binaryArrayIncludes,
   shortenText,
   htmlDecode,
-} from "./utils.tsx";
+} from "./utils";
 
 
 const prepareGraphObject = (graph) => {
@@ -79,15 +79,15 @@ export default class Graph {
   };
 
   #searchValue = "";
-  #onHighlight = null;
-  #onChange = null;
-  #openNote = null;
-  #nodes = null;
-  #links = null;
-  #screenPosition = null;
-  #initialNodePosition = null;
-  #parent = null;
-  svg = null;
+  #onHighlight;
+  #onChange;
+  #openNote;
+  #nodes;
+  #links;
+  #screenPosition;
+  #initialNodePosition;
+  #parent;
+  svg;
   #idsOfAllNodesWithLinkedNote = [];
   #updatedNodes = new Set();
   #mouseDownNode = null;
@@ -95,9 +95,23 @@ export default class Graph {
   #justScaleTransGraph = false;
   #lastKeyDown = -1;
   #newLinkCreationInProgress = false;
-  #selection = new Set();
-  #connectedNodeIdsOfSelection = [];
+  #selection = new Set<any>();
+  #connectedNodeIdsOfSelection:number[] = [];
   #titleRenderingEnabled = false;
+
+  mainSVGGroup;
+  gridLines;
+  initialNodePositionIndicator;
+  initialNodePositionIndicatorElement;
+  nodeHighlighterContainer;
+  newLinkLine;
+  linksContainer;
+  nodesContainer;
+  nodeDrag;
+  inpIndicatorDrag;
+  nodeHighlighterElements;
+  nodeElements;
+  linkElements;
 
   #shiftKeyIsPressed = false;
   #ctrlKeyIsPressed = false;
@@ -270,7 +284,7 @@ export default class Graph {
         thisGraph.#svgKeyUp(e);
       });
     svg.on("mouseup", function(e, d) {
-      thisGraph.#svgMouseUp(d);
+      thisGraph.#svgMouseUp();
     });
     svg.on("mousemove", function(e) {
       thisGraph.#newPathMove(e, thisGraph.#mouseDownNode);
@@ -591,7 +605,7 @@ export default class Graph {
 
 
   // call to propagate changes to graph
-  #updateGraph(event) {
+  #updateGraph(event?):void {
     const thisGraph = this;
     const consts = Graph.#consts;
 
@@ -870,7 +884,7 @@ export default class Graph {
     });
 
     const nodePositionUpdates = Array.from(thisGraph.#updatedNodes)
-      .map((node) => {
+      .map((node:any) => {
         return {
           id: node.id,
           position: node.position,
