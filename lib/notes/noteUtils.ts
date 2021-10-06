@@ -476,20 +476,34 @@ const getNumberOfComponents = (nodes:DatabaseNote[], links:Link[]):number => {
   return numberOfComponents;
 }
 
+
 // this returns all notes that contain a url that is used in another note too
 const getNotesWithDuplicateUrls = (notes:DatabaseNote[]):DatabaseNote[] => {
-  return notes.filter((n1:DatabaseNote, i:number, notes:DatabaseNote[]) => {
-    const n1URLs = getURLsOfNote(n1);
+  const urlIndex = new Map<string, Set<DatabaseNote>>();
 
+  notes.forEach((note:DatabaseNote):void => {
+    const urls = getURLsOfNote(note);
 
-    const duplicate = notes.find((n2:DatabaseNote, n2_i:number):boolean => {
-      if (n2_i === i) return false;
-      const n2URLs = getURLsOfNote(n2);
-      return n1URLs.some((n1Link) => n2URLs.includes(n1Link));
+    urls.forEach((url) => {
+      if (urlIndex.has(url)) {
+        (urlIndex.get(url) as Set<DatabaseNote>).add(note);
+      } else {
+        urlIndex.set(url, new Set([note]));
+      }
     });
-    
-    return !!duplicate;
   });
+
+  const duplicates:Set<DatabaseNote> = new Set();
+
+  for (const notesWithUrl of urlIndex.values()) {
+    if (notesWithUrl.size > 1) {
+      notesWithUrl.forEach((note) => {
+        duplicates.add(note);
+      });
+    }
+  }
+
+  return Array.from(duplicates);
 };
 
 
