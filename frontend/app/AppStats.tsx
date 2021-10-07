@@ -1,5 +1,5 @@
 import React from "react";
-import { Tooltip } from "react-tippy";
+import Tooltip from "./Tooltip.js";
 import { emojis } from "./lib/config";
 
 const AppStatsItem = ({
@@ -9,9 +9,6 @@ const AppStatsItem = ({
 }) => {
   return <Tooltip
     title={label}
-    position="bottom"
-    // @ts-ignore types are not correct
-    trigger="mouseenter focus"
   >
     <span className="app-stats-item">{icon} {value}</span>
   </Tooltip>;

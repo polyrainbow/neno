@@ -1,21 +1,14 @@
 import React from "react";
-import { Tooltip as ReactTippyTooltip } from "react-tippy";
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
 const Tooltip = ({
   title,
-  tag = "div",
   children,
 }) => {
-  return <ReactTippyTooltip
-    title={title}
-    position="bottom"
-    // @ts-ignore types are not correct https://github.com/tvkhoa/react-tippy/issues/127
-    trigger="mouseenter focus"
-    style={{
-      display: (tag === "span") ? "inline" : "flex",
-    }}
-    tag={tag}
-  >{children}</ReactTippyTooltip>;
+  return <Tippy content={title}>
+    {children}
+  </Tippy>;
 };
 
 export default Tooltip;

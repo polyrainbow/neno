@@ -1,7 +1,5 @@
 import React from "react";
-import {
-  Tooltip,
-} from "react-tippy";
+import Tooltip from "./Tooltip.js";
 import { ICON_PATH } from "./lib/config";
 
 interface IconButtonProps {
@@ -21,9 +19,6 @@ const IconButton = ({
 }:IconButtonProps) => {
   return <Tooltip
     title={title}
-    position="bottom"
-    // @ts-ignore types are incorrect
-    trigger="mouseenter focus"
   >
     <button
       className="icon-button"

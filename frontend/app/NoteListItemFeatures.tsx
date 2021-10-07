@@ -15,44 +15,38 @@ const NoteListItemFeatures = ({
     {
       features?.containsText
         ? <Tooltip
-          tag="span"
-          title="Contains text">{emojis.text}</Tooltip>
-        : ""
+          title="Contains text"><span>{emojis.text}</span></Tooltip>
+        : null
     }
     {
       features?.containsWeblink
         ? <Tooltip
-          tag="span"
-          title="Contains links">{emojis.weblink}</Tooltip>
-        : ""
+          title="Contains links"><span>{emojis.weblink}</span></Tooltip>
+        : null
     }
     {
       features?.containsCode
         ? <Tooltip
-          tag="span"
-          title="Contains code">{emojis.code}</Tooltip>
-        : ""
+          title="Contains code"><span>{emojis.code}</span></Tooltip>
+        : null
     }
     {
       features?.containsImages
         ? <Tooltip
-          tag="span"
-          title="Contains images">{emojis.image}</Tooltip>
-        : ""
+          title="Contains images"><span>{emojis.image}</span></Tooltip>
+        : null
     }
     {
       features?.containsAttachements
         ? <Tooltip
-          tag="span"
-          title="Contains files">{emojis.file}</Tooltip>
-        : ""
+          title="Contains files"><span>{emojis.file}</span></Tooltip>
+        : null
     }
     {
       features?.containsAudio
         ? <Tooltip
-          tag="span"
-          title="Contains audio">{emojis.audio}</Tooltip>
-        : ""
+          title="Contains audio"><span>{emojis.audio}</span></Tooltip>
+        : null
     }
   </div>;
 };

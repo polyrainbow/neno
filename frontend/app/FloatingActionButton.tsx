@@ -1,7 +1,5 @@
 import React from "react";
-import {
-  Tooltip,
-} from "react-tippy";
+import Tooltip from "./Tooltip.js";
 import { ICON_PATH } from "./lib/config";
 
 const FloatingActionButton = ({
@@ -12,9 +10,6 @@ const FloatingActionButton = ({
 }) => {
   return <Tooltip
     title={title}
-    position="bottom"
-    // @ts-ignore type definition is not correct
-    trigger="mouseenter focus"
   >
     <button
       className="icon-button-floating"

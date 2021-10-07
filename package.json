@@ -16,6 +16,7 @@
     "@editorjs/link": "github:SebastianZimmer/link#016b6eb007d70ef3d47bd6bf6b3769b22c5a82e3",
     "@editorjs/list": "^1.6.1",
     "@material-ui/lab": "^4.0.0-alpha.57",
+    "@tippyjs/react": "^4.2.5",
     "@types/express": "^4.17.13",
     "archiver": "^5.0.2",
     "babel-loader": "^8.1.0",

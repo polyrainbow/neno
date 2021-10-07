@@ -1,7 +1,5 @@
 import React from "react";
-import {
-  Tooltip,
-} from "react-tippy";
+import Tooltip from "./Tooltip.js";
 import { emojis } from "./lib/config.js";
 
 interface UnsavedChangesIndicatorProps {
@@ -26,9 +24,6 @@ const UnsavedChangesIndicator = ({
       isUnsaved
         ? <Tooltip
           title="This note has not been saved yet"
-          position="bottom"
-          // @ts-ignore types are not correct
-          trigger="mouseenter focus"
         >
           <span>{emojis.new}</span>
         </Tooltip>
@@ -36,9 +31,6 @@ const UnsavedChangesIndicator = ({
     }
     <Tooltip
       title={unsavedChangesText}
-      position="bottom"
-      // @ts-ignore types are not correct
-      trigger="mouseenter focus"
     >
       <span>{unsavedChangesSymbol}</span>
     </Tooltip>
