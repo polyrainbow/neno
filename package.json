@@ -60,7 +60,6 @@
     "eslint": "^7.29.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-config-standard-preact": "^1.1.6",
     "eslint-config-standard-react": "^11.0.1",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-node": "^11.1.0",
