@@ -89,5 +89,5 @@
     "dev-local-only": "concurrently --kill-others \"npm run compile-typescript && npm run start-server-dev\" \"npm run build-frontend-development-local-only\""
   },
   "author": "Sebastian Zimmer",
-  "license": "ISC"
+  "license": "Apache License 2.0"
 }
