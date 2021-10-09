@@ -1,0 +1,27 @@
+{
+    "name": "NENO",
+    "description": "A browser extension for saving web pages to NENO",
+    "version": "1.0",
+    "manifest_version": 3,
+    "background": {
+      "service_worker": "background.js"
+    },
+    "permissions": [
+      "storage",
+      "activeTab"
+    ],
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "images/icon/48x48.png",
+        "32": "images/icon/32x32.png",
+        "48": "images/icon/48x48.png"
+      }
+    },
+    "icons": {
+      "16": "images/icon/48x48.png",
+      "32": "images/icon/32x32.png",
+      "48": "images/icon/48x48.png"
+    },
+    "options_page": "options.html"
+  }

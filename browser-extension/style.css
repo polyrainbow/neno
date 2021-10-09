@@ -1,0 +1,129 @@
+:root {
+    --main-font: 'Rubik', sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --accent-color-1: rgb(70, 184, 255);
+    --accent-color-1-light: rgb(168, 222, 255);
+    --accent-color-2: rgb(255, 133, 152);
+    --accent-color-interactible: #e0e0e0;
+    --background-color: white;
+    --main-content-color: black;
+    --link-color: rgb(0, 40, 216);
+    --overlay-gradient: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(9,9,121,0.5) 35%, rgba(0,212,255,1) 100%);
+  }
+}
+  
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent-color-1: rgb(11, 73, 92);
+    --accent-color-1-light: rgb(4, 53, 65);
+    --accent-color-2: #6d2433;
+    --accent-color-interactible: #303030;
+    --background-color: black;
+    --main-content-color: rgb(255, 255, 255);
+    --link-color: rgb(122, 146, 255);
+    --overlay-gradient: linear-gradient(45deg, rgb(17 10 146) 0%, rgba(9, 9, 121, 0.5) 35%, rgb(0 125 151) 100%);
+  }
+
+  img.svg-icon {
+    filter: invert(1);
+  }
+}
+
+:root {
+  --font-color: var(--main-content-color);
+  --header-background-color: var(--accent-color-1);
+  --subheader-1-background-color: var(--accent-color-2);
+  --subheader-2-background-color: var(--accent-color-1);
+  --nli-color: var(--accent-color-interactible);
+  --nli-color-hover: var(--accent-color-1-light);
+  --nli-color-active: var(--accent-color-1);
+  --nli-color-linked: var(--accent-color-2);
+  --nli-color-unlinked: var(--accent-color-1-light);
+  --buton-background-color: var(--accent-color-interactible);
+  --input-element-border-color: var(--main-content-color);
+  --button-background-color-active: var(--accent-color-1);
+  --table-row-background-color-odd: var(--background-color);
+  --table-row-background-color-even: var(--accent-color-interactible);
+  --main-font: 'Rubik', sans-serif;
+  --input-border-width: 2px;
+  --border-radius: 10px;
+  --default-margin: 15px;
+  --xl-list-width: 720px;
+  --main-ui-font-size: 24px;
+  --default-box-shadow:
+    0 1px 1px hsl(0deg 0% 0% / 0.075),
+    0 2px 2px hsl(0deg 0% 0% / 0.075),
+    0 4px 4px hsl(0deg 0% 0% / 0.075),
+    0 8px 8px hsl(0deg 0% 0% / 0.075),
+    0 16px 16px hsl(0deg 0% 0% / 0.075);
+}
+
+body, button, #input_note-title, #textarea_note-text {
+    font-family: var(--main-font);
+    color: var(--main-content-color);
+    background-color: var(--background-color);
+}
+
+input, select {
+  border: var(--input-border-width) solid var(--main-content-color) !important;
+  font-size: var(--main-ui-font-size);
+  background: var(--background-color);
+  color: var(--font-color);
+}
+
+input[type="radio"] {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+
+body, #app {
+  background-color: var(--background-color);
+  color: var(--font-color);
+}
+
+body, #app, input, select, button {
+  font-family: var(--main-font);
+}
+
+button {
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  background-color: var(--buton-background-color);
+  color: var(--font-color);
+  padding: 10px;
+}
+
+button[disabled]{
+  color: grey;
+  fill: grey;
+  cursor: inherit;
+  border: none;
+}
+
+
+a {
+  color: var(--link-color);
+}
+
+#textarea_note-text{
+    height: 100px;
+    border: var(--input-border-width) solid var(--main-content-color) !important;
+}
+
+#input_note-title, #textarea_note-text {
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+#button_addPage {
+    font-size: 20px;
+}
+
+#input_note-title {
+    font-size: 20px;
+}

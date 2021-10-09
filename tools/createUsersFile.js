@@ -32,6 +32,7 @@ for (let i = 0; i < numberOfUsers; i++) {
     passwordHash: passwordHash,
     mfaSecret: mfa.secret,
     mfaUri: uri,
+    apiKeys: [],
   });
 
   console.log("Scan this QR code with your favorite 2FA app");

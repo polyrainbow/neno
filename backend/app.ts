@@ -24,6 +24,7 @@ import fallback from "express-history-api-fallback";
 import * as path from "path";
 import session from "express-session";
 import MemoryStore from "memorystore";
+import User from "./interfaces/User.js";
 
 const startApp = async ({
   users,
@@ -55,11 +56,36 @@ const startApp = async ({
   });
 
 
-  const verifySession = (req, res, next) => {
+  const getUserByApiKey = (apiKey:string):User | null => {
+    const user = users.find((user) => {
+      return user.apiKeys?.includes(apiKey);
+    });
+
+    return user ?? null;
+  };
+
+
+  const verifyUser = (req, res, next) => {
     if (req.session.userId) {
       // make the user id available in the req object for easier access
       req.userId = req.session.userId;
       next();
+
+    // if userId has not been set via session, check if api key is present
+    } else if (typeof req.headers["x-auth-token"] === "string") {
+      const apiKey = req.headers["x-auth-token"];
+      const user = getUserByApiKey(apiKey);
+
+      if (user) {
+        req.userId = user.id;
+        next();
+      } else {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_CREDENTIALS,
+        };
+        return res.status(401).json(response);
+      }
     } else {
       const response:APIResponse = {
         success: false,
@@ -69,9 +95,29 @@ const startApp = async ({
     }
   };
 
+  //CORS middleware
+  const allowCORS = (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header(
+      'Access-Control-Allow-Methods',
+      'GET, PUT, POST, PATCH, DELETE, OPTIONS',
+    );
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, Content-Type, X-Auth-Token',
+    );
+
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
+
+    next();
+  };
+
   app.use("/", express.static(frontendPath));
   app.use(compression());
   app.use(cookieParser());
+  app.use(allowCORS);
 
 
   /* ***************
@@ -85,7 +131,7 @@ const startApp = async ({
   app.get(
     config.API_PATH + "authenticated",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       const response:APIResponse = {
         success: true,
@@ -101,7 +147,7 @@ const startApp = async ({
   app.get(
     config.API_PATH + "database",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       const withUploads = req.query.withUploads === "true";
 
@@ -126,7 +172,7 @@ const startApp = async ({
   app.put(
     config.API_PATH + "database",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json(),
     function(req, res) {
       const response:APIResponse = {
@@ -150,7 +196,7 @@ const startApp = async ({
   app.get(
     config.API_PATH + "graph",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       const graph = await Notes.getGraph(req.userId);
       const response:APIResponse = {
@@ -165,7 +211,7 @@ const startApp = async ({
   app.get(
     config.API_PATH + "stats",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       const exhaustive = req.query.exhaustive === "true";
       const stats:Stats = await Notes.getStats(req.userId, exhaustive);
@@ -181,7 +227,7 @@ const startApp = async ({
   app.post(
     config.API_PATH + "graph",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json({ limit: "1mb" }), // posting a graph can be somewhat larger
     async function(req, res) {
       try {
@@ -204,7 +250,7 @@ const startApp = async ({
   app.get(
     config.API_PATH + "notes",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       const query = req.query.q || "";
       const caseSensitiveQuery = req.query.caseSensitive === "true";
@@ -232,7 +278,7 @@ const startApp = async ({
   app.get(
     config.API_PATH + "note/:noteId",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       const noteId:NoteId = parseInt(req.params.noteId);
 
@@ -257,7 +303,7 @@ const startApp = async ({
   app.put(
     config.API_PATH + "note",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -288,7 +334,7 @@ const startApp = async ({
   app.put(
     config.API_PATH + "import-links-as-notes",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -308,7 +354,7 @@ const startApp = async ({
   app.delete(
     config.API_PATH + "note/:noteId",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       try {
         await Notes.remove(parseInt(req.params.noteId), req.userId);
@@ -330,7 +376,7 @@ const startApp = async ({
   app.post(
     config.API_PATH + "file",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       const form = new formidable.IncomingForm({
         maxFileSize: config.MAX_UPLOAD_FILE_SIZE,
@@ -403,7 +449,7 @@ const startApp = async ({
   app.post(
     config.API_PATH + "file-by-url",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -502,7 +548,7 @@ const startApp = async ({
     // /api/file/ae62787f-4344-4124-8026-3839543fde70.png/my-pic.png
     config.API_PATH + "file/:fileId/:publicName*?",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async function(req, res) {
       try {
 
@@ -596,7 +642,7 @@ const startApp = async ({
   app.get(
     config.API_PATH + "url-metadata",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     async (req, res) => {
       const url = req.query.url;
 
@@ -622,7 +668,7 @@ const startApp = async ({
   app.put(
     config.API_PATH + "pins",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -642,7 +688,7 @@ const startApp = async ({
   app.delete(
     config.API_PATH + "pins",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json(),
     async function(req, res) {
       const reqBody = req.body;
@@ -662,7 +708,7 @@ const startApp = async ({
   app.get(
     config.API_PATH + "pins",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json(),
     async function(req, res) {
       const pinnedNotes = await Notes.getPins(req.userId);
@@ -678,7 +724,7 @@ const startApp = async ({
   app.post(
     config.API_PATH + "logout",
     sessionMiddleware,
-    verifySession,
+    verifyUser,
     express.json(),
     async function(req, res) {
       const response:APIResponse = {
