@@ -40,6 +40,7 @@ const getNewNoteObject = ():ActiveNote => {
     id: NaN,
     isUnsaved: true,
     linkedNotes: [],
+    title: "New note",
   };
 
   Object.seal(note);

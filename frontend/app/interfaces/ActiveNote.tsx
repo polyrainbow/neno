@@ -7,6 +7,7 @@ interface ActiveNote {
     linkedNotes: any[],
     blocks: NoteContentBlock[],
     id: number,
+    title: string,
   };
 
 export default ActiveNote;

@@ -398,6 +398,14 @@ const EditorView = ({
     loadNote(activeNoteId);
   }, [activeNoteId]);
 
+  useEffect(() => {
+    document.title = activeNote.title;
+
+    return () => {
+      document.title = Config.DEFAULT_DOCUMENT_TITLE;
+    }
+  }, [activeNote]);
+
 
   const pinOrUnpinNote = async () => {
     let newPinnedNotes;
