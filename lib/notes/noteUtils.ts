@@ -14,6 +14,14 @@ import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import UserNoteChange from "./interfaces/UserNoteChange.js";
 import { UserNoteChangeType } from "./interfaces/UserNoteChangeType.js";
 import * as Utils from "../utils.js";
+import NoteContentBlock, {
+  NoteContentBlockDocument,
+  NoteContentBlockHeading,
+  NoteContentBlockImage,
+  NoteContentBlockLink,
+  NoteContentBlockParagraph,
+  NoteContentBlockType,
+} from "./interfaces/NoteContentBlock.js";
 
 
 const shortenText = (text:string, maxLength:number):string => {
@@ -26,9 +34,16 @@ const shortenText = (text:string, maxLength:number):string => {
 
 
 const getNoteTitle = (note:Note, maxLength = 800):string => {
-  if (typeof note?.blocks?.[0]?.data?.text === "string") {
+  if (
+    note.blocks.length > 0
+    && [
+    NoteContentBlockType.PARAGRAPH,
+    NoteContentBlockType.HEADING,
+  ].includes(note.blocks[0].type)) {
+    const block
+      = note.blocks[0] as NoteContentBlockParagraph | NoteContentBlockHeading;
     const title
-      = Utils.unescapeHTML(note.blocks[0].data.text).trim();
+      = Utils.unescapeHTML(block.data.text).trim();
 
     const titleShortened = shortenText(title, maxLength);
 
@@ -203,15 +218,18 @@ const removeLinksOfNote = (db: DatabaseMainData, noteId: NoteId):true => {
 
 const getFilesOfNote = (note:DatabaseNote):FileId[] => {
   return note.blocks
-    .filter((block) => {
+    .filter((block:NoteContentBlock):boolean => {
       const blockHasFileOrImage = (
-        ((block.type === "image") || (block.type === "attaches"))
+        (
+          (block.type === NoteContentBlockType.IMAGE)
+          || (block.type === NoteContentBlockType.DOCUMENT)
+        )
         && (typeof block.data.file.fileId === "string")
       );
 
       return blockHasFileOrImage;
     })
-    .map((block) => {
+    .map((block: NoteContentBlockImage | NoteContentBlockDocument):FileId => {
       return block.data.file.fileId;
     });
 };
@@ -318,12 +336,24 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
   let containsAudio = false;
 
   note.blocks.forEach((block) => {
-    if (block.type === "paragraph") containsText = true;
-    if (block.type === "linkTool") containsWeblink = true;
-    if (block.type === "code") containsCode = true;
-    if (block.type === "image") containsImages = true;
-    if (block.type === "attaches") containsAttachements = true;
-    if (block.type === "audio") containsAudio = true;
+    if (block.type === NoteContentBlockType.PARAGRAPH) {
+      containsText = true;
+    }
+    if (block.type === NoteContentBlockType.LINK) {
+      containsWeblink = true;
+    }
+    if (block.type === NoteContentBlockType.CODE) {
+      containsCode = true;
+    }
+    if (block.type === NoteContentBlockType.IMAGE) {
+      containsImages = true;
+    }
+    if (block.type === NoteContentBlockType.DOCUMENT) {
+      containsAttachements = true;
+    }
+    if (block.type === NoteContentBlockType.AUDIO) {
+      containsAudio = true;
+    }
   });
 
   const features:NoteListItemFeatures = {
@@ -401,8 +431,13 @@ const getSortFunction = (
 
 const getNumberOfCharacters = (note:DatabaseNote):number => {
   return note.blocks.reduce((accumulator, block) => {
-    if (["paragraph", "header"].includes(block.type) && block.data?.text) {
-      return accumulator + block.data.text.length;
+    if ([
+      NoteContentBlockType.PARAGRAPH,
+      NoteContentBlockType.HEADING,
+    ].includes(block.type)) {
+      return accumulator
+        + (block as NoteContentBlockParagraph | NoteContentBlockHeading)
+          .data.text.length;
     } else {
       return accumulator;
     }
@@ -412,8 +447,8 @@ const getNumberOfCharacters = (note:DatabaseNote):number => {
 
 const getURLsOfNote = (note:DatabaseNote):string[] => {
   return note.blocks
-    .filter((block) => {
-      return block.type === "linkTool";
+    .filter((block):block is NoteContentBlockLink => {
+      return block.type === NoteContentBlockType.LINK;
     })
     .map((block) => {
       return block.data.link;
@@ -524,13 +559,13 @@ const getNotesByTitle = (
 
 const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
   return note.blocks.reduce((accumulator, block) => {
-    if (block.type === "paragraph") {
+    if (block.type === NoteContentBlockType.PARAGRAPH) {
       return accumulator + " " + block.data.text;
-    } else if (block.type === "header") {
+    } else if (block.type === NoteContentBlockType.HEADING) {
       return accumulator + " " + block.data.text;
-    } else if (block.type === "code") {
+    } else if (block.type === NoteContentBlockType.CODE) {
       return accumulator + " " + block.data.code;
-    } else if (block.type === "list") {
+    } else if (block.type === NoteContentBlockType.LIST) {
       const itemsConcatenated = block.data.items.join(" ");
       return accumulator + " " + itemsConcatenated;
     } else {

@@ -46,6 +46,7 @@ import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
 import StatsExhaustive from "./interfaces/StatsExhaustive.js";
 import DatabaseMainData from "./interfaces/DatabaseMainData.js";
+import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 
 let io;
 
@@ -400,14 +401,14 @@ const importLinksAsNotes = async (dbId, links) => {
     const noteFromUser:NoteFromUser = {
       blocks: [
         {
-          "type": "header",
+          "type": NoteContentBlockType.HEADING,
           "data": {
             "text": urlMetadataObject.title,
             "level": 1,
           },
         },
         {
-          "type": "linkTool",
+          "type": NoteContentBlockType.LINK,
           "data": {
             "link": urlMetadataObject.url,
             "meta": {
