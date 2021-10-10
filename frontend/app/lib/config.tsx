@@ -50,6 +50,7 @@ const emojis = {
   "image": "🖼️",
   "code": "🤖",
   "audio": "🎧",
+  "video": "📺",
   "pin": "📌",
   "hub": "🐙",
   "text": "✏️",

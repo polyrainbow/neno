@@ -48,6 +48,12 @@ const NoteListItemFeatures = ({
           title="Contains audio"><span>{emojis.audio}</span></Tooltip>
         : null
     }
+    {
+      features?.containsVideo
+        ? <Tooltip
+          title="Contains video"><span>{emojis.video}</span></Tooltip>
+        : null
+    }
   </div>;
 };
 

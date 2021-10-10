@@ -334,6 +334,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
   let containsImages = false;
   let containsAttachements = false;
   let containsAudio = false;
+  let containsVideo = false;
 
   note.blocks.forEach((block) => {
     if (block.type === NoteContentBlockType.PARAGRAPH) {
@@ -354,6 +355,9 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
     if (block.type === NoteContentBlockType.AUDIO) {
       containsAudio = true;
     }
+    if (block.type === NoteContentBlockType.VIDEO) {
+      containsVideo = true;
+    }
   });
 
   const features:NoteListItemFeatures = {
@@ -363,6 +367,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
     containsImages,
     containsAttachements,
     containsAudio,
+    containsVideo,
   };
 
   return features;
