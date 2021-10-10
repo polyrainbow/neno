@@ -1,0 +1,53 @@
+body {
+  width: 320px;
+  margin: 0px;
+}
+
+header, main {
+  padding: 10px;
+}
+
+main {
+  display: none;
+}
+
+#heading {
+  margin: 0px;
+}
+
+h2 {
+  margin-top: 0px;
+}
+
+
+footer {
+  background-color: grey;
+  padding: 5px 10px;
+}
+
+
+a {
+  color: var(--link-color);
+}
+
+#textarea_note-text{
+  height: 100px;
+  border: var(--input-border-width) solid var(--main-content-color) !important;
+}
+
+#input_note-title, #textarea_note-text {
+  width: 290px;
+  margin-bottom: 10px;
+}
+
+#button_addPage {
+  font-size: 20px;
+}
+
+#input_note-title {
+  font-size: 20px;
+}
+
+#server-status {
+  margin: 0px;
+}

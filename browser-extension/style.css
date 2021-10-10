@@ -61,10 +61,11 @@
     0 16px 16px hsl(0deg 0% 0% / 0.075);
 }
 
+
 body, button, #input_note-title, #textarea_note-text {
-    font-family: var(--main-font);
-    color: var(--main-content-color);
-    background-color: var(--background-color);
+  font-family: var(--main-font);
+  color: var(--main-content-color);
+  background-color: var(--background-color);
 }
 
 input, select {
@@ -103,27 +104,4 @@ button[disabled]{
   fill: grey;
   cursor: inherit;
   border: none;
-}
-
-
-a {
-  color: var(--link-color);
-}
-
-#textarea_note-text{
-    height: 100px;
-    border: var(--input-border-width) solid var(--main-content-color) !important;
-}
-
-#input_note-title, #textarea_note-text {
-    width: 300px;
-    margin-bottom: 10px;
-}
-
-#button_addPage {
-    font-size: 20px;
-}
-
-#input_note-title {
-    font-size: 20px;
 }

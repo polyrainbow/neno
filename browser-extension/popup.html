@@ -2,25 +2,27 @@
 <html>
   <head>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="popup.css">
     <link
       href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap"
       rel="stylesheet"
     >
   </head>
   <body>
-    <h1 id="heading">NENO</h1>
-    <p id="server-status">Verifying server ...</p>
-    <section id="section_main">
+    <header><h1 id="heading">NENO</h1></header>
+    <main id="section_main">
         <h2>Add this page as a note</h2>
         <input type="text" id="input_note-title">
         <textarea id="textarea_note-text"></textarea>
         <div id="div_controls">
-            <button id="button_addPage">Add</button>
+          <button id="button_addPage">Add</button>
         </div>
         <div>
-            <p id="status"></p>
+          <p id="status"></p>
         </div>
-    </section>
-    <script src="popup.js"></script>
+      </main>
+    <footer id="status-bar">
+      <p id="server-status">Verifying server ...</p></footer>
+    <script src="popup.js" type="module"></script>
   </body>
 </html>

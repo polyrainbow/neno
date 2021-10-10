@@ -247,6 +247,10 @@ const put = async (
   dbId:DatabaseId,
   options
 ):Promise<NoteToTransmit> => {
+  if ((!noteFromUser) || (!noteFromUser.blocks)) {
+    throw new Error("Invalid note structure");
+  }
+
   let ignoreDuplicateTitles = true;
   if (
     (typeof options === "object")
