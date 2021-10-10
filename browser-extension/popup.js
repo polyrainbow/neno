@@ -12,6 +12,7 @@ const addPageButton = document.getElementById("button_addPage");
 const serverStatusElement = document.getElementById("server-status");
 const controlsContainer = document.getElementById("div_controls");
 const noteTitleElement = document.getElementById("input_note-title");
+const statusBar = document.getElementById("status-bar");
 
 const init = async ({
   apiKey,
@@ -39,7 +40,12 @@ const init = async ({
       });
 
       if (result.success) {
-        controlsContainer.innerHTML = "Note added.";
+        controlsContainer.innerHTML = "Note added. ";
+        const a = document.createElement("a");
+        a.innerHTML = "Click here to open it in NENO.";
+        a.href = hostUrl + "/editor/" + result.payload.id;
+        a.target = "_blank";
+        controlsContainer.appendChild(a);
       } else {
         serverStatusElement.innerHTML = "Error adding note: " + result.error;
       }
@@ -55,14 +61,19 @@ const init = async ({
   if (result.success) {
     serverStatusElement.innerHTML
       = "Server ready. User: " + result.payload.dbId;
+    statusBar.style.backgroundColor = "green";
   } else {
     serverStatusElement.innerHTML
       = "Authentication error. Please check server and API key. Error: "
       + result.error;
+    statusBar.style.backgroundColor = "red";
     addPageButton.disabled = true;
   }
 
-  if (activeTab.url.startsWith("chrome://")) {
+  if (
+    activeTab.url.startsWith("chrome://")
+    || activeTab.url.startsWith("about:")
+  ) {
     mainSection.innerHTML = "This page cannot be added as a note.";
   }
 

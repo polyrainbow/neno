@@ -7,6 +7,10 @@ header, main {
   padding: 10px;
 }
 
+header {
+  background-color: var(--header-background-color);
+}
+
 main {
   display: none;
 }
