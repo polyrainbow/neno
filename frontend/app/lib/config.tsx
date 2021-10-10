@@ -1,21 +1,23 @@
+import NoteContentBlock, { NoteContentBlockType } from "../../../lib/notes/interfaces/NoteContentBlock";
+
 const DEFAULT_NOTE_TITLE = "Note title";
 
-const DEFAULT_NOTE_BLOCKS = [
+const DEFAULT_NOTE_BLOCKS:NoteContentBlock[] = [
   {
-    "type": "header",
+    "type": NoteContentBlockType.HEADING,
     "data": {
       "text": DEFAULT_NOTE_TITLE,
       "level": 1,
     },
   },
   {
-    "type": "paragraph",
+    "type": NoteContentBlockType.PARAGRAPH,
     "data": {
       "text": "Note text",
     },
   },
   {
-    "type": "linkTool",
+    "type": NoteContentBlockType.LINK,
     "data": {
       "link": "",
       "meta": {},
