@@ -25,6 +25,7 @@ import * as path from "path";
 import session from "express-session";
 import MemoryStore from "memorystore";
 import User from "./interfaces/User.js";
+import { randomUUID } from "crypto";
 
 const startApp = async ({
   users,
@@ -35,7 +36,7 @@ const startApp = async ({
   const storageProvider = new FileSystemStorageProvider(dataPath);
   console.log("File system storage ready at " + dataPath);
 
-  await Notes.init(storageProvider, getUrlMetadata);
+  await Notes.init(storageProvider, getUrlMetadata, randomUUID);
   const app = express();
 
   const sessionMiddleware = session({

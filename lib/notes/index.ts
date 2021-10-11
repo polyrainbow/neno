@@ -1,6 +1,5 @@
 import DatabaseIO from "./DatabaseIO.js";
 import * as Utils from "../utils.js";
-import { v4 as uuidv4 } from "uuid";
 import {
   getNoteTitle,
   removeDefaultTextParagraphs,
@@ -49,6 +48,7 @@ import DatabaseMainData from "./interfaces/DatabaseMainData.js";
 import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 
 let io;
+let randomUUID;
 
 /* this is the fallback getUrlMetadata function that is used if the initializer
 does not provide a better one */
@@ -66,7 +66,11 @@ let getUrlMetadata = (url) => {
 **/
 
 
-const init = async (storageProvider, _getUrlMetadata):Promise<void> => {
+const init = async (
+  storageProvider,
+  _getUrlMetadata,
+  _randomUUID,
+):Promise<void> => {
   console.log("Initializing notes module...");
 
   if (typeof _getUrlMetadata === "function") {
@@ -75,6 +79,7 @@ const init = async (storageProvider, _getUrlMetadata):Promise<void> => {
 
   console.log("Initializing DatabaseIO instance...");
   io = new DatabaseIO({storageProvider});
+  randomUUID = _randomUUID;
 
   console.log("Cleaning data...");
   await cleanUpData(io);
@@ -349,7 +354,7 @@ const addFile = async (
     throw new Error("Invalid MIME type: " + mimeType);
   }
 
-  const fileId:FileId = uuidv4() + "." + fileType.ending;
+  const fileId:FileId = randomUUID() + "." + fileType.ending;
   await io.addFile(dbId, fileId, readable);
   return fileId;
 };

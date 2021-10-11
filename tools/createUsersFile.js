@@ -1,7 +1,7 @@
 import readlineSync from "readline-sync";
 import bcrypt from "bcryptjs";
 import fs from "fs";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import twofactor from "node-2fa";
 import qrcode from "qrcode-terminal";
 
@@ -27,7 +27,7 @@ for (let i = 0; i < numberOfUsers; i++) {
   const uri = `otpauth://totp/NENO%3A%20${username}?secret=${mfa.secret}&issuer=NENO`;
 
   users.push({
-    id: uuidv4(),
+    id: randomUUID(),
     login: username,
     passwordHash: passwordHash,
     mfaSecret: mfa.secret,

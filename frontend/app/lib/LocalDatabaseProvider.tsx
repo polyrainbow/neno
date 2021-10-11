@@ -112,7 +112,12 @@ export default class LocalDatabaseProvider {
       = new FileSystemAccessAPIStorageProvider(this.#folderHandle);
 
     try {
-      await this.#notesModule.init(storageProvider);
+      await this.#notesModule.init(
+        storageProvider,
+        null,
+        //@ts-ignore
+        () => crypto.randomUUID(),
+      );
     } catch (e) {
       console.error(
         "Initializing notes module not possible. "

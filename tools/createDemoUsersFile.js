@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import fs from "fs";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import twofactor from "node-2fa";
 import qrcode from "qrcode-terminal";
 
@@ -21,7 +21,7 @@ console.log("Scan this QR code with your favorite 2FA app");
 console.log("URL: " + uri);
 qrcode.generate(uri, { small: true }, (qrCode) => {
   users.push({
-    id: uuidv4(),
+    id: randomUUID(),
     login: username,
     passwordHash: passwordHash,
     mfaSecret: mfa.secret,

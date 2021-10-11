@@ -1,8 +1,8 @@
 import * as path from "path";
-import { v4 as uuidv4 } from "uuid";
 import { Command } from "commander";
 const program = new Command();
 import { REPO_PATH } from "./config.js";
+import { randomUUID } from "crypto";
 
 const getArguments = (version) => {
   program.version(version);
@@ -43,7 +43,7 @@ const getArguments = (version) => {
     .option(
       '--session-secret <value>',
       "secret for session authentication",
-      uuidv4(),
+      randomUUID(),
     )
     .option(
       '--url-metadata <value>',

@@ -1,7 +1,6 @@
 import React, {
   useEffect, useState, useCallback, useRef, useMemo,
 } from "react";
-import { v4 as uuidv4 } from "uuid";
 import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
@@ -277,7 +276,8 @@ const EditorView = ({
         options.query = searchValue;
       }
 
-      const requestId = uuidv4();
+      //@ts-ignore randomUUID not yet in types
+      const requestId = crypto.randomUUID();
       currentRequestId.current = requestId;
       try {
         const {
