@@ -8,7 +8,7 @@ interface IconButtonProps {
   icon: string,
   onClick: any,
   disabled?: boolean,
-};
+}
 
 const IconButton = ({
   id,

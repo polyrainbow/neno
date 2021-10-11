@@ -124,7 +124,7 @@ const GraphView = ({
       }
     }
   };
-  
+
   useEffect(() => {
     initializeGraphInstance();
   }, [databaseProvider]);

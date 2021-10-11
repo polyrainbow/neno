@@ -1,4 +1,9 @@
 {
+  "overrides": [
+    {
+      "files": [".js", "*.ts", "*.tsx"]
+    }
+  ],
   "env": {
     "es6": true,
     "jest": true

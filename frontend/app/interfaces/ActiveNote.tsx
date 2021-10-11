@@ -8,6 +8,6 @@ interface ActiveNote {
     blocks: NoteContentBlock[],
     id: number,
     title: string,
-  };
+  }
 
 export default ActiveNote;

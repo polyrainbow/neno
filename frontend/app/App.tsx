@@ -81,7 +81,7 @@ const App = ({
     } else {
       history.push(paths.login);
     }
-  }
+  };
 
   useEffect(() => {
     startApp();

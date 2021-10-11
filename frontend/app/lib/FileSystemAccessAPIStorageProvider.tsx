@@ -108,7 +108,7 @@ export default class FileSystemAccessAPIStorageProvider {
     while (!done) {
       const iteration = await iterator.next();
       if (!iteration.done) {
-        //@ts-ignore
+        // @ts-ignore
         values.push(iteration.value);
       } else {
         done = true;
@@ -116,9 +116,9 @@ export default class FileSystemAccessAPIStorageProvider {
     }
 
     const directoryNames = values
-      //@ts-ignore
+      // @ts-ignore
       .filter((value) => value.kind === "directory")
-      //@ts-ignore
+      // @ts-ignore
       .map((dirHandle) => dirHandle.name);
 
     return directoryNames;
@@ -144,7 +144,7 @@ export default class FileSystemAccessAPIStorageProvider {
     while (!done) {
       const iteration = await iterator.next();
       if (!iteration.done) {
-        //@ts-ignore
+        // @ts-ignore
         values.push(iteration.value);
       } else {
         done = true;
@@ -152,7 +152,7 @@ export default class FileSystemAccessAPIStorageProvider {
     }
 
     const entryNames = values
-      //@ts-ignore
+      // @ts-ignore
       .map((dirHandle) => dirHandle.name);
 
     return entryNames;

@@ -183,7 +183,7 @@ const EditorView = ({
               change.type === UserNoteChangeType.LINKED_NOTE_ADDED
               && change.noteId === linkedNoteId
             );
-          }
+          },
         ),
         {
           type: UserNoteChangeType.LINKED_NOTE_DELETED,
@@ -403,7 +403,7 @@ const EditorView = ({
 
     return () => {
       document.title = Config.DEFAULT_DOCUMENT_TITLE;
-    }
+    };
   }, [activeNote]);
 
 

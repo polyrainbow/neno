@@ -23,7 +23,7 @@ const LoginViewLocal = ({
       if (!localDatabaseProvider) return;
       const folderHandleName = await localDatabaseProvider.getFolderHandleName();
       setLocalDatabaseFolderHandleName(folderHandleName);
-    }
+    };
 
     retrieveLocalDatabaseFolderHandle();
   }, [localDatabaseProvider]);

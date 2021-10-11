@@ -37,7 +37,7 @@ export default class LocalDatabaseProvider {
   // and initialize the database
   async getFolderHandleName() {
     if (this.#folderHandle) {
-      //@ts-ignore
+      // @ts-ignore
       return this.#folderHandle.name;
     }
 
@@ -47,7 +47,7 @@ export default class LocalDatabaseProvider {
     }
 
     this.#folderHandle = folderHandle;
-    //@ts-ignore
+    // @ts-ignore
     return this.#folderHandle.name;
   }
 

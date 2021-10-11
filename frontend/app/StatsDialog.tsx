@@ -18,7 +18,7 @@ const StatsDialog = ({
       const stats = await databaseProvider.getStats(true);
       setStats(stats);
       setStatus("READY");
-    }
+    };
 
     updateStats();
   }, []);
