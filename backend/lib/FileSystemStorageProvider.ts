@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import fsClassic from "fs";
 import * as path from "path";
-import mkdirp from "mkdirp";
 import { Readable } from "stream";
 import archiver from "archiver";
 
@@ -33,7 +32,7 @@ export default class FileSystemStorageProvider {
 
   constructor(dataPath: string) {
     this.#dataPath = dataPath;
-    mkdirp.sync(path.dirname(dataPath));
+    fsClassic.mkdirSync(path.dirname(dataPath), { recursive: true });
   }
 
   async writeObject(
@@ -41,7 +40,7 @@ export default class FileSystemStorageProvider {
     data: string | Buffer,
   ):Promise<void> {
     const finalPath = this.joinPath(this.#dataPath, requestPath);
-    mkdirp.sync(path.dirname(finalPath));
+    await fs.mkdir(path.dirname(finalPath), { recursive: true });
     await fs.writeFile(finalPath, data);
   }
 
@@ -50,7 +49,7 @@ export default class FileSystemStorageProvider {
     readableStream: Readable,
   ):Promise<void> {
     const finalPath = this.joinPath(this.#dataPath, requestPath);
-    mkdirp.sync(path.dirname(finalPath));
+    await fs.mkdir(path.dirname(finalPath), { recursive: true });
     const writableStream = fsClassic.createWriteStream(finalPath);
     readableStream.pipe(writableStream);
     return await new Promise((resolve, reject) => {
