@@ -23,9 +23,9 @@ import twofactor from "node-2fa";
 import fallback from "express-history-api-fallback";
 import * as path from "path";
 import session from "express-session";
-import MemoryStore from "memorystore";
 import User from "./interfaces/User.js";
 import { randomUUID } from "crypto";
+import FileSessionStore from "./lib/FileSessionStore.js";
 
 const startApp = async ({
   users,
@@ -51,8 +51,10 @@ const startApp = async ({
     resave: false,
     name: config.SESSION_COOKIE_NAME,
     unset: "keep",
-    store: new (MemoryStore(session))({
-      checkPeriod: 86400000 // prune expired entries every 24h
+    store: new (FileSessionStore(session))({
+      checkPeriod: 86400000, // prune expired entries every 24h,
+      maxNumberOfSessions: 1000,
+      filePath: path.join(dataPath, "sessions.json"),
     }),
   });
 

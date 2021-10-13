@@ -30,7 +30,6 @@
     "express-session": "^1.17.2",
     "formidable": "^1.2.2",
     "idb-keyval": "^6.0.2",
-    "memorystore": "^1.6.6",
     "node-2fa": "^2.0.2",
     "qrcode-terminal": "^0.12.0",
     "react": "^17.0.1",
