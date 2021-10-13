@@ -44,7 +44,7 @@ export const getNoteBlocks = ({
 
   if (noteText.trim().length > 0) {
     const paragraphs = noteText.split("\n\n");
-    const blocks = paragraphs.map((paragraph) => {
+    const paragraphBlocks = paragraphs.map((paragraph) => {
       return {
         type: "paragraph",
         data: {
@@ -53,7 +53,7 @@ export const getNoteBlocks = ({
       };
     });
 
-    blocks.push(...blocks);
+    blocks.push(...paragraphBlocks);
   }
 
   return blocks;
