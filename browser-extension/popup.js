@@ -8,6 +8,12 @@ import {
   getExistingNotesWithThisUrl,
 } from "./utils.js";
 
+const forbiddenUrlStartStrings = [
+  "chrome://",
+  "about:",
+  "chrome-extension://",
+];
+
 const mainSection = document.getElementById("section_main");
 const pushNoteButton = document.getElementById("button_pushNote");
 const serverStatusElement = document.getElementById("server-status");
@@ -101,10 +107,9 @@ const init = async ({
     pushNoteButton.disabled = true;
   }
 
-  if (
-    activeTab.url.startsWith("chrome://")
-    || activeTab.url.startsWith("about:")
-  ) {
+  if (forbiddenUrlStartStrings.some(
+    (startString) => activeTab.url.startsWith(startString),
+  )) {
     mainSection.innerHTML = "This page cannot be added as a note.";
   }
 
