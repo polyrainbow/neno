@@ -49,6 +49,11 @@ const getArguments = (version) => {
       '--url-metadata <value>',
       "don't start server, only grab url metadata for given url",
       "",
+    )
+    .option(
+      '--session-ttl <value>',
+      "time to live for a session in days",
+      "30",
     );
   
   program.parse(process.argv);

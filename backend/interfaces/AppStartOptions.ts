@@ -6,4 +6,5 @@ export default interface AppStartOptions {
     dataPath: Filepath,
     frontendPath: Filepath,
     sessionSecret: string,
+    sessionTTL: number,
 }

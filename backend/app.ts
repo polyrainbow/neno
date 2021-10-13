@@ -32,9 +32,11 @@ const startApp = async ({
   dataPath,
   frontendPath,
   sessionSecret,
+  sessionTTL,
 }:AppStartOptions):Promise<Express.Application> => {
   const storageProvider = new FileSystemStorageProvider(dataPath);
   console.log("File system storage ready at " + dataPath);
+  console.log("Session TTL: " + sessionTTL.toString() + " day(s)");
 
   await Notes.init(storageProvider, getUrlMetadata, randomUUID);
   const app = express();
@@ -43,7 +45,7 @@ const startApp = async ({
     secret: sessionSecret,
     saveUninitialized: false,
     cookie: {
-      maxAge: config.MAX_SESSION_AGE_DAYS * 24 * 60 * 60 * 1000, // days to ms
+      maxAge: sessionTTL * 24 * 60 * 60 * 1000, // days to ms
       path: '/',
       httpOnly: true,
       secure: "auto",

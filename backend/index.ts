@@ -29,6 +29,7 @@ const app = await startApp({
   dataPath: programArguments.dataFolderPath,
   frontendPath: path.join(REPO_PATH, "frontend"),
   sessionSecret: programArguments.sessionSecret,
+  sessionTTL: parseInt(programArguments.sessionTtl),
 });
 
 

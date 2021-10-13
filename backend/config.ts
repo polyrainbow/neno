@@ -3,9 +3,6 @@ import * as url from "url";
 
 const API_PATH = "/api/";
 
-// in days
-const MAX_SESSION_AGE_DAYS = 30;
-
 // in bytes
 const MAX_UPLOAD_FILE_SIZE = 524_288_000; // 500 MB
 
@@ -19,7 +16,6 @@ const SESSION_COOKIE_NAME = "NENO_token";
 
 export {
   API_PATH,
-  MAX_SESSION_AGE_DAYS,
   MAX_UPLOAD_FILE_SIZE,
   REPO_PATH,
   SESSION_COOKIE_NAME,
