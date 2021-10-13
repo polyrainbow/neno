@@ -9,13 +9,15 @@ import {
 } from "./utils.js";
 
 const mainSection = document.getElementById("section_main");
-const addPageButton = document.getElementById("button_addPage");
+const pushNoteButton = document.getElementById("button_pushNote");
 const serverStatusElement = document.getElementById("server-status");
-const controlsContainer = document.getElementById("div_controls");
 const noteTitleElement = document.getElementById("input_note-title");
 const statusBar = document.getElementById("status-bar");
 const existingNotesSection = document.getElementById("section_existing-notes");
 const existingNotesContainer = document.getElementById("existing-notes");
+const noteStatusElement = document.getElementById("note-status");
+
+let activeNoteId = null;
 
 const loadAndShowExistingNotesWithThisUrl = async (url, hostUrl, apiKey) => {
   const existingNotesResponse
@@ -42,7 +44,7 @@ const init = async ({
   hostUrl,
   activeTab,
 }) => {
-  addPageButton
+  pushNoteButton
     .addEventListener("click", async () => {
       const noteTitle = noteTitleElement.value;
 
@@ -57,20 +59,26 @@ const init = async ({
       });
 
       const result = await putNote({
-        blocks,
+        note: {
+          id: activeNoteId,
+          blocks,
+        },
         hostUrl,
         apiKey,
       });
 
       if (result.success) {
-        controlsContainer.innerHTML = "Note added. ";
+        noteStatusElement.innerHTML = "Note added. ";
         const a = document.createElement("a");
         a.innerHTML = "Click here to open it in NENO.";
         a.href = hostUrl + "/editor/" + result.payload.id;
         a.target = "_blank";
-        controlsContainer.appendChild(a);
+        noteStatusElement.appendChild(a);
+
+        activeNoteId = result.payload.id;
+        pushNoteButton.innerHTML = "Update";
       } else {
-        serverStatusElement.innerHTML = "Error adding note: " + result.error;
+        noteStatusElement.innerHTML = "Error adding note: " + result.error;
       }
     });
 
@@ -90,7 +98,7 @@ const init = async ({
       = "Authentication error. Please check server and API key. Error: "
       + result.error;
     statusBar.style.backgroundColor = "red";
-    addPageButton.disabled = true;
+    pushNoteButton.disabled = true;
   }
 
   if (

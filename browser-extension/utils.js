@@ -60,14 +60,12 @@ export const getNoteBlocks = ({
 };
 
 export const putNote = ({
-  blocks,
+  note,
   hostUrl,
   apiKey,
 }) => {
   const requestBody = {
-    note: {
-      blocks,
-    },
+    note,
     options: {
       ignoreDuplicateTitles: true,
     },
