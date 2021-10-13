@@ -43,12 +43,17 @@ export const getNoteBlocks = ({
   ];
 
   if (noteText.trim().length > 0) {
-    blocks.push({
-      type: "paragraph",
-      data: {
-        text: noteText,
-      },
+    const paragraphs = noteText.split("\n\n");
+    const blocks = paragraphs.map((paragraph) => {
+      return {
+        type: "paragraph",
+        data: {
+          text: paragraph,
+        },
+      };
     });
+
+    blocks.push(...blocks);
   }
 
   return blocks;
@@ -80,6 +85,28 @@ export const putNote = ({
   })
     .then((response) => {
       return response;
+    });
+};
+
+
+export const getExistingNotesWithThisUrl = (url, hostUrl, apiKey) => {
+  const hostUrlTrimmed = trimHostUrl(hostUrl);
+
+  return fetchJSON(hostUrlTrimmed + "/api/notes?q=has-url:" + url, {
+    method: "GET",
+    headers: {
+      "X-Auth-Token": apiKey,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((result) => {
+      return result;
+    })
+    .catch((e) => {
+      return {
+        success: false,
+        error: e.message,
+      };
     });
 };
 

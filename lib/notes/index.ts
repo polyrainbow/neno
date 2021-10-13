@@ -20,6 +20,7 @@ import {
   getNotesWithDuplicateUrls,
   getNotesThatContainTokens,
   getNotesByTitle,
+  getNotesWithUrl,
   getNotesWithTitleContainingTokens,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
@@ -124,6 +125,12 @@ const getNotesList = async (
     const startOfExactQuery = query.indexOf("exact:") + "exact:".length;
     const exactQuery = query.substr(startOfExactQuery);
     matchingNotes = getNotesByTitle(db.notes, exactQuery, false);
+
+  // search for notes with specific urls
+  } else if (query.includes("has-url:")) {
+    const startOfExactQuery = query.indexOf("has-url:") + "has-url:".length;
+    const url = query.substr(startOfExactQuery);
+    matchingNotes = getNotesWithUrl(db.notes, url);
 
   // full-text search
   } else if (query.includes("ft:")) {

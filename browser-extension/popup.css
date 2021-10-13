@@ -11,7 +11,7 @@ header {
   background-color: var(--header-background-color);
 }
 
-main {
+main, #section_existing-notes {
   display: none;
 }
 

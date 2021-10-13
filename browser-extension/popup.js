@@ -5,6 +5,7 @@ import {
   getNoteBlocks,
   putNote,
   isAuthenticated,
+  getExistingNotesWithThisUrl,
 } from "./utils.js";
 
 const mainSection = document.getElementById("section_main");
@@ -13,6 +14,28 @@ const serverStatusElement = document.getElementById("server-status");
 const controlsContainer = document.getElementById("div_controls");
 const noteTitleElement = document.getElementById("input_note-title");
 const statusBar = document.getElementById("status-bar");
+const existingNotesSection = document.getElementById("section_existing-notes");
+const existingNotesContainer = document.getElementById("existing-notes");
+
+const loadAndShowExistingNotesWithThisUrl = async (url, hostUrl, apiKey) => {
+  const existingNotesResponse
+    = await getExistingNotesWithThisUrl(url, hostUrl, apiKey);
+  const existingNotes = existingNotesResponse.payload.results;
+  if (existingNotes.length > 0) {
+    existingNotes.forEach((note) => {
+      const p = document.createElement("p");
+      const a = document.createElement("a");
+      a.innerHTML = note.title;
+      a.href = hostUrl + "/editor/" + note.id;
+      a.target = "_blank";
+      p.appendChild(a);
+      existingNotesContainer.appendChild(p);
+    });
+  } else {
+    existingNotesContainer.innerHTML = "None found.";
+  }
+  existingNotesSection.style.display = "block";
+};
 
 const init = async ({
   apiKey,
@@ -78,6 +101,12 @@ const init = async ({
   }
 
   mainSection.style.display = "block";
+
+  try {
+    await loadAndShowExistingNotesWithThisUrl(activeTab.url, hostUrl, apiKey);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
 

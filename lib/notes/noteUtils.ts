@@ -562,6 +562,20 @@ const getNotesByTitle = (
 }
 
 
+const getNotesWithUrl = (
+  notes:DatabaseNote[],
+  url: string,
+):DatabaseNote[] => {
+  return notes.filter((note:DatabaseNote) => {
+    return note.blocks
+      .filter((block):block is NoteContentBlockLink => {
+        return block.type === NoteContentBlockType.LINK;
+      })
+      .some((linkBlock) => linkBlock.data.link === url);
+  });
+}
+
+
 const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
   return note.blocks.reduce((accumulator, block) => {
     if (block.type === NoteContentBlockType.PARAGRAPH) {
@@ -655,6 +669,7 @@ export {
   getNumberOfUnlinkedNotes,
   getNotesWithDuplicateUrls,
   getNotesByTitle,
+  getNotesWithUrl,
   getConcatenatedTextOfNote,
   getNotesWithTitleContainingTokens,
   getNotesThatContainTokens,
