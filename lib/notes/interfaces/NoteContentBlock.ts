@@ -66,9 +66,7 @@ export interface NoteContentBlockCode {
 interface NoteContentBlockImageData {
   file: any,
   caption: string,
-  stretched: boolean,
   withBackground: boolean,
-  withBorder: boolean,
 }
 
 export interface NoteContentBlockImage {

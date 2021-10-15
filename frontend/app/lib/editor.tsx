@@ -31,7 +31,7 @@ const loadInstance = async ({
     import("@editorjs/editorjs"),
     import("@editorjs/header"),
     import("@editorjs/link"),
-    import("@editorjs/image"),
+    import("./editor-js-image-plugin/index.js"),
     import("@editorjs/list"),
     import("@editorjs/code"),
     import("@editorjs/attaches"),

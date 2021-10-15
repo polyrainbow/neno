@@ -2,6 +2,12 @@
     padding-bottom: 50px !important;
 }
 
+@media (min-width: 651px) {
+  .codex-editor--narrow .codex-editor__redactor {
+    margin-right: 0px !important;
+  }
+}
+
 .ce-block__content, .ce-toolbar__content {
     max-width: unset !important;
 }
