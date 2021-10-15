@@ -113,7 +113,10 @@ const StatsDialog = ({
                 }</p></td>
               </tr>
               <tr>
-                <td>{emojis.image}{emojis.file} Files</td>
+                <td>
+                  {emojis.file}{emojis.image}{emojis.audio}{emojis.video}
+                  <span> </span>Files
+                </td>
                 <td>{stats.numberOfFiles.toLocaleString("en")}</td>
               </tr>
               <tr>
