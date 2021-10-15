@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Dialog from "./Dialog";
-import { emojis } from "./lib/config.js";
+import { emojis, paths } from "./lib/config.js";
 import {
   makeTimestampHumanReadable,
 } from "./lib/utils.js";
@@ -99,10 +99,18 @@ const StatsDialog = ({
                 }</td>
               </tr>
               <tr>
-                <td>🔥 Maximum number of links on a node</td>
-                <td>{
-                  stats.maxNumberOfLinksOnANode.toLocaleString("en")
-                }</td>
+                <td>🔥 Nodes with highest number of links</td>
+                <td><p>{
+                  stats.nodesWithHighestNumberOfLinks.map((note) => {
+                    return <><a href={
+                      paths.editorWithNote.replace("%NOTE_ID%", note.id)
+                    }>
+                      {note.title}
+                    </a> ({note.numberOfLinkedNotes.toLocaleString("en")})
+                    <br/>
+                    </>
+                  })
+                }</p></td>
               </tr>
               <tr>
                 <td>{emojis.image}{emojis.file} Files</td>

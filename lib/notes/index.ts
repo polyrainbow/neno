@@ -224,10 +224,9 @@ const getStats = async (
       numberOfHubs: db.notes
         .filter((note) => getNumberOfLinkedNotes(db, note.id) >= 5)
         .length,
-      maxNumberOfLinksOnANode: db.notes.reduce((accumulator, note) => {
-        const numberOfLinks = getNumberOfLinkedNotes(db, note.id);
-        return numberOfLinks > accumulator ? numberOfLinks : accumulator
-      }, 0),
+      nodesWithHighestNumberOfLinks: createNoteListItems(db.notes, db)
+        .sort(getSortFunction(NoteListSortMode.NUMBER_OF_LINKS_DESCENDING))
+        .slice(0, 3),
       dbCreationTime: db.creationTime,
       dbUpdateTime: db.updateTime,
       dbId: db.id,
