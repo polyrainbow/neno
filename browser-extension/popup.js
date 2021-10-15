@@ -6,6 +6,7 @@ import {
   putNote,
   isAuthenticated,
   getExistingNotesWithThisUrl,
+  trimHostUrl,
 } from "./utils.js";
 
 const forbiddenUrlStartStrings = [
@@ -124,10 +125,11 @@ const init = async ({
 
 
 chrome.storage.sync.get(["apiKey", "hostUrl"], ({ apiKey, hostUrl }) => {
+  const hostUrlTrimmed = trimHostUrl(hostUrl);
   chrome.tabs.query({ active: true, currentWindow: true })
     .then((tabs) => {
       const activeTab = tabs[0];
-      init({ apiKey, hostUrl, activeTab });
+      init({ apiKey, hostUrl: hostUrlTrimmed, activeTab });
     });
 });
 

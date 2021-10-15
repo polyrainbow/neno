@@ -71,9 +71,7 @@ export const putNote = ({
     },
   };
 
-  const hostUrlTrimmed = trimHostUrl(hostUrl);
-
-  return fetchJSON(hostUrlTrimmed + "/api/note", {
+  return fetchJSON(hostUrl + "/api/note", {
     method: "PUT",
     headers: {
       "X-Auth-Token": apiKey,
@@ -88,9 +86,7 @@ export const putNote = ({
 
 
 export const getExistingNotesWithThisUrl = (url, hostUrl, apiKey) => {
-  const hostUrlTrimmed = trimHostUrl(hostUrl);
-
-  return fetchJSON(hostUrlTrimmed + "/api/notes?q=has-url:" + url, {
+  return fetchJSON(hostUrl + "/api/notes?q=has-url:" + url, {
     method: "GET",
     headers: {
       "X-Auth-Token": apiKey,
@@ -113,9 +109,7 @@ export const isAuthenticated = ({
   hostUrl,
   apiKey,
 }) => {
-  const hostUrlTrimmed = trimHostUrl(hostUrl);
-
-  return fetchJSON(hostUrlTrimmed + "/api/authenticated", {
+  return fetchJSON(hostUrl + "/api/authenticated", {
     method: "GET",
     headers: {
       "X-Auth-Token": apiKey,
