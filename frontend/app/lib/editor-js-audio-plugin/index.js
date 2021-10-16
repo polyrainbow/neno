@@ -340,12 +340,16 @@ export default class AudioTool {
     firstLine.appendChild(downloadIcon);
 
     const secondLine = this.make("div", "cdx-audio-second-line");
+    secondLine.setAttribute("data-mutation-free", "true");
 
     const audioElement = document.createElement("audio");
     audioElement.controls = true;
     audioElement.src = await this.config.getUrl(this.data.file);
     audioElement.style.width = "100%";
     audioElement.style.marginTop = "20px";
+    // this prevents editor.js from triggering the onChange callback as soon
+    // as the audio loads
+    audioElement.setAttribute("data-mutation-free", "true");
     secondLine.appendChild(audioElement);
 
     this.nodes.wrapper.appendChild(firstLine);

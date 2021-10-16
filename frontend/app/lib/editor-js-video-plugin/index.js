@@ -340,12 +340,16 @@ export default class VideoTool {
     firstLine.appendChild(downloadIcon);
 
     const secondLine = this.make("div", "cdx-video-second-line");
+    secondLine.setAttribute("data-mutation-free", "true");
 
     const videoElement = document.createElement("video");
     videoElement.controls = true;
     videoElement.src = await this.config.getUrl(this.data.file);
     videoElement.style.width = "100%";
     videoElement.style.marginTop = "20px";
+    // this prevents editor.js from triggering the onChange callback as soon
+    // as the audio loads
+    videoElement.setAttribute("data-mutation-free", "true");
     secondLine.appendChild(videoElement);
 
     this.nodes.wrapper.appendChild(firstLine);

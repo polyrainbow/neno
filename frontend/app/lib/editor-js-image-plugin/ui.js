@@ -188,6 +188,10 @@ export default class Ui {
      */
     this.nodes.imageEl = make("img", this.CSS.imageEl, attributes);
 
+    // this prevents editor.js from triggering the onChange callback as soon
+    // as the image loads
+    this.nodes.imageEl.setAttribute("data-mutation-free", "true");
+
     /**
      * Add load event listener
      */
