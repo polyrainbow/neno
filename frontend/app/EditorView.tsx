@@ -152,13 +152,9 @@ const EditorView = ({
     const noteFromServer = await databaseProvider.putNote(
       noteToTransmit, { ignoreDuplicateTitles: true },
     );
-    setActiveNote({
-      ...noteFromServer,
-      isUnsaved: false,
-      changes: [],
-    });
     setUnsavedChanges(false);
     refreshNotesList();
+    goToNote(noteFromServer.id);
   };
 
 
