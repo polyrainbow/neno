@@ -52,6 +52,7 @@ const loadInstance = async ({
   ] = modules.map((module) => module.default);
 
   const instance = new EditorJS({
+    logLevel: "ERROR",
     holder: parent,
     data: {
       blocks: data,
