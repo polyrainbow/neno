@@ -139,6 +139,11 @@ const EditorView = ({
   const duplicateNote = async () => {
     if (activeNote.isUnsaved) return;
 
+    if (unsavedChanges) {
+      await confirmDiscardingUnsavedChanges();
+      setUnsavedChanges(false);
+    }
+
     const noteToTransmit = {
       id: null,
       blocks: activeNote.blocks,
@@ -152,7 +157,6 @@ const EditorView = ({
     const noteFromServer = await databaseProvider.putNote(
       noteToTransmit, { ignoreDuplicateTitles: true },
     );
-    setUnsavedChanges(false);
     refreshNotesList();
     goToNote(noteFromServer.id);
   };
