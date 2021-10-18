@@ -5,15 +5,7 @@ To deploy NENO for local mode usage, you need a web space capable of serving sta
 ## 1. Clone this repository
 
 ## 2. Install dependencies
-Run the following commands:
-
-`npm cache clean --force`
-
-`npm update`
-
-`npm i`
-
-Sometimes, npm does not correctly install **all** modules. `npm cache clean --force` and `npm update` make sure it does.
+Run `npm i`
 
 ## 3. Build the frontend from the source
 

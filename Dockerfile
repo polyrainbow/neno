@@ -8,9 +8,6 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package*.json ./
 
-RUN npm cache clean --force
-RUN npm update
-
 # install modules before adding code, so that modules are not every time built
 # on code change
 RUN npm install

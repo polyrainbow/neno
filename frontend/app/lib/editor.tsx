@@ -30,7 +30,7 @@ const loadInstance = async ({
   const modules = await Promise.all([
     import("@editorjs/editorjs"),
     import("@editorjs/header"),
-    import("@editorjs/link"),
+    import("./editor-js-plugins/link/index.js"),
     import("./editor-js-plugins/image/index.js"),
     import("@editorjs/list"),
     import("@editorjs/code"),

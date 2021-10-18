@@ -5,15 +5,7 @@ Requirements: You need to have Node.js (>=15) and npm (>=6) installed.
 ## 1. Clone this repository
 
 ## 2. Install dependencies
-Run the following commands:
-
-`npm cache clean --force`
-
-`npm update`
-
-`npm i`
-
-Sometimes, npm does not correctly install **all** modules. `npm cache clean --force` and `npm update` make sure it does.
+Run `npm i`
 
 ## 3. Build the frontend and the backend from the source
 Run `npm run build`
