@@ -1,13 +1,13 @@
 .cdx-audio--with-file {
   display: block;
-  padding: 13px 20px;
-  border: 1px solid #7e7e7e;
-  border-radius: 3px;
+  padding: var(--block-padding);
+  border: var(--block-border);
+  box-shadow: var(--block-box-shadow);
+  border-radius: var(--block-border-radius);
 }
 .cdx-audio-first-line {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 .cdx-audio--with-file__file-info {
   flex-grow: 8;
@@ -44,6 +44,14 @@
   content: attr(data-size);
   margin-left: 0.2em;
 }
+
+.cdx-audio__title {
+  font-size: var(--block-title-font-size);
+  font-weight: var(--block-title-font-weight);
+  line-height: var(--block-title-line-height);
+  margin: var(--block-title-margin);
+}
+
 .cdx-audio--with-file__title {
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -67,4 +75,8 @@
 }
 .cdx-audio__button:hover {
   color: #393f52;
+}
+
+.cdx-audio--with-file .cdx-audio__download-button svg {
+  fill: var(--block-download-icon-fill-color);
 }

@@ -37,3 +37,23 @@
 .icon.icon--toggler-down {
     color: black !important;
 }
+
+:root {
+    --block-border: 1px solid rgba(201, 201, 204, 0.48);
+    --block-box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
+    --block-border-radius: 6px;
+    --block-padding: 25px;
+
+    --block-title-font-size: 17px;
+    --block-title-font-weight: 600;
+    --block-title-line-height: 1.5em;
+    --block-title-margin: 0 0 10px 0;
+
+    --block-download-icon-fill-color: #7b7e89;
+}
+
+
+.ce-code__textarea {
+    font-size: 14px !important;
+    border: var(--block-border) !important;
+}

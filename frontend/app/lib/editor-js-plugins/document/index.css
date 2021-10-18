@@ -40,7 +40,7 @@ SOFTWARE.
     align-items: center;
   }
 .cdx-document--with-file .cdx-document__download-button svg {
-      fill: #7b7e89;
+      fill: var(--block-download-icon-fill-color);
     }
 .cdx-document--with-file .cdx-document__file-icon {
     margin-right: 20px;

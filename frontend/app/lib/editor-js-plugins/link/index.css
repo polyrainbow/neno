@@ -85,7 +85,7 @@ SOFTWARE.
 
 .link-tool__content {
     display: block;
-    padding: 25px;
+    padding: var(--block-padding);
     border-radius: 2px;
     box-shadow: 0 0 0 2px #fff;
     color: inherit;
@@ -99,9 +99,9 @@ SOFTWARE.
 }
 
 .link-tool__content--rendered {
-    border: 1px solid rgba(201, 201, 204, 0.48);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
-    border-radius: 6px;
+    border: var(--block-border);
+    box-shadow: var(--block-box-shadow);
+    border-radius: var(--block-border-radius);
     will-change: filter;
     animation: link-in 450ms 1 cubic-bezier(0.215, 0.61, 0.355, 1);
 }
@@ -122,10 +122,10 @@ SOFTWARE.
 }
 
 .link-tool__title {
-    font-size: 17px;
-    font-weight: 600;
-    line-height: 1.5em;
-    margin: 0 0 10px 0;
+    font-size: var(--block-title-font-size);
+    font-weight: var(--block-title-font-weight);
+    line-height: var(--block-title-line-height);
+    margin: var(--block-title-margin);
 }
 
 .link-tool__title+.link-tool__anchor {
