@@ -97,6 +97,10 @@ const cleanUpData = async (io) => {
         if (block.type === "attaches") {
           block.type = "document";
         }
+
+        if (block.type === "linkTool") {
+          block.type = "link";
+        }
       })
 
       removeDefaultTextParagraphs(note);

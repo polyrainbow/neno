@@ -67,7 +67,7 @@ const loadInstance = async ({
         class: Header,
         placeholder: "Note title",
       },
-      linkTool: {
+      link: {
         class: Link,
         config: {
           customRequestFunction: async (url) => {

@@ -1,6 +1,6 @@
 export enum NoteContentBlockType {
   PARAGRAPH = "paragraph",
-  LINK = "linkTool",
+  LINK = "link",
   HEADING = "header",
   IMAGE = "image",
   DOCUMENT = "document",

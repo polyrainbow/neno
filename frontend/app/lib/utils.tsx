@@ -51,7 +51,7 @@ const getNewNoteObject = ():ActiveNote => {
 const setNoteTitleByLinkTitleIfUnset = (note, defaultNoteTitle) => {
   // if the note has no title yet, take the title of the link metadata
   const firstLinkBlock = note.blocks.find(
-    (block) => block.type === "linkTool",
+    (block) => block.type === "link",
   );
 
   if (

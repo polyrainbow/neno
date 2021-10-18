@@ -37,7 +37,7 @@ mainDB.notes.forEach((note) => {
   note.updateTime = 1584709669753;
 
   note.blocks = note.blocks.filter((block) => {
-    return ["header", "paragraph", "linkTool"].includes(block.type);
+    return ["header", "paragraph", "link"].includes(block.type);
   });
 
   note.blocks.forEach((block) => {
@@ -45,7 +45,7 @@ mainDB.notes.forEach((note) => {
       block.data.text = LOREM_IMPSUM_TEXT;
     }
 
-    if (block.type === "linkTool") {
+    if (block.type === "link") {
       block.data = {
         link: "https://www.youtube.com/watch?v=Vw4KVoEVcr0",
         meta: {

@@ -28,7 +28,7 @@ export const getNoteBlocks = ({
       },
     },
     {
-      type: "linkTool",
+      type: "link",
       data: {
         link: url,
         meta: {

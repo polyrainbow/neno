@@ -68,7 +68,7 @@ const removeDefaultTextParagraphs = (note:Note):void => {
 const removeEmptyLinks = (note:Note):void => {
   note.blocks = note.blocks.filter((block) => {
     const isEmptyLink = (
-      block.type === "linkTool"
+      block.type === "link"
       && block.data.link === ""
     );
 
