@@ -22,6 +22,7 @@ import {
   getNotesByTitle,
   getNotesWithUrl,
   getNotesWithTitleContainingTokens,
+  getNotesWithBlockOfType,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "./interfaces/DatabaseMainData.js";
@@ -131,6 +132,12 @@ const getNotesList = async (
     const startOfExactQuery = query.indexOf("has-url:") + "has-url:".length;
     const url = query.substr(startOfExactQuery);
     matchingNotes = getNotesWithUrl(db.notes, url);
+
+  // search for notes with specific block types
+  } else if (query.includes("has:")) {
+    const startOfExactQuery = query.indexOf("has:") + "has:".length;
+    const type = query.substr(startOfExactQuery);
+    matchingNotes = getNotesWithBlockOfType(db.notes, type);
 
   // full-text search
   } else if (query.includes("ft:")) {

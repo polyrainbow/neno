@@ -645,6 +645,17 @@ const getNotesThatContainTokens = (
 }
 
 
+const getNotesWithBlockOfType = (
+  notes:DatabaseNote[],
+  type: NoteContentBlockType,
+):DatabaseNote[] => {
+  return notes
+    .filter((note:DatabaseNote):boolean => {
+      return note.blocks.some((block) => block.type === type);
+    });
+}
+
+
 export {
   getNoteTitle,
   removeDefaultTextParagraphs,
@@ -673,4 +684,5 @@ export {
   getConcatenatedTextOfNote,
   getNotesWithTitleContainingTokens,
   getNotesThatContainTokens,
+  getNotesWithBlockOfType,
 };
