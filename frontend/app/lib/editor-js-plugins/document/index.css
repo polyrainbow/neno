@@ -24,73 +24,85 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
 .cdx-document--with-file {
   display: flex;
   padding: 13px 20px;
   border: 1px solid #e6e9eb;
   border-radius: 3px;
 }
+
 .cdx-document--with-file .cdx-document__file-info {
-    flex-grow: 8;
-    max-width: calc(100% - 80px);
-  }
+  flex-grow: 8;
+  max-width: calc(100% - 80px);
+}
+
 .cdx-document--with-file .cdx-document__download-button {
-    display: flex;
-    align-items: center;
-  }
+  display: flex;
+  align-items: center;
+}
+
 .cdx-document--with-file .cdx-document__download-button svg {
-      fill: var(--block-download-icon-fill-color);
-    }
+  fill: var(--block-download-icon-fill-color);
+}
+
 .cdx-document--with-file .cdx-document__file-icon {
-    margin-right: 20px;
-    position: relative;
-  }
+  margin-right: 20px;
+  position: relative;
+}
+
 .cdx-document--with-file .cdx-document__file-icon::before {
-      position: absolute;
-      bottom: 7px;
-      left: 8.5px;
-      font-size: 8px;
-      font-weight: 900;
-      text-transform: uppercase;
-      line-height: 150%;
-      content: attr(data-extension);
-    }
+  position: absolute;
+  bottom: 7px;
+  left: 8.5px;
+  font-size: 8px;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 150%;
+  content: attr(data-extension);
+}
+
 .cdx-document--with-file .cdx-document__file-icon svg {
-      fill: currentColor;
-    }
+  fill: currentColor;
+}
+
 .cdx-document--with-file .cdx-document__size {
-    color: #7b7e89;
-  }
+  color: #7b7e89;
+}
+
 .cdx-document--with-file .cdx-document__size::after {
-      content: attr(data-size);
-      margin-left: 0.2em;
-    }
+  content: attr(data-size);
+  margin-left: 0.2em;
+}
+
 .cdx-document--with-file .cdx-document__title {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    outline: none;
-    max-width: 90%;
-  }
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  outline: none;
+  max-width: 90%;
+}
+
 .cdx-document--loading .cdx-document__title,
-  .cdx-document--loading .cdx-document__file-icon,
-  .cdx-document--loading .cdx-document__size,
-  .cdx-document--loading .cdx-document__download-button,
-  .cdx-document--loading .cdx-document__button {
-    opacity: 0;
-    font-size: 0;
-  }
+.cdx-document--loading .cdx-document__file-icon,
+.cdx-document--loading .cdx-document__size,
+.cdx-document--loading .cdx-document__download-button,
+.cdx-document--loading .cdx-document__button {
+  opacity: 0;
+  font-size: 0;
+}
+
 .cdx-document__button {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .cdx-document__button svg {
-    height: 14px;
-    margin-top: 0;
-    margin-right: 8px;
-  }
+  height: 14px;
+  margin-top: 0;
+  margin-right: 8px;
+}
+
 .cdx-document__button:hover {
-    color: #393f52;
-  }
+  color: #393f52;
+}
