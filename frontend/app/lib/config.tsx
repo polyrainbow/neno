@@ -47,6 +47,7 @@ const emojis = {
   "noUnsavedChanges": "✔️",
   "weblink": "🌍",
   "file": "📎",
+  "document": "📄",
   "image": "🖼️",
   "code": "🤖",
   "audio": "🎧",
