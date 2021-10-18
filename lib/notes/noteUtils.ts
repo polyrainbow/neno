@@ -332,7 +332,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
   let containsWeblink = false;
   let containsCode = false;
   let containsImages = false;
-  let containsAttachements = false;
+  let containsDocuments = false;
   let containsAudio = false;
   let containsVideo = false;
 
@@ -350,7 +350,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
       containsImages = true;
     }
     if (block.type === NoteContentBlockType.DOCUMENT) {
-      containsAttachements = true;
+      containsDocuments = true;
     }
     if (block.type === NoteContentBlockType.AUDIO) {
       containsAudio = true;
@@ -365,7 +365,7 @@ const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
     containsWeblink,
     containsCode,
     containsImages,
-    containsAttachements,
+    containsDocuments,
     containsAudio,
     containsVideo,
   };
@@ -417,9 +417,9 @@ const getSortFunction = (
     },
     [NoteListSortMode.HAS_FILES]: (a, b) => {
       const aHasFiles
-        = a.features.containsImages || a.features.containsAttachements;
+        = a.features.containsImages || a.features.containsDocuments;
       const bHasFiles
-        = b.features.containsImages || b.features.containsAttachements;
+        = b.features.containsImages || b.features.containsDocuments;
 
       if (aHasFiles && !bHasFiles) return -1;
       if (!aHasFiles && bHasFiles) return 1;

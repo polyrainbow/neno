@@ -3,7 +3,7 @@ export enum NoteContentBlockType {
   LINK = "linkTool",
   HEADING = "header",
   IMAGE = "image",
-  DOCUMENT = "attaches",
+  DOCUMENT = "document",
   AUDIO = "audio",
   VIDEO = "video",
   LIST = "list",

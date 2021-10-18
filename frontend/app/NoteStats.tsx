@@ -66,9 +66,9 @@ const NoteStats = ({
           <td>File attachements</td>
           <td>{
             note.blocks
-              .filter((block) => block.type === "attaches").length > 0
+              .filter((block) => block.type === "document").length > 0
               ? note.blocks
-                .filter((block) => block.type === "attaches")
+                .filter((block) => block.type === "document")
                 .map((block, i, array) => {
                   return <React.Fragment key={block.data.file.fileId + note.id}>
                     <NoteStatsFileLink

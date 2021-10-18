@@ -34,9 +34,9 @@ const loadInstance = async ({
     import("./editor-js-image-plugin/index.js"),
     import("@editorjs/list"),
     import("@editorjs/code"),
-    import("@editorjs/attaches"),
     import("./editor-js-audio-plugin/index.js"),
     import("./editor-js-video-plugin/index.js"),
+    import("./editor-js-plugins/document/index.js"),
   ]);
 
   const [
@@ -46,7 +46,7 @@ const loadInstance = async ({
     Image,
     List,
     Code,
-    Attaches,
+    Document,
     Audio,
     Video,
   ] = modules.map((module) => module.default);
@@ -130,8 +130,8 @@ const loadInstance = async ({
           placeholder: "Enter your code here",
         },
       },
-      attaches: {
-        class: Attaches,
+      document: {
+        class: Document,
         config: {
           uploader: async (file) => {
             const fileId = await databaseProvider.uploadFile(file);

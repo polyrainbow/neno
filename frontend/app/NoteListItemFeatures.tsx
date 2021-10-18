@@ -37,9 +37,9 @@ const NoteListItemFeatures = ({
         : null
     }
     {
-      features?.containsAttachements
+      features?.containsDocuments
         ? <Tooltip
-          title="Contains files"><span>{emojis.file}</span></Tooltip>
+          title="Contains documents"><span>{emojis.document}</span></Tooltip>
         : null
     }
     {

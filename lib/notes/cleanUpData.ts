@@ -93,6 +93,12 @@ const cleanUpData = async (io) => {
           = note.blocks[0].data.text.trim();
       }
 
+      note.blocks.forEach((block) => {
+        if (block.type === "attaches") {
+          block.type = "document";
+        }
+      })
+
       removeDefaultTextParagraphs(note);
       removeEmptyLinks(note);
     });
