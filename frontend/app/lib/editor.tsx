@@ -31,12 +31,12 @@ const loadInstance = async ({
     import("@editorjs/editorjs"),
     import("@editorjs/header"),
     import("@editorjs/link"),
-    import("./editor-js-image-plugin/index.js"),
+    import("./editor-js-plugins/image/index.js"),
     import("@editorjs/list"),
     import("@editorjs/code"),
-    import("./editor-js-audio-plugin/index.js"),
-    import("./editor-js-video-plugin/index.js"),
     import("./editor-js-plugins/document/index.js"),
+    import("./editor-js-plugins/audio/index.js"),
+    import("./editor-js-plugins/video/index.js"),
   ]);
 
   const [
