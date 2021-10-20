@@ -1,6 +1,11 @@
 # Setting up a NENO server
 
-Requirements: You need to have Node.js (>=15) and npm (>=6) installed.
+## 0. Requirements
+
+Make sure that these are installed:
+
+* Node.js (>=17)
+* npm (>=8)
 
 ## 1. Clone this repository
 

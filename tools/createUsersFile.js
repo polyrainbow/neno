@@ -1,20 +1,23 @@
-import readlineSync from "readline-sync";
+import * as readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "process";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import { randomUUID } from "crypto";
 import twofactor from "node-2fa";
 import qrcode from "qrcode-terminal";
 
+const rl = readline.createInterface({ input, output });
 const users = [];
 
+
 const numberOfUsers
-  = readlineSync.question("How many users do you wish to create? (1) ") || 1;
+  = (await rl.question("How many users do you wish to create? (1) ")) || 1;
 
 for (let i = 0; i < numberOfUsers; i++) {
   console.log("Gathering info for user " + (i + 1));
-  const username = readlineSync.question("User name: ");
+  const username = await rl.question("User name: ");
 
-  const password = readlineSync.question("Password: ", {
+  const password = await rl.question("Password: ", {
     hideEchoBack: true, // The typed text on screen is hidden by `*` (default).
     mask: "",
   });
