@@ -45,3 +45,4 @@ for (let i = 0; i < numberOfUsers; i++) {
 
 fs.writeFileSync("users.json", JSON.stringify(users, null, "  "));
 console.log("users.json file created! Please put this into the data folder");
+process.exit();
