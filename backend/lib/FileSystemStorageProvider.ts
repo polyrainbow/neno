@@ -130,4 +130,20 @@ export default class FileSystemStorageProvider {
   joinPath(...args) {
     return path.join(...args);
   }
+
+
+  async getFolderSize(folderPath) {
+    const path = this.joinPath(this.#dataPath, folderPath);
+    const files = await fs.readdir(path);
+    const validFiles = files.filter((file) => !file.startsWith("."));
+    const statsPromises = validFiles.map((file) => {
+      return fs.stat(this.joinPath(this.#dataPath, folderPath, file));
+    });
+    const stats = await Promise.all(statsPromises);
+    const folderSize =  stats.reduce((accumulator, {size}) => {
+      return accumulator + size;
+    }, 0 );
+
+    return folderSize;
+  }
 }

@@ -208,7 +208,7 @@ const getStats = async (
   dbId:DatabaseId,
   exhaustive:boolean,
 ):Promise<Stats | StatsExhaustive> => {
-  const db = await io.getMainData(dbId);
+  const db:DatabaseMainData = await io.getMainData(dbId);
 
   const numberOfUnlinkedNotes = getNumberOfUnlinkedNotes(db);  
 
@@ -237,6 +237,10 @@ const getStats = async (
       dbCreationTime: db.creationTime,
       dbUpdateTime: db.updateTime,
       dbId: db.id,
+      dbSize: {
+        mainData: await io.getSizeOfDatabaseMainData(db.id),
+        files: await io.getSizeOfDatabaseFiles(db.id),
+      },
     }
   }
 

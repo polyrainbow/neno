@@ -3,6 +3,7 @@ import Dialog from "./Dialog";
 import { emojis, paths } from "./lib/config.js";
 import {
   makeTimestampHumanReadable,
+  humanFileSize,
 } from "./lib/utils.js";
 
 const StatsDialog = ({
@@ -57,6 +58,14 @@ const StatsDialog = ({
               <tr>
                 <td>Database update time</td>
                 <td>{makeTimestampHumanReadable(stats.dbUpdateTime)}</td>
+              </tr>
+              <tr>
+                <td>Database size (main data)</td>
+                <td>{humanFileSize(stats.dbSize.mainData)}</td>
+              </tr>
+              <tr>
+                <td>Database size (files)</td>
+                <td>{humanFileSize(stats.dbSize.files)}</td>
               </tr>
             </tbody>
           </table>

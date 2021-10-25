@@ -11,4 +11,8 @@ export default interface StatsExhaustive extends Stats{
     readonly dbCreationTime: number,
     readonly dbUpdateTime: number,
     readonly dbId: string,
+    readonly dbSize: {
+        mainData: number,
+        files: number,
+    },
 }

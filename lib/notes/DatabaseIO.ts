@@ -231,6 +231,28 @@ export default class DatabaseIO {
   }
 
 
+  async getSizeOfDatabaseFiles(
+    databaseId: DatabaseId,
+  ):Promise<number> {
+    const fileFolderPath = this.getFileFolderPath(databaseId);
+    const size = await this.#storageProvider.getFolderSize(fileFolderPath);
+    return size;
+  }
+
+
+  async getSizeOfDatabaseMainData(
+    databaseId: DatabaseId,
+  ):Promise<number> {
+    const filepath = this.#storageProvider.joinPath(
+      databaseId,
+      this.#MAIN_DATA_FILE_NAME,
+    );
+    const fileSize
+      = await this.#storageProvider.getFileSize(filepath);
+
+    return fileSize;
+  }
+
 
   async getReadableDatabaseStream(
     databaseId: DatabaseId,
