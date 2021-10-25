@@ -109,17 +109,22 @@ const StatsDialog = ({
               </tr>
               <tr>
                 <td>🔥 Nodes with highest number of links</td>
-                <td><p>{
-                  stats.nodesWithHighestNumberOfLinks.map((note) => {
-                    return <><a href={
-                      paths.editorWithNote.replace("%NOTE_ID%", note.id)
-                    }>
-                      {note.title}
-                    </a> ({note.numberOfLinkedNotes.toLocaleString("en")})
-                    <br/>
-                    </>
-                  })
-                }</p></td>
+                <td>
+                  {
+                    stats.nodesWithHighestNumberOfLinks.map((note) => {
+                      return <p
+                        key={`stats_nodesWithHighesNumberOfLinks_${note.id}`}
+                        style={{
+                          "margin": "0",
+                        }}
+                      ><a href={
+                        paths.editorWithNote.replace("%NOTE_ID%", note.id)
+                      }>
+                        {note.title}
+                      </a> ({note.numberOfLinkedNotes.toLocaleString("en")})</p>
+                    })
+                  }
+                </td>
               </tr>
               <tr>
                 <td>
