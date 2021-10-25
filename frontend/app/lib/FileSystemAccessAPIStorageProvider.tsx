@@ -1,3 +1,9 @@
+/*
+  This class provides an adapter for the nodes module to manipulate files
+  and folders on the user's local machina via the File System Access API.
+  More info: https://web.dev/file-system-access/
+*/
+
 export default class FileSystemAccessAPIStorageProvider {
 
   constructor(directoryHandle) {

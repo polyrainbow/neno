@@ -1,5 +1,6 @@
-// import all modules dynamically, so that webpack writes them into a separate
-// bundles
+/*
+  This is the entry point of the React application.
+*/
 
 import {
   BrowserRouter as Router,
@@ -7,6 +8,8 @@ import {
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
 import { API_URL } from "./lib/config";
 
+// import modules dynamically, so that webpack writes them into a separate
+// bundles
 const [
   React,
   ReactDOM,

@@ -1,6 +1,10 @@
 /* eslint-disable no-invalid-this */
 
 /*
+  This class provides everything to render the D3.js graph.
+*/
+
+/*
 @license
 Parts of the code in this file are based loosely on code from this repository:
 https://github.com/gaguri777/d3--directed-graph-creator
