@@ -1,14 +1,19 @@
 export default class FileSystemAccessAPIStorageProvider {
-  #directoryHandle;
-
-  DS = "/";
 
   constructor(directoryHandle) {
     this.#directoryHandle = directoryHandle;
   }
 
 
-  async getSubFolderHandle(folderHandle, subDirName) {
+  /****************
+    PRIVATE
+  ****************/
+
+
+  #directoryHandle;
+
+
+  async #getSubFolderHandle(folderHandle, subDirName:string) {
     const subDir = await folderHandle.getDirectoryHandle(
       subDirName,
       {
@@ -19,20 +24,32 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  async getFileHandle(requestPath) {
-    const pathSegments = this.splitPath(requestPath);
+  async #getDescendantFolderHandle(folderHandle, descendantFolderPath) {
+    const pathSegments = this.splitPath(descendantFolderPath);
 
-    let dirHandle = this.#directoryHandle;
+    let dirHandle = folderHandle;
 
-    for (let i = 0; i < pathSegments.length - 1; i++) {
-      dirHandle = await this.getSubFolderHandle(
+    for (let pathSegment of pathSegments) {
+      dirHandle = await this.#getSubFolderHandle(
         dirHandle,
-        pathSegments[i],
+        pathSegment,
       );
     }
 
+    return dirHandle;
+  }
+
+
+  async #getDescendantFileHandle(folderHandle, filePath:string) {
+    const pathSegments = this.splitPath(filePath);
+    const folderPathSegments = pathSegments.slice(0, pathSegments.length - 1);
     const filename = pathSegments[pathSegments.length - 1];
-    const fileHandle = await dirHandle.getFileHandle(
+    const destinationFolderHandle
+      = await this.#getDescendantFolderHandle(
+        folderHandle,
+        folderPathSegments.join(this.DS),
+      );
+    const fileHandle = await destinationFolderHandle.getFileHandle(
       filename,
       {
         create: true,
@@ -42,11 +59,26 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
+  async #getFileHandle(requestPath) {
+    return await this.#getDescendantFileHandle(
+      this.#directoryHandle,
+      requestPath,
+    );
+  }
+
+
+  /****************
+    PUBLIC
+  ****************/
+
+  DS = "/";
+
+
   async writeObject(
     requestPath,
     data,
   ) {
-    const fileHandle = await this.getFileHandle(requestPath);
+    const fileHandle = await this.#getFileHandle(requestPath);
     const writable = await fileHandle.createWritable();
     await writable.write(data);
     await writable.close();
@@ -57,14 +89,14 @@ export default class FileSystemAccessAPIStorageProvider {
     requestPath,
     readableStream,
   ) {
-    const fileHandle = await this.getFileHandle(requestPath);
+    const fileHandle = await this.#getFileHandle(requestPath);
     const writable = await fileHandle.createWritable();
     await readableStream.pipeTo(writable);
   }
 
 
   async readObjectAsString(requestPath) {
-    const fileHandle = await this.getFileHandle(requestPath);
+    const fileHandle = await this.#getFileHandle(requestPath);
     const file = await fileHandle.getFile();
     const string = await file.text();
     return string;
@@ -72,7 +104,7 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async getReadableStream(requestPath) {
-    const fileHandle = await this.getFileHandle(requestPath);
+    const fileHandle = await this.#getFileHandle(requestPath);
     const file = await fileHandle.getFile();
     const readable = file.stream();
     return readable;
@@ -94,7 +126,7 @@ export default class FileSystemAccessAPIStorageProvider {
       const subfolders = this.splitPath(requestPath);
 
       for (let i = 0; i < subfolders.length; i++) {
-        dirHandle = await this.getSubFolderHandle(
+        dirHandle = await this.#getSubFolderHandle(
           dirHandle,
           subfolders[i],
         );
@@ -126,16 +158,10 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async listDirectory(requestPath) {
-    const subfolders = this.splitPath(requestPath);
-
-    let dirHandle = this.#directoryHandle;
-
-    for (let i = 0; i < subfolders.length; i++) {
-      dirHandle = await this.getSubFolderHandle(
-        dirHandle,
-        subfolders[i],
-      );
-    }
+    const dirHandle = await this.#getDescendantFolderHandle(
+      this.#directoryHandle,
+      requestPath,
+    );
 
     const iterator = dirHandle.values();
     const values = [];
@@ -164,5 +190,54 @@ export default class FileSystemAccessAPIStorageProvider {
 
   splitPath(path) {
     return path.split(this.DS);
+  }
+
+
+  async getFileSize(filePath) {
+    const fileHandle = await this.#getFileHandle(filePath);
+    // @ts-ignore
+    const file = await fileHandle.getFile();
+    const size = file.size;
+    return size;
+  }
+
+
+  async getFolderSize(folderPath) {
+    const folderHandle = await this.#getDescendantFolderHandle(
+      this.#directoryHandle,
+      folderPath,
+    );
+
+    const iterator = folderHandle.values();
+    const values = [];
+    let done = false;
+
+    while (!done) {
+      const iteration = await iterator.next();
+      if (!iteration.done) {
+        // @ts-ignore
+        values.push(iteration.value);
+      } else {
+        done = true;
+      }
+    }
+
+    const entryNames = values
+      // @ts-ignore
+      .filter((value) => value.kind === "file");
+
+    const filePromises = entryNames
+      .map((fileHandle) => {
+        // @ts-ignore
+        return fileHandle.getFile();
+      });
+      
+    const files = await Promise.all(filePromises);
+    const fileSizes = files.map((file) => file.size);
+    const folderSize =  fileSizes.reduce((accumulator, size) => {
+      return accumulator + size;
+    }, 0);
+
+    return folderSize;
   }
 }
