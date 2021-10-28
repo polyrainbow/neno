@@ -8,6 +8,7 @@ const NoteListControls = ({
   sortMode,
   setSortMode,
   showNotesWithDuplicateURLs,
+  refreshNoteList,
 }) => {
   return <section id="section-search-input">
     <div
@@ -29,6 +30,12 @@ const NoteListControls = ({
         title="Show notes with same URLs"
         icon="view_agenda"
         onClick={showNotesWithDuplicateURLs}
+      />
+      <IconButton
+        id="button_refresh-note-list"
+        title="Refresh list"
+        icon="refresh"
+        onClick={refreshNoteList}
       />
     </div>
     <div

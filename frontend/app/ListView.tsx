@@ -129,6 +129,7 @@ const ListView = ({
       showNotesWithDuplicateURLs={() => handleSearchInputChange(
         "special:DUPLICATE_URLS",
       )}
+      refreshNoteList={refreshNotesList}
     />
     <NoteList
       notes={noteListItems}
