@@ -139,7 +139,7 @@ export default class Ui {
 
     button.innerHTML
       = this.config.buttonContent
-      || `${svgs.buttonIcon} ${this.api.i18n.t("Select an Image")}`;
+      || this.api.i18n.t("Select an image");
 
     button.addEventListener("click", () => {
       this.onSelectFile();
