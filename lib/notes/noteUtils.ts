@@ -15,12 +15,11 @@ import UserNoteChange from "./interfaces/UserNoteChange.js";
 import { UserNoteChangeType } from "./interfaces/UserNoteChangeType.js";
 import * as Utils from "../utils.js";
 import NoteContentBlock, {
-  NoteContentBlockDocument,
   NoteContentBlockHeading,
-  NoteContentBlockImage,
   NoteContentBlockLink,
   NoteContentBlockParagraph,
   NoteContentBlockType,
+  NoteContentBlockWithFile,
 } from "./interfaces/NoteContentBlock.js";
 
 
@@ -218,18 +217,23 @@ const removeLinksOfNote = (db: DatabaseMainData, noteId: NoteId):true => {
 
 const getFilesOfNote = (note:DatabaseNote):FileId[] => {
   return note.blocks
-    .filter((block:NoteContentBlock):boolean => {
-      const blockHasFileOrImage = (
-        (
-          (block.type === NoteContentBlockType.IMAGE)
-          || (block.type === NoteContentBlockType.DOCUMENT)
+    .filter((block:NoteContentBlock):block is NoteContentBlockWithFile => {
+      const blockHasFile = (
+        [
+          NoteContentBlockType.IMAGE,
+          NoteContentBlockType.DOCUMENT,
+          NoteContentBlockType.AUDIO,
+          NoteContentBlockType.VIDEO
+        ].includes(block.type)
+        && (
+          typeof (block as NoteContentBlockWithFile).data.file.fileId
+            === "string"
         )
-        && (typeof block.data.file.fileId === "string")
       );
 
-      return blockHasFileOrImage;
+      return blockHasFile;
     })
-    .map((block: NoteContentBlockImage | NoteContentBlockDocument):FileId => {
+    .map((block: NoteContentBlockWithFile):FileId => {
       return block.data.file.fileId;
     });
 };

@@ -104,6 +104,15 @@ export interface NoteContentBlockVideo {
   data: NoteContentBlockVideoData,
 }
 
+
+export type NoteContentBlockWithFile = (
+  NoteContentBlockImage
+  | NoteContentBlockDocument
+  | NoteContentBlockAudio
+  | NoteContentBlockVideo
+)
+
+
 type NoteContentBlock = (
   NoteContentBlockParagraph
   | NoteContentBlockLink
