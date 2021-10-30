@@ -115,7 +115,9 @@ const loadInstance = async ({
           },
           getUrl: async (file) => {
             const fileId = file.fileId;
-            const url = await getUrlForFileId(fileId, databaseProvider);
+            // currently we don't support public names for images, that's why
+            // we're passing null here
+            const url = await getUrlForFileId(fileId, databaseProvider, null);
             return url;
           },
         },
@@ -146,7 +148,8 @@ const loadInstance = async ({
           },
           onDownload: async (file) => {
             const fileId = file.fileId;
-            const url = await getUrlForFileId(fileId, databaseProvider);
+            const name = file.name;
+            const url = await getUrlForFileId(fileId, databaseProvider, name);
             window.open(url, "_blank");
           },
           field: "file",
@@ -171,12 +174,14 @@ const loadInstance = async ({
           },
           onDownload: async (file) => {
             const fileId = file.fileId;
-            const url = await getUrlForFileId(fileId, databaseProvider);
+            const name = file.name;
+            const url = await getUrlForFileId(fileId, databaseProvider, name);
             window.open(url, "_blank");
           },
           getUrl: async (file) => {
             const fileId = file.fileId;
-            const url = await getUrlForFileId(fileId, databaseProvider);
+            const name = file.name;
+            const url = await getUrlForFileId(fileId, databaseProvider, name);
             return url;
           },
           field: "file",
@@ -201,12 +206,14 @@ const loadInstance = async ({
           },
           onDownload: async (file) => {
             const fileId = file.fileId;
-            const url = await getUrlForFileId(fileId, databaseProvider);
+            const name = file.name;
+            const url = await getUrlForFileId(fileId, databaseProvider, name);
             window.open(url, "_blank");
           },
           getUrl: async (file) => {
             const fileId = file.fileId;
-            const url = await getUrlForFileId(fileId, databaseProvider);
+            const name = file.name;
+            const url = await getUrlForFileId(fileId, databaseProvider, name);
             return url;
           },
           field: "file",
