@@ -164,6 +164,82 @@ export default class AudioTool {
 
 
   /**
+   * Specify paste substitutes
+   *
+   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
+   * @return {{
+   *   tags: string[],
+   *   patterns: object<string, RegExp>,
+   *   files: {extensions: string[], mimeTypes: string[]}
+   * }}
+   */
+  static get pasteConfig() {
+    return {
+      /**
+       * Paste HTML into Editor
+       */
+      tags: ["audio"],
+
+      /**
+       * Paste URL of image into the Editor
+       */
+      patterns: {
+        audio: /https?:\/\/\S+\.mp3$/i,
+      },
+
+      /**
+       * Drag n drop file from into the Editor
+       */
+      files: {
+        mimeTypes: ["audio/mp3", "audio/mpeg"],
+        extensions: ["mp3"],
+      },
+    };
+  }
+
+  /**
+   * Specify paste handlers
+   *
+   * @public
+   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
+   * @param {CustomEvent} event - editor.js custom paste event
+   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
+   * @return {void}
+   */
+  async onPaste(event) {
+    switch (event.type) {
+    case "tag": {
+      const image = event.detail.data;
+
+      /** Images from PDF */
+      if (/^blob:/.test(image.src)) {
+        const response = await fetch(image.src);
+        const file = await response.blob();
+
+        this.uploadFile(file);
+        break;
+      }
+
+      this.uploadUrl(image.src);
+      break;
+    }
+    case "pattern": {
+      const url = event.detail.data;
+
+      this.uploadUrl(url);
+      break;
+    }
+    case "file": {
+      const file = event.detail.file;
+
+      this.uploadFile(file);
+      break;
+    }
+    }
+  }
+
+
+  /**
    * Return Block data
    *
    * @param {HTMLElement} toolsContent
