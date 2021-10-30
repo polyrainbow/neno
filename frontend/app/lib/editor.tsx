@@ -129,7 +129,9 @@ const loadInstance = async ({
       code: {
         class: Code,
         config: {
-          placeholder: "Enter your code here",
+          // placeholder must not be an empty string because then it would use
+          // the default placeholder which we don't want
+          placeholder: " ",
         },
       },
       document: {
