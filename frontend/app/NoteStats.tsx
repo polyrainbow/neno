@@ -1,6 +1,7 @@
 import React from "react";
 import {
   makeTimestampHumanReadable,
+  getFileInfosOfNoteFiles,
 } from "./lib/utils.js";
 import NoteStatsFileLink from "./NoteStatsFileLink";
 
@@ -8,6 +9,8 @@ const NoteStats = ({
   note,
   databaseProvider,
 }) => {
+  const fileInfos = getFileInfosOfNoteFiles(note);
+
   return <div
     id="stats"
   >
@@ -39,43 +42,18 @@ const NoteStats = ({
           <td>{note.numberOfCharacters}</td>
         </tr>
         <tr>
-          <td>Images</td>
+          <td>Files</td>
           <td>{
-            note.blocks
-              .filter((block) => block.type === "image").length > 0
-              ? note.blocks
-                .filter((block) => block.type === "image")
-                .map((block, i, array) => {
-                  return <React.Fragment key={block.data.file.fileId + note.id}>
+            fileInfos.length > 0
+              ? fileInfos
+                .map((fileInfo, i, array) => {
+                  return <React.Fragment
+                    key={"nsfwt_" + fileInfo.fileId + note.id}
+                  >
                     <NoteStatsFileLink
-                      fileId={block.data.file.fileId}
-                      name={null}
+                      fileInfo={fileInfo}
                       databaseProvider={databaseProvider}
-                    />
-                    {
-                      i < array.length - 1
-                        ? <br />
-                        : null
-                    }
-                  </React.Fragment>;
-                })
-              : "None"
-          }</td>
-        </tr>
-        <tr>
-          <td>File attachements</td>
-          <td>{
-            note.blocks
-              .filter((block) => block.type === "document").length > 0
-              ? note.blocks
-                .filter((block) => block.type === "document")
-                .map((block, i, array) => {
-                  return <React.Fragment key={block.data.file.fileId + note.id}>
-                    <NoteStatsFileLink
-                      fileId={block.data.file.fileId}
-                      name={block.data.file.name}
-                      databaseProvider={databaseProvider}
-                    />
+                    /> ({fileInfo.type})
                     {
                       i < array.length - 1
                         ? <br />

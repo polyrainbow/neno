@@ -182,7 +182,16 @@ const streamToBlob = async (stream, mimeType) => {
 };
 
 
-const getUrlForFileId = async (fileId, databaseProvider) => {
+/**
+ * Obtains a URL for a file.
+ * @param {string} fileId 
+ * @param {DatabaseProvider} databaseProvider 
+ * @param {string?} publicName This optional file name is appended at the url
+ * so that if the user decides to download the file, it is saved with this
+ * public name instead of the more technical fileId. 
+ * @returns {string} url
+ */
+const getUrlForFileId = async (fileId, databaseProvider, publicName) => {
   let url;
 
   if (databaseProvider.constructor.type === "LOCAL") {
@@ -194,6 +203,10 @@ const getUrlForFileId = async (fileId, databaseProvider) => {
     url = URL.createObjectURL(blob);
   } else {
     url = Config.API_URL + "file/" + fileId;
+
+    if (typeof publicName === "string") {
+      url += `/${encodeURIComponent(publicName)}`;
+    }
   }
 
   return url;
@@ -207,6 +220,36 @@ const getWindowDimensions = () => {
   return { width, height };
 };
 
+
+/**
+ * Checks if the block contains a valid file.
+ * @param block
+ * @returns {boolean} true or false
+ */
+const blockHasFile = (block) => {
+  return (
+    [
+      "image",
+      "document",
+      "audio",
+      "video",
+    ].includes(block.type)
+    && (typeof block.data.file.fileId === "string")
+  );
+};
+
+
+const getFileInfosOfNoteFiles = (note) => {
+  return note.blocks
+    .filter(blockHasFile)
+    .map((block) => {
+      return {
+        type: block.type,
+        fileId: block.data.file.fileId,
+        name: block.data.file.name,
+      };
+    });
+};
 
 export {
   yyyymmdd,
@@ -222,4 +265,6 @@ export {
   streamToBlob,
   getUrlForFileId,
   getWindowDimensions,
+  blockHasFile,
+  getFileInfosOfNoteFiles,
 };

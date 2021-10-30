@@ -4,24 +4,24 @@ import {
 } from "./lib/utils.js";
 
 const NoteStatsFileLink = ({
-  fileId,
-  name,
+  fileInfo,
   databaseProvider,
 }) => {
   return <a
-    key={"note-stats-link-" + fileId}
+    key={"note-stats-link-" + fileInfo.fileId}
     style={{
       "cursor": "pointer",
     }}
     onClick={async () => {
       const url = await getUrlForFileId(
-        fileId,
+        fileInfo.fileId,
         databaseProvider,
+        fileInfo.name,
       );
       window.open(url, "_blank");
     }}
   >
-    {name ?? fileId}
+    {fileInfo.name ?? fileInfo.fileId}
   </a>;
 };
 
