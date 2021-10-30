@@ -438,11 +438,7 @@ export default class AudioTool {
    * @param {string} errorMessage -  error message
    */
   uploadingFailed(errorMessage) {
-    this.api.notifier.show({
-      message: errorMessage,
-      style: "error",
-    });
-
+    console.log(errorMessage);
     this.removeLoader();
   }
 
