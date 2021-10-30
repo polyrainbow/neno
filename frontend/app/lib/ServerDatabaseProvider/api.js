@@ -132,9 +132,16 @@ const deleteNote = (noteId) => {
 };
 
 
-const getStats = (exhaustive) => {
+const getStats = (options) => {
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(options)) {
+    searchParams.append(key, value.toString());
+  }
+
+  const endpoint = "stats?" + searchParams.toString();
+
   return callAPIAndGetJSONPayload({
-    endpoint: "stats?exhaustive=" + exhaustive.toString(),
+    endpoint,
   });
 };
 

@@ -233,7 +233,10 @@ const EditorView = ({
   const refreshStats = () => {
     if (!databaseProvider) return;
 
-    databaseProvider.getStats(false)
+    databaseProvider.getStats({
+      includeDatabaseMetadata: false,
+      includeGraphAnalysis: false,
+    })
       .then((stats) => {
         setStats(stats);
       })

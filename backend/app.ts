@@ -218,8 +218,11 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
-      const exhaustive = req.query.exhaustive === "true";
-      const stats:Stats = await Notes.getStats(req.userId, exhaustive);
+      const options = {
+        includeDatabaseMetadata: req.query.includeDatabaseMetadata === "true",
+        includeGraphAnalysis: req.query.includeGraphAnalysis === "true",
+      };
+      const stats:Stats = await Notes.getStats(req.userId, options);
       const response:APIResponse = {
         success: true,
         payload: stats,

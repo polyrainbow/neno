@@ -139,8 +139,8 @@ export default class LocalDatabaseProvider {
     return this.#notesModule.getNotesList(LocalDatabaseProvider.dbId, options);
   }
 
-  getStats(exhaustive) {
-    return this.#notesModule.getStats(LocalDatabaseProvider.dbId, exhaustive);
+  getStats(options) {
+    return this.#notesModule.getStats(LocalDatabaseProvider.dbId, options);
   }
 
   deleteNote(noteId) {

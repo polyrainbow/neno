@@ -16,7 +16,10 @@ const StatsDialog = ({
 
   useEffect(() => {
     const updateStats = async () => {
-      const stats = await databaseProvider.getStats(true);
+      const stats = await databaseProvider.getStats({
+        includeDatabaseMetadata: true,
+        includeGraphAnalysis: true,
+      });
       setStats(stats);
       setStatus("READY");
     };

@@ -45,7 +45,6 @@ import { Readable } from "stream";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
-import StatsExhaustive from "./interfaces/StatsExhaustive.js";
 import DatabaseMainData from "./interfaces/DatabaseMainData.js";
 import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
@@ -207,34 +206,26 @@ const getGraph = async (dbId: DatabaseId):Promise<Graph> => {
 
 const getStats = async (
   dbId:DatabaseId,
-  exhaustive:boolean,
-):Promise<Stats | StatsExhaustive> => {
+  options:{
+    includeDatabaseMetadata: boolean,
+    includeGraphAnalysis: boolean,
+  },
+):Promise<Stats> => {
   const db:DatabaseMainData = await io.getMainData(dbId);
 
   const numberOfUnlinkedNotes = getNumberOfUnlinkedNotes(db);  
 
-  let stats:Stats | StatsExhaustive = {
+  let stats:Stats = {
     numberOfAllNotes: db.notes.length,
     numberOfLinks: db.links.length,
+    numberOfFiles: await io.getNumberOfFiles(dbId),
+    numberOfPins: db.pinnedNotes.length,
     numberOfUnlinkedNotes,
   };
 
-  if (exhaustive) {
-    const numberOfComponents = getNumberOfComponents(db.notes, db.links);
-
+  if (options.includeDatabaseMetadata) {
     stats = {
       ...stats,
-      numberOfFiles: await io.getNumberOfFiles(dbId),
-      numberOfPins: db.pinnedNotes.length,
-      numberOfComponents,
-      numberOfComponentsWithMoreThanOneNode:
-        numberOfComponents - numberOfUnlinkedNotes,
-      numberOfHubs: db.notes
-        .filter((note) => getNumberOfLinkedNotes(db, note.id) >= 5)
-        .length,
-      nodesWithHighestNumberOfLinks: createNoteListItems(db.notes, db)
-        .sort(getSortFunction(NoteListSortMode.NUMBER_OF_LINKS_DESCENDING))
-        .slice(0, 3),
       dbCreationTime: db.creationTime,
       dbUpdateTime: db.updateTime,
       dbId: db.id,
@@ -242,6 +233,26 @@ const getStats = async (
         mainData: await io.getSizeOfDatabaseMainData(db.id),
         files: await io.getSizeOfDatabaseFiles(db.id),
       },
+    };
+  }
+
+  if (options.includeGraphAnalysis) {
+    const numberOfComponents = getNumberOfComponents(db.notes, db.links);
+
+    stats = {
+      ...stats,
+      numberOfComponents,
+      numberOfComponentsWithMoreThanOneNode:
+        numberOfComponents - numberOfUnlinkedNotes,
+      numberOfHubs: db.notes
+        .filter((note) => {
+          const numberOfLinkedNotes = getNumberOfLinkedNotes(db, note.id);
+          return numberOfLinkedNotes >= config.MIN_NUMBER_OF_LINKS_FOR_HUB;
+        })
+        .length,
+      nodesWithHighestNumberOfLinks: createNoteListItems(db.notes, db)
+        .sort(getSortFunction(NoteListSortMode.NUMBER_OF_LINKS_DESCENDING))
+        .slice(0, 3),
     }
   }
 
