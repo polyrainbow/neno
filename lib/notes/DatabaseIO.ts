@@ -5,6 +5,7 @@ import { Readable } from "stream";
 import DatabaseMainData from "./interfaces/DatabaseMainData.js";
 import ReadableWithMimeType from "./interfaces/ReadableWithMimeType.js";
 import * as config from "./config.js";
+import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 
 
 export default class DatabaseIO {
@@ -204,9 +205,7 @@ export default class DatabaseIO {
       });
 
     if (!fileInfo) {
-      throw Error(
-        "The requested object has an unknown file ending: " + fileEnding
-      );
+      throw Error(ErrorMessage.INVALID_FILE_ENDING);
     }
 
     const mimeType = fileInfo.mimeType;

@@ -48,6 +48,7 @@ import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
 import StatsExhaustive from "./interfaces/StatsExhaustive.js";
 import DatabaseMainData from "./interfaces/DatabaseMainData.js";
 import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
+import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 
 let io;
 let randomUUID;
@@ -95,7 +96,7 @@ const get = async (
   const db = await io.getMainData(dbId);
   const noteFromDB:DatabaseNote | null = findNote(db, noteId);
   if (!noteFromDB) {
-    throw new Error("NOTE_NOT_FOUND");
+    throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
 
   const noteToTransmit:NoteToTransmit = createNoteToTransmit(noteFromDB, db);
@@ -271,7 +272,7 @@ const put = async (
   options
 ):Promise<NoteToTransmit> => {
   if ((!noteFromUser) || (!noteFromUser.blocks)) {
-    throw new Error("Invalid note structure");
+    throw new Error(ErrorMessage.INVALID_NOTE_STRUCTURE);
   }
 
   let ignoreDuplicateTitles = true;
@@ -285,7 +286,7 @@ const put = async (
   const db:Database = await io.getMainData(dbId);
 
   if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, db)) {
-    throw new Error("NOTE_WITH_SAME_TITLE_EXISTS");
+    throw new Error(ErrorMessage.NOTE_WITH_SAME_TITLE_EXISTS);
   }
 
   let databaseNote:DatabaseNote | null = null;
@@ -330,7 +331,7 @@ const remove = async (
   const db = await io.getMainData(dbId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
   if ((noteIndex === -1) || (noteIndex === null)) {
-    throw new Error("Note not found");
+    throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
 
   db.notes.splice(noteIndex, 1);
@@ -351,7 +352,7 @@ const importDB = (
   dbId:DatabaseId,
 ):Promise<boolean> => {
   if (db.id !== dbId) {
-    throw new Error("UNAUTHORIZED: You are not allowed to update another DB");
+    throw new Error(ErrorMessage.UNAUTHORIZED);
   }
   return io.flushChanges(db);
 };
@@ -368,7 +369,7 @@ const addFile = async (
     });
 
   if (!fileType) {
-    throw new Error("Invalid MIME type: " + mimeType);
+    throw new Error(ErrorMessage.INVALID_MIME_TYPE);
   }
 
   const fileId:FileId = randomUUID() + "." + fileType.ending;
@@ -487,7 +488,7 @@ const pin = async (
   const db = await io.getMainData(dbId);
   const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
   if (noteIndex === -1) {
-    throw new Error("Note not found");
+    throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
 
   db.pinnedNotes = Array.from(
