@@ -513,6 +513,7 @@ button[disabled]{
 
   #right-view{
     grid-area: 1 / 2 / 2 / 3;
+    width: calc(100vw - var(--xl-list-width));
   }
 
   #note{
