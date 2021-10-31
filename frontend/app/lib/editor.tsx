@@ -97,6 +97,7 @@ const loadInstance = async ({
                 success: 1,
                 file: {
                   "size": file.size,
+                  "name": file.name,
                   "fileId": fileId,
                 },
               };
@@ -115,9 +116,8 @@ const loadInstance = async ({
           },
           getUrl: async (file) => {
             const fileId = file.fileId;
-            // currently we don't support public names for images, that's why
-            // we're passing null here
-            const url = await getUrlForFileId(fileId, databaseProvider, null);
+            const name = file.name;
+            const url = await getUrlForFileId(fileId, databaseProvider, name);
             return url;
           },
         },
