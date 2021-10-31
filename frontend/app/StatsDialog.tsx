@@ -44,34 +44,47 @@ const StatsDialog = ({
     {
       status === "READY"
         ? <>
+          <h2>Database</h2>
           <table className="data-table stats-table">
             <tbody>
               <tr>
-                <td>Database ID</td>
+                <td>ID</td>
                 <td>{stats.dbId}</td>
               </tr>
               <tr>
-                <td>Database type</td>
+                <td>Type</td>
                 <td>{databaseProvider.constructor.type}</td>
               </tr>
               <tr>
-                <td>Database creation time</td>
+                <td>Creation time</td>
                 <td>{makeTimestampHumanReadable(stats.dbCreationTime)}</td>
               </tr>
               <tr>
-                <td>Database update time</td>
+                <td>Update time</td>
                 <td>{makeTimestampHumanReadable(stats.dbUpdateTime)}</td>
               </tr>
               <tr>
-                <td>Database size (main data)</td>
+                <td>Size of main data</td>
                 <td>{humanFileSize(stats.dbSize.mainData)}</td>
               </tr>
               <tr>
-                <td>Database size (files)</td>
+                <td>Size of all files</td>
                 <td>{humanFileSize(stats.dbSize.files)}</td>
+              </tr>
+              <tr>
+                <td>
+                  {emojis.document}{emojis.image}{emojis.audio}{emojis.video}
+                  <span> </span>Number of files
+                </td>
+                <td>{stats.numberOfFiles.toLocaleString("en")}</td>
+              </tr>
+              <tr>
+                <td>{emojis.pin} Pins</td>
+                <td>{stats.numberOfPins.toLocaleString("en")}</td>
               </tr>
             </tbody>
           </table>
+          <h2>Graph</h2>
           <table className="data-table stats-table">
             <tbody>
               <tr>
@@ -128,17 +141,6 @@ const StatsDialog = ({
                     })
                   }
                 </td>
-              </tr>
-              <tr>
-                <td>
-                  {emojis.document}{emojis.image}{emojis.audio}{emojis.video}
-                  <span> </span>Files
-                </td>
-                <td>{stats.numberOfFiles.toLocaleString("en")}</td>
-              </tr>
-              <tr>
-                <td>{emojis.pin} Pins</td>
-                <td>{stats.numberOfPins.toLocaleString("en")}</td>
               </tr>
             </tbody>
           </table>
