@@ -5,6 +5,7 @@ export default class ServerDatabaseProvider {
     "EXPORT_DATABASE",
     "AUTHENTICATION",
     "GET_URL_METADATA",
+    "UPLOAD_BY_URL",
   ];
 
   static type = "SERVER";
