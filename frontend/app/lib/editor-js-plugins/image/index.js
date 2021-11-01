@@ -322,7 +322,6 @@ export default class ImageTool {
 
   /**
    * Private methods
-   * ̿̿ ̿̿ ̿̿ ̿'̿'\̵͇̿̿\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿’̿ ̿ ̿̿ ̿̿ ̿̿
    */
 
   /**
