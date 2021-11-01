@@ -331,7 +331,6 @@ export default class ImageTool {
     }
     case "pattern": {
       const url = event.detail.data;
-
       this.uploadUrl(url);
       break;
     }
@@ -484,8 +483,9 @@ export default class ImageTool {
    * @param {string} url - url pasted
    * @return {void}
    */
-  uploadUrl(url) {
+  async uploadUrl(url) {
     this.ui.showPreloader(url);
-    this.uploader.uploadByUrl(url);
+    const result = await this.config.uploader.uploadByUrl(url);
+    this.onUploadFinished(result);
   }
 }
