@@ -276,7 +276,12 @@ export default class ImageTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: ["image/*"],
+        mimeTypes: [
+          "image/png",
+          "image/jpeg",
+          "image/webp",
+          "image/gif",
+        ],
       },
     };
   }
