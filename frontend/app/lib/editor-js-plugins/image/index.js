@@ -265,10 +265,12 @@ export default class ImageTool {
 
       /**
        * Paste URL of image into the Editor
+       * We have disabled this because we want to be able to insert an image
+       * url without turning it into an image
        */
-      patterns: {
-        image: /https?:\/\/\S+\.(gif|jpe?g|tiff|png)$/i,
-      },
+      /* patterns: {
+        image: /https?:\/\/\S+\.(gif|jpe?g|webp|png)$/i,
+      },*/
 
       /**
        * Drag n drop file from into the Editor
