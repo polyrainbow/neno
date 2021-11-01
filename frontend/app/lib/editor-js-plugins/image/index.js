@@ -288,17 +288,19 @@ export default class ImageTool {
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
    * @return {void}
    */
-  async onPaste(event) {
+  onPaste(event) {
     switch (event.type) {
     case "tag": {
       const image = event.detail.data;
 
       /** Images from PDF */
       if (/^blob:/.test(image.src)) {
-        const response = await fetch(image.src);
-        const file = await response.blob();
+        fetch(image.src)
+          .then((response) => response.blob())
+          .then((file) => {
+            this.uploadFile(file);
+          });
 
-        this.uploadFile(file);
         break;
       }
 
@@ -449,12 +451,9 @@ export default class ImageTool {
    * @param {File} file - file that is currently uploading (from paste)
    * @return {void}
    */
-  uploadFile(file) {
-    this.uploader.uploadByFile(file, {
-      onPreview: (src) => {
-        this.ui.showPreloader(src);
-      },
-    });
+  async uploadFile(file) {
+    const result = await this.config.uploader.uploadByFile(file);
+    this.onUpload(result);
   }
 
   /**
