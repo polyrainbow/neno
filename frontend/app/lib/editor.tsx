@@ -74,7 +74,7 @@ const loadInstance = async ({
             const metadata = await databaseProvider.getUrlMetadata(url);
 
             return {
-              "success": 1,
+              "success": true,
               "url": url,
               "meta": {
                 "title": metadata.title,
@@ -94,7 +94,7 @@ const loadInstance = async ({
             uploadByFile: async (file) => {
               const fileId = await databaseProvider.uploadFile(file);
               return {
-                success: 1,
+                success: true,
                 file: {
                   "size": file.size,
                   "name": file.name,
@@ -107,7 +107,7 @@ const loadInstance = async ({
                 url,
               });
               return {
-                success: 1,
+                success: true,
                 file: {
                   "fileId": fileId,
                 },
@@ -140,7 +140,7 @@ const loadInstance = async ({
           uploader: async (file) => {
             const fileId = await databaseProvider.uploadFile(file);
             return {
-              success: 1,
+              success: true,
               file: {
                 "size": file.size,
                 "name": file.name,
@@ -166,7 +166,7 @@ const loadInstance = async ({
           uploader: async (file) => {
             const fileId = await databaseProvider.uploadFile(file);
             return {
-              success: 1,
+              success: true,
               file: {
                 "size": file.size,
                 "name": file.name,
@@ -198,7 +198,7 @@ const loadInstance = async ({
           uploader: async (file) => {
             const fileId = await databaseProvider.uploadFile(file);
             return {
-              success: 1,
+              success: true,
               file: {
                 "size": file.size,
                 "name": file.name,
