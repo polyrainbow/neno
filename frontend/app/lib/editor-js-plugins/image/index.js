@@ -73,7 +73,6 @@ import "./index.css";
 import Ui from "./ui.js";
 import Tunes from "./tunes.js";
 import * as svgs from "./svgs.js";
-import Uploader from "./uploader.js";
 
 /**
  * @typedef {object} ImageConfig
@@ -94,6 +93,7 @@ import Uploader from "./uploader.js";
  * @property {function(string): Promise.<UploadResponseFormat>}
  * [uploader.uploadByUrl] - method that upload image by URL
  */
+
 
 /**
  * @typedef {object} UploadResponseFormat
@@ -158,14 +158,6 @@ export default class ImageTool {
       getUrl: config.getUrl || null,
     };
 
-    /**
-     * Module for file uploading
-     */
-    this.uploader = new Uploader({
-      config: this.config,
-      onUpload: (response) => this.onUpload(response),
-      onError: (error) => this.uploadingFailed(error),
-    });
 
     /**
      * Module for working with UI
@@ -173,13 +165,7 @@ export default class ImageTool {
     this.ui = new Ui({
       api,
       config: this.config,
-      onSelectFile: () => {
-        this.uploader.uploadSelectedFile({
-          onPreview: (src) => {
-            this.ui.showPreloader(src);
-          },
-        });
-      },
+      onSelectFile: () => this.#selectAndUploadFile(),
       readOnly,
     });
 
@@ -197,6 +183,35 @@ export default class ImageTool {
      */
     this._data = {};
     this.data = data;
+  }
+
+
+  async #selectAndUploadFile() {
+    // eslint-disable-next-line
+    const [fileHandle] = await window.showOpenFilePicker({
+      multiple: false,
+      types: [
+        {
+          description: "Image",
+          accept: {
+            "image/png": [".png"],
+            "image/jpeg": [".jpg"],
+            "image/webp": [".webp"],
+            "image/gif": [".gif"],
+          },
+        },
+      ],
+    });
+
+    const file = await fileHandle.getFile();
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      this.ui.showPreloader(e.target.result);
+    };
+    const result = await this.config.uploader.uploadByFile(file);
+    this.onUploadFinished(result);
   }
 
   /**
@@ -406,7 +421,7 @@ export default class ImageTool {
    * @param {UploadResponseFormat} response - uploading server response
    * @return {void}
    */
-  onUpload(response) {
+  onUploadFinished(response) {
     if (response.success && response.file) {
       this.image = response.file;
     } else {
@@ -460,7 +475,7 @@ export default class ImageTool {
    */
   async uploadFile(file) {
     const result = await this.config.uploader.uploadByFile(file);
-    this.onUpload(result);
+    this.onUploadFinished(result);
   }
 
   /**
