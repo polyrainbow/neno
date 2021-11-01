@@ -26,7 +26,6 @@ SOFTWARE.
 
 
 import "./index.css";
-import Uploader from "./uploader.js";
 import * as svgs from "./svgs.js";
 const LOADER_TIMEOUT = 500;
 
@@ -108,23 +107,12 @@ export default class AudioTool {
       buttonText: config.buttonText || "Select file to upload",
       errorMessage: config.errorMessage || "File upload failed",
       additionalRequestHeaders: config.additionalRequestHeaders || {},
-      uploader: config.uploader || null,
+      uploader: config.uploader,
       onDownload: config.onDownload || null,
       getUrl: config.getUrl || null,
     };
 
     this.data = data;
-
-    /**
-     * Module for files uploading
-     */
-    this.uploader = new Uploader({
-      config: this.config,
-      onUpload: (response) => this.onUpload(response),
-      onError: (error) => this.uploadingFailed(error),
-    });
-
-    this.enableFileUpload = this.enableFileUpload.bind(this);
   }
 
   /**
@@ -181,11 +169,13 @@ export default class AudioTool {
       tags: ["audio"],
 
       /**
-       * Paste URL of image into the Editor
+       * Paste URL of audio into the Editor
+       * We have disabled this because we want to be able to insert a
+       * url without turning it into an audio block
        */
-      patterns: {
+      /* patterns: {
         audio: /https?:\/\/\S+\.mp3$/i,
-      },
+      },*/
 
       /**
        * Drag n drop file from into the Editor
@@ -206,33 +196,24 @@ export default class AudioTool {
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
    * @return {void}
    */
-  async onPaste(event) {
+  /* onPaste must not be an async function
+  see also: https://github.com/codex-team/editor.js/issues/1803
+  */
+  onPaste(event) {
     switch (event.type) {
     case "tag": {
-      const image = event.detail.data;
-
-      /** Images from PDF */
-      if (/^blob:/.test(image.src)) {
-        const response = await fetch(image.src);
-        const file = await response.blob();
-
-        this.uploadFile(file);
-        break;
-      }
-
-      this.uploadUrl(image.src);
+      const audio = event.detail.data;
+      this.#uploadFileByUrlAndRefreshUI(audio.src);
       break;
     }
     case "pattern": {
       const url = event.detail.data;
-
-      this.uploadUrl(url);
+      this.#uploadFileByUrlAndRefreshUI(url);
       break;
     }
     case "file": {
       const file = event.detail.file;
-
-      this.uploadFile(file);
+      this.#uploadFileAndRefreshUI(file);
       break;
     }
     }
@@ -285,8 +266,46 @@ export default class AudioTool {
   prepareUploadButton() {
     this.nodes.button = this.make("div", [this.CSS.apiButton, this.CSS.button]);
     this.nodes.button.innerHTML = this.config.buttonText;
-    this.nodes.button.addEventListener("click", this.enableFileUpload);
+    this.nodes.button.addEventListener("click", this.#selectAndUploadFile);
     this.nodes.wrapper.appendChild(this.nodes.button);
+  }
+
+
+  async #selectAndUploadFile() {
+    // eslint-disable-next-line
+    const [fileHandle] = await window.showOpenFilePicker({
+      multiple: false,
+      types: [
+        {
+          description: "MP3 File",
+          accept: {
+            "audio/mp3": [".mp3"],
+            "audio/mpeg": [".mp3"],
+          },
+        },
+      ],
+    });
+
+    const file = await fileHandle.getFile();
+
+    this.nodes.wrapper.classList.add(
+      this.CSS.wrapperLoading,
+      this.CSS.loader,
+    );
+
+    await this.#uploadFileAndRefreshUI(file);
+  }
+
+
+  async #uploadFileByUrlAndRefreshUI(url) {
+    const result = await this.config.uploader.uploadByUrl(url);
+    this.#onUploadFinished(result);
+  }
+
+
+  async #uploadFileAndRefreshUI(file) {
+    const result = await this.config.uploader.uploadByFile(file);
+    this.#onUploadFinished(result);
   }
 
   /**
@@ -311,26 +330,13 @@ export default class AudioTool {
       );
   }
 
-  /**
-   * Allow to upload files on button click
-   */
-  enableFileUpload() {
-    this.uploader.uploadSelectedFile({
-      onPreview: () => {
-        this.nodes.wrapper.classList.add(
-          this.CSS.wrapperLoading,
-          this.CSS.loader,
-        );
-      },
-    });
-  }
 
   /**
    * File uploading callback
    *
    * @param {UploadResponseFormat} response
    */
-  onUpload(response) {
+  #onUploadFinished(response) {
     if (response.success && response.file) {
       const receivedFileData = response.file || {};
       const filename = receivedFileData.name;

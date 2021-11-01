@@ -163,16 +163,29 @@ const loadInstance = async ({
       audio: {
         class: Audio,
         config: {
-          uploader: async (file) => {
-            const fileId = await databaseProvider.uploadFile(file);
-            return {
-              success: true,
-              file: {
-                "size": file.size,
-                "name": file.name,
-                "fileId": fileId,
-              },
-            };
+          uploader: {
+            uploadByFile: async (file) => {
+              const fileId = await databaseProvider.uploadFile(file);
+              return {
+                success: true,
+                file: {
+                  "size": file.size,
+                  "name": file.name,
+                  "fileId": fileId,
+                },
+              };
+            },
+            uploadByUrl: async (url) => {
+              const fileId = await databaseProvider.uploadFileByUrl({
+                url,
+              });
+              return {
+                success: true,
+                file: {
+                  "fileId": fileId,
+                },
+              };
+            },
           },
           onDownload: async (file) => {
             const fileId = file.fileId;
