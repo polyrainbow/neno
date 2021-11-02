@@ -26,7 +26,6 @@ SOFTWARE.
 
 
 import "./index.css";
-import Uploader from "./uploader.js";
 import * as svgs from "./svgs.js";
 const LOADER_TIMEOUT = 500;
 
@@ -108,23 +107,12 @@ export default class VideoTool {
       buttonText: config.buttonText || "Select file to upload",
       errorMessage: config.errorMessage || "File upload failed",
       additionalRequestHeaders: config.additionalRequestHeaders || {},
-      uploader: config.uploader || null,
+      uploader: config.uploader,
       onDownload: config.onDownload || null,
       getUrl: config.getUrl || null,
     };
 
     this.data = data;
-
-    /**
-     * Module for files uploading
-     */
-    this.uploader = new Uploader({
-      config: this.config,
-      onUpload: (response) => this.onUpload(response),
-      onError: (error) => this.uploadingFailed(error),
-    });
-
-    this.enableFileUpload = this.enableFileUpload.bind(this);
   }
 
   /**
@@ -160,6 +148,75 @@ export default class VideoTool {
       fileInfo: "cdx-video__file-info",
       fileIcon: "cdx-video__file-icon",
     };
+  }
+
+
+  /**
+   * Specify paste substitutes
+   *
+   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
+   * @return {{
+   *   tags: string[],
+   *   patterns: object<string, RegExp>,
+   *   files: {extensions: string[], mimeTypes: string[]}
+   * }}
+   */
+  static get pasteConfig() {
+    return {
+      /**
+       * Paste HTML into Editor
+       */
+      tags: ["video"],
+
+      /**
+       * Paste URL of audio into the Editor
+       * We have disabled this because we want to be able to insert a
+       * url without turning it into an audio block
+       */
+      /* patterns: {
+        audio: /https?:\/\/\S+\.mp4$/i,
+      },*/
+
+      /**
+       * Drag n drop file from into the Editor
+       */
+      files: {
+        mimeTypes: ["video/mp4", "video/webm"],
+        extensions: ["mp4", "webm"],
+      },
+    };
+  }
+
+  /**
+   * Specify paste handlers
+   *
+   * @public
+   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
+   * @param {CustomEvent} event - editor.js custom paste event
+   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
+   * @return {void}
+   */
+  /* onPaste must not be an async function
+  see also: https://github.com/codex-team/editor.js/issues/1803
+  */
+  onPaste(event) {
+    switch (event.type) {
+    case "tag": {
+      const video = event.detail.data;
+      this.#uploadFileByUrlAndRefreshUI(video.src);
+      break;
+    }
+    case "pattern": {
+      const url = event.detail.data;
+      this.#uploadFileByUrlAndRefreshUI(url);
+      break;
+    }
+    case "file": {
+      const file = event.detail.file;
+      this.#uploadFileAndRefreshUI(file);
+      break;
+    }
+    }
   }
 
 
@@ -209,8 +266,46 @@ export default class VideoTool {
   prepareUploadButton() {
     this.nodes.button = this.make("div", [this.CSS.apiButton, this.CSS.button]);
     this.nodes.button.innerHTML = this.config.buttonText;
-    this.nodes.button.addEventListener("click", this.enableFileUpload);
+    this.nodes.button.addEventListener("click", this.#selectAndUploadFile);
     this.nodes.wrapper.appendChild(this.nodes.button);
+  }
+
+
+  async #selectAndUploadFile() {
+    // eslint-disable-next-line
+    const [fileHandle] = await window.showOpenFilePicker({
+      multiple: false,
+      types: [
+        {
+          description: "Video file",
+          accept: {
+            "video/mp4": [".mp4"],
+            "video/webm": [".webm"],
+          },
+        },
+      ],
+    });
+
+    const file = await fileHandle.getFile();
+
+    this.nodes.wrapper.classList.add(
+      this.CSS.wrapperLoading,
+      this.CSS.loader,
+    );
+
+    await this.#uploadFileAndRefreshUI(file);
+  }
+
+
+  async #uploadFileByUrlAndRefreshUI(url) {
+    const result = await this.config.uploader.uploadByUrl(url);
+    this.#onUploadFinished(result);
+  }
+
+
+  async #uploadFileAndRefreshUI(file) {
+    const result = await this.config.uploader.uploadByFile(file);
+    this.#onUploadFinished(result);
   }
 
   /**
@@ -235,26 +330,13 @@ export default class VideoTool {
       );
   }
 
-  /**
-   * Allow to upload files on button click
-   */
-  enableFileUpload() {
-    this.uploader.uploadSelectedFile({
-      onPreview: () => {
-        this.nodes.wrapper.classList.add(
-          this.CSS.wrapperLoading,
-          this.CSS.loader,
-        );
-      },
-    });
-  }
 
   /**
    * File uploading callback
    *
    * @param {UploadResponseFormat} response
    */
-  onUpload(response) {
+  #onUploadFinished(response) {
     if (response.success && response.file) {
       const receivedFileData = response.file || {};
       const filename = receivedFileData.name;
@@ -362,11 +444,7 @@ export default class VideoTool {
    * @param {string} errorMessage -  error message
    */
   uploadingFailed(errorMessage) {
-    this.api.notifier.show({
-      message: errorMessage,
-      style: "error",
-    });
-
+    console.log(errorMessage);
     this.removeLoader();
   }
 
