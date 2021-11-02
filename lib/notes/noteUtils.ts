@@ -591,6 +591,8 @@ const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
     } else if (block.type === NoteContentBlockType.LIST) {
       const itemsConcatenated = block.data.items.join(" ");
       return accumulator + " " + itemsConcatenated;
+    } else if (block.type === NoteContentBlockType.IMAGE) {
+      return accumulator + " " + block.data.caption;
     } else {
       return accumulator;
     }
