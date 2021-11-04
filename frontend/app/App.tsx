@@ -9,8 +9,10 @@ import ExportDatabaseDialog from "./ExportDatabaseDialog";
 import StatsDialog from "./StatsDialog";
 import { paths } from "./lib/config";
 import {
+  Routes,
   Route,
-  useHistory,
+  Navigate,
+  useNavigate,
 } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
@@ -28,7 +30,7 @@ const App = ({
   const [databaseMode, setDatabaseMode]
     = useState<DatabaseMode>(DatabaseMode.NONE);
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
 
   const beforeUnload = function(e) {
@@ -76,10 +78,10 @@ const App = ({
         location.pathname.startsWith(paths.login)
         || location.pathname === "/"
       ) {
-        history.push(isSmallScreen ? paths.list : paths.newNote);
+        navigate(isSmallScreen ? paths.list : paths.editorWithNewNote);
       }
     } else {
-      history.push(paths.login);
+      navigate(paths.login);
     }
   };
 
@@ -91,60 +93,76 @@ const App = ({
   const handleInvalidCredentialsError = async () => {
     await databaseProvider.removeAccess();
     setDatabaseMode(DatabaseMode.NONE);
-    history.push(paths.login);
+    navigate(paths.login);
   };
 
 
   return <ConfirmationServiceProvider>
-    <Route path={paths.login}>
-      <LoginView
-        setDatabaseMode={setDatabaseMode}
-        serverDatabaseProvider={serverDatabaseProvider}
-        localDatabaseProvider={localDatabaseProvider}
-      />
-    </Route>
-    <Route path={paths.editor + "/:activeNoteId?"}>
-      {
-        databaseProvider
-          ? <EditorView
-            databaseProvider={databaseProvider}
-            unsavedChanges={unsavedChanges}
-            setUnsavedChanges={setUnsavedChanges}
-            toggleAppMenu={toggleAppMenu}
-            setOpenDialog={setOpenDialog}
-            openDialog={openDialog}
-            handleInvalidCredentialsError={handleInvalidCredentialsError}
+    <Routes>
+      <Route
+        path={paths.login}
+        element={
+          <LoginView
+            setDatabaseMode={setDatabaseMode}
+            serverDatabaseProvider={serverDatabaseProvider}
+            localDatabaseProvider={localDatabaseProvider}
           />
-          : null
-      }
-    </Route>
-    <Route path={paths.list}>
-      {
-        databaseProvider
-          ? <>
-            <ListView
+        }
+      />
+      <Route
+        path={paths.editor}
+        element={
+          <Navigate to={paths.editorWithNewNote} replace />
+        }
+      />
+      <Route
+        path={paths.editor + "/:activeNoteId"}
+        element={
+          databaseProvider
+            ? <EditorView
               databaseProvider={databaseProvider}
+              unsavedChanges={unsavedChanges}
+              setUnsavedChanges={setUnsavedChanges}
               toggleAppMenu={toggleAppMenu}
+              setOpenDialog={setOpenDialog}
+              openDialog={openDialog}
               handleInvalidCredentialsError={handleInvalidCredentialsError}
             />
-            <FloatingActionButton
-              title="New note"
-              icon="note_add"
-              onClick={() => history.push(paths.newNote)}
-            ></FloatingActionButton>
-          </>
-          : null
-      }
-    </Route>
-    <Route path={paths.graph}>
-      <GraphView
-        unsavedChanges={unsavedChanges}
-        setUnsavedChanges={setUnsavedChanges}
-        databaseProvider={databaseProvider}
-        toggleAppMenu={toggleAppMenu}
-        handleInvalidCredentialsError={handleInvalidCredentialsError}
+            : null
+        }
       />
-    </Route>
+      <Route
+        path={paths.list}
+        element={
+          databaseProvider
+            ? <>
+              <ListView
+                databaseProvider={databaseProvider}
+                toggleAppMenu={toggleAppMenu}
+                handleInvalidCredentialsError={handleInvalidCredentialsError}
+              />
+              <FloatingActionButton
+                title="New note"
+                icon="note_add"
+                onClick={() => navigate(paths.editorWithNewNote)}
+              ></FloatingActionButton>
+            </>
+            : null
+        }
+      />
+      <Route
+        path={paths.graph}
+        element={
+          <GraphView
+            unsavedChanges={unsavedChanges}
+            setUnsavedChanges={setUnsavedChanges}
+            databaseProvider={databaseProvider}
+            toggleAppMenu={toggleAppMenu}
+            handleInvalidCredentialsError={handleInvalidCredentialsError}
+          />
+        }
+      />
+    </Routes>
     {
       isAppMenuOpen
         ? <AppMenu

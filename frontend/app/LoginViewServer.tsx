@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  useHistory,
+  useNavigate,
 } from "react-router-dom";
 import { paths } from "./lib/config.js";
 import { DatabaseMode } from "./enum/DatabaseMode.js";
@@ -17,14 +17,14 @@ const LoginViewServer = ({
 
   const [isBusy, setIsBusy] = useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const startLoginAttempt = () => {
     setIsBusy(true);
     serverDatabaseProvider.login(username, password, mfaToken)
       .then(() => {
         setDatabaseMode(DatabaseMode.SERVER);
-        history.push(paths.editor);
+        navigate(paths.editorWithNewNote);
       })
       .catch((e) => {
         const disclaimer = (e.message === "INVALID_CREDENTIALS")

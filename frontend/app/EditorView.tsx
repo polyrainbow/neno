@@ -11,7 +11,7 @@ import * as Editor from "./lib/editor";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import ImportLinksDialog from "./ImportLinksDialog";
 import {
-  useHistory,
+  useNavigate,
   useParams,
 } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen";
@@ -50,7 +50,7 @@ const EditorView = ({
 
   const isSmallScreen = useIsSmallScreen();
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const goToNote = useGoToNote();
   const { activeNoteId } = useParams();
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
@@ -208,7 +208,7 @@ const EditorView = ({
     }
 
     if (isNaN(noteIdNumber)) {
-      history.replace(Config.paths.newNote);
+      navigate(Config.paths.editorWithNewNote, { replace: true });
       setActiveNote(Utils.getNewNoteObject());
     } else {
       try {
@@ -311,7 +311,7 @@ const EditorView = ({
 
 
   const createNewNote = () => {
-    history.push(Config.paths.newNote);
+    navigate(Config.paths.editorWithNewNote);
   };
 
 
@@ -322,7 +322,7 @@ const EditorView = ({
 
     await databaseProvider.deleteNote(activeNote.id);
     refreshNotesList();
-    history.push(Config.paths.newNote);
+    navigate(Config.paths.editorWithNewNote);
   };
 
 
@@ -354,6 +354,10 @@ const EditorView = ({
     });
     setUnsavedChanges(false);
     refreshNotesList();
+    /*
+      when saving the new note for the first time, we get its id from the 
+      databaseProvider. then we update the address bar to include the new id
+    */
     goToNote(noteFromServer.id, true);
   };
 
@@ -497,7 +501,7 @@ const EditorView = ({
           openImportLinksDialog={() => setOpenDialog(Dialog.IMPORT_LINKS)}
           duplicateNote={duplicateNote}
           openInGraphView={() => {
-            history.push(
+            navigate(
               Config.paths.graphWithFocusNote.replace(
                 "%FOCUS_NOTE_ID%",
                 activeNote.id.toString(),

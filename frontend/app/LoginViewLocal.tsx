@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  useHistory,
+  useNavigate,
 } from "react-router-dom";
 import { paths } from "./lib/config";
 import { DatabaseMode } from "./enum/DatabaseMode";
@@ -16,7 +16,7 @@ const LoginViewLocal = ({
     setLocalDatabaseFolderHandleName,
   ] = useState(null);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const retrieveLocalDatabaseFolderHandle = async () => {
@@ -51,7 +51,7 @@ const LoginViewLocal = ({
               try {
                 await localDatabaseProvider.initializeDatabase();
                 setDatabaseMode(DatabaseMode.LOCAL);
-                history.push(paths.editor);
+                navigate(paths.editorWithNewNote);
               } catch (e) {
                 console.error(e);
 
@@ -80,7 +80,7 @@ const LoginViewLocal = ({
           const folderHandle = await window.showDirectoryPicker();
           await localDatabaseProvider.login(folderHandle);
           setDatabaseMode(DatabaseMode.LOCAL);
-          history.push(paths.editor);
+          navigate(paths.editorWithNewNote);
         } catch (e) {
           console.error(e);
         }

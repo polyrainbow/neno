@@ -64,7 +64,7 @@ const MAX_WIDTH_SMALL_SCREEN = 1200;
 const paths = {
   editor: "/editor",
   editorWithNote: "/editor/%NOTE_ID%",
-  newNote: "/editor/new",
+  editorWithNewNote: "/editor/new",
   list: "/list",
   graph: "/graph",
   graphWithFocusNote: "/graph?focusNote=%FOCUS_NOTE_ID%",

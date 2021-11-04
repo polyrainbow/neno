@@ -3,7 +3,7 @@ import AppMenuItem from "./AppMenuItem";
 import * as Config from "./lib/config";
 import OutsideAlerter from "./OutsideAlerter";
 import {
-  useHistory,
+  useNavigate,
   useLocation,
 } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen";
@@ -23,7 +23,7 @@ const AppMenu = ({
 
   const location = useLocation();
   const pathname = location.pathname;
-  const history = useHistory();
+  const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
 
   const showGraphButton:boolean
@@ -63,7 +63,7 @@ const AppMenu = ({
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              history.push(Config.paths.graph);
+              navigate(Config.paths.graph);
             }}
           />
           : null
@@ -79,8 +79,10 @@ const AppMenu = ({
                 setUnsavedChanges(false);
               }
 
-              history.push(
-                isSmallScreen ? Config.paths.list : Config.paths.editor,
+              navigate(
+                isSmallScreen
+                  ? Config.paths.list
+                  : Config.paths.editorWithNewNote,
               );
             }}
           />
@@ -112,7 +114,7 @@ const AppMenu = ({
               }
 
               await databaseProvider.removeAccess();
-              history.push(Config.paths.login);
+              navigate(Config.paths.login);
             }}
           />
           : null

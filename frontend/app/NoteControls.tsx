@@ -1,7 +1,7 @@
 import React from "react";
 import IconButton from "./IconButton.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
 import { paths } from "./lib/config.js";
 import useConfirmDiscardingUnsavedChangesDialog
@@ -22,7 +22,7 @@ const NoteControls = ({
 }) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
-  const history = useHistory();
+  const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
@@ -39,7 +39,7 @@ const NoteControls = ({
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              history.push(paths.list);
+              navigate(paths.list);
             }}
           />
           : null
