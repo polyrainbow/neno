@@ -24,7 +24,7 @@
     "express": "^4.17.1",
     "express-history-api-fallback": "^2.2.1",
     "express-session": "^1.17.2",
-    "formidable": "^1.2.2",
+    "formidable": "^2.0.1",
     "idb-keyval": "^6.0.3",
     "node-2fa": "^2.0.2",
     "qrcode-terminal": "^0.12.0",

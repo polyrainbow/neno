@@ -412,8 +412,8 @@ const startApp = async ({
           return;
         }
 
-        const readable = fs.createReadStream(file.path);
-        const mimeType = file.type;
+        const readable = fs.createReadStream(file.filepath);
+        const mimeType = file.mimetype;
         const size = file.size;
 
         if (size > config.MAX_UPLOAD_FILE_SIZE) {
