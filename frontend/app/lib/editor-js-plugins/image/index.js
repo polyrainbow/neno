@@ -40,14 +40,6 @@ SOFTWARE.
  *  3) ui.js — module for UI manipulations: render, showing preloader, etc
  *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
  *
- * For debug purposes there is a testing server
- * that can save uploaded files and return a Response
- * {@link UploadResponseFormat}
- *
- *       $ node dev/server.js
- *
- * It will expose 8008 port, so you can pass http://localhost:8008 with the Tools config:
- *
  * image: {
  *   class: ImageTool,
  *   config: {

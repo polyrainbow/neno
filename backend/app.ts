@@ -27,6 +27,7 @@ import User from "./interfaces/User.js";
 import { randomUUID } from "crypto";
 import FileSessionStore from "./lib/FileSessionStore.js";
 
+
 const startApp = async ({
   users,
   dataPath,
