@@ -27,7 +27,7 @@ SOFTWARE.
 /**
  * Build styles
  */
-import { getLineStartPosition } from './utils/string';
+import { getLineStartPosition } from './utils/string.js';
 import './index.css';
 
 /**
