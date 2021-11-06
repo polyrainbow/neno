@@ -10,24 +10,20 @@ Make sure that these are installed:
 ## 1. Clone this repository
 
 ## 2. Install dependencies
-Run `npm i`
+Navigate your terminal to this repository's directory and run `npm i`
 
 ## 3. Build the frontend and the backend from the source
 Run `npm run build`
 
-## 4. Create a data directory
-The NENO server needs a directory where it stores all the data. By default, NENO assumes that this directory is on the same level as the repository folder and has the name `neno-data`. You can customize this (see below in server start parameters).
-
-## 5. Create a users file
-NENO needs a users file in the data directory where the user information is stored.
-In the repository folder, run `node tools/createUsersFile.js` and follow the instructions on screen. This script will then create a users file called `users.json`. Move the this file into the data directory. 
-
-
-## 6. Start the server
+## 4. Start the server
 * If you do not want to use a TLS certificate, this is the start up command for you: `node dist/backend/index.js --port [YOUR_PORT]` (replace `[YOUR_PORT]` with a number like `80`)
 * If you do want to use a TLS certificate, you can do `node dist/backend/index.js --use-https
 --cert-path [PATH_TO_CERTIFICATE_FILE]
 --cert-key-path [PATH_TO_CERTIFICATE_KEY_FILE]`
+
+The NENO server needs a directory where it stores all the data. By default, NENO assumes that this directory is on the same level as the repository folder and has the name `neno-data`. You can customize this (see below in server start parameters). If no directory is present at the given path, a new one will be created.
+
+When running NENO server for the first time, follow the instructions on the terminal to create a new users file.
 
 ### Example to run NENO with a TLS certificate 
 

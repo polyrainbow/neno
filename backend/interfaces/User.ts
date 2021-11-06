@@ -5,6 +5,7 @@ export default interface User {
   login: string,
   passwordHash: string,
   mfaSecret: string,
+  mfaUri?: string,
   qrCode?: string,
   apiKeys?: string[],
 }

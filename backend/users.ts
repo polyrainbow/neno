@@ -1,19 +1,23 @@
 import * as path from "path";
-import fs from "fs";
+import fs from "fs/promises";
+import { constants } from 'fs';
 import User from "./interfaces/User.js";
+import createUsersFile from "./createUsersFile.js";
 
-const getUsers = (dataFolderPath) => {
+const getUsers = async (dataFolderPath) => {
   const usersFile = path.join(dataFolderPath, "users.json");
 
-  if (!fs.existsSync(usersFile)) {
+  try {
+    await fs.access(usersFile, constants.R_OK | constants.W_OK);
+  } catch {
     console.log(
-      "ERROR: No users file found. Please create one with tools/createUsersFile.js",
+      "WARN: No users file found. We must create one.",
     );
-    process.exit(1);
+    await createUsersFile(usersFile);
   }
-  
-  console.log("Loading existing users file...");
-  const json = fs.readFileSync(usersFile).toString();
+
+  console.log("Loading users file...");
+  const json = (await fs.readFile(usersFile)).toString();
   const users:User[] = JSON.parse(json);
 
   if (!users.every((user) => {

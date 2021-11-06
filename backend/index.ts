@@ -1,5 +1,6 @@
 import * as path from "path";
-import fs from "fs";
+import fs from "fs/promises";
+import { constants } from 'fs';
 import http, { RequestListener } from "http";
 import https from "https";
 import startApp from "./app.js";
@@ -22,7 +23,22 @@ if (programArguments.urlMetadata.length > 0) {
   process.exit(0);
 }
 
-const users: User[] = getUsers(programArguments.dataFolderPath);
+try {
+  await fs.access(
+    programArguments.dataFolderPath,
+    constants.R_OK | constants.W_OK,
+  );
+  console.log(`Data directory found at ${programArguments.dataFolderPath}`);
+} catch (e) {
+  console.log(
+    `WARN: No data directory found at ${programArguments.dataFolderPath}`,
+  );
+  console.log("Creating one...");
+  await fs.mkdir(programArguments.dataFolderPath, { recursive: true });
+}
+
+
+const users: User[] = await getUsers(programArguments.dataFolderPath);
 
 const app = await startApp({
   users,
@@ -36,8 +52,8 @@ const app = await startApp({
 if (programArguments.useHttps) {
   const httpsServer = https.createServer(
     {
-      key: fs.readFileSync(programArguments.certKeyPath),
-      cert: fs.readFileSync(programArguments.certPath)
+      key: await fs.readFile(programArguments.certKeyPath),
+      cert: await fs.readFile(programArguments.certPath)
     },
     app as RequestListener,
   );
