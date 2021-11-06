@@ -204,14 +204,7 @@ export default class ImageTool {
     });
 
     const file = await fileHandle.getFile();
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      this.ui.showPreloader(e.target.result);
-    };
-    const result = await this.config.uploader.uploadByFile(file);
-    this.onUploadFinished(result);
+    await this.uploadFile(file);
   }
 
   /**
@@ -473,6 +466,12 @@ export default class ImageTool {
    * @return {void}
    */
   async uploadFile(file) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      this.ui.showPreloader(e.target.result);
+    };
+
     const result = await this.config.uploader.uploadByFile(file);
     this.onUploadFinished(result);
   }
