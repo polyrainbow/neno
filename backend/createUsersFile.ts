@@ -35,7 +35,7 @@ export default async (filepath) => {
     = (await rl.question("How many users do you wish to create? (1) ")) || 1;
 
   for (let i = 0; i < numberOfUsers; i++) {
-    console.log("Gathering info for user " + (i + 1));
+    console.log(`Gathering info for user ${(i + 1)}/${numberOfUsers}`);
     const username = await rl.question("User name: ");
 
     stdout.write("Password: ");
