@@ -25,7 +25,7 @@ SOFTWARE.
 */
 
 .ce-code__textarea {
-    min-height: 200px;
+    min-height: 400px;
     font-family: Menlo, Monaco, Consolas, Courier New, monospace;
     color: #41314e;
     line-height: 1.6em;
