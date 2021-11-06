@@ -111,6 +111,7 @@ export default class CodeTool {
   drawView() {
     const wrapper = document.createElement("div");
     const textarea = document.createElement("textarea");
+    textarea.spellcheck = false;
 
     wrapper.classList.add(this.CSS.baseClass, this.CSS.wrapper);
     textarea.classList.add(this.CSS.textarea, this.CSS.input);
