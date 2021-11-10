@@ -1,3 +1,4 @@
+import { DEFAULT_NOTE_BLOCKS } from "./config";
 import { getUrlForFileId } from "./utils";
 
 // this instance queue makes sure that there are not several editor instances
@@ -251,6 +252,14 @@ const save = async () => {
   const instance = await instanceQueue;
   await instance.isReady;
   const editorData = await instance.save();
+
+  // when the user did not enter anything, editor.js
+  // decides to remove those blocks. but we want to have at least an empty
+  // heading block being present, so the user is always encouraged to give its
+  // note a title
+  if (editorData.blocks.length === 0) {
+    editorData.blocks = [...DEFAULT_NOTE_BLOCKS];
+  }
   return editorData.blocks;
 };
 
