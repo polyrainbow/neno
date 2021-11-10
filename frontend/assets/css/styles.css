@@ -58,13 +58,19 @@
   --small-font-size: 13px;
   --default-font-size: 16px;
   --large-font-size: 24px;
+  --h1-font-size: 28px;
   --header-bar-height: 50px;
+  --max-content-width: 1000px;
   --default-box-shadow:
     0 1px 1px hsl(0deg 0% 0% / 0.075),
     0 2px 2px hsl(0deg 0% 0% / 0.075),
     0 4px 4px hsl(0deg 0% 0% / 0.075),
     0 8px 8px hsl(0deg 0% 0% / 0.075),
     0 16px 16px hsl(0deg 0% 0% / 0.075);
+}
+
+h1 {
+  font-size: var(--h1-font-size);
 }
 
 #app-menu {
@@ -146,7 +152,7 @@ header h1 {
 #header-left {
   display: flex;
   justify-content: center;
-  height: 50px;
+  height: var(--header-bar-height);
   align-items: center;
 }
 
@@ -157,7 +163,7 @@ header h1 {
 
 #header-right {
   display: flex;
-  height: 50px;
+  height: var(--header-bar-height);
   align-items: center;
 }
 
@@ -204,8 +210,7 @@ main {
 }
 
 #note-content {
-  padding: 0px var(--default-margin);
-  max-width: 1100px;
+  max-width: var(--max-content-width);
   margin: auto;
 }
 
@@ -288,7 +293,7 @@ button[disabled]{
   border-radius: var(--border-radius);
   overflow: hidden;
   user-select: none;
-  max-width: 1000px;
+  max-width: var(--max-content-width);
 }
 
 .note-list-item-main {
@@ -494,7 +499,7 @@ button[disabled]{
 }
 
 
-@media only screen and (min-width: 1201px) {
+@media only screen and (min-width: 1281px) {
   body, #app{
     overflow: hidden;
   }
@@ -537,6 +542,7 @@ button[disabled]{
   }
 
   #note-content{
+    padding: 0px 48px;
     overflow-y: auto;
     height: calc(100vh - (2 * var(--header-bar-height)));
   }
@@ -544,7 +550,7 @@ button[disabled]{
 
 
 
-@media only screen and (max-width: 1200px){
+@media only screen and (max-width: 1280px){
   main {
     grid-template-columns: 1fr;
   }
@@ -563,6 +569,10 @@ button[disabled]{
 
   #right-view{
     grid-area: 1 / 1 / 2 / 2;
+  }
+
+  #note-content{
+    padding: 0px var(--default-margin);
   }
 }
 
