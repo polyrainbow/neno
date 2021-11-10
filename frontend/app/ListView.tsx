@@ -20,7 +20,7 @@ const ListView = ({
   const [page, setPage] = useState<number>(1);
   const [isBusy, setIsBusy] = useState<boolean>(true);
   const [stats, setStats] = useState(null);
-  const [sortMode, setSortMode] = useState("CREATION_DATE_DESCENDING");
+  const [sortMode, setSortMode] = useState("UPDATE_DATE_DESCENDING");
   const [searchValue, setSearchValue] = useState<string>("");
   const [pinnedNotes, setPinnedNotes] = useState([]);
 
