@@ -656,14 +656,24 @@ const getNotesThatContainTokens = (
 }
 
 
-const getNotesWithBlockOfType = (
+const getNotesWithBlocksOfTypes = (
   notes:DatabaseNote[],
-  type: NoteContentBlockType,
+  types: NoteContentBlockType[],
+  notesMustContainAllBlockTypes:boolean,
 ):DatabaseNote[] => {
-  return notes
-    .filter((note:DatabaseNote):boolean => {
-      return note.blocks.some((block) => block.type === type);
-    });
+  return notesMustContainAllBlockTypes
+    ? notes
+      // every single note must contain blocks from all the types
+      .filter((note:DatabaseNote):boolean => {
+        return types.every((type) => {
+          return note.blocks.some((block) => block.type === type);
+        });
+      })
+    // every note must contain one block with only one type of types:
+    : notes
+      .filter((note:DatabaseNote):boolean => {
+        return note.blocks.some((block) => types.includes(block.type));
+      });
 }
 
 
@@ -695,5 +705,5 @@ export {
   getConcatenatedTextOfNote,
   getNotesWithTitleContainingTokens,
   getNotesThatContainTokens,
-  getNotesWithBlockOfType,
+  getNotesWithBlocksOfTypes,
 };

@@ -22,7 +22,7 @@ import {
   getNotesByTitle,
   getNotesWithUrl,
   getNotesWithTitleContainingTokens,
-  getNotesWithBlockOfType,
+  getNotesWithBlocksOfTypes,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "./interfaces/DatabaseMainData.js";
@@ -136,8 +136,19 @@ const getNotesList = async (
   // search for notes with specific block types
   } else if (query.includes("has:")) {
     const startOfExactQuery = query.indexOf("has:") + "has:".length;
-    const type = query.substr(startOfExactQuery);
-    matchingNotes = getNotesWithBlockOfType(db.notes, type);
+    const typesString = query.substr(startOfExactQuery);
+    /*
+      has:audio+video - show all notes that contain audio as well as video
+      has:audio|video - show all notes that contain audio or video
+    */
+    if (typesString.includes("+")) {
+      const types = typesString.split("+");
+      matchingNotes = getNotesWithBlocksOfTypes(db.notes, types, true);
+    } else {
+      const types = typesString.split("|");
+      matchingNotes = getNotesWithBlocksOfTypes(db.notes, types, false);
+    }
+
 
   // full-text search
   } else if (query.includes("ft:")) {
