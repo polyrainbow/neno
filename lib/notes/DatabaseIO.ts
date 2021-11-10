@@ -234,8 +234,13 @@ export default class DatabaseIO {
     databaseId: DatabaseId,
   ):Promise<number> {
     const fileFolderPath = this.getFileFolderPath(databaseId);
-    const size = await this.#storageProvider.getFolderSize(fileFolderPath);
-    return size;
+    // maybe the file folder was not created yet, so let's just try
+    try {
+      const size = await this.#storageProvider.getFolderSize(fileFolderPath);
+      return size;
+    } catch (e) {
+      return 0;
+    }
   }
 
 
