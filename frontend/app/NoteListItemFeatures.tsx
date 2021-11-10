@@ -6,11 +6,8 @@ import { emojis } from "./lib/config.js";
 const NoteListItemFeatures = ({
   features,
 }) => {
-  return <div
+  return <span
     className="note-features"
-    style={{
-      textAlign: "right",
-    }}
   >
     {
       features?.containsText
@@ -54,7 +51,7 @@ const NoteListItemFeatures = ({
           title="Contains video"><span>{emojis.video}</span></Tooltip>
         : null
     }
-  </div>;
+  </span>;
 };
 
 export default NoteListItemFeatures;

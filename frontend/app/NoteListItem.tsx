@@ -14,6 +14,8 @@ const NoteListItem = ({
   onLinkChange,
   isLinkable,
 }) => {
+  const SPAN_SEPARATOR = " · ";
+
   const isHub = (
     typeof note.numberOfLinkedNotes === "number"
     && !isNaN(note.numberOfLinkedNotes)
@@ -43,29 +45,31 @@ const NoteListItem = ({
       onClick={onSelect}
     >
       <div
-        className="note-list-item-text-section"
+        className="title"
       >
+        {note.title}
+      </div>
+      <div className="note-list-item-second-row">
         <div
-          className="title"
+          className="info"
         >
-          {note.title}
-        </div>
-        <div className="note-list-item-second-row">
-          <div
-            className="info"
-          >
-            {yyyymmdd(new Date(note.updateTime))}
-            {
-              isHub
-                ? " · " + emojis.hub + " Hub"
-                : ""
-            }
-          </div>
+          {yyyymmdd(new Date(note.updateTime))}
+          {
+            isHub
+              ? SPAN_SEPARATOR + emojis.hub + " Hub"
+              : ""
+          }
+          {
+            /* if note contains at least one feature, show the separator */
+            Object.values(note.features || {}).some((val) => val === true)
+              ? SPAN_SEPARATOR
+              : ""
+          }
+          <NoteListItemFeatures
+            features={note.features}
+          />
         </div>
       </div>
-      <NoteListItemFeatures
-        features={note.features}
-      />
     </div>
     <NoteListItemLinkedNotesIndicator
       isLinked={isLinked}
