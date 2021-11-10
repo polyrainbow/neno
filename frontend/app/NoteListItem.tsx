@@ -53,7 +53,7 @@ const NoteListItem = ({
         <div
           className="info"
         >
-          {yyyymmdd(new Date(note.updateTime))}
+          {(new Date(note.updateTime)).toLocaleDateString()}
           {
             isHub
               ? SPAN_SEPARATOR + emojis.hub + " Hub"
