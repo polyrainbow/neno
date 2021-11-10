@@ -48,7 +48,6 @@ const Pagination = (props) => {
           margin: 0,
           display: "flex",
           alignItems: "center",
-          fontSize: "22px",
           justifyContent: "center",
           flexWrap: "wrap",
         }}>
@@ -62,7 +61,7 @@ const Pagination = (props) => {
                 <button
                   type="button"
                   className={
-                    "default-button"
+                    "small-button"
                     + (selected ? " pagination-button-selected" : "")
                   }
                   {...item}
@@ -74,7 +73,7 @@ const Pagination = (props) => {
               children = (
                 <button
                   type="button"
-                  className="default-button pagination-button-special"
+                  className="small-button pagination-button-special"
                   title={type === "previous" ? "Previous page" : "Next page"}
                   {...item}
                 >

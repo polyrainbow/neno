@@ -43,25 +43,29 @@ const NoteListItem = ({
       onClick={onSelect}
     >
       <div
-        className="title"
+        className="note-list-item-text-section"
       >
-        {note.title}
-      </div>
-      <div className="note-list-item-second-row">
         <div
-          className="info"
+          className="title"
         >
-          {yyyymmdd(new Date(note.updateTime))}
-          {
-            isHub
-              ? " · " + emojis.hub + " Hub"
-              : ""
-          }
+          {note.title}
         </div>
-        <NoteListItemFeatures
-          features={note.features}
-        />
+        <div className="note-list-item-second-row">
+          <div
+            className="info"
+          >
+            {yyyymmdd(new Date(note.updateTime))}
+            {
+              isHub
+                ? " · " + emojis.hub + " Hub"
+                : ""
+            }
+          </div>
+        </div>
       </div>
+      <NoteListItemFeatures
+        features={note.features}
+      />
     </div>
     <NoteListItemLinkedNotesIndicator
       isLinked={isLinked}

@@ -61,6 +61,10 @@
   margin: var(--block-title-margin);
 }
 
+.cdx-video__size {
+  font-size: var(--block-subtitle-font-size);
+}
+
 .cdx-video--with-file__title {
   white-space: nowrap;
   text-overflow: ellipsis;

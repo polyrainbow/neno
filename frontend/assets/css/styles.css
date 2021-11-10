@@ -55,7 +55,9 @@
   --border-radius: 10px;
   --default-margin: 15px;
   --xl-list-width: 720px;
-  --main-ui-font-size: 24px;
+  --small-font-size: 13px;
+  --default-font-size: 16px;
+  --large-font-size: 24px;
   --default-box-shadow:
     0 1px 1px hsl(0deg 0% 0% / 0.075),
     0 2px 2px hsl(0deg 0% 0% / 0.075),
@@ -89,7 +91,7 @@
 
 input, select {
   border: var(--input-border-width) solid var(--main-content-color) !important;
-  font-size: var(--main-ui-font-size);
+  font-size: var(--large-font-size);
   background: var(--background-color);
   color: var(--font-color);
 }
@@ -170,7 +172,7 @@ header h1 {
 #heading {
   margin: 0px;
   padding: 11px 10px;
-  font-size: var(--main-ui-font-size);
+  font-size: var(--large-font-size);
   white-space: pre;
 }
 
@@ -261,10 +263,6 @@ button[disabled]{
 }
 
 
-.pagination-button-special {
-  width: 80px;
-}
-
 .pagination-ellipsis {
   margin-right: 10px;
 }
@@ -283,19 +281,28 @@ button[disabled]{
   text-align: left;
   display: flex;
   background-color: var(--nli-color);
+  margin: auto;
   margin-bottom: var(--default-margin);
   border-radius: var(--border-radius);
   overflow: hidden;
   user-select: none;
+  max-width: 1000px;
 }
 
 .note-list-item-main {
+  display: flex;
+  justify-content: space-between;
   cursor: pointer;
   padding: 15px;
   width: calc(100% - 70px);
 }
 
+.note-list-item-main .title {
+  font-size: var(--default-font-size);
+}
+
 .note-list-item-second-row {
+  font-size: var(--small-font-size);
   display: flex;
   justify-content: space-between;
 }
@@ -359,6 +366,11 @@ button[disabled]{
   background-color: var(--nli-color-linked);
 }
 
+.note-list-item .note-features {
+  font-size: var(--default-font-size);
+  margin-left: 10px;
+}
+
 
 .dialog-box {
   background-color: var(--background-color);
@@ -386,8 +398,15 @@ button[disabled]{
   height: 200px;
 }
 
+.small-button {
+  font-size: var(--default-font-size);
+  margin-right: 10px;
+  padding: 10px;
+  margin-bottom: var(--default-margin);
+}
+
 .default-button {
-  font-size: var(--main-ui-font-size);
+  font-size: var(--large-font-size);
   margin-right: 10px;
   padding: 10px 20px;
   margin-bottom: var(--default-margin);
@@ -428,7 +447,7 @@ button[disabled]{
 
 
 #section_login {
-  font-size: var(--main-ui-font-size);
+  font-size: var(--large-font-size);
   padding: 20px;
   box-sizing: border-box;
   width: 100vw;
@@ -438,7 +457,7 @@ button[disabled]{
 }
 
 #section_login input {
-  font-size: var(--main-ui-font-size);
+  font-size: var(--large-font-size);
   padding: 5px;
   color: var(--font-color);
 }
