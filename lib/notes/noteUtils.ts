@@ -21,6 +21,7 @@ import NoteContentBlock, {
   NoteContentBlockType,
   NoteContentBlockWithFile,
 } from "./interfaces/NoteContentBlock.js";
+import { NOTE_TITLE_PLACEHOLDER } from "./config.js";
 
 
 const shortenText = (text:string, maxLength:number):string => {
@@ -46,9 +47,13 @@ const getNoteTitle = (note:Note, maxLength = 800):string => {
 
     const titleShortened = shortenText(title, maxLength);
 
+    if (titleShortened.length === 0) {
+      return NOTE_TITLE_PLACEHOLDER;
+    }
+
     return titleShortened;
   } else {
-    return "⁉️ Note without title";
+    return NOTE_TITLE_PLACEHOLDER;
   }
 };
 
