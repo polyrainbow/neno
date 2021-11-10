@@ -1,6 +1,6 @@
 import NoteContentBlock, { NoteContentBlockType } from "../../../lib/notes/interfaces/NoteContentBlock";
 
-const DEFAULT_NOTE_TITLE = "Note title";
+const DEFAULT_NOTE_TITLE = "";
 
 const DEFAULT_NOTE_BLOCKS:NoteContentBlock[] = [
   {
@@ -8,19 +8,6 @@ const DEFAULT_NOTE_BLOCKS:NoteContentBlock[] = [
     "data": {
       "text": DEFAULT_NOTE_TITLE,
       "level": 1,
-    },
-  },
-  {
-    "type": NoteContentBlockType.PARAGRAPH,
-    "data": {
-      "text": "Note text",
-    },
-  },
-  {
-    "type": NoteContentBlockType.LINK,
-    "data": {
-      "link": "",
-      "meta": {},
     },
   },
 ];

@@ -60,7 +60,7 @@ const loadInstance = async ({
       time: Date.now(),
     },
     autofocus: true,
-    placeholder: "Let's write an awesome note!",
+    placeholder: "",
     hideToolbar: false,
     tools: {
       header: {
