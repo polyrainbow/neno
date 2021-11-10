@@ -46,7 +46,7 @@ const emojis = {
 
 const ICON_PATH = "/assets/icons/";
 
-const MAX_WIDTH_SMALL_SCREEN = 1200;
+const MAX_WIDTH_SMALL_SCREEN = 1280;
 
 const paths = {
   editor: "/editor",
