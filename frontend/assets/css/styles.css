@@ -94,6 +94,7 @@ input, select {
   font-size: var(--large-font-size);
   background: var(--background-color);
   color: var(--font-color);
+  margin: 10px 0px;
 }
 
 input[type="radio"] {
