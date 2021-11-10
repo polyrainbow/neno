@@ -27,7 +27,8 @@ SOFTWARE.
 .cdx-document--with-file {
   display: flex;
   padding: 13px 20px;
-  border: 1px solid #e6e9eb;
+  border: var(--block-border);
+  box-shadow: var(--block-box-shadow);
   border-radius: 3px;
 }
 
