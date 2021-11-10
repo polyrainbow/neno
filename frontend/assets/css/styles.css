@@ -12,6 +12,7 @@
     --accent-color-interactible: #e0e0e0;
     --background-color: white;
     --main-content-color: black;
+    --alt-content-color: #7b7e89;
     --link-color: rgb(0, 40, 216);
     --overlay-gradient: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(9,9,121,0.5) 35%, rgba(0,212,255,1) 100%);
   }
@@ -25,6 +26,7 @@
     --accent-color-interactible: #303030;
     --background-color: black;
     --main-content-color: rgb(255, 255, 255);
+    --alt-content-color: #949494;
     --link-color: rgb(122, 146, 255);
     --overlay-gradient: linear-gradient(45deg, rgb(17 10 146) 0%, rgba(9, 9, 121, 0.5) 35%, rgb(0 125 151) 100%);
   }

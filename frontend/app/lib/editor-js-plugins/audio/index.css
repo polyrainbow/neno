@@ -46,7 +46,12 @@
 }
 
 .cdx-audio--with-file__size {
-  color: #7b7e89;
+  color: var(--block-filesize-color);
+}
+
+.cdx-audio__size {
+  font-size: var(--block-subtitle-font-size);
+  color: var(--block-filesize-color);
 }
 
 .cdx-audio--with-file__size::after {

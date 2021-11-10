@@ -66,7 +66,8 @@ SOFTWARE.
 }
 
 .cdx-document--with-file .cdx-document__size {
-  color: #7b7e89;
+  font-size: var(--block-subtitle-font-size);
+  color: var(--block-filesize-color);
 }
 
 .cdx-document--with-file .cdx-document__size::after {
@@ -80,6 +81,7 @@ SOFTWARE.
   overflow: hidden;
   outline: none;
   max-width: 90%;
+  font-weight: var(--block-title-font-weight);
 }
 
 .cdx-document--loading .cdx-document__title,
