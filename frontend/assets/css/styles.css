@@ -58,6 +58,7 @@
   --small-font-size: 13px;
   --default-font-size: 16px;
   --large-font-size: 24px;
+  --header-bar-height: 50px;
   --default-box-shadow:
     0 1px 1px hsl(0deg 0% 0% / 0.075),
     0 2px 2px hsl(0deg 0% 0% / 0.075),
@@ -127,7 +128,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 50px;
+  height: var(--header-bar-height);
   user-select: none;
 
   width: 100vw;
@@ -194,7 +195,7 @@ main {
 }
 
 #note-controls {
-  background-color: var(--subheader-2-background-color);
+  background-color: var(--subheader-1-background-color);
   user-select: none;
 }
 
@@ -446,7 +447,7 @@ button[disabled]{
   box-sizing: border-box;
   width: 100vw;
   margin: auto;
-  height: calc(100vh - 50px);
+  height: calc(100vh - var(--header-bar-height));
   overflow: auto;
 }
 
@@ -503,7 +504,7 @@ button[disabled]{
     grid-template-rows: 100%;
     position: fixed;
     bottom: 0px;
-    top: 50px;
+    top: var(--header-bar-height);
     width: 100%;
   }
 
@@ -514,14 +515,14 @@ button[disabled]{
   }
 
   #note-controls, #section-search-input {
-    height: 50px;
+    height: var(--header-bar-height);
   }
 
   #section_list{
     overflow-y: scroll;
     /* height is 100vh minus 2 headers of 50px height and minus top padding of
     this element */
-    height: calc(100vh - 100px - var(--default-margin));
+    height: calc(100vh - (2 * var(--header-bar-height)) - var(--default-margin));
   }
 
   #right-view{
@@ -530,13 +531,14 @@ button[disabled]{
   }
 
   #note{
-    margin: 20px;
+    margin: 0;
     padding: 0;
     padding-bottom: 15px;
-    border-radius: var(--border-radius);
+  }
+
+  #note-content{
     overflow-y: auto;
-    height: calc(100vh - 105px);
-    box-shadow: var(--default-box-shadow);
+    height: calc(100vh - (2 * var(--header-bar-height)));
   }
 }
 
