@@ -48,7 +48,7 @@ const Note = ({
   // takes some time
   }, [blocks]);
 
-  return <section id="note">
+  return <>
     <NoteControls
       activeNote={note}
       createNewNote={createNewNote}
@@ -61,38 +61,40 @@ const Note = ({
       duplicateNote={duplicateNote}
       openInGraphView={openInGraphView}
     />
-    <div id="note-content">
-      <div id="editor"></div>
-      <hr/>
-      <div id="links">
-        <h2>Linked notes</h2>
+    <section id="note">
+      <div id="note-content">
+        <div id="editor"></div>
+        <hr/>
+        <div id="links">
+          <h2>Linked notes</h2>
+          {
+            displayedLinkedNotes.length === 0
+              ? <p className="note-meta-paragraph"
+              >There are no notes linked to this one yet.</p>
+              : null
+          }
+          <div id="links">
+            {
+              displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
+                note={displayedLinkedNote}
+                key={"note-link-list-item-" + displayedLinkedNote.id}
+                onSelect={() => goToNote(displayedLinkedNote.id)}
+                isActive={false}
+                isLinked={true}
+                onLinkChange={() => onLinkRemoval(displayedLinkedNote.id)}
+                isLinkable={true}
+              />)
+            }
+          </div>
+        </div>
         {
-          displayedLinkedNotes.length === 0
-            ? <p className="note-meta-paragraph"
-            >There are no notes linked to this one yet.</p>
+          (!note.isUnsaved)
+            ? <NoteStats note={note} databaseProvider={databaseProvider} />
             : null
         }
-        <div id="links">
-          {
-            displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
-              note={displayedLinkedNote}
-              key={"note-link-list-item-" + displayedLinkedNote.id}
-              onSelect={() => goToNote(displayedLinkedNote.id)}
-              isActive={false}
-              isLinked={true}
-              onLinkChange={() => onLinkRemoval(displayedLinkedNote.id)}
-              isLinkable={true}
-            />)
-          }
-        </div>
       </div>
-      {
-        (!note.isUnsaved)
-          ? <NoteStats note={note} databaseProvider={databaseProvider} />
-          : null
-      }
-    </div>
-  </section>;
+    </section>
+  </>;
 };
 
 export default Note;

@@ -536,14 +536,9 @@ button[disabled]{
   }
 
   #note{
-    margin: 0;
-    padding: 0;
-    padding-bottom: 15px;
-  }
-
-  #note-content{
     padding: 0px 48px;
     overflow-y: auto;
+    margin: 0;
     height: calc(100vh - (2 * var(--header-bar-height)));
   }
 }
