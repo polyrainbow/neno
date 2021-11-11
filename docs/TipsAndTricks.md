@@ -14,13 +14,17 @@ In that case, you can type `exact:` followed by the exact title of the note in t
 
 ![Search for exact matches](./img/exact%20matches.png)
 
-### `special:` - Special searches
+### `duplicates:` - Search for duplicates
 
-With the prefix special, some special searches can be performed.
+With the prefix duplicates, duplicate notes can be found.
 
-#### `DUPLICATE_URLS` - Show notes with same URLs
+#### `duplicates:url` - Show notes with same URLs
 
-When you have a lot of notes, chances are that the same URL is included in several notes. It might be better to extract it and create a new note for it, or to remove the duplicate. To find such notes, use the `Show notes with same URLs` button in the note list control bar, or type  `special:DUPLICATE_URLS` into the search box.
+When you have a lot of notes, chances are that the same URL is included in several notes. To find such notes, use the `Show notes with same URLs` button in the note list control bar, or type  `duplicates:url` into the search box.
+
+#### `duplicates:title` - Show notes with same titles
+
+Find notes that have the same title.
 
 ### `ft:` - Full-text search
 You can perform a full-text search on all notes by typing `ft:` followed by the search query

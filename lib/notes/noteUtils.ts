@@ -556,6 +556,33 @@ const getNotesWithDuplicateUrls = (notes:DatabaseNote[]):DatabaseNote[] => {
 };
 
 
+const getNotesWithDuplicateTitles = (notes:DatabaseNote[]):DatabaseNote[] => {
+  const titleIndex = new Map<string, Set<DatabaseNote>>();
+
+  notes.forEach((note:DatabaseNote):void => {
+    const noteTitle = getNoteTitle(note);
+
+    if (titleIndex.has(noteTitle)) {
+      (titleIndex.get(noteTitle) as Set<DatabaseNote>).add(note);
+    } else {
+      titleIndex.set(noteTitle, new Set([note]));
+    }
+  });
+
+  const duplicates:Set<DatabaseNote> = new Set();
+
+  for (const notesWithOneTitle of titleIndex.values()) {
+    if (notesWithOneTitle.size > 1) {
+      notesWithOneTitle.forEach((note) => {
+        duplicates.add(note);
+      });
+    }
+  }
+
+  return Array.from(duplicates);
+};
+
+
 const getNotesByTitle = (
   notes:DatabaseNote[],
   query: string,
@@ -700,6 +727,7 @@ export {
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
   getNotesWithDuplicateUrls,
+  getNotesWithDuplicateTitles,
   getNotesByTitle,
   getNotesWithUrl,
   getConcatenatedTextOfNote,

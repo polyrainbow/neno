@@ -23,6 +23,7 @@ import {
   getNotesWithUrl,
   getNotesWithTitleContainingTokens,
   getNotesWithBlocksOfTypes,
+  getNotesWithDuplicateTitles,
 } from "./noteUtils.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "./interfaces/DatabaseMainData.js";
@@ -118,8 +119,17 @@ const getNotesList = async (
   let matchingNotes;
 
   // search for note pairs containing identical urls
-  if (query.includes("special:DUPLICATE_URLS")){
-    matchingNotes = getNotesWithDuplicateUrls(db.notes);
+  if (query.includes("duplicates:")){
+    const startOfDuplicateType
+      = query.indexOf("duplicates:") + "duplicates:".length;
+    const duplicateType = query.substr(startOfDuplicateType);
+    if (duplicateType === "url") {
+      matchingNotes = getNotesWithDuplicateUrls(db.notes);
+    } else if (duplicateType === "title"){
+      matchingNotes = getNotesWithDuplicateTitles(db.notes);
+    } else {
+      matchingNotes = [];
+    }
 
   // search for exact title
   } else if (query.includes("exact:")) {

@@ -459,7 +459,7 @@ const EditorView = ({
                 setPage(1);
               }}
               showNotesWithDuplicateURLs={() => handleSearchInputChange(
-                "special:DUPLICATE_URLS",
+                "duplicates:url",
               )}
               refreshNoteList={refreshNotesList}
             />
