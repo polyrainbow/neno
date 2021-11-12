@@ -26,8 +26,12 @@ SOFTWARE.
 
 
 import "./index.css";
-import Uploader from "./uploader.js";
 import * as svgs from "./svgs.js";
+import {
+  make,
+  getFilenameFromUrl,
+} from "../utils.js";
+
 const LOADER_TIMEOUT = 500;
 
 /**
@@ -108,23 +112,10 @@ export default class DocumentTool {
       types: config.types || "*",
       buttonText: config.buttonText || "Select file to upload",
       errorMessage: config.errorMessage || "File upload failed",
-      additionalRequestHeaders: config.additionalRequestHeaders || {},
-      uploader: config.uploader,
-      onDownload: config.onDownload,
+      fileHandling: config.fileHandling,
     };
 
     this.data = data;
-
-    /**
-     * Module for files uploading
-     */
-    this.uploader = new Uploader({
-      config: this.config,
-      onUpload: (response) => this.onUpload(response),
-      onError: (error) => this.uploadingFailed(error),
-    });
-
-    this.enableFileUpload = this.enableFileUpload.bind(this);
   }
 
   /**
@@ -199,6 +190,66 @@ export default class DocumentTool {
     };
   }
 
+
+  /**
+   * Specify paste substitutes
+   *
+   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
+   * @return {{
+   *   tags: string[],
+   *   patterns: object<string, RegExp>,
+   *   files: {extensions: string[], mimeTypes: string[]}
+   * }}
+   */
+  static get pasteConfig() {
+    return {
+      /**
+       * Paste URL of audio into the Editor
+       * We have disabled this because we want to be able to insert a
+       * url without turning it into an audio block
+       */
+      patterns: {
+        document: /https?:\/\/\S+\.pdf$/i,
+      },
+
+      /**
+       * Drag n drop file from into the Editor
+       */
+      files: {
+        mimeTypes: ["application/pdf"],
+        extensions: ["pdf"],
+      },
+    };
+  }
+
+  /**
+   * Specify paste handlers
+   *
+   * @public
+   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
+   * @param {CustomEvent} event - editor.js custom paste event
+   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
+   * @return {void}
+   */
+  /* onPaste must not be an async function
+  see also: https://github.com/codex-team/editor.js/issues/1803
+  */
+  onPaste(event) {
+    switch (event.type) {
+    case "pattern": {
+      const url = event.detail.data;
+      this.#uploadFileByUrlAndRefreshUI(url);
+      break;
+    }
+    case "file": {
+      const file = event.detail.file;
+      this.#uploadFileAndRefreshUI(file);
+      break;
+    }
+    }
+  }
+
+
   /**
    * Return Block data
    *
@@ -224,9 +275,9 @@ export default class DocumentTool {
    * @return {HTMLDivElement}
    */
   render() {
-    const holder = this.make("div", this.CSS.baseClass);
+    const holder = make("div", this.CSS.baseClass);
 
-    this.nodes.wrapper = this.make("div", this.CSS.wrapper);
+    this.nodes.wrapper = make("div", this.CSS.wrapper);
 
     if (this.pluginHasData()) {
       this.showFileData();
@@ -243,10 +294,57 @@ export default class DocumentTool {
    * Prepares button for file uploading
    */
   prepareUploadButton() {
-    this.nodes.button = this.make("div", [this.CSS.apiButton, this.CSS.button]);
+    this.nodes.button = make("div", [this.CSS.apiButton, this.CSS.button]);
     this.nodes.button.innerHTML = `${svgs.toolbox} ${this.config.buttonText}`;
-    this.nodes.button.addEventListener("click", this.enableFileUpload);
+    /*
+      editorjs core will automatically click on this button because we assign
+      it CSS classes defined by the editorjs core API.
+      that is why we need to use an arrow function here because otherwise "this"
+      is not this class anymore and the event handler does not work.
+    */
+    this.nodes.button.addEventListener("click", () => {
+      this.#selectAndUploadFile();
+    });
     this.nodes.wrapper.appendChild(this.nodes.button);
+  }
+
+
+  async #selectAndUploadFile() {
+    // eslint-disable-next-line
+    const [fileHandle] = await window.showOpenFilePicker({
+      multiple: false,
+      types: [
+        {
+          description: "PDF file",
+          accept: {
+            "application/pdf": [".pdf"],
+          },
+        },
+      ],
+    });
+
+    const file = await fileHandle.getFile();
+
+    this.nodes.wrapper.classList.add(
+      this.CSS.wrapperLoading,
+      this.CSS.loader,
+    );
+
+    await this.#uploadFileAndRefreshUI(file);
+  }
+
+
+  async #uploadFileByUrlAndRefreshUI(url) {
+    const result = await this.config.fileHandling.uploadByUrl(url);
+    const filename = getFilenameFromUrl(url);
+    result.file.name = filename;
+    this.#onUploadFinished(result);
+  }
+
+
+  async #uploadFileAndRefreshUI(file) {
+    const result = await this.config.fileHandling.uploadByFile(file);
+    this.#onUploadFinished(result);
   }
 
   /**
@@ -271,25 +369,13 @@ export default class DocumentTool {
       );
   }
 
-  /**
-   * Allow to upload files on button click
-   */
-  enableFileUpload() {
-    this.uploader.uploadSelectedFile({
-      onPreview: () => {
-        this.nodes.wrapper.classList.add(
-          this.CSS.wrapperLoading, this.CSS.loader,
-        );
-      },
-    });
-  }
 
   /**
    * File uploading callback
    *
    * @param {UploadResponseFormat} response
    */
-  onUpload(response) {
+  #onUploadFinished(response) {
     if (response.success && response.file) {
       const receivedFileData = response.file || {};
       const filename = receivedFileData.name;
@@ -300,7 +386,7 @@ export default class DocumentTool {
           ...receivedFileData,
           extension,
         },
-        title: filename || "",
+        title: filename,
       };
 
       this.nodes.button.remove();
@@ -320,7 +406,7 @@ export default class DocumentTool {
     const extension = this.data.file.extension || "";
     const extensionColor = this.EXTENSIONS[extension];
 
-    const fileIcon = this.make("div", this.CSS.fileIcon, {
+    const fileIcon = make("div", this.CSS.fileIcon, {
       innerHTML: extensionColor ? svgs.custom : svgs.standard,
     });
 
@@ -357,21 +443,19 @@ export default class DocumentTool {
 
     this.appendFileIcon();
 
-    const fileInfo = this.make("div", this.CSS.fileInfo);
+    const fileInfo = make("div", this.CSS.fileInfo);
 
-    if (title) {
-      this.nodes.title = this.make("div", this.CSS.title, {
-        contentEditable: true,
-      });
+    this.nodes.title = make("div", this.CSS.title, {
+      contentEditable: true,
+    });
 
-      this.nodes.title.textContent = title;
-      fileInfo.appendChild(this.nodes.title);
-    }
+    this.nodes.title.textContent = title;
+    fileInfo.appendChild(this.nodes.title);
 
     if (size) {
       let sizePrefix;
       let formattedSize;
-      const fileSize = this.make("div", this.CSS.size);
+      const fileSize = make("div", this.CSS.size);
 
       if (Math.log10(+size) >= 6) {
         sizePrefix = "MiB";
@@ -388,13 +472,13 @@ export default class DocumentTool {
 
     this.nodes.wrapper.appendChild(fileInfo);
 
-    const downloadIcon = this.make("a", this.CSS.downloadButton, {
+    const downloadIcon = make("a", this.CSS.downloadButton, {
       innerHTML: svgs.arrowDownload,
     });
 
-    if (typeof this.config.onDownload === "function") {
+    if (typeof this.config.fileHandling.onDownload === "function") {
       downloadIcon.addEventListener("click", () => {
-        this.config.onDownload(this.data.file);
+        this.config.fileHandling.onDownload(this.data.file);
       });
     } else {
       downloadIcon.href = url;
@@ -411,11 +495,7 @@ export default class DocumentTool {
    * @param {string} errorMessage -  error message
    */
   uploadingFailed(errorMessage) {
-    this.api.notifier.show({
-      message: errorMessage,
-      style: "error",
-    });
-
+    console.log(errorMessage);
     this.removeLoader();
   }
 
@@ -436,7 +516,6 @@ export default class DocumentTool {
   set data({ file, title }) {
     this._data = Object.assign({}, {
       file: {
-        url: (file && file.url) || this._data.file.url,
         name: (file && file.name) || this._data.file.name,
         extension: (file && file.extension) || this._data.file.extension,
         size: (file && file.size) || this._data.file.size,
@@ -459,30 +538,5 @@ export default class DocumentTool {
     range.collapse(false);
     selection.removeAllRanges();
     selection.addRange(range);
-  }
-
-  /**
-   * Helper method for elements creation
-   *
-   * @param {string} tagName
-   * @param {array?} classNames
-   * @param {object} attributes
-   * @return {HTMLElement}
-   */
-  make(tagName, classNames = null, attributes = {}) {
-    const el = document.createElement(tagName);
-
-    if (Array.isArray(classNames)) {
-      el.classList.add(...classNames);
-    } else if (classNames) {
-      el.classList.add(classNames);
-    }
-
-    // eslint-disable-next-line guard-for-in
-    for (const attrName in attributes) {
-      el[attrName] = attributes[attrName];
-    }
-
-    return el;
   }
 }

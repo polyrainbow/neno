@@ -392,14 +392,23 @@ const startApp = async ({
       });
       form.parse(req, (err, fields, files) => {
         if (err) {
-          console.log("error")
-          console.log(err);
-          const response:APIResponse = {
-            success: false,
-            error: APIError.INTERNAL_SERVER_ERROR,
-          };
-          res.status(500).json(response);
-          return;
+          if (err.message === "Request aborted") {
+            const response:APIResponse = {
+              success: false,
+              error: APIError.INVALID_REQUEST,
+            };
+            res.status(406).json(response);
+            return;
+          } else {
+            console.log("Server error:");
+            console.log(err);
+            const response:APIResponse = {
+              success: false,
+              error: APIError.INTERNAL_SERVER_ERROR,
+            };
+            res.status(500).json(response);
+            return;
+          }
         }
 
         const file:File = files.file;
@@ -504,7 +513,10 @@ const startApp = async ({
 
           const response:APIResponse = {
             success: true,
-            payload: fileId,
+            payload: {
+              fileId,
+              size,
+            },
           };
           res.json(response);
         } catch (e) {

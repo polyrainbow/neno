@@ -52,6 +52,46 @@ const loadInstance = async ({
     Video,
   ] = modules.map((module) => module.default);
 
+  // several plugins are able to upload and download files. the following
+  // config object is passed to all of them
+  const fileHandlingConfig = {
+    uploadByFile: async (file) => {
+      const fileId = await databaseProvider.uploadFile(file);
+      return {
+        success: true,
+        file: {
+          fileId,
+          name: file.name,
+          size: file.size,
+        },
+      };
+    },
+    uploadByUrl: async (url) => {
+      const { fileId, size } = await databaseProvider.uploadFileByUrl({
+        url,
+      });
+      return {
+        success: true,
+        file: {
+          fileId,
+          size,
+        },
+      };
+    },
+    onDownload: async (file) => { console.log(file)
+      const fileId = file.fileId;
+      const name = file.name;
+      const url = await getUrlForFileId(fileId, databaseProvider, name);
+      window.open(url, "_blank");
+    },
+    getUrl: async (file) => {
+      const fileId = file.fileId;
+      const name = file.name;
+      const url = await getUrlForFileId(fileId, databaseProvider, name);
+      return url;
+    },
+  };
+
   const instance = new EditorJS({
     logLevel: "ERROR",
     holder: parent,
@@ -91,36 +131,7 @@ const loadInstance = async ({
       image: {
         class: Image,
         config: {
-          uploader: {
-            uploadByFile: async (file) => {
-              const fileId = await databaseProvider.uploadFile(file);
-              return {
-                success: true,
-                file: {
-                  "size": file.size,
-                  "name": file.name,
-                  "fileId": fileId,
-                },
-              };
-            },
-            uploadByUrl: async (url) => {
-              const fileId = await databaseProvider.uploadFileByUrl({
-                url,
-              });
-              return {
-                success: true,
-                file: {
-                  "fileId": fileId,
-                },
-              };
-            },
-          },
-          getUrl: async (file) => {
-            const fileId = file.fileId;
-            const name = file.name;
-            const url = await getUrlForFileId(fileId, databaseProvider, name);
-            return url;
-          },
+          fileHandling: fileHandlingConfig,
         },
       },
       list: {
@@ -138,24 +149,7 @@ const loadInstance = async ({
       document: {
         class: Document,
         config: {
-          uploader: async (file) => {
-            const fileId = await databaseProvider.uploadFile(file);
-            return {
-              success: true,
-              file: {
-                "size": file.size,
-                "name": file.name,
-                "fileId": fileId,
-              },
-            };
-          },
-          onDownload: async (file) => {
-            const fileId = file.fileId;
-            const name = file.name;
-            const url = await getUrlForFileId(fileId, databaseProvider, name);
-            window.open(url, "_blank");
-          },
-          field: "file",
+          fileHandling: fileHandlingConfig,
           types: "application/pdf",
           buttonText: "Select PDF file",
           errorMessage: "File upload failed",
@@ -164,43 +158,7 @@ const loadInstance = async ({
       audio: {
         class: Audio,
         config: {
-          uploader: {
-            uploadByFile: async (file) => {
-              const fileId = await databaseProvider.uploadFile(file);
-              return {
-                success: true,
-                file: {
-                  "size": file.size,
-                  "name": file.name,
-                  "fileId": fileId,
-                },
-              };
-            },
-            uploadByUrl: async (url) => {
-              const fileId = await databaseProvider.uploadFileByUrl({
-                url,
-              });
-              return {
-                success: true,
-                file: {
-                  "fileId": fileId,
-                },
-              };
-            },
-          },
-          onDownload: async (file) => {
-            const fileId = file.fileId;
-            const name = file.name;
-            const url = await getUrlForFileId(fileId, databaseProvider, name);
-            window.open(url, "_blank");
-          },
-          getUrl: async (file) => {
-            const fileId = file.fileId;
-            const name = file.name;
-            const url = await getUrlForFileId(fileId, databaseProvider, name);
-            return url;
-          },
-          field: "file",
+          fileHandling: fileHandlingConfig,
           types: "audio/mp3, audio/mpeg",
           buttonText: "Select MP3 file",
           errorMessage: "File upload failed",
@@ -209,30 +167,7 @@ const loadInstance = async ({
       video: {
         class: Video,
         config: {
-          uploader: async (file) => {
-            const fileId = await databaseProvider.uploadFile(file);
-            return {
-              success: true,
-              file: {
-                "size": file.size,
-                "name": file.name,
-                "fileId": fileId,
-              },
-            };
-          },
-          onDownload: async (file) => {
-            const fileId = file.fileId;
-            const name = file.name;
-            const url = await getUrlForFileId(fileId, databaseProvider, name);
-            window.open(url, "_blank");
-          },
-          getUrl: async (file) => {
-            const fileId = file.fileId;
-            const name = file.name;
-            const url = await getUrlForFileId(fileId, databaseProvider, name);
-            return url;
-          },
-          field: "file",
+          fileHandling: fileHandlingConfig,
           types: "video/mp4, video/webm",
           buttonText: "Select video file",
           errorMessage: "File upload failed",

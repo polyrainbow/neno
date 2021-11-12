@@ -83,6 +83,10 @@
   font-size: 0;
 }
 
+.cdx-video--loading .cdx-video__button {
+  opacity: 0;
+}
+
 .cdx-video__button {
   display: flex;
   align-items: center;

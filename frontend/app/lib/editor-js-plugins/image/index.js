@@ -32,23 +32,11 @@ SOFTWARE.
  * @see {@link https://github.com/editor-js/image}
  *
  * To developers.
- * To simplify Tool structure, we split it to 4 parts:
+ * To simplify Tool structure, we split it to 3 parts:
  *  1) index.js — main Tool's interface, public API and methods for working
  * with data
- *  2) uploader.js — module that has methods for sending files via AJAX: from
- * device, by URL or File pasting
- *  3) ui.js — module for UI manipulations: render, showing preloader, etc
- *  4) tunes.js — working with Block Tunes: render buttons, handle clicks
- *
- * image: {
- *   class: ImageTool,
- *   config: {
- *     endpoints: {
- *       byFile: 'http://localhost:8008/uploadFile',
- *       byUrl: 'http://localhost:8008/fetchUrl',
- *     }
- *   },
- * },
+ *  2) ui.js — module for UI manipulations: render, showing preloader, etc
+ *  3) tunes.js — working with Block Tunes: render buttons, handle clicks
  */
 
 /**
@@ -65,6 +53,9 @@ import "./index.css";
 import Ui from "./ui.js";
 import Tunes from "./tunes.js";
 import * as svgs from "./svgs.js";
+import {
+  getFilenameFromUrl,
+} from "../utils.js";
 
 /**
  * @typedef {object} ImageConfig
@@ -108,20 +99,6 @@ export default class ImageTool {
   }
 
   /**
-   * Get Tool toolbox settings
-   * icon - Tool icon's SVG
-   * title - title to show in toolbox
-   *
-   * @return {{icon: string, title: string}}
-   */
-  static get toolbox() {
-    return {
-      icon: svgs.toolbox,
-      title: "Image",
-    };
-  }
-
-  /**
    * @param {object} tool - tool properties got from editor.js
    * @param {ImageToolData} tool.data - previously saved data
    * @param {ImageConfig} tool.config - user config for Tool
@@ -141,13 +118,10 @@ export default class ImageTool {
       additionalRequestHeaders: config.additionalRequestHeaders || {},
       field: config.field || "image",
       types: config.types || "image/*",
-      captionPlaceholder: this.api.i18n.t(
-        config.captionPlaceholder || "Caption",
-      ),
+      captionPlaceholder: config.captionPlaceholder || "Caption",
       buttonContent: config.buttonContent || "",
-      uploader: config.uploader,
+      fileHandling: config.fileHandling,
       actions: config.actions || [],
-      getUrl: config.getUrl || null,
     };
 
 
@@ -177,73 +151,18 @@ export default class ImageTool {
     this.data = data;
   }
 
-
-  async #selectAndUploadFile() {
-    // eslint-disable-next-line
-    const [fileHandle] = await window.showOpenFilePicker({
-      multiple: false,
-      types: [
-        {
-          description: "Image",
-          accept: {
-            "image/png": [".png"],
-            "image/jpeg": [".jpg"],
-            "image/webp": [".webp"],
-            "image/gif": [".gif"],
-          },
-        },
-      ],
-    });
-
-    const file = await fileHandle.getFile();
-    await this.uploadFile(file);
-  }
-
   /**
-   * Renders Block content
+   * Get Tool toolbox settings
+   * icon - Tool icon's SVG
+   * title - title to show in toolbox
    *
-   * @public
-   *
-   * @return {HTMLDivElement}
+   * @return {{icon: string, title: string}}
    */
-  render() {
-    return this.ui.render(this.data);
-  }
-
-  /**
-   * Return Block data
-   *
-   * @public
-   *
-   * @return {ImageToolData}
-   */
-  save() {
-    const caption = this.ui.nodes.caption;
-
-    this._data.caption = caption.innerHTML;
-
-    return this.data;
-  }
-
-  /**
-   * Makes buttons with tunes: add background, add border, stretch image
-   *
-   * @public
-   *
-   * @return {Element}
-   */
-  renderSettings() {
-    return this.tunes.render(this.data);
-  }
-
-  /**
-   * Fires after clicks on the Toolbox Image Icon
-   * Initiates click on the Select File button
-   *
-   * @public
-   */
-  appendCallback() {
-    this.ui.nodes.fileButton.click();
+  static get toolbox() {
+    return {
+      icon: svgs.toolbox,
+      title: "Image",
+    };
   }
 
   /**
@@ -305,27 +224,93 @@ export default class ImageTool {
         fetch(image.src)
           .then((response) => response.blob())
           .then((file) => {
-            this.uploadFile(file);
+            this.#uploadFileByUrlAndRefreshUI(file);
           });
 
         break;
       }
 
-      this.uploadUrl(image.src);
+      this.#uploadFileByUrlAndRefreshUI(image.src);
       break;
     }
     case "pattern": {
       const url = event.detail.data;
-      this.uploadUrl(url);
+      this.#uploadFileByUrlAndRefreshUI(url);
       break;
     }
     case "file": {
       const file = event.detail.file;
 
-      this.uploadFile(file);
+      this.#uploadFileAndRefreshUI(file);
       break;
     }
     }
+  }
+
+  /**
+   * Return Block data
+   *
+   * @public
+   * @return {ImageToolData}
+   */
+  save() {
+    const caption = this.ui.nodes.caption;
+
+    this._data.caption = caption.innerHTML;
+
+    return this.data;
+  }
+
+  /**
+   * Renders Block content
+   *
+   * @public
+   * @return {HTMLDivElement}
+   */
+  render() {
+    return this.ui.render(this.data);
+  }
+
+  async #selectAndUploadFile() {
+    // eslint-disable-next-line
+    const [fileHandle] = await window.showOpenFilePicker({
+      multiple: false,
+      types: [
+        {
+          description: "Image",
+          accept: {
+            "image/png": [".png"],
+            "image/jpeg": [".jpg"],
+            "image/webp": [".webp"],
+            "image/gif": [".gif"],
+          },
+        },
+      ],
+    });
+
+    const file = await fileHandle.getFile();
+    await this.#uploadFileAndRefreshUI(file);
+  }
+
+  /**
+   * Makes buttons with tunes: add background, add border, stretch image
+   *
+   * @public
+   *
+   * @return {Element}
+   */
+  renderSettings() {
+    return this.tunes.render(this.data);
+  }
+
+  /**
+   * Fires after clicks on the Toolbox Image Icon
+   * Initiates click on the Select File button
+   *
+   * @public
+   */
+  appendCallback() {
+    this.ui.nodes.fileButton.click();
   }
 
   /**
@@ -381,8 +366,8 @@ export default class ImageTool {
     this._data.file = file || {};
 
     if (file) {
-      if (typeof this.config.getUrl === "function") {
-        this.config.getUrl(file)
+      if (typeof this.config.fileHandling.getUrl === "function") {
+        this.config.fileHandling.getUrl(file)
           .then((url) => {
             this.ui.fillImage(url);
           })
@@ -405,7 +390,7 @@ export default class ImageTool {
    * @param {UploadResponseFormat} response - uploading server response
    * @return {void}
    */
-  onUploadFinished(response) {
+  #onUploadFinished(response) {
     if (response.success && response.file) {
       this.image = response.file;
     } else {
@@ -457,15 +442,15 @@ export default class ImageTool {
    * @param {File} file - file that is currently uploading (from paste)
    * @return {void}
    */
-  async uploadFile(file) {
+  async #uploadFileAndRefreshUI(file) {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (e) => {
       this.ui.showPreloader(e.target.result);
     };
 
-    const result = await this.config.uploader.uploadByFile(file);
-    this.onUploadFinished(result);
+    const result = await this.config.fileHandling.uploadByFile(file);
+    this.#onUploadFinished(result);
   }
 
   /**
@@ -474,9 +459,11 @@ export default class ImageTool {
    * @param {string} url - url pasted
    * @return {void}
    */
-  async uploadUrl(url) {
+  async #uploadFileByUrlAndRefreshUI(url) {
     this.ui.showPreloader(url);
-    const result = await this.config.uploader.uploadByUrl(url);
-    this.onUploadFinished(result);
+    const result = await this.config.fileHandling.uploadByUrl(url);
+    const filename = getFilenameFromUrl(url);
+    result.file.name = filename;
+    this.#onUploadFinished(result);
   }
 }

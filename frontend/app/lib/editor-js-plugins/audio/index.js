@@ -27,6 +27,11 @@ SOFTWARE.
 
 import "./index.css";
 import * as svgs from "./svgs.js";
+import {
+  make,
+  getFilenameFromUrl,
+} from "../utils.js";
+
 const LOADER_TIMEOUT = 500;
 
 /**
@@ -106,10 +111,7 @@ export default class AudioTool {
       types: config.types || "*",
       buttonText: config.buttonText || "Select file to upload",
       errorMessage: config.errorMessage || "File upload failed",
-      additionalRequestHeaders: config.additionalRequestHeaders || {},
-      uploader: config.uploader,
-      onDownload: config.onDownload || null,
-      getUrl: config.getUrl || null,
+      fileHandling: config.fileHandling,
     };
 
     this.data = data;
@@ -245,9 +247,9 @@ export default class AudioTool {
    * @return {HTMLDivElement}
    */
   render() {
-    const holder = this.make("div", this.CSS.baseClass);
+    const holder = make("div", this.CSS.baseClass);
 
-    this.nodes.wrapper = this.make("div", this.CSS.wrapper);
+    this.nodes.wrapper = make("div", this.CSS.wrapper);
 
     if (this.pluginHasData()) {
       this.showFileData();
@@ -264,9 +266,17 @@ export default class AudioTool {
    * Prepares button for file uploading
    */
   prepareUploadButton() {
-    this.nodes.button = this.make("div", [this.CSS.apiButton, this.CSS.button]);
+    this.nodes.button = make("div", [this.CSS.apiButton, this.CSS.button]);
     this.nodes.button.innerHTML = this.config.buttonText;
-    this.nodes.button.addEventListener("click", this.#selectAndUploadFile);
+    /*
+      editorjs core will automatically click on this button because we assign
+      it CSS classes defined by the editorjs core API.
+      that is why we need to use an arrow function here because otherwise "this"
+      is not this class anymore and the event handler does not work.
+    */
+    this.nodes.button.addEventListener("click", () => {
+      this.#selectAndUploadFile();
+    });
     this.nodes.wrapper.appendChild(this.nodes.button);
   }
 
@@ -298,13 +308,15 @@ export default class AudioTool {
 
 
   async #uploadFileByUrlAndRefreshUI(url) {
-    const result = await this.config.uploader.uploadByUrl(url);
+    const result = await this.config.fileHandling.uploadByUrl(url);
+    const filename = getFilenameFromUrl(url);
+    result.file.name = filename;
     this.#onUploadFinished(result);
   }
 
 
   async #uploadFileAndRefreshUI(file) {
-    const result = await this.config.uploader.uploadByFile(file);
+    const result = await this.config.fileHandling.uploadByFile(file);
     this.#onUploadFinished(result);
   }
 
@@ -366,9 +378,12 @@ export default class AudioTool {
    */
   removeLoader() {
     // eslint-disable-next-line
-    setTimeout(() => this.nodes.wrapper.classList.remove(
-      this.CSS.wrapperLoading, this.CSS.loader),
-    LOADER_TIMEOUT,
+    setTimeout(
+      () => this.nodes.wrapper.classList.remove(
+        this.CSS.wrapperLoading,
+        this.CSS.loader,
+      ),
+      LOADER_TIMEOUT,
     );
   }
 
@@ -380,10 +395,10 @@ export default class AudioTool {
 
     const { file: { size }, title } = this.data;
 
-    const fileInfo = this.make("div", this.CSS.fileInfo);
+    const fileInfo = make("div", this.CSS.fileInfo);
 
     if (title) {
-      this.nodes.title = this.make("div", this.CSS.title, {
+      this.nodes.title = make("div", this.CSS.title, {
         contentEditable: true,
       });
 
@@ -394,7 +409,7 @@ export default class AudioTool {
     if (size) {
       let sizePrefix;
       let formattedSize;
-      const fileSize = this.make("div", this.CSS.size);
+      const fileSize = make("div", this.CSS.size);
 
       if (Math.log10(+size) >= 6) {
         sizePrefix = "MiB";
@@ -408,25 +423,25 @@ export default class AudioTool {
       fileInfo.appendChild(fileSize);
     }
 
-    const downloadIcon = this.make("a", this.CSS.downloadButton, {
+    const downloadIcon = make("a", this.CSS.downloadButton, {
       innerHTML: svgs.arrowDownload,
     });
 
     downloadIcon.addEventListener("click", () => {
-      this.config.onDownload(this.data.file);
+      this.config.fileHandling.onDownload(this.data.file);
     });
 
-    const firstLine = this.make("div", "cdx-audio-first-line");
+    const firstLine = make("div", "cdx-audio-first-line");
 
     firstLine.appendChild(fileInfo);
     firstLine.appendChild(downloadIcon);
 
-    const secondLine = this.make("div", "cdx-audio-second-line");
+    const secondLine = make("div", "cdx-audio-second-line");
     secondLine.setAttribute("data-mutation-free", "true");
 
     const audioElement = document.createElement("audio");
     audioElement.controls = true;
-    audioElement.src = await this.config.getUrl(this.data.file);
+    audioElement.src = await this.config.fileHandling.getUrl(this.data.file);
     audioElement.style.width = "100%";
     audioElement.style.marginTop = "20px";
     // this prevents editor.js from triggering the onChange callback as soon
@@ -490,31 +505,5 @@ export default class AudioTool {
     range.collapse(false);
     selection.removeAllRanges();
     selection.addRange(range);
-  }
-
-  /**
-   * Helper method for elements creation
-   *
-   * @param {string} tagName
-   * @param {array} classNames
-   * @param {object} attributes
-   * @return {HTMLElement}
-   */
-  make(tagName, classNames = null, attributes = {}) {
-    // eslint-disable-next-line no-undef
-    const el = document.createElement(tagName);
-
-    if (Array.isArray(classNames)) {
-      el.classList.add(...classNames);
-    } else if (classNames) {
-      el.classList.add(classNames);
-    }
-
-    // eslint-disable-next-line guard-for-in
-    for (const attrName in attributes) {
-      el[attrName] = attributes[attrName];
-    }
-
-    return el;
   }
 }

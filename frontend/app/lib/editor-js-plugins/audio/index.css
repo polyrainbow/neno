@@ -83,6 +83,10 @@
   font-size: 0;
 }
 
+.cdx-audio--loading .cdx-audio__button {
+  opacity: 0;
+}
+
 .cdx-audio__button {
   display: flex;
   align-items: center;
