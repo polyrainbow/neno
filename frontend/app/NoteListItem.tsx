@@ -1,9 +1,7 @@
 import React from "react";
-import { yyyymmdd } from "./lib/utils.js";
-import { emojis } from "./lib/config.js";
 import NoteListItemLinkedNotesIndicator
   from "./NoteListItemLinkedNotesIndicator";
-import NoteListItemFeatures from "./NoteListItemFeatures";
+import NoteListItemInfo from "./NoteListItemInfo.js";
 
 
 const NoteListItem = ({
@@ -14,8 +12,6 @@ const NoteListItem = ({
   onLinkChange,
   isLinkable,
 }) => {
-  const SPAN_SEPARATOR = " · ";
-
   const isHub = (
     typeof note.numberOfLinkedNotes === "number"
     && !isNaN(note.numberOfLinkedNotes)
@@ -50,25 +46,7 @@ const NoteListItem = ({
         {note.title}
       </div>
       <div className="note-list-item-second-row">
-        <div
-          className="info"
-        >
-          {(new Date(note.updateTime)).toLocaleDateString()}
-          {
-            isHub
-              ? SPAN_SEPARATOR + emojis.hub + " Hub"
-              : ""
-          }
-          {
-            /* if note contains at least one feature, show the separator */
-            Object.values(note.features || {}).some((val) => val === true)
-              ? SPAN_SEPARATOR
-              : ""
-          }
-          <NoteListItemFeatures
-            features={note.features}
-          />
-        </div>
+        <NoteListItemInfo note={note} />
       </div>
     </div>
     <NoteListItemLinkedNotesIndicator
