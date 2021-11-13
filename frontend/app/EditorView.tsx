@@ -279,7 +279,7 @@ const EditorView = ({
         options.query = searchValue;
       }
 
-      //@ts-ignore randomUUID not yet in types
+      // @ts-ignore randomUUID not yet in types
       const requestId = crypto.randomUUID();
       currentRequestId.current = requestId;
       try {
@@ -355,7 +355,7 @@ const EditorView = ({
     setUnsavedChanges(false);
     refreshNotesList();
     /*
-      when saving the new note for the first time, we get its id from the 
+      when saving the new note for the first time, we get its id from the
       databaseProvider. then we update the address bar to include the new id
     */
     goToNote(noteFromServer.id, true);

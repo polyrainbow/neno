@@ -79,7 +79,7 @@ const ListView = ({
       options.query = searchValue;
     }
 
-    //@ts-ignore randomUUID not yet in types
+    // @ts-ignore randomUUID not yet in types
     const requestId = crypto.randomUUID();
     currentRequestId.current = requestId;
     try {

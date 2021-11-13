@@ -78,7 +78,7 @@ const loadInstance = async ({
         },
       };
     },
-    onDownload: async (file) => { console.log(file)
+    onDownload: async (file) => {
       const fileId = file.fileId;
       const name = file.name;
       const url = await getUrlForFileId(fileId, databaseProvider, name);

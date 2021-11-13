@@ -133,11 +133,13 @@ const StatsDialog = ({
                         style={{
                           "margin": "0",
                         }}
-                      ><a href={
-                        paths.editorWithNote.replace("%NOTE_ID%", note.id)
-                      }>
-                        {note.title}
-                      </a> ({note.numberOfLinkedNotes.toLocaleString("en")})</p>
+                      >
+                        <a href={
+                          paths.editorWithNote.replace("%NOTE_ID%", note.id)
+                        }>
+                          {note.title}
+                        </a> ({note.numberOfLinkedNotes.toLocaleString("en")})
+                      </p>;
                     })
                   }
                 </td>

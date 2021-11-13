@@ -115,7 +115,7 @@ export default class LocalDatabaseProvider {
       await this.#notesModule.init(
         storageProvider,
         null,
-        //@ts-ignore
+        // @ts-ignore
         () => crypto.randomUUID(),
       );
     } catch (e) {

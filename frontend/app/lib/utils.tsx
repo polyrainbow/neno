@@ -184,12 +184,12 @@ const streamToBlob = async (stream, mimeType) => {
 
 /**
  * Obtains a URL for a file.
- * @param {string} fileId 
- * @param {DatabaseProvider} databaseProvider 
+ * @param {string} fileId
+ * @param {DatabaseProvider} databaseProvider
  * @param {string?} publicName This optional file name is appended at the url
  * so that if the user decides to download the file, it is saved with this
- * public name instead of the more technical fileId. 
- * @returns {string} url
+ * public name instead of the more technical fileId.
+ * @return {string} url
  */
 const getUrlForFileId = async (fileId, databaseProvider, publicName) => {
   let url;
@@ -224,7 +224,7 @@ const getWindowDimensions = () => {
 /**
  * Checks if the block contains a valid file.
  * @param block
- * @returns {boolean} true or false
+ * @return {boolean} true or false
  */
 const blockHasFile = (block) => {
   return (

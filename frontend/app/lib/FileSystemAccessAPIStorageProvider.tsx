@@ -5,13 +5,12 @@
 */
 
 export default class FileSystemAccessAPIStorageProvider {
-
   constructor(directoryHandle) {
     this.#directoryHandle = directoryHandle;
   }
 
 
-  /****************
+  /** **************
     PRIVATE
   ****************/
 
@@ -35,7 +34,7 @@ export default class FileSystemAccessAPIStorageProvider {
 
     let dirHandle = folderHandle;
 
-    for (let pathSegment of pathSegments) {
+    for (const pathSegment of pathSegments) {
       dirHandle = await this.#getSubFolderHandle(
         dirHandle,
         pathSegment,
@@ -73,7 +72,7 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  /****************
+  /** **************
     PUBLIC
   ****************/
 
@@ -237,10 +236,10 @@ export default class FileSystemAccessAPIStorageProvider {
         // @ts-ignore
         return fileHandle.getFile();
       });
-      
+
     const files = await Promise.all(filePromises);
     const fileSizes = files.map((file) => file.size);
-    const folderSize =  fileSizes.reduce((accumulator, size) => {
+    const folderSize = fileSizes.reduce((accumulator, size) => {
       return accumulator + size;
     }, 0);
 
