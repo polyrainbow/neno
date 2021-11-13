@@ -77,8 +77,14 @@ const NoteListControls = ({
           value="NUMBER_OF_LINKS_DESCENDING"
         >Number of links (descending)</option>
         <option
-          value="HAS_FILES"
-        >Notes with images/files</option>
+          value="NUMBER_OF_FILES_ASCENDING"
+        >Number of files (ascending)</option>
+        <option
+          value="NUMBER_OF_FILES_DESCENDING"
+        >Number of files (descending)</option>
+        <option
+          value="NUMBER_OF_CHARACTERS_ASCENDING"
+        >Number of chars (ascending)</option>
         <option
           value="NUMBER_OF_CHARACTERS_DESCENDING"
         >Number of chars (descending)</option>

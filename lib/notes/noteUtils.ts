@@ -222,22 +222,7 @@ const removeLinksOfNote = (db: DatabaseMainData, noteId: NoteId):true => {
 
 const getFilesOfNote = (note:DatabaseNote):FileId[] => {
   return note.blocks
-    .filter((block:NoteContentBlock):block is NoteContentBlockWithFile => {
-      const blockHasFile = (
-        [
-          NoteContentBlockType.IMAGE,
-          NoteContentBlockType.DOCUMENT,
-          NoteContentBlockType.AUDIO,
-          NoteContentBlockType.VIDEO
-        ].includes(block.type)
-        && (
-          typeof (block as NoteContentBlockWithFile).data.file.fileId
-            === "string"
-        )
-      );
-
-      return blockHasFile;
-    })
+    .filter(blockHasFile)
     .map((block: NoteContentBlockWithFile):FileId => {
       return block.data.file.fileId;
     });
@@ -305,6 +290,7 @@ const createNoteListItem = (
       ? numberOfLinkedNotes
       : getNumberOfLinkedNotes(db, databaseNote.id),
     numberOfCharacters: getNumberOfCharacters(databaseNote),
+    numberOfFiles: getNumberOfFiles(databaseNote),
   };
 
   return noteListItem;
@@ -390,6 +376,31 @@ const getSortKeyForTitle = (title) => {
     .trim();
 }
 
+
+/**
+ * Checks if the block contains a valid file.
+ * @param block
+ * @returns {boolean} true or false
+ */
+const blockHasFile = (
+  block:NoteContentBlock,
+):block is NoteContentBlockWithFile => {
+  return (
+    [
+      NoteContentBlockType.IMAGE,
+      NoteContentBlockType.DOCUMENT,
+      NoteContentBlockType.AUDIO,
+      NoteContentBlockType.VIDEO,
+    ].includes(block.type)
+    && (typeof (block as NoteContentBlockWithFile).data.file.fileId === "string")
+  );
+};
+
+
+const getNumberOfFiles = (note:DatabaseNote) => {
+  return note.blocks.filter(blockHasFile).length;
+};
+
 const getSortFunction = (
   sortMode:NoteListSortMode,
 ):((a:NoteListItem, b:NoteListItem) => number) => {
@@ -424,15 +435,14 @@ const getSortFunction = (
     [NoteListSortMode.NUMBER_OF_LINKS_DESCENDING]: (a, b) => {
       return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
     },
-    [NoteListSortMode.HAS_FILES]: (a, b) => {
-      const aHasFiles
-        = a.features.containsImages || a.features.containsDocuments;
-      const bHasFiles
-        = b.features.containsImages || b.features.containsDocuments;
-
-      if (aHasFiles && !bHasFiles) return -1;
-      if (!aHasFiles && bHasFiles) return 1;
-      return 0;
+    [NoteListSortMode.NUMBER_OF_FILES_ASCENDING]: (a, b) => {
+      return a.numberOfFiles - b.numberOfFiles;
+    },
+    [NoteListSortMode.NUMBER_OF_FILES_DESCENDING]: (a, b) => {
+      return b.numberOfFiles - a.numberOfFiles;
+    },
+    [NoteListSortMode.NUMBER_OF_CHARACTERS_ASCENDING]: (a, b) => {
+      return a.numberOfCharacters - b.numberOfCharacters;
     },
     [NoteListSortMode.NUMBER_OF_CHARACTERS_DESCENDING]: (a, b) => {
       return b.numberOfCharacters - a.numberOfCharacters;
@@ -731,6 +741,7 @@ export {
   getNotesByTitle,
   getNotesWithUrl,
   getConcatenatedTextOfNote,
+  blockHasFile,
   getNotesWithTitleContainingTokens,
   getNotesThatContainTokens,
   getNotesWithBlocksOfTypes,
