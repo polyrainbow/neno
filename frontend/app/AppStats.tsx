@@ -24,7 +24,7 @@ const AppStats = ({
     return <div id="app-stats">Loading stats ...</div>;
   }
 
-  let percentageOfUnlinkedNotes:number = NaN;
+  let percentageOfUnlinkedNotes = NaN;
   if (showStats && (stats.numberOfAllNotes > 0)) {
     percentageOfUnlinkedNotes = Math.round(
       (stats.numberOfUnlinkedNotes / stats.numberOfAllNotes) * 100 * 100,

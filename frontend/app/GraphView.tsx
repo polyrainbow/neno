@@ -16,7 +16,7 @@ const GraphView = ({
   toggleAppMenu,
   handleInvalidCredentialsError,
 }) => {
-  const DEFAULT_STATUS:string = "";
+  const DEFAULT_STATUS = "";
   const mainElement = useRef<HTMLElement | null>(null);
   const graphInstance = useRef<Graph | null>(null);
   const [status, setStatus] = useState<string>(DEFAULT_STATUS);

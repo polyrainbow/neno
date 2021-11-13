@@ -30,6 +30,9 @@ SOFTWARE.
  *  - show/hide preview
  *  - apply tune view
  */
+
+import { make } from "../utils.js";
+
 export default class Ui {
   /**
    * @param {object} ui - image tool Ui module
@@ -249,28 +252,3 @@ export default class Ui {
     );
   }
 }
-
-/**
- * Helper for making Elements with attributes
- *
- * @param  {string} tagName           - new Element tag name
- * @param  {Array|string} classNames  - list or name of CSS class
- * @param  {object} attributes        - any attributes
- * @return {Element}
- */
-export const make = function make(tagName, classNames = null, attributes = {}) {
-  const el = document.createElement(tagName);
-
-  if (Array.isArray(classNames)) {
-    el.classList.add(...classNames);
-  } else if (classNames) {
-    el.classList.add(classNames);
-  }
-
-  // eslint-disable-next-line
-  for (const attrName in attributes) {
-    el[attrName] = attributes[attrName];
-  }
-
-  return el;
-};

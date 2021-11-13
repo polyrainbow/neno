@@ -7,20 +7,6 @@ import { getUrlForFileId } from "./utils";
 // fulfilled
 let instanceQueue:Promise<any> | null = null;
 
-const load = async ({ data, parent, onChange, databaseProvider }) => {
-  if (instanceQueue === null) {
-    instanceQueue = loadInstance({ data, parent, onChange, databaseProvider });
-  } else {
-    instanceQueue = instanceQueue.then((instance) => {
-      instance.destroy();
-      return loadInstance({ data, parent, onChange, databaseProvider });
-    });
-  }
-
-  const instance = await instanceQueue;
-  return instance;
-};
-
 
 const loadInstance = async ({
   data,
@@ -178,6 +164,21 @@ const loadInstance = async ({
   });
 
   await instance.isReady;
+  return instance;
+};
+
+
+const load = async ({ data, parent, onChange, databaseProvider }) => {
+  if (instanceQueue === null) {
+    instanceQueue = loadInstance({ data, parent, onChange, databaseProvider });
+  } else {
+    instanceQueue = instanceQueue.then((instance) => {
+      instance.destroy();
+      return loadInstance({ data, parent, onChange, databaseProvider });
+    });
+  }
+
+  const instance = await instanceQueue;
   return instance;
 };
 

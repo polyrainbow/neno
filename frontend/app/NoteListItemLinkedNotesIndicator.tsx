@@ -25,14 +25,12 @@ const NoteListItemLinkedNotesIndicator = ({
   >
     <div
       className={"link-control " + (isLinkable ? "linkable" : "not-linkable")}
-      onClick={
-        isLinkable && (!isActive)
-          ? (e) => {
-            onLinkChange();
-            e.stopPropagation();
-          }
-          : undefined
-      }
+      onClick={(e) => {
+        if (isLinkable && (!isActive)) {
+          onLinkChange();
+          e.stopPropagation();
+        }
+      }}
     >
       <div
         style={{

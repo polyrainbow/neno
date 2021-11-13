@@ -223,7 +223,7 @@ const getWindowDimensions = () => {
 
 /**
  * Checks if the block contains a valid file.
- * @param block
+ * @param {NoteContentBlock} block
  * @return {boolean} true or false
  */
 const blockHasFile = (block) => {

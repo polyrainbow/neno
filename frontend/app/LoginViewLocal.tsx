@@ -21,7 +21,8 @@ const LoginViewLocal = ({
   useEffect(() => {
     const retrieveLocalDatabaseFolderHandle = async () => {
       if (!localDatabaseProvider) return;
-      const folderHandleName = await localDatabaseProvider.getFolderHandleName();
+      const folderHandleName
+        = await localDatabaseProvider.getFolderHandleName();
       setLocalDatabaseFolderHandleName(folderHandleName);
     };
 
