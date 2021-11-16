@@ -6,7 +6,6 @@ import LoginView from "./LoginView";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider";
 import AppMenu from "./AppMenu";
 import ExportDatabaseDialog from "./ExportDatabaseDialog";
-import StatsDialog from "./StatsDialog";
 import { paths } from "./lib/config";
 import {
   Routes,
@@ -18,6 +17,7 @@ import useIsSmallScreen from "./hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
 import { DatabaseMode } from "./enum/DatabaseMode.js";
 import { DialogType } from "./enum/DialogType";
+import StatsView from "./StatsView";
 
 
 const App = ({
@@ -164,6 +164,15 @@ const App = ({
           />
         }
       />
+      <Route
+        path={paths.stats}
+        element={
+          <StatsView
+            databaseProvider={databaseProvider}
+            toggleAppMenu={toggleAppMenu}
+          />
+        }
+      />
     </Routes>
     {
       isAppMenuOpen
@@ -174,7 +183,6 @@ const App = ({
           onClose={() => setIsAppMenuOpen(false)}
           unsavedChanges={unsavedChanges}
           setUnsavedChanges={setUnsavedChanges}
-          showStats={() => setOpenDialog(DialogType.STATS)}
           databaseProvider={databaseProvider}
         />
         : null
@@ -182,14 +190,6 @@ const App = ({
     {
       openDialog === DialogType.EXPORT_DATABASE
         ? <ExportDatabaseDialog
-          onCancel={() => setOpenDialog(DialogType.NONE)}
-          databaseProvider={databaseProvider}
-        />
-        : null
-    }
-    {
-      openDialog === DialogType.STATS
-        ? <StatsDialog
           onCancel={() => setOpenDialog(DialogType.NONE)}
           databaseProvider={databaseProvider}
         />

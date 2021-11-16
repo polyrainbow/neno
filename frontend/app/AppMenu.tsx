@@ -15,7 +15,6 @@ const AppMenu = ({
   onClose,
   unsavedChanges,
   setUnsavedChanges,
-  showStats,
   databaseProvider,
 }) => {
   const confirmDiscardingUnsavedChanges
@@ -25,19 +24,6 @@ const AppMenu = ({
   const pathname = location.pathname;
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
-
-  const showGraphButton:boolean
-    = pathname.startsWith(Config.paths.editor)
-    || pathname.startsWith(Config.paths.list);
-
-  const showNoteListOrEditorButton:boolean
-    = pathname.startsWith(Config.paths.graph);
-
-  const showLogoutButton:boolean = (
-    pathname.startsWith(Config.paths.editor)
-    || pathname.startsWith(Config.paths.graph)
-    || pathname.startsWith(Config.paths.list)
-  );
 
   return <OutsideAlerter
     onOutsideClick={onClose}
@@ -53,41 +39,52 @@ const AppMenu = ({
         onClose
       }
     >
-      {
-        showGraphButton
-          ? <AppMenuItem
-            label="Graph"
-            icon="scatter_plot"
-            onClick={async () => {
-              if (unsavedChanges) {
-                await confirmDiscardingUnsavedChanges();
-                setUnsavedChanges(false);
-              }
-              navigate(Config.paths.graph);
-            }}
-          />
-          : null
-      }
-      {
-        showNoteListOrEditorButton
-          ? <AppMenuItem
-            label={isSmallScreen ? "Note list" : "Editor"}
-            icon={isSmallScreen ? "list" : "create"}
-            onClick={async () => {
-              if (unsavedChanges) {
-                await confirmDiscardingUnsavedChanges();
-                setUnsavedChanges(false);
-              }
+      <AppMenuItem
+        label={isSmallScreen ? "Note list" : "Editor"}
+        icon={isSmallScreen ? "list" : "create"}
+        onClick={async () => {
+          const target = isSmallScreen
+            ? Config.paths.list
+            : Config.paths.editorWithNewNote;
 
-              navigate(
-                isSmallScreen
-                  ? Config.paths.list
-                  : Config.paths.editorWithNewNote,
-              );
-            }}
-          />
-          : null
-      }
+          if (pathname === target) return;
+
+          if (unsavedChanges) {
+            await confirmDiscardingUnsavedChanges();
+            setUnsavedChanges(false);
+          }
+
+          navigate(target);
+        }}
+      />
+      <AppMenuItem
+        label="Graph"
+        icon="scatter_plot"
+        onClick={async () => {
+          const target = Config.paths.graph;
+          if (pathname === target) return;
+
+          if (unsavedChanges) {
+            await confirmDiscardingUnsavedChanges();
+            setUnsavedChanges(false);
+          }
+          navigate(target);
+        }}
+      />
+      <AppMenuItem
+        label="Stats"
+        icon="query_stats"
+        onClick={async () => {
+          const target = Config.paths.stats;
+          if (pathname === target) return;
+
+          if (unsavedChanges) {
+            await confirmDiscardingUnsavedChanges();
+            setUnsavedChanges(false);
+          }
+          navigate(target);
+        }}
+      />
       {
         databaseProvider.constructor.features.includes("EXPORT_DATABASE")
           ? <AppMenuItem
@@ -98,27 +95,18 @@ const AppMenu = ({
           : null
       }
       <AppMenuItem
-        label="Stats"
-        icon="query_stats"
-        onClick={showStats}
-      />
-      {
-        showLogoutButton
-          ? <AppMenuItem
-            label="Logout"
-            icon="lock"
-            onClick={async () => {
-              if (unsavedChanges) {
-                await confirmDiscardingUnsavedChanges();
-                setUnsavedChanges(false);
-              }
+        label="Logout"
+        icon="lock"
+        onClick={async () => {
+          if (unsavedChanges) {
+            await confirmDiscardingUnsavedChanges();
+            setUnsavedChanges(false);
+          }
 
-              await databaseProvider.removeAccess();
-              navigate(Config.paths.login);
-            }}
-          />
-          : null
-      }
+          await databaseProvider.removeAccess();
+          navigate(Config.paths.login);
+        }}
+      />
     </div>
   </OutsideAlerter>;
 };

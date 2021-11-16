@@ -1,7 +1,6 @@
 export enum DialogType {
   EXPORT_DATABASE = "EXPORT_DATABASE",
   IMPORT_LINKS = "IMPORT_LINKS",
-  STATS = "STATS",
   SEARCH = "SEARCH",
   NONE = "NONE",
 }

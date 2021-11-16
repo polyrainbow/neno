@@ -71,6 +71,15 @@
     0 16px 16px hsl(0deg 0% 0% / 0.075);
 }
 
+.content-section {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  padding: var(--default-margin);
+  overflow: auto;
+  height: calc(100vh - var(--header-bar-height) - var(--default-margin));
+}
+
+
 h1 {
   font-size: var(--h1-font-size);
 }

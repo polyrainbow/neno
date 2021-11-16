@@ -58,6 +58,7 @@ const paths = {
   graph: "/graph",
   graphWithFocusNote: "/graph?focusNote=%FOCUS_NOTE_ID%",
   login: "/login",
+  stats: "/stats",
 };
 
 const SEARCH_RESULTS_PER_PAGE = 100;
