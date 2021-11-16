@@ -17,7 +17,7 @@ import {
 import useIsSmallScreen from "./hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
 import { DatabaseMode } from "./enum/DatabaseMode.js";
-import { Dialog } from "./enum/Dialog";
+import { DialogType } from "./enum/DialogType";
 
 
 const App = ({
@@ -26,7 +26,7 @@ const App = ({
 }) => {
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState<boolean>(false);
-  const [openDialog, setOpenDialog] = useState<Dialog>(Dialog.NONE);
+  const [openDialog, setOpenDialog] = useState<DialogType>(DialogType.NONE);
   const [databaseMode, setDatabaseMode]
     = useState<DatabaseMode>(DatabaseMode.NONE);
 
@@ -140,6 +140,8 @@ const App = ({
                 databaseProvider={databaseProvider}
                 toggleAppMenu={toggleAppMenu}
                 handleInvalidCredentialsError={handleInvalidCredentialsError}
+                openDialog={openDialog}
+                setOpenDialog={setOpenDialog}
               />
               <FloatingActionButton
                 title="New note"
@@ -166,27 +168,29 @@ const App = ({
     {
       isAppMenuOpen
         ? <AppMenu
-          openExportDatabaseDialog={() => setOpenDialog(Dialog.EXPORT_DATABASE)}
+          openExportDatabaseDialog={
+            () => setOpenDialog(DialogType.EXPORT_DATABASE)
+          }
           onClose={() => setIsAppMenuOpen(false)}
           unsavedChanges={unsavedChanges}
           setUnsavedChanges={setUnsavedChanges}
-          showStats={() => setOpenDialog(Dialog.STATS)}
+          showStats={() => setOpenDialog(DialogType.STATS)}
           databaseProvider={databaseProvider}
         />
         : null
     }
     {
-      openDialog === Dialog.EXPORT_DATABASE
+      openDialog === DialogType.EXPORT_DATABASE
         ? <ExportDatabaseDialog
-          onCancel={() => setOpenDialog(Dialog.NONE)}
+          onCancel={() => setOpenDialog(DialogType.NONE)}
           databaseProvider={databaseProvider}
         />
         : null
     }
     {
-      openDialog === Dialog.STATS
+      openDialog === DialogType.STATS
         ? <StatsDialog
-          onCancel={() => setOpenDialog(Dialog.NONE)}
+          onCancel={() => setOpenDialog(DialogType.NONE)}
           databaseProvider={databaseProvider}
         />
         : null

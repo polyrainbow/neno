@@ -6,11 +6,15 @@ import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import * as Config from "./lib/config";
 import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
+import { DialogType } from "./enum/DialogType";
+import SearchDialog from "./SearchDialog";
 
 
 const ListView = ({
   databaseProvider,
   toggleAppMenu,
+  openDialog,
+  setOpenDialog,
   handleInvalidCredentialsError,
 }) => {
   const currentRequestId = useRef<string>("");
@@ -129,9 +133,7 @@ const ListView = ({
         setSortMode(sortMode);
         setPage(1);
       }}
-      showNotesWithDuplicateURLs={() => handleSearchInputChange(
-        "duplicates:url",
-      )}
+      showSearchDialog={() => setOpenDialog(DialogType.SEARCH)}
       refreshNoteList={refreshNotesList}
     />
     <NoteList
@@ -154,6 +156,17 @@ const ListView = ({
       onLinkRemoval={null}
       displayedLinkedNotes={null}
     />
+    {
+      openDialog === DialogType.SEARCH
+        ? <SearchDialog
+          setSearchValue={(newSearchValue) => {
+            setSearchValue(newSearchValue);
+            setOpenDialog(null);
+          }}
+          onCancel={() => setOpenDialog(null)}
+        />
+        : null
+    }
   </>;
 };
 

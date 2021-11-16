@@ -20,11 +20,12 @@ import {
 } from "../../lib/notes/interfaces/UserNoteChangeType";
 import ActiveNote from "./interfaces/ActiveNote";
 import FrontendUserNoteChange from "./interfaces/FrontendUserNoteChange";
-import { Dialog } from "./enum/Dialog";
+import { DialogType } from "./enum/DialogType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useGoToNote from "./hooks/useGoToNote";
 import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
+import SearchDialog from "./SearchDialog";
 
 const EditorView = ({
   databaseProvider,
@@ -458,9 +459,7 @@ const EditorView = ({
                 setSortMode(sortMode);
                 setPage(1);
               }}
-              showNotesWithDuplicateURLs={() => handleSearchInputChange(
-                "duplicates:url",
-              )}
+              showSearchDialog={() => setOpenDialog(DialogType.SEARCH)}
               refreshNoteList={refreshNotesList}
             />
             <NoteList
@@ -498,7 +497,7 @@ const EditorView = ({
           removeActiveNote={removeActiveNote}
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}
-          openImportLinksDialog={() => setOpenDialog(Dialog.IMPORT_LINKS)}
+          openImportLinksDialog={() => setOpenDialog(DialogType.IMPORT_LINKS)}
           duplicateNote={duplicateNote}
           openInGraphView={() => {
             navigate(
@@ -512,9 +511,20 @@ const EditorView = ({
       </div>
     </main>
     {
-      openDialog === Dialog.IMPORT_LINKS
+      openDialog === DialogType.IMPORT_LINKS
         ? <ImportLinksDialog
           importLinksAsNotes={importLinksAsNotes}
+          onCancel={() => setOpenDialog(null)}
+        />
+        : null
+    }
+    {
+      openDialog === DialogType.SEARCH
+        ? <SearchDialog
+          setSearchValue={(newSearchValue) => {
+            setSearchValue(newSearchValue);
+            setOpenDialog(null);
+          }}
           onCancel={() => setOpenDialog(null)}
         />
         : null
