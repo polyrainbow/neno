@@ -1,122 +1,31 @@
-import React, {
-  useEffect, useState, useRef,
-} from "react";
+import React from "react";
 import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
-import * as Config from "./lib/config";
-import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
 import { DialogType } from "./enum/DialogType";
 import SearchDialog from "./SearchDialog";
 
 
 const ListView = ({
-  databaseProvider,
   toggleAppMenu,
   openDialog,
   setOpenDialog,
-  handleInvalidCredentialsError,
+  refreshNotesList,
+  stats,
+  pinnedNotes,
+  handleSearchInputChange,
+  searchValue,
+  sortMode,
+  handleSortModeChange,
+  noteListItems,
+  numberOfResults,
+  noteListIsBusy,
+  noteListScrollTop,
+  setNoteListScrollTop,
+  page,
+  setPage,
+  setSearchValue,
 }) => {
-  const currentRequestId = useRef<string>("");
-  const [noteListItems, setNoteListItems] = useState<NoteListItemType[]>([]);
-  const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
-  const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
-  const [isBusy, setIsBusy] = useState<boolean>(true);
-  const [stats, setStats] = useState(null);
-  const [sortMode, setSortMode] = useState("UPDATE_DATE_DESCENDING");
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [pinnedNotes, setPinnedNotes] = useState([]);
-
-  const handleSearchInputChange = (value) => {
-    setSearchValue(value);
-    setNoteListScrollTop(0);
-    setPage(1);
-  };
-
-
-  const refreshStats = () => {
-    if (!databaseProvider) return;
-
-    databaseProvider.getStats({
-      includeDatabaseMetadata: false,
-      includeGraphAnalysis: false,
-    })
-      .then((stats) => {
-        setStats(stats);
-      })
-      .catch((e) => {
-        // if credentials are invalid, it's fine, refeshNotesList takes care of
-        // this. if there is another error, throw.
-        if (e.message !== "INVALID_CREDENTIALS") {
-          throw new Error(e);
-        }
-      });
-  };
-
-
-  const refreshNotesList = async () => {
-    if (!databaseProvider) return;
-
-    refreshStats();
-    setNoteListItems([]);
-
-    // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
-    // we don't do anything and leave the note list empty
-    if (
-      searchValue.length > 0
-      && searchValue.length < Config.MINIMUM_SEARCH_QUERY_LENGTH
-    ) {
-      return;
-    }
-
-    setIsBusy(true);
-
-    const options = {
-      page,
-      sortMode,
-      query: "",
-      caseSensitive: false,
-    };
-
-    if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
-      options.query = searchValue;
-    }
-
-    // @ts-ignore randomUUID not yet in types
-    const requestId = crypto.randomUUID();
-    currentRequestId.current = requestId;
-    try {
-      const {
-        results,
-        numberOfResults,
-      } = await databaseProvider.getNotes(options);
-
-      // ... some time later - check if this is the current request
-      if (currentRequestId.current === requestId) {
-        setNoteListItems(results);
-        setNumberOfResults(numberOfResults);
-        setIsBusy(false);
-      }
-
-      const pinnedNotes = await databaseProvider.getPins();
-      setPinnedNotes(pinnedNotes);
-    } catch (e) {
-      // if credentials are invalid, go to LoginView. If not, throw.
-      if (e.message === "INVALID_CREDENTIALS") {
-        await handleInvalidCredentialsError();
-      } else {
-        throw new Error(e);
-      }
-    }
-  };
-
-
-  useEffect(() => {
-    refreshNotesList();
-  }, [searchValue, page, sortMode, databaseProvider]);
-
-
   return <>
     <EditorViewHeader
       stats={stats}
@@ -128,11 +37,7 @@ const ListView = ({
       onChange={handleSearchInputChange}
       value={searchValue}
       sortMode={sortMode}
-      setSortMode={(sortMode) => {
-        setNoteListScrollTop(0);
-        setSortMode(sortMode);
-        setPage(1);
-      }}
+      setSortMode={handleSortModeChange}
       showSearchDialog={() => setOpenDialog(DialogType.SEARCH)}
       refreshNoteList={refreshNotesList}
     />
@@ -140,7 +45,7 @@ const ListView = ({
       notes={noteListItems}
       numberOfResults={numberOfResults}
       activeNote={null} /* in list view, no note is active */
-      isBusy={isBusy}
+      isBusy={noteListIsBusy}
       searchValue={searchValue}
       scrollTop={noteListScrollTop}
       setScrollTop={setNoteListScrollTop}

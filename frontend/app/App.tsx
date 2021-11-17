@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import EditorView from "./EditorView";
 import ListView from "./ListView";
 import GraphView from "./GraphView";
@@ -18,6 +18,8 @@ import FloatingActionButton from "./FloatingActionButton";
 import { DatabaseMode } from "./enum/DatabaseMode.js";
 import { DialogType } from "./enum/DialogType";
 import StatsView from "./StatsView";
+import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
+import * as Config from "./lib/config";
 
 
 const App = ({
@@ -30,8 +32,134 @@ const App = ({
   const [databaseMode, setDatabaseMode]
     = useState<DatabaseMode>(DatabaseMode.NONE);
 
+  /* states for note list */
+  const currentRequestId = useRef<string>("");
+  const [noteListItems, setNoteListItems] = useState<NoteListItemType[]>([]);
+  const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
+  const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [noteListIsBusy, setNoteListIsBusy] = useState<boolean>(true);
+  const [stats, setStats] = useState(null);
+  const [sortMode, setSortMode] = useState("UPDATE_DATE_DESCENDING");
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [pinnedNotes, setPinnedNotes] = useState<any[]>([]);
+
+  const databaseProvider = databaseMode === DatabaseMode.LOCAL
+    ? localDatabaseProvider
+    : (
+      databaseMode === DatabaseMode.SERVER
+        ? serverDatabaseProvider
+        : null
+    );
+
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
+
+  const handleSearchInputChange = (value) => {
+    setSearchValue(value);
+    setNoteListScrollTop(0);
+    setPage(1);
+  };
+
+
+  const refreshStats = () => {
+    if (!databaseProvider) return;
+
+    databaseProvider.getStats({
+      includeDatabaseMetadata: false,
+      includeGraphAnalysis: false,
+    })
+      .then((stats) => {
+        setStats(stats);
+      })
+      .catch((e) => {
+        // if credentials are invalid, it's fine, refeshNotesList takes care of
+        // this. if there is another error, throw.
+        if (e.message !== "INVALID_CREDENTIALS") {
+          throw new Error(e);
+        }
+      });
+  };
+
+
+  const handleInvalidCredentialsError = async () => {
+    await databaseProvider.removeAccess();
+    setDatabaseMode(DatabaseMode.NONE);
+    navigate(paths.login);
+  };
+
+
+  const refreshNotesList = useCallback(
+    async () => {
+      if (!databaseProvider) return;
+
+      refreshStats();
+      setNoteListItems([]);
+
+      // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
+      // we don't do anything and leave the note list empty
+      if (
+        searchValue.length > 0
+        && searchValue.length < Config.MINIMUM_SEARCH_QUERY_LENGTH
+      ) {
+        return;
+      }
+
+      setNoteListIsBusy(true);
+
+      const options = {
+        page,
+        sortMode,
+        query: "",
+        caseSensitive: false,
+      };
+
+      if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
+        options.query = searchValue;
+      }
+
+      // @ts-ignore randomUUID not yet in types
+      const requestId = crypto.randomUUID();
+      currentRequestId.current = requestId;
+      try {
+        const {
+          results,
+          numberOfResults,
+        } = await databaseProvider.getNotes(options);
+
+        // ... some time later - check if this is the current request
+        if (currentRequestId.current === requestId) {
+          setNoteListItems(results);
+          setNumberOfResults(numberOfResults);
+          setNoteListIsBusy(false);
+        }
+
+        const pinnedNotes = await databaseProvider.getPins();
+        setPinnedNotes(pinnedNotes);
+      } catch (e) {
+        // if credentials are invalid, go to LoginView. If not, throw.
+        if (e.message === "INVALID_CREDENTIALS") {
+          await handleInvalidCredentialsError();
+        } else {
+          throw new Error(e);
+        }
+      }
+    },
+    [searchValue, page, sortMode, databaseProvider],
+  );
+
+
+  const handleSortModeChange = (sortMode) => {
+    setNoteListScrollTop(0);
+    setSortMode(sortMode);
+    setPage(1);
+  };
+
+
+  useEffect(() => {
+    refreshNotesList();
+  }, [searchValue, page, sortMode, databaseProvider]);
+
 
   const beforeUnload = function(e) {
     if (unsavedChanges) {
@@ -63,14 +191,6 @@ const App = ({
   };
 
 
-  const databaseProvider = databaseMode === DatabaseMode.LOCAL
-    ? localDatabaseProvider
-    : (
-      databaseMode === DatabaseMode.SERVER
-        ? serverDatabaseProvider
-        : null
-    );
-
   const startApp = async () => {
     if (await serverDatabaseProvider?.isAuthenticated()) {
       setDatabaseMode(DatabaseMode.SERVER);
@@ -88,13 +208,6 @@ const App = ({
   useEffect(() => {
     startApp();
   }, []);
-
-
-  const handleInvalidCredentialsError = async () => {
-    await databaseProvider.removeAccess();
-    setDatabaseMode(DatabaseMode.NONE);
-    navigate(paths.login);
-  };
 
 
   return <ConfirmationServiceProvider>
@@ -127,6 +240,22 @@ const App = ({
               setOpenDialog={setOpenDialog}
               openDialog={openDialog}
               handleInvalidCredentialsError={handleInvalidCredentialsError}
+              refreshNotesList={refreshNotesList}
+              stats={stats}
+              pinnedNotes={pinnedNotes}
+              handleSearchInputChange={handleSearchInputChange}
+              setPinnedNotes={setPinnedNotes}
+              searchValue={searchValue}
+              sortMode={sortMode}
+              handleSortModeChange={handleSortModeChange}
+              noteListItems={noteListItems}
+              numberOfResults={numberOfResults}
+              noteListIsBusy={noteListIsBusy}
+              noteListScrollTop={noteListScrollTop}
+              setNoteListScrollTop={setNoteListScrollTop}
+              page={page}
+              setPage={setPage}
+              setSearchValue={setSearchValue}
             />
             : null
         }
@@ -137,11 +266,24 @@ const App = ({
           databaseProvider
             ? <>
               <ListView
-                databaseProvider={databaseProvider}
                 toggleAppMenu={toggleAppMenu}
-                handleInvalidCredentialsError={handleInvalidCredentialsError}
                 openDialog={openDialog}
                 setOpenDialog={setOpenDialog}
+                refreshNotesList={refreshNotesList}
+                stats={stats}
+                pinnedNotes={pinnedNotes}
+                handleSearchInputChange={handleSearchInputChange}
+                searchValue={searchValue}
+                sortMode={sortMode}
+                handleSortModeChange={handleSortModeChange}
+                noteListItems={noteListItems}
+                numberOfResults={numberOfResults}
+                noteListIsBusy={noteListIsBusy}
+                noteListScrollTop={noteListScrollTop}
+                setNoteListScrollTop={setNoteListScrollTop}
+                page={page}
+                setPage={setPage}
+                setSearchValue={setSearchValue}
               />
               <FloatingActionButton
                 title="New note"
