@@ -76,7 +76,7 @@
   margin: 0 auto;
   padding: var(--default-margin);
   overflow: auto;
-  height: calc(100vh - var(--header-bar-height) - var(--default-margin));
+  height: calc(100vh - var(--header-bar-height) - (2 * var(--default-margin)));
 }
 
 
