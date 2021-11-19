@@ -1,6 +1,7 @@
 import ActiveNote from "../interfaces/ActiveNote";
 import * as Config from "./config";
 
+
 const yyyymmdd = (date = new Date()) => {
   const yyyy = date.getFullYear().toString();
   const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
@@ -277,6 +278,12 @@ const getFileInfosOfNoteFiles = (note) => {
     });
 };
 
+
+const getIconSrc = (iconName) => {
+  return Config.ICON_PATH + iconName + "_black_24dp.svg";
+};
+
+
 export {
   yyyymmdd,
   htmlDecode,
@@ -293,4 +300,5 @@ export {
   getWindowDimensions,
   blockHasFile,
   getFileInfosOfNoteFiles,
+  getIconSrc,
 };

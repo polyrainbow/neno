@@ -1,5 +1,5 @@
 import React from "react";
-import { ICON_PATH } from "./lib/config";
+import { getIconSrc } from "./lib/utils";
 
 
 const AppMenuItem = ({
@@ -18,7 +18,7 @@ const AppMenuItem = ({
     className="app-menu-item"
   >
     <img
-      src={ICON_PATH + icon + "-24px.svg"}
+      src={getIconSrc(icon)}
       alt={label}
       width="24"
       height="24"

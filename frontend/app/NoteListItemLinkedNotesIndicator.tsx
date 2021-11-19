@@ -1,6 +1,7 @@
 import React from "react";
 import Tooltip from "./Tooltip";
-import { emojis, ICON_PATH } from "./lib/config.js";
+import { emojis } from "./lib/config.js";
+import { getIconSrc } from "./lib/utils";
 
 
 const NoteListItemLinkedNotesIndicator = ({
@@ -40,7 +41,7 @@ const NoteListItemLinkedNotesIndicator = ({
         <img
           style={{ "verticalAlign": "bottom" }}
           src={
-            ICON_PATH + (isLinked ? "link_off" : "link") + "-24px.svg"
+            getIconSrc(isLinked ? "link_off" : "link")
           }
           alt={linkControlLabel}
           className="svg-icon"

@@ -1,6 +1,5 @@
 import React from "react";
-import { shortenText } from "./lib/utils";
-import { ICON_PATH } from "./lib/config";
+import { getIconSrc, shortenText } from "./lib/utils";
 
 const EditorViewHeaderPinnedNote = ({
   note,
@@ -18,7 +17,7 @@ const EditorViewHeaderPinnedNote = ({
     onClick={onClick}
   >
     <img
-      src={ICON_PATH + "push_pin-24px.svg"}
+      src={getIconSrc("push_pin")}
       alt={"Pinned note"}
       width="24"
       height="24"
