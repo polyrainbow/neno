@@ -51,6 +51,9 @@ const GraphViewHeader = ({
           placeholder="Search..."
           value={searchValue}
           onChange={(value) => setSearchValue(value)}
+          inputStyle={{
+            marginRight: "10px",
+          }}
         />
         <UnsavedChangesIndicator unsavedChanges={unsavedChanges} />
       </>

@@ -22,7 +22,7 @@ const NoteListControls = ({
         value={value}
         onChange={onChange}
         inputStyle={{
-          width: "200px",
+          width: "250px",
         }}
       />
       <IconButton
