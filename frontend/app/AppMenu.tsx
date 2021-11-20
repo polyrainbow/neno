@@ -16,6 +16,7 @@ const AppMenu = ({
   unsavedChanges,
   setUnsavedChanges,
   databaseProvider,
+  openImportLinksDialog,
 }) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -94,6 +95,11 @@ const AppMenu = ({
           />
           : null
       }
+      <AppMenuItem
+        label="Import links as notes"
+        icon="dynamic_feed"
+        onClick={openImportLinksDialog}
+      />
       <AppMenuItem
         label="Logout"
         icon="lock"

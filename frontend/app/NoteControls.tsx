@@ -16,7 +16,6 @@ const NoteControls = ({
   unsavedChanges,
   setUnsavedChanges,
   pinOrUnpinNote,
-  openImportLinksDialog,
   duplicateNote,
   openInGraphView,
 }) => {
@@ -108,12 +107,6 @@ const NoteControls = ({
           : "center_focus_strong"
         }
         onClick={openInGraphView}
-      />
-      <IconButton
-        id="button_import_links_as_notes"
-        title="Import links as notes"
-        icon="dynamic_feed"
-        onClick={openImportLinksDialog}
       />
     </div>
     <div id="note-controls-right">

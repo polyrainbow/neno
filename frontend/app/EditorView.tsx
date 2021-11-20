@@ -9,7 +9,6 @@ import * as Utils from "./lib/utils";
 import * as Config from "./lib/config";
 import * as Editor from "./lib/editor";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
-import ImportLinksDialog from "./ImportLinksDialog";
 import {
   useNavigate,
   useParams,
@@ -346,13 +345,6 @@ const EditorView = ({
   };
 
 
-  const importLinksAsNotes = async (links) => {
-    await databaseProvider.importLinksAsNotes(links);
-    setOpenDialog(null);
-    refreshNotesList();
-  };
-
-
   return <>
     <EditorViewHeader
       stats={stats}
@@ -407,7 +399,6 @@ const EditorView = ({
           removeActiveNote={removeActiveNote}
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}
-          openImportLinksDialog={() => setOpenDialog(DialogType.IMPORT_LINKS)}
           duplicateNote={duplicateNote}
           openInGraphView={() => {
             navigate(
@@ -420,14 +411,6 @@ const EditorView = ({
         />
       </div>
     </main>
-    {
-      openDialog === DialogType.IMPORT_LINKS
-        ? <ImportLinksDialog
-          importLinksAsNotes={importLinksAsNotes}
-          onCancel={() => setOpenDialog(null)}
-        />
-        : null
-    }
     {
       openDialog === DialogType.SEARCH
         ? <SearchDialog

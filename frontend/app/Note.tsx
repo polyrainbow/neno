@@ -17,7 +17,6 @@ const Note = ({
   removeActiveNote,
   unsavedChanges,
   pinOrUnpinNote,
-  openImportLinksDialog,
   duplicateNote,
   openInGraphView,
 }) => {
@@ -57,7 +56,6 @@ const Note = ({
       unsavedChanges={unsavedChanges}
       setUnsavedChanges={setUnsavedChanges}
       pinOrUnpinNote={pinOrUnpinNote}
-      openImportLinksDialog={openImportLinksDialog}
       duplicateNote={duplicateNote}
       openInGraphView={openInGraphView}
     />

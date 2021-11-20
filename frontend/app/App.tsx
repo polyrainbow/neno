@@ -20,6 +20,7 @@ import { DialogType } from "./enum/DialogType";
 import StatsView from "./StatsView";
 import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
 import * as Config from "./lib/config";
+import ImportLinksDialog from "./ImportLinksDialog";
 
 
 const App = ({
@@ -191,6 +192,13 @@ const App = ({
   };
 
 
+  const importLinksAsNotes = async (links) => {
+    await databaseProvider.importLinksAsNotes(links);
+    setOpenDialog(DialogType.NONE);
+    refreshNotesList();
+  };
+
+
   const startApp = async () => {
     if (await serverDatabaseProvider?.isAuthenticated()) {
       setDatabaseMode(DatabaseMode.SERVER);
@@ -326,6 +334,7 @@ const App = ({
           unsavedChanges={unsavedChanges}
           setUnsavedChanges={setUnsavedChanges}
           databaseProvider={databaseProvider}
+          openImportLinksDialog={() => setOpenDialog(DialogType.IMPORT_LINKS)}
         />
         : null
     }
@@ -334,6 +343,14 @@ const App = ({
         ? <ExportDatabaseDialog
           onCancel={() => setOpenDialog(DialogType.NONE)}
           databaseProvider={databaseProvider}
+        />
+        : null
+    }
+    {
+      openDialog === DialogType.IMPORT_LINKS
+        ? <ImportLinksDialog
+          importLinksAsNotes={importLinksAsNotes}
+          onCancel={() => setOpenDialog(DialogType.NONE)}
         />
         : null
     }
