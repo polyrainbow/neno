@@ -63,8 +63,6 @@ import {
  * @property {object} endpoints - upload endpoints
  * @property {string} endpoints.byFile - upload by file
  * @property {string} endpoints.byUrl - upload by URL
- * @property {string} field - field name for uploaded image
- * @property {string} types - available mime-types
  * @property {string} captionPlaceholder - placeholder for Caption field
  * @property {object} additionalRequestData - any data to send with requests
  * @property {object} additionalRequestHeaders - allows to pass custom headers
@@ -116,8 +114,6 @@ export default class ImageTool {
       endpoints: config.endpoints || "",
       additionalRequestData: config.additionalRequestData || {},
       additionalRequestHeaders: config.additionalRequestHeaders || {},
-      field: config.field || "image",
-      types: config.types || "image/*",
       captionPlaceholder: config.captionPlaceholder || "Caption",
       buttonContent: config.buttonContent || "",
       fileHandling: config.fileHandling,
@@ -200,6 +196,7 @@ export default class ImageTool {
           "image/jpeg",
           "image/webp",
           "image/gif",
+          "image/svg+xml",
         ],
       },
     };
@@ -283,6 +280,7 @@ export default class ImageTool {
             "image/jpeg": [".jpg"],
             "image/webp": [".webp"],
             "image/gif": [".gif"],
+            "image/svg+xml": [".svg"],
           },
         },
       ],

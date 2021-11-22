@@ -16,6 +16,10 @@ const ALLOWED_FILE_TYPES = [
     ending: "gif",
   },
   {
+    mimeType: "image/svg+xml",
+    ending: "svg",
+  },
+  {
     mimeType: "application/pdf",
     ending: "pdf",
   },
