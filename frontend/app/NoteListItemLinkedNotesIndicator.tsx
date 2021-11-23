@@ -58,7 +58,13 @@ const NoteListItemLinkedNotesIndicator = ({
                 ? <span title={numberOfLinkedNotes + " Links"}>
                   {numberOfLinkedNotes}
                 </span>
-                : <span title="Not linked">{emojis.unlinked}</span>
+                : <span title="Not linked"
+                  style={{
+                    // style fix for
+                    // https://stackoverflow.com/questions/70028281/emoji-font-displayed-in-web-pages-lose-color-when-bold
+                    fontWeight: "normal",
+                  }}
+                >{emojis.unlinked}</span>
               : ""
           }
         </div>
