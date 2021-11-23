@@ -74,17 +74,13 @@ const init = async (
   _getUrlMetadata,
   _randomUUID,
 ):Promise<void> => {
-  console.log("Initializing notes module...");
-
   if (typeof _getUrlMetadata === "function") {
     getUrlMetadata = _getUrlMetadata;
   }
 
-  console.log("Initializing DatabaseIO instance...");
   io = new DatabaseIO({storageProvider});
   randomUUID = _randomUUID;
 
-  console.log("Cleaning data...");
   await cleanUpData(io);
 };
 

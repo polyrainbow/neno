@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import * as logger from "./logger.js";
 
 export default function (session) {
   const Store = session.Store
@@ -19,8 +20,8 @@ export default function (session) {
       try {
         fileContent = await fs.readFile(this.#filePath, "utf8")
       } catch (e) {
-        console.log(e);
-        console.log("Creating sessions file: " + this.#filePath);
+        logger.info("Could not access sessions file.");
+        logger.info("Creating sessions file: " + this.#filePath);
         await fs.writeFile(this.#filePath, JSON.stringify([]));
         fileContent = await fs.readFile(this.#filePath, "utf8")
       }

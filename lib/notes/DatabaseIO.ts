@@ -40,8 +40,6 @@ export default class DatabaseIO {
       const object:DatabaseMainData = JSON.parse(json);
       return object;
     } catch (e) {
-      console.log(e);
-      console.error("Could not find or parse file " + filename);
       return null;
     }
   }

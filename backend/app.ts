@@ -26,6 +26,7 @@ import session from "express-session";
 import User from "./interfaces/User.js";
 import { randomUUID } from "crypto";
 import FileSessionStore from "./lib/FileSessionStore.js";
+import * as logger from "./lib/logger.js";
 
 
 const startApp = async ({
@@ -36,10 +37,11 @@ const startApp = async ({
   sessionTTL,
 }:AppStartOptions):Promise<Express.Application> => {
   const storageProvider = new FileSystemStorageProvider(dataPath);
-  console.log("File system storage ready at " + dataPath);
-  console.log("Session TTL: " + sessionTTL.toString() + " day(s)");
-
+  logger.info("File system storage ready at " + dataPath);
+  logger.info("Session TTL: " + sessionTTL.toString() + " day(s)");
+  logger.info("Initializing notes module...");
   await Notes.init(storageProvider, getUrlMetadata, randomUUID);
+  logger.info("Initializing routes...")
   const app = express();
 
   const sessionMiddleware = session({
@@ -400,8 +402,8 @@ const startApp = async ({
             res.status(406).json(response);
             return;
           } else {
-            console.log("Server error:");
-            console.log(err);
+            logger.error("Server error:");
+            logger.error(err);
             const response:APIResponse = {
               success: false,
               error: APIError.INTERNAL_SERVER_ERROR,

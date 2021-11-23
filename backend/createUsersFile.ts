@@ -8,6 +8,7 @@ import twofactor from "node-2fa";
 import qrcode from "qrcode-terminal";
 import User from "./interfaces/User";
 import { Writable } from "stream";
+import * as logger from "./lib/logger.js";
 
 
 export default async (filepath) => {
@@ -35,7 +36,7 @@ export default async (filepath) => {
     = (await rl.question("How many users do you wish to create? (1) ")) || 1;
 
   for (let i = 0; i < numberOfUsers; i++) {
-    console.log(`Gathering info for user ${(i + 1)}/${numberOfUsers}`);
+    logger.info(`Gathering info for user ${(i + 1)}/${numberOfUsers}`);
     const username = await rl.question("User name: ");
 
     stdout.write("Password: ");
@@ -61,11 +62,11 @@ export default async (filepath) => {
       apiKeys: [],
     });
 
-    console.log("Scan this QR code with your favorite 2FA app");
-    console.log("URL: " + uri);
+    logger.info("Scan this QR code with your favorite 2FA app");
+    logger.info("URL: " + uri);
     qrcode.generate(uri, { small: true });
   }
 
   await fs.writeFile(filepath, JSON.stringify(users, null, "  "));
-  console.log(`Users file created at: ${filepath}`);
+  logger.info(`Users file created at: ${filepath}`);
 };

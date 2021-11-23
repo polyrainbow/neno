@@ -9,16 +9,17 @@ import User from "./interfaces/User.js";
 import getUsers from "./users.js";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
 import { REPO_PATH } from "./config.js";
+import * as logger from "./lib/logger.js";
 
 const VERSION = "1.0.0";
 const programArguments = getProgramArguments(VERSION);
 
 if (programArguments.urlMetadata.length > 0) {
-  console.log("Grabbing url metadata for " + programArguments.urlMetadata);
+  logger.info("Grabbing url metadata for " + programArguments.urlMetadata);
   try {
-    await getUrlMetadata(programArguments.urlMetadata, true);
+    await getUrlMetadata(programArguments.urlMetadata);
   } catch (e) {
-    console.log(e);
+    logger.error(e);
   }
   process.exit(0);
 }
@@ -28,12 +29,12 @@ try {
     programArguments.dataFolderPath,
     constants.R_OK | constants.W_OK,
   );
-  console.log(`Data directory found at ${programArguments.dataFolderPath}`);
+  logger.info(`Data directory found at ${programArguments.dataFolderPath}`);
 } catch (e) {
-  console.log(
-    `WARN: No data directory found at ${programArguments.dataFolderPath}`,
+  logger.warn(
+    `No data directory found at ${programArguments.dataFolderPath}`,
   );
-  console.log("Creating one...");
+  logger.info("Creating one...");
   await fs.mkdir(programArguments.dataFolderPath, { recursive: true });
 }
 
@@ -48,6 +49,7 @@ const app = await startApp({
   sessionTTL: parseInt(programArguments.sessionTtl),
 });
 
+logger.info("Starting server...");
 
 if (programArguments.useHttps) {
   const httpsServer = https.createServer(
@@ -60,7 +62,7 @@ if (programArguments.useHttps) {
 
   httpsServer.listen(parseInt(programArguments.httpsPort));
 
-  console.log("HTTPS access ready on port " + programArguments.httpsPort);
+  logger.info("HTTPS access ready on port " + programArguments.httpsPort);
   
   if (programArguments.port == "80" && programArguments.httpsPort == "443") {
     // redirect http requests to https
@@ -71,7 +73,7 @@ if (programArguments.useHttps) {
       res.end();
     }).listen(programArguments.port);
 
-    console.log(
+    logger.info(
       "HTTP requests to port "
       + programArguments.port + " will be redirected to HTTPS.",
     );
@@ -80,7 +82,7 @@ if (programArguments.useHttps) {
   const httpServer = http.createServer(app);
   httpServer.listen(parseInt(programArguments.port));
 
-  console.log("HTTP access ready on port " + programArguments.port);
+  logger.info("HTTP access ready on port " + programArguments.port);
 }
 
 

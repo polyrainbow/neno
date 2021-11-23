@@ -68,8 +68,6 @@ const cleanUpLinks = (db) => {
 // canonical data structure
 const cleanUpData = async (io) => {
   await io.forEach((db) => {
-    console.log("Cleaning db " + db.id + " ...");
-
     // remove invalid links
     cleanUpLinks(db);
 

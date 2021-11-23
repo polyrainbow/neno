@@ -1,16 +1,14 @@
+import * as logger from "./logger.js";
 import urlMetadata from "url-metadata";
 import UrlMetadataResponse from "../../lib/notes/interfaces/UrlMetadataResponse";
 
 const getUrlMetadata = async (
   url:string,
-  verbose = false,
 ):Promise<UrlMetadataResponse> => {
   const metadata = await urlMetadata(url);
 
-  if (verbose) {
-    console.log("URL METADATA RECEIVED:");
-    console.log(metadata);
-  }
+  logger.debug("URL METADATA RECEIVED:");
+  logger.debug(metadata);
 
   const response = {
     url,
@@ -19,10 +17,8 @@ const getUrlMetadata = async (
     image: metadata.image,
   };
 
-  if (verbose) {
-    console.log("URL METADATA RESPONSE OBJECT:");
-    console.log(response);
-  }
+  logger.debug("URL METADATA RESPONSE OBJECT:");
+  logger.debug(response);
 
   return response;
 };
