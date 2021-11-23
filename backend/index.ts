@@ -85,4 +85,4 @@ if (programArguments.useHttps) {
   logger.info("HTTP access ready on port " + programArguments.port);
 }
 
-
+logger.info("Ready.");
