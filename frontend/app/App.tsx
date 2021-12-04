@@ -179,10 +179,18 @@ const App = ({
 
 
   useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === "Escape") {
+        setOpenDialog(DialogType.NONE);
+      }
+    };
+
     window.addEventListener("beforeunload", beforeUnload);
+    document.addEventListener("keydown", handleKeyPress);
 
     return () => {
       window.removeEventListener("beforeunload", beforeUnload);
+      document.removeEventListener("keydown", handleKeyPress);
     };
   }, [beforeUnload]);
 
