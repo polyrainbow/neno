@@ -256,6 +256,18 @@ export default class DatabaseIO {
   }
 
 
+  async getTotalDatabaseSize(
+    databaseId: DatabaseId,
+  ):Promise<number> {
+    const sizes = await Promise.all([
+      this.getSizeOfDatabaseMainData(databaseId),
+      this.getSizeOfDatabaseFiles(databaseId),
+    ]);
+
+    return sizes[0] + sizes[1];
+  }
+
+
   async getReadableDatabaseStream(
     databaseId: DatabaseId,
     withUploads: boolean,

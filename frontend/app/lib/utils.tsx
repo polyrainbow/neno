@@ -184,7 +184,12 @@ function humanFileSize(bytes, si = false, dp = 1) {
   );
 
 
-  return bytes.toFixed(dp) + " " + units[u];
+  // https://stackoverflow.com/a/39686116/3890888
+  // eslint-disable-next-line no-undefined
+  return bytes.toLocaleString(undefined, {
+    minimumFractionDigits: dp,
+    maximumFractionDigits: dp,
+  }) + " " + units[u];
 }
 
 

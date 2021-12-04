@@ -31,6 +31,9 @@ import {
   make,
   getFilenameFromUrl,
 } from "../utils.js";
+import {
+  humanFileSize,
+} from "../../utils.tsx";
 
 const LOADER_TIMEOUT = 500;
 
@@ -407,19 +410,8 @@ export default class AudioTool {
     }
 
     if (size) {
-      let sizePrefix;
-      let formattedSize;
       const fileSize = make("div", this.CSS.size);
-
-      if (Math.log10(+size) >= 6) {
-        sizePrefix = "MiB";
-        formattedSize = size / Math.pow(2, 20);
-      } else {
-        sizePrefix = "KiB";
-        formattedSize = size / Math.pow(2, 10);
-      }
-
-      fileSize.textContent = formattedSize.toFixed(1) + " " + sizePrefix;
+      fileSize.textContent = humanFileSize(size);
       fileInfo.appendChild(fileSize);
     }
 
