@@ -33,6 +33,7 @@ const startApp = async ({
   sessionSecret,
   sessionTTL,
   maxUploadFileSize,
+  sessionCookieName,
 }:AppStartOptions):Promise<Express.Application> => {
   const storageProvider = new FileSystemStorageProvider(dataPath);
   logger.info("File system storage ready at " + dataPath);
@@ -55,7 +56,7 @@ const startApp = async ({
       secure: "auto",
     },
     resave: false,
-    name: config.SESSION_COOKIE_NAME,
+    name: sessionCookieName,
     unset: "keep",
     store: new (FileSessionStore(session))({
       checkPeriod: 86400000, // prune expired entries every 24h,
@@ -796,7 +797,7 @@ const startApp = async ({
       return res
         .status(200)
         .clearCookie(
-          config.SESSION_COOKIE_NAME,
+          sessionCookieName,
         )
         .json(response);
     },

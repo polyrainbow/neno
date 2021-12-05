@@ -57,8 +57,13 @@ const getArguments = (version) => {
     )
     .option(
       '--max-upload-file-size <value>',
-      "the maximum size of an upload in bytes (default=524288000)",
+      "the maximum size of an upload in bytes",
       "524288000", // 500 MB
+    )
+    .option(
+      '--session-cookie-name <value>',
+      "the name of the session cookie in which the auth token is stored",
+      "NENO_token",
     );
   
   program.parse(process.argv);

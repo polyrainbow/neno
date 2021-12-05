@@ -8,4 +8,5 @@ export default interface AppStartOptions {
     sessionSecret: string,
     sessionTTL: number,
     maxUploadFileSize: number,
+    sessionCookieName: string,
 }
