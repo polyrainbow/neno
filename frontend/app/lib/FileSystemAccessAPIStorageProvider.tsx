@@ -97,6 +97,8 @@ export default class FileSystemAccessAPIStorageProvider {
     const fileHandle = await this.#getFileHandle(requestPath);
     const writable = await fileHandle.createWritable();
     await readableStream.pipeTo(writable);
+    const size = await this.getFileSize(requestPath);
+    return size;
   }
 
 

@@ -429,18 +429,47 @@ const startApp = async ({
       }
 
       try {
-        const fileId = await Notes.addFile(req.userId, req, mimeType);
+        logger.debug("Starting file upload. Type: " + mimeType);
+        //console.log(req)
+
+        const {fileId, size: transmittedBytes} = await Notes.addFile(
+          req.userId,
+          req,
+          mimeType,
+        );
+
+        logger.debug(
+          `Expected size: ${size} Transmitted: ${transmittedBytes}`,
+        );
+        if (size !== transmittedBytes) {
+          /* this looks like the request was not completed. we'll remove the
+          file */
+          logger.debug("Removing file due to incomplete upload");
+          await Notes.deleteFile(req.userId, fileId);
+
+          const response:APIResponse = {
+            success: false,
+            error: APIError.INVALID_REQUEST,
+          };
+          res.status(406).json(response);
+          return;
+        }
         const response:APIResponse = {
           success: true,
-          payload: fileId, 
+          payload: {
+            fileId,
+            size,
+          },
         };
         res.json(response);
       } catch (e) {
+        logger.debug("Catched an error trying to upload a file:");
+        logger.debug(e);
         const response:APIResponse = {
           success: false,
           error: e.message,
         };
-        res.json(response);
+        res.status(406).json(response);
       }
     },
   );
@@ -487,11 +516,27 @@ const startApp = async ({
         }
 
         try {
-          const fileId = await Notes.addFile(
+          logger.debug("Starting file download. Type: " + mimeType);
+          const {fileId, size: transmittedBytes} = await Notes.addFile(
             req.userId,
             resourceResponse,
             mimeType,
           );
+          logger.debug(
+            `Expected size: ${size} Transmitted: ${transmittedBytes}`,
+          );
+          if (size !== transmittedBytes) {
+            /* this looks like the download was not completed. we'll remove the
+            file */
+            await Notes.deleteFile(req.userId, fileId);
+
+            const response:APIResponse = {
+              success: false,
+              error: APIError.INVALID_REQUEST,
+            };
+            res.status(406).json(response);
+            return;
+          }
 
           const response:APIResponse = {
             success: true,

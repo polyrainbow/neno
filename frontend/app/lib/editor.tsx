@@ -42,7 +42,7 @@ const loadInstance = async ({
   // config object is passed to all of them
   const fileHandlingConfig = {
     uploadByFile: async (file) => {
-      const fileId = await databaseProvider.uploadFile(file);
+      const { fileId } = await databaseProvider.uploadFile(file);
       return {
         success: true,
         file: {

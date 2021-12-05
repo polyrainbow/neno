@@ -12,6 +12,7 @@ import { REPO_PATH } from "./config.js";
 import * as logger from "./lib/logger.js";
 
 const VERSION = "1.0.0";
+const SERVER_TIMEOUT = 30_000; // ms
 const programArguments = getProgramArguments(VERSION);
 
 if (programArguments.urlMetadata.length > 0) {
@@ -59,19 +60,36 @@ if (programArguments.useHttps) {
     },
     app as RequestListener,
   );
-
+  httpsServer.timeout = SERVER_TIMEOUT;
   httpsServer.listen(parseInt(programArguments.httpsPort));
-
   logger.info("HTTPS access ready on port " + programArguments.httpsPort);
+
+  httpsServer.on('clientError', (err, socket) => {
+    // @ts-ignore
+    if (err.code === 'ECONNRESET' || !socket.writable) {
+      return;
+    }
+  
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  });
   
   if (programArguments.port == "80" && programArguments.httpsPort == "443") {
     // redirect http requests to https
-    http.createServer(function (req, res) {
+    const httpServer = http.createServer(function (req, res) {
       res.writeHead(301, {
         "Location": "https://" + req.headers['host'] + req.url,
       });
       res.end();
     }).listen(programArguments.port);
+
+    httpServer.on('clientError', (err, socket) => {
+      // @ts-ignore
+      if (err.code === 'ECONNRESET' || !socket.writable) {
+        return;
+      }
+    
+      socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+    });
 
     logger.info(
       "HTTP requests to port "
@@ -80,8 +98,18 @@ if (programArguments.useHttps) {
   }
 } else {
   const httpServer = http.createServer(app);
-  httpServer.listen(parseInt(programArguments.port));
+  httpServer.timeout = SERVER_TIMEOUT;
 
+  httpServer.on('clientError', (err, socket) => {
+    // @ts-ignore
+    if (err.code === 'ECONNRESET' || !socket.writable) {
+      return;
+    }
+  
+    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  });
+
+  httpServer.listen(parseInt(programArguments.port));
   logger.info("HTTP access ready on port " + programArguments.port);
 }
 

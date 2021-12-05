@@ -154,10 +154,14 @@ export default class DatabaseIO {
     databaseId: DatabaseId,
     fileId:FileId,
     source:Readable,
-  ):Promise<void> {
+  ):Promise<number> {
     const fileFolderPath = this.getFileFolderPath(databaseId);
     const filepath = this.#storageProvider.joinPath(fileFolderPath, fileId);
-    await this.#storageProvider.writeObjectFromReadable(filepath, source);
+    const size = await this.#storageProvider.writeObjectFromReadable(
+      filepath,
+      source,
+    );
+    return size;
   }
 
 

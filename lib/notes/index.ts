@@ -368,7 +368,8 @@ const remove = async (
 
   /*
     we do not remove files used in this note, because they could be used in
-    other notes. unused files should be deleted in the clean up process.
+    other notes. this module considers files to exist independently of notes.
+    unused files should be deleted in the clean up process, if at all.
   */
 
   await io.flushChanges(db);
@@ -390,7 +391,10 @@ const addFile = async (
   dbId:DatabaseId,
   readable:Readable,
   mimeType: string,
-):Promise<FileId> => {
+):Promise<{
+  fileId: FileId,
+  size: number,
+}> => {
   const fileType = config.ALLOWED_FILE_TYPES
     .find((filetype) => {
       return filetype.mimeType === mimeType;
@@ -401,8 +405,19 @@ const addFile = async (
   }
 
   const fileId:FileId = randomUUID() + "." + fileType.ending;
-  await io.addFile(dbId, fileId, readable);
-  return fileId;
+  const size = await io.addFile(dbId, fileId, readable);
+  return {
+    fileId,
+    size,
+  };
+};
+
+
+const deleteFile = async (
+  dbId: DatabaseId,
+  fileId: FileId,
+):Promise<void> => {
+  return io.deleteFile(dbId, fileId);
 };
 
 
@@ -582,6 +597,7 @@ export {
   remove,
   importDB,
   addFile,
+  deleteFile,
   getReadableFileStream,
   getFileSize,
   getReadableDatabaseStream,

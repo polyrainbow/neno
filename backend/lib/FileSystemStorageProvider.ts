@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import fsClassic from "fs";
 import * as path from "path";
 import { Readable } from "stream";
+import { finished } from "stream/promises";
 import archiver from "archiver";
 
 
@@ -47,24 +48,37 @@ export default class FileSystemStorageProvider {
   async writeObjectFromReadable(
     requestPath: string,
     readableStream: Readable,
-  ):Promise<void> {
+  ):Promise<number> {
     const finalPath = this.joinPath(this.#dataPath, requestPath);
     await fs.mkdir(path.dirname(finalPath), { recursive: true });
     const writableStream = fsClassic.createWriteStream(finalPath);
     readableStream.pipe(writableStream);
-    return await new Promise((resolve, reject) => {
-      writableStream.on('finish', () => {
-        resolve();
-      });
 
-      writableStream.on('error', (e) => {
-        reject(e);
-      });
+    // One important caveat is that if the Readable stream emits an error
+    // during processing, the Writable destination is not closed automatically.
+    // If an error occurs, it will be necessary to manually close each stream
+    // in order to prevent memory leaks.
+    // https://nodejs.org/api/stream.html#readablepipedestination-options
+    try {
+      await finished(readableStream);
+    } catch (e) {
+      // we must not pass the error event to destroy, because we do not handle
+      // it there explicitly
+      writableStream.destroy();
+      readableStream.destroy();
+      await this.removeObject(requestPath);
+      throw new Error(
+        "Readable stream ended unexpectedly.",
+        // @ts-ignore
+        {
+          cause: e,
+        }
+      );
 
-      readableStream.on('error', (e) => {
-        reject(e);
-      });
-    })
+    }
+
+    const size = await this.getFileSize(requestPath);
+    return size;
   }
 
   async readObjectAsString(requestPath:string):Promise<string> {
