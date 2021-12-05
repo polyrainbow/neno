@@ -32,10 +32,14 @@ const startApp = async ({
   frontendPath,
   sessionSecret,
   sessionTTL,
+  maxUploadFileSize,
 }:AppStartOptions):Promise<Express.Application> => {
   const storageProvider = new FileSystemStorageProvider(dataPath);
   logger.info("File system storage ready at " + dataPath);
   logger.info("Session TTL: " + sessionTTL.toString() + " day(s)");
+  logger.info(
+    "Maximum upload file size: " + maxUploadFileSize.toString() + " byte(s)",
+  );
   logger.info("Initializing notes module...");
   await Notes.init(storageProvider, getUrlMetadata, randomUUID);
   logger.info("Initializing routes...")
@@ -408,7 +412,7 @@ const startApp = async ({
         return;
       }
 
-      if (size > config.MAX_UPLOAD_FILE_SIZE) {
+      if (size > maxUploadFileSize) {
         const response:APIResponse = {
           success: false,
           error: APIError.RESOURCE_EXCEEDS_FILE_SIZE,
@@ -497,7 +501,7 @@ const startApp = async ({
         const mimeType = resourceResponse.headers['content-type'];
         const size = parseInt(resourceResponse.headers['content-length']);
 
-        if (size > config.MAX_UPLOAD_FILE_SIZE) {
+        if (size > maxUploadFileSize) {
           const response:APIResponse = {
             success: false,
             error: APIError.RESOURCE_EXCEEDS_FILE_SIZE,

@@ -7,4 +7,5 @@ export default interface AppStartOptions {
     frontendPath: Filepath,
     sessionSecret: string,
     sessionTTL: number,
+    maxUploadFileSize: number,
 }

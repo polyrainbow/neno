@@ -54,6 +54,11 @@ const getArguments = (version) => {
       '--session-ttl <value>',
       "time to live for a session in days",
       "30",
+    )
+    .option(
+      '--max-upload-file-size <value>',
+      "the maximum size of an upload in bytes (default=524288000)",
+      "524288000", // 500 MB
     );
   
   program.parse(process.argv);

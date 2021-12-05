@@ -48,6 +48,7 @@ const app = await startApp({
   frontendPath: path.join(REPO_PATH, "frontend"),
   sessionSecret: programArguments.sessionSecret,
   sessionTTL: parseInt(programArguments.sessionTtl),
+  maxUploadFileSize: parseInt(programArguments.maxUploadFileSize),
 });
 
 logger.info("Starting server...");
