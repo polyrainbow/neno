@@ -1,7 +1,6 @@
 import NoteToTransmit from "../lib/notes/interfaces/NoteToTransmit.js";
 import { NoteId } from "../lib/notes/interfaces/NoteId.js";
 import Stats from "../lib/notes/interfaces/Stats.js";
-import formidable from "formidable";
 import { yyyymmdd } from "../lib/utils.js";
 import * as config from "./config.js";
 import compression from "compression";
@@ -10,12 +9,10 @@ import * as Notes from "../lib/notes/index.js";
 import bcrypt from "bcryptjs";
 import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
-import { File } from "./interfaces/File.js";
 import cookieParser from "cookie-parser";
 import AppStartOptions from "./interfaces/AppStartOptions.js";
 import NoteListPage from "../lib/notes/interfaces/NoteListPage.js";
 import FileSystemStorageProvider from "./lib/FileSystemStorageProvider.js";
-import fs from "fs";
 import http from "http";
 import https from "https";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
@@ -389,79 +386,62 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
-      const form = new formidable.IncomingForm({
-        maxFileSize: config.MAX_UPLOAD_FILE_SIZE,
-      });
-      form.parse(req, (err, fields, files) => {
-        if (err) {
-          if (err.message === "Request aborted") {
-            const response:APIResponse = {
-              success: false,
-              error: APIError.INVALID_REQUEST,
-            };
-            res.status(406).json(response);
-            return;
-          } else {
-            logger.error("Server error:");
-            logger.error(err);
-            const response:APIResponse = {
-              success: false,
-              error: APIError.INTERNAL_SERVER_ERROR,
-            };
-            res.status(500).json(response);
-            return;
-          }
-        }
+      const sizeString = req.headers["content-length"];
 
-        const file:File = files.file;
+      if (typeof sizeString !== "string") {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.status(406).json(response);
+        return;
+      }
 
-        if (!file) {
-          const response:APIResponse = {
-            success: false,
-            error: APIError.INVALID_REQUEST,
-          };
-          res.status(406).json(response);
-          return;
-        }
+      const size = parseInt(sizeString);
 
-        const readable = fs.createReadStream(file.filepath);
-        const mimeType = file.mimetype;
-        const size = file.size;
+      if (isNaN(size) || size < 1) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.status(406).json(response);
+        return;
+      }
 
-        if (size > config.MAX_UPLOAD_FILE_SIZE) {
-          const response:APIResponse = {
-            success: false,
-            error: APIError.RESOURCE_EXCEEDS_FILE_SIZE,
-          };
-          res.status(406).json(response);
-          return;
-        }
+      if (size > config.MAX_UPLOAD_FILE_SIZE) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.RESOURCE_EXCEEDS_FILE_SIZE,
+        };
+        res.status(406).json(response);
+        return;
+      }
 
-        if (!mimeType) {
-          const response:APIResponse = {
-            success: false,
-            error: APIError.INVALID_REQUEST,
-          };
-          res.status(406).json(response);
-          return;
-        }
+      const mimeType = req.headers["content-type"];
 
-        Notes.addFile(req.userId, readable, mimeType)
-          .then((fileId) => {
-            const response:APIResponse = {
-              success: true,
-              payload: fileId, 
-            };
-            res.json(response);
-          })
-          .catch((e) => {
-            const response:APIResponse = {
-              success: false,
-              error: e.message,
-            };
-            res.json(response);
-          });
-      });
+      if (!mimeType) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.status(406).json(response);
+        return;
+      }
+
+      try {
+        const fileId = await Notes.addFile(req.userId, req, mimeType);
+        const response:APIResponse = {
+          success: true,
+          payload: fileId, 
+        };
+        res.json(response);
+      } catch (e) {
+        const response:APIResponse = {
+          success: false,
+          error: e.message,
+        };
+        res.json(response);
+      }
     },
   );
 

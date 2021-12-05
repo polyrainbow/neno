@@ -10,22 +10,18 @@ const callAPI = async ({
   endpoint,
   body,
   outputType = "json",
-  bodyType = "json",
+  bodyType = "application/json",
 }) => {
   const fetchOptions = {
     method,
-    headers: {},
+    headers: {
+      "Content-Type": bodyType,
+    },
   };
-
-  // do NOT set content-type header if content is form data
-  // https://stackoverflow.com/a/39281156/3890888
-  if (bodyType === "json") {
-    fetchOptions.headers["Content-Type"] = "application/json";
-  }
 
   if (body) {
     fetchOptions.body
-      = bodyType === "json" ? JSON.stringify(body) : body;
+      = bodyType === "application/json" ? JSON.stringify(body) : body;
   }
 
   const response = await fetch(API_URL + endpoint, fetchOptions);
@@ -192,13 +188,11 @@ const importLinksAsNotes = (links) => {
 
 
 const uploadFile = (file) => {
-  const data = new FormData();
-  data.append("file", file);
   return callAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "file",
-    body: data,
-    bodyType: "form-data",
+    body: file,
+    bodyType: file.type,
   });
 };
 
