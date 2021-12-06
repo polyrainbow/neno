@@ -1,18 +1,16 @@
 import * as path from "path";
-import fs from "fs/promises";
-import { constants } from 'fs';
-import http, { RequestListener } from "http";
-import https from "https";
 import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
 import User from "./interfaces/User.js";
 import getUsers from "./users.js";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
-import { REPO_PATH } from "./config.js";
+import { REPO_PATH, VERSION, SERVER_TIMEOUT } from "./config.js";
 import * as logger from "./lib/logger.js";
+import startServer from "./server.js";
+import checkDataDirectory from "./checkDataDirectory.js";
 
-const VERSION = "1.0.0";
-const SERVER_TIMEOUT = 30_000; // ms
+logger.info("💡 Starting NENO...");
+
 const programArguments = getProgramArguments(VERSION);
 
 if (programArguments.urlMetadata.length > 0) {
@@ -25,22 +23,15 @@ if (programArguments.urlMetadata.length > 0) {
   process.exit(0);
 }
 
-try {
-  await fs.access(
-    programArguments.dataFolderPath,
-    constants.R_OK | constants.W_OK,
-  );
-  logger.info(`Data directory found at ${programArguments.dataFolderPath}`);
-} catch (e) {
-  logger.warn(
-    `No data directory found at ${programArguments.dataFolderPath}`,
-  );
-  logger.info("Creating one...");
-  await fs.mkdir(programArguments.dataFolderPath, { recursive: true });
-}
+logger.info("💡 Checking data directory...");
 
+await checkDataDirectory(programArguments.dataFolderPath);
+
+logger.info("💡 Getting users...");
 
 const users: User[] = await getUsers(programArguments.dataFolderPath);
+
+logger.info("💡 Starting app...");
 
 const app = await startApp({
   users,
@@ -52,67 +43,16 @@ const app = await startApp({
   sessionCookieName: programArguments.sessionCookieName,
 });
 
-logger.info("Starting server...");
+logger.info("💡 Starting server...");
 
-if (programArguments.useHttps) {
-  const httpsServer = https.createServer(
-    {
-      key: await fs.readFile(programArguments.certKeyPath),
-      cert: await fs.readFile(programArguments.certPath)
-    },
-    app as RequestListener,
-  );
-  httpsServer.timeout = SERVER_TIMEOUT;
-  httpsServer.listen(parseInt(programArguments.httpsPort));
-  logger.info("HTTPS access ready on port " + programArguments.httpsPort);
+await startServer({
+  app,
+  certKeyPath: programArguments.certKeyPath,
+  certPath: programArguments.certPath,
+  useHttps: programArguments.useHttps,
+  port: parseInt(programArguments.port),
+  httpsPort: parseInt(programArguments.httpsPort),
+  timeout: SERVER_TIMEOUT,
+});
 
-  httpsServer.on('clientError', (err, socket) => {
-    // @ts-ignore
-    if (err.code === 'ECONNRESET' || !socket.writable) {
-      return;
-    }
-  
-    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-  });
-  
-  if (programArguments.port == "80" && programArguments.httpsPort == "443") {
-    // redirect http requests to https
-    const httpServer = http.createServer(function (req, res) {
-      res.writeHead(301, {
-        "Location": "https://" + req.headers['host'] + req.url,
-      });
-      res.end();
-    }).listen(programArguments.port);
-
-    httpServer.on('clientError', (err, socket) => {
-      // @ts-ignore
-      if (err.code === 'ECONNRESET' || !socket.writable) {
-        return;
-      }
-    
-      socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-    });
-
-    logger.info(
-      "HTTP requests to port "
-      + programArguments.port + " will be redirected to HTTPS.",
-    );
-  }
-} else {
-  const httpServer = http.createServer(app);
-  httpServer.timeout = SERVER_TIMEOUT;
-
-  httpServer.on('clientError', (err, socket) => {
-    // @ts-ignore
-    if (err.code === 'ECONNRESET' || !socket.writable) {
-      return;
-    }
-  
-    socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-  });
-
-  httpServer.listen(parseInt(programArguments.port));
-  logger.info("HTTP access ready on port " + programArguments.port);
-}
-
-logger.info("Ready.");
+logger.info("✅ Ready.");
