@@ -303,7 +303,7 @@ const App = ({
               />
               <FloatingActionButton
                 title="New note"
-                icon="note_add"
+                icon="add"
                 onClick={() => navigate(paths.editorWithNewNote)}
               ></FloatingActionButton>
             </>

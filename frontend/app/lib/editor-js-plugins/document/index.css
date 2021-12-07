@@ -26,10 +26,10 @@ SOFTWARE.
 
 .cdx-document--with-file {
   display: flex;
-  padding: 13px 20px;
+  padding: var(--block-padding);
   border: var(--block-border);
   box-shadow: var(--block-box-shadow);
-  border-radius: 3px;
+  border-radius: var(--block-border-radius);
 }
 
 .cdx-document--with-file .cdx-document__file-info {

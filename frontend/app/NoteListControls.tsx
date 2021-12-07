@@ -48,9 +48,6 @@ const NoteListControls = ({
         id="sortModeSelect"
         value={sortMode}
         onChange={(e) => setSortMode(e.target.value)}
-        style={{
-          width: "320px",
-        }}
       >
         <option
           value="CREATION_DATE_ASCENDING"

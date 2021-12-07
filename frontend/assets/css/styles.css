@@ -56,6 +56,7 @@
   --input-border-width: 2px;
   --border-radius: 10px;
   --default-margin: 15px;
+  --default-padding: 15px;
   --xl-list-width: 720px;
   --small-font-size: 13px;
   --default-font-size: 16px;
@@ -69,6 +70,10 @@
     0 4px 4px hsl(0deg 0% 0% / 0.075),
     0 8px 8px hsl(0deg 0% 0% / 0.075),
     0 16px 16px hsl(0deg 0% 0% / 0.075);
+  --content-element-border:
+    var(--input-border-width) solid var(--main-content-color) !important;
+  --content-element-border-radius: 0px;
+  --input-padding: 5px;
 }
 
 .content-section {
@@ -77,6 +82,11 @@
   padding: var(--default-margin);
   overflow: auto;
   height: calc(100vh - var(--header-bar-height) - (2 * var(--default-margin)));
+}
+
+
+hr {
+  border: var(--content-element-border);
 }
 
 
@@ -108,11 +118,12 @@ h1 {
 
 
 input, select {
-  border: var(--input-border-width) solid var(--main-content-color) !important;
-  font-size: var(--large-font-size);
+  border: var(--content-element-border);
+  font-size: var(--default-font-size);
   background: var(--background-color);
   color: var(--font-color);
-  margin: 10px 0px;
+  margin: 0px;
+  padding: var(--input-padding);
 }
 
 input[type="radio"] {
@@ -179,7 +190,7 @@ header h1 {
 }
 
 .app-stats-item {
-  margin-left: 15px;
+  margin-left: var(--default-margin);
 }
 
 #header-right input {
@@ -308,7 +319,7 @@ button[disabled]{
 
 .note-list-item-main {
   cursor: pointer;
-  padding: 15px;
+  padding: var(--default-padding);
   width: calc(100% - 70px);
 }
 
@@ -342,17 +353,6 @@ button[disabled]{
 
 .note-list-item .index {
   width: 56px;
-}
-
-.note-list-item .noteListItemControls {
-  height: 36px;
-  text-align: right;
-  padding: 0px 5px;
-}
-
-.noteListItemButton {
-  height: 32px;
-  cursor: pointer;
 }
 
 .note-list-item .linkedNotesIndicatorNumber {
@@ -402,7 +402,7 @@ button[disabled]{
 .import-link-dialog textarea {
   background-color: var(--background-color);
   color: var(--font-color);
-  margin-bottom: 15px;
+  margin-bottom: var(--default-margin);
   width: calc(100% - 5px);
   display: block;
   height: 200px;
@@ -468,7 +468,6 @@ button[disabled]{
 
 #section_login input {
   font-size: var(--large-font-size);
-  padding: 5px;
   color: var(--font-color);
 }
 

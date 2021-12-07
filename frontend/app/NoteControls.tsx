@@ -48,7 +48,7 @@ const NoteControls = ({
           ? <IconButton
             id="button_new"
             title="New note"
-            icon="note_add"
+            icon="add"
             onClick={createNewNote}
           />
           : null

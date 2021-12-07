@@ -2,6 +2,11 @@
   padding-bottom: 50px !important;
 }
 
+.cdx-input{
+  border: var(--content-element-border);
+  border-radius: var(--content-element-border-radius);
+}
+
 @media (min-width: 651px) {
   .codex-editor--narrow .codex-editor__redactor {
     margin-right: 0px !important;
@@ -41,10 +46,9 @@
 }
 
 :root {
-  --block-border: 1px solid rgba(201, 201, 204, 0.48);
-  --block-box-shadow: 0 1px 3px rgba(0, 0, 0, .1);
-  --block-border-radius: 6px;
-  --block-padding: 25px;
+  --block-border: var(--content-element-border);
+  --block-border-radius: var(--content-element-border-radius);
+  --block-padding: 20px;
   --block-title-font-size: var(--default-font-size);
   --block-subtitle-font-size: var(--small-font-size);
   --block-filesize-color: var(--alt-content-color);
