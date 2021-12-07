@@ -6,6 +6,7 @@ interface SearchInputProps {
   label?: string,
   placeholder?: string,
   inputStyle?: any,
+  autoComplete?: string,
 }
 
 const SearchInput = ({
@@ -14,6 +15,7 @@ const SearchInput = ({
   label,
   placeholder,
   inputStyle = {},
+  autoComplete,
 }:SearchInputProps) => {
   return <>
     {
@@ -35,6 +37,7 @@ const SearchInput = ({
       placeholder={placeholder}
       value={value}
       onChange={(e) => {onChange(e.target.value);}}
+      autoComplete={autoComplete}
     />
   </>;
 };

@@ -1,14 +1,23 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import NoteListItem from "./NoteListItem";
 import * as Editor from "./lib/editor";
 import NoteStats from "./NoteStats";
 import isEqual from "react-fast-compare";
 import NoteControls from "./NoteControls";
 import useGoToNote from "./hooks/useGoToNote";
+import SearchInput from "./SearchInput";
+import {
+  useNavigate,
+} from "react-router-dom";
+// import { DatabaseMode } from "./enum/DatabaseMode.js";
+import { paths } from "./lib/config";
+import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
+
 
 const Note = ({
   note,
   displayedLinkedNotes,
+  onLinkAddition,
   onLinkRemoval,
   setUnsavedChanges,
   databaseProvider,
@@ -23,6 +32,64 @@ const Note = ({
   const previousBlocks = useRef(null);
   const blocks = note?.blocks;
   const goToNote = useGoToNote();
+  const [searchString, setSearchString] = useState("");
+  const [searchResults, setSearchResults] = useState<NoteListItemType[]>([]);
+
+  const navigate = useNavigate();
+
+  const handleInvalidCredentialsError = async () => {
+    await databaseProvider.removeAccess();
+    // setDatabaseMode(DatabaseMode.NONE);
+    navigate(paths.login);
+  };
+
+  const refreshNotesList = async () => {
+    const options = {
+      page: 1,
+      sortMode: "UPDATE_DATE_DESCENDING",
+      searchString,
+      caseSensitive: false,
+      limit: 10,
+    };
+
+    // @ts-ignore randomUUID not yet in types
+    // const requestId = crypto.randomUUID();
+    // currentRequestId.current = requestId;
+    try {
+      const {
+        results,
+      } = await databaseProvider.getNotes(options);
+
+      /*
+      // ... some time later - check if this is the current request
+      if (currentRequestId.current === requestId) {
+        setNoteListItems(results);
+        setNumberOfResults(numberOfResults);
+        setNoteListIsBusy(false);
+      }
+      */
+
+      setSearchResults(results);
+    } catch (e) {
+      // if credentials are invalid, go to LoginView. If not, throw.
+      if (e.message === "INVALID_CREDENTIALS") {
+        await handleInvalidCredentialsError();
+      } else {
+        throw new Error(e);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (
+      searchString.length === 0
+    ) {
+      setSearchResults([]);
+      return;
+    }
+    refreshNotesList();
+  }, [searchString]);
+
 
   useEffect(() => {
     const parent = document.getElementById("editor");
@@ -84,6 +151,39 @@ const Note = ({
               />)
             }
           </div>
+          <h2>Add links</h2>
+          <SearchInput
+            value={searchString}
+            placeholder="Search notes..."
+            onChange={(newValue) => setSearchString(newValue)}
+            autoComplete="off"
+            inputStyle={{
+              width: "100%",
+              marginTop: 0,
+            }}
+          />
+          {
+            searchResults
+              .filter((noteListItem) => {
+                return (
+                  noteListItem.id !== note.id
+                  && !displayedLinkedNotes
+                    .map((note) => note.id)
+                    .includes(noteListItem.id)
+                );
+              })
+              .map((noteListItem) => {
+                return <NoteListItem
+                  note={noteListItem}
+                  onSelect={() => goToNote(noteListItem.id)}
+                  isActive={false}
+                  isLinked={false}
+                  key={"noteLinkAdditionSearchResult-" + noteListItem.id}
+                  onLinkChange={() => onLinkAddition(noteListItem)}
+                  isLinkable={true}
+                />;
+              })
+          }
         </div>
         {
           (!note.isUnsaved)

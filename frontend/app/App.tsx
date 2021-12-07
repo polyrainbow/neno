@@ -111,12 +111,12 @@ const App = ({
       const options = {
         page,
         sortMode,
-        query: "",
+        searchString: "",
         caseSensitive: false,
       };
 
       if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
-        options.query = searchValue;
+        options.searchString = searchValue;
       }
 
       // @ts-ignore randomUUID not yet in types

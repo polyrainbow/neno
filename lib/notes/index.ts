@@ -49,6 +49,7 @@ import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
 import DatabaseMainData from "./interfaces/DatabaseMainData.js";
 import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
+import DatabaseQuery from "./interfaces/DatabaseQuery.js";
 
 let io;
 let randomUUID;
@@ -102,23 +103,24 @@ const get = async (
 
 const getNotesList = async (
   dbId: DatabaseId,
-  options,
+  query: DatabaseQuery,
 ): Promise<NoteListPage> => {
-  const query = options.query || "";
-  const caseSensitiveQuery = options.caseSensitiveQuery;
-  const page = Math.max(options.page, 1) || 1;
+  const searchString = query.searchString || "";
+  const caseSensitive = query.caseSensitive || false;
+  const page = query.page ? Math.max(query.page, 1) : 1;
   const sortMode
-    = options.sortMode || NoteListSortMode.CREATION_DATE_DESCENDING;
+    = query.sortMode || NoteListSortMode.CREATION_DATE_DESCENDING;
+  const limit = query.limit || 0;
 
   const db: Database = await io.getMainData(dbId);
 
   let matchingNotes;
 
   // search for note pairs containing identical urls
-  if (query.includes("duplicates:")){
+  if (searchString.includes("duplicates:")){
     const startOfDuplicateType
-      = query.indexOf("duplicates:") + "duplicates:".length;
-    const duplicateType = query.substr(startOfDuplicateType);
+      = searchString.indexOf("duplicates:") + "duplicates:".length;
+    const duplicateType = searchString.substr(startOfDuplicateType);
     if (duplicateType === "url") {
       matchingNotes = getNotesWithDuplicateUrls(db.notes);
     } else if (duplicateType === "title"){
@@ -128,57 +130,62 @@ const getNotesList = async (
     }
 
   // search for exact title
-  } else if (query.includes("exact:")) {
-    const startOfExactQuery = query.indexOf("exact:") + "exact:".length;
-    const exactQuery = query.substr(startOfExactQuery);
+  } else if (searchString.includes("exact:")) {
+    const startOfExactQuery = searchString.indexOf("exact:") + "exact:".length;
+    const exactQuery = searchString.substr(startOfExactQuery);
     matchingNotes = getNotesByTitle(db.notes, exactQuery, false);
 
   // search for notes with specific urls
-  } else if (query.includes("has-url:")) {
-    const startOfExactQuery = query.indexOf("has-url:") + "has-url:".length;
-    const url = query.substr(startOfExactQuery);
+  } else if (searchString.includes("has-url:")) {
+    const startOfExactQuery = searchString.indexOf("has-url:") + "has-url:".length;
+    const url = searchString.substr(startOfExactQuery);
     matchingNotes = getNotesWithUrl(db.notes, url);
 
   // search for notes with specific block types
-  } else if (query.includes("has:")) {
-    const startOfExactQuery = query.indexOf("has:") + "has:".length;
-    const typesString = query.substr(startOfExactQuery);
+  } else if (searchString.includes("has:")) {
+    const startOfExactQuery = searchString.indexOf("has:") + "has:".length;
+    const typesString = searchString.substr(startOfExactQuery);
     /*
       has:audio+video - show all notes that contain audio as well as video
       has:audio|video - show all notes that contain audio or video
     */
     if (typesString.includes("+")) {
-      const types = typesString.split("+");
+      const types = typesString.split("+") as NoteContentBlockType[];
       matchingNotes = getNotesWithBlocksOfTypes(db.notes, types, true);
     } else {
-      const types = typesString.split("|");
+      const types = typesString.split("|") as NoteContentBlockType[];
       matchingNotes = getNotesWithBlocksOfTypes(db.notes, types, false);
     }
 
 
   // full-text search
-  } else if (query.includes("ft:")) {
-    const startOfFtQuery = query.indexOf("ft:") + "ft:".length;
-    const ftQuery = query.substr(startOfFtQuery);
+  } else if (searchString.includes("ft:")) {
+    const startOfFtQuery = searchString.indexOf("ft:") + "ft:".length;
+    const ftQuery = searchString.substr(startOfFtQuery);
     matchingNotes = getNotesThatContainTokens(
       db.notes,
       ftQuery,
-      caseSensitiveQuery,
+      caseSensitive,
     );
 
   // default mode: check if all query tokens are included in note title
   } else {
     matchingNotes = getNotesWithTitleContainingTokens(
       db.notes,
-      query,
-      caseSensitiveQuery,
+      searchString,
+      caseSensitive,
     );
   }
 
   // now we need to transform all notes into NoteListItems before we can
   // sort those
-  const noteListItems:NoteListItem[] = createNoteListItems(matchingNotes, db)
+  let noteListItems:NoteListItem[] = createNoteListItems(matchingNotes, db)
     .sort(getSortFunction(sortMode));
+
+  // let's only slice the array if it makes sense to do so
+  if (limit > 0 && limit < noteListItems.length) {
+    noteListItems = noteListItems.slice(0, limit);
+  }
 
   // let's extract the list items for the requested page
   const noteListItemsOfPage:NoteListItem[] = Utils.getPagedMatches(

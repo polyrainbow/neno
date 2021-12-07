@@ -7,7 +7,7 @@ const setAPIUrl = (_API_URL) => {
 
 const callAPI = async ({
   method = "GET",
-  endpoint,
+  url,
   body,
   outputType = "json",
   bodyType = "application/json",
@@ -24,7 +24,7 @@ const callAPI = async ({
       = bodyType === "application/json" ? JSON.stringify(body) : body;
   }
 
-  const response = await fetch(API_URL + endpoint, fetchOptions);
+  const response = await fetch(API_URL + url, fetchOptions);
 
   let responseFormatted;
 
@@ -60,7 +60,7 @@ const callAPIAndGetJSONPayload = async (options) => {
 const login = (username, password, mfaToken) => {
   return callAPIAndGetJSONPayload({
     method: "POST",
-    endpoint: "login",
+    url: "login",
     body: { username, password, mfaToken },
   });
 };
@@ -69,41 +69,31 @@ const login = (username, password, mfaToken) => {
 const logout = () => {
   return callAPIAndGetJSONPayload({
     method: "POST",
-    endpoint: "logout",
+    url: "logout",
   });
 };
 
 
 const isAuthenticated = () => {
   return callAPIAndGetJSONPayload({
-    endpoint: "authenticated",
+    url: "authenticated",
   });
 };
 
 
 const getNote = (noteId) => {
   return callAPIAndGetJSONPayload({
-    endpoint: "note/" + noteId,
+    url: "note/" + noteId,
   });
 };
 
 
 const getNotes = (options) => {
-  const query = options?.query;
-  const caseSensitive = options?.caseSensitive;
-  const page = options?.page || 1;
-  const sortMode = options?.sortMode;
-
-  let url = "notes?page=" + page.toString() + "&sortMode=" + sortMode;
-
-  if (typeof query === "string") {
-    url = url
-      + "&q=" + encodeURIComponent(query)
-      + "&caseSensitive=" + caseSensitive;
-  }
+  const params = new URLSearchParams(options);
+  const url = `notes?${params.toString()}`;
 
   return callAPIAndGetJSONPayload({
-    endpoint: url,
+    url,
   });
 };
 
@@ -111,7 +101,7 @@ const getNotes = (options) => {
 const putNote = (note, options) => {
   return callAPIAndGetJSONPayload({
     method: "PUT",
-    endpoint: "note",
+    url: "note",
     body: {
       note,
       options,
@@ -123,28 +113,24 @@ const putNote = (note, options) => {
 const deleteNote = (noteId) => {
   return callAPIAndGetJSONPayload({
     method: "DELETE",
-    endpoint: "note/" + noteId,
+    url: "note/" + noteId,
   });
 };
 
 
 const getStats = (options) => {
-  const searchParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(options)) {
-    searchParams.append(key, value.toString());
-  }
-
-  const endpoint = "stats?" + searchParams.toString();
+  const searchParams = new URLSearchParams(options);
+  const url = "stats?" + searchParams.toString();
 
   return callAPIAndGetJSONPayload({
-    endpoint,
+    url,
   });
 };
 
 
 const getGraph = () => {
   return callAPIAndGetJSONPayload({
-    endpoint: "graph",
+    url: "graph",
   });
 };
 
@@ -152,16 +138,16 @@ const getGraph = () => {
 const saveGraph = (graphObject) => {
   return callAPIAndGetJSONPayload({
     method: "POST",
-    endpoint: "graph",
+    url: "graph",
     body: graphObject,
   });
 };
 
 
 const getReadableDatabaseStream = async (withUploads) => {
-  const apiEndpoint = "database?withUploads=" + withUploads.toString();
+  const url = "database?withUploads=" + withUploads.toString();
   const response = await callAPI({
-    endpoint: apiEndpoint,
+    url,
     outputType: "body",
   });
   return response;
@@ -169,9 +155,9 @@ const getReadableDatabaseStream = async (withUploads) => {
 
 
 const getReadableFileStream = async (fileId) => {
-  const apiEndpoint = "file/" + fileId;
+  const url = "file/" + fileId;
   const response = await callAPI({
-    endpoint: apiEndpoint,
+    url,
     outputType: "body",
   });
   return response;
@@ -181,7 +167,7 @@ const getReadableFileStream = async (fileId) => {
 const importLinksAsNotes = (links) => {
   return callAPIAndGetJSONPayload({
     method: "PUT",
-    endpoint: "import-links-as-notes",
+    url: "import-links-as-notes",
     body: { links },
   });
 };
@@ -190,7 +176,7 @@ const importLinksAsNotes = (links) => {
 const uploadFile = (file) => {
   return callAPIAndGetJSONPayload({
     method: "POST",
-    endpoint: "file",
+    url: "file",
     body: file,
     bodyType: file.type,
   });
@@ -200,7 +186,7 @@ const uploadFile = (file) => {
 const uploadFileByUrl = (data) => {
   return callAPIAndGetJSONPayload({
     method: "POST",
-    endpoint: "file-by-url",
+    url: "file-by-url",
     body: data,
   });
 };
@@ -209,7 +195,7 @@ const uploadFileByUrl = (data) => {
 const getUrlMetadata = (url) => {
   const requestUrl = "url-metadata?url=" + url;
   return callAPIAndGetJSONPayload({
-    endpoint: requestUrl,
+    url: requestUrl,
   });
 };
 
@@ -217,7 +203,7 @@ const getUrlMetadata = (url) => {
 const pinNote = (noteId) => {
   return callAPIAndGetJSONPayload({
     method: "PUT",
-    endpoint: "pins",
+    url: "pins",
     body: { noteId },
   });
 };
@@ -226,7 +212,7 @@ const pinNote = (noteId) => {
 const unpinNote = (noteId) => {
   return callAPIAndGetJSONPayload({
     method: "DELETE",
-    endpoint: "pins",
+    url: "pins",
     body: { noteId },
   });
 };
@@ -234,7 +220,7 @@ const unpinNote = (noteId) => {
 
 const getPins = () => {
   return callAPIAndGetJSONPayload({
-    endpoint: "pins",
+    url: "pins",
   });
 };
 

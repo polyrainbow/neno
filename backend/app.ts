@@ -24,6 +24,7 @@ import User from "./interfaces/User.js";
 import { randomUUID } from "crypto";
 import FileSessionStore from "./lib/FileSessionStore.js";
 import * as logger from "./lib/logger.js";
+import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode.js";
 
 
 const startApp = async ({
@@ -265,18 +266,22 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
-      const query = req.query.q || "";
-      const caseSensitiveQuery = req.query.caseSensitive === "true";
-      const page = req.query.page || 1;
-      const sortMode = req.query.sortMode;
-      const includeLinkedNotes = true;
+      const searchString = req.query.searchString as (string | undefined) || "";
+      const caseSensitive = req.query.caseSensitive === "true";
+      const page = typeof req.query.page === "string"
+        ? parseInt(req.query.page)
+        : 1;
+      const sortMode = req.query.sortMode as NoteListSortMode;
+      const limit = typeof req.query.limit === "string"
+        ? parseInt(req.query.limit)
+        : 0;
 
       const notesListPage:NoteListPage = await Notes.getNotesList(req.userId, {
-        includeLinkedNotes,
-        query,
-        caseSensitiveQuery,
+        searchString,
+        caseSensitive,
         page,
         sortMode,
+        limit,
       });
 
       const response:APIResponse = {

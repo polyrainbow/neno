@@ -390,6 +390,7 @@ const EditorView = ({
       <div id="right-view">
         <Note
           note={activeNote}
+          onLinkAddition={handleLinkAddition}
           onLinkRemoval={handleLinkRemoval}
           displayedLinkedNotes={displayedLinkedNotes}
           setUnsavedChanges={setUnsavedChanges}
