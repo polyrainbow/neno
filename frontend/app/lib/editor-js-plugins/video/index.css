@@ -99,10 +99,6 @@
   margin-right: 8px;
 }
 
-.cdx-video__button:hover {
-  color: #393f52;
-}
-
 .cdx-video--with-file .cdx-video__download-button svg {
   fill: var(--block-download-icon-fill-color);
 }

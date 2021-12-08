@@ -138,9 +138,7 @@ export default class Ui {
   createFileButton() {
     const button = make("div", [this.CSS.button]);
 
-    button.innerHTML
-      = this.config.buttonContent
-      || this.api.i18n.t("Select an image");
+    button.innerHTML = "Select image";
 
     button.addEventListener("click", () => {
       this.onSelectFile();
@@ -155,9 +153,8 @@ export default class Ui {
    * @param {string} src - preview source
    * @return {void}
    */
-  showPreloader(src) {
-    this.nodes.imagePreloader.style.backgroundImage = `url(${src})`;
-
+  showPreloader() {
+    this.nodes.imagePreloader.innerHTML = "Uploading...";
     this.toggleStatus(Ui.status.UPLOADING);
   }
 

@@ -441,12 +441,7 @@ export default class ImageTool {
    * @return {void}
    */
   async #uploadFileAndRefreshUI(file) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      this.ui.showPreloader(e.target.result);
-    };
-
+    this.ui.showPreloader();
     const result = await this.config.fileHandling.uploadByFile(file);
     this.#onUploadFinished(result);
   }
@@ -458,7 +453,7 @@ export default class ImageTool {
    * @return {void}
    */
   async #uploadFileByUrlAndRefreshUI(url) {
-    this.ui.showPreloader(url);
+    this.ui.showPreloader();
     const result = await this.config.fileHandling.uploadByUrl(url);
     const filename = getFilenameFromUrl(url);
     result.file.name = filename;

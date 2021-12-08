@@ -93,16 +93,6 @@
   justify-content: center;
 }
 
-.cdx-audio__button svg {
-  height: 14px;
-  margin-top: 0;
-  margin-right: 8px;
-}
-
-.cdx-audio__button:hover {
-  color: #393f52;
-}
-
 .cdx-audio--with-file .cdx-audio__download-button svg {
   fill: var(--block-download-icon-fill-color);
 }

@@ -36,7 +36,19 @@
 }
 
 .cdx-button {
-  background: none !important;
+  padding: var(--default-padding) !important;
+  font-size: var(--default-font-size);
+  background-color: var(--buton-background-color);
+  color: var(--font-color);
+  box-shadow: none !important;
+  border: none;
+  border-radius: var(--border-radius);
+}
+
+.cdx-button:hover {
+  box-shadow: none;
+  background-color: var(--buton-background-color);
+  color: var(--font-color);
 }
 
 .ce-conversion-toolbar,

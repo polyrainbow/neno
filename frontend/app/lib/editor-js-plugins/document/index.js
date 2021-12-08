@@ -113,8 +113,8 @@ export default class DocumentTool {
       endpoint: config.endpoint || "",
       field: config.field || "file",
       types: config.types || "*",
-      buttonText: config.buttonText || "Select file to upload",
-      errorMessage: config.errorMessage || "File upload failed",
+      buttonText: "Select document",
+      errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
     };
 
@@ -298,7 +298,7 @@ export default class DocumentTool {
    */
   prepareUploadButton() {
     this.nodes.button = make("div", [this.CSS.apiButton, this.CSS.button]);
-    this.nodes.button.innerHTML = `${svgs.toolbox} ${this.config.buttonText}`;
+    this.nodes.button.innerHTML = this.config.buttonText;
     /*
       editorjs core will automatically click on this button because we assign
       it CSS classes defined by the editorjs core API.

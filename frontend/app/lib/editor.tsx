@@ -137,8 +137,6 @@ const loadInstance = async ({
         config: {
           fileHandling: fileHandlingConfig,
           types: "application/pdf",
-          buttonText: "Select PDF file",
-          errorMessage: "File upload failed",
         },
       },
       audio: {
@@ -146,8 +144,6 @@ const loadInstance = async ({
         config: {
           fileHandling: fileHandlingConfig,
           types: "audio/mp3, audio/mpeg",
-          buttonText: "Select MP3 file",
-          errorMessage: "File upload failed",
         },
       },
       video: {
@@ -155,8 +151,6 @@ const loadInstance = async ({
         config: {
           fileHandling: fileHandlingConfig,
           types: "video/mp4, video/webm",
-          buttonText: "Select video file",
-          errorMessage: "File upload failed",
         },
       },
     },

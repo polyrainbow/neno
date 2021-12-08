@@ -71,7 +71,6 @@ const LOADER_TIMEOUT = 500;
 /**
  * @typedef {object} AudioToolConfig
  * @description Config supported by Tool
- * @property {string} endpoint - file upload url
  * @property {string} field - field name for uploaded file
  * @property {string} types - available mime-types
  * @property {string} placeholder
@@ -109,11 +108,10 @@ export default class AudioTool {
     };
 
     this.config = {
-      endpoint: config.endpoint || "",
-      field: config.field || "file",
+      field: "file",
       types: config.types || "*",
-      buttonText: config.buttonText || "Select file to upload",
-      errorMessage: config.errorMessage || "File upload failed",
+      buttonText: "Select audio",
+      errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
     };
 
