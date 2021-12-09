@@ -706,13 +706,14 @@ const startApp = async ({
 
       try {
         const metadata = await Notes.getUrlMetadata(url as string);
-
         const response:APIResponse = {
           success: true,
           payload: metadata,
         };
         res.json(response);
       } catch (e) {
+        logger.debug("Error while getting URL metadata");
+        logger.debug(JSON.stringify(e));
         const response:APIResponse = {
           "success": false,
           "error": e.message,

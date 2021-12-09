@@ -16,6 +16,7 @@
     "archiver": "^5.0.2",
     "babel-loader": "^8.2.3",
     "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0-rc.10",
     "commander": "^8.3.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
@@ -25,6 +26,7 @@
     "express-session": "^1.17.2",
     "idb-keyval": "^6.0.3",
     "node-2fa": "^2.0.2",
+    "node-fetch": "^3.1.0",
     "qrcode-terminal": "^0.12.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -33,7 +35,6 @@
     "tippy.js": "^6.3.3",
     "ts-loader": "^9.2.5",
     "typescript": "^4.4.4",
-    "url-metadata": "^2.5.0",
     "webpack": "^5.61.0",
     "webpack-dev-server": "^4.4.0",
     "webpack-merge": "^5.8.0"
