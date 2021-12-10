@@ -37,9 +37,10 @@ const getNoteTitle = (note:Note, maxLength = 800):string => {
   if (
     note.blocks.length > 0
     && [
-    NoteContentBlockType.PARAGRAPH,
-    NoteContentBlockType.HEADING,
-  ].includes(note.blocks[0].type)) {
+      NoteContentBlockType.PARAGRAPH,
+      NoteContentBlockType.HEADING,
+    ].includes(note.blocks[0].type)
+  ) {
     const block
       = note.blocks[0] as NoteContentBlockParagraph | NoteContentBlockHeading;
     const title
@@ -69,14 +70,14 @@ const removeDefaultTextParagraphs = (note:Note):void => {
   });
 };
 
-const removeEmptyLinks = (note:Note):void => {
+const removeEmptyLinkBlocks = (note:Note):void => {
   note.blocks = note.blocks.filter((block) => {
-    const isEmptyLink = (
+    const isEmptyLinkBlock = (
       block.type === "link"
       && block.data.link === ""
     );
 
-    return !isEmptyLink;
+    return !isEmptyLinkBlock;
   });
 };
 
@@ -717,7 +718,7 @@ const getNotesWithBlocksOfTypes = (
 export {
   getNoteTitle,
   removeDefaultTextParagraphs,
-  removeEmptyLinks,
+  removeEmptyLinkBlocks,
   noteWithSameTitleExists,
   findNote,
   getNewNoteId,

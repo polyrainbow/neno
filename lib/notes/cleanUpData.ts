@@ -4,7 +4,7 @@ import {
   findNote,
   getNewNoteId,
   removeDefaultTextParagraphs,
-  removeEmptyLinks,
+  removeEmptyLinkBlocks,
 } from "./noteUtils.js";
 
 
@@ -64,52 +64,43 @@ const cleanUpLinks = (db) => {
 };
 
 
-// this function must always be indempotent, so that there is only one
+const cleanUpNotes = (db) => {
+  const existingNoteIds = [];
+
+  db.notes.forEach((note) => {
+    // assign id to id-less notes
+    if (typeof note.id !== "number" || existingNoteIds.includes(note.id)) {
+      note.id = getNewNoteId(db);
+    }
+    existingNoteIds.push(note.id);
+
+    // trim heading if present
+    if (note.blocks[0]?.type === "header") {
+      note.blocks[0].data.text
+        = note.blocks[0].data.text.trim();
+    }
+
+    removeDefaultTextParagraphs(note);
+    removeEmptyLinkBlocks(note);
+  });
+
+  // remove invalid note ids from pins
+  db.pinnedNotes = db.pinnedNotes.filter((pinnedNoteId) => {
+    return existingNoteIds.includes(pinnedNoteId);
+  });
+}
+
+
+const cleanUpDatabase = (db) => {
+  cleanUpLinks(db);
+  cleanUpNotes(db);
+}
+
+
+// this function must be indempotent, so that there is only one
 // canonical data structure
 const cleanUpData = async (io) => {
-  await io.forEach((db) => {
-    // remove invalid links
-    cleanUpLinks(db);
-
-    const ids = [];
-
-    db.notes.forEach((note) => {
-      // assign id to id-less notes
-      if (typeof note.id !== "number" || ids.includes(note.id)) {
-        note.id = getNewNoteId(db);
-      }
-      ids.push(note.id);
-
-      if (note.editorData) {
-        note.blocks = note.editorData.blocks;
-        delete note.editorData;
-      }
-
-      // trim heading if present
-      if (note.blocks[0]?.type === "header") {
-        note.blocks[0].data.text
-          = note.blocks[0].data.text.trim();
-      }
-
-      note.blocks.forEach((block) => {
-        if (block.type === "attaches") {
-          block.type = "document";
-        }
-
-        if (block.type === "linkTool") {
-          block.type = "link";
-        }
-      })
-
-      removeDefaultTextParagraphs(note);
-      removeEmptyLinks(note);
-    });
-
-    // remove invalid note ids from pins
-    db.pinnedNotes = db.pinnedNotes.filter((pinnedNoteId) => {
-      return ids.includes(pinnedNoteId);
-    });
-  });
+  await io.forEach(cleanUpDatabase);
 };
 
 export default cleanUpData;

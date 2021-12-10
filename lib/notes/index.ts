@@ -3,7 +3,7 @@ import * as Utils from "../utils.js";
 import {
   getNoteTitle,
   removeDefaultTextParagraphs,
-  removeEmptyLinks,
+  removeEmptyLinkBlocks,
   noteWithSameTitleExists,
   findNote,
   getNewNoteId,
@@ -348,7 +348,7 @@ const put = async (
   }
 
   removeDefaultTextParagraphs(databaseNote);
-  removeEmptyLinks(databaseNote);
+  removeEmptyLinkBlocks(databaseNote);
   incorporateUserChangesIntoNote(noteFromUser.changes, databaseNote, db);
 
   await io.flushChanges(db);

@@ -8,7 +8,7 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-typescript": "^7.15.0",
     "@editorjs/editorjs": "2.22.2",
-    "@editorjs/header": "^2.6.0",
+    "@editorjs/header": "^2.6.2",
     "@editorjs/list": "^1.6.1",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@tippyjs/react": "^4.2.6",

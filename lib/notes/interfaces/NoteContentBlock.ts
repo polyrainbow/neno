@@ -1,3 +1,5 @@
+import { FileId } from "./FileId";
+
 export enum NoteContentBlockType {
   PARAGRAPH = "paragraph",
   LINK = "link",
@@ -23,7 +25,13 @@ export interface NoteContentBlockParagraph {
 
 interface NoteContentBlockLinkData {
   link: string,
-  meta: any,
+  meta: {
+    title: string,
+    image: {
+      url: string,
+    },
+    description: string,
+  },
 }
 
 export interface NoteContentBlockLink {
@@ -63,8 +71,16 @@ export interface NoteContentBlockCode {
 }
 
 
+interface NoteContentBlockFileMetadata {
+  extension: string,
+  fileId: FileId,
+  name: string,
+  size: number,
+}
+
+
 interface NoteContentBlockImageData {
-  file: any,
+  file: NoteContentBlockFileMetadata,
   caption: string,
   withBackground: boolean,
 }
@@ -76,7 +92,7 @@ export interface NoteContentBlockImage {
 
 
 interface NoteContentBlockDocumentData {
-  file: any,
+  file: NoteContentBlockFileMetadata,
 }
 
 export interface NoteContentBlockDocument {
@@ -86,7 +102,7 @@ export interface NoteContentBlockDocument {
 
 
 interface NoteContentBlockAudioData {
-  file: any,
+  file: NoteContentBlockFileMetadata,
 }
 
 export interface NoteContentBlockAudio {
@@ -96,7 +112,7 @@ export interface NoteContentBlockAudio {
 
 
 interface NoteContentBlockVideoData {
-  file: any,
+  file: NoteContentBlockFileMetadata,
 }
 
 export interface NoteContentBlockVideo {
