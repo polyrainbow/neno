@@ -142,6 +142,7 @@ const Note = ({
           onInput={(e) => {
             const element = e.currentTarget;
             setNoteTitle(element.value);
+            setUnsavedChanges(true);
           }}
           value={note.title}
           onKeyDown={(e) => {
