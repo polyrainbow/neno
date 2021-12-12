@@ -45,7 +45,7 @@ const NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE = 100;
 
 const MIN_NUMBER_OF_LINKS_FOR_HUB = 5;
 
-const NOTE_TITLE_PLACEHOLDER = "⁉️ Untitled note";
+const NOTE_TITLE_PLACEHOLDER = "Untitled note";
 
 export {
   ALLOWED_FILE_TYPES,
