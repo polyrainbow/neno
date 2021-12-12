@@ -82,12 +82,6 @@ const cleanUpNotes = (db) => {
     }
     existingNoteIds.push(note.id);
 
-    // trim heading if present
-    if (note.blocks[0]?.type === "header") {
-      note.blocks[0].data.text
-        = note.blocks[0].data.text.trim();
-    }
-
     removeDefaultTextParagraphs(note);
     removeEmptyLinkBlocks(note);
     note.title = normalizeNoteTitle(note.title);

@@ -5,6 +5,8 @@
 
 const updateNotes = (db) => {
   db.notes.forEach((note) => {
+
+    // add new note title field if not present
     if (
       typeof note.title !== "string"
     ) {

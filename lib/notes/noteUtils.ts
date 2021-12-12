@@ -52,7 +52,9 @@ const getDisplayNoteTitle = (note:Note, maxLength = 800):string => {
 
 
 const normalizeNoteTitle = (title:string) => {
-  return title.replaceAll(/[\r\n]/g, " ");
+  return title
+    .replaceAll(/[\r\n]/g, " ")
+    .trim();
 }
 
 
