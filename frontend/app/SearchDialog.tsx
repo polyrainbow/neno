@@ -10,6 +10,12 @@ const SearchDialog = ({
     className="stats-dialog"
   >
     <h1>Search presets</h1>
+    <p>
+      <button
+        onClick={() => setSearchValue("exact:")}
+        className="default-button dialog-box-button"
+      >Untitled notes</button>
+    </p>
     <h2>Duplicates</h2>
     <p>
       <button
