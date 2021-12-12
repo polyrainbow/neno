@@ -613,7 +613,7 @@ const getNotesWithUrl = (
 
 
 const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
-  return note.blocks.reduce((accumulator, block) => {
+  const blockText = note.blocks.reduce((accumulator, block) => {
     if (block.type === NoteContentBlockType.PARAGRAPH) {
       return accumulator + " " + block.data.text;
     } else if (block.type === NoteContentBlockType.HEADING) {
@@ -629,6 +629,8 @@ const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
       return accumulator;
     }
   }, "");
+
+  return note.title + " " + blockText;
 };
 
 
