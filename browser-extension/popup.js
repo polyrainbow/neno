@@ -53,13 +53,10 @@ const init = async ({
 }) => {
   pushNoteButton
     .addEventListener("click", async () => {
-      const noteTitle = noteTitleElement.value;
-
       const noteText
         = document.getElementById("textarea_note-text").value;
 
       const blocks = getNoteBlocks({
-        noteTitle,
         url: activeTab.url,
         pageTitle: activeTab.title,
         noteText,
@@ -69,6 +66,7 @@ const init = async ({
         note: {
           id: activeNoteId,
           blocks,
+          title: noteTitleElement.value,
         },
         hostUrl,
         apiKey,

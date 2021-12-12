@@ -3,6 +3,7 @@ export const fetchJSON = (url, options) => {
   return fetch(url, options).then((response) => response.json());
 };
 
+
 export const trimHostUrl = (hostUrl) => {
   let hostUrlTrimmed = hostUrl;
 
@@ -13,20 +14,13 @@ export const trimHostUrl = (hostUrl) => {
   return hostUrlTrimmed;
 };
 
+
 export const getNoteBlocks = ({
-  noteTitle,
   url,
   pageTitle,
   noteText,
 }) => {
   const blocks = [
-    {
-      type: "header",
-      data: {
-        level: 1,
-        text: noteTitle,
-      },
-    },
     {
       type: "link",
       data: {
@@ -58,6 +52,7 @@ export const getNoteBlocks = ({
 
   return blocks;
 };
+
 
 export const putNote = ({
   note,
