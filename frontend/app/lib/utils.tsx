@@ -49,10 +49,10 @@ const getNewNoteObject = ():ActiveNote => {
 };
 
 
+// if the note has no title yet, take the title of the link metadata
 const setNoteTitleByLinkTitleIfUnset = (note, defaultNoteTitle) => {
   if (note.blocks.length === 0) return;
 
-  // if the note has no title yet, take the title of the link metadata
   const firstLinkBlock = note.blocks.find(
     (block) => block.type === "link",
   );
@@ -66,30 +66,13 @@ const setNoteTitleByLinkTitleIfUnset = (note, defaultNoteTitle) => {
   if (!linkBlockHasValidTitle) return;
 
   const noteHasNoTitle = (
-    (![
-      "paragraph",
-      "header",
-    ].includes(note.blocks[0].type))
-    || note.blocks[0]?.data?.text === defaultNoteTitle
-    || note.blocks[0]?.data?.text.trim() === ""
+    note.title === defaultNoteTitle
+    || note.title === ""
   );
 
   if (noteHasNoTitle && linkBlockHasValidTitle) {
     const newNoteTitle = firstLinkBlock.data.meta.title;
-
-    if (note.blocks[0].type === "header") {
-      note.blocks[0].data.text = newNoteTitle;
-    } else {
-      const newHeadingBlock = {
-        type: "header",
-        data: {
-          level: 1,
-          text: newNoteTitle,
-        },
-      };
-
-      note.blocks.unshift(newHeadingBlock);
-    }
+    note.title = newNoteTitle;
   }
 };
 
