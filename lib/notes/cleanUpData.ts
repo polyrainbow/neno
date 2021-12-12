@@ -10,6 +10,7 @@ import { NoteId } from "./interfaces/NoteId.js";
 import {
   findNote,
   getNewNoteId,
+  normalizeNoteTitle,
   removeDefaultTextParagraphs,
   removeEmptyLinkBlocks,
 } from "./noteUtils.js";
@@ -89,6 +90,7 @@ const cleanUpNotes = (db) => {
 
     removeDefaultTextParagraphs(note);
     removeEmptyLinkBlocks(note);
+    note.title = normalizeNoteTitle(note.title);
   });
 
   // remove invalid note ids from pins

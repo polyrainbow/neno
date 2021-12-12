@@ -51,6 +51,11 @@ const getDisplayNoteTitle = (note:Note, maxLength = 800):string => {
 };
 
 
+const normalizeNoteTitle = (title:string) => {
+  return title.replaceAll(/[\r\n]/g, " ");
+}
+
+
 const removeDefaultTextParagraphs = (note:Note):void => {
   note.blocks = note.blocks.filter((block) => {
     const isDefaultTextParagraph = (
@@ -708,6 +713,7 @@ const getNotesWithBlocksOfTypes = (
 
 export {
   getDisplayNoteTitle,
+  normalizeNoteTitle,
   removeDefaultTextParagraphs,
   removeEmptyLinkBlocks,
   noteWithSameTitleExists,

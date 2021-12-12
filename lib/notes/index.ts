@@ -2,6 +2,7 @@ import DatabaseIO from "./DatabaseIO.js";
 import * as Utils from "../utils.js";
 import {
   getDisplayNoteTitle,
+  normalizeNoteTitle,
   removeDefaultTextParagraphs,
   removeEmptyLinkBlocks,
   noteWithSameTitleExists,
@@ -339,7 +340,7 @@ const put = async (
     databaseNote = {
       id: noteId,
       position: db.initialNodePosition,
-      title: noteFromUser.title,
+      title: normalizeNoteTitle(noteFromUser.title),
       blocks: noteFromUser.blocks,
       creationTime: Date.now(),
       updateTime: Date.now(),
@@ -347,7 +348,7 @@ const put = async (
     db.notes.push(databaseNote);
   } else {
     databaseNote.blocks = noteFromUser.blocks;
-    databaseNote.title = noteFromUser.title;
+    databaseNote.title = normalizeNoteTitle(noteFromUser.title);
     databaseNote.updateTime = Date.now();
   }
 
