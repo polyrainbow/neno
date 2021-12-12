@@ -589,7 +589,7 @@ const getNotesByTitle = (
   caseSensitive: boolean,
 ):DatabaseNote[] => {
   return notes.filter((note:DatabaseNote) => {
-    const title = getDisplayNoteTitle(note);
+    const title = note.title;
 
     return caseSensitive
       ? title === query
