@@ -424,7 +424,7 @@ export default class LinkTool {
 
       this.onFetch(response);
     } catch (error) {
-      this.fetchingFailed(this.api.i18n.t("Couldn't fetch the link data"));
+      this.fetchingFailed();
     }
   }
 
@@ -435,9 +435,7 @@ export default class LinkTool {
    */
   onFetch(response) {
     if (!response || !response.success) {
-      this.fetchingFailed(
-        this.api.i18n.t("Couldn't get this link data, try the other one"),
-      );
+      this.fetchingFailed();
 
       return;
     }
@@ -447,9 +445,7 @@ export default class LinkTool {
     this.data = { meta: metaData };
 
     if (!metaData) {
-      this.fetchingFailed(
-        this.api.i18n.t("Wrong response format from the server"),
-      );
+      this.fetchingFailed();
 
       return;
     }
@@ -467,11 +463,8 @@ export default class LinkTool {
    *
    * @param {string} errorMessage
    */
-  fetchingFailed(errorMessage) {
-    this.api.notifier.show({
-      message: errorMessage,
-      style: "error",
-    });
+  fetchingFailed() {
+    console.log("Link data fetching failed.");
 
     this.applyErrorStyle();
   }
