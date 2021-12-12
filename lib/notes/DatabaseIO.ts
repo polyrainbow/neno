@@ -198,7 +198,7 @@ export default class DatabaseIO {
     const stream
       = await this.#storageProvider.getReadableStream(filepath, range);
 
-    const fileEnding = fileId.substr(fileId.lastIndexOf(".") + 1)
+    const fileEnding = fileId.substring(fileId.lastIndexOf(".") + 1)
       .toLocaleLowerCase();
 
     const fileInfo = config.ALLOWED_FILE_TYPES

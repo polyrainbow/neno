@@ -193,9 +193,9 @@ function humanFileSize(bytes, si = false, dp = 1) {
 }
 
 
-const shortenText = (text, maxLength) => {
+const shortenText = (text:string, maxLength:number) => {
   if (text.length > maxLength) {
-    return text.trim().substr(0, maxLength) + "…";
+    return text.trim().substring(0, maxLength) + "…";
   } else {
     return text;
   }

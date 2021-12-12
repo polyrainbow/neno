@@ -119,9 +119,10 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async removeObject(requestPath) {
-    const subDirName = requestPath.substr(0, requestPath.indexOf(this.DS));
+    const subDirName = requestPath.substring(0, requestPath.indexOf(this.DS));
     const subDir = this.#directoryHandle.getDirectoryHandle(subDirName);
-    const filename = requestPath.substr(requestPath.indexOf(this.DS) + 1);
+    const filename = requestPath
+      .substring(requestPath.indexOf(this.DS) + 1);
     await subDir.removeEntry(filename);
   }
 

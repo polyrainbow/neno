@@ -6,7 +6,7 @@ export const getFilenameFromUrl = (url) => {
     return getFilenameFromUrl(url.subst(0, url.length - 1));
   }
 
-  return url.substr(posOfLastSlash + 1);
+  return url.substring(posOfLastSlash + 1);
 };
 
 /**

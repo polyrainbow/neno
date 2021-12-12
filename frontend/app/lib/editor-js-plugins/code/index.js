@@ -288,7 +288,10 @@ export default class CodeTool {
        * For Shift+Tab pressing, remove an indentation from the start of line
        */
       const currentLineStart = getLineStartPosition(value, caretPosition);
-      const firstLineChars = value.substr(currentLineStart, indentation.length);
+      const firstLineChars = value.substring(
+        currentLineStart,
+        currentLineStart + indentation.length,
+      );
 
       if (firstLineChars !== indentation) {
         return;

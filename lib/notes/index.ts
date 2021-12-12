@@ -122,7 +122,7 @@ const getNotesList = async (
   if (searchString.includes("duplicates:")){
     const startOfDuplicateType
       = searchString.indexOf("duplicates:") + "duplicates:".length;
-    const duplicateType = searchString.substr(startOfDuplicateType);
+    const duplicateType = searchString.substring(startOfDuplicateType);
     if (duplicateType === "url") {
       matchingNotes = getNotesWithDuplicateUrls(db.notes);
     } else if (duplicateType === "title"){
@@ -134,19 +134,19 @@ const getNotesList = async (
   // search for exact title
   } else if (searchString.includes("exact:")) {
     const startOfExactQuery = searchString.indexOf("exact:") + "exact:".length;
-    const exactQuery = searchString.substr(startOfExactQuery);
+    const exactQuery = searchString.substring(startOfExactQuery);
     matchingNotes = getNotesByTitle(db.notes, exactQuery, false);
 
   // search for notes with specific urls
   } else if (searchString.includes("has-url:")) {
     const startOfExactQuery = searchString.indexOf("has-url:") + "has-url:".length;
-    const url = searchString.substr(startOfExactQuery);
+    const url = searchString.substring(startOfExactQuery);
     matchingNotes = getNotesWithUrl(db.notes, url);
 
   // search for notes with specific block types
   } else if (searchString.includes("has:")) {
     const startOfExactQuery = searchString.indexOf("has:") + "has:".length;
-    const typesString = searchString.substr(startOfExactQuery);
+    const typesString = searchString.substring(startOfExactQuery);
     /*
       has:audio+video - show all notes that contain audio as well as video
       has:audio|video - show all notes that contain audio or video
@@ -163,7 +163,7 @@ const getNotesList = async (
   // full-text search
   } else if (searchString.includes("ft:")) {
     const startOfFtQuery = searchString.indexOf("ft:") + "ft:".length;
-    const ftQuery = searchString.substr(startOfFtQuery);
+    const ftQuery = searchString.substring(startOfFtQuery);
     matchingNotes = getNotesThatContainTokens(
       db.notes,
       ftQuery,

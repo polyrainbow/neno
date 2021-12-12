@@ -26,7 +26,7 @@ import { NOTE_TITLE_PLACEHOLDER } from "./config.js";
 
 const shortenText = (text:string, maxLength:number):string => {
   if (text.length > maxLength) {
-    return text.trim().substr(0, maxLength) + "…";
+    return text.trim().substring(0, maxLength) + "…";
   } else {
     return text;
   }

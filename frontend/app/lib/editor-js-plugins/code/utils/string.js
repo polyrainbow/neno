@@ -47,7 +47,7 @@ export function getLineStartPosition(string, position) {
    */
   while (char !== "\n" && position > 0) {
     position = position - charLength;
-    char = string.substr(position, charLength);
+    char = string.substring(position, position + charLength);
   }
 
   /**
