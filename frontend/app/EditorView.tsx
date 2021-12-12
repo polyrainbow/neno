@@ -247,6 +247,7 @@ const EditorView = ({
 
   const prepareNoteToTransmit = async () => {
     const noteToTransmit = {
+      title: activeNote.title,
       blocks: await Editor.save(),
       changes: activeNote.changes,
       id: activeNote.isUnsaved ? null : activeNote.id,
@@ -325,7 +326,9 @@ const EditorView = ({
   }, [activeNoteId]);
 
   useEffect(() => {
-    document.title = activeNote.title;
+    document.title = activeNote.title.length > 0
+      ? activeNote.title
+      : Config.DEFAULT_DOCUMENT_TITLE;
 
     return () => {
       document.title = Config.DEFAULT_DOCUMENT_TITLE;
@@ -390,6 +393,14 @@ const EditorView = ({
       <div id="right-view">
         <Note
           note={activeNote}
+          setNoteTitle={
+            (newTitle) => {
+              setActiveNote({
+                ...activeNote,
+                title: newTitle,
+              });
+            }
+          }
           onLinkAddition={handleLinkAddition}
           onLinkRemoval={handleLinkRemoval}
           displayedLinkedNotes={displayedLinkedNotes}

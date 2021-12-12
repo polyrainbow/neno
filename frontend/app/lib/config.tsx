@@ -6,10 +6,9 @@ const DEFAULT_NOTE_TITLE = "";
 
 const DEFAULT_NOTE_BLOCKS:NoteContentBlock[] = [
   {
-    "type": NoteContentBlockType.HEADING,
+    "type": NoteContentBlockType.PARAGRAPH,
     "data": {
-      "text": DEFAULT_NOTE_TITLE,
-      "level": 1,
+      "text": "",
     },
   },
 ];

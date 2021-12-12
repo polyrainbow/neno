@@ -87,6 +87,7 @@
 
 hr {
   border: var(--content-element-border);
+  background: var(--main-content-color);
 }
 
 
@@ -298,6 +299,24 @@ button[disabled]{
 .pagination-button-selected {
   background-color: var(--button-background-color-active);
   font-weight: bold;
+}
+
+#noteTitle {
+  outline: none;
+  border: none;
+  width: 100%;
+  font-size: var(--h1-font-size);
+  font-weight: bold;
+  padding: 0px;
+  margin-top: 30px;
+  margin-bottom: 0px;
+  background-color: var(--background-color);
+  color: var(--font-color);
+  font-family: var(--main-font);
+  min-height: 33px;
+  height: 33px;
+  resize: none;
+  overflow: hidden;
 }
 
 #note-list {

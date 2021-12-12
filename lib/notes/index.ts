@@ -1,7 +1,7 @@
 import DatabaseIO from "./DatabaseIO.js";
 import * as Utils from "../utils.js";
 import {
-  getNoteTitle,
+  getDisplayNoteTitle,
   removeDefaultTextParagraphs,
   removeEmptyLinkBlocks,
   noteWithSameTitleExists,
@@ -25,6 +25,7 @@ import {
   getNotesWithBlocksOfTypes,
   getNotesWithDuplicateTitles,
 } from "./noteUtils.js";
+import updateDataStructure from "./updateDataStructure.js";
 import cleanUpData from "./cleanUpData.js";
 import Database from "./interfaces/DatabaseMainData.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -79,9 +80,10 @@ const init = async (
     getUrlMetadata = _getUrlMetadata;
   }
 
-  io = new DatabaseIO({storageProvider});
   randomUUID = _randomUUID;
 
+  io = new DatabaseIO({storageProvider});
+  await updateDataStructure(io);
   await cleanUpData(io);
 };
 
@@ -209,7 +211,7 @@ const getGraph = async (dbId: DatabaseId):Promise<Graph> => {
   const graphNodes:GraphNode[] = db.notes.map((note) => {
     const graphNode:GraphNode = {
       id: note.id,
-      title: getNoteTitle(note),
+      title: getDisplayNoteTitle(note),
       position: note.position,
       linkedNotes: getLinkedNotes(db, note.id),
       creationTime: note.creationTime,
@@ -337,6 +339,7 @@ const put = async (
     databaseNote = {
       id: noteId,
       position: db.initialNodePosition,
+      title: noteFromUser.title,
       blocks: noteFromUser.blocks,
       creationTime: Date.now(),
       updateTime: Date.now(),
@@ -344,6 +347,7 @@ const put = async (
     db.notes.push(databaseNote);
   } else {
     databaseNote.blocks = noteFromUser.blocks;
+    databaseNote.title = noteFromUser.title;
     databaseNote.updateTime = Date.now();
   }
 
@@ -472,14 +476,8 @@ const importLinksAsNotes = async (dbId, links) => {
   const notesFromUser:NoteFromUser[]
     = urlMetadataResults.map((urlMetadataObject) => {
     const noteFromUser:NoteFromUser = {
+      title: urlMetadataObject.title,
       blocks: [
-        {
-          "type": NoteContentBlockType.HEADING,
-          "data": {
-            "text": urlMetadataObject.title,
-            "level": 1,
-          },
-        },
         {
           "type": NoteContentBlockType.LINK,
           "data": {

@@ -41,7 +41,7 @@ const getNewNoteObject = ():ActiveNote => {
     id: NaN,
     isUnsaved: true,
     linkedNotes: [],
-    title: "New note",
+    title: Config.DEFAULT_NOTE_TITLE,
   };
 
   Object.seal(note);

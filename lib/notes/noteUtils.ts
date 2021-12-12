@@ -33,29 +33,21 @@ const shortenText = (text:string, maxLength:number):string => {
 };
 
 
-const getNoteTitle = (note:Note, maxLength = 800):string => {
-  if (
-    note.blocks.length > 0
-    && [
-      NoteContentBlockType.PARAGRAPH,
-      NoteContentBlockType.HEADING,
-    ].includes(note.blocks[0].type)
-  ) {
-    const block
-      = note.blocks[0] as NoteContentBlockParagraph | NoteContentBlockHeading;
-    const title
-      = Utils.unescapeHTML(block.data.text).trim();
-
-    const titleShortened = shortenText(title, maxLength);
-
-    if (titleShortened.length === 0) {
-      return NOTE_TITLE_PLACEHOLDER;
-    }
-
-    return titleShortened;
-  } else {
+const getDisplayNoteTitle = (note:Note, maxLength = 800):string => {
+  if (note.title.length === 0) {
     return NOTE_TITLE_PLACEHOLDER;
   }
+
+  const titleUnescapedAndTrimmed
+    = Utils.unescapeHTML(note.title).trim();
+
+  const titleShortened = shortenText(titleUnescapedAndTrimmed, maxLength);
+
+  if (titleShortened.length === 0) {
+    return NOTE_TITLE_PLACEHOLDER;
+  }
+
+  return titleShortened;
 };
 
 
@@ -83,16 +75,13 @@ const removeEmptyLinkBlocks = (note:Note):void => {
 
 
 const noteWithSameTitleExists = (
-  note:NoteFromUser,
+  userNote:NoteFromUser,
   db:DatabaseMainData,
 ):boolean => {
-  const noteTitle = getNoteTitle(note);
-
   return db.notes.some((noteFromDB:DatabaseNote):boolean => {
-    const noteFromDBTitle = getNoteTitle(noteFromDB);
     return (
-      (noteFromDBTitle === noteTitle)
-      && (note.id !== noteFromDB.id)
+      (noteFromDB.title === userNote.title)
+      && (noteFromDB.id !== userNote.id)
     );
   });
 };
@@ -146,7 +135,7 @@ const getLinkedNotes = (db:DatabaseMainData, noteId:NoteId):LinkedNote[] => {
     .map((note:DatabaseNote) => {
       const linkedNote:LinkedNote = {
         id: note.id,
-        title: getNoteTitle(note),
+        title: getDisplayNoteTitle(note),
         creationTime: note.creationTime,
         updateTime: note.updateTime,
       }
@@ -261,7 +250,7 @@ const createNoteToTransmit = (
   const noteToTransmit:NoteToTransmit = {
     id: databaseNote.id,
     blocks: databaseNote.blocks,
-    title: getNoteTitle(databaseNote),
+    title: databaseNote.title,
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
     linkedNotes: getLinkedNotes(db, databaseNote.id),
@@ -283,7 +272,7 @@ const createNoteListItem = (
 ):NoteListItem => {
   const noteListItem:NoteListItem = {
     id: databaseNote.id,
-    title: getNoteTitle(databaseNote),
+    title: getDisplayNoteTitle(databaseNote),
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
     features: getNoteFeatures(databaseNote),
@@ -571,7 +560,7 @@ const getNotesWithDuplicateTitles = (notes:DatabaseNote[]):DatabaseNote[] => {
   const titleIndex = new Map<string, Set<DatabaseNote>>();
 
   notes.forEach((note:DatabaseNote):void => {
-    const noteTitle = getNoteTitle(note);
+    const noteTitle = note.title;
 
     if (titleIndex.has(noteTitle)) {
       (titleIndex.get(noteTitle) as Set<DatabaseNote>).add(note);
@@ -600,7 +589,7 @@ const getNotesByTitle = (
   caseSensitive: boolean,
 ):DatabaseNote[] => {
   return notes.filter((note:DatabaseNote) => {
-    const title = getNoteTitle(note);
+    const title = getDisplayNoteTitle(note);
 
     return caseSensitive
       ? title === query
@@ -657,7 +646,7 @@ const getNotesWithTitleContainingTokens = (
       return false;
     }
 
-    const title = getNoteTitle(note);
+    const title = getDisplayNoteTitle(note);
     const queryTokens = query.split(" ");
 
     if (caseSensitive) {
@@ -716,7 +705,7 @@ const getNotesWithBlocksOfTypes = (
 
 
 export {
-  getNoteTitle,
+  getDisplayNoteTitle,
   removeDefaultTextParagraphs,
   removeEmptyLinkBlocks,
   noteWithSameTitleExists,

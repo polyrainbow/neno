@@ -194,7 +194,13 @@ const save = async () => {
 };
 
 
+const focus = async () => {
+  (await instanceQueue).focus();
+};
+
+
 export {
   load,
   save,
+  focus,
 };

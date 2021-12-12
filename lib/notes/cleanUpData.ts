@@ -1,5 +1,12 @@
-// @ts-nocheck
+/*
+  This module is to clean up the database.
+  It is not used to modify the data structure/the database schema from
+  legacy schemas.
+*/
 
+import DatabaseMainData from "./interfaces/DatabaseMainData.js";
+import { Link } from "./interfaces/Link.js";
+import { NoteId } from "./interfaces/NoteId.js";
 import {
   findNote,
   getNewNoteId,
@@ -42,12 +49,12 @@ const linkExists = (linkToTest, links) => {
 };
 
 
-const removeDuplicateLinks = (db) => {
+const removeDuplicateLinks = (db:DatabaseMainData) => {
   const oldLinks = db.links;
-  const newLinks = [];
+  const newLinks:Link[] = [];
 
   for (let i = 0; i < oldLinks.length; i++) {
-    const link = oldLinks[i];
+    const link:Link = oldLinks[i];
 
     if (!linkExists(link, newLinks)) {
       newLinks.push(link);
@@ -65,7 +72,7 @@ const cleanUpLinks = (db) => {
 
 
 const cleanUpNotes = (db) => {
-  const existingNoteIds = [];
+  const existingNoteIds:NoteId[] = [];
 
   db.notes.forEach((note) => {
     // assign id to id-less notes

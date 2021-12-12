@@ -16,6 +16,7 @@ import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
 
 const Note = ({
   note,
+  setNoteTitle,
   displayedLinkedNotes,
   onLinkAddition,
   onLinkRemoval,
@@ -34,7 +35,7 @@ const Note = ({
   const goToNote = useGoToNote();
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState<NoteListItemType[]>([]);
-
+  const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
 
   const handleInvalidCredentialsError = async () => {
@@ -114,6 +115,13 @@ const Note = ({
   // takes some time
   }, [blocks]);
 
+  useEffect(() => {
+    if (noteTitleElementRef.current === null) return;
+    noteTitleElementRef.current.style.height = "0px";
+    noteTitleElementRef.current.style.height
+      = (noteTitleElementRef.current.scrollHeight) + "px";
+  }, [note.title]);
+
   return <>
     <NoteControls
       activeNote={note}
@@ -128,6 +136,22 @@ const Note = ({
     />
     <section id="note">
       <div id="note-content">
+        <textarea
+          ref={noteTitleElementRef}
+          id="noteTitle"
+          onInput={(e) => {
+            const element = e.currentTarget;
+            setNoteTitle(element.value);
+          }}
+          value={note.title}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              Editor.focus();
+            }
+          }}
+        />
+        <hr/>
         <div id="editor"></div>
         <hr/>
         <div id="links">
