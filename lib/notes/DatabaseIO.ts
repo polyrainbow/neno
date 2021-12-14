@@ -1,3 +1,13 @@
+/*
+  This class communicates with the Storage provider it is given to do
+  IO operations on the file system.
+  This class knows about the folder structure inside a graph folder but not
+  about the outside folder structure. That is why it always passes a graph id
+  to the storage provider and a path relative to the graph folder. The storage
+  provider is responsible to resolve the graph id to an absolute folder path.
+*/
+
+
 import { cloneObject, stringContainsUUID } from "../utils.js";
 import { FileId } from "./interfaces/FileId.js";
 import { Readable } from "stream";

@@ -1,3 +1,8 @@
+/*
+  This module manages the users file.
+  Initialize it to read the users file to memory.
+*/
+
 import * as path from "path";
 import fs from "fs/promises";
 import { constants } from 'fs';

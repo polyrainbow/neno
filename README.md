@@ -24,7 +24,7 @@ want. In addition, in server mode NENO will retrieve metadata on pasted URLs
 and displays them with your note.
 The NENO server supports
 * HTTPS and SSL certificates for secure connections
-* as many users/databases as you like
+* as many users and graphs as you like
 * two-factor authentication with password and token
 
 [How to setup a NENO server](./docs/SettingUpNENOServer.md)
