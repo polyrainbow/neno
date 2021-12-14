@@ -237,7 +237,7 @@ export default class LocalDatabaseProvider {
    * public name instead of the more technical fileId.
    * @return {string} url
   */
-  async getUrlForFileId(fileId, publicName) { // can we use it??
+  async getUrlForFileId(fileId) {
     const { readable, mimeType }
       = await this.getReadableFileStream(
         fileId,
