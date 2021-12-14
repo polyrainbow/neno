@@ -18,7 +18,8 @@
     "noUnusedParameters": false,
     "jsx": "react",
     "sourceMap": true,
-    "target": "ES2021",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
     "types": [
       "node"
     ],
