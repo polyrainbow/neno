@@ -19,8 +19,8 @@ const StatsView = ({
 
     const updateStats = async () => {
       const stats = await databaseProvider.getStats({
-        includeDatabaseMetadata: true,
-        includeGraphAnalysis: true,
+        includeMetadata: true,
+        includeAnalysis: true,
       });
       setStats(stats);
       setStatus("READY");
@@ -41,16 +41,16 @@ const StatsView = ({
       toggleAppMenu={toggleAppMenu}
     />
     <section className="content-section">
-      <h1>Stats</h1>
+      <h1>Graph Stats</h1>
       {
         status === "READY"
           ? <>
-            <h2>Database</h2>
+            <h2>Metadata</h2>
             <table className="data-table stats-table">
               <tbody>
                 <tr>
                   <td>ID</td>
-                  <td>{stats.dbId}</td>
+                  <td>{stats.id}</td>
                 </tr>
                 <tr>
                   <td>Type</td>
@@ -58,19 +58,19 @@ const StatsView = ({
                 </tr>
                 <tr>
                   <td>Creation time</td>
-                  <td>{makeTimestampHumanReadable(stats.dbCreationTime)}</td>
+                  <td>{makeTimestampHumanReadable(stats.creationTime)}</td>
                 </tr>
                 <tr>
                   <td>Update time</td>
-                  <td>{makeTimestampHumanReadable(stats.dbUpdateTime)}</td>
+                  <td>{makeTimestampHumanReadable(stats.updateTime)}</td>
                 </tr>
                 <tr>
-                  <td>Size of main data</td>
-                  <td>{humanFileSize(stats.dbSize.mainData)}</td>
+                  <td>Size of graph (without files)</td>
+                  <td>{humanFileSize(stats.size.graph)}</td>
                 </tr>
                 <tr>
                   <td>Size of all files</td>
-                  <td>{humanFileSize(stats.dbSize.files)}</td>
+                  <td>{humanFileSize(stats.size.files)}</td>
                 </tr>
                 <tr>
                   <td>
@@ -85,7 +85,7 @@ const StatsView = ({
                 </tr>
               </tbody>
             </table>
-            <h2>Graph</h2>
+            <h2>Analysis</h2>
             <table className="data-table stats-table">
               <tbody>
                 <tr>
@@ -100,7 +100,11 @@ const StatsView = ({
                   <td>{emojis.unlinked} Unlinked notes</td>
                   <td>{
                     stats.numberOfUnlinkedNotes.toLocaleString()
-                    + ` (${percentageOfUnlinkedNotes.toLocaleString()} %)`
+                    + (
+                      stats.numberOfAllNotes > 0
+                        ? ` (${percentageOfUnlinkedNotes.toLocaleString()} %)`
+                        : ""
+                    )
                   }</td>
                 </tr>
                 <tr>
@@ -128,20 +132,24 @@ const StatsView = ({
                   <td>🔥 Nodes with highest number of links</td>
                   <td>
                     {
-                      stats.nodesWithHighestNumberOfLinks.map((note) => {
-                        return <p
-                          key={`stats_nodesWithHighesNumberOfLinks_${note.id}`}
-                          style={{
-                            "margin": "0",
-                          }}
-                        >
-                          <a href={
-                            paths.editorWithNote.replace("%NOTE_ID%", note.id)
-                          }>
-                            {note.title}
-                          </a> ({note.numberOfLinkedNotes.toLocaleString()})
-                        </p>;
-                      })
+                      stats.numberOfAllNotes > 0
+                        ? stats.nodesWithHighestNumberOfLinks.map((note) => {
+                          return <p
+                            key={
+                              `stats_nodesWithHighesNumberOfLinks_${note.id}`
+                            }
+                            style={{
+                              "margin": "0",
+                            }}
+                          >
+                            <a href={
+                              paths.editorWithNote.replace("%NOTE_ID%", note.id)
+                            }>
+                              {note.title}
+                            </a> ({note.numberOfLinkedNotes.toLocaleString()})
+                          </p>;
+                        })
+                        : "There are no nodes yet."
                     }
                   </td>
                 </tr>
