@@ -47,3 +47,5 @@ web space capable of serving static files via HTTPS.
 * [How to use the Graph view](./docs/GraphViewManual.md)
 
 * [Tips and tricks for working with NENO](./docs/TipsAndTricks.md)
+
+* [Developer Notes](./docs/DeveloperNotes.md)
