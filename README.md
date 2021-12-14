@@ -32,11 +32,8 @@ The NENO server supports
 ### Local mode
 
 In local mode, NENO stores the data in a directory of your choice on your
-local machine (could be a cloud storage directory for example). This is possible
-thanks to the [File System Access API](https://web.dev/file-system-access/) that is
-now available in Chromium-based browsers (Chrome, Edge, Opera, ...) and
-hopefully soon in Firefox, too.
-In local mode, no notes data is transmitted to the server.
+local machine (could be a cloud storage folder for example).
+In local mode, no note data is sent to the web server.
 To run NENO in local mode, you do not need a Node.js server. You only need a
 web space capable of serving static files via HTTPS.
 
