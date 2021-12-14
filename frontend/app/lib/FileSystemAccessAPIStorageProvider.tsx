@@ -30,7 +30,9 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async #getDescendantFolderHandle(folderHandle, descendantFolderPath) {
-    const pathSegments = this.splitPath(descendantFolderPath);
+    const pathSegments = descendantFolderPath.length > 0
+      ? this.splitPath(descendantFolderPath)
+      : [];
 
     let dirHandle = folderHandle;
 
@@ -49,11 +51,14 @@ export default class FileSystemAccessAPIStorageProvider {
     const pathSegments = this.splitPath(filePath);
     const folderPathSegments = pathSegments.slice(0, pathSegments.length - 1);
     const filename = pathSegments[pathSegments.length - 1];
-    const destinationFolderHandle
-      = await this.#getDescendantFolderHandle(
+
+    const destinationFolderHandle = (folderPathSegments.length > 0)
+      ? await this.#getDescendantFolderHandle(
         folderHandle,
         folderPathSegments.join(this.DS),
-      );
+      )
+      : folderHandle;
+
     const fileHandle = await destinationFolderHandle.getFileHandle(
       filename,
       {
