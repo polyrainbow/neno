@@ -2,6 +2,8 @@ import * as path from "path";
 import * as url from "url";
 
 const API_PATH = "/api/";
+const USER_ENDOPINT = API_PATH + "user/";
+const GRAPH_ENDPOINT = API_PATH + "graph/:graphId/";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 // since ts files will be compiled to dist/ directory, we need to go two levels
@@ -9,10 +11,14 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const REPO_PATH = path.join(__dirname, "..", "..");
 const VERSION = "1.0.0";
 const SERVER_TIMEOUT = 30_000; // ms
+const GRAPHS_DIRECTORY_NAME = "graphs";
 
 export {
   API_PATH,
+  USER_ENDOPINT,
+  GRAPH_ENDPOINT,
   REPO_PATH,
   VERSION,
   SERVER_TIMEOUT,
+  GRAPHS_DIRECTORY_NAME,
 }

@@ -1,7 +1,17 @@
 let API_URL;
+let GRAPH_ID;
+let GRAPH_ENDPOINT;
+let USER_ENDPOINT;
 
-const setAPIUrl = (_API_URL) => {
-  API_URL = _API_URL;
+const init = (apiUrl) => {
+  API_URL = apiUrl;
+  USER_ENDPOINT = API_URL + "user/";
+};
+
+
+const setGraphId = (graphId) => {
+  GRAPH_ID = graphId;
+  GRAPH_ENDPOINT = API_URL + "graph/" + GRAPH_ID + "/";
 };
 
 
@@ -24,7 +34,7 @@ const callAPI = async ({
       = bodyType === "application/json" ? JSON.stringify(body) : body;
   }
 
-  const response = await fetch(API_URL + url, fetchOptions);
+  const response = await fetch(url, fetchOptions);
 
   let responseFormatted;
 
@@ -51,14 +61,26 @@ const getJSONResponsePayloadIfSuccessful = (response) => {
 };
 
 
-const callAPIAndGetJSONPayload = async (options) => {
-  const response = await callAPI(options);
+const callUserAPIAndGetJSONPayload = async (options) => {
+  const response = await callAPI({
+    ...options,
+    url: USER_ENDPOINT + options.url,
+  });
+  return getJSONResponsePayloadIfSuccessful(response);
+};
+
+
+const callGraphAPIAndGetJSONPayload = async (options) => {
+  const response = await callAPI({
+    ...options,
+    url: GRAPH_ENDPOINT + options.url,
+  });
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
 const login = (username, password, mfaToken) => {
-  return callAPIAndGetJSONPayload({
+  return callUserAPIAndGetJSONPayload({
     method: "POST",
     url: "login",
     body: { username, password, mfaToken },
@@ -67,7 +89,7 @@ const login = (username, password, mfaToken) => {
 
 
 const logout = () => {
-  return callAPIAndGetJSONPayload({
+  return callUserAPIAndGetJSONPayload({
     method: "POST",
     url: "logout",
   });
@@ -75,14 +97,14 @@ const logout = () => {
 
 
 const isAuthenticated = () => {
-  return callAPIAndGetJSONPayload({
+  return callUserAPIAndGetJSONPayload({
     url: "authenticated",
   });
 };
 
 
 const getNote = (noteId) => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     url: "note/" + noteId,
   });
 };
@@ -92,14 +114,14 @@ const getNotes = (options) => {
   const params = new URLSearchParams(options);
   const url = `notes?${params.toString()}`;
 
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     url,
   });
 };
 
 
 const putNote = (note, options) => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     method: "PUT",
     url: "note",
     body: {
@@ -111,7 +133,7 @@ const putNote = (note, options) => {
 
 
 const deleteNote = (noteId) => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
     url: "note/" + noteId,
   });
@@ -122,23 +144,23 @@ const getStats = (options) => {
   const searchParams = new URLSearchParams(options);
   const url = "stats?" + searchParams.toString();
 
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     url,
   });
 };
 
 
-const getGraph = () => {
-  return callAPIAndGetJSONPayload({
-    url: "graph",
+const getGraphVisualization = () => {
+  return callGraphAPIAndGetJSONPayload({
+    url: "graph-visualization",
   });
 };
 
 
-const saveGraph = (graphObject) => {
-  return callAPIAndGetJSONPayload({
+const saveGraphVisualization = (graphObject) => {
+  return callGraphAPIAndGetJSONPayload({
     method: "POST",
-    url: "graph",
+    url: "graph-visualization",
     body: graphObject,
   });
 };
@@ -165,7 +187,7 @@ const getReadableFileStream = async (fileId) => {
 
 
 const importLinksAsNotes = (links) => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     method: "PUT",
     url: "import-links-as-notes",
     body: { links },
@@ -174,7 +196,7 @@ const importLinksAsNotes = (links) => {
 
 
 const uploadFile = (file) => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     method: "POST",
     url: "file",
     body: file,
@@ -184,7 +206,7 @@ const uploadFile = (file) => {
 
 
 const uploadFileByUrl = (data) => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     method: "POST",
     url: "file-by-url",
     body: data,
@@ -194,14 +216,14 @@ const uploadFileByUrl = (data) => {
 
 const getUrlMetadata = (url) => {
   const requestUrl = "url-metadata?url=" + url;
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     url: requestUrl,
   });
 };
 
 
 const pinNote = (noteId) => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     method: "PUT",
     url: "pins",
     body: { noteId },
@@ -210,7 +232,7 @@ const pinNote = (noteId) => {
 
 
 const unpinNote = (noteId) => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
     url: "pins",
     body: { noteId },
@@ -219,14 +241,15 @@ const unpinNote = (noteId) => {
 
 
 const getPins = () => {
-  return callAPIAndGetJSONPayload({
+  return callGraphAPIAndGetJSONPayload({
     url: "pins",
   });
 };
 
 
 export {
-  setAPIUrl,
+  init,
+  setGraphId,
   login,
   logout,
   isAuthenticated,
@@ -235,8 +258,8 @@ export {
   putNote,
   deleteNote,
   getStats,
-  getGraph,
-  saveGraph,
+  getGraphVisualization,
+  saveGraphVisualization,
   getReadableDatabaseStream,
   importLinksAsNotes,
   uploadFile,

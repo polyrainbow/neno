@@ -2,7 +2,7 @@ import * as path from "path";
 import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
 import User from "./interfaces/User.js";
-import getUsers from "./users.js";
+import Users from "./Users.js";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
 import { REPO_PATH, VERSION, SERVER_TIMEOUT } from "./config.js";
 import * as logger from "./lib/logger.js";
@@ -29,7 +29,8 @@ await checkDataDirectory(programArguments.dataFolderPath);
 
 logger.info("💡 Getting users...");
 
-const users: User[] = await getUsers(programArguments.dataFolderPath);
+await Users.init(programArguments.dataFolderPath);
+const users: User[] = Users.getAll();
 
 logger.info("💡 Starting app...");
 

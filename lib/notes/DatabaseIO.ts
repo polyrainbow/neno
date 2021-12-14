@@ -1,43 +1,32 @@
 import { cloneObject, stringContainsUUID } from "../utils.js";
 import { FileId } from "./interfaces/FileId.js";
-import { DatabaseId } from "./interfaces/DatabaseId.js";
 import { Readable } from "stream";
-import DatabaseMainData from "./interfaces/DatabaseMainData.js";
+import Graph from "./interfaces/Graph.js";
 import ReadableWithMimeType from "./interfaces/ReadableWithMimeType.js";
 import * as config from "./config.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
+import { GraphId } from "../../backend/interfaces/GraphId.js";
+import updateGraphDataStructure from "./updateGraphDataStructure.js";
+import cleanUpGraph from "./cleanUpGraph.js";
 
 
 export default class DatabaseIO {
   #storageProvider;
-  #loadedMainDataObjects:DatabaseMainData[] = [];
+  #loadedGraphs:Map<GraphId, Graph> = new Map();
 
-  #MAIN_DATA_FILE_NAME = "main.db.json";
-  #NAME_OF_FILE_FOLDERS = "files";
-
-
-
-  private getFileFolderPath(databaseId: DatabaseId) {
-    const USER_DB_FOLDER = databaseId;
-    const fileFolderPath = this.#storageProvider.joinPath(
-      USER_DB_FOLDER,
-      this.#NAME_OF_FILE_FOLDERS,
-    );
-    return fileFolderPath;
-  }
+  #GRAPH_FILE_NAME = "graph.json";
+  #NAME_OF_FILES_SUBDIRECTORY = "files";
 
 
-  private async readMainDataFile(
-    databaseId: DatabaseId,
-  ):Promise<DatabaseMainData | null> {
-    const filename = this.#storageProvider.joinPath(
-      databaseId,
-      this.#MAIN_DATA_FILE_NAME,
-    );
-
+  private async readGraphFile(
+    graphId: GraphId,
+  ):Promise<Graph | null> {
     try {
-      const json = await this.#storageProvider.readObjectAsString(filename);
-      const object:DatabaseMainData = JSON.parse(json);
+      const json = await this.#storageProvider.readObjectAsString(
+        graphId,
+        this.#GRAPH_FILE_NAME,
+      );
+      const object:Graph = JSON.parse(json);
       return object;
     } catch (e) {
       return null;
@@ -45,21 +34,21 @@ export default class DatabaseIO {
   }
 
 
-  private async writeMainDataFile (databaseId: DatabaseId, value) {
+  private async writeGraphFile (graphId: GraphId, value) {
     await this.#storageProvider.writeObject(
-      this.#storageProvider.joinPath(databaseId, this.#MAIN_DATA_FILE_NAME),
+      graphId,
+      this.#GRAPH_FILE_NAME,
       JSON.stringify(value),
     );
   }
 
 
-  private async createDatabase (
-    databaseId: DatabaseId,
-  ): Promise<DatabaseMainData> {
-    const newMainData:DatabaseMainData = {
+  private async createGraph (
+    graphId: GraphId,
+  ): Promise<Graph> {
+    const newGraph:Graph = {
       creationTime: Date.now(),
       updateTime: Date.now(),
-      id: databaseId,
       notes: [],
       links: [],
       idCounter: 0,
@@ -74,9 +63,9 @@ export default class DatabaseIO {
       },
       pinnedNotes: [],
     };
-    await this.writeMainDataFile(databaseId, newMainData);
+    await this.writeGraphFile(graphId, newGraph);
 
-    return newMainData;
+    return newGraph;
   }
 
 
@@ -89,75 +78,60 @@ export default class DatabaseIO {
   }
 
 
-  async getMainData(dbId: DatabaseId):Promise<DatabaseMainData> {
-    // 1. try to get from loaded objects
-    const mainDataFromLoadedObjects:DatabaseMainData | undefined
-      = this.#loadedMainDataObjects.find(
-        (db) => db.id === dbId,
-      );
+  async getGraph(graphId: GraphId):Promise<Graph> {
+    // when we are trying to get a graph object, we can try it in 3 ways:
 
-    if (mainDataFromLoadedObjects) {
-      return mainDataFromLoadedObjects;
+    // Way 1: try to get it from loaded graph objects
+    if (this.#loadedGraphs.has(graphId)){
+      return this.#loadedGraphs.get(graphId) as Graph;
     }
 
-    // 2. try to get from file
-    const mainDataFromFile:DatabaseMainData | null
-      = await this.readMainDataFile(dbId);
-    if (mainDataFromFile) {
-      this.#loadedMainDataObjects.push(mainDataFromFile);
-      return mainDataFromFile;
+    // Way 2: try to get it from file
+    const graphFromFile:Graph | null
+      = await this.readGraphFile(graphId);
+    if (graphFromFile) {
+      // when we open a graph from file for the first time, let's make sure
+      // it has the up-to-date data structure and is cleaned up.
+      updateGraphDataStructure(graphFromFile);
+      cleanUpGraph(graphFromFile);
+
+      // flushing these changes will also save the graph in memory for
+      // faster access the next time
+      await this.flushChanges(graphId, graphFromFile);
+
+      // manually saving it in memory is not needed anymore here.
+      // this.#loadedGraphs.set(graphId, graphFromFile);
+  
+      return graphFromFile;
     }
 
-    // 3. create new database and return main data
-    const mainDataFromNewDB:DatabaseMainData = await this.createDatabase(dbId);
-    return mainDataFromNewDB;
+    // Way 3: Create a new graph object and return it
+    const newGraph:Graph = await this.createGraph(graphId);
+    return newGraph;
   }
 
-  // flushChanges makes sure that the changes applied to the main data object are
+  // flushChanges makes sure that the changes applied to the graph object are
   // written to the disk and thus are persistent. it should always be called
   // after any operations on the main data object have been performed.
-  async flushChanges (db:DatabaseMainData):Promise<boolean> {
-    db.updateTime = Date.now();
-
-    const mdFromLoadedMDOsIndex:number
-      = this.#loadedMainDataObjects.findIndex((loadedDB) => {
-        return loadedDB.id === db.id;
-      });
-
-    if (mdFromLoadedMDOsIndex > -1) {
-      this.#loadedMainDataObjects[mdFromLoadedMDOsIndex] = db;
-    } else {
-      this.#loadedMainDataObjects.push(db);
-    }
-
-    await this.writeMainDataFile(db.id, db);
+  async flushChanges (graphId:GraphId, graph:Graph):Promise<boolean> {
+    graph.updateTime = Date.now();
+    this.#loadedGraphs.set(graphId, graph);
+    await this.writeGraphFile(graphId, graph);
     return true;
   }
 
 
-  async forEach (
-    handler:(DatabaseMainData) => any,
-  ):Promise<void> {
-    const databases = await this.#storageProvider.listSubDirectories("")
-    
-    for (let i = 0; i < databases.length; i++) {
-      const dbId:DatabaseId = databases[i];
-      const mainData:DatabaseMainData = await this.getMainData(dbId);
-      const mainDataCopy:DatabaseMainData = cloneObject(mainData);
-      handler(mainDataCopy);
-      await this.flushChanges(mainDataCopy);
-    }
-  }
-
-
   async addFile(
-    databaseId: DatabaseId,
+    graphId:GraphId,
     fileId:FileId,
     source:Readable,
   ):Promise<number> {
-    const fileFolderPath = this.getFileFolderPath(databaseId);
-    const filepath = this.#storageProvider.joinPath(fileFolderPath, fileId);
+    const filepath = this.#storageProvider.joinPath(
+      this.#NAME_OF_FILES_SUBDIRECTORY,
+      fileId,
+    );
     const size = await this.#storageProvider.writeObjectFromReadable(
+      graphId,
       filepath,
       source,
     );
@@ -166,37 +140,50 @@ export default class DatabaseIO {
 
 
   async deleteFile(
-    databaseId: DatabaseId,
+    graphId:GraphId,
     fileId:FileId,
   ):Promise<void> {
-    const fileFolderPath = this.getFileFolderPath(databaseId);
     await this.#storageProvider.removeObject(
-      this.#storageProvider.joinPath(fileFolderPath, fileId),
+      graphId,
+      this.#storageProvider.joinPath(
+        this.#NAME_OF_FILES_SUBDIRECTORY,
+        fileId,
+      ),
     );
   }
 
 
-  async getReadableMainDataStream(
-    databaseId:DatabaseId,
+  async getReadableGraphStream(
+    graphId:GraphId,
+    withFiles:boolean,
   ):Promise<Readable> {
-    const filename = this.#storageProvider.joinPath(
-      databaseId,
-      this.#MAIN_DATA_FILE_NAME,
-    );
-    const stream = await this.#storageProvider.getReadableStream(filename);
-    return stream;
+    if (!withFiles) {
+      const stream = await this.#storageProvider.getReadableStream(
+        graphId,
+        this.#GRAPH_FILE_NAME,
+      );
+      return stream;
+    }
+
+    return this.#storageProvider.getArchiveStreamOfFolder(graphId, "");
   }
 
 
   async getReadableFileStream(
-    databaseId: DatabaseId,
+    graphId: GraphId,
     fileId:FileId,
     range,
   ):Promise<ReadableWithMimeType> {
-    const fileFolderPath = this.getFileFolderPath(databaseId);
-    const filepath = this.#storageProvider.joinPath(fileFolderPath, fileId);
-    const stream
-      = await this.#storageProvider.getReadableStream(filepath, range);
+    const filepath = this.#storageProvider.joinPath(
+      this.#NAME_OF_FILES_SUBDIRECTORY,
+      fileId,
+    );
+
+    const stream = await this.#storageProvider.getReadableStream(
+      graphId,
+      filepath,
+      range,
+    );
 
     const fileEnding = fileId.substring(fileId.lastIndexOf(".") + 1)
       .toLocaleLowerCase();
@@ -220,25 +207,29 @@ export default class DatabaseIO {
 
 
   async getFileSize(
-    databaseId: DatabaseId,
+    graphId: GraphId,
     fileId:FileId,
   ):Promise<number> {
-    const fileFolderPath = this.getFileFolderPath(databaseId);
-    const filepath = this.#storageProvider.joinPath(fileFolderPath, fileId);
+    const filepath = this.#storageProvider.joinPath(
+      this.#NAME_OF_FILES_SUBDIRECTORY,
+      fileId,
+    );
     const fileSize
-      = await this.#storageProvider.getFileSize(filepath);
+      = await this.#storageProvider.getFileSize(graphId, filepath);
 
     return fileSize;
   }
 
 
-  async getSizeOfDatabaseFiles(
-    databaseId: DatabaseId,
+  async getSizeOfGraphFiles(
+    graphId: GraphId,
   ):Promise<number> {
-    const fileFolderPath = this.getFileFolderPath(databaseId);
     // maybe the file folder was not created yet, so let's just try
     try {
-      const size = await this.#storageProvider.getFolderSize(fileFolderPath);
+      const size = await this.#storageProvider.getFolderSize(
+        graphId,
+        this.#NAME_OF_FILES_SUBDIRECTORY,
+      );
       return size;
     } catch (e) {
       return 0;
@@ -246,54 +237,39 @@ export default class DatabaseIO {
   }
 
 
-  async getSizeOfDatabaseMainData(
-    databaseId: DatabaseId,
+  async getSizeOfGraph(
+    graphId: GraphId,
   ):Promise<number> {
-    const filepath = this.#storageProvider.joinPath(
-      databaseId,
-      this.#MAIN_DATA_FILE_NAME,
-    );
     const fileSize
-      = await this.#storageProvider.getFileSize(filepath);
+      = await this.#storageProvider.getFileSize(graphId, this.#GRAPH_FILE_NAME);
 
     return fileSize;
   }
 
 
-  async getTotalDatabaseSize(
-    databaseId: DatabaseId,
+  async getSizeOfGraphWithFiles(
+    graphId: GraphId,
   ):Promise<number> {
     const sizes = await Promise.all([
-      this.getSizeOfDatabaseMainData(databaseId),
-      this.getSizeOfDatabaseFiles(databaseId),
+      this.getSizeOfGraph(graphId),
+      this.getSizeOfGraphFiles(graphId),
     ]);
 
     return sizes[0] + sizes[1];
   }
 
 
-  async getReadableDatabaseStream(
-    databaseId: DatabaseId,
-    withUploads: boolean,
-  ) {
-    if (!withUploads) {
-      return await this.getReadableMainDataStream(databaseId);
-    }
-
-    return this.#storageProvider.getArchiveStreamOfFolder(databaseId);
-  }
-
-
   async getNumberOfFiles(
-    databaseId: DatabaseId,
+    graphId: GraphId,
   ):Promise<number> {
-    const fileFolderPath = this.getFileFolderPath(databaseId);
-
     // it could be that the directory does not exist yet
     try {
-      const files = (await this.#storageProvider.listDirectory(fileFolderPath))
-        .filter(stringContainsUUID);
-
+      const directoryListing = await this.#storageProvider.listDirectory(
+        graphId,
+        this.#NAME_OF_FILES_SUBDIRECTORY,
+      )
+      // filter out system files
+      const files = directoryListing.filter(stringContainsUUID);
       return files.length;
     } catch (e) {
       return 0;

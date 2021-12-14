@@ -52,8 +52,8 @@ export default class LocalDatabaseProvider {
   }
 
 
-  /* when using a local db folder, we'll always call this db the same */
-  static dbId = "local";
+  /* when using a local graph folder, we'll always call this graph the same */
+  static graphId = "local-graph";
 
   #notesModule;
 
@@ -70,7 +70,7 @@ export default class LocalDatabaseProvider {
 
 
   async getDbId() {
-    return LocalDatabaseProvider.dbId;
+    return LocalDatabaseProvider.graphId;
   }
 
 
@@ -132,46 +132,49 @@ export default class LocalDatabaseProvider {
 
 
   getNote(noteId) {
-    return this.#notesModule.get(noteId, LocalDatabaseProvider.dbId);
+    return this.#notesModule.get(noteId, LocalDatabaseProvider.graphId);
   }
 
   getNotes(options) {
-    return this.#notesModule.getNotesList(LocalDatabaseProvider.dbId, options);
+    return this.#notesModule.getNotesList(
+      LocalDatabaseProvider.graphId,
+      options,
+    );
   }
 
   getStats(options) {
-    return this.#notesModule.getStats(LocalDatabaseProvider.dbId, options);
+    return this.#notesModule.getStats(LocalDatabaseProvider.graphId, options);
   }
 
   deleteNote(noteId) {
-    return this.#notesModule.remove(noteId, LocalDatabaseProvider.dbId);
+    return this.#notesModule.remove(noteId, LocalDatabaseProvider.graphId);
   }
 
   putNote(noteToTransmit, options) {
     return this.#notesModule.put(
       noteToTransmit,
-      LocalDatabaseProvider.dbId,
+      LocalDatabaseProvider.graphId,
       options,
     );
   }
 
   importLinksAsNotes(links) {
     return this.#notesModule.importLinksAsNotes(
-      LocalDatabaseProvider.dbId,
+      LocalDatabaseProvider.graphId,
       links,
     );
   }
 
-  saveGraph(graphObject) {
+  saveGraphVisualization(graphVisualization) {
     return this.#notesModule.setGraph(
-      graphObject,
-      LocalDatabaseProvider.dbId,
+      graphVisualization,
+      LocalDatabaseProvider.graphId,
     );
   }
 
-  async getGraph() {
-    const graph = await this.#notesModule.getGraph(
-      LocalDatabaseProvider.dbId,
+  async getGraphVisualization() {
+    const graphVisualization = await this.#notesModule.getGraphVisualization(
+      LocalDatabaseProvider.graphId,
     );
 
     /*
@@ -180,12 +183,12 @@ export default class LocalDatabaseProvider {
       otherwise: Node dragging would do weird things with INPI.
       So let's serialize and re-parse
     */
-    return JSON.parse(JSON.stringify(graph));
+    return JSON.parse(JSON.stringify(graphVisualization));
   }
 
   getReadableDatabaseStream(includingImagesAndFiles) {
     return this.#notesModule.getReadableDatabaseStream(
-      LocalDatabaseProvider.dbId,
+      LocalDatabaseProvider.graphId,
       includingImagesAndFiles,
     );
   }
@@ -193,7 +196,7 @@ export default class LocalDatabaseProvider {
 
   uploadFile(file) {
     return this.#notesModule.addFile(
-      LocalDatabaseProvider.dbId,
+      LocalDatabaseProvider.graphId,
       file.stream(),
       file.type,
     );
@@ -207,21 +210,21 @@ export default class LocalDatabaseProvider {
 
   getReadableFileStream(fileId) {
     return this.#notesModule.getReadableFileStream(
-      LocalDatabaseProvider.dbId,
+      LocalDatabaseProvider.graphId,
       fileId,
     );
   }
 
 
   pinNote(noteId) {
-    return this.#notesModule.pin(LocalDatabaseProvider.dbId, noteId);
+    return this.#notesModule.pin(LocalDatabaseProvider.graphId, noteId);
   }
 
   unpinNote(noteId) {
-    return this.#notesModule.unpin(LocalDatabaseProvider.dbId, noteId);
+    return this.#notesModule.unpin(LocalDatabaseProvider.graphId, noteId);
   }
 
   getPins() {
-    return this.#notesModule.getPins(LocalDatabaseProvider.dbId);
+    return this.#notesModule.getPins(LocalDatabaseProvider.graphId);
   }
 }

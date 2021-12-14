@@ -1,10 +1,10 @@
 /*
-  This module is to clean up the database.
+  This module is to clean up a graph.
   It is not used to modify the data structure/the database schema from
   legacy schemas.
 */
 
-import DatabaseMainData from "./interfaces/DatabaseMainData.js";
+import DatabaseMainData from "./interfaces/Graph.js";
 import { Link } from "./interfaces/Link.js";
 import { NoteId } from "./interfaces/NoteId.js";
 import {
@@ -16,10 +16,10 @@ import {
 } from "./noteUtils.js";
 
 
-const removeLinksOfNonExistingNotes = (db) => {
-  db.links = db.links.filter((link) => {
-    const note0 = findNote(db, link[0]);
-    const note1 = findNote(db, link[1]);
+const removeLinksOfNonExistingNotes = (graph) => {
+  graph.links = graph.links.filter((link) => {
+    const note0 = findNote(graph, link[0]);
+    const note1 = findNote(graph, link[1]);
     return (
       (typeof note0 === "object")
       && (note0 !== null)
@@ -50,8 +50,8 @@ const linkExists = (linkToTest, links) => {
 };
 
 
-const removeDuplicateLinks = (db:DatabaseMainData) => {
-  const oldLinks = db.links;
+const removeDuplicateLinks = (graph:DatabaseMainData) => {
+  const oldLinks = graph.links;
   const newLinks:Link[] = [];
 
   for (let i = 0; i < oldLinks.length; i++) {
@@ -62,23 +62,23 @@ const removeDuplicateLinks = (db:DatabaseMainData) => {
     }
   }
 
-  db.links = newLinks;
+  graph.links = newLinks;
 };
 
 
-const cleanUpLinks = (db) => {
-  removeLinksOfNonExistingNotes(db);
-  removeDuplicateLinks(db);
+const cleanUpLinks = (graph) => {
+  removeLinksOfNonExistingNotes(graph);
+  removeDuplicateLinks(graph);
 };
 
 
-const cleanUpNotes = (db) => {
+const cleanUpNotes = (graph) => {
   const existingNoteIds:NoteId[] = [];
 
-  db.notes.forEach((note) => {
+  graph.notes.forEach((note) => {
     // assign id to id-less notes
     if (typeof note.id !== "number" || existingNoteIds.includes(note.id)) {
-      note.id = getNewNoteId(db);
+      note.id = getNewNoteId(graph);
     }
     existingNoteIds.push(note.id);
 
@@ -88,22 +88,17 @@ const cleanUpNotes = (db) => {
   });
 
   // remove invalid note ids from pins
-  db.pinnedNotes = db.pinnedNotes.filter((pinnedNoteId) => {
+  graph.pinnedNotes = graph.pinnedNotes.filter((pinnedNoteId) => {
     return existingNoteIds.includes(pinnedNoteId);
   });
 }
 
 
-const cleanUpDatabase = (db) => {
-  cleanUpLinks(db);
-  cleanUpNotes(db);
+// this function must be indempotent, since there is only one
+// ideal cleaned-up state
+const cleanUpGraph = (graph) => {
+  cleanUpLinks(graph);
+  cleanUpNotes(graph);
 }
 
-
-// this function must be indempotent, so that there is only one
-// canonical data structure
-const cleanUpData = async (io) => {
-  await io.forEach(cleanUpDatabase);
-};
-
-export default cleanUpData;
+export default cleanUpGraph;

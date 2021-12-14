@@ -1,6 +1,6 @@
 import NoteToTransmit from "../lib/notes/interfaces/NoteToTransmit.js";
 import { NoteId } from "../lib/notes/interfaces/NoteId.js";
-import Stats from "../lib/notes/interfaces/Stats.js";
+import Stats from "../lib/notes/interfaces/GraphStats.js";
 import { yyyymmdd } from "../lib/utils.js";
 import * as config from "./config.js";
 import compression from "compression";
@@ -25,6 +25,8 @@ import { randomUUID } from "crypto";
 import FileSessionStore from "./lib/FileSessionStore.js";
 import * as logger from "./lib/logger.js";
 import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode.js";
+import { UserId } from "./interfaces/UserId.js";
+import { GraphId } from "./interfaces/GraphId.js";
 
 
 const startApp = async ({
@@ -36,8 +38,9 @@ const startApp = async ({
   maxUploadFileSize,
   sessionCookieName,
 }:AppStartOptions):Promise<Express.Application> => {
-  const storageProvider = new FileSystemStorageProvider(dataPath);
-  logger.info("File system storage ready at " + dataPath);
+  const graphsDirectoryPath = path.join(dataPath, config.GRAPHS_DIRECTORY_NAME);
+  const storageProvider = new FileSystemStorageProvider(graphsDirectoryPath);
+  logger.info("File system storage ready at " + graphsDirectoryPath);
   logger.info("Session TTL: " + sessionTTL.toString() + " day(s)");
   logger.info(
     "Maximum upload file size: " + maxUploadFileSize.toString() + " byte(s)",
@@ -76,10 +79,34 @@ const startApp = async ({
   };
 
 
+  const getGraphIdsForUser = (userId:UserId):GraphId[] => {
+    const user = users.find((user) => user.id === userId);
+  
+    if (!user) {
+      throw new Error("Unknown user id");
+    }
+  
+    return user.graphIds;
+  }
+
+
   const verifyUser = (req, res, next) => {
     if (req.session.userId) {
       // make the user id available in the req object for easier access
       req.userId = req.session.userId;
+
+      // if the user passed a graph id as param, they must have the rights to
+      // access it
+      if (req.params.graphId) {
+        const graphIds = getGraphIdsForUser(req.userId);
+        if (!graphIds.includes(req.params.graphId)){
+          const response:APIResponse = {
+            success: false,
+            error: APIError.INVALID_REQUEST,
+          };
+          return res.status(406).json(response);
+        }
+      }
       next();
 
     // if userId has not been set via session, check if api key is present
@@ -140,14 +167,14 @@ const startApp = async ({
   *****************/
 
   app.get(
-    config.API_PATH + "authenticated",
+    config.USER_ENDOPINT + "authenticated",
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
       const response:APIResponse = {
         success: true,
         payload: {
-          dbId: req.userId,
+          graphIds: getGraphIdsForUser(req.userId),
         },
       };
       res.json(response);
@@ -156,14 +183,15 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "database",
+    config.GRAPH_ENDPOINT,
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
+      const graphId = req.params.graphId;
       const withUploads = req.query.withUploads === "true";
 
       const databaseStream = await Notes.getReadableDatabaseStream(
-        req.userId,
+        graphId,
         withUploads,
       );
 
@@ -171,7 +199,7 @@ const startApp = async ({
       const dateSuffix = yyyymmdd(new Date());
 
       const fileEnding = withUploads ? "zip" : "json";
-      const filename = `neno-${req.userId}-${dateSuffix}.db.${fileEnding}`;
+      const filename = `neno-${graphId}-${dateSuffix}.db.${fileEnding}`;
       res.attachment(filename);
 
       // this is the streaming magic
@@ -181,17 +209,19 @@ const startApp = async ({
 
 
   app.put(
-    config.API_PATH + "database",
+    config.GRAPH_ENDPOINT,
     sessionMiddleware,
     verifyUser,
     express.json(),
     function(req, res) {
+      const graphId = req.params.graphId;
+      
       const response:APIResponse = {
         success: false,
       };
     
       try {
-        const success = Notes.importDB(req.body, req.userId);
+        const success = Notes.importDB(req.body, graphId);
         if (!success) throw new Error("INTERNAL_SERVER_ERROR");
         response.success = true;
       } catch(e) {
@@ -205,11 +235,11 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "graph",
+    config.GRAPH_ENDPOINT + "graph-visualization",
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
-      const graph = await Notes.getGraph(req.userId);
+      const graph = await Notes.getGraphVisualization(req.userId);
       const response:APIResponse = {
         success: true,
         payload: graph,
@@ -220,13 +250,13 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "stats",
+    config.GRAPH_ENDPOINT + "stats",
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
       const options = {
-        includeDatabaseMetadata: req.query.includeDatabaseMetadata === "true",
-        includeGraphAnalysis: req.query.includeGraphAnalysis === "true",
+        includeMetadata: req.query.includeMetadata === "true",
+        includeAnalysis: req.query.includeAnalysis === "true",
       };
       const stats:Stats = await Notes.getStats(req.userId, options);
       const response:APIResponse = {
@@ -239,13 +269,14 @@ const startApp = async ({
 
 
   app.post(
-    config.API_PATH + "graph",
+    config.GRAPH_ENDPOINT + "graph-visualization",
     sessionMiddleware,
     verifyUser,
     express.json({ limit: "1mb" }), // posting a graph can be somewhat larger
     async function(req, res) {
+      const graphId = req.params.graphId;
       try {
-        await Notes.setGraph(req.body, req.userId);
+        await Notes.setGraphVisualization(req.body, graphId);
         const response:APIResponse = {
           success: true,
         };
@@ -262,10 +293,11 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "notes",
+    config.GRAPH_ENDPOINT + "notes",
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
+      const graphId = req.params.graphId;
       const searchString = req.query.searchString as (string | undefined) || "";
       const caseSensitive = req.query.caseSensitive === "true";
       const page = typeof req.query.page === "string"
@@ -276,13 +308,16 @@ const startApp = async ({
         ? parseInt(req.query.limit)
         : 0;
 
-      const notesListPage:NoteListPage = await Notes.getNotesList(req.userId, {
-        searchString,
-        caseSensitive,
-        page,
-        sortMode,
-        limit,
-      });
+      const notesListPage:NoteListPage = await Notes.getNotesList(
+        graphId,
+        {
+          searchString,
+          caseSensitive,
+          page,
+          sortMode,
+          limit,
+        },
+      );
 
       const response:APIResponse = {
         success: true,
@@ -294,7 +329,7 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "note/:noteId",
+    config.GRAPH_ENDPOINT + "note/:noteId",
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
@@ -319,7 +354,7 @@ const startApp = async ({
 
 
   app.put(
-    config.API_PATH + "note",
+    config.GRAPH_ENDPOINT + "note",
     sessionMiddleware,
     verifyUser,
     express.json(),
@@ -350,7 +385,7 @@ const startApp = async ({
 
 
   app.put(
-    config.API_PATH + "import-links-as-notes",
+    config.GRAPH_ENDPOINT + "import-links-as-notes",
     sessionMiddleware,
     verifyUser,
     express.json(),
@@ -370,7 +405,7 @@ const startApp = async ({
 
 
   app.delete(
-    config.API_PATH + "note/:noteId",
+    config.GRAPH_ENDPOINT + "note/:noteId",
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
@@ -392,7 +427,7 @@ const startApp = async ({
 
 
   app.post(
-    config.API_PATH + "file",
+    config.GRAPH_ENDPOINT + "file",
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
@@ -486,7 +521,7 @@ const startApp = async ({
 
 
   app.post(
-    config.API_PATH + "file-by-url",
+    config.GRAPH_ENDPOINT + "file-by-url",
     sessionMiddleware,
     verifyUser,
     express.json(),
@@ -604,7 +639,7 @@ const startApp = async ({
     // it's only there for the browser to save/display the file with a custom
     // name with a url like
     // /api/file/ae62787f-4344-4124-8026-3839543fde70.png/my-pic.png
-    config.API_PATH + "file/:fileId/:publicName*?",
+    config.GRAPH_ENDPOINT + "file/:fileId/:publicName*?",
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
@@ -698,7 +733,7 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "url-metadata",
+    config.GRAPH_ENDPOINT + "url-metadata",
     sessionMiddleware,
     verifyUser,
     async (req, res) => {
@@ -725,7 +760,7 @@ const startApp = async ({
 
 
   app.put(
-    config.API_PATH + "pins",
+    config.GRAPH_ENDPOINT + "pins",
     sessionMiddleware,
     verifyUser,
     express.json(),
@@ -745,7 +780,7 @@ const startApp = async ({
 
 
   app.delete(
-    config.API_PATH + "pins",
+    config.GRAPH_ENDPOINT + "pins",
     sessionMiddleware,
     verifyUser,
     express.json(),
@@ -765,7 +800,7 @@ const startApp = async ({
 
 
   app.get(
-    config.API_PATH + "pins",
+    config.GRAPH_ENDPOINT + "pins",
     sessionMiddleware,
     verifyUser,
     express.json(),
@@ -781,7 +816,7 @@ const startApp = async ({
   );
 
   app.post(
-    config.API_PATH + "logout",
+    config.USER_ENDOPINT + "logout",
     sessionMiddleware,
     verifyUser,
     express.json(),
@@ -824,7 +859,7 @@ const startApp = async ({
 
 
   app.post(
-    config.API_PATH + 'login',
+    config.USER_ENDOPINT + 'login',
     sessionMiddleware,
     express.json(),
     (req, res) => {
@@ -888,14 +923,14 @@ const startApp = async ({
 
       // this modification of the session object initializes the session and
       // makes express-session set the cookie
-      req.session.userId = user.id;
+      req.session.userId = user.login;
       req.session.userAgent = req.headers["user-agent"];
       req.session.userPlatform = req.headers["sec-ch-ua-platform"];
 
       const response:APIResponse = {
         success: true,
         payload: {
-          dbId: user.id,
+          graphIds: user.graphIds,
         },
       };
 

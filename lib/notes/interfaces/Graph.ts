@@ -1,11 +1,16 @@
-import NodePosition from "./NodePosition.js";
-import GraphNode from "./GraphNode.js";
+import SavedNote from "./SavedNote.js";
 import { Link } from "./Link.js";
+import NodePosition from "./NodePosition.js";
+import { NoteId } from "./NoteId.js";
 import ScreenPosition from "./ScreenPosition.js";
 
-export default interface Graph {
-    nodes: GraphNode[],
+export default interface GraphObject {
+    readonly creationTime: number,
+    updateTime: number,
+    notes: SavedNote[],
     links: Link[],
+    idCounter: number,
     screenPosition: ScreenPosition,
     initialNodePosition: NodePosition,
+    pinnedNotes: NoteId[],
 }

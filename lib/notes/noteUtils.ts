@@ -1,7 +1,7 @@
-import DatabaseMainData from "./interfaces/DatabaseMainData.js";
-import DatabaseNote from "./interfaces/DatabaseNote.js";
+import Graph from "./interfaces/Graph.js";
+import SavedNote from "./interfaces/SavedNote.js";
 import { FileId } from "./interfaces/FileId.js";
-import GraphNodePositionUpdate from "./interfaces/GraphNodePositionUpdate.js";
+import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import { Link } from "./interfaces/Link.js";
 import LinkedNote from "./interfaces/LinkedNote.js";
 import Note from "./interfaces/Note.js";
@@ -83,9 +83,9 @@ const removeEmptyLinkBlocks = (note:Note):void => {
 
 const noteWithSameTitleExists = (
   userNote:NoteFromUser,
-  db:DatabaseMainData,
+  graph:Graph,
 ):boolean => {
-  return db.notes.some((noteFromDB:DatabaseNote):boolean => {
+  return graph.notes.some((noteFromDB:SavedNote):boolean => {
     return (
       (noteFromDB.title === userNote.title)
       && (noteFromDB.id !== userNote.id)
@@ -94,22 +94,22 @@ const noteWithSameTitleExists = (
 };
 
 
-const findNote = (db:DatabaseMainData, noteId:NoteId):DatabaseNote | null => {
-  return Utils.binaryArrayFind(db.notes, "id", noteId);
+const findNote = (graph:Graph, noteId:NoteId):SavedNote | null => {
+  return Utils.binaryArrayFind(graph.notes, "id", noteId);
 };
 
 
-const getNewNoteId = (db:DatabaseMainData):NoteId => {
-  db.idCounter = db.idCounter + 1;
-  return db.idCounter;
+const getNewNoteId = (graph:Graph):NoteId => {
+  graph.idCounter = graph.idCounter + 1;
+  return graph.idCounter;
 };
 
 
 const updateNotePosition = (
-  db:DatabaseMainData,
+  graph:Graph,
   nodePositionUpdate: GraphNodePositionUpdate,
 ): boolean => {
-  const note:DatabaseNote | null = findNote(db, nodePositionUpdate.id);
+  const note:SavedNote | null = findNote(graph, nodePositionUpdate.id);
   if (note === null) {
     return false;
   }
@@ -118,8 +118,8 @@ const updateNotePosition = (
 };
 
 
-const getLinksOfNote = (db:DatabaseMainData, noteId:NoteId):Link[] => {
-  const linksOfThisNote:Link[] = db.links
+const getLinksOfNote = (graph:Graph, noteId:NoteId):Link[] => {
+  const linksOfThisNote:Link[] = graph.links
     .filter((link:Link):boolean => {
       return (link[0] === noteId) || (link[1] === noteId);
     });
@@ -128,18 +128,18 @@ const getLinksOfNote = (db:DatabaseMainData, noteId:NoteId):Link[] => {
 }
 
 
-const getLinkedNotes = (db:DatabaseMainData, noteId:NoteId):LinkedNote[] => {
-  const notes:DatabaseNote[] = getLinksOfNote(db, noteId)
-    .map((link:Link):DatabaseNote => {
+const getLinkedNotes = (graph:Graph, noteId:NoteId):LinkedNote[] => {
+  const notes:SavedNote[] = getLinksOfNote(graph, noteId)
+    .map((link:Link):SavedNote => {
       const linkedNoteId = (link[0] === noteId) ? link[1] : link[0];
       // we are sure that the notes we are retrieving from noteIds in links
       // really exist. that's why we cast the result of findNote as
-      // DatabaseNote
-      return findNote(db, linkedNoteId) as DatabaseNote;
+      // SavedNote
+      return findNote(graph, linkedNoteId) as SavedNote;
     });
 
   const linkedNotes:LinkedNote[] = notes
-    .map((note:DatabaseNote) => {
+    .map((note:SavedNote) => {
       const linkedNote:LinkedNote = {
         id: note.id,
         title: getDisplayNoteTitle(note),
@@ -153,15 +153,15 @@ const getLinkedNotes = (db:DatabaseMainData, noteId:NoteId):LinkedNote[] => {
 };
 
 
-const getNumberOfLinkedNotes = (db:DatabaseMainData, noteId:NoteId):number => {
-  const linksOfThisNote:Link[] = getLinksOfNote(db, noteId);
+const getNumberOfLinkedNotes = (graph:Graph, noteId:NoteId):number => {
+  const linksOfThisNote:Link[] = getLinksOfNote(graph, noteId);
   const numberOfLinkedNotes = linksOfThisNote.length;
   return numberOfLinkedNotes;
 }
 
 
 const getNumberOfLinkedNotesForSeveralNotes = (
-  db:DatabaseMainData,
+  graph:Graph,
   noteIds:NoteId[],
 ):any => {
 
@@ -170,7 +170,7 @@ const getNumberOfLinkedNotesForSeveralNotes = (
     numbersOfLinkedNotes[noteId] = 0;
   });
 
-  db.links.forEach((link) => {
+  graph.links.forEach((link) => {
     if (typeof numbersOfLinkedNotes[link[0]] === "number"){
       numbersOfLinkedNotes[link[0]]++;
     }
@@ -184,24 +184,24 @@ const getNumberOfLinkedNotesForSeveralNotes = (
 }
 
 
-const getNumberOfUnlinkedNotes = (db:DatabaseMainData):number => {
+const getNumberOfUnlinkedNotes = (graph:Graph):number => {
   /*
   We could do it like this but then the links array is traversed as many times
   as there are notes. So we don't do it like this. We do it faster.
 
-  const numberOfUnlinkedNotes = db.notes.filter((note) => {
-    return getNumberOfLinkedNotes(db, note.id) === 0;
+  const numberOfUnlinkedNotes = graph.notes.filter((note) => {
+    return getNumberOfLinkedNotes(graph, note.id) === 0;
   }).length;
   */
 
   const linkedNotes = new Set();
 
-  db.links.forEach((link) => {
+  graph.links.forEach((link) => {
     linkedNotes.add(link[0]);
     linkedNotes.add(link[1]);
   });
 
-  const numberOfAllNotes = db.notes.length;
+  const numberOfAllNotes = graph.notes.length;
   const numberOfLinkedNotes = Array.from(linkedNotes).length;
   const numberOfUnlinkedNotes = numberOfAllNotes - numberOfLinkedNotes;
 
@@ -209,15 +209,15 @@ const getNumberOfUnlinkedNotes = (db:DatabaseMainData):number => {
 };
 
 
-const removeLinksOfNote = (db: DatabaseMainData, noteId: NoteId):true => {
-  db.links = db.links.filter((link) => {
+const removeLinksOfNote = (graph: Graph, noteId: NoteId):true => {
+  graph.links = graph.links.filter((link) => {
     return (link[0] !== noteId) && (link[1] !== noteId);
   });
   return true;
 };
 
 
-const getFilesOfNote = (note:DatabaseNote):FileId[] => {
+const getFilesOfNote = (note:SavedNote):FileId[] => {
   return note.blocks
     .filter(blockHasFile)
     .map((block: NoteContentBlockWithFile):FileId => {
@@ -228,18 +228,18 @@ const getFilesOfNote = (note:DatabaseNote):FileId[] => {
 
 const incorporateUserChangesIntoNote = (
   changes:UserNoteChange[] | undefined,
-  note:DatabaseNote,
-  db:DatabaseMainData,
+  note:SavedNote,
+  graph:Graph,
 ):void => {
   if (Array.isArray(changes)) {
     changes.forEach((change) => {
       if (change.type === UserNoteChangeType.LINKED_NOTE_ADDED) {
         const link:Link = [note.id, change.noteId];
-        db.links.push(link);
+        graph.links.push(link);
       }
 
       if (change.type === UserNoteChangeType.LINKED_NOTE_DELETED) {
-        db.links = db.links.filter((link) => {
+        graph.links = graph.links.filter((link) => {
           return !(
             link.includes(note.id) && link.includes(change.noteId)
           );
@@ -251,8 +251,8 @@ const incorporateUserChangesIntoNote = (
 
 
 const createNoteToTransmit = (
-  databaseNote:NonNullable<DatabaseNote>,
-  db: NonNullable<DatabaseMainData>,
+  databaseNote:NonNullable<SavedNote>,
+  graph: NonNullable<Graph>,
 ):NoteToTransmit => {
   const noteToTransmit:NoteToTransmit = {
     id: databaseNote.id,
@@ -260,7 +260,7 @@ const createNoteToTransmit = (
     title: databaseNote.title,
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
-    linkedNotes: getLinkedNotes(db, databaseNote.id),
+    linkedNotes: getLinkedNotes(graph, databaseNote.id),
     position: databaseNote.position,
     numberOfCharacters: getNumberOfCharacters(databaseNote),
   };
@@ -270,8 +270,8 @@ const createNoteToTransmit = (
 
 
 const createNoteListItem = (
-  databaseNote:NonNullable<DatabaseNote>,
-  db: NonNullable<DatabaseMainData>,
+  databaseNote:SavedNote,
+  graph: Graph,
   // for performance reasons, numberOfLinkedNotes can be given as argument,
   // so that this function does not have to find it out by itself for each
   // NoteListItem to be created
@@ -285,7 +285,7 @@ const createNoteListItem = (
     features: getNoteFeatures(databaseNote),
     numberOfLinkedNotes: typeof numberOfLinkedNotes === "number"
       ? numberOfLinkedNotes
-      : getNumberOfLinkedNotes(db, databaseNote.id),
+      : getNumberOfLinkedNotes(graph, databaseNote.id),
     numberOfCharacters: getNumberOfCharacters(databaseNote),
     numberOfFiles: getNumberOfFiles(databaseNote),
   };
@@ -295,22 +295,22 @@ const createNoteListItem = (
 
 
 const createNoteListItems = (
-  databaseNotes:DatabaseNote[],
-  db: DatabaseMainData,
+  databaseNotes:SavedNote[],
+  graph: Graph,
 ):NoteListItem[] => {
   /*
-    Before we transform every DatabaseNote to a NoteListItem, we get the
+    Before we transform every SavedNote to a NoteListItem, we get the
     number of linked notes for every note in one batch. This is more performant
     than traversing all links again and again for every single note.
   */
   const noteIds = databaseNotes.map((note) => note.id);
   const numbersOfLinkedNotes
-    = getNumberOfLinkedNotesForSeveralNotes(db, noteIds);
+    = getNumberOfLinkedNotesForSeveralNotes(graph, noteIds);
 
   const noteListItems = databaseNotes.map((databaseNote) => {
     return createNoteListItem(
       databaseNote,
-      db,
+      graph,
       numbersOfLinkedNotes[databaseNote.id],
     );
   })
@@ -319,7 +319,7 @@ const createNoteListItems = (
 };
 
 
-const getNoteFeatures = (note:DatabaseNote):NoteListItemFeatures => {
+const getNoteFeatures = (note:SavedNote):NoteListItemFeatures => {
   let containsText = false;
   let containsWeblink = false;
   let containsCode = false;
@@ -394,7 +394,7 @@ const blockHasFile = (
 };
 
 
-const getNumberOfFiles = (note:DatabaseNote) => {
+const getNumberOfFiles = (note:SavedNote) => {
   return note.blocks.filter(blockHasFile).length;
 };
 
@@ -450,7 +450,7 @@ const getSortFunction = (
 };
 
 
-const getNumberOfCharacters = (note:DatabaseNote):number => {
+const getNumberOfCharacters = (note:SavedNote):number => {
   return note.blocks.reduce((accumulator, block) => {
     if ([
       NoteContentBlockType.PARAGRAPH,
@@ -466,7 +466,7 @@ const getNumberOfCharacters = (note:DatabaseNote):number => {
 };
 
 
-const getURLsOfNote = (note:DatabaseNote):string[] => {
+const getURLsOfNote = (note:SavedNote):string[] => {
   return note.blocks
     .filter((block):block is NoteContentBlockLink => {
       return block.type === NoteContentBlockType.LINK;
@@ -478,23 +478,23 @@ const getURLsOfNote = (note:DatabaseNote):string[] => {
 
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
-const breadthFirstSearch = (nodes, links, root: DatabaseNote):DatabaseNote[] => {
-  const queue:DatabaseNote[] = [];
-  const discovered:DatabaseNote[] = [];
+const breadthFirstSearch = (nodes, links, root: SavedNote):SavedNote[] => {
+  const queue:SavedNote[] = [];
+  const discovered:SavedNote[] = [];
   discovered.push(root);
   queue.push(root);
 
   while (queue.length > 0) {
-    const v = queue.shift() as DatabaseNote;
+    const v = queue.shift() as SavedNote;
     const connectedNodes = links
       .filter((link:Link):boolean => {
         return (link[0] === v.id) || (link[1] === v.id);
       })
-      .map((link:Link):DatabaseNote => {
+      .map((link:Link):SavedNote => {
         const linkedNoteId = (link[0] === v.id) ? link[1] : link[0];
         // we are sure that the notes we are retrieving from noteIds in links
         // really exist. that's why we cast the result of findNote as
-        // DatabaseNote
+        // SavedNote
         return nodes.find((n) => (n.id === linkedNoteId));
       });
     for (let i = 0; i < connectedNodes.length; i++){
@@ -511,8 +511,8 @@ const breadthFirstSearch = (nodes, links, root: DatabaseNote):DatabaseNote[] => 
 
 
 // https://en.wikipedia.org/wiki/Component_(graph_theory)#Algorithms
-const getNumberOfComponents = (nodes:DatabaseNote[], links:Link[]):number => {
-  let totallyDiscovered:DatabaseNote[] = [];
+const getNumberOfComponents = (nodes:SavedNote[], links:Link[]):number => {
+  let totallyDiscovered:SavedNote[] = [];
   let numberOfComponents = 0;
 
   let i = 0;
@@ -524,7 +524,7 @@ const getNumberOfComponents = (nodes:DatabaseNote[], links:Link[]):number => {
       root = nodes[i];
     }
     const inComponent = breadthFirstSearch(nodes, links, root);
-    totallyDiscovered = [...totallyDiscovered, ...inComponent] as DatabaseNote[];
+    totallyDiscovered = [...totallyDiscovered, ...inComponent] as SavedNote[];
     numberOfComponents++;
     i++;
   }
@@ -534,22 +534,22 @@ const getNumberOfComponents = (nodes:DatabaseNote[], links:Link[]):number => {
 
 
 // this returns all notes that contain a url that is used in another note too
-const getNotesWithDuplicateUrls = (notes:DatabaseNote[]):DatabaseNote[] => {
-  const urlIndex = new Map<string, Set<DatabaseNote>>();
+const getNotesWithDuplicateUrls = (notes:SavedNote[]):SavedNote[] => {
+  const urlIndex = new Map<string, Set<SavedNote>>();
 
-  notes.forEach((note:DatabaseNote):void => {
+  notes.forEach((note:SavedNote):void => {
     const urls = getURLsOfNote(note);
 
     urls.forEach((url) => {
       if (urlIndex.has(url)) {
-        (urlIndex.get(url) as Set<DatabaseNote>).add(note);
+        (urlIndex.get(url) as Set<SavedNote>).add(note);
       } else {
         urlIndex.set(url, new Set([note]));
       }
     });
   });
 
-  const duplicates:Set<DatabaseNote> = new Set();
+  const duplicates:Set<SavedNote> = new Set();
 
   for (const notesWithUrl of urlIndex.values()) {
     if (notesWithUrl.size > 1) {
@@ -563,20 +563,20 @@ const getNotesWithDuplicateUrls = (notes:DatabaseNote[]):DatabaseNote[] => {
 };
 
 
-const getNotesWithDuplicateTitles = (notes:DatabaseNote[]):DatabaseNote[] => {
-  const titleIndex = new Map<string, Set<DatabaseNote>>();
+const getNotesWithDuplicateTitles = (notes:SavedNote[]):SavedNote[] => {
+  const titleIndex = new Map<string, Set<SavedNote>>();
 
-  notes.forEach((note:DatabaseNote):void => {
+  notes.forEach((note:SavedNote):void => {
     const noteTitle = note.title;
 
     if (titleIndex.has(noteTitle)) {
-      (titleIndex.get(noteTitle) as Set<DatabaseNote>).add(note);
+      (titleIndex.get(noteTitle) as Set<SavedNote>).add(note);
     } else {
       titleIndex.set(noteTitle, new Set([note]));
     }
   });
 
-  const duplicates:Set<DatabaseNote> = new Set();
+  const duplicates:Set<SavedNote> = new Set();
 
   for (const notesWithOneTitle of titleIndex.values()) {
     if (notesWithOneTitle.size > 1) {
@@ -591,11 +591,11 @@ const getNotesWithDuplicateTitles = (notes:DatabaseNote[]):DatabaseNote[] => {
 
 
 const getNotesByTitle = (
-  notes:DatabaseNote[],
+  notes:SavedNote[],
   query: string,
   caseSensitive: boolean,
-):DatabaseNote[] => {
-  return notes.filter((note:DatabaseNote) => {
+):SavedNote[] => {
+  return notes.filter((note:SavedNote) => {
     const title = note.title;
 
     return caseSensitive
@@ -606,10 +606,10 @@ const getNotesByTitle = (
 
 
 const getNotesWithUrl = (
-  notes:DatabaseNote[],
+  notes:SavedNote[],
   url: string,
-):DatabaseNote[] => {
-  return notes.filter((note:DatabaseNote) => {
+):SavedNote[] => {
+  return notes.filter((note:SavedNote) => {
     return note.blocks
       .filter((block):block is NoteContentBlockLink => {
         return block.type === NoteContentBlockType.LINK;
@@ -619,7 +619,7 @@ const getNotesWithUrl = (
 }
 
 
-const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
+const getConcatenatedTextOfNote = (note:SavedNote):string => {
   const blockText = note.blocks.reduce((accumulator, block) => {
     if (block.type === NoteContentBlockType.PARAGRAPH) {
       return accumulator + " " + block.data.text;
@@ -642,11 +642,11 @@ const getConcatenatedTextOfNote = (note:DatabaseNote):string => {
 
 
 const getNotesWithTitleContainingTokens = (
-  notes: DatabaseNote[],
+  notes: SavedNote[],
   query: string,
   caseSensitive: boolean
-):DatabaseNote[] => {
-  return notes.filter((note:DatabaseNote) => {
+):SavedNote[] => {
+  return notes.filter((note:SavedNote) => {
     if (query.length === 0) {
       return true;
     }
@@ -672,14 +672,14 @@ const getNotesWithTitleContainingTokens = (
 
 
 const getNotesThatContainTokens = (
-  notes:DatabaseNote[],
+  notes:SavedNote[],
   query: string,
   caseSensitive: boolean,
-):DatabaseNote[] => {
+):SavedNote[] => {
   const queryTokens = query.split(" ");
 
   return notes
-    .filter((note:DatabaseNote) => {
+    .filter((note:SavedNote) => {
       const noteText = getConcatenatedTextOfNote(note);
 
       // the note text must include every query token to be a positive
@@ -693,21 +693,21 @@ const getNotesThatContainTokens = (
 
 
 const getNotesWithBlocksOfTypes = (
-  notes:DatabaseNote[],
+  notes:SavedNote[],
   types: NoteContentBlockType[],
   notesMustContainAllBlockTypes:boolean,
-):DatabaseNote[] => {
+):SavedNote[] => {
   return notesMustContainAllBlockTypes
     ? notes
       // every single note must contain blocks from all the types
-      .filter((note:DatabaseNote):boolean => {
+      .filter((note:SavedNote):boolean => {
         return types.every((type) => {
           return note.blocks.some((block) => block.type === type);
         });
       })
     // every note must contain one block with only one type of types:
     : notes
-      .filter((note:DatabaseNote):boolean => {
+      .filter((note:SavedNote):boolean => {
         return note.blocks.some((block) => types.includes(block.type));
       });
 }

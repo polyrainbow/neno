@@ -29,27 +29,33 @@ async function asyncFilter<T>(
 
 
 export default class FileSystemStorageProvider {
-  #dataPath;
+  #graphsDirectoryPath;
 
-  constructor(dataPath: string) {
-    this.#dataPath = dataPath;
-    fsClassic.mkdirSync(path.dirname(dataPath), { recursive: true });
+  constructor(graphsDirectoryPath: string) {
+    this.#graphsDirectoryPath = graphsDirectoryPath;
+    fsClassic.mkdirSync(path.dirname(graphsDirectoryPath), { recursive: true });
   }
 
   async writeObject(
+    graphId: string,
     requestPath: string,
     data: string | Buffer,
   ):Promise<void> {
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
     await fs.mkdir(path.dirname(finalPath), { recursive: true });
     await fs.writeFile(finalPath, data);
   }
 
   async writeObjectFromReadable(
+    graphId: string,
     requestPath: string,
     readableStream: Readable,
   ):Promise<number> {
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
     await fs.mkdir(path.dirname(finalPath), { recursive: true });
     const writableStream = fsClassic.createWriteStream(finalPath);
     readableStream.pipe(writableStream);
@@ -66,7 +72,7 @@ export default class FileSystemStorageProvider {
       // it there explicitly
       writableStream.destroy();
       readableStream.destroy();
-      await this.removeObject(requestPath);
+      await this.removeObject(graphId, requestPath);
       throw new Error(
         "Readable stream ended unexpectedly.",
         // @ts-ignore
@@ -77,41 +83,68 @@ export default class FileSystemStorageProvider {
 
     }
 
-    const size = await this.getFileSize(requestPath);
+    const size = await this.getFileSize(graphId, requestPath);
     return size;
   }
 
-  async readObjectAsString(requestPath:string):Promise<string> {
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
+  async readObjectAsString(
+    graphId: string,
+    requestPath: string,
+  ):Promise<string> {
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
     const content = await fs.readFile(finalPath);
     const string = content.toString();
     return string;
   }
 
-  async getReadableStream(requestPath:string, range):Promise<Readable> {
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
+  async getReadableStream(
+    graphId: string,
+    requestPath: string,
+    range,
+  ):Promise<Readable> {
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
     const readableStream = fsClassic.createReadStream(finalPath, range);
     return readableStream;
   }
 
-  async getFileSize(requestPath:string):Promise<number> {
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
+  async getFileSize(
+    graphId: string,
+    requestPath: string,
+  ):Promise<number> {
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
     const stats = await fs.stat(finalPath);
     const size = stats.size;
     return size;
   }
 
-  async removeObject(requestPath:string):Promise<void> {
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
+  async removeObject(
+    graphId: string,
+    requestPath: string,
+  ):Promise<void> {
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
     await fs.unlink(finalPath);
   }
 
-  async listSubDirectories(requestPath):Promise<string[]> {
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
-    const filenames:string[] = await fs.readdir(finalPath);
+  async listSubDirectories(
+    graphId: string,
+    requestPath: string,
+  ):Promise<string[]> {
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
+
+    const entries:string[] = await fs.readdir(finalPath);
     
     const directories:string[] = await asyncFilter(
-      filenames,
+      entries,
       async (objectName:string):Promise<boolean> => {
         const stat = await fs.stat(this.joinPath(finalPath, objectName));
         return stat.isDirectory();
@@ -121,37 +154,56 @@ export default class FileSystemStorageProvider {
     return directories;
   }
 
-  async listDirectory(requestPath) {
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
+  async listDirectory(
+    graphId: string,
+    requestPath: string,
+  ) {
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
     const filenames = await fs.readdir(finalPath);
     return filenames;
   }
 
 
-  getArchiveStreamOfFolder(requestPath) {
+  getArchiveStreamOfFolder(
+    graphId: string,
+    requestPath: string,
+  ) {
     const archive = archiver("zip");
   
     archive.on("error", function(err) {
       throw new Error(err);
     });
 
-    const finalPath = this.joinPath(this.#dataPath, requestPath);
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
     archive.directory(finalPath, false);
     archive.finalize();
     return archive;
   }
+
 
   joinPath(...args) {
     return path.join(...args);
   }
 
 
-  async getFolderSize(folderPath) {
-    const path = this.joinPath(this.#dataPath, folderPath);
-    const files = await fs.readdir(path);
+  async getFolderSize(
+    graphId: string,
+    requestPath: string,
+  ) {
+    const finalPath = this.joinPath(
+      this.#graphsDirectoryPath, graphId, requestPath,
+    );
+    const files = await fs.readdir(finalPath);
     const validFiles = files.filter((file) => !file.startsWith("."));
-    const statsPromises = validFiles.map((file) => {
-      return fs.stat(this.joinPath(this.#dataPath, folderPath, file));
+    const statsPromises = validFiles.map((filename) => {
+      const filepath = this.joinPath(
+        this.#graphsDirectoryPath, graphId, requestPath, filename,
+      );
+      return fs.stat(filepath);
     });
     const stats = await Promise.all(statsPromises);
     const folderSize =  stats.reduce((accumulator, {size}) => {

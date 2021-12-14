@@ -67,8 +67,8 @@ const App = ({
     if (!databaseProvider) return;
 
     databaseProvider.getStats({
-      includeDatabaseMetadata: false,
-      includeGraphAnalysis: false,
+      includeMetadata: false,
+      includeAnalysis: false,
     })
       .then((stats) => {
         setStats(stats);

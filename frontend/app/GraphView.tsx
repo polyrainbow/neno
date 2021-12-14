@@ -34,9 +34,9 @@ const GraphView = ({
     if (!graphInstance.current) {
       throw new Error("Error saving graph. Graph instance undefined.");
     }
-    const graphObject = graphInstance.current.getSaveData();
+    const graphVisualization = graphInstance.current.getSaveData();
     try {
-      await databaseProvider.saveGraph(graphObject);
+      await databaseProvider.saveGraphVisualization(graphVisualization);
       setUnsavedChanges(false);
     } catch (e) {
       console.error(e);
@@ -104,7 +104,7 @@ const GraphView = ({
     };
 
     try {
-      const graphObject = await databaseProvider.getGraph();
+      const graphObject = await databaseProvider.getGraphVisualization();
 
       graphInstance.current
         = new Graph({

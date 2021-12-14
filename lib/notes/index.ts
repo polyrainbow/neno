@@ -26,20 +26,19 @@ import {
   getNotesWithBlocksOfTypes,
   getNotesWithDuplicateTitles,
 } from "./noteUtils.js";
-import updateDataStructure from "./updateDataStructure.js";
-import cleanUpData from "./cleanUpData.js";
-import Database from "./interfaces/DatabaseMainData.js";
-import NoteListItem from "./interfaces/NoteListItem.js";
 import Graph from "./interfaces/Graph.js";
-import { DatabaseId } from "./interfaces/DatabaseId.js";
+import NoteListItem from "./interfaces/NoteListItem.js";
+import GraphVisualization from "./interfaces/GraphVisualization.js";
+import { GraphId } from "./interfaces/GraphId.js";
 import { NoteId } from "./interfaces/NoteId.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
-import GraphNode from "./interfaces/GraphNode.js";
-import DatabaseNote from "./interfaces/DatabaseNote.js";
+import GraphNode from "./interfaces/GraphVisualizationNode.js";
+import SavedNote from "./interfaces/SavedNote.js";
 import NoteFromUser from "./interfaces/NoteFromUser.js";
-import Stats from "./interfaces/Stats.js";
-import GraphFromUser from "./interfaces/GraphFromUser.js";
-import GraphNodePositionUpdate from "./interfaces/GraphNodePositionUpdate.js";
+import GraphStats from "./interfaces/GraphStats.js";
+import GraphVisualizationFromUser
+  from "./interfaces/GraphVisualizationFromUser.js";
+import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import { FileId } from "./interfaces/FileId.js";
 import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
 import ImportLinkAsNoteFailure from "./interfaces/ImportLinkAsNoteFailure.js";
@@ -48,7 +47,7 @@ import { Readable } from "stream";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
-import DatabaseMainData from "./interfaces/DatabaseMainData.js";
+import GraphObject from "./interfaces/Graph.js";
 import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import DatabaseQuery from "./interfaces/DatabaseQuery.js";
@@ -84,28 +83,26 @@ const init = async (
   randomUUID = _randomUUID;
 
   io = new DatabaseIO({storageProvider});
-  await updateDataStructure(io);
-  await cleanUpData(io);
 };
 
 
 const get = async (
   noteId: NoteId,
-  dbId: DatabaseId,
+  graphId: GraphId,
 ):Promise<NoteToTransmit> => {
-  const db = await io.getMainData(dbId);
-  const noteFromDB:DatabaseNote | null = findNote(db, noteId);
+  const graph = await io.getGraph(graphId);
+  const noteFromDB:SavedNote | null = findNote(graph, noteId);
   if (!noteFromDB) {
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
 
-  const noteToTransmit:NoteToTransmit = createNoteToTransmit(noteFromDB, db);
+  const noteToTransmit:NoteToTransmit = createNoteToTransmit(noteFromDB, graph);
   return noteToTransmit;
 };
 
 
 const getNotesList = async (
-  dbId: DatabaseId,
+  graphId: GraphId,
   query: DatabaseQuery,
 ): Promise<NoteListPage> => {
   const searchString = query.searchString || "";
@@ -115,7 +112,7 @@ const getNotesList = async (
     = query.sortMode || NoteListSortMode.CREATION_DATE_DESCENDING;
   const limit = query.limit || 0;
 
-  const db: Database = await io.getMainData(dbId);
+  const graph: Graph = await io.getGraph(graphId);
 
   let matchingNotes;
 
@@ -125,9 +122,9 @@ const getNotesList = async (
       = searchString.indexOf("duplicates:") + "duplicates:".length;
     const duplicateType = searchString.substring(startOfDuplicateType);
     if (duplicateType === "url") {
-      matchingNotes = getNotesWithDuplicateUrls(db.notes);
+      matchingNotes = getNotesWithDuplicateUrls(graph.notes);
     } else if (duplicateType === "title"){
-      matchingNotes = getNotesWithDuplicateTitles(db.notes);
+      matchingNotes = getNotesWithDuplicateTitles(graph.notes);
     } else {
       matchingNotes = [];
     }
@@ -136,13 +133,13 @@ const getNotesList = async (
   } else if (searchString.includes("exact:")) {
     const startOfExactQuery = searchString.indexOf("exact:") + "exact:".length;
     const exactQuery = searchString.substring(startOfExactQuery);
-    matchingNotes = getNotesByTitle(db.notes, exactQuery, false);
+    matchingNotes = getNotesByTitle(graph.notes, exactQuery, false);
 
   // search for notes with specific urls
   } else if (searchString.includes("has-url:")) {
     const startOfExactQuery = searchString.indexOf("has-url:") + "has-url:".length;
     const url = searchString.substring(startOfExactQuery);
-    matchingNotes = getNotesWithUrl(db.notes, url);
+    matchingNotes = getNotesWithUrl(graph.notes, url);
 
   // search for notes with specific block types
   } else if (searchString.includes("has:")) {
@@ -154,10 +151,10 @@ const getNotesList = async (
     */
     if (typesString.includes("+")) {
       const types = typesString.split("+") as NoteContentBlockType[];
-      matchingNotes = getNotesWithBlocksOfTypes(db.notes, types, true);
+      matchingNotes = getNotesWithBlocksOfTypes(graph.notes, types, true);
     } else {
       const types = typesString.split("|") as NoteContentBlockType[];
-      matchingNotes = getNotesWithBlocksOfTypes(db.notes, types, false);
+      matchingNotes = getNotesWithBlocksOfTypes(graph.notes, types, false);
     }
 
 
@@ -166,7 +163,7 @@ const getNotesList = async (
     const startOfFtQuery = searchString.indexOf("ft:") + "ft:".length;
     const ftQuery = searchString.substring(startOfFtQuery);
     matchingNotes = getNotesThatContainTokens(
-      db.notes,
+      graph.notes,
       ftQuery,
       caseSensitive,
     );
@@ -174,7 +171,7 @@ const getNotesList = async (
   // default mode: check if all query tokens are included in note title
   } else {
     matchingNotes = getNotesWithTitleContainingTokens(
-      db.notes,
+      graph.notes,
       searchString,
       caseSensitive,
     );
@@ -182,7 +179,7 @@ const getNotesList = async (
 
   // now we need to transform all notes into NoteListItems before we can
   // sort those
-  let noteListItems:NoteListItem[] = createNoteListItems(matchingNotes, db)
+  let noteListItems:NoteListItem[] = createNoteListItems(matchingNotes, graph)
     .sort(getSortFunction(sortMode));
 
   // let's only slice the array if it makes sense to do so
@@ -206,78 +203,82 @@ const getNotesList = async (
 };
 
 
-const getGraph = async (dbId: DatabaseId):Promise<Graph> => {
-  const db = await io.getMainData(dbId);
+const getGraphVisualization = async (graphId: GraphId):Promise<GraphVisualization> => {
+  const graph = await io.getGraph(graphId);
 
-  const graphNodes:GraphNode[] = db.notes.map((note) => {
+  const graphNodes:GraphNode[] = graph.notes.map((note) => {
     const graphNode:GraphNode = {
       id: note.id,
       title: getDisplayNoteTitle(note),
       position: note.position,
-      linkedNotes: getLinkedNotes(db, note.id),
+      linkedNotes: getLinkedNotes(graph, note.id),
       creationTime: note.creationTime,
     };
     return graphNode;
   });
 
-  const graph:Graph = {
+  const graphVisualization:GraphVisualization = {
     nodes: graphNodes,
-    links: db.links,
-    screenPosition: db.screenPosition,
-    initialNodePosition: db.initialNodePosition,
+    links: graph.links,
+    screenPosition: graph.screenPosition,
+    initialNodePosition: graph.initialNodePosition,
   }
 
-  return graph;
+  return graphVisualization;
 };
 
 
 const getStats = async (
-  dbId:DatabaseId,
+  graphId:GraphId,
+  /*
+    including a graph analysis is quite CPU-heavy, that's why we include it
+    only if explicitly asked for
+  */
   options:{
-    includeDatabaseMetadata: boolean,
-    includeGraphAnalysis: boolean,
+    includeMetadata: boolean,
+    includeAnalysis: boolean,
   },
-):Promise<Stats> => {
-  const db:DatabaseMainData = await io.getMainData(dbId);
+):Promise<GraphStats> => {
+  const graph:GraphObject = await io.getGraph(graphId);
 
-  const numberOfUnlinkedNotes = getNumberOfUnlinkedNotes(db);  
+  const numberOfUnlinkedNotes = getNumberOfUnlinkedNotes(graph);  
 
-  let stats:Stats = {
-    numberOfAllNotes: db.notes.length,
-    numberOfLinks: db.links.length,
-    numberOfFiles: await io.getNumberOfFiles(dbId),
-    numberOfPins: db.pinnedNotes.length,
+  let stats:GraphStats = {
+    numberOfAllNotes: graph.notes.length,
+    numberOfLinks: graph.links.length,
+    numberOfFiles: await io.getNumberOfFiles(graphId),
+    numberOfPins: graph.pinnedNotes.length,
     numberOfUnlinkedNotes,
   };
 
-  if (options.includeDatabaseMetadata) {
+  if (options.includeMetadata) {
     stats = {
       ...stats,
-      dbCreationTime: db.creationTime,
-      dbUpdateTime: db.updateTime,
-      dbId: db.id,
-      dbSize: {
-        mainData: await io.getSizeOfDatabaseMainData(db.id),
-        files: await io.getSizeOfDatabaseFiles(db.id),
+      creationTime: graph.creationTime,
+      updateTime: graph.updateTime,
+      id: graphId,
+      size: {
+        graph: await io.getSizeOfGraph(graphId),
+        files: await io.getSizeOfGraphFiles(graphId),
       },
     };
   }
 
-  if (options.includeGraphAnalysis) {
-    const numberOfComponents = getNumberOfComponents(db.notes, db.links);
+  if (options.includeAnalysis) {
+    const numberOfComponents = getNumberOfComponents(graph.notes, graph.links);
 
     stats = {
       ...stats,
       numberOfComponents,
       numberOfComponentsWithMoreThanOneNode:
         numberOfComponents - numberOfUnlinkedNotes,
-      numberOfHubs: db.notes
+      numberOfHubs: graph.notes
         .filter((note) => {
-          const numberOfLinkedNotes = getNumberOfLinkedNotes(db, note.id);
+          const numberOfLinkedNotes = getNumberOfLinkedNotes(graph, note.id);
           return numberOfLinkedNotes >= config.MIN_NUMBER_OF_LINKS_FOR_HUB;
         })
         .length,
-      nodesWithHighestNumberOfLinks: createNoteListItems(db.notes, db)
+      nodesWithHighestNumberOfLinks: createNoteListItems(graph.notes, graph)
         .sort(getSortFunction(NoteListSortMode.NUMBER_OF_LINKS_DESCENDING))
         .slice(0, 3),
     }
@@ -287,26 +288,26 @@ const getStats = async (
 };
 
 
-const setGraph = async (
-  graphFromUser:GraphFromUser,
-  dbId:DatabaseId,
+const setGraphVisualization = async (
+  graphVisualizationFromUser:GraphVisualizationFromUser,
+  graphId:GraphId,
 ):Promise<void> => {
-  const db:Database = await io.getMainData(dbId);
-  graphFromUser.nodePositionUpdates.forEach(
+  const graph:Graph = await io.getGraph(graphId);
+  graphVisualizationFromUser.nodePositionUpdates.forEach(
     (nodePositionUpdate:GraphNodePositionUpdate):void => {
-      updateNotePosition(db, nodePositionUpdate);
+      updateNotePosition(graph, nodePositionUpdate);
     },
   );
-  db.links = graphFromUser.links;
-  db.screenPosition = graphFromUser.screenPosition;
-  db.initialNodePosition = graphFromUser.initialNodePosition;
-  await io.flushChanges(db);
+  graph.links = graphVisualizationFromUser.links;
+  graph.screenPosition = graphVisualizationFromUser.screenPosition;
+  graph.initialNodePosition = graphVisualizationFromUser.initialNodePosition;
+  await io.flushChanges(graphId, graph);
 };
 
 
 const put = async (
   noteFromUser:NoteFromUser,
-  dbId:DatabaseId,
+  graphId:GraphId,
   options
 ):Promise<NoteToTransmit> => {
   if ((!noteFromUser) || (!noteFromUser.blocks)) {
@@ -321,62 +322,62 @@ const put = async (
     ignoreDuplicateTitles = false;
   }
 
-  const db:Database = await io.getMainData(dbId);
+  const graph:Graph = await io.getGraph(graphId);
 
-  if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, db)) {
+  if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, graph)) {
     throw new Error(ErrorMessage.NOTE_WITH_SAME_TITLE_EXISTS);
   }
 
-  let databaseNote:DatabaseNote | null = null;
+  let savedNote:SavedNote | null = null;
 
   if (
     typeof noteFromUser.id === "number"
   ) {
-    databaseNote = await findNote(db, noteFromUser.id);
+    savedNote = await findNote(graph, noteFromUser.id);
   }
 
-  if (databaseNote === null) {
-    const noteId:NoteId = getNewNoteId(db);
-    databaseNote = {
+  if (savedNote === null) {
+    const noteId:NoteId = getNewNoteId(graph);
+    savedNote = {
       id: noteId,
-      position: db.initialNodePosition,
+      position: graph.initialNodePosition,
       title: normalizeNoteTitle(noteFromUser.title),
       blocks: noteFromUser.blocks,
       creationTime: Date.now(),
       updateTime: Date.now(),
     };
-    db.notes.push(databaseNote);
+    graph.notes.push(savedNote);
   } else {
-    databaseNote.blocks = noteFromUser.blocks;
-    databaseNote.title = normalizeNoteTitle(noteFromUser.title);
-    databaseNote.updateTime = Date.now();
+    savedNote.blocks = noteFromUser.blocks;
+    savedNote.title = normalizeNoteTitle(noteFromUser.title);
+    savedNote.updateTime = Date.now();
   }
 
-  removeDefaultTextParagraphs(databaseNote);
-  removeEmptyLinkBlocks(databaseNote);
-  incorporateUserChangesIntoNote(noteFromUser.changes, databaseNote, db);
+  removeDefaultTextParagraphs(savedNote);
+  removeEmptyLinkBlocks(savedNote);
+  incorporateUserChangesIntoNote(noteFromUser.changes, savedNote, graph);
 
-  await io.flushChanges(db);
+  await io.flushChanges(graphId, graph);
 
   const noteToTransmit:NoteToTransmit
-    = createNoteToTransmit(databaseNote, db);
+    = createNoteToTransmit(savedNote, graph);
   return noteToTransmit;
 };
 
 
 const remove = async (
   noteId:NoteId,
-  dbId:DatabaseId,
+  graphId:GraphId,
 ):Promise<void> => {
-  const db = await io.getMainData(dbId);
-  const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
+  const graph = await io.getGraph(graphId);
+  const noteIndex = Utils.binaryArrayFindIndex(graph.notes, "id", noteId);
   if ((noteIndex === -1) || (noteIndex === null)) {
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
 
-  db.notes.splice(noteIndex, 1);
-  removeLinksOfNote(db, noteId);
-  db.pinnedNotes = db.pinnedNotes.filter((nId) => nId !== noteId);
+  graph.notes.splice(noteIndex, 1);
+  removeLinksOfNote(graph, noteId);
+  graph.pinnedNotes = graph.pinnedNotes.filter((nId) => nId !== noteId);
 
   /*
     we do not remove files used in this note, because they could be used in
@@ -384,23 +385,20 @@ const remove = async (
     unused files should be deleted in the clean up process, if at all.
   */
 
-  await io.flushChanges(db);
+  await io.flushChanges(graphId, graph);
 };
 
 
 const importDB = (
-  db:DatabaseMainData,
-  dbId:DatabaseId,
+  graph:GraphObject,
+  graphId:GraphId,
 ):Promise<boolean> => {
-  if (db.id !== dbId) {
-    throw new Error(ErrorMessage.UNAUTHORIZED);
-  }
-  return io.flushChanges(db);
+  return io.flushChanges(graphId, graph);
 };
 
 
 const addFile = async (
-  dbId:DatabaseId,
+  graphId:GraphId,
   readable:Readable,
   mimeType: string,
 ):Promise<{
@@ -417,7 +415,7 @@ const addFile = async (
   }
 
   const fileId:FileId = randomUUID() + "." + fileType.ending;
-  const size = await io.addFile(dbId, fileId, readable);
+  const size = await io.addFile(graphId, fileId, readable);
   return {
     fileId,
     size,
@@ -426,36 +424,36 @@ const addFile = async (
 
 
 const deleteFile = async (
-  dbId: DatabaseId,
+  graphId: GraphId,
   fileId: FileId,
 ):Promise<void> => {
-  return io.deleteFile(dbId, fileId);
+  return io.deleteFile(graphId, fileId);
 };
 
 
 const getReadableFileStream = (
-  dbId: DatabaseId,
+  graphId: GraphId,
   fileId:FileId,
   range?,
 ):Promise<ReadableWithType> => {
-  return io.getReadableFileStream(dbId, fileId, range);
+  return io.getReadableFileStream(graphId, fileId, range);
 };
 
 
 const getFileSize = (
-  dbId: DatabaseId,
+  graphId: GraphId,
   fileId:FileId,
 ):Promise<number> => {
-  return io.getFileSize(dbId, fileId);
+  return io.getFileSize(graphId, fileId);
 };
 
 
-const getReadableDatabaseStream = async (dbId, withUploads) => {
-  return await io.getReadableDatabaseStream(dbId, withUploads);
+const getReadableDatabaseStream = async (graphId, withUploads) => {
+  return await io.getReadableDatabaseStream(graphId, withUploads);
 };
 
 
-const importLinksAsNotes = async (dbId, links) => {
+const importLinksAsNotes = async (graphId, links) => {
   const promises:Promise<UrlMetadataResponse>[]
     = links.map((url:string):Promise<UrlMetadataResponse> => {
       return getUrlMetadata(url);
@@ -507,7 +505,7 @@ const importLinksAsNotes = async (dbId, links) => {
     try {
       const noteToTransmit:NoteToTransmit = await put(
         noteFromUser,
-        dbId,
+        graphId,
         {
           ignoreDuplicateTitles: true,
         },
@@ -531,25 +529,25 @@ const importLinksAsNotes = async (dbId, links) => {
 
 
 const pin = async (
-  dbId:DatabaseId,
+  graphId:GraphId,
   noteId:NoteId,
 ):Promise<NoteToTransmit[]> => {
-  const db = await io.getMainData(dbId);
-  const noteIndex = Utils.binaryArrayFindIndex(db.notes, "id", noteId);
+  const graph = await io.getGraph(graphId);
+  const noteIndex = Utils.binaryArrayFindIndex(graph.notes, "id", noteId);
   if (noteIndex === -1) {
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
 
-  db.pinnedNotes = Array.from(
-    new Set([...db.pinnedNotes, noteId]),
+  graph.pinnedNotes = Array.from(
+    new Set([...graph.pinnedNotes, noteId]),
   );
 
-  await io.flushChanges(db);
+  await io.flushChanges(graphId, graph);
 
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
-    db.pinnedNotes
+    graph.pinnedNotes
       .map((noteId) => {
-        return get(noteId, dbId);
+        return get(noteId, graphId);
       })
   );
 
@@ -558,19 +556,19 @@ const pin = async (
 
 
 const unpin = async (
-  dbId:DatabaseId,
+  graphId:GraphId,
   noteId:NoteId,
 ):Promise<NoteToTransmit[]> => {
-  const db = await io.getMainData(dbId);
+  const graph = await io.getGraph(graphId);
 
-  db.pinnedNotes = db.pinnedNotes.filter((nId) => nId !== noteId);
+  graph.pinnedNotes = graph.pinnedNotes.filter((nId) => nId !== noteId);
 
-  await io.flushChanges(db);
+  await io.flushChanges(graphId, graph);
 
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
-    db.pinnedNotes
+    graph.pinnedNotes
       .map((noteId) => {
-        return get(noteId, dbId);
+        return get(noteId, graphId);
       })
   );
 
@@ -578,13 +576,13 @@ const unpin = async (
 };
 
 
-const getPins = async (dbId:DatabaseId):Promise<NoteToTransmit[]> => {
-  const db = await io.getMainData(dbId);
+const getPins = async (graphId:GraphId):Promise<NoteToTransmit[]> => {
+  const graph = await io.getGraph(graphId);
 
   const pinnedNotes:NoteToTransmit[] = await Promise.all(
-    db.pinnedNotes
+    graph.pinnedNotes
       .map((noteId) => {
-        return get(noteId, dbId);
+        return get(noteId, graphId);
       })
   );
 
@@ -596,8 +594,8 @@ export {
   init,
   get,
   getNotesList,
-  getGraph,
-  setGraph,
+  getGraphVisualization,
+  setGraphVisualization,
   getStats,
   put,
   remove,

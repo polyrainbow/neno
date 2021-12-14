@@ -80,7 +80,8 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async writeObject(
-    requestPath,
+    graphId: string,
+    requestPath: string,
     data,
   ) {
     const fileHandle = await this.#getFileHandle(requestPath);
@@ -91,18 +92,22 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async writeObjectFromReadable(
+    graphId: string,
     requestPath,
     readableStream,
   ) {
     const fileHandle = await this.#getFileHandle(requestPath);
     const writable = await fileHandle.createWritable();
     await readableStream.pipeTo(writable);
-    const size = await this.getFileSize(requestPath);
+    const size = await this.getFileSize(graphId, requestPath);
     return size;
   }
 
 
-  async readObjectAsString(requestPath) {
+  async readObjectAsString(
+    graphId: string,
+    requestPath: string,
+  ) {
     const fileHandle = await this.#getFileHandle(requestPath);
     const file = await fileHandle.getFile();
     const string = await file.text();
@@ -110,7 +115,12 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  async getReadableStream(requestPath) {
+  async getReadableStream(
+    graphId: string,
+    requestPath: string,
+    // eslint-disable-next-line
+    range, // to be implemented
+  ) {
     const fileHandle = await this.#getFileHandle(requestPath);
     const file = await fileHandle.getFile();
     const readable = file.stream();
@@ -118,7 +128,10 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  async removeObject(requestPath) {
+  async removeObject(
+    graphId: string,
+    requestPath: string,
+  ) {
     const subDirName = requestPath.substring(0, requestPath.indexOf(this.DS));
     const subDir = this.#directoryHandle.getDirectoryHandle(subDirName);
     const filename = requestPath
@@ -127,7 +140,10 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  async listSubDirectories(requestPath) {
+  async listSubDirectories(
+    graphId: string,
+    requestPath: string,
+  ) {
     let dirHandle = this.#directoryHandle;
 
     if (requestPath.length > 0) {
@@ -165,7 +181,10 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  async listDirectory(requestPath) {
+  async listDirectory(
+    graphId: string,
+    requestPath: string,
+  ) {
     const dirHandle = await this.#getDescendantFolderHandle(
       this.#directoryHandle,
       requestPath,
@@ -201,8 +220,11 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  async getFileSize(filePath) {
-    const fileHandle = await this.#getFileHandle(filePath);
+  async getFileSize(
+    graphId: string,
+    requestPath: string,
+  ) {
+    const fileHandle = await this.#getFileHandle(requestPath);
     // @ts-ignore
     const file = await fileHandle.getFile();
     const size = file.size;
@@ -210,10 +232,13 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  async getFolderSize(folderPath) {
+  async getFolderSize(
+    graphId: string,
+    requestPath: string,
+  ) {
     const folderHandle = await this.#getDescendantFolderHandle(
       this.#directoryHandle,
-      folderPath,
+      requestPath,
     );
 
     const iterator = folderHandle.values();

@@ -10,26 +10,28 @@ export default class ServerDatabaseProvider {
 
   static type = "SERVER";
 
-  #dbId = null;
+  #graphIds = null;
 
   constructor(API_URL) {
-    API.setAPIUrl(API_URL);
+    API.init(API_URL);
   }
 
-  async getDbId() {
-    return this.#dbId;
+  async getGraphId() {
+    return this.#graphIds?.[0];
   }
 
   async login(username, password, mfaToken) {
     const response = await API.login(username, password, mfaToken);
-    this.#dbId = response.dbId;
+    this.#graphIds = response.graphIds;
+    API.setGraphId(this.#graphIds?.[0]);
     return response;
   }
 
   async isAuthenticated() {
     try {
       const response = await API.isAuthenticated();
-      this.#dbId = response.dbId;
+      this.#graphIds = response.graphIds;
+      API.setGraphId(this.#graphIds?.[0]);
       return true;
     } catch (e) {
       return false;
@@ -37,7 +39,8 @@ export default class ServerDatabaseProvider {
   }
 
   async removeAccess() {
-    this.#dbId = null;
+    this.#graphIds = null;
+    API.setGraphId(null);
 
     // we try to logout from the server but if the server fails to do this and
     // throws an INVALID_CREDENTIALS error, we assume we are already logged out
@@ -74,12 +77,12 @@ export default class ServerDatabaseProvider {
     return API.importLinksAsNotes(links);
   }
 
-  saveGraph(graphObject) {
-    return API.saveGraph(graphObject);
+  saveGraphVisualization(graphVisualization) {
+    return API.saveGraphVisualization(graphVisualization);
   }
 
-  getGraph() {
-    return API.getGraph();
+  getGraphVisualization() {
+    return API.getGraphVisualization();
   }
 
   getReadableDatabaseStream(includingImagesAndFiles) {

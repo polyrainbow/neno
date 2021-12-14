@@ -3,8 +3,8 @@
   legacy schemas.
 */
 
-const updateNotes = (db) => {
-  db.notes.forEach((note) => {
+const updateNotes = (graph) => {
+  graph.notes.forEach((note) => {
 
     // add new note title field if not present
     if (
@@ -21,15 +21,11 @@ const updateNotes = (db) => {
 }
 
 
-const updateDatabase = (db) => {
-  updateNotes(db);
+// this function must be indempotent, so that it always results in one
+// canonical data structure
+const updateGraphDataStructure = (graph) => {
+  updateNotes(graph);
 }
 
 
-// this function must be indempotent, so that there is only one
-// canonical data structure
-const updateDataStructure = async (io) => {
-  await io.forEach(updateDatabase);
-};
-
-export default updateDataStructure;
+export default updateGraphDataStructure;

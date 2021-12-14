@@ -1,6 +1,6 @@
 import NoteListItem from "./NoteListItem";
 
-export default interface Stats {
+export default interface GraphStats {
     readonly numberOfAllNotes: number,
     readonly numberOfLinks: number,
     readonly numberOfFiles: number,
@@ -11,11 +11,11 @@ export default interface Stats {
     readonly numberOfComponentsWithMoreThanOneNode?: number,
     readonly numberOfHubs?: number,
     readonly nodesWithHighestNumberOfLinks?: NoteListItem[],
-    readonly dbCreationTime?: number,
-    readonly dbUpdateTime?: number,
-    readonly dbId?: string,
-    readonly dbSize?: {
-        mainData: number,
+    readonly creationTime?: number,
+    readonly updateTime?: number,
+    readonly id?: string,
+    readonly size?: {
+        graph: number,
         files: number,
     },
 }

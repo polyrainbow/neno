@@ -60,6 +60,10 @@ export default async (filepath) => {
       mfaSecret: mfa.secret,
       mfaUri: uri,
       apiKeys: [],
+      // start with one graph per user
+      graphIds: [
+        randomUUID(),
+      ]
     });
 
     logger.info("Scan this QR code with your favorite 2FA app");
