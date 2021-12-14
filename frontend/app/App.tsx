@@ -228,6 +228,16 @@ const App = ({
 
   return <ConfirmationServiceProvider>
     <Routes>
+      {/*
+        this route is just to get rid of a react-router warning
+        startApp() will take care of navigating to the correct start route
+      */}
+      <Route
+        path="/"
+        element={
+          <></>
+        }
+      />
       <Route
         path={paths.login}
         element={
