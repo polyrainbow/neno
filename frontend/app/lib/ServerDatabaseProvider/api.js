@@ -166,8 +166,11 @@ const saveGraphVisualization = (graphObject) => {
 };
 
 
-const getReadableDatabaseStream = async (withUploads) => {
-  const url = "database?withUploads=" + withUploads.toString();
+const getReadableGraphStream = async (withFiles) => {
+  const searchParams = new URLSearchParams({
+    withFiles,
+  });
+  const url = GRAPH_ENDPOINT + "?" + searchParams.toString();
   const response = await callAPI({
     url,
     outputType: "body",
@@ -177,7 +180,7 @@ const getReadableDatabaseStream = async (withUploads) => {
 
 
 const getReadableFileStream = async (fileId) => {
-  const url = "file/" + fileId;
+  const url = GRAPH_ENDPOINT + "file/" + fileId;
   const response = await callAPI({
     url,
     outputType: "body",
@@ -260,7 +263,7 @@ export {
   getStats,
   getGraphVisualization,
   saveGraphVisualization,
-  getReadableDatabaseStream,
+  getReadableGraphStream,
   importLinksAsNotes,
   uploadFile,
   uploadFileByUrl,

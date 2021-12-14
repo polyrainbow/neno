@@ -8,7 +8,7 @@ const ExportDatabaseDialog = ({
   databaseProvider,
   onCancel,
 }) => {
-  const [withUploads, setWithUploads] = useState(false);
+  const [withFiles, setWithFiles] = useState(false);
   // status can be READY, BUSY, DONE
   const [status, setStatus] = useState("READY");
   const bytesWrittenContainer = useRef(0);
@@ -16,9 +16,9 @@ const ExportDatabaseDialog = ({
   const animationFrameRequestContainer = useRef<number>(NaN);
 
 
-  const exportDatabase = async (writableStream, withUploads) => {
+  const exportDatabase = async (writableStream, withFiles) => {
     const readableStream
-      = await databaseProvider.getReadableDatabaseStream(withUploads);
+      = await databaseProvider.getReadableGraphStream(withFiles);
 
     const reader = readableStream.getReader();
     const writer = writableStream.getWriter();
@@ -95,26 +95,26 @@ const ExportDatabaseDialog = ({
       status === "READY"
         ? <>
           <RadioGroup
-            id="radioGroup_withUploads"
+            id="radioGroup_withFiles"
             options={[
               {
                 value: "false",
-                label: "Export main database file only (JSON)",
+                label: "Export graph file only (JSON)",
               },
               {
                 value: "true",
                 label:
-                  "Export main database file and include attached files (ZIP)",
+                  "Export graph file and include uploaded files (ZIP)",
               },
             ]}
-            selectedValue={withUploads.toString()}
-            onChange={(newValue) => setWithUploads(newValue === "true")}
+            selectedValue={withFiles.toString()}
+            onChange={(newValue) => setWithFiles(newValue === "true")}
           />
           <button
             onClick={async () => {
               const dbId = await databaseProvider.getDbId();
 
-              const opts = withUploads
+              const opts = withFiles
                 ? {
                   suggestedName: dbId + "-" + yyyymmdd() + ".neno-db.zip",
                   types: [{
@@ -133,7 +133,7 @@ const ExportDatabaseDialog = ({
               try {
                 const writableStream = await getWritableStream(opts);
                 setStatus("BUSY");
-                await exportDatabase(writableStream, withUploads);
+                await exportDatabase(writableStream, withFiles);
                 setStatus("DONE");
               } catch (e) {
                 if (

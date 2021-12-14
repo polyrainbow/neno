@@ -186,10 +186,10 @@ export default class LocalDatabaseProvider {
     return JSON.parse(JSON.stringify(graphVisualization));
   }
 
-  getReadableDatabaseStream(includingImagesAndFiles) {
-    return this.#notesModule.getReadableDatabaseStream(
+  getReadableGraphStream(withFiles) {
+    return this.#notesModule.getReadableGraphStream(
       LocalDatabaseProvider.graphId,
-      includingImagesAndFiles,
+      withFiles,
     );
   }
 

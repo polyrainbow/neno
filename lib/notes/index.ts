@@ -448,8 +448,8 @@ const getFileSize = (
 };
 
 
-const getReadableDatabaseStream = async (graphId, withUploads) => {
-  return await io.getReadableDatabaseStream(graphId, withUploads);
+const getReadableGraphStream = async (graphId, withFiles) => {
+  return await io.getReadableGraphStream(graphId, withFiles);
 };
 
 
@@ -604,7 +604,7 @@ export {
   deleteFile,
   getReadableFileStream,
   getFileSize,
-  getReadableDatabaseStream,
+  getReadableGraphStream,
   importLinksAsNotes,
   getUrlMetadata,
   pin,

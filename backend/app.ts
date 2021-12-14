@@ -188,17 +188,17 @@ const startApp = async ({
     verifyUser,
     async function(req, res) {
       const graphId = req.params.graphId;
-      const withUploads = req.query.withUploads === "true";
+      const withFiles = req.query.withFiles === "true";
 
-      const databaseStream = await Notes.getReadableDatabaseStream(
+      const databaseStream = await Notes.getReadableGraphStream(
         graphId,
-        withUploads,
+        withFiles,
       );
 
       // set the archive name
       const dateSuffix = yyyymmdd(new Date());
 
-      const fileEnding = withUploads ? "zip" : "json";
+      const fileEnding = withFiles ? "zip" : "json";
       const filename = `neno-${graphId}-${dateSuffix}.db.${fileEnding}`;
       res.attachment(filename);
 

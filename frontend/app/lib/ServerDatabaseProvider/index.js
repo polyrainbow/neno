@@ -85,8 +85,8 @@ export default class ServerDatabaseProvider {
     return API.getGraphVisualization();
   }
 
-  getReadableDatabaseStream(includingImagesAndFiles) {
-    return API.getReadableDatabaseStream(includingImagesAndFiles);
+  getReadableGraphStream(withFiles) {
+    return API.getReadableGraphStream(withFiles);
   }
 
   uploadFile(file) {
