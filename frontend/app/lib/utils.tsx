@@ -197,37 +197,6 @@ const streamToBlob = async (stream, mimeType) => {
 };
 
 
-/**
- * Obtains a URL for a file.
- * @param {string} fileId
- * @param {DatabaseProvider} databaseProvider
- * @param {string?} publicName This optional file name is appended at the url
- * so that if the user decides to download the file, it is saved with this
- * public name instead of the more technical fileId.
- * @return {string} url
- */
-const getUrlForFileId = async (fileId, databaseProvider, publicName) => {
-  let url;
-
-  if (databaseProvider.constructor.type === "LOCAL") {
-    const { readable, mimeType }
-      = await databaseProvider.getReadableFileStream(
-        fileId,
-      );
-    const blob = await streamToBlob(readable, mimeType);
-    url = URL.createObjectURL(blob);
-  } else {
-    url = Config.API_URL + "file/" + fileId;
-
-    if (typeof publicName === "string") {
-      url += `/${encodeURIComponent(publicName)}`;
-    }
-  }
-
-  return url;
-};
-
-
 const getWindowDimensions = () => {
   const docEl = document.documentElement;
   const width = window.innerWidth || docEl.clientWidth;
@@ -284,7 +253,6 @@ export {
   humanFileSize,
   shortenText,
   streamToBlob,
-  getUrlForFileId,
   getWindowDimensions,
   blockHasFile,
   getFileInfosOfNoteFiles,

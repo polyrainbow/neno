@@ -1,7 +1,4 @@
 import React from "react";
-import {
-  getUrlForFileId,
-} from "./lib/utils.js";
 
 const NoteStatsFileLink = ({
   fileInfo,
@@ -13,9 +10,8 @@ const NoteStatsFileLink = ({
       "cursor": "pointer",
     }}
     onClick={async () => {
-      const url = await getUrlForFileId(
+      const url = await databaseProvider.getUrlForFileId(
         fileInfo.fileId,
-        databaseProvider,
         fileInfo.name,
       );
       window.open(url, "_blank");

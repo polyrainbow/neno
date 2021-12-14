@@ -11,8 +11,10 @@ export default class ServerDatabaseProvider {
   static type = "SERVER";
 
   #graphIds = null;
+  #apiUrl = null;
 
   constructor(API_URL) {
+    this.#apiUrl = API_URL;
     API.init(API_URL);
   }
 
@@ -115,5 +117,23 @@ export default class ServerDatabaseProvider {
 
   getPins() {
     return API.getPins();
+  }
+
+  /**
+   * Obtains a URL for a file.
+   * @param {string} fileId
+   * @param {string?} publicName This optional file name is appended at the url
+   * so that if the user decides to download the file, it is saved with this
+   * public name instead of the more technical fileId.
+   * @return {string} url
+  */
+  async getUrlForFileId(fileId, publicName) {
+    let url = this.#apiUrl + "graph/" + this.#graphIds[0] + "/file/" + fileId;
+
+    if (typeof publicName === "string") {
+      url += `/${encodeURIComponent(publicName)}`;
+    }
+
+    return url;
   }
 }

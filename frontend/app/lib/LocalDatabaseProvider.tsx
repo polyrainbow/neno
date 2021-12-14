@@ -1,6 +1,7 @@
 import * as IDB from "idb-keyval";
 import FileSystemAccessAPIStorageProvider
   from "./FileSystemAccessAPIStorageProvider.js";
+import { streamToBlob } from "./utils.js";
 
 
 async function verifyPermission(fileHandle, readWrite) {
@@ -226,5 +227,23 @@ export default class LocalDatabaseProvider {
 
   getPins() {
     return this.#notesModule.getPins(LocalDatabaseProvider.graphId);
+  }
+
+  /**
+   * Obtains a URL for a file.
+   * @param {string} fileId
+   * @param {string?} publicName This optional file name is appended at the url
+   * so that if the user decides to download the file, it is saved with this
+   * public name instead of the more technical fileId.
+   * @return {string} url
+  */
+  async getUrlForFileId(fileId, publicName) { // can we use it??
+    const { readable, mimeType }
+      = await this.getReadableFileStream(
+        fileId,
+      );
+    const blob = await streamToBlob(readable, mimeType);
+    const url = URL.createObjectURL(blob);
+    return url;
   }
 }
