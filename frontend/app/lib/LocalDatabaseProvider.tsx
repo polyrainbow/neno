@@ -70,7 +70,7 @@ export default class LocalDatabaseProvider {
   }
 
 
-  async getDbId() {
+  async getGraphId() {
     return LocalDatabaseProvider.graphId;
   }
 

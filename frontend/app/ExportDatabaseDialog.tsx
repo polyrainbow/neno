@@ -112,7 +112,7 @@ const ExportDatabaseDialog = ({
           />
           <button
             onClick={async () => {
-              const dbId = await databaseProvider.getDbId();
+              const dbId = await databaseProvider.getGraphId();
 
               const opts = withFiles
                 ? {
