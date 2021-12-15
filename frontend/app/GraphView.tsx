@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import Graph from "./lib/Graph.js";
+import GraphVisualization from "./lib/GraphVisualization.js";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {
   useLocation,
@@ -18,7 +18,7 @@ const GraphView = ({
 }) => {
   const DEFAULT_STATUS = "";
   const mainElement = useRef<HTMLElement | null>(null);
-  const graphInstance = useRef<Graph | null>(null);
+  const graphVisualizationInstance = useRef<GraphVisualization | null>(null);
   const [status, setStatus] = useState<string>(DEFAULT_STATUS);
   const [searchValue, setSearchValue] = useState<string>("");
 
@@ -31,10 +31,10 @@ const GraphView = ({
   const focusNoteId = parseInt(searchParams.get("focusNote") || "");
 
   const saveGraphObject = async () => {
-    if (!graphInstance.current) {
+    if (!graphVisualizationInstance.current) {
       throw new Error("Error saving graph. Graph instance undefined.");
     }
-    const graphVisualization = graphInstance.current.getSaveData();
+    const graphVisualization = graphVisualizationInstance.current.getSaveData();
     try {
       await databaseProvider.saveGraphVisualization(graphVisualization);
       setUnsavedChanges(false);
@@ -56,8 +56,8 @@ const GraphView = ({
 
 
   const openSelectedNoteInEditor = async () => {
-    if (!graphInstance.current) return;
-    const ids = graphInstance.current.getSelectedNodeIds();
+    if (!graphVisualizationInstance.current) return;
+    const ids = graphVisualizationInstance.current.getSelectedNodeIds();
     if (ids.length === 0) {
       alert("Please select one note before opening it.");
       return;
@@ -106,8 +106,8 @@ const GraphView = ({
     try {
       const graphObject = await databaseProvider.getGraphVisualization();
 
-      graphInstance.current
-        = new Graph({
+      graphVisualizationInstance.current
+        = new GraphVisualization({
           parent: mainElement.current,
           graphObject,
           onHighlight,
@@ -130,8 +130,8 @@ const GraphView = ({
   }, [databaseProvider]);
 
   useEffect(() => {
-    if (!graphInstance.current) return;
-    graphInstance.current.setSearchValue(searchValue);
+    if (!graphVisualizationInstance.current) return;
+    graphVisualizationInstance.current.setSearchValue(searchValue);
   }, [searchValue]);
 
   return <>
@@ -142,7 +142,7 @@ const GraphView = ({
       setSearchValue={setSearchValue}
       openSelectedNoteInEditor={openSelectedNoteInEditor}
       saveGraphObject={saveGraphObject}
-      graphInstance={graphInstance}
+      graphVisualizationInstance={graphVisualizationInstance}
     />
     <main id="main" className="main-graph" ref={mainElement}></main>
     <GraphViewStatusIndicator status={status} />

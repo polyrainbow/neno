@@ -64,7 +64,7 @@ const prepareGraphObject = (graph) => {
 };
 
 
-export default class Graph {
+export default class GraphVisualization {
   static #consts = {
     selectedClass: "selected",
     connectClass: "connect-node",
@@ -170,7 +170,7 @@ export default class Graph {
     this.#initialNodePosition = graphObjectPrepared.initialNodePosition;
 
     this.#mainSVGGroup = svg.append("g")
-      .classed(Graph.#consts.graphClass, true);
+      .classed(GraphVisualization.#consts.graphClass, true);
     const mainSVGGroup = this.#mainSVGGroup;
 
     this.#gridLines = mainSVGGroup.append("g")
@@ -195,8 +195,8 @@ export default class Graph {
     this.#initialNodePositionIndicator = mainSVGGroup.append("g")
       .classed("new-node-position-indicator", true)
       .append("rect")
-      .attr("width", String(Graph.#consts.newNodeIndicatorSize))
-      .attr("height", String(Graph.#consts.newNodeIndicatorSize))
+      .attr("width", String(GraphVisualization.#consts.newNodeIndicatorSize))
+      .attr("height", String(GraphVisualization.#consts.newNodeIndicatorSize))
       .attr("rx", 4)
       .attr("ry", 4)
       .on("mouseover", () => {
@@ -305,7 +305,9 @@ export default class Graph {
     });
 
     zoom.on("start", (e) => {
-      const ael = d3.select("#" + Graph.#consts.activeEditId).node();
+      const ael = d3.select(
+        "#" + GraphVisualization.#consts.activeEditId,
+      ).node();
       if (ael) {
         ael.blur();
       }
@@ -385,7 +387,7 @@ export default class Graph {
   #insertTitleLinebreaks(gEl, title) {
     const titleShortened = shortenText(
       title,
-      Graph.#consts.MAX_NODE_TEXT_LENGTH,
+      GraphVisualization.#consts.MAX_NODE_TEXT_LENGTH,
     );
     const words = (titleShortened && titleShortened.split(/\s+/g)) || "";
     const nwords = words.length;
@@ -471,7 +473,7 @@ export default class Graph {
 
   // mouseup on nodes
   #handleMouseUpOnNode(d3node, mouseUpNode) {
-    const consts = Graph.#consts;
+    const consts = GraphVisualization.#consts;
     // reset the states
     this.#newLinkCreationInProgress = false;
     d3node.classed(consts.connectClass, false);
@@ -534,7 +536,7 @@ export default class Graph {
 
   // keydown on main svg
   #svgKeyDown(e) {
-    const consts = Graph.#consts;
+    const consts = GraphVisualization.#consts;
 
     if (e.shiftKey) {
       this.#shiftKeyIsPressed = true;
@@ -586,7 +588,7 @@ export default class Graph {
     this.#shiftKeyIsPressed = e.shiftKey;
     this.#ctrlKeyIsPressed = e.ctrlKey;
 
-    if (e.keyCode === Graph.#consts.S_KEY) {
+    if (e.keyCode === GraphVisualization.#consts.S_KEY) {
       this.#sKeyIsPressed = false;
     }
 
@@ -596,7 +598,7 @@ export default class Graph {
 
   // call to propagate changes to graph
   #updateGraph(event?):void {
-    const consts = Graph.#consts;
+    const consts = GraphVisualization.#consts;
 
     this.#initialNodePositionIndicator
       .attr("x",
@@ -826,7 +828,7 @@ export default class Graph {
     // currently it's not possible to remove nodes in Graph View
     /*
     // remove old nodes
-    const nodeExitSelection = thisGraph.nodeElements.exit();
+    const nodeExitSelection = this.nodeElements.exit();
     nodeExitSelection.remove();
   */
   }
@@ -834,7 +836,7 @@ export default class Graph {
 
   #zoomed(e) {
     this.#justScaleTransGraph = true;
-    d3.select("." + Graph.#consts.graphClass)
+    d3.select("." + GraphVisualization.#consts.graphClass)
       .attr(
         "transform",
         "translate("
@@ -918,7 +920,7 @@ export default class Graph {
   toggleTextRendering() {
     if (!this.#titleRenderingEnabled) {
       this.#titleRenderingEnabled = true;
-      d3.selectAll("g." + Graph.#consts.nodeClassName)
+      d3.selectAll("g." + GraphVisualization.#consts.nodeClassName)
         .each((d, i, nodes) => {
           const domElement = nodes[i];
           this.#insertTitleLinebreaks(d3.select(domElement), d.title);

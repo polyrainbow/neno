@@ -10,7 +10,7 @@ const GraphViewHeader = ({
   searchValue,
   setSearchValue,
   saveGraphObject,
-  graphInstance,
+  graphVisualizationInstance,
   openSelectedNoteInEditor,
 }) => {
   return <HeaderContainer
@@ -31,16 +31,16 @@ const GraphViewHeader = ({
           icon="zoom_out_map"
           title="Inflate graph by 10%"
           onClick={async () => {
-            if (!graphInstance.current) return;
-            graphInstance.current.inflateGraph(1.1);
+            if (!graphVisualizationInstance.current) return;
+            graphVisualizationInstance.current.inflateGraph(1.1);
           }}
         />
         <IconButton
           icon="title"
           title="Toggle text rendering"
           onClick={async () => {
-            if (!graphInstance.current) return;
-            graphInstance.current.toggleTextRendering();
+            if (!graphVisualizationInstance.current) return;
+            graphVisualizationInstance.current.toggleTextRendering();
           }}
         />
       </>
