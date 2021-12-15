@@ -195,11 +195,6 @@ const EditorView = ({
 
 
   const loadNote = async (noteId) => {
-    if (unsavedChanges) {
-      await confirmDiscardingUnsavedChanges();
-      setUnsavedChanges(false);
-    }
-
     let noteIdNumber = noteId;
 
     if (typeof noteIdNumber !== "number") {
@@ -354,6 +349,8 @@ const EditorView = ({
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
       activeNote={activeNote}
+      setUnsavedChanges={setUnsavedChanges}
+      unsavedChanges={unsavedChanges}
     />
     <main>
       {
@@ -386,6 +383,8 @@ const EditorView = ({
               }}
               stats={stats}
               itemsAreLinkable={true}
+              setUnsavedChanges={setUnsavedChanges}
+              unsavedChanges={unsavedChanges}
             />
           </div>
           : null

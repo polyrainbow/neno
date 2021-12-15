@@ -3,13 +3,19 @@ import AppTitle from "./AppTitle";
 import AppStats from "./AppStats";
 import EditorViewHeaderPinnedNote from "./EditorViewHeaderPinnedNote";
 import useGoToNote from "./hooks/useGoToNote";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const EditorViewHeader = ({
   stats,
   toggleAppMenu,
   pinnedNotes,
   activeNote,
+  unsavedChanges,
+  setUnsavedChanges,
 }) => {
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
   const goToNote = useGoToNote();
 
   return (
@@ -33,7 +39,14 @@ const EditorViewHeader = ({
               return <EditorViewHeaderPinnedNote
                 key={`pinnedNote_${pinnedNote.id}`}
                 note={pinnedNote}
-                onClick={() => goToNote(pinnedNote.id)}
+                onClick={async () => {
+                  if (unsavedChanges) {
+                    await confirmDiscardingUnsavedChanges();
+                    setUnsavedChanges(false);
+                  }
+
+                  goToNote(pinnedNote.id);
+                }}
                 isActive={activeNote && (pinnedNote.id === activeNote.id)}
               />;
             })

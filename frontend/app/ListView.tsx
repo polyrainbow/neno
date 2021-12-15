@@ -5,7 +5,6 @@ import NoteListControls from "./NoteListControls";
 import { DialogType } from "./enum/DialogType";
 import SearchDialog from "./SearchDialog";
 
-
 const ListView = ({
   toggleAppMenu,
   openDialog,
@@ -25,6 +24,8 @@ const ListView = ({
   page,
   setPage,
   setSearchValue,
+  unsavedChanges,
+  setUnsavedChanges,
 }) => {
   return <>
     <EditorViewHeader
@@ -32,6 +33,8 @@ const ListView = ({
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
       activeNote={null} /* in list view, no note is active */
+      setUnsavedChanges={setUnsavedChanges}
+      unsavedChanges={unsavedChanges}
     />
     <NoteListControls
       onChange={handleSearchInputChange}
@@ -60,6 +63,8 @@ const ListView = ({
       onLinkAddition={null}
       onLinkRemoval={null}
       displayedLinkedNotes={null}
+      setUnsavedChanges={setUnsavedChanges}
+      unsavedChanges={unsavedChanges}
     />
     {
       openDialog === DialogType.SEARCH

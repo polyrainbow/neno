@@ -5,7 +5,8 @@ import Pagination from "./Pagination";
 import NoteSearchDisclaimer from "./NoteSearchDisclaimer";
 import useGoToNote from "./hooks/useGoToNote";
 import { SEARCH_RESULTS_PER_PAGE } from "./lib/config";
-
+import useConfirmDiscardingUnsavedChangesDialog
+  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const NoteList = ({
   notes,
@@ -23,9 +24,13 @@ const NoteList = ({
   setPage,
   stats,
   itemsAreLinkable,
+  unsavedChanges,
+  setUnsavedChanges,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const goToNote = useGoToNote();
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
 
   let status = "DEFAULT";
 
@@ -107,7 +112,14 @@ const NoteList = ({
             isActive={isActive}
             isLinked={isLinked}
             key={`main-notes-list-item-${note.id}`}
-            onSelect={() => goToNote(note.id)}
+            onSelect={async () => {
+              if (unsavedChanges) {
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
+              }
+
+              goToNote(note.id);
+            }}
             isLinkable={itemsAreLinkable}
             onLinkChange={() => {
               if (isActive) return;

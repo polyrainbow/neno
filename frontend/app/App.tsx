@@ -310,6 +310,8 @@ const App = ({
                 page={page}
                 setPage={setPage}
                 setSearchValue={setSearchValue}
+                unsavedChanges={unsavedChanges}
+                setUnsavedChanges={setUnsavedChanges}
               />
               <FloatingActionButton
                 title="New note"

@@ -12,7 +12,8 @@ import {
 // import { DatabaseMode } from "./enum/DatabaseMode.js";
 import { paths } from "./lib/config";
 import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
-
+import useConfirmDiscardingUnsavedChangesDialog
+  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const Note = ({
   note,
@@ -37,6 +38,8 @@ const Note = ({
   const [searchResults, setSearchResults] = useState<NoteListItemType[]>([]);
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
 
   const handleInvalidCredentialsError = async () => {
     await databaseProvider.removeAccess();
@@ -168,7 +171,14 @@ const Note = ({
               displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
                 note={displayedLinkedNote}
                 key={"note-link-list-item-" + displayedLinkedNote.id}
-                onSelect={() => goToNote(displayedLinkedNote.id)}
+                onSelect={async () => {
+                  if (unsavedChanges) {
+                    await confirmDiscardingUnsavedChanges();
+                    setUnsavedChanges(false);
+                  }
+
+                  goToNote(displayedLinkedNote.id);
+                }}
                 isActive={false}
                 isLinked={true}
                 onLinkChange={() => onLinkRemoval(displayedLinkedNote.id)}
@@ -200,7 +210,14 @@ const Note = ({
               .map((noteListItem) => {
                 return <NoteListItem
                   note={noteListItem}
-                  onSelect={() => goToNote(noteListItem.id)}
+                  onSelect={async () => {
+                    if (unsavedChanges) {
+                      await confirmDiscardingUnsavedChanges();
+                      setUnsavedChanges(false);
+                    }
+
+                    goToNote(noteListItem.id);
+                  }}
                   isActive={false}
                   isLinked={false}
                   key={"noteLinkAdditionSearchResult-" + noteListItem.id}
