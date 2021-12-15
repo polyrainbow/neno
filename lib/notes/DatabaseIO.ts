@@ -8,7 +8,7 @@
 */
 
 
-import { cloneObject, stringContainsUUID } from "../utils.js";
+import { stringContainsUUID } from "../utils.js";
 import { FileId } from "./interfaces/FileId.js";
 import { Readable } from "stream";
 import Graph from "./interfaces/Graph.js";
