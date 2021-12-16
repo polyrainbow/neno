@@ -301,6 +301,8 @@ const EditorView = ({
 
   const handleKeydown = (e) => {
     if (
+      // navigator.platform is deprecated and should be replaced with
+      // navigator.userAgentData.platform at some point
       (window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
       && e.key === "s"
     ) {
