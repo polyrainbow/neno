@@ -145,6 +145,7 @@ const EditorView = ({
 
     const noteToTransmit = {
       id: null,
+      title: activeNote.title,
       blocks: activeNote.blocks,
       changes: activeNote.linkedNotes.map((linkedNote) => {
         return {

@@ -310,7 +310,11 @@ const put = async (
   graphId:GraphId,
   options
 ):Promise<NoteToTransmit> => {
-  if ((!noteFromUser) || (!noteFromUser.blocks)) {
+  if (
+    (!noteFromUser)
+    || (!Array.isArray(noteFromUser.blocks))
+    || (typeof noteFromUser.title !== "string")
+  ) {
     throw new Error(ErrorMessage.INVALID_NOTE_STRUCTURE);
   }
 
