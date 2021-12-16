@@ -24,6 +24,7 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useGoToNote from "./hooks/useGoToNote";
 import SearchDialog from "./SearchDialog";
+import NoteFromUser from "../../lib/notes/interfaces/NoteFromUser";
 
 const EditorView = ({
   databaseProvider,
@@ -143,8 +144,7 @@ const EditorView = ({
       setUnsavedChanges(false);
     }
 
-    const noteToTransmit = {
-      id: null,
+    const noteToTransmit:NoteFromUser = {
       title: activeNote.title,
       blocks: activeNote.blocks,
       changes: activeNote.linkedNotes.map((linkedNote) => {
@@ -241,12 +241,13 @@ const EditorView = ({
   };
 
 
-  const prepareNoteToTransmit = async () => {
+  const prepareNoteToTransmit = async ():Promise<NoteFromUser> => {
     const noteToTransmit = {
       title: activeNote.title,
       blocks: await Editor.save(),
       changes: activeNote.changes,
-      id: activeNote.isUnsaved ? null : activeNote.id,
+      // eslint-disable-next-line no-undefined
+      id: (!activeNote.isUnsaved) ? activeNote.id : undefined,
     };
 
     Utils.setNoteTitleByLinkTitleIfUnset(
