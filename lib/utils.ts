@@ -116,25 +116,6 @@ const binaryArrayIncludes = function(sortedArray, valueToLookFor) {
 };
 
 
-const cloneObject = function(obj):any {
-  let clone = {};
-
-  if (Array.isArray(obj)) {
-    clone = [];
-  }
-
-  for (const i in obj) {
-    if (obj[i] && typeof obj[i] === "object") {
-      clone[i] = cloneObject(obj[i]);
-    } else {
-      clone[i] = obj[i];
-    }
-  }
-
-  return clone;
-};
-
-
 const yyyymmdd = (date) => {
   const yyyy = date.getFullYear().toString();
   const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
@@ -241,7 +222,6 @@ export {
   binaryArrayFind,
   binaryArrayFindIndex,
   binaryArrayIncludes,
-  cloneObject,
   yyyymmdd,
   unescapeHTML,
   deepFreeze,
