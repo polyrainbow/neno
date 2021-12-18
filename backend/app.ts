@@ -239,7 +239,8 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
-      const graph = await Notes.getGraphVisualization(req.userId);
+      const graphId = req.params.graphId;
+      const graph = await Notes.getGraphVisualization(graphId);
       const response:APIResponse = {
         success: true,
         payload: graph,
@@ -254,11 +255,12 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
+      const graphId = req.params.graphId;
       const options = {
         includeMetadata: req.query.includeMetadata === "true",
         includeAnalysis: req.query.includeAnalysis === "true",
       };
-      const stats:Stats = await Notes.getStats(req.userId, options);
+      const stats:Stats = await Notes.getStats(graphId, options);
       const response:APIResponse = {
         success: true,
         payload: stats,
@@ -333,10 +335,11 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
+      const graphId = req.params.graphId;
       const noteId:NoteId = parseInt(req.params.noteId);
 
       try {
-        const note:NoteToTransmit = await Notes.get(noteId, req.userId);
+        const note:NoteToTransmit = await Notes.get(noteId, graphId);
         const response:APIResponse = {
           success: true,
           payload: note,
@@ -359,12 +362,13 @@ const startApp = async ({
     verifyUser,
     express.json(),
     async function(req, res) {
+      const graphId = req.params.graphId;
       const reqBody = req.body;
 
       try {
         const noteToTransmit:NoteToTransmit = await Notes.put(
           reqBody.note,
-          req.userId,
+          graphId,
           reqBody.options,
         );
 
@@ -390,10 +394,11 @@ const startApp = async ({
     verifyUser,
     express.json(),
     async function(req, res) {
+      const graphId = req.params.graphId;
       const reqBody = req.body;
       const links:string[] = reqBody.links;
 
-      const result = await Notes.importLinksAsNotes(req.userId, links);
+      const result = await Notes.importLinksAsNotes(graphId, links);
 
       const response:APIResponse = {
         payload: result,
@@ -410,7 +415,8 @@ const startApp = async ({
     verifyUser,
     async function(req, res) {
       try {
-        await Notes.remove(parseInt(req.params.noteId), req.userId);
+        const graphId = req.params.graphId;
+        await Notes.remove(parseInt(req.params.noteId), graphId);
         const response:APIResponse = {
           success: true,
         };
@@ -431,6 +437,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
+      const graphId = req.params.graphId;
       const sizeString = req.headers["content-length"];
 
       if (typeof sizeString !== "string") {
@@ -478,7 +485,7 @@ const startApp = async ({
         //console.log(req)
 
         const {fileId, size: transmittedBytes} = await Notes.addFile(
-          req.userId,
+          graphId,
           req,
           mimeType,
         );
@@ -490,7 +497,7 @@ const startApp = async ({
           /* this looks like the request was not completed. we'll remove the
           file */
           logger.debug("Removing file due to incomplete upload");
-          await Notes.deleteFile(req.userId, fileId);
+          await Notes.deleteFile(graphId, fileId);
 
           const response:APIResponse = {
             success: false,
@@ -526,6 +533,7 @@ const startApp = async ({
     verifyUser,
     express.json(),
     async function(req, res) {
+      const graphId = req.params.graphId;
       const reqBody = req.body;
       const url = reqBody.url;
 
@@ -563,7 +571,7 @@ const startApp = async ({
         try {
           logger.debug("Starting file download. Type: " + mimeType);
           const {fileId, size: transmittedBytes} = await Notes.addFile(
-            req.userId,
+            graphId,
             resourceResponse,
             mimeType,
           );
@@ -573,7 +581,7 @@ const startApp = async ({
           if (size !== transmittedBytes) {
             /* this looks like the download was not completed. we'll remove the
             file */
-            await Notes.deleteFile(req.userId, fileId);
+            await Notes.deleteFile(graphId, fileId);
 
             const response:APIResponse = {
               success: false,
@@ -644,9 +652,10 @@ const startApp = async ({
     verifyUser,
     async function(req, res) {
       try {
+        const graphId = req.params.graphId;
 
         /** Calculate Size of file */
-        const size = await Notes.getFileSize(req.userId, req.params.fileId);
+        const size = await Notes.getFileSize(graphId, req.params.fileId);
         const range = req.headers.range;
 
         /** Check for Range header */
@@ -679,7 +688,7 @@ const startApp = async ({
 
           const { readable, mimeType }
             = await Notes.getReadableFileStream(
-              req.userId,
+              graphId,
               req.params.fileId,
               { start: start, end: end },
             );
@@ -704,7 +713,7 @@ const startApp = async ({
 
         } else { // no range request
           const { readable, mimeType }
-            = await Notes.getReadableFileStream(req.userId, req.params.fileId);
+            = await Notes.getReadableFileStream(graphId, req.params.fileId);
 
           readable.on("error", () => {
             const response:APIResponse = {
@@ -765,10 +774,11 @@ const startApp = async ({
     verifyUser,
     express.json(),
     async function(req, res) {
+      const graphId = req.params.graphId;
       const reqBody = req.body;
       const noteId = reqBody.noteId;
 
-      const pinnedNotes = await Notes.pin(req.userId, noteId);
+      const pinnedNotes = await Notes.pin(graphId, noteId);
 
       const response:APIResponse = {
         payload: pinnedNotes,
@@ -785,10 +795,11 @@ const startApp = async ({
     verifyUser,
     express.json(),
     async function(req, res) {
+      const graphId = req.params.graphId;
       const reqBody = req.body;
       const noteId = reqBody.noteId;
 
-      const pinnedNotes = await Notes.unpin(req.userId, noteId);
+      const pinnedNotes = await Notes.unpin(graphId, noteId);
 
       const response:APIResponse = {
         payload: pinnedNotes,
@@ -805,7 +816,8 @@ const startApp = async ({
     verifyUser,
     express.json(),
     async function(req, res) {
-      const pinnedNotes = await Notes.getPins(req.userId);
+      const graphId = req.params.graphId;
+      const pinnedNotes = await Notes.getPins(graphId);
 
       const response:APIResponse = {
         payload: pinnedNotes,
