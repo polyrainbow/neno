@@ -2,7 +2,7 @@ import * as path from "path";
 import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
 import User from "./interfaces/User.js";
-import Users from "./Users.js";
+import Users from "./users.js";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
 import { REPO_PATH, VERSION, SERVER_TIMEOUT } from "./config.js";
 import * as logger from "./lib/logger.js";
