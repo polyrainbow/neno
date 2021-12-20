@@ -67,6 +67,10 @@ export default class ServerDatabaseProvider {
     return API.getStats(options);
   }
 
+  getFiles() {
+    return API.getFiles();
+  }
+
   deleteNote(noteId) {
     return API.deleteNote(noteId);
   }

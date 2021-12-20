@@ -742,6 +742,24 @@ const startApp = async ({
 
 
   app.get(
+    config.GRAPH_ENDPOINT + "files",
+    sessionMiddleware,
+    verifyUser,
+    express.json(),
+    async function(req, res) {
+      const graphId = req.params.graphId;
+      const files = await Notes.getFiles(graphId);
+
+      const response:APIResponse = {
+        payload: files,
+        success: true,
+      };
+      res.json(response);
+    },
+  );
+
+
+  app.get(
     config.GRAPH_ENDPOINT + "url-metadata",
     sessionMiddleware,
     verifyUser,

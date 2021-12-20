@@ -73,6 +73,20 @@ const AppMenu = ({
         }}
       />
       <AppMenuItem
+        label="Images"
+        icon="grid_view"
+        onClick={async () => {
+          const target = Config.paths.files;
+          if (pathname === target) return;
+
+          if (unsavedChanges) {
+            await confirmDiscardingUnsavedChanges();
+            setUnsavedChanges(false);
+          }
+          navigate(target);
+        }}
+      />
+      <AppMenuItem
         label="Stats"
         icon="query_stats"
         onClick={async () => {

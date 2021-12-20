@@ -84,6 +84,13 @@
   height: calc(100vh - var(--header-bar-height) - (2 * var(--default-margin)));
 }
 
+.content-section-wide {
+  margin: 0 auto;
+  padding: var(--default-margin);
+  overflow: auto;
+  height: calc(100vh - var(--header-bar-height) - (2 * var(--default-margin)));
+}
+
 
 hr {
   border: var(--content-element-border);

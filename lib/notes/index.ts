@@ -22,6 +22,7 @@ import {
   getNotesThatContainTokens,
   getNotesByTitle,
   getNotesWithUrl,
+  getNotesWithFile,
   getNotesWithTitleContainingTokens,
   getNotesWithBlocksOfTypes,
   getNotesWithDuplicateTitles,
@@ -140,6 +141,12 @@ const getNotesList = async (
     const startOfExactQuery = searchString.indexOf("has-url:") + "has-url:".length;
     const url = searchString.substring(startOfExactQuery);
     matchingNotes = getNotesWithUrl(graph.notes, url);
+
+  // search for notes with specific fileIds
+  } else if (searchString.includes("has-file:")) {
+    const startOfExactQuery = searchString.indexOf("has-file:") + "has-file:".length;
+    const fileId = searchString.substring(startOfExactQuery);
+    matchingNotes = getNotesWithFile(graph.notes, fileId);
 
   // search for notes with specific block types
   } else if (searchString.includes("has:")) {
@@ -435,6 +442,13 @@ const deleteFile = async (
 };
 
 
+const getFiles = async (
+  graphId,
+):Promise<FileId[]> => {
+  return io.getFiles(graphId);
+};
+
+
 const getReadableFileStream = (
   graphId: GraphId,
   fileId:FileId,
@@ -606,6 +620,7 @@ export {
   importDB,
   addFile,
   deleteFile,
+  getFiles,
   getReadableFileStream,
   getFileSize,
   getReadableGraphStream,

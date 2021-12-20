@@ -241,6 +241,33 @@ const getIconSrc = (iconName) => {
 };
 
 
+const getFileTypeFromFilename = (filename:string):string | null => {
+  const map = new Map(Object.entries({
+    "png": "image",
+    "jpg": "image",
+    "webp": "image",
+    "gif": "image",
+    "svg": "image",
+    "pdf": "document",
+    "mp3": "audio",
+    "mp4": "video",
+    "webm": "video",
+  }));
+
+  const posOfDot = filename.lastIndexOf(".");
+  if (posOfDot === -1) {
+    return null;
+  }
+
+  const fileEnding = filename.substring(posOfDot + 1);
+  if (fileEnding.length === 0) {
+    return null;
+  }
+
+  return map.has(fileEnding) ? map.get(fileEnding) as string : null;
+};
+
+
 export {
   yyyymmdd,
   htmlDecode,
@@ -257,4 +284,5 @@ export {
   blockHasFile,
   getFileInfosOfNoteFiles,
   getIconSrc,
+  getFileTypeFromFilename,
 };

@@ -150,6 +150,13 @@ const getStats = (options) => {
 };
 
 
+const getFiles = () => {
+  return callGraphAPIAndGetJSONPayload({
+    url: "files",
+  });
+};
+
+
 const getGraphVisualization = () => {
   return callGraphAPIAndGetJSONPayload({
     url: "graph-visualization",
@@ -261,6 +268,7 @@ export {
   putNote,
   deleteNote,
   getStats,
+  getFiles,
   getGraphVisualization,
   saveGraphVisualization,
   getReadableGraphStream,

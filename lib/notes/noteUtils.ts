@@ -619,6 +619,18 @@ const getNotesWithUrl = (
 }
 
 
+const getNotesWithFile = (
+  notes: SavedNote[],
+  file: FileId,
+):SavedNote[] => {
+  return notes.filter((note:SavedNote) => {
+    return note.blocks
+      .filter(blockHasFile)
+      .some((block) => block.data.file.fileId === file);
+  });
+}
+
+
 const getConcatenatedTextOfNote = (note:SavedNote):string => {
   const blockText = note.blocks.reduce((accumulator, block) => {
     if (block.type === NoteContentBlockType.PARAGRAPH) {
@@ -740,6 +752,7 @@ export {
   getNotesWithDuplicateTitles,
   getNotesByTitle,
   getNotesWithUrl,
+  getNotesWithFile,
   getConcatenatedTextOfNote,
   blockHasFile,
   getNotesWithTitleContainingTokens,

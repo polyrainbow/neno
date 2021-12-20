@@ -21,6 +21,8 @@ import StatsView from "./StatsView";
 import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
 import * as Config from "./lib/config";
 import ImportLinksDialog from "./ImportLinksDialog";
+import FilesView from "./FilesView";
+import FileView from "./FileView";
 
 
 const App = ({
@@ -331,6 +333,24 @@ const App = ({
             databaseProvider={databaseProvider}
             toggleAppMenu={toggleAppMenu}
             handleInvalidCredentialsError={handleInvalidCredentialsError}
+          />
+        }
+      />
+      <Route
+        path={paths.files}
+        element={
+          <FilesView
+            databaseProvider={databaseProvider}
+            toggleAppMenu={toggleAppMenu}
+          />
+        }
+      />
+      <Route
+        path={paths.files + "/:fileId"}
+        element={
+          <FileView
+            databaseProvider={databaseProvider}
+            toggleAppMenu={toggleAppMenu}
           />
         }
       />
