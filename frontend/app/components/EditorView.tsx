@@ -5,26 +5,26 @@ import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import Note from "./Note";
-import * as Utils from "./lib/utils";
-import * as Config from "./lib/config";
-import * as Editor from "./lib/editor";
+import * as Utils from "../lib/utils";
+import * as Config from "../lib/config";
+import * as Editor from "../lib/editor";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import {
   useNavigate,
   useParams,
 } from "react-router-dom";
-import useIsSmallScreen from "./hooks/useIsSmallScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import {
   UserNoteChangeType,
-} from "../../lib/notes/interfaces/UserNoteChangeType";
-import ActiveNote from "./interfaces/ActiveNote";
-import FrontendUserNoteChange from "./interfaces/FrontendUserNoteChange";
-import { DialogType } from "./enum/DialogType";
+} from "../../../lib/notes/interfaces/UserNoteChangeType";
+import ActiveNote from "../interfaces/ActiveNote";
+import FrontendUserNoteChange from "../interfaces/FrontendUserNoteChange";
+import { DialogType } from "../enum/DialogType";
 import useConfirmDiscardingUnsavedChangesDialog
-  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
-import useGoToNote from "./hooks/useGoToNote";
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import useGoToNote from "../hooks/useGoToNote";
 import SearchDialog from "./SearchDialog";
-import NoteFromUser from "../../lib/notes/interfaces/NoteFromUser";
+import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 
 const EditorView = ({
   databaseProvider,

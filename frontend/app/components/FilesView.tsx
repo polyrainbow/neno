@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
 import FilesViewImageBox from "./FilesViewImageBox";
-import { getFileTypeFromFilename } from "./lib/utils";
+import { getFileTypeFromFilename } from "../lib/utils";
 
 
 const FilesView = ({

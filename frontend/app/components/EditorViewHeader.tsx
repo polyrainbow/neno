@@ -2,9 +2,9 @@ import React from "react";
 import AppTitle from "./AppTitle";
 import AppStats from "./AppStats";
 import EditorViewHeaderPinnedNote from "./EditorViewHeaderPinnedNote";
-import useGoToNote from "./hooks/useGoToNote";
+import useGoToNote from "../hooks/useGoToNote";
 import useConfirmDiscardingUnsavedChangesDialog
-  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const EditorViewHeader = ({
   stats,

@@ -1,5 +1,5 @@
 import React from "react";
-import { emojis } from "./lib/config";
+import { emojis } from "../lib/config";
 
 const GraphViewStatusIndicator = ({
   status,

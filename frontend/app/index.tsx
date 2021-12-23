@@ -17,7 +17,7 @@ const [
 ] = (await Promise.all([
   import("react"),
   import("react-dom"),
-  import("./App"),
+  import("./components/App"),
 ])).map((module) => module.default);
 
 const localDatabaseProvider = new LocalDatabaseProvider();

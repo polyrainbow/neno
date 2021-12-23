@@ -1,5 +1,5 @@
 import React from "react";
-import { getIconSrc } from "./lib/utils";
+import { getIconSrc } from "../lib/utils";
 
 
 const AppMenuItem = ({

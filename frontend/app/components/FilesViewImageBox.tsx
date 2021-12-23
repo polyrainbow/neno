@@ -2,7 +2,7 @@ import React from "react";
 import {
   Link,
 } from "react-router-dom";
-import { paths } from "./lib/config";
+import { paths } from "../lib/config";
 
 
 const FilesViewImageBox = ({

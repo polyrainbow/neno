@@ -2,7 +2,7 @@ import React from "react";
 import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
-import { DialogType } from "./enum/DialogType";
+import { DialogType } from "../enum/DialogType";
 import SearchDialog from "./SearchDialog";
 
 const ListView = ({

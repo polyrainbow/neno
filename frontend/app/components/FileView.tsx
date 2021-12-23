@@ -3,8 +3,8 @@ import HeaderContainer from "./HeaderContainer";
 import {
   useParams, Link,
 } from "react-router-dom";
-import { paths } from "./lib/config";
-import NoteListItem from "../../lib/notes/interfaces/NoteListItem";
+import { paths } from "../lib/config";
+import NoteListItem from "../../../lib/notes/interfaces/NoteListItem";
 
 
 const FileView = ({

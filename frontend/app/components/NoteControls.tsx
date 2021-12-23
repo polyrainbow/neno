@@ -2,10 +2,10 @@ import React from "react";
 import IconButton from "./IconButton.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import { useNavigate } from "react-router-dom";
-import useIsSmallScreen from "./hooks/useIsSmallScreen.js";
-import { paths } from "./lib/config.js";
+import useIsSmallScreen from "../hooks/useIsSmallScreen.js";
+import { paths } from "../lib/config.js";
 import useConfirmDiscardingUnsavedChangesDialog
-  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
 
 const NoteControls = ({

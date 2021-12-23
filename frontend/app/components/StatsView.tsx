@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
-import { emojis, paths } from "./lib/config.js";
+import { emojis, paths } from "../lib/config.js";
 import {
   makeTimestampHumanReadable,
   humanFileSize,
-} from "./lib/utils.js";
+} from "../lib/utils.js";
 
 const StatsView = ({
   databaseProvider,

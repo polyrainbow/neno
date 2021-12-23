@@ -1,14 +1,14 @@
 import React from "react";
 import AppMenuItem from "./AppMenuItem";
-import * as Config from "./lib/config";
+import * as Config from "../lib/config";
 import OutsideAlerter from "./OutsideAlerter";
 import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
-import useIsSmallScreen from "./hooks/useIsSmallScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useConfirmDiscardingUnsavedChangesDialog
-  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const AppMenu = ({
   openExportDatabaseDialog,

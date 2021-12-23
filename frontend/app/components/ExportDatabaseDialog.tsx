@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Dialog from "./Dialog";
 import RadioGroup from "./RadioGroup";
-import { humanFileSize, yyyymmdd } from "./lib/utils";
+import { humanFileSize, yyyymmdd } from "../lib/utils";
 
 
 const ExportDatabaseDialog = ({

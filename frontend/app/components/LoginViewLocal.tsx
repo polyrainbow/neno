@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import {
   useNavigate,
 } from "react-router-dom";
-import { paths } from "./lib/config";
-import { DatabaseMode } from "./enum/DatabaseMode";
+import { paths } from "../lib/config";
+import { DatabaseMode } from "../enum/DatabaseMode";
 
 const LoginViewLocal = ({
   localDatabaseProvider,

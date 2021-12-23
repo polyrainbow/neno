@@ -6,20 +6,20 @@ import LoginView from "./LoginView";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider";
 import AppMenu from "./AppMenu";
 import ExportDatabaseDialog from "./ExportDatabaseDialog";
-import { paths } from "./lib/config";
+import { paths } from "../lib/config";
 import {
   Routes,
   Route,
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import useIsSmallScreen from "./hooks/useIsSmallScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
-import { DatabaseMode } from "./enum/DatabaseMode.js";
-import { DialogType } from "./enum/DialogType";
+import { DatabaseMode } from "../enum/DatabaseMode.js";
+import { DialogType } from "../enum/DialogType";
 import StatsView from "./StatsView";
-import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
-import * as Config from "./lib/config";
+import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
+import * as Config from "../lib/config";
 import ImportLinksDialog from "./ImportLinksDialog";
 import FilesView from "./FilesView";
 import FileView from "./FileView";

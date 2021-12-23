@@ -1,5 +1,5 @@
 import React from "react";
-import { emojis } from "./lib/config.js";
+import { emojis } from "../lib/config.js";
 import NoteListItemFeatures from "./NoteListItemFeatures";
 
 

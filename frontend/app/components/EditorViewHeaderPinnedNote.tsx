@@ -1,5 +1,5 @@
 import React from "react";
-import { getIconSrc, shortenText } from "./lib/utils";
+import { getIconSrc, shortenText } from "../lib/utils";
 
 const EditorViewHeaderPinnedNote = ({
   note,

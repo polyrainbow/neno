@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import {
   useNavigate,
 } from "react-router-dom";
-import { paths } from "./lib/config.js";
-import { DatabaseMode } from "./enum/DatabaseMode.js";
+import { paths } from "../lib/config.js";
+import { DatabaseMode } from "../enum/DatabaseMode.js";
 
 const LoginViewServer = ({
   serverDatabaseProvider,

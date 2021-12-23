@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import GraphVisualization from "./lib/GraphVisualization.js";
+import GraphVisualization from "../lib/GraphVisualization.js";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {
   useLocation,
 } from "react-router-dom";
 import GraphViewHeader from "./GraphViewHeader";
 import useConfirmDiscardingUnsavedChangesDialog
-  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
-import useGoToNote from "./hooks/useGoToNote";
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import useGoToNote from "../hooks/useGoToNote";
 
 const GraphView = ({
   databaseProvider,

@@ -2,7 +2,7 @@ import React from "react";
 import {
   makeTimestampHumanReadable,
   getFileInfosOfNoteFiles,
-} from "./lib/utils.js";
+} from "../lib/utils.js";
 import NoteStatsFileLink from "./NoteStatsFileLink";
 
 const NoteStats = ({

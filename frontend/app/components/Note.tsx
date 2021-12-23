@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import NoteListItem from "./NoteListItem";
-import * as Editor from "./lib/editor";
+import * as Editor from "../lib/editor";
 import NoteStats from "./NoteStats";
 import isEqual from "react-fast-compare";
 import NoteControls from "./NoteControls";
-import useGoToNote from "./hooks/useGoToNote";
+import useGoToNote from "../hooks/useGoToNote";
 import SearchInput from "./SearchInput";
 import {
   useNavigate,
 } from "react-router-dom";
 // import { DatabaseMode } from "./enum/DatabaseMode.js";
-import { paths } from "./lib/config";
-import NoteListItemType from "../../lib/notes/interfaces/NoteListItem";
+import { paths } from "../lib/config";
+import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
 import useConfirmDiscardingUnsavedChangesDialog
-  from "./hooks/useConfirmDiscardingUnsavedChangesDialog";
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 const Note = ({
   note,
