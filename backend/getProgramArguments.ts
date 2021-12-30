@@ -9,7 +9,7 @@ const getArguments = (version) => {
   
   program
     .option(
-      '-p, --port <value>',
+      '-p, --http-port <value>',
       'HTTP port',
       "80",
     )
@@ -64,6 +64,10 @@ const getArguments = (version) => {
       '--session-cookie-name <value>',
       "the name of the session cookie in which the auth token is stored",
       "NENO_token",
+    )
+    .option(
+      '--ipv6-only',
+      "only allow IPv6 connections",
     );
   
   program.parse(process.argv);

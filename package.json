@@ -60,7 +60,7 @@
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
     "compile-typescript": "npx tsc",
-    "start-server-dev": "node dist/backend/index.js --port 8080 --session-secret 000",
+    "start-server-dev": "node dist/backend/index.js --http-port 8080 --session-secret 000",
     "start-server-dev-tls": "node dist/backend/index.js --https-port 8080 --use-https --cert-path ~/.neno/server.cert --cert-key-path ~/.neno/server.key",
     "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
     "build-frontend-production-local-only": "npx webpack --config frontend/webpack.production.local-only.js",

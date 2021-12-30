@@ -51,9 +51,10 @@ await startServer({
   certKeyPath: programArguments.certKeyPath,
   certPath: programArguments.certPath,
   useHttps: programArguments.useHttps,
-  port: parseInt(programArguments.port),
+  httpPort: parseInt(programArguments.httpPort),
   httpsPort: parseInt(programArguments.httpsPort),
   timeout: SERVER_TIMEOUT,
+  ipv6Only: programArguments.ipv6Only,
 });
 
 logger.info("✅ Ready.");

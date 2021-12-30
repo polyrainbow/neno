@@ -17,10 +17,20 @@ const startServer = async ({
   certKeyPath,
   certPath,
   useHttps,
-  port,
+  httpPort,
   httpsPort,
   timeout,
+  ipv6Only,
 }) => {
+  if (ipv6Only) {
+    logger.info("ipv6-only mode enabled");
+  }
+
+  // if ipv6 only is enabled we want to listen only to the unspecified
+  // ipv6 address (::). if both ipv4 and ipv6 are enabled, we should let 
+  // node.js decide which host is used.
+  const host = ipv6Only ? "::" : null;
+
   if (useHttps) {
     const httpsServer = https.createServer(
       {
@@ -30,30 +40,42 @@ const startServer = async ({
       app as RequestListener,
     );
     httpsServer.timeout = timeout;
-    httpsServer.listen(httpsPort);
+    httpsServer.listen({
+      port: httpsPort,
+      ipv6Only,
+      host,
+    });
     httpsServer.on('clientError', handleClientError);
     logger.info("HTTPS access ready on port " + httpsPort);
     
-    if (port === 80 && httpsPort === 443) {
+    if (httpPort === 80 && httpsPort === 443) {
       // redirect http requests to https
       const httpServer = http.createServer(function (req, res) {
         res.writeHead(301, {
           "Location": "https://" + req.headers['host'] + req.url,
         });
         res.end();
-      }).listen(port);
+      }).listen({
+        port: httpPort,
+        ipv6Only,
+        host,
+      });
       httpServer.on('clientError', handleClientError);
       logger.info(
         "HTTP requests to port "
-        + port + " will be redirected to HTTPS.",
+        + httpPort + " will be redirected to HTTPS.",
       );
     }
   } else {
     const httpServer = http.createServer(app);
     httpServer.timeout = timeout;
-    httpServer.listen(parseInt(port));
+    httpServer.listen({
+      port: httpPort,
+      ipv6Only,
+      host,
+    });
     httpServer.on('clientError', handleClientError);
-    logger.info("HTTP access ready on port " + port);
+    logger.info("HTTP access ready on port " + httpPort);
   }
 };
 
