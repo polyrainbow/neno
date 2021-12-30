@@ -118,6 +118,7 @@ const startApp = async ({
         req.userId = user.id;
         next();
       } else {
+        logger.verbose("User provided invalid API key: " + apiKey);
         const response:APIResponse = {
           success: false,
           error: APIError.INVALID_CREDENTIALS,
@@ -127,7 +128,7 @@ const startApp = async ({
     } else {
       const response:APIResponse = {
         success: false,
-        error: APIError.INVALID_CREDENTIALS,
+        error: APIError.UNAUTHORIZED,
       };
       return res.status(401).json(response);
     }
@@ -481,7 +482,7 @@ const startApp = async ({
       }
 
       try {
-        logger.debug("Starting file upload. Type: " + mimeType);
+        logger.verbose("Starting file upload. Type: " + mimeType);
         //console.log(req)
 
         const {fileId, size: transmittedBytes} = await Notes.addFile(
@@ -490,13 +491,13 @@ const startApp = async ({
           mimeType,
         );
 
-        logger.debug(
+        logger.verbose(
           `Expected size: ${size} Transmitted: ${transmittedBytes}`,
         );
         if (size !== transmittedBytes) {
           /* this looks like the request was not completed. we'll remove the
           file */
-          logger.debug("Removing file due to incomplete upload");
+          logger.verbose("Removing file due to incomplete upload");
           await Notes.deleteFile(graphId, fileId);
 
           const response:APIResponse = {
@@ -515,8 +516,8 @@ const startApp = async ({
         };
         res.json(response);
       } catch (e) {
-        logger.debug("Catched an error trying to upload a file:");
-        logger.debug(e);
+        logger.verbose("Catched an error trying to upload a file:");
+        logger.verbose(e);
         const response:APIResponse = {
           success: false,
           error: e.message,
@@ -569,13 +570,13 @@ const startApp = async ({
         }
 
         try {
-          logger.debug("Starting file download. Type: " + mimeType);
+          logger.verbose("Starting file download. Type: " + mimeType);
           const {fileId, size: transmittedBytes} = await Notes.addFile(
             graphId,
             resourceResponse,
             mimeType,
           );
-          logger.debug(
+          logger.verbose(
             `Expected size: ${size} Transmitted: ${transmittedBytes}`,
           );
           if (size !== transmittedBytes) {
@@ -774,8 +775,8 @@ const startApp = async ({
         };
         res.json(response);
       } catch (e) {
-        logger.debug("Error while getting URL metadata");
-        logger.debug(JSON.stringify(e));
+        logger.verbose("Error while getting URL metadata");
+        logger.verbose(JSON.stringify(e));
         const response:APIResponse = {
           "success": false,
           "error": e.message,
@@ -855,6 +856,8 @@ const startApp = async ({
         success: true,
       };
 
+      logger.verbose(`Logout: ${req.userId}`);
+
       await new Promise((resolve, reject) => {
         req.session.destroy(function(err) {
           if (err) {
@@ -888,6 +891,19 @@ const startApp = async ({
   });
 
 
+  const handleUnsuccessfulLoginAttempt = (req, res) => {
+    logger.verbose("Unsuccessful login attempt");
+    logger.verbose(`User: ${req.body.username}`);
+    logger.verbose(`Password: ${req.body.password}`);
+    logger.verbose(`MFA Token: ${req.body.mfaToken}`);
+    const response:APIResponse = {
+      success: false,
+      error: APIError.INVALID_CREDENTIALS,
+    };
+    return res.status(401).json(response);
+  }
+
+
   app.post(
     config.USER_ENDOPINT + 'login',
     sessionMiddleware,
@@ -903,12 +919,7 @@ const startApp = async ({
         || (!submittedPassword)
         || (!submittedMfaToken)
       ) {
-        // Access denied...
-        const response:APIResponse = {
-          success: false,
-          error: APIError.INVALID_CREDENTIALS,
-        };
-        return res.status(401).json(response);
+        return handleUnsuccessfulLoginAttempt(req, res);
       }
 
       const user = users.find((user) => {
@@ -916,12 +927,7 @@ const startApp = async ({
       });
 
       if (!user) {
-        // Access denied...
-        const response:APIResponse = {
-          success: false,
-          error: APIError.INVALID_CREDENTIALS,
-        };
-        return res.status(401).json(response);
+        return handleUnsuccessfulLoginAttempt(req, res);
       }
 
       const mfaTokenIsValid
@@ -931,24 +937,14 @@ const startApp = async ({
         )?.delta === 0;
 
       if (!mfaTokenIsValid) {
-        // Access denied...
-        const response:APIResponse = {
-          success: false,
-          error: APIError.INVALID_CREDENTIALS,
-        };
-        return res.status(401).json(response);
+        return handleUnsuccessfulLoginAttempt(req, res);
       }
 
       const passwordIsValid
         = bcrypt.compareSync(submittedPassword, user.passwordHash);
 
       if (!passwordIsValid) {
-        // Access denied...
-        const response:APIResponse = {
-          success: false,
-          error: APIError.INVALID_CREDENTIALS,
-        };
-        return res.status(401).json(response);
+        return handleUnsuccessfulLoginAttempt(req, res);
       }
 
       // this modification of the session object initializes the session and
@@ -956,6 +952,8 @@ const startApp = async ({
       req.session.userId = user.login;
       req.session.userAgent = req.headers["user-agent"];
       req.session.userPlatform = req.headers["sec-ch-ua-platform"];
+
+      logger.verbose(`Successful login: ${req.session.userId}`);
 
       const response:APIResponse = {
         success: true,

@@ -2,7 +2,7 @@ const logLevels = [
   "error",
   "warn",
   "info",
-  "debug",
+  "verbose",
 ];
 
 let currentLogLevel = "info";
@@ -38,10 +38,10 @@ const info = (msg) => {
   }
 };
 
-const debug = (msg) => {
-  if (logLevels.indexOf(currentLogLevel) >= logLevels.indexOf("debug")) {
+const verbose = (msg) => {
+  if (logLevels.indexOf(currentLogLevel) >= logLevels.indexOf("verbose")) {
     // eslint-disable-next-line no-console
-    console.log("DEBUG: " + msg);
+    console.log("VERBOSE: " + msg);
   }
 };
 
@@ -49,5 +49,5 @@ export {
   error,
   warn,
   info,
-  debug,
+  verbose,
 };

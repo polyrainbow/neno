@@ -7,8 +7,8 @@ const getUrlMetadata = async (
 ):Promise<UrlMetadataResponse> => {
   const metadata = await urlMetadata(url);
 
-  logger.debug("URL metadata received:");
-  logger.debug(JSON.stringify(metadata));
+  logger.verbose("URL metadata received:");
+  logger.verbose(JSON.stringify(metadata));
 
   const response = {
     url,
@@ -17,8 +17,8 @@ const getUrlMetadata = async (
     image: metadata.image,
   };
 
-  logger.debug("URL metadata response object:");
-  logger.debug(JSON.stringify(response));
+  logger.verbose("URL metadata response object:");
+  logger.verbose(JSON.stringify(response));
 
   return response;
 };
