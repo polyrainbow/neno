@@ -27,6 +27,7 @@ import * as logger from "./lib/logger.js";
 import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode.js";
 import { UserId } from "./interfaces/UserId.js";
 import { GraphId } from "./interfaces/GraphId.js";
+import BruteForcePreventer from "./BruteForcePreventer.js";
 
 
 const startApp = async ({
@@ -49,6 +50,8 @@ const startApp = async ({
   await Notes.init(storageProvider, getUrlMetadata, randomUUID);
   logger.info("Initializing routes...")
   const app = express();
+
+  const bruteForcePreventer = new BruteForcePreventer();
 
   const sessionMiddleware = session({
     secret: sessionSecret,
@@ -896,6 +899,10 @@ const startApp = async ({
     logger.verbose(`User: ${req.body.username}`);
     logger.verbose(`Password: ${req.body.password}`);
     logger.verbose(`MFA Token: ${req.body.mfaToken}`);
+    logger.verbose(`IP: ${req.socket.remoteAddress}`);
+
+    bruteForcePreventer.unsuccessfulLogin(req.socket.remoteAddress);
+
     const response:APIResponse = {
       success: false,
       error: APIError.INVALID_CREDENTIALS,
@@ -909,6 +916,18 @@ const startApp = async ({
     sessionMiddleware,
     express.json(),
     (req, res) => {
+      if (!bruteForcePreventer.isLoginAttemptLegit(req.socket.remoteAddress)) {
+        logger.verbose(
+          `Login request denied due to brute force prevention. IP: ${req.socket.remoteAddress}`
+        );
+
+        const response:APIResponse = {
+          success: false,
+          error: APIError.TOO_EARLY,
+        };
+        return res.status(425).json(response);
+      }
+
       // read username and password from request body
       const submittedUsername = req.body.username;
       const submittedPassword = req.body.password;
@@ -953,7 +972,10 @@ const startApp = async ({
       req.session.userAgent = req.headers["user-agent"];
       req.session.userPlatform = req.headers["sec-ch-ua-platform"];
 
-      logger.verbose(`Successful login: ${req.session.userId}`);
+      logger.verbose(
+        `Successful login: ${req.session.userId} IP: ${req.socket.remoteAddress}`,
+      );
+      bruteForcePreventer.successfulLogin(req.socket.remoteAddress);
 
       const response:APIResponse = {
         success: true,

@@ -27,9 +27,7 @@ const LoginViewServer = ({
         navigate(paths.editorWithNewNote);
       })
       .catch((e) => {
-        const disclaimer = (e.message === "INVALID_CREDENTIALS")
-          ? "INVALID_CREDENTIALS"
-          : "SERVER_ERROR";
+        const disclaimer = e.message;
         setDisclaimer(disclaimer);
         setIsBusy(false);
       });
@@ -57,6 +55,13 @@ const LoginViewServer = ({
         ? <p style={{ color: "red" }}>
           Your combination of username, password, and 2FA token does not
           seem to be correct. Please try again.
+        </p>
+        : ""
+    }
+    {
+      disclaimer === "TOO_EARLY"
+        ? <p style={{ color: "red" }}>
+          Too many failed login attempts. Please wait a bit and try again.
         </p>
         : ""
     }
