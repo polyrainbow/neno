@@ -259,12 +259,12 @@ const getFileTypeFromFilename = (filename:string):string | null => {
     return null;
   }
 
-  const fileEnding = filename.substring(posOfDot + 1);
-  if (fileEnding.length === 0) {
+  const extension = filename.substring(posOfDot + 1);
+  if (extension.length === 0) {
     return null;
   }
 
-  return map.has(fileEnding) ? map.get(fileEnding) as string : null;
+  return map.has(extension) ? map.get(extension) as string : null;
 };
 
 

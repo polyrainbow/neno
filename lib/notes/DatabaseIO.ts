@@ -195,16 +195,16 @@ export default class DatabaseIO {
       range,
     );
 
-    const fileEnding = fileId.substring(fileId.lastIndexOf(".") + 1)
+    const extension = fileId.substring(fileId.lastIndexOf(".") + 1)
       .toLocaleLowerCase();
 
     const fileInfo = config.ALLOWED_FILE_TYPES
       .find((filetype) => {
-        return filetype.ending === fileEnding;
+        return filetype.extension === extension;
       });
 
     if (!fileInfo) {
-      throw Error(ErrorMessage.INVALID_FILE_ENDING);
+      throw Error(ErrorMessage.INVALID_FILENAME_EXTENSION);
     }
 
     const mimeType = fileInfo.mimeType;

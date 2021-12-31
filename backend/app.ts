@@ -202,8 +202,8 @@ const startApp = async ({
       // set the archive name
       const dateSuffix = yyyymmdd(new Date());
 
-      const fileEnding = withFiles ? "zip" : "json";
-      const filename = `neno-${graphId}-${dateSuffix}.db.${fileEnding}`;
+      const extension = withFiles ? "zip" : "json";
+      const filename = `neno-${graphId}-${dateSuffix}.db.${extension}`;
       res.attachment(filename);
 
       // this is the streaming magic

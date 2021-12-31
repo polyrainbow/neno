@@ -425,7 +425,7 @@ const addFile = async (
     throw new Error(ErrorMessage.INVALID_MIME_TYPE);
   }
 
-  const fileId:FileId = randomUUID() + "." + fileType.ending;
+  const fileId:FileId = randomUUID() + "." + fileType.extension;
   const size = await io.addFile(graphId, fileId, readable);
   return {
     fileId,

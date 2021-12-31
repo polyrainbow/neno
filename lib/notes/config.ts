@@ -1,43 +1,43 @@
 const ALLOWED_FILE_TYPES = [
   {
     mimeType: "image/png",
-    ending: "png",
+    extension: "png",
   },
   {
     mimeType: "image/jpeg",
-    ending: "jpg",
+    extension: "jpg",
   },
   {
     mimeType: "image/webp",
-    ending: "webp",
+    extension: "webp",
   },
   {
     mimeType: "image/gif",
-    ending: "gif",
+    extension: "gif",
   },
   {
     mimeType: "image/svg+xml",
-    ending: "svg",
+    extension: "svg",
   },
   {
     mimeType: "application/pdf",
-    ending: "pdf",
+    extension: "pdf",
   },
   {
     mimeType: "audio/mp3",
-    ending: "mp3",
+    extension: "mp3",
   },
   {
     mimeType: "audio/mpeg",
-    ending: "mp3",
+    extension: "mp3",
   },
   {
     mimeType: "video/mp4",
-    ending: "mp4",
+    extension: "mp4",
   },
   {
     mimeType: "video/webm",
-    ending: "webm",
+    extension: "webm",
   },
 ];
 
