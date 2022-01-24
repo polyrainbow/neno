@@ -67,6 +67,7 @@ export default class FileSystemStorageProvider {
     // https://nodejs.org/api/stream.html#readablepipedestination-options
     try {
       await finished(readableStream);
+      await finished(writableStream);
     } catch (e) {
       // we must not pass the error event to destroy, because we do not handle
       // it there explicitly
