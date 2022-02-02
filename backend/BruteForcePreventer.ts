@@ -10,11 +10,11 @@ export default class BruteForcePreventer {
     const MINS10 = 600000;
     const MINS30 = 3 * MINS10;
 
-    setInterval(function() {
+    setInterval(() => {
       for (const ip in this.#failures) {
-          if (Date.now() - this.#failures.get(ip).nextTry > MINS10) {
-            this.#failures.delete(ip);
-          }
+        if (Date.now() - this.#failures.get(ip).nextTry > MINS10) {
+          this.#failures.delete(ip);
+        }
       }
     }, MINS30);
   }
