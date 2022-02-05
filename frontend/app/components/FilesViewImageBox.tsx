@@ -2,14 +2,15 @@ import React from "react";
 import {
   Link,
 } from "react-router-dom";
-import { paths } from "../lib/config";
+import { PathTemplate } from "../enum/PathTemplate";
+import { getAppPath } from "../lib/utils";
 
 
 const FilesViewImageBox = ({
   imageFile,
 }) => {
   return <Link
-    to={paths.files + "/" + imageFile.id}
+    to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", imageFile.id]]))}
     style={{
       lineHeight: "0",
     }}

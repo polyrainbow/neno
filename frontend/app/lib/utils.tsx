@@ -1,3 +1,4 @@
+import { PathTemplate } from "../enum/PathTemplate";
 import ActiveNote from "../interfaces/ActiveNote";
 import * as Config from "./config";
 
@@ -236,6 +237,18 @@ const getFileInfosOfNoteFiles = (note) => {
 };
 
 
+const getAppPath = (
+  pathTemplate:PathTemplate,
+  params?:Map<string, string>,
+):string => {
+  let path = `${Config.ROOT_PATH}${pathTemplate}`;
+  params?.forEach((value, key) => {
+    path = path.replace(`%${key}%`, value);
+  });
+  return path;
+};
+
+
 const getIconSrc = (iconName) => {
   return Config.ICON_PATH + iconName + "_black_24dp.svg";
 };
@@ -283,6 +296,7 @@ export {
   getWindowDimensions,
   blockHasFile,
   getFileInfosOfNoteFiles,
+  getAppPath,
   getIconSrc,
   getFileTypeFromFilename,
 };

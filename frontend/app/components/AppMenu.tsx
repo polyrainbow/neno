@@ -1,6 +1,5 @@
 import React from "react";
 import AppMenuItem from "./AppMenuItem";
-import * as Config from "../lib/config";
 import OutsideAlerter from "./OutsideAlerter";
 import {
   useNavigate,
@@ -9,6 +8,8 @@ import {
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
 
 const AppMenu = ({
   openExportDatabaseDialog,
@@ -45,8 +46,8 @@ const AppMenu = ({
         icon={isSmallScreen ? "list" : "create"}
         onClick={async () => {
           const target = isSmallScreen
-            ? Config.paths.list
-            : Config.paths.editorWithNewNote;
+            ? getAppPath(PathTemplate.LIST)
+            : getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE);
 
           if (pathname === target) return;
 
@@ -62,7 +63,7 @@ const AppMenu = ({
         label="Graph"
         icon="scatter_plot"
         onClick={async () => {
-          const target = Config.paths.graph;
+          const target = getAppPath(PathTemplate.GRAPH);
           if (pathname === target) return;
 
           if (unsavedChanges) {
@@ -76,7 +77,7 @@ const AppMenu = ({
         label="Images"
         icon="grid_view"
         onClick={async () => {
-          const target = Config.paths.files;
+          const target = getAppPath(PathTemplate.FILES);
           if (pathname === target) return;
 
           if (unsavedChanges) {
@@ -90,7 +91,7 @@ const AppMenu = ({
         label="Stats"
         icon="query_stats"
         onClick={async () => {
-          const target = Config.paths.stats;
+          const target = getAppPath(PathTemplate.STATS);
           if (pathname === target) return;
 
           if (unsavedChanges) {
@@ -124,7 +125,7 @@ const AppMenu = ({
           }
 
           await databaseProvider.removeAccess();
-          navigate(Config.paths.login);
+          navigate(getAppPath(PathTemplate.LOGIN));
         }}
       />
     </div>

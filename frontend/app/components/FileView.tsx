@@ -3,8 +3,9 @@ import HeaderContainer from "./HeaderContainer";
 import {
   useParams, Link,
 } from "react-router-dom";
-import { paths } from "../lib/config";
 import NoteListItem from "../../../lib/notes/interfaces/NoteListItem";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
 
 
 const FileView = ({
@@ -63,7 +64,12 @@ const FileView = ({
         notes.map((note) => {
           return <p key={"notelink-" + note.id}>
             <Link
-              to={paths.editorWithNote.replace("%NOTE_ID%", note.id.toString())}
+              to={
+                getAppPath(
+                  PathTemplate.EDITOR_WITH_NOTE,
+                  new Map([["NOTE_ID", note.id.toString()]]),
+                )
+              }
             >{note.title}</Link>
           </p>;
         })

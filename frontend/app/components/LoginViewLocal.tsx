@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
   useNavigate,
 } from "react-router-dom";
-import { paths } from "../lib/config";
 import { DatabaseMode } from "../enum/DatabaseMode";
+import { PathTemplate } from "../enum/PathTemplate";
+import { getAppPath } from "../lib/utils";
 
 const LoginViewLocal = ({
   localDatabaseProvider,
@@ -52,7 +53,7 @@ const LoginViewLocal = ({
               try {
                 await localDatabaseProvider.initializeDatabase();
                 setDatabaseMode(DatabaseMode.LOCAL);
-                navigate(paths.editorWithNewNote);
+                navigate(getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
               } catch (e) {
                 console.error(e);
 
@@ -81,7 +82,7 @@ const LoginViewLocal = ({
           const folderHandle = await window.showDirectoryPicker();
           await localDatabaseProvider.login(folderHandle);
           setDatabaseMode(DatabaseMode.LOCAL);
-          navigate(paths.editorWithNewNote);
+          navigate(getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
         } catch (e) {
           console.error(e);
         }

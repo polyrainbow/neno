@@ -3,10 +3,11 @@ import IconButton from "./IconButton.js";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
 import { useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen.js";
-import { paths } from "../lib/config.js";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
+import { getAppPath } from "../lib/utils.js";
+import { PathTemplate } from "../enum/PathTemplate.js";
 
 const NoteControls = ({
   activeNote,
@@ -38,7 +39,7 @@ const NoteControls = ({
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              navigate(paths.list);
+              navigate(getAppPath(PathTemplate.LIST));
             }}
           />
           : null

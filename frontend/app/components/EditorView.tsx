@@ -25,6 +25,7 @@ import useConfirmDiscardingUnsavedChangesDialog
 import useGoToNote from "../hooks/useGoToNote";
 import SearchDialog from "./SearchDialog";
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
+import { PathTemplate } from "../enum/PathTemplate";
 
 const EditorView = ({
   databaseProvider,
@@ -203,7 +204,10 @@ const EditorView = ({
     }
 
     if (isNaN(noteIdNumber)) {
-      navigate(Config.paths.editorWithNewNote, { replace: true });
+      navigate(
+        Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
+        { replace: true },
+      );
       setActiveNote(Utils.getNewNoteObject());
     } else {
       try {
@@ -226,7 +230,7 @@ const EditorView = ({
 
 
   const createNewNote = () => {
-    navigate(Config.paths.editorWithNewNote);
+    navigate(Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
   };
 
 
@@ -237,7 +241,7 @@ const EditorView = ({
 
     await databaseProvider.deleteNote(activeNote.id);
     refreshNotesList();
-    navigate(Config.paths.editorWithNewNote);
+    navigate(Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
   };
 
 
@@ -417,9 +421,9 @@ const EditorView = ({
           duplicateNote={duplicateNote}
           openInGraphView={() => {
             navigate(
-              Config.paths.graphWithFocusNote.replace(
-                "%FOCUS_NOTE_ID%",
-                activeNote.id.toString(),
+              Utils.getAppPath(
+                PathTemplate.GRAPH_WITH_FOCUS_NOTE,
+                new Map([["FOCUS_NOTE_ID", activeNote.id.toString()]]),
               ),
             );
           }}

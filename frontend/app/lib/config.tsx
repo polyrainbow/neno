@@ -45,21 +45,11 @@ const emojis = {
   "text": "✏️",
 };
 
-const ICON_PATH = "/assets/icons/";
+const ROOT_PATH = "/";
+const ASSETS_PATH = `${ROOT_PATH}assets/`;
+const ICON_PATH = `${ASSETS_PATH}icons/`;
 
 const MAX_WIDTH_SMALL_SCREEN = 1280;
-
-const paths = {
-  editor: "/editor",
-  editorWithNote: "/editor/%NOTE_ID%",
-  editorWithNewNote: "/editor/new",
-  list: "/list",
-  graph: "/graph",
-  graphWithFocusNote: "/graph?focusNote=%FOCUS_NOTE_ID%",
-  login: "/login",
-  stats: "/stats",
-  files: "/files",
-};
 
 const SEARCH_RESULTS_PER_PAGE = 100;
 
@@ -72,9 +62,10 @@ export {
   texts,
   MINIMUM_SEARCH_QUERY_LENGTH,
   emojis,
+  ROOT_PATH,
+  ASSETS_PATH,
   ICON_PATH,
   MAX_WIDTH_SMALL_SCREEN,
-  paths,
   SEARCH_RESULTS_PER_PAGE,
   DEFAULT_DOCUMENT_TITLE,
 };

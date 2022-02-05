@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import {
   useNavigate,
 } from "react-router-dom";
-import { paths } from "../lib/config.js";
 import { DatabaseMode } from "../enum/DatabaseMode.js";
+import { PathTemplate } from "../enum/PathTemplate.js";
+import { getAppPath } from "../lib/utils.js";
 
 const LoginViewServer = ({
   serverDatabaseProvider,
@@ -24,7 +25,7 @@ const LoginViewServer = ({
     serverDatabaseProvider.login(username, password, mfaToken)
       .then(() => {
         setDatabaseMode(DatabaseMode.SERVER);
-        navigate(paths.editorWithNewNote);
+        navigate(getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
       })
       .catch((e) => {
         const disclaimer = e.message;

@@ -9,11 +9,11 @@ import SearchInput from "./SearchInput";
 import {
   useNavigate,
 } from "react-router-dom";
-// import { DatabaseMode } from "./enum/DatabaseMode.js";
-import { paths } from "../lib/config";
 import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
 
 const Note = ({
   note,
@@ -44,7 +44,7 @@ const Note = ({
   const handleInvalidCredentialsError = async () => {
     await databaseProvider.removeAccess();
     // setDatabaseMode(DatabaseMode.NONE);
-    navigate(paths.login);
+    navigate(getAppPath(PathTemplate.LOGIN));
   };
 
   const refreshNotesList = async () => {

@@ -6,7 +6,6 @@ import LoginView from "./LoginView";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider";
 import AppMenu from "./AppMenu";
 import ExportDatabaseDialog from "./ExportDatabaseDialog";
-import { paths } from "../lib/config";
 import {
   Routes,
   Route,
@@ -23,6 +22,8 @@ import * as Config from "../lib/config";
 import ImportLinksDialog from "./ImportLinksDialog";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
 
 
 const App = ({
@@ -88,7 +89,7 @@ const App = ({
   const handleInvalidCredentialsError = async () => {
     await databaseProvider.removeAccess();
     setDatabaseMode(DatabaseMode.NONE);
-    navigate(paths.login);
+    navigate(getAppPath(PathTemplate.LOGIN));
   };
 
 
@@ -213,13 +214,17 @@ const App = ({
     if (await serverDatabaseProvider?.isAuthenticated()) {
       setDatabaseMode(DatabaseMode.SERVER);
       if (
-        location.pathname.startsWith(paths.login)
+        location.pathname.startsWith(getAppPath(PathTemplate.LOGIN))
         || location.pathname === "/"
       ) {
-        navigate(isSmallScreen ? paths.list : paths.editorWithNewNote);
+        navigate(
+          isSmallScreen
+            ? getAppPath(PathTemplate.LIST)
+            : getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
+        );
       }
     } else {
-      navigate(paths.login);
+      navigate(getAppPath(PathTemplate.LOGIN));
     }
   };
 
@@ -241,7 +246,7 @@ const App = ({
         }
       />
       <Route
-        path={paths.login}
+        path={getAppPath(PathTemplate.LOGIN)}
         element={
           <LoginView
             setDatabaseMode={setDatabaseMode}
@@ -251,13 +256,20 @@ const App = ({
         }
       />
       <Route
-        path={paths.editor}
+        path={getAppPath(PathTemplate.EDITOR)}
         element={
-          <Navigate to={paths.editorWithNewNote} replace />
+          <Navigate to={
+            getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE)
+          } replace />
         }
       />
       <Route
-        path={paths.editor + "/:activeNoteId"}
+        path={
+          getAppPath(
+            PathTemplate.EDITOR_WITH_NOTE,
+            new Map([["NOTE_ID", ":activeNoteId"]]),
+          )
+        }
         element={
           databaseProvider
             ? <EditorView
@@ -289,7 +301,7 @@ const App = ({
         }
       />
       <Route
-        path={paths.list}
+        path={getAppPath(PathTemplate.LIST)}
         element={
           databaseProvider
             ? <>
@@ -318,14 +330,16 @@ const App = ({
               <FloatingActionButton
                 title="New note"
                 icon="add"
-                onClick={() => navigate(paths.editorWithNewNote)}
+                onClick={() => navigate(
+                  getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
+                )}
               ></FloatingActionButton>
             </>
             : null
         }
       />
       <Route
-        path={paths.graph}
+        path={getAppPath(PathTemplate.GRAPH)}
         element={
           <GraphView
             unsavedChanges={unsavedChanges}
@@ -337,7 +351,7 @@ const App = ({
         }
       />
       <Route
-        path={paths.files}
+        path={getAppPath(PathTemplate.FILES)}
         element={
           <FilesView
             databaseProvider={databaseProvider}
@@ -346,7 +360,7 @@ const App = ({
         }
       />
       <Route
-        path={paths.files + "/:fileId"}
+        path={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", ":fileId"]]))}
         element={
           <FileView
             databaseProvider={databaseProvider}
@@ -355,7 +369,7 @@ const App = ({
         }
       />
       <Route
-        path={paths.stats}
+        path={getAppPath(PathTemplate.STATS)}
         element={
           <StatsView
             databaseProvider={databaseProvider}

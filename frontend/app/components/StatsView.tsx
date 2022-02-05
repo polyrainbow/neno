@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
-import { emojis, paths } from "../lib/config.js";
+import { emojis } from "../lib/config.js";
 import {
   makeTimestampHumanReadable,
   humanFileSize,
+  getAppPath,
 } from "../lib/utils.js";
+import { Link } from "react-router-dom";
+import { PathTemplate } from "../enum/PathTemplate";
 
 const StatsView = ({
   databaseProvider,
@@ -142,11 +145,16 @@ const StatsView = ({
                               "margin": "0",
                             }}
                           >
-                            <a href={
-                              paths.editorWithNote.replace("%NOTE_ID%", note.id)
+                            <Link to={
+                              getAppPath(
+                                PathTemplate.EDITOR_WITH_NOTE,
+                                new Map([["NOTE_ID", note.id]]),
+                              )
                             }>
                               {note.title}
-                            </a> ({note.numberOfLinkedNotes.toLocaleString()})
+                            </Link>
+                            <span> </span>
+                            ({note.numberOfLinkedNotes.toLocaleString()})
                           </p>;
                         })
                         : "There are no nodes yet."
