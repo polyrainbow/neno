@@ -209,6 +209,11 @@ export default class LocalDatabaseProvider {
   }
 
 
+  getFiles() {
+    return this.#notesModule.getFiles();
+  }
+
+
   getReadableFileStream(fileId) {
     return this.#notesModule.getReadableFileStream(
       LocalDatabaseProvider.graphId,
