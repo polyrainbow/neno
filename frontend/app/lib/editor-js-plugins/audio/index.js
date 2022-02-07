@@ -199,9 +199,6 @@ export default class AudioTool {
    *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
    * @return {void}
    */
-  /* onPaste must not be an async function
-  see also: https://github.com/codex-team/editor.js/issues/1803
-  */
   onPaste(event) {
     switch (event.type) {
     case "tag": {
