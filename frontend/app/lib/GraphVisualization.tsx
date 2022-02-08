@@ -80,6 +80,8 @@ export default class GraphVisualization {
     nodeRadius: 50,
     newNodeIndicatorSize: 4 * 50,
     MAX_NODE_TEXT_LENGTH: 55,
+    // minimum and maximum zoom
+    SCALE_EXTENT: [0.01, 10],
   };
 
   #searchValue = "";
@@ -291,8 +293,9 @@ export default class GraphVisualization {
       this.#newPathMove(e, this.#mouseDownNode);
     });
 
-    // listen for dragging
-    const zoom = d3.zoom();
+    // listen for dragging and zooming
+    const zoom = d3.zoom()
+      .scaleExtent(GraphVisualization.#consts.SCALE_EXTENT);
 
     zoom.on("zoom", (e) => {
       if (e.shiftKey) {
@@ -835,18 +838,20 @@ export default class GraphVisualization {
 
 
   #zoomed(e) {
+    const x = e.transform.x;
+    const y = e.transform.y;
+    const k = e.transform.k;
+
     this.#justScaleTransGraph = true;
     d3.select("." + GraphVisualization.#consts.graphClass)
       .attr(
         "transform",
-        "translate("
-        + e.transform.x + "," + e.transform.y + ") "
-        + "scale(" + e.transform.k + ")",
+        `translate(${x}, ${y}) scale(${k})`,
       );
 
-    this.#screenPosition.translateX = e.transform.x;
-    this.#screenPosition.translateY = e.transform.y;
-    this.#screenPosition.scale = e.transform.k;
+    this.#screenPosition.translateX = x;
+    this.#screenPosition.translateY = y;
+    this.#screenPosition.scale = k;
   }
 
 
