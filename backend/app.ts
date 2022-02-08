@@ -968,7 +968,7 @@ const startApp = async ({
 
       // this modification of the session object initializes the session and
       // makes express-session set the cookie
-      req.session.userId = user.login;
+      req.session.userId = user.id;
       req.session.userAgent = req.headers["user-agent"];
       req.session.userPlatform = req.headers["sec-ch-ua-platform"];
 
