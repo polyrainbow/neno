@@ -21,19 +21,14 @@ const [
 ])).map((module) => module.default);
 
 const localDatabaseProvider = new LocalDatabaseProvider();
-let serverDatabaseProvider = null;
 
-// ENABLE_SERVER_DATABASE defined via webpack.DefinePlugin
-// @ts-ignore
-if (ENABLE_SERVER_DATABASE) {
-  const ServerDatabaseProvider = (await import(
-    "./lib/ServerDatabaseProvider/index.js"
-  )).default;
+const ServerDatabaseProvider = (await import(
+  "./lib/ServerDatabaseProvider/index"
+)).default;
 
-  serverDatabaseProvider = new ServerDatabaseProvider(
-    API_URL,
-  );
-}
+const serverDatabaseProvider = new ServerDatabaseProvider(
+  API_URL,
+);
 
 const appContainer = document.getElementById("app");
 ReactDOM.render(
