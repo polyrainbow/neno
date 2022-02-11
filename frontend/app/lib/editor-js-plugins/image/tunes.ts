@@ -31,6 +31,11 @@ import * as svgs from "./svgs.js";
  * Working with Block Tunes
  */
 export default class Tunes {
+  api;
+  actions;
+  onChange;
+  buttons;
+
   /**
    * @param {object} tune - image tool Tunes managers
    * @param {object} tune.api - Editor API
@@ -80,7 +85,7 @@ export default class Tunes {
    * @return {Element}
    */
   render(toolData) {
-    const wrapper = make("div", this.CSS.wrapper);
+    const wrapper = make("div", [this.CSS.wrapper]);
 
     this.buttons = [];
 
@@ -92,11 +97,11 @@ export default class Tunes {
         innerHTML: tune.icon,
         title,
       });
-
+      /*
       el.addEventListener("click", () => {
         this.tuneClicked(tune.name, tune.action);
       });
-
+      */
       el.dataset.tune = tune.name;
       el.classList.toggle(this.CSS.buttonActive, toolData[tune.name]);
 

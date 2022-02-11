@@ -132,6 +132,11 @@ export default class ServerDatabaseProvider {
    * @return {string} url
   */
   async getUrlForFileId(fileId, publicName) {
+    if (
+      (!Array.isArray(this.#graphIds))) {
+      return;
+    }
+
     let url = this.#apiUrl + "graph/" + this.#graphIds[0] + "/file/" + fileId;
 
     if (typeof publicName === "string") {

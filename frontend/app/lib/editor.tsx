@@ -16,13 +16,13 @@ const loadInstance = async ({
   const modules = await Promise.all([
     import("@editorjs/editorjs"),
     import("@editorjs/header"),
-    import("./editor-js-plugins/link/index.js"),
-    import("./editor-js-plugins/image/index.js"),
+    import("./editor-js-plugins/link/index"),
+    import("./editor-js-plugins/image/index"),
     import("@editorjs/list"),
-    import("./editor-js-plugins/code/index.js"),
-    import("./editor-js-plugins/document/index.js"),
-    import("./editor-js-plugins/audio/index.js"),
-    import("./editor-js-plugins/video/index.js"),
+    import("./editor-js-plugins/code/index"),
+    import("./editor-js-plugins/document/index"),
+    import("./editor-js-plugins/audio/index"),
+    import("./editor-js-plugins/video/index"),
   ]);
 
   const [

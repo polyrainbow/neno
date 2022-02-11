@@ -34,6 +34,12 @@ SOFTWARE.
 import { make } from "../utils.js";
 
 export default class Ui {
+  nodes;
+  api;
+  config;
+  onSelectFile;
+  readOnly;
+
   /**
    * @param {object} ui - image tool Ui module
    * @param {object} ui.api - Editor.js API
@@ -52,7 +58,7 @@ export default class Ui {
       imageContainer: make("div", [this.CSS.imageContainer]),
       fileButton: this.createFileButton(),
       // imageEl: undefined,
-      imagePreloader: make("div", this.CSS.imagePreloader),
+      imagePreloader: make("div", [this.CSS.imagePreloader]),
       caption: make("div", [this.CSS.input, this.CSS.caption], {
         contentEditable: !this.readOnly,
       }),
@@ -184,7 +190,7 @@ export default class Ui {
      *
      * @type {Element}
      */
-    this.nodes.imageEl = make("img", this.CSS.imageEl, attributes);
+    this.nodes.imageEl = make("img", [this.CSS.imageEl], attributes);
 
     // this prevents editor.js from triggering the onChange callback as soon
     // as the image loads

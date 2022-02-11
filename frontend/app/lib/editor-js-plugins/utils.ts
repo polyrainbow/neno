@@ -17,15 +17,11 @@ export const getFilenameFromUrl = (url) => {
 * @param {object} attributes
 * @return {HTMLElement}
 */
-export const make = (tagName, classNames = null, attributes = {}) => {
+export const make = (tagName:string, classNames:string[], attributes = {}) => {
   // eslint-disable-next-line no-undef
   const el = document.createElement(tagName);
 
-  if (Array.isArray(classNames)) {
-    el.classList.add(...classNames);
-  } else if (classNames) {
-    el.classList.add(classNames);
-  }
+  el.classList.add(...classNames);
 
   // eslint-disable-next-line guard-for-in
   for (const attrName in attributes) {

@@ -27,7 +27,7 @@ SOFTWARE.
 /**
  * Build styles
  */
-import { getLineStartPosition } from "./utils/string.js";
+import { getLineStartPosition } from "./utils/string";
 import "./index.css";
 
 /**
@@ -44,6 +44,13 @@ import "./index.css";
  * Code Tool for the Editor.js allows to include code examples in your articles.
  */
 export default class CodeTool {
+  api;
+  readOnly;
+  placeholder;
+  CSS;
+  nodes;
+  _data;
+
   /**
    * Notify core that read-only mode is supported
    *

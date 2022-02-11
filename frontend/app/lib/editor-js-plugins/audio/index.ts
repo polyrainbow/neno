@@ -26,27 +26,27 @@ SOFTWARE.
 
 
 import "./index.css";
-import * as svgs from "./svgs.js";
+import * as svgs from "./svgs";
 import {
   make,
   getFilenameFromUrl,
-} from "../utils.js";
+} from "../utils";
 import {
   humanFileSize,
-} from "../../utils.tsx";
+} from "../../utils";
 
 const LOADER_TIMEOUT = 500;
 
 /**
- * @typedef {object} VideoToolData
- * @description Video Tool's output data format
- * @property {VideoFileData} file - object containing information about the file
+ * @typedef {object} AudioToolData
+ * @description Audio Tool's output data format
+ * @property {AudioFileData} file - object containing information about the file
  * @property {string} title - file's title
  */
 
 /**
- * @typedef {object} VideoFileData
- * @description Video Tool's file format
+ * @typedef {object} AudioFileData
+ * @description Audio Tool's file format
  * @property {string} [url] - file's upload url
  * @property {string} [size] - file's size
  * @property {string} [extension] - file's extension
@@ -55,7 +55,7 @@ const LOADER_TIMEOUT = 500;
 
 /**
  * @typedef {object} FileData
- * @description Video Tool's response from backend
+ * @description Audio Tool's response from backend
  * @property {string} url - file's url
  * @property {string} name - file's name with extension
  * @property {string} extension - file's extension
@@ -69,27 +69,32 @@ const LOADER_TIMEOUT = 500;
  */
 
 /**
- * @typedef {object} VideoToolConfig
+ * @typedef {object} AudioToolConfig
  * @description Config supported by Tool
- * @property {string} endpoint - file upload url
  * @property {string} field - field name for uploaded file
  * @property {string} types - available mime-types
  * @property {string} placeholder
  * @property {string} errorMessage
+ * @property {object} additionalRequestHeaders
  * - allows to pass custom headers with Request
  */
 
 /**
- * @class VideoTool
- * @classdesc VideoTool for Editor.js 2.0
+ * @class AudioTool
+ * @classdesc AudioTool for Editor.js 2.0
  *
  * @property {API} api - Editor.js API
- * @property {VideoToolData} data
- * @property {VideoToolConfig} config
+ * @property {AudioToolData} data
+ * @property {AudioToolConfig} config
  */
-export default class VideoTool {
+export default class AudioTool {
+  api;
+  nodes;
+  _data;
+  config;
+
   /**
-   * @param {VideoToolData} data
+   * @param {AudioToolData} data
    * @param {object} config
    * @param {API} api
    */
@@ -110,7 +115,7 @@ export default class VideoTool {
     this.config = {
       field: "file",
       types: config.types || "*",
-      buttonText: "Select video",
+      buttonText: "Select audio",
       errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
     };
@@ -126,7 +131,7 @@ export default class VideoTool {
   static get toolbox() {
     return {
       icon: svgs.toolbox,
-      title: "Video",
+      title: "Audio",
     };
   }
 
@@ -141,15 +146,15 @@ export default class VideoTool {
       /**
        * Tool's classes
        */
-      wrapper: "cdx-video",
-      wrapperWithFile: "cdx-video--with-file",
-      wrapperLoading: "cdx-video--loading",
-      button: "cdx-video__button",
-      title: "cdx-video__title",
-      size: "cdx-video__size",
-      downloadButton: "cdx-video__download-button",
-      fileInfo: "cdx-video__file-info",
-      fileIcon: "cdx-video__file-icon",
+      wrapper: "cdx-audio",
+      wrapperWithFile: "cdx-audio--with-file",
+      wrapperLoading: "cdx-audio--loading",
+      button: "cdx-audio__button",
+      title: "cdx-audio__title",
+      size: "cdx-audio__size",
+      downloadButton: "cdx-audio__download-button",
+      fileInfo: "cdx-audio__file-info",
+      fileIcon: "cdx-audio__file-icon",
     };
   }
 
@@ -169,7 +174,7 @@ export default class VideoTool {
       /**
        * Paste HTML into Editor
        */
-      tags: ["video"],
+      tags: ["audio"],
 
       /**
        * Paste URL of audio into the Editor
@@ -177,15 +182,15 @@ export default class VideoTool {
        * url without turning it into an audio block
        */
       /* patterns: {
-        audio: /https?:\/\/\S+\.mp4$/i,
+        audio: /https?:\/\/\S+\.mp3$/i,
       },*/
 
       /**
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: ["video/mp4", "video/webm"],
-        extensions: ["mp4", "webm"],
+        mimeTypes: ["audio/mp3", "audio/mpeg"],
+        extensions: ["mp3"],
       },
     };
   }
@@ -202,8 +207,8 @@ export default class VideoTool {
   onPaste(event) {
     switch (event.type) {
     case "tag": {
-      const video = event.detail.data;
-      this.#uploadFileByUrlAndRefreshUI(video.src);
+      const audio = event.detail.data;
+      this.#uploadFileByUrlAndRefreshUI(audio.src);
       break;
     }
     case "pattern": {
@@ -224,7 +229,7 @@ export default class VideoTool {
    * Return Block data
    *
    * @param {HTMLElement} toolsContent
-   * @return {VideoToolData}
+   * @return {AudioToolData}
    */
   save(toolsContent) {
     /**
@@ -247,7 +252,7 @@ export default class VideoTool {
   render() {
     const holder = make("div", this.CSS.baseClass);
 
-    this.nodes.wrapper = make("div", this.CSS.wrapper);
+    this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
     if (this.pluginHasData()) {
       this.showFileData();
@@ -280,15 +285,15 @@ export default class VideoTool {
 
 
   async #selectAndUploadFile() {
-    // eslint-disable-next-line
+    // @ts-ignore
     const [fileHandle] = await window.showOpenFilePicker({
       multiple: false,
       types: [
         {
-          description: "Video file",
+          description: "MP3 File",
           accept: {
-            "video/mp4": [".mp4"],
-            "video/webm": [".webm"],
+            "audio/mp3": [".mp3"],
+            "audio/mpeg": [".mp3"],
           },
         },
       ],
@@ -319,7 +324,7 @@ export default class VideoTool {
   }
 
   /**
-   * Fires after clicks on the Toolbox VideoTool Icon
+   * Fires after clicks on the Toolbox AudioTool Icon
    * Initiates click on the Select File button
    *
    * @public
@@ -376,9 +381,12 @@ export default class VideoTool {
    */
   removeLoader() {
     // eslint-disable-next-line
-    setTimeout(() => this.nodes.wrapper.classList.remove(
-      this.CSS.wrapperLoading, this.CSS.loader),
-    LOADER_TIMEOUT,
+    setTimeout(
+      () => this.nodes.wrapper.classList.remove(
+        this.CSS.wrapperLoading,
+        this.CSS.loader,
+      ),
+      LOADER_TIMEOUT,
     );
   }
 
@@ -390,10 +398,10 @@ export default class VideoTool {
 
     const { file: { size }, title } = this.data;
 
-    const fileInfo = make("div", this.CSS.fileInfo);
+    const fileInfo = make("div", [this.CSS.fileInfo]);
 
     if (title) {
-      this.nodes.title = make("div", this.CSS.title, {
+      this.nodes.title = make("div", [this.CSS.title], {
         contentEditable: true,
       });
 
@@ -402,12 +410,12 @@ export default class VideoTool {
     }
 
     if (size) {
-      const fileSize = make("div", this.CSS.size);
+      const fileSize = make("div", [this.CSS.size]);
       fileSize.textContent = humanFileSize(size);
       fileInfo.appendChild(fileSize);
     }
 
-    const downloadIcon = make("a", this.CSS.downloadButton, {
+    const downloadIcon = make("a", [this.CSS.downloadButton], {
       innerHTML: svgs.arrowDownload,
     });
 
@@ -415,23 +423,23 @@ export default class VideoTool {
       this.config.fileHandling.onDownload(this.data.file);
     });
 
-    const firstLine = make("div", "cdx-video-first-line");
+    const firstLine = make("div", ["cdx-audio-first-line"]);
 
     firstLine.appendChild(fileInfo);
     firstLine.appendChild(downloadIcon);
 
-    const secondLine = make("div", "cdx-video-second-line");
+    const secondLine = make("div", ["cdx-audio-second-line"]);
     secondLine.setAttribute("data-mutation-free", "true");
 
-    const videoElement = document.createElement("video");
-    videoElement.controls = true;
-    videoElement.src = await this.config.fileHandling.getUrl(this.data.file);
-    videoElement.style.width = "100%";
-    videoElement.style.marginTop = "20px";
+    const audioElement = document.createElement("audio");
+    audioElement.controls = true;
+    audioElement.src = await this.config.fileHandling.getUrl(this.data.file);
+    audioElement.style.width = "100%";
+    audioElement.style.marginTop = "20px";
     // this prevents editor.js from triggering the onChange callback as soon
     // as the audio loads
-    videoElement.setAttribute("data-mutation-free", "true");
-    secondLine.appendChild(videoElement);
+    audioElement.setAttribute("data-mutation-free", "true");
+    secondLine.appendChild(audioElement);
 
     this.nodes.wrapper.appendChild(firstLine);
     this.nodes.wrapper.appendChild(secondLine);
@@ -448,9 +456,9 @@ export default class VideoTool {
   }
 
   /**
-   * Return Video Tool's data
+   * Return Audio Tool's data
    *
-   * @return {VideoToolData}
+   * @return {AudioToolData}
    */
   get data() {
     return this._data;
@@ -459,7 +467,7 @@ export default class VideoTool {
   /**
    * Stores all Tool's data
    *
-   * @param {VideoToolData} data
+   * @param {AudioToolData} data
    */
   set data({ file, title }) {
     this._data = Object.assign({}, {
@@ -487,7 +495,7 @@ export default class VideoTool {
 
     range.selectNodeContents(element);
     range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
   }
 }

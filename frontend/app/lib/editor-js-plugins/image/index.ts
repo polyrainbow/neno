@@ -50,12 +50,12 @@ SOFTWARE.
 
 // eslint-disable-next-line
 import "./index.css";
-import Ui from "./ui.js";
-import Tunes from "./tunes.js";
+import Ui from "./ui";
+import Tunes from "./tunes";
 import * as svgs from "./svgs.js";
 import {
   getFilenameFromUrl,
-} from "../utils.js";
+} from "../utils";
 
 /**
  * @typedef {object} ImageConfig
@@ -87,6 +87,13 @@ import {
  * @property {string} file.url - [Required] image source URL
  */
 export default class ImageTool {
+  api;
+  readOnly;
+  config;
+  ui;
+  tunes;
+  _data;
+
   /**
    * Notify core that read-only mode is supported
    *
@@ -269,7 +276,7 @@ export default class ImageTool {
   }
 
   async #selectAndUploadFile() {
-    // eslint-disable-next-line
+    // @ts-ignore
     const [fileHandle] = await window.showOpenFilePicker({
       multiple: false,
       types: [

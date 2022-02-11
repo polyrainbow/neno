@@ -40,8 +40,9 @@ SOFTWARE.
  */
 
 // eslint-disable-next-line
-import css from './index.css';
+import './index.css';
 import * as svgs from "./svgs.js";
+import { make } from "../utils";
 
 /**
  * @typedef {object} UploadResponseFormat
@@ -53,6 +54,12 @@ import * as svgs from "./svgs.js";
  * design: title, description, image, url
  */
 export default class LinkTool {
+  api;
+  nodes;
+  _data;
+  config;
+  readOnly;
+
   /**
    * Notify core that read-only mode supported
    *
@@ -134,8 +141,8 @@ export default class LinkTool {
    * @return {HTMLDivElement}
    */
   render() {
-    this.nodes.wrapper = this.make("div", this.CSS.baseClass);
-    this.nodes.container = this.make("div", this.CSS.container);
+    this.nodes.wrapper = make("div", [this.CSS.baseClass]);
+    this.nodes.container = make("div", [this.CSS.container]);
 
     this.nodes.inputHolder = this.makeInputHolder();
     this.nodes.linkContent = this.prepareLinkPreview();
@@ -204,8 +211,8 @@ export default class LinkTool {
    */
   get CSS() {
     return {
-      baseClass: this.api.styles.block,
-      input: this.api.styles.input,
+      baseClass: this.api.styles.block as string,
+      input: this.api.styles.input as string,
 
       /**
        * Tool's classes
@@ -232,10 +239,10 @@ export default class LinkTool {
    * @return {HTMLElement}
    */
   makeInputHolder() {
-    const inputHolder = this.make("div", this.CSS.inputHolder);
+    const inputHolder = make("div", [this.CSS.inputHolder]);
 
-    this.nodes.progress = this.make("label", this.CSS.progress);
-    this.nodes.input = this.make("div", [this.CSS.input, this.CSS.inputEl], {
+    this.nodes.progress = make("label", [this.CSS.progress]);
+    this.nodes.input = make("div", [this.CSS.input, this.CSS.inputEl], {
       contentEditable: !this.readOnly,
     });
 
@@ -283,6 +290,7 @@ export default class LinkTool {
     let url = this.nodes.input.textContent;
 
     if (event.type === "paste") {
+      // @ts-ignore
       url = (event.clipboardData || window.clipboardData).getData("text");
     }
 
@@ -310,14 +318,17 @@ export default class LinkTool {
     const selection = window.getSelection();
     const range = new Range();
 
-    const currentNode = selection.anchorNode.parentNode;
-    const currentItem = currentNode.closest(`.${this.CSS.inputHolder}`);
-    const inputElement = currentItem.querySelector(`.${this.CSS.inputEl}`);
+    const currentNode = selection?.anchorNode?.parentNode;
+    const currentItem
+      = currentNode?.parentElement?.closest(`.${this.CSS.inputHolder}`);
+    const inputElement = currentItem?.querySelector(`.${this.CSS.inputEl}`);
 
-    range.selectNodeContents(inputElement);
+    if (inputElement) {
+      range.selectNodeContents(inputElement);
+    }
 
-    selection.removeAllRanges();
-    selection.addRange(range);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
   }
 
   /**
@@ -326,15 +337,15 @@ export default class LinkTool {
    * @return {HTMLElement}
    */
   prepareLinkPreview() {
-    const holder = this.make("a", this.CSS.linkContent, {
+    const holder = make("a", [this.CSS.linkContent], {
       target: "_blank",
       rel: "nofollow noindex noreferrer",
     });
 
-    this.nodes.linkImage = this.make("div", this.CSS.linkImage);
-    this.nodes.linkTitle = this.make("div", this.CSS.linkTitle);
-    this.nodes.linkDescription = this.make("p", this.CSS.linkDescription);
-    this.nodes.linkText = this.make("span", this.CSS.linkText);
+    this.nodes.linkImage = make("div", [this.CSS.linkImage]);
+    this.nodes.linkTitle = make("div", [this.CSS.linkTitle]);
+    this.nodes.linkDescription = make("p", [this.CSS.linkDescription]);
+    this.nodes.linkText = make("span", [this.CSS.linkText]);
 
     return holder;
   }
@@ -411,17 +422,7 @@ export default class LinkTool {
     this.data = { link: linkUrl };
 
     try {
-      let response;
-
-      if (typeof this.config.customRequestFunction === "function") {
-        response = await this.config.customRequestFunction(linkUrl);
-      } else {
-        const requestUrl = this.config.endpoint + "?url=" + linkUrl;
-        response = (await (fetch(requestUrl, {
-          headers: this.config.additionalRequestHeaders,
-        }))).body();
-      }
-
+      const response = await this.config.customRequestFunction(linkUrl);
       this.onFetch(response);
     } catch (error) {
       this.fetchingFailed();
@@ -467,30 +468,5 @@ export default class LinkTool {
     console.log("Link data fetching failed.");
 
     this.applyErrorStyle();
-  }
-
-  /**
-   * Helper method for elements creation
-   *
-   * @param {string} tagName
-   * @param {string} classNames
-   * @param {object} attributes
-   * @return {HTMLElement}
-   */
-  make(tagName, classNames = null, attributes = {}) {
-    const el = document.createElement(tagName);
-
-    if (Array.isArray(classNames)) {
-      el.classList.add(...classNames);
-    } else if (classNames) {
-      el.classList.add(classNames);
-    }
-
-    // eslint-disable-next-line guard-for-in
-    for (const attrName in attributes) {
-      el[attrName] = attributes[attrName];
-    }
-
-    return el;
   }
 }

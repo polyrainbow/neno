@@ -33,21 +33,20 @@ import {
 } from "../utils.js";
 import {
   humanFileSize,
-} from "../../utils.tsx";
+} from "../../utils";
 
 const LOADER_TIMEOUT = 500;
 
 /**
- * @typedef {object} DocumentToolData
- * @description Document Tool's output data format
- * @property {DocumentFileData} file - object containing information about the
- * file
+ * @typedef {object} VideoToolData
+ * @description Video Tool's output data format
+ * @property {VideoFileData} file - object containing information about the file
  * @property {string} title - file's title
  */
 
 /**
- * @typedef {object} DocumentFileData
- * @description Document Tool's file format
+ * @typedef {object} VideoFileData
+ * @description Video Tool's file format
  * @property {string} [url] - file's upload url
  * @property {string} [size] - file's size
  * @property {string} [extension] - file's extension
@@ -56,7 +55,7 @@ const LOADER_TIMEOUT = 500;
 
 /**
  * @typedef {object} FileData
- * @description Document Tool's response from backend
+ * @description Video Tool's response from backend
  * @property {string} url - file's url
  * @property {string} name - file's name with extension
  * @property {string} extension - file's extension
@@ -70,28 +69,32 @@ const LOADER_TIMEOUT = 500;
  */
 
 /**
- * @typedef {object} DocumentToolConfig
+ * @typedef {object} VideoToolConfig
  * @description Config supported by Tool
  * @property {string} endpoint - file upload url
  * @property {string} field - field name for uploaded file
  * @property {string} types - available mime-types
  * @property {string} placeholder
  * @property {string} errorMessage
- * @property {object} additionalRequestHeaders - allows to pass custom headers
- * with Request
+ * - allows to pass custom headers with Request
  */
 
 /**
- * @class DocumentTool
- * @classdesc DocumentTool for Editor.js 2.0
+ * @class VideoTool
+ * @classdesc VideoTool for Editor.js 2.0
  *
  * @property {API} api - Editor.js API
- * @property {DocumentToolData} data
- * @property {DocumentToolConfig} config
+ * @property {VideoToolData} data
+ * @property {VideoToolConfig} config
  */
-export default class DocumentTool {
+export default class VideoTool {
+  api;
+  nodes;
+  _data;
+  config;
+
   /**
-   * @param {DocumentToolData} data
+   * @param {VideoToolData} data
    * @param {object} config
    * @param {API} api
    */
@@ -110,10 +113,9 @@ export default class DocumentTool {
     };
 
     this.config = {
-      endpoint: config.endpoint || "",
-      field: config.field || "file",
+      field: "file",
       types: config.types || "*",
-      buttonText: "Select document",
+      buttonText: "Select video",
       errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
     };
@@ -129,7 +131,7 @@ export default class DocumentTool {
   static get toolbox() {
     return {
       icon: svgs.toolbox,
-      title: "Document",
+      title: "Video",
     };
   }
 
@@ -144,48 +146,15 @@ export default class DocumentTool {
       /**
        * Tool's classes
        */
-      wrapper: "cdx-document",
-      wrapperWithFile: "cdx-document--with-file",
-      wrapperLoading: "cdx-document--loading",
-      button: "cdx-document__button",
-      title: "cdx-document__title",
-      size: "cdx-document__size",
-      downloadButton: "cdx-document__download-button",
-      fileInfo: "cdx-document__file-info",
-      fileIcon: "cdx-document__file-icon",
-    };
-  }
-
-  /**
-   * Possible files' extension colors
-   */
-  get EXTENSIONS() {
-    return {
-      doc: "#3e74da",
-      docx: "#3e74da",
-      odt: "#3e74da",
-      pdf: "#d47373",
-      rtf: "#656ecd",
-      tex: "#5a5a5b",
-      txt: "#5a5a5b",
-      pptx: "#e07066",
-      ppt: "#e07066",
-      mp3: "#eab456",
-      mp4: "#f676a6",
-      xls: "#3f9e64",
-      html: "#2988f0",
-      htm: "#2988f0",
-      zip: "#4f566f",
-      rar: "#4f566f",
-      exe: "#e26f6f",
-      svg: "#bf5252",
-      key: "#e07066",
-      sketch: "#df821c",
-      ai: "#df821c",
-      psd: "#388ae5",
-      dmg: "#e26f6f",
-      json: "#2988f0",
-      csv: "#3f9e64",
+      wrapper: "cdx-video",
+      wrapperWithFile: "cdx-video--with-file",
+      wrapperLoading: "cdx-video--loading",
+      button: "cdx-video__button",
+      title: "cdx-video__title",
+      size: "cdx-video__size",
+      downloadButton: "cdx-video__download-button",
+      fileInfo: "cdx-video__file-info",
+      fileIcon: "cdx-video__file-icon",
     };
   }
 
@@ -203,20 +172,25 @@ export default class DocumentTool {
   static get pasteConfig() {
     return {
       /**
+       * Paste HTML into Editor
+       */
+      tags: ["video"],
+
+      /**
        * Paste URL of audio into the Editor
        * We have disabled this because we want to be able to insert a
        * url without turning it into an audio block
        */
-      patterns: {
-        document: /https?:\/\/\S+\.pdf$/i,
-      },
+      /* patterns: {
+        audio: /https?:\/\/\S+\.mp4$/i,
+      },*/
 
       /**
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: ["application/pdf"],
-        extensions: ["pdf"],
+        mimeTypes: ["video/mp4", "video/webm"],
+        extensions: ["mp4", "webm"],
       },
     };
   }
@@ -232,6 +206,11 @@ export default class DocumentTool {
    */
   onPaste(event) {
     switch (event.type) {
+    case "tag": {
+      const video = event.detail.data;
+      this.#uploadFileByUrlAndRefreshUI(video.src);
+      break;
+    }
     case "pattern": {
       const url = event.detail.data;
       this.#uploadFileByUrlAndRefreshUI(url);
@@ -250,7 +229,7 @@ export default class DocumentTool {
    * Return Block data
    *
    * @param {HTMLElement} toolsContent
-   * @return {DocumentToolData}
+   * @return {VideoToolData}
    */
   save(toolsContent) {
     /**
@@ -273,7 +252,7 @@ export default class DocumentTool {
   render() {
     const holder = make("div", this.CSS.baseClass);
 
-    this.nodes.wrapper = make("div", this.CSS.wrapper);
+    this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
     if (this.pluginHasData()) {
       this.showFileData();
@@ -306,14 +285,15 @@ export default class DocumentTool {
 
 
   async #selectAndUploadFile() {
-    // eslint-disable-next-line
+    // @ts-ignore
     const [fileHandle] = await window.showOpenFilePicker({
       multiple: false,
       types: [
         {
-          description: "PDF file",
+          description: "Video file",
           accept: {
-            "application/pdf": [".pdf"],
+            "video/mp4": [".mp4"],
+            "video/webm": [".webm"],
           },
         },
       ],
@@ -344,7 +324,7 @@ export default class DocumentTool {
   }
 
   /**
-   * Fires after clicks on the Toolbox DocumentTool Icon
+   * Fires after clicks on the Toolbox VideoTool Icon
    * Initiates click on the Select File button
    *
    * @public
@@ -382,7 +362,7 @@ export default class DocumentTool {
           ...receivedFileData,
           extension,
         },
-        title: filename,
+        title: filename || "",
       };
 
       this.nodes.button.remove();
@@ -395,82 +375,71 @@ export default class DocumentTool {
     }
   }
 
-  /**
-   * Handles uploaded file's extension and appends corresponding icon
-   */
-  appendFileIcon() {
-    const extension = this.data.file.extension || "";
-    const extensionColor = this.EXTENSIONS[extension];
-
-    const fileIcon = make("div", this.CSS.fileIcon, {
-      innerHTML: extensionColor ? svgs.custom : svgs.standard,
-    });
-
-    if (extensionColor) {
-      fileIcon.style.color = extensionColor;
-      fileIcon.setAttribute("data-extension", extension);
-    }
-
-    this.nodes.wrapper.appendChild(fileIcon);
-  }
 
   /**
    * Removes tool's loader
    */
   removeLoader() {
-    setTimeout(
-      () => {
-        this.nodes.wrapper.classList.remove(
-          this.CSS.wrapperLoading,
-          this.CSS.loader,
-        );
-      },
-      LOADER_TIMEOUT,
+    // eslint-disable-next-line
+    setTimeout(() => this.nodes.wrapper.classList.remove(
+      this.CSS.wrapperLoading, this.CSS.loader),
+    LOADER_TIMEOUT,
     );
   }
 
   /**
    * If upload is successful, show info about the file
    */
-  showFileData() {
+  async showFileData() {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
 
-    const { file: { size, url }, title } = this.data;
+    const { file: { size }, title } = this.data;
 
-    this.appendFileIcon();
+    const fileInfo = make("div", [this.CSS.fileInfo]);
 
-    const fileInfo = make("div", this.CSS.fileInfo);
+    if (title) {
+      this.nodes.title = make("div", [this.CSS.title], {
+        contentEditable: true,
+      });
 
-    this.nodes.title = make("div", this.CSS.title, {
-      contentEditable: true,
-    });
-
-    this.nodes.title.textContent = title;
-    fileInfo.appendChild(this.nodes.title);
+      this.nodes.title.textContent = title;
+      fileInfo.appendChild(this.nodes.title);
+    }
 
     if (size) {
-      const fileSize = make("div", this.CSS.size);
+      const fileSize = make("div", [this.CSS.size]);
       fileSize.textContent = humanFileSize(size);
       fileInfo.appendChild(fileSize);
     }
 
-    this.nodes.wrapper.appendChild(fileInfo);
-
-    const downloadIcon = make("a", this.CSS.downloadButton, {
+    const downloadIcon = make("a", [this.CSS.downloadButton], {
       innerHTML: svgs.arrowDownload,
     });
 
-    if (typeof this.config.fileHandling.onDownload === "function") {
-      downloadIcon.addEventListener("click", () => {
-        this.config.fileHandling.onDownload(this.data.file);
-      });
-    } else {
-      downloadIcon.href = url;
-      downloadIcon.target = "_blank";
-      downloadIcon.rel = "nofollow noindex noreferrer";
-    }
+    downloadIcon.addEventListener("click", () => {
+      this.config.fileHandling.onDownload(this.data.file);
+    });
 
-    this.nodes.wrapper.appendChild(downloadIcon);
+    const firstLine = make("div", ["cdx-video-first-line"]);
+
+    firstLine.appendChild(fileInfo);
+    firstLine.appendChild(downloadIcon);
+
+    const secondLine = make("div", ["cdx-video-second-line"]);
+    secondLine.setAttribute("data-mutation-free", "true");
+
+    const videoElement = document.createElement("video");
+    videoElement.controls = true;
+    videoElement.src = await this.config.fileHandling.getUrl(this.data.file);
+    videoElement.style.width = "100%";
+    videoElement.style.marginTop = "20px";
+    // this prevents editor.js from triggering the onChange callback as soon
+    // as the audio loads
+    videoElement.setAttribute("data-mutation-free", "true");
+    secondLine.appendChild(videoElement);
+
+    this.nodes.wrapper.appendChild(firstLine);
+    this.nodes.wrapper.appendChild(secondLine);
   }
 
   /**
@@ -484,9 +453,9 @@ export default class DocumentTool {
   }
 
   /**
-   * Return Document Tool's data
+   * Return Video Tool's data
    *
-   * @return {DocumentToolData}
+   * @return {VideoToolData}
    */
   get data() {
     return this._data;
@@ -495,11 +464,12 @@ export default class DocumentTool {
   /**
    * Stores all Tool's data
    *
-   * @param {DocumentToolData} data
+   * @param {VideoToolData} data
    */
   set data({ file, title }) {
     this._data = Object.assign({}, {
       file: {
+        url: (file && file.url) || this._data.file.url,
         name: (file && file.name) || this._data.file.name,
         extension: (file && file.extension) || this._data.file.extension,
         size: (file && file.size) || this._data.file.size,
@@ -515,12 +485,16 @@ export default class DocumentTool {
    * @param {HTMLElement} element - contentEditable element
    */
   moveCaretToEnd(element) {
+    // eslint-disable-next-line no-undef
     const range = document.createRange();
+    // eslint-disable-next-line no-undef
     const selection = window.getSelection();
 
     range.selectNodeContents(element);
     range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    if (selection) {
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
   }
 }

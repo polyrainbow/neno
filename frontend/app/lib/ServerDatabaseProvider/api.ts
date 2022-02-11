@@ -14,6 +14,13 @@ const setGraphId = (graphId) => {
   GRAPH_ENDPOINT = API_URL + "graph/" + GRAPH_ID + "/";
 };
 
+interface APICallParams {
+  method?: string,
+  url: string,
+  body?: string,
+  outputType: string,
+  bodyType?: string,
+}
 
 const callAPI = async ({
   method = "GET",
@@ -21,18 +28,14 @@ const callAPI = async ({
   body,
   outputType = "json",
   bodyType = "application/json",
-}) => {
+}:APICallParams) => {
   const fetchOptions = {
     method,
     headers: {
       "Content-Type": bodyType,
     },
+    body: body ?? bodyType === "application/json" ? JSON.stringify(body) : body,
   };
-
-  if (body) {
-    fetchOptions.body
-      = bodyType === "application/json" ? JSON.stringify(body) : body;
-  }
 
   const response = await fetch(url, fetchOptions);
 

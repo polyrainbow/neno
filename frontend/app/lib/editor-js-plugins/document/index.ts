@@ -26,27 +26,28 @@ SOFTWARE.
 
 
 import "./index.css";
-import * as svgs from "./svgs.js";
+import * as svgs from "./svgs";
 import {
   make,
   getFilenameFromUrl,
-} from "../utils.js";
+} from "../utils";
 import {
   humanFileSize,
-} from "../../utils.tsx";
+} from "../../utils";
 
 const LOADER_TIMEOUT = 500;
 
 /**
- * @typedef {object} AudioToolData
- * @description Audio Tool's output data format
- * @property {AudioFileData} file - object containing information about the file
+ * @typedef {object} DocumentToolData
+ * @description Document Tool's output data format
+ * @property {DocumentFileData} file - object containing information about the
+ * file
  * @property {string} title - file's title
  */
 
 /**
- * @typedef {object} AudioFileData
- * @description Audio Tool's file format
+ * @typedef {object} DocumentFileData
+ * @description Document Tool's file format
  * @property {string} [url] - file's upload url
  * @property {string} [size] - file's size
  * @property {string} [extension] - file's extension
@@ -55,7 +56,7 @@ const LOADER_TIMEOUT = 500;
 
 /**
  * @typedef {object} FileData
- * @description Audio Tool's response from backend
+ * @description Document Tool's response from backend
  * @property {string} url - file's url
  * @property {string} name - file's name with extension
  * @property {string} extension - file's extension
@@ -69,27 +70,33 @@ const LOADER_TIMEOUT = 500;
  */
 
 /**
- * @typedef {object} AudioToolConfig
+ * @typedef {object} DocumentToolConfig
  * @description Config supported by Tool
+ * @property {string} endpoint - file upload url
  * @property {string} field - field name for uploaded file
  * @property {string} types - available mime-types
  * @property {string} placeholder
  * @property {string} errorMessage
- * @property {object} additionalRequestHeaders
- * - allows to pass custom headers with Request
+ * @property {object} additionalRequestHeaders - allows to pass custom headers
+ * with Request
  */
 
 /**
- * @class AudioTool
- * @classdesc AudioTool for Editor.js 2.0
+ * @class DocumentTool
+ * @classdesc DocumentTool for Editor.js 2.0
  *
  * @property {API} api - Editor.js API
- * @property {AudioToolData} data
- * @property {AudioToolConfig} config
+ * @property {DocumentToolData} data
+ * @property {DocumentToolConfig} config
  */
-export default class AudioTool {
+export default class DocumentTool {
+  api;
+  nodes;
+  _data;
+  config;
+
   /**
-   * @param {AudioToolData} data
+   * @param {DocumentToolData} data
    * @param {object} config
    * @param {API} api
    */
@@ -108,9 +115,10 @@ export default class AudioTool {
     };
 
     this.config = {
-      field: "file",
+      endpoint: config.endpoint || "",
+      field: config.field || "file",
       types: config.types || "*",
-      buttonText: "Select audio",
+      buttonText: "Select document",
       errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
     };
@@ -126,7 +134,7 @@ export default class AudioTool {
   static get toolbox() {
     return {
       icon: svgs.toolbox,
-      title: "Audio",
+      title: "Document",
     };
   }
 
@@ -141,15 +149,48 @@ export default class AudioTool {
       /**
        * Tool's classes
        */
-      wrapper: "cdx-audio",
-      wrapperWithFile: "cdx-audio--with-file",
-      wrapperLoading: "cdx-audio--loading",
-      button: "cdx-audio__button",
-      title: "cdx-audio__title",
-      size: "cdx-audio__size",
-      downloadButton: "cdx-audio__download-button",
-      fileInfo: "cdx-audio__file-info",
-      fileIcon: "cdx-audio__file-icon",
+      wrapper: "cdx-document",
+      wrapperWithFile: "cdx-document--with-file",
+      wrapperLoading: "cdx-document--loading",
+      button: "cdx-document__button",
+      title: "cdx-document__title",
+      size: "cdx-document__size",
+      downloadButton: "cdx-document__download-button",
+      fileInfo: "cdx-document__file-info",
+      fileIcon: "cdx-document__file-icon",
+    };
+  }
+
+  /**
+   * Possible files' extension colors
+   */
+  get EXTENSIONS() {
+    return {
+      doc: "#3e74da",
+      docx: "#3e74da",
+      odt: "#3e74da",
+      pdf: "#d47373",
+      rtf: "#656ecd",
+      tex: "#5a5a5b",
+      txt: "#5a5a5b",
+      pptx: "#e07066",
+      ppt: "#e07066",
+      mp3: "#eab456",
+      mp4: "#f676a6",
+      xls: "#3f9e64",
+      html: "#2988f0",
+      htm: "#2988f0",
+      zip: "#4f566f",
+      rar: "#4f566f",
+      exe: "#e26f6f",
+      svg: "#bf5252",
+      key: "#e07066",
+      sketch: "#df821c",
+      ai: "#df821c",
+      psd: "#388ae5",
+      dmg: "#e26f6f",
+      json: "#2988f0",
+      csv: "#3f9e64",
     };
   }
 
@@ -167,25 +208,20 @@ export default class AudioTool {
   static get pasteConfig() {
     return {
       /**
-       * Paste HTML into Editor
-       */
-      tags: ["audio"],
-
-      /**
        * Paste URL of audio into the Editor
        * We have disabled this because we want to be able to insert a
        * url without turning it into an audio block
        */
-      /* patterns: {
-        audio: /https?:\/\/\S+\.mp3$/i,
-      },*/
+      patterns: {
+        document: /https?:\/\/\S+\.pdf$/i,
+      },
 
       /**
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: ["audio/mp3", "audio/mpeg"],
-        extensions: ["mp3"],
+        mimeTypes: ["application/pdf"],
+        extensions: ["pdf"],
       },
     };
   }
@@ -201,11 +237,6 @@ export default class AudioTool {
    */
   onPaste(event) {
     switch (event.type) {
-    case "tag": {
-      const audio = event.detail.data;
-      this.#uploadFileByUrlAndRefreshUI(audio.src);
-      break;
-    }
     case "pattern": {
       const url = event.detail.data;
       this.#uploadFileByUrlAndRefreshUI(url);
@@ -224,7 +255,7 @@ export default class AudioTool {
    * Return Block data
    *
    * @param {HTMLElement} toolsContent
-   * @return {AudioToolData}
+   * @return {DocumentToolData}
    */
   save(toolsContent) {
     /**
@@ -245,9 +276,9 @@ export default class AudioTool {
    * @return {HTMLDivElement}
    */
   render() {
-    const holder = make("div", this.CSS.baseClass);
+    const holder = make("div", [this.CSS.baseClass]);
 
-    this.nodes.wrapper = make("div", this.CSS.wrapper);
+    this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
     if (this.pluginHasData()) {
       this.showFileData();
@@ -280,15 +311,14 @@ export default class AudioTool {
 
 
   async #selectAndUploadFile() {
-    // eslint-disable-next-line
+    // @ts-ignore
     const [fileHandle] = await window.showOpenFilePicker({
       multiple: false,
       types: [
         {
-          description: "MP3 File",
+          description: "PDF file",
           accept: {
-            "audio/mp3": [".mp3"],
-            "audio/mpeg": [".mp3"],
+            "application/pdf": [".pdf"],
           },
         },
       ],
@@ -319,7 +349,7 @@ export default class AudioTool {
   }
 
   /**
-   * Fires after clicks on the Toolbox AudioTool Icon
+   * Fires after clicks on the Toolbox DocumentTool Icon
    * Initiates click on the Select File button
    *
    * @public
@@ -357,7 +387,7 @@ export default class AudioTool {
           ...receivedFileData,
           extension,
         },
-        title: filename || "",
+        title: filename,
       };
 
       this.nodes.button.remove();
@@ -370,17 +400,36 @@ export default class AudioTool {
     }
   }
 
+  /**
+   * Handles uploaded file's extension and appends corresponding icon
+   */
+  appendFileIcon() {
+    const extension = this.data.file.extension || "";
+    const extensionColor = this.EXTENSIONS[extension];
+
+    const fileIcon = make("div", [this.CSS.fileIcon], {
+      innerHTML: extensionColor ? svgs.custom : svgs.standard,
+    });
+
+    if (extensionColor) {
+      fileIcon.style.color = extensionColor;
+      fileIcon.setAttribute("data-extension", extension);
+    }
+
+    this.nodes.wrapper.appendChild(fileIcon);
+  }
 
   /**
    * Removes tool's loader
    */
   removeLoader() {
-    // eslint-disable-next-line
     setTimeout(
-      () => this.nodes.wrapper.classList.remove(
-        this.CSS.wrapperLoading,
-        this.CSS.loader,
-      ),
+      () => {
+        this.nodes.wrapper.classList.remove(
+          this.CSS.wrapperLoading,
+          this.CSS.loader,
+        );
+      },
       LOADER_TIMEOUT,
     );
   }
@@ -388,56 +437,45 @@ export default class AudioTool {
   /**
    * If upload is successful, show info about the file
    */
-  async showFileData() {
+  showFileData() {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
 
-    const { file: { size }, title } = this.data;
+    const { file: { size, url }, title } = this.data;
 
-    const fileInfo = make("div", this.CSS.fileInfo);
+    this.appendFileIcon();
 
-    if (title) {
-      this.nodes.title = make("div", this.CSS.title, {
-        contentEditable: true,
-      });
+    const fileInfo = make("div", [this.CSS.fileInfo]);
 
-      this.nodes.title.textContent = title;
-      fileInfo.appendChild(this.nodes.title);
-    }
+    this.nodes.title = make("div", [this.CSS.title], {
+      contentEditable: true,
+    });
+
+    this.nodes.title.textContent = title;
+    fileInfo.appendChild(this.nodes.title);
 
     if (size) {
-      const fileSize = make("div", this.CSS.size);
+      const fileSize = make("div", [this.CSS.size]);
       fileSize.textContent = humanFileSize(size);
       fileInfo.appendChild(fileSize);
     }
 
-    const downloadIcon = make("a", this.CSS.downloadButton, {
+    this.nodes.wrapper.appendChild(fileInfo);
+
+    const downloadIcon = make("a", [this.CSS.downloadButton], {
       innerHTML: svgs.arrowDownload,
-    });
+    }) as HTMLAnchorElement;
 
-    downloadIcon.addEventListener("click", () => {
-      this.config.fileHandling.onDownload(this.data.file);
-    });
+    if (typeof this.config.fileHandling.onDownload === "function") {
+      downloadIcon.addEventListener("click", () => {
+        this.config.fileHandling.onDownload(this.data.file);
+      });
+    } else {
+      downloadIcon.href = url;
+      downloadIcon.target = "_blank";
+      downloadIcon.rel = "nofollow noindex noreferrer";
+    }
 
-    const firstLine = make("div", "cdx-audio-first-line");
-
-    firstLine.appendChild(fileInfo);
-    firstLine.appendChild(downloadIcon);
-
-    const secondLine = make("div", "cdx-audio-second-line");
-    secondLine.setAttribute("data-mutation-free", "true");
-
-    const audioElement = document.createElement("audio");
-    audioElement.controls = true;
-    audioElement.src = await this.config.fileHandling.getUrl(this.data.file);
-    audioElement.style.width = "100%";
-    audioElement.style.marginTop = "20px";
-    // this prevents editor.js from triggering the onChange callback as soon
-    // as the audio loads
-    audioElement.setAttribute("data-mutation-free", "true");
-    secondLine.appendChild(audioElement);
-
-    this.nodes.wrapper.appendChild(firstLine);
-    this.nodes.wrapper.appendChild(secondLine);
+    this.nodes.wrapper.appendChild(downloadIcon);
   }
 
   /**
@@ -451,9 +489,9 @@ export default class AudioTool {
   }
 
   /**
-   * Return Audio Tool's data
+   * Return Document Tool's data
    *
-   * @return {AudioToolData}
+   * @return {DocumentToolData}
    */
   get data() {
     return this._data;
@@ -462,12 +500,11 @@ export default class AudioTool {
   /**
    * Stores all Tool's data
    *
-   * @param {AudioToolData} data
+   * @param {DocumentToolData} data
    */
   set data({ file, title }) {
     this._data = Object.assign({}, {
       file: {
-        url: (file && file.url) || this._data.file.url,
         name: (file && file.name) || this._data.file.name,
         extension: (file && file.extension) || this._data.file.extension,
         size: (file && file.size) || this._data.file.size,
@@ -483,14 +520,12 @@ export default class AudioTool {
    * @param {HTMLElement} element - contentEditable element
    */
   moveCaretToEnd(element) {
-    // eslint-disable-next-line no-undef
     const range = document.createRange();
-    // eslint-disable-next-line no-undef
     const selection = window.getSelection();
 
     range.selectNodeContents(element);
     range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
   }
 }
