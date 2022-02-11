@@ -21,7 +21,7 @@ export const make = (tagName:string, classNames:string[], attributes = {}) => {
   // eslint-disable-next-line no-undef
   const el = document.createElement(tagName);
 
-  el.classList.add(...classNames);
+  el.classList.add(...classNames.filter((className) => className.length > 0));
 
   // eslint-disable-next-line guard-for-in
   for (const attrName in attributes) {

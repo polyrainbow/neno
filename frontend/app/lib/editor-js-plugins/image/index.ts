@@ -124,7 +124,6 @@ export default class ImageTool {
       captionPlaceholder: config.captionPlaceholder || "Caption",
       buttonContent: config.buttonContent || "",
       fileHandling: config.fileHandling,
-      actions: config.actions || [],
     };
 
 
@@ -143,7 +142,6 @@ export default class ImageTool {
      */
     this.tunes = new Tunes({
       api,
-      actions: this.config.actions,
       onChange: (tuneName) => this.tuneToggled(tuneName),
     });
 
