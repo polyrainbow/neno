@@ -11,10 +11,6 @@ header {
   background-color: var(--header-background-color);
 }
 
-main, #section_existing-notes {
-  display: none;
-}
-
 #heading {
   margin: 0px;
 }
@@ -50,8 +46,4 @@ a {
 
 #input_note-title {
   font-size: 20px;
-}
-
-#server-status {
-  margin: 0px;
 }

@@ -21,7 +21,8 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "types": [
-      "node"
+      "node",
+      "chrome"
     ],
     "typeRoots": [
       "./custom_typings",

@@ -58,6 +58,7 @@ export const putNote = ({
   note,
   hostUrl,
   apiKey,
+  graphId
 }) => {
   const requestBody = {
     note,
@@ -66,7 +67,9 @@ export const putNote = ({
     },
   };
 
-  return fetchJSON(hostUrl + "/api/note", {
+  const requestUrl = `${hostUrl}/api/graph/${graphId}/note`;
+
+  return fetchJSON(requestUrl, {
     method: "PUT",
     headers: {
       "X-Auth-Token": apiKey,
@@ -80,8 +83,11 @@ export const putNote = ({
 };
 
 
-export const getExistingNotesWithThisUrl = (url, hostUrl, apiKey) => {
-  return fetchJSON(hostUrl + "/api/notes?q=has-url:" + url, {
+export const getExistingNotesWithThisUrl = (url, graphId, hostUrl, apiKey) => {
+  const requestUrl
+    = `${hostUrl}/api/graph/${graphId}/notes?searchString=${encodeURIComponent("has-url:" + url)}`;
+
+  return fetchJSON(requestUrl, {
     method: "GET",
     headers: {
       "X-Auth-Token": apiKey,
@@ -104,7 +110,9 @@ export const isAuthenticated = ({
   hostUrl,
   apiKey,
 }) => {
-  return fetchJSON(hostUrl + "/api/authenticated", {
+  const url = hostUrl + "/api/user/authenticated";
+
+  return fetchJSON(url, {
     method: "GET",
     headers: {
       "X-Auth-Token": apiKey,

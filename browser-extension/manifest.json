@@ -13,15 +13,15 @@
     "action": {
       "default_popup": "popup.html",
       "default_icon": {
-        "16": "images/icon/48x48.png",
-        "32": "images/icon/32x32.png",
-        "48": "images/icon/48x48.png"
+        "16": "assets/images/icon/48x48.png",
+        "32": "assets/images/icon/32x32.png",
+        "48": "assets/images/icon/48x48.png"
       }
     },
     "icons": {
-      "16": "images/icon/48x48.png",
-      "32": "images/icon/32x32.png",
-      "48": "images/icon/48x48.png"
+      "16": "assets/images/icon/48x48.png",
+      "32": "assets/images/icon/32x32.png",
+      "48": "assets/images/icon/48x48.png"
     },
     "options_page": "options.html"
   }

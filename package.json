@@ -12,6 +12,7 @@
     "@editorjs/list": "^1.6.1",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@tippyjs/react": "^4.2.6",
+    "@types/chrome": "^0.0.178",
     "@types/express": "^4.17.13",
     "archiver": "^5.0.2",
     "babel-loader": "^8.2.3",
@@ -59,6 +60,8 @@
   "scripts": {
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
+    "dev-be": "npx webpack --config browser-extension/webpack.common.js",
+    "build-browser-extension": "npx webpack --config browser-extension/webpack.common.js",
     "compile-typescript": "npx tsc",
     "start-server-dev": "node dist/backend/index.js --http-port 8080 --session-secret 000",
     "start-server-dev-tls": "node dist/backend/index.js --https-port 8080 --use-https --cert-path ~/.neno/server.cert --cert-key-path ~/.neno/server.key",
