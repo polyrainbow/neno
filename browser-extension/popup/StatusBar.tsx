@@ -3,7 +3,7 @@ import {
   isAuthenticated,
 } from "../utils";
 
-export default ({config, setGraphId}) => {
+const StatusBar = ({ config, setGraphId }) => {
   const [statusMessage, setStatusMessage] = useState("Verifying server ...");
   const [statusColor, setStatusColor] = useState("");
 
@@ -34,7 +34,7 @@ export default ({config, setGraphId}) => {
         setStatusColor("red");
         // TODO: pushNoteButton.disabled = true;
       }
-    }
+    };
 
     updateStatusBar();
   }, [config.hostUrl, config.apiKey]);
@@ -47,4 +47,6 @@ export default ({config, setGraphId}) => {
   >
     <p id="server-status">{statusMessage}</p>
   </footer>;
-}
+};
+
+export default StatusBar;

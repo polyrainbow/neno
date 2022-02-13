@@ -58,7 +58,7 @@ export const putNote = ({
   note,
   hostUrl,
   apiKey,
-  graphId
+  graphId,
 }) => {
   const requestBody = {
     note,
@@ -84,8 +84,9 @@ export const putNote = ({
 
 
 export const getExistingNotesWithThisUrl = (url, graphId, hostUrl, apiKey) => {
+  const searchString = encodeURIComponent("has-url:" + url);
   const requestUrl
-    = `${hostUrl}/api/graph/${graphId}/notes?searchString=${encodeURIComponent("has-url:" + url)}`;
+    = `${hostUrl}/api/graph/${graphId}/notes?searchString=${searchString}`;
 
   return fetchJSON(requestUrl, {
     method: "GET",

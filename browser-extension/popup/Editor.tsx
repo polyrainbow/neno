@@ -11,7 +11,7 @@ const forbiddenUrlStartStrings = [
   "chrome-extension://",
 ];
 
-export default ({config, activeTab, graphId}) => {
+const Editor = ({ config, activeTab, graphId }) => {
   const [statusMessage, setStatusMessage] = useState("");
   const [noteTitle, setNoteTitle] = useState("");
   const [noteText, setNoteText] = useState("");
@@ -19,7 +19,7 @@ export default ({config, activeTab, graphId}) => {
   const [pushNoteButtonValue, setPushNoteButtonValue] = useState("Add");
 
   useEffect(() => {
-    activeTab?.title && setNoteTitle(activeTab.title)
+    activeTab?.title && setNoteTitle(activeTab.title);
   }, [activeTab]);
 
   if (activeTab && forbiddenUrlStartStrings.some(
@@ -30,7 +30,7 @@ export default ({config, activeTab, graphId}) => {
 
   const pushNote = async () => {
     if (typeof graphId !== "string") return;
-  
+
     const blocks = getNoteBlocks({
       url: activeTab.url,
       pageTitle: activeTab.title,
@@ -60,7 +60,7 @@ export default ({config, activeTab, graphId}) => {
   const link = typeof activeNoteId === "number"
     ? <a
       href={config.hostUrl + "/editor/" + activeNoteId}
-      target="_blank"
+      target="_blank" rel="noreferrer"
     >Click here to open it in NENO.</a>
     : "";
 
@@ -93,4 +93,6 @@ export default ({config, activeTab, graphId}) => {
       graphId={graphId}
     />
   </main>;
-}
+};
+
+export default Editor;

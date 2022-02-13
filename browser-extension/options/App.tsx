@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-export default () => {
+const App = () => {
   const [hostUrl, setHostUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
 
@@ -36,4 +36,6 @@ export default () => {
       }}
     />
   </div>;
-}
+};
+
+export default App;

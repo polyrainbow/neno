@@ -6,7 +6,7 @@ interface Note {
   id: number,
 }
 
-export default ({config, activeTab, graphId}) => {
+const ExistingNotes = ({ config, activeTab, graphId }) => {
   const [existingNotes, setExistingNotes] = useState<Note[]>([]);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default ({config, activeTab, graphId}) => {
       } catch (e) {
         console.log(e);
       }
-    }
+    };
 
     if (activeTab) {
       updateExistingNotes();
@@ -51,12 +51,14 @@ export default ({config, activeTab, graphId}) => {
             >
               <a
                 href={config.hostUrl + "/editor/" + note.id}
-                target="_blank"
+                target="_blank" rel="noreferrer"
               >{note.title}</a>
-            </p>
+            </p>;
           })
           : "None found."
       }
     </div>
   </section>;
-}
+};
+
+export default ExistingNotes;
