@@ -5,7 +5,6 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 export default {
   mode: "development",
-  watch: true,
   entry: {
     popup: path.join(__dirname, "popup", "index.tsx"),
     options: path.join(__dirname, "options", "index.tsx"),
