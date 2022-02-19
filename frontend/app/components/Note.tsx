@@ -159,7 +159,7 @@ const Note = ({
         <div id="editor"></div>
         <hr/>
         <div id="links">
-          <h2>Linked notes</h2>
+          <h2>Linked notes ({displayedLinkedNotes.length})</h2>
           {
             displayedLinkedNotes.length === 0
               ? <p className="note-meta-paragraph"
