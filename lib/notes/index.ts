@@ -1,7 +1,7 @@
 import DatabaseIO from "./DatabaseIO.js";
 import * as Utils from "../utils.js";
 import {
-  getDisplayNoteTitle,
+  getNoteTitlePreview,
   normalizeNoteTitle,
   removeDefaultTextParagraphs,
   removeEmptyLinkBlocks,
@@ -216,7 +216,7 @@ const getGraphVisualization = async (graphId: GraphId):Promise<GraphVisualizatio
   const graphNodes:GraphNode[] = graph.notes.map((note) => {
     const graphNode:GraphNode = {
       id: note.id,
-      title: getDisplayNoteTitle(note),
+      title: getNoteTitlePreview(note),
       position: note.position,
       linkedNotes: getLinkedNotes(graph, note.id),
       creationTime: note.creationTime,

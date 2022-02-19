@@ -33,7 +33,7 @@ const shortenText = (text:string, maxLength:number):string => {
 };
 
 
-const getDisplayNoteTitle = (note:Note, maxLength = 800):string => {
+const getNoteTitlePreview = (note:Note, maxLength = 800):string => {
   if (note.title.length === 0) {
     return NOTE_TITLE_PLACEHOLDER;
   }
@@ -141,7 +141,7 @@ const getLinkedNotes = (graph:Graph, noteId:NoteId):LinkedNote[] => {
     .map((note:SavedNote) => {
       const linkedNote:LinkedNote = {
         id: note.id,
-        title: getDisplayNoteTitle(note),
+        title: getNoteTitlePreview(note),
         creationTime: note.creationTime,
         updateTime: note.updateTime,
       }
@@ -278,7 +278,7 @@ const createNoteListItem = (
 ):NoteListItem => {
   const noteListItem:NoteListItem = {
     id: databaseNote.id,
-    title: getDisplayNoteTitle(databaseNote),
+    title: getNoteTitlePreview(databaseNote),
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
     features: getNoteFeatures(databaseNote),
@@ -724,7 +724,7 @@ const getNotesWithBlocksOfTypes = (
 
 
 export {
-  getDisplayNoteTitle,
+  getNoteTitlePreview,
   normalizeNoteTitle,
   removeDefaultTextParagraphs,
   removeEmptyLinkBlocks,
