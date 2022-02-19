@@ -38,10 +38,9 @@ const getDisplayNoteTitle = (note:Note, maxLength = 800):string => {
     return NOTE_TITLE_PLACEHOLDER;
   }
 
-  const titleUnescapedAndTrimmed
-    = Utils.unescapeHTML(note.title).trim();
+  const titleTrimmed = note.title.trim();
 
-  const titleShortened = shortenText(titleUnescapedAndTrimmed, maxLength);
+  const titleShortened = shortenText(titleTrimmed, maxLength);
 
   if (titleShortened.length === 0) {
     return NOTE_TITLE_PLACEHOLDER;
@@ -667,16 +666,15 @@ const getNotesWithTitleContainingTokens = (
       return false;
     }
 
-    const title = getDisplayNoteTitle(note);
     const queryTokens = query.split(" ");
 
     if (caseSensitive) {
       return queryTokens.every((queryToken) => {
-        return title.includes(queryToken);
+        return note.title.includes(queryToken);
       });
     } else {
       return queryTokens.every((queryToken) => {
-        return title.toLowerCase().includes(queryToken.toLowerCase());
+        return note.title.toLowerCase().includes(queryToken.toLowerCase());
       });
     }
   });
