@@ -28,7 +28,7 @@ interface NoteContentBlockLinkData {
   meta: {
     title: string,
     image: {
-      url: string,
+      url: string | null,
     },
     description: string,
   },

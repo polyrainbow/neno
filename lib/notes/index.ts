@@ -63,7 +63,7 @@ let getUrlMetadata = (url:string):Promise<UrlMetadataResponse> => {
     "url": url,
     "title": url,
     "description": "",
-    "image": "",
+    "image": null,
   });
 };
 
