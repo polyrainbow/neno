@@ -58,7 +58,7 @@ let randomUUID;
 
 /* this is the fallback getUrlMetadata function that is used if the initializer
 does not provide a better one */
-let getUrlMetadata = (url) => {
+let getUrlMetadata = (url:string):Promise<UrlMetadataResponse> => {
   return Promise.resolve({
     "url": url,
     "title": url,
@@ -74,8 +74,8 @@ let getUrlMetadata = (url) => {
 
 const init = async (
   storageProvider,
-  _getUrlMetadata,
-  _randomUUID,
+  _getUrlMetadata: (string) => Promise<UrlMetadataResponse>,
+  _randomUUID: () => string,
 ):Promise<void> => {
   if (typeof _getUrlMetadata === "function") {
     getUrlMetadata = _getUrlMetadata;
