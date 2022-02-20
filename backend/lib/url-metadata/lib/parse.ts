@@ -28,7 +28,7 @@ export default function (url, body, options) {
   if (metadata.get('og:title')) {
     metadata.set({ title: metadata.get('og:title') })
   } else {
-    metadata.set({ title: $('title').html() })
+    metadata.set({ title: $('title').text() })
   }
 
   // derive author
