@@ -137,9 +137,9 @@ export default class CodeTool {
      */
     textarea.addEventListener("keydown", (event) => {
       switch (event.code) {
-      case "Tab":
-        this.tabHandler(event);
-        break;
+        case "Tab":
+          this.tabHandler(event);
+          break;
       }
     });
 

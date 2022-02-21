@@ -258,19 +258,19 @@ export default class LinkTool {
         const cmdPressed = event.ctrlKey || event.metaKey;
 
         switch (event.keyCode) {
-        case ENTER: {
-          event.preventDefault();
-          event.stopPropagation();
+          case ENTER: {
+            event.preventDefault();
+            event.stopPropagation();
 
-          this.startFetching(event);
-          break;
-        }
-        case A: {
-          if (cmdPressed) {
-            this.selectLinkUrl(event);
+            this.startFetching(event);
+            break;
           }
-          break;
-        }
+          case A: {
+            if (cmdPressed) {
+              this.selectLinkUrl(event);
+            }
+            break;
+          }
         }
       });
     }

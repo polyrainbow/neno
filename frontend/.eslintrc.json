@@ -37,7 +37,8 @@
     "@typescript-eslint/no-unused-vars": ["error"],
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": ["error"],
-    "indent": [
+    "indent": "off",
+    "@typescript-eslint/indent": [
       "error",
       2
     ],

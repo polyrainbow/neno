@@ -237,16 +237,16 @@ export default class DocumentTool {
    */
   onPaste(event) {
     switch (event.type) {
-    case "pattern": {
-      const url = event.detail.data;
-      this.#uploadFileByUrlAndRefreshUI(url);
-      break;
-    }
-    case "file": {
-      const file = event.detail.file;
-      this.#uploadFileAndRefreshUI(file);
-      break;
-    }
+      case "pattern": {
+        const url = event.detail.data;
+        this.#uploadFileByUrlAndRefreshUI(url);
+        break;
+      }
+      case "file": {
+        const file = event.detail.file;
+        this.#uploadFileAndRefreshUI(file);
+        break;
+      }
     }
   }
 

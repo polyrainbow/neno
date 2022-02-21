@@ -177,9 +177,9 @@ export default class FileSystemAccessAPIStorageProvider {
     }
 
     const directoryNames = values
-      // @ts-ignore
+    // @ts-ignore
       .filter((value) => value.kind === "directory")
-      // @ts-ignore
+    // @ts-ignore
       .map((dirHandle) => dirHandle.name);
 
     return directoryNames;
@@ -210,7 +210,7 @@ export default class FileSystemAccessAPIStorageProvider {
     }
 
     const entryNames = values
-      // @ts-ignore
+    // @ts-ignore
       .map((dirHandle) => dirHandle.name);
 
     return entryNames;
@@ -261,7 +261,7 @@ export default class FileSystemAccessAPIStorageProvider {
     }
 
     const entryNames = values
-      // @ts-ignore
+    // @ts-ignore
       .filter((value) => value.kind === "file");
 
     const filePromises = entryNames

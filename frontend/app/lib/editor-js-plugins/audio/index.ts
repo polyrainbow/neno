@@ -206,21 +206,21 @@ export default class AudioTool {
    */
   onPaste(event) {
     switch (event.type) {
-    case "tag": {
-      const audio = event.detail.data;
-      this.#uploadFileByUrlAndRefreshUI(audio.src);
-      break;
-    }
-    case "pattern": {
-      const url = event.detail.data;
-      this.#uploadFileByUrlAndRefreshUI(url);
-      break;
-    }
-    case "file": {
-      const file = event.detail.file;
-      this.#uploadFileAndRefreshUI(file);
-      break;
-    }
+      case "tag": {
+        const audio = event.detail.data;
+        this.#uploadFileByUrlAndRefreshUI(audio.src);
+        break;
+      }
+      case "pattern": {
+        const url = event.detail.data;
+        this.#uploadFileByUrlAndRefreshUI(url);
+        break;
+      }
+      case "file": {
+        const file = event.detail.file;
+        this.#uploadFileAndRefreshUI(file);
+        break;
+      }
     }
   }
 

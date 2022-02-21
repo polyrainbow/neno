@@ -218,34 +218,34 @@ export default class ImageTool {
    */
   onPaste(event) {
     switch (event.type) {
-    case "tag": {
-      const image = event.detail.data;
+      case "tag": {
+        const image = event.detail.data;
 
-      /** Images from PDF */
-      if (/^blob:/.test(image.src)) {
-        fetch(image.src)
-          .then((response) => response.blob())
-          .then((file) => {
-            this.#uploadFileByUrlAndRefreshUI(file);
-          });
+        /** Images from PDF */
+        if (/^blob:/.test(image.src)) {
+          fetch(image.src)
+            .then((response) => response.blob())
+            .then((file) => {
+              this.#uploadFileByUrlAndRefreshUI(file);
+            });
 
+          break;
+        }
+
+        this.#uploadFileByUrlAndRefreshUI(image.src);
         break;
       }
+      case "pattern": {
+        const url = event.detail.data;
+        this.#uploadFileByUrlAndRefreshUI(url);
+        break;
+      }
+      case "file": {
+        const file = event.detail.file;
 
-      this.#uploadFileByUrlAndRefreshUI(image.src);
-      break;
-    }
-    case "pattern": {
-      const url = event.detail.data;
-      this.#uploadFileByUrlAndRefreshUI(url);
-      break;
-    }
-    case "file": {
-      const file = event.detail.file;
-
-      this.#uploadFileAndRefreshUI(file);
-      break;
-    }
+        this.#uploadFileAndRefreshUI(file);
+        break;
+      }
     }
   }
 

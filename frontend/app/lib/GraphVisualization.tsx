@@ -559,30 +559,30 @@ export default class GraphVisualization {
     this.#lastKeyDown = e.keyCode;
 
     switch (e.keyCode) {
-    case consts.BACKSPACE_KEY:
-    case consts.DELETE_KEY:
+      case consts.BACKSPACE_KEY:
+      case consts.DELETE_KEY:
       // we cannot prevent default because then we cannot delete values from
       // search input
       // e.preventDefault();
 
-      // right now, we don't support deleting nodes from the graph view
-      // so let's consider only edges
-      Array.from(this.#selection)
-        .filter(this.#isEdge)
-        .forEach((edge) => {
-          this.#links.splice(this.#links.indexOf(edge), 1);
-        });
+        // right now, we don't support deleting nodes from the graph view
+        // so let's consider only edges
+        Array.from(this.#selection)
+          .filter(this.#isEdge)
+          .forEach((edge) => {
+            this.#links.splice(this.#links.indexOf(edge), 1);
+          });
 
-      this.#onChange();
-      this.#select([]);
-      this.#updateConnectedNodeIds();
-      this.#updateGraph();
+        this.#onChange();
+        this.#select([]);
+        this.#updateConnectedNodeIds();
+        this.#updateGraph();
 
-      break;
-    case consts.ESCAPE_KEY:
-    case consts.C_KEY:
-      this.#select([]);
-      break;
+        break;
+      case consts.ESCAPE_KEY:
+      case consts.C_KEY:
+        this.#select([]);
+        break;
     }
   }
 

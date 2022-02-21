@@ -488,31 +488,31 @@ const importLinksAsNotes = async (graphId, links) => {
     = fulfilledPromises.map((response) => {
       return (response.status === "fulfilled") && response.value;
     })
-    .filter(Utils.isNotFalse);
+      .filter(Utils.isNotFalse);
 
   const notesFromUser:NoteFromUser[]
     = urlMetadataResults.map((urlMetadataObject) => {
-    const noteFromUser:NoteFromUser = {
-      title: urlMetadataObject.title,
-      blocks: [
-        {
-          "type": NoteContentBlockType.LINK,
-          "data": {
-            "link": urlMetadataObject.url,
-            "meta": {
-              "title": urlMetadataObject.title,
-              "description": urlMetadataObject.description,
-              "image": {
-                "url": urlMetadataObject.image,
-              },
-            }
+      const noteFromUser:NoteFromUser = {
+        title: urlMetadataObject.title,
+        blocks: [
+          {
+            "type": NoteContentBlockType.LINK,
+            "data": {
+              "link": urlMetadataObject.url,
+              "meta": {
+                "title": urlMetadataObject.title,
+                "description": urlMetadataObject.description,
+                "image": {
+                  "url": urlMetadataObject.image,
+                },
+              }
+            },
           },
-        },
-      ],
-    };
+        ],
+      };
 
-    return noteFromUser;
-  });
+      return noteFromUser;
+    });
 
   const notesToTransmit:NoteToTransmit[] = [];
   const failures:ImportLinkAsNoteFailure[] = [];
