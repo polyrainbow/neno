@@ -1,4 +1,4 @@
-name: Lint test
+name: Test
 
 on:
   push:
@@ -16,3 +16,4 @@ jobs:
         node-version: '16'
     - run: npm i
     - run: npm run lint
+    - run: npm run compile-typescript
