@@ -13,12 +13,6 @@ const yyyymmdd = (date = new Date()) => {
 };
 
 
-const htmlDecode = (input) => {
-  const doc = new DOMParser().parseFromString(input, "text/html");
-  return doc.documentElement.textContent;
-};
-
-
 const getParameterByName = (name, url) => {
   if (!url) url = window.location.href;
   name = name.replace(/[[\]]/g, "\\$&");
@@ -283,7 +277,6 @@ const getFileTypeFromFilename = (filename:string):string | null => {
 
 export {
   yyyymmdd,
-  htmlDecode,
   getParameterByName,
   makeTimestampHumanReadable,
   getNewNoteObject,

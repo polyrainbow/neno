@@ -39,7 +39,6 @@ import * as d3 from "d3";
 import {
   binaryArrayIncludes,
   shortenText,
-  htmlDecode,
 } from "./utils";
 
 
@@ -47,11 +46,6 @@ const prepareGraphObject = (graph) => {
   const preparedGraphObject = {
     ...graph,
   };
-
-  preparedGraphObject.nodes = graph.nodes.map((node) => {
-    node.title = htmlDecode(node.title);
-    return node;
-  });
 
   preparedGraphObject.links = graph.links.map((link) => {
     return {
