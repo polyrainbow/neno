@@ -118,7 +118,7 @@ const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind) {
   @param valueToLookFor:
     The value we want to find.
 */
-const binaryArrayIncludes = function(sortedArray, valueToLookFor) {
+const binaryArrayIncludes = function(sortedArray, valueToLookFor):boolean {
   let start = 0;
   let end = sortedArray.length - 1;
 
@@ -141,7 +141,7 @@ const binaryArrayIncludes = function(sortedArray, valueToLookFor) {
 };
 
 
-function humanFileSize(bytes, si = false, dp = 1) {
+function humanFileSize(bytes: number, si = false, dp = 1): string {
   const thresh = si ? 1000 : 1024;
 
   if (Math.abs(bytes) < thresh) {

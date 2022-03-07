@@ -40,22 +40,17 @@ import {
   binaryArrayIncludes,
   shortenText,
 } from "./utils";
-
-
-const prepareGraphObject = (graph) => {
-  const preparedGraphObject = {
-    ...graph,
-  };
-
-  preparedGraphObject.links = graph.links.map((link) => {
-    return {
-      source: graph.nodes.find((node) => node.id === link[0]),
-      target: graph.nodes.find((node) => node.id === link[1]),
-    };
-  });
-
-  return preparedGraphObject;
-};
+import BackendGraphVisualization
+  from "../../../lib/notes/interfaces/GraphVisualization";
+import FrontendGraphVisualization, { GraphVisualizationLink }
+  from "../interfaces/GraphVisualization";
+import GraphVisualizationNode
+  from "../../../lib/notes/interfaces/GraphVisualizationNode";
+import { Link } from "../../../lib/notes/interfaces/Link";
+import { NoteId } from "../../../lib/notes/interfaces/NoteId";
+import GraphVisualizationFromUser
+  from "../../../lib/notes/interfaces/GraphVisualizationFromUser";
+import ScreenPosition from "../../../lib/notes/interfaces/ScreenPosition";
 
 
 export default class GraphVisualization {
@@ -78,25 +73,58 @@ export default class GraphVisualization {
     SCALE_EXTENT: [0.01, 10],
   };
 
+  static prepareGraphObject = (
+    backendGraph:BackendGraphVisualization,
+  ): FrontendGraphVisualization => {
+    const frontendGraph:FrontendGraphVisualization = {
+      ...backendGraph,
+      links: backendGraph.links.map(
+        (link: Link):GraphVisualizationLink => {
+          return [
+            backendGraph.nodes.find(
+              (node) => node.id === link[0],
+            ) as GraphVisualizationNode,
+            backendGraph.nodes.find(
+              (node) => node.id === link[1],
+            ) as GraphVisualizationNode,
+          ];
+        },
+      ),
+    };
+
+    return frontendGraph;
+  };
+
+
+  static #isNode(value): value is GraphVisualizationNode {
+    return !GraphVisualization.#isEdge(value);
+  }
+
+
+  static #isEdge(value): value is GraphVisualizationLink {
+    return !!(value[0] && value[1]);
+  }
+
+
   #searchValue = "";
   #onHighlight;
   #onChange;
   #openNote;
-  #nodes;
-  #links;
-  #screenPosition;
+  #nodes: GraphVisualizationNode[];
+  #links: GraphVisualizationLink[];
+  #screenPosition: ScreenPosition;
   #initialNodePosition;
   #parent;
   #svg;
-  #idsOfAllNodesWithLinkedNote = [];
-  #updatedNodes = new Set();
+  #idsOfAllNodesWithLinkedNote: NoteId[] = [];
+  #updatedNodes = new Set<GraphVisualizationNode>();
   #mouseDownNode = null;
   #justDragged = false;
   #justScaleTransGraph = false;
   #lastKeyDown = -1;
   #newLinkCreationInProgress = false;
-  #selection = new Set<any>();
-  #connectedNodeIdsOfSelection:number[] = [];
+  #selection = new Set<GraphVisualizationNode | GraphVisualizationLink>();
+  #connectedNodeIdsOfSelection:NoteId[] = [];
   #titleRenderingEnabled = false;
 
   #mainSVGGroup;
@@ -124,7 +152,8 @@ export default class GraphVisualization {
     initialFocusNoteId,
     openNote,
   }) {
-    const graphObjectPrepared = prepareGraphObject(graphObject);
+    const graphObjectPrepared:FrontendGraphVisualization
+      = GraphVisualization.prepareGraphObject(graphObject);
     this.#parent = parent;
     const { width, height } = this.#parent.getBoundingClientRect();
 
@@ -241,7 +270,7 @@ export default class GraphVisualization {
         this.#justDragged = true;
 
         const nodesToDrag = Array.from(this.#selection)
-          .filter((value) => !this.#isEdge(value));
+          .filter(GraphVisualization.#isNode);
 
         // also drag mouse down node, regardless of if it's selected or not
         if (!nodesToDrag.includes(d)) {
@@ -350,18 +379,18 @@ export default class GraphVisualization {
   }
 
 
-  #updateConnectedNodeIds() {
+  #updateConnectedNodeIds():void {
     this.#idsOfAllNodesWithLinkedNote = this.#links
-      .reduce((accumulator, link) => {
-        accumulator.push(link.source.id);
-        accumulator.push(link.target.id);
+      .reduce((accumulator: NoteId[], link) => {
+        accumulator.push(link[0].id);
+        accumulator.push(link[1].id);
         return accumulator;
       }, [])
       .sort((a, b) => a - b);
   }
 
 
-  #newPathMove(e, originNode) {
+  #newPathMove(e, originNode):void {
     if (!this.#newLinkCreationInProgress) {
       return;
     }
@@ -381,7 +410,7 @@ export default class GraphVisualization {
 
   // insert svg line breaks: taken from
   // http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts
-  #insertTitleLinebreaks(gEl, title) {
+  #insertTitleLinebreaks(gEl, title:string):void {
     const titleShortened = shortenText(
       title,
       GraphVisualization.#consts.MAX_NODE_TEXT_LENGTH,
@@ -399,22 +428,18 @@ export default class GraphVisualization {
   }
 
 
-  #getConnectedNodeIdsOfSelection(selection) {
+  #getConnectedNodeIdsOfSelection(selection):NoteId[] {
     return selection.reduce((accumulator, newValue) => {
-      if (this.#isEdge(newValue)) {
-        accumulator.push(newValue.source.id, newValue.target.id);
+      if (GraphVisualization.#isEdge(newValue)) {
+        accumulator.push(newValue[0].id, newValue[1].id);
       } else {
-        const linkedNoteIds = newValue.linkedNotes.map((node) => node.id);
+        const linkedNoteIds:NoteId[]
+          = newValue.linkedNotes.map((node) => node.id);
         accumulator.push(...linkedNoteIds);
       }
 
       return accumulator;
     }, []);
-  }
-
-
-  #isEdge(value) {
-    return !!(value.source && value.target);
   }
 
 
@@ -484,17 +509,17 @@ export default class GraphVisualization {
     if (mouseDownNode !== mouseUpNode) {
       // we're in a different node:
       // create new edge for mousedown edge and add to graph
-      const newEdge = { source: mouseDownNode, target: mouseUpNode };
+      const newEdge:GraphVisualizationLink = [mouseDownNode, mouseUpNode];
 
       // check if such an edge is already there ...
       const edgeAlreadyExists = this
         .#linksContainer
         .selectAll("path.link")
         .filter(
-          (d) => {
+          (d: GraphVisualizationLink) => {
             return (
-              (d.source === newEdge.source && d.target === newEdge.target)
-              || (d.source === newEdge.target && d.target === newEdge.source)
+              (d[0] === newEdge[0] && d[1] === newEdge[1])
+              || (d[0] === newEdge[1] && d[1] === newEdge[0])
             );
           },
         )
@@ -562,7 +587,7 @@ export default class GraphVisualization {
         // right now, we don't support deleting nodes from the graph view
         // so let's consider only edges
         Array.from(this.#selection)
-          .filter(this.#isEdge)
+          .filter(GraphVisualization.#isEdge)
           .forEach((edge) => {
             this.#links.splice(this.#links.indexOf(edge), 1);
           });
@@ -666,21 +691,21 @@ export default class GraphVisualization {
       .classed(consts.selectedClass, (edge) => {
         return this.#selection.has(edge);
       })
-      .attr("d", (d) => {
-        return "M" + d.source.position.x + "," + d.source.position.y
-          + "L" + d.target.position.x + "," + d.target.position.y;
+      .attr("d", (d:GraphVisualizationLink) => {
+        return "M" + d[0].position.x + "," + d[0].position.y
+          + "L" + d[1].position.x + "," + d[1].position.y;
       })
-      .classed("connected-to-selected", (edge) => {
+      .classed("connected-to-selected", (edge:GraphVisualizationLink) => {
         // only nodes can be connected to a link, links cannot be connected to
         // other links
 
         const idsOfSelectedNodes = Array.from(this.#selection)
-          .filter((val) => !this.#isEdge(val))
+          .filter(GraphVisualization.#isNode)
           .map((val) => val.id);
 
         return (
-          idsOfSelectedNodes.includes(edge.source.id)
-          || idsOfSelectedNodes.includes(edge.target.id)
+          idsOfSelectedNodes.includes(edge[0].id)
+          || idsOfSelectedNodes.includes(edge[1].id)
         );
       });
 
@@ -690,15 +715,15 @@ export default class GraphVisualization {
       .enter()
       .append("path")
       .classed("link", true)
-      .attr("d", (d) => {
-        return "M" + d.source.position.x + "," + d.source.position.y
-        + "L" + d.target.position.x + "," + d.target.position.y;
+      .attr("d", (d:GraphVisualizationLink) => {
+        return "M" + d[0].position.x + "," + d[0].position.y
+        + "L" + d[1].position.x + "," + d[1].position.y;
       })
-      .on("mouseover", (e, d) => {
+      .on("mouseover", (e, d:GraphVisualizationLink) => {
         this.#onHighlight({
           active: true,
           type: "edge",
-          titles: [d.source.title, d.target.title],
+          titles: [d[0].title, d[1].title],
         });
       })
       .on("mouseout", () => {
@@ -736,9 +761,7 @@ export default class GraphVisualization {
         const draggedNode = event?.type === "NODE_DRAG" && event.node;
 
         const selectedNodeIds = Array.from(this.#selection)
-          .filter((value) => {
-            return !this.#isEdge(value);
-          })
+          .filter(GraphVisualization.#isNode)
           .map((node) => node.id);
 
         return draggedNode || selectedNodeIds.includes(d.id);
@@ -860,11 +883,11 @@ export default class GraphVisualization {
   ********************/
 
 
-  getSaveData() {
-    const linksToTransmit = this.#links.map((link) => {
+  getSaveData():GraphVisualizationFromUser {
+    const linksToTransmit:Link[] = this.#links.map((link) => {
       return [
-        link.source.id,
-        link.target.id,
+        link[0].id,
+        link[1].id,
       ];
     });
 
@@ -876,7 +899,7 @@ export default class GraphVisualization {
         };
       });
 
-    const graphObject = {
+    const graphObject:GraphVisualizationFromUser = {
       nodePositionUpdates,
       links: linksToTransmit,
       screenPosition: this.#screenPosition,
@@ -889,7 +912,7 @@ export default class GraphVisualization {
 
   getSelectedNodeIds() {
     return Array.from(this.#selection)
-      .filter((val) => !this.#isEdge(val))
+      .filter(GraphVisualization.#isNode)
       .map((val) => val.id);
   }
 
