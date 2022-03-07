@@ -337,9 +337,7 @@ export default class GraphVisualization {
       });
 
     zoom.on("zoom", (e) => {
-      const x = e.transform.x;
-      const y = e.transform.y;
-      const k = e.transform.k;
+      const { x, y, k } = e.transform;
 
       this.#justScaleTransGraph = true;
       d3.select("." + GraphVisualization.#consts.graphClass)
@@ -348,9 +346,11 @@ export default class GraphVisualization {
           `translate(${x}, ${y}) scale(${k})`,
         );
 
-      this.#screenPosition.translateX = x;
-      this.#screenPosition.translateY = y;
-      this.#screenPosition.scale = k;
+      this.#screenPosition = {
+        translateX: x,
+        translateY: y,
+        scale: k,
+      };
     });
 
     zoom.on("start", (e) => {
