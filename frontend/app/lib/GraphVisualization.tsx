@@ -63,7 +63,6 @@ export default class GraphVisualization {
     connectClass: "connect-node",
     nodeClassName: "node",
     graphClass: "graph",
-    activeEditId: "active-editing",
     BACKSPACE_KEY: 8,
     DELETE_KEY: 46,
     ENTER_KEY: 13,
@@ -354,12 +353,6 @@ export default class GraphVisualization {
     });
 
     zoom.on("start", (e) => {
-      const ael = d3.select(
-        "#" + GraphVisualization.#consts.activeEditId,
-      ).node();
-      if (ael) {
-        ael.blur();
-      }
       if (!e.shiftKey) {
         d3.select("body").style("cursor", "move");
       }
