@@ -51,6 +51,7 @@ import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import GraphVisualizationFromUser
   from "../../../lib/notes/interfaces/GraphVisualizationFromUser";
 import ScreenPosition from "../../../lib/notes/interfaces/ScreenPosition";
+import NodePosition from "../../../lib/notes/interfaces/NodePosition";
 
 
 export default class GraphVisualization {
@@ -73,7 +74,7 @@ export default class GraphVisualization {
     newNodeIndicatorSize: 4 * 50,
     MAX_NODE_TEXT_LENGTH: 55,
     // minimum and maximum zoom
-    SCALE_EXTENT: [0.01, 10],
+    SCALE_EXTENT: [0.01, 10] as [number, number],
   };
 
 
@@ -120,12 +121,12 @@ export default class GraphVisualization {
   #nodes: GraphVisualizationNode[];
   #links: GraphVisualizationLink[];
   #screenPosition: ScreenPosition;
-  #initialNodePosition;
+  #initialNodePosition: NodePosition;
   #parent;
   #svg;
   #idsOfAllNodesWithLinkedNote: NoteId[] = [];
   #updatedNodes = new Set<GraphVisualizationNode>();
-  #mouseDownNode = null;
+  #mouseDownNode:GraphVisualizationNode | null = null;
   #justDragged = false;
   #justScaleTransGraph = false;
   #lastKeyDown = -1;
@@ -277,7 +278,7 @@ export default class GraphVisualization {
           && (!this.#ctrlKeyIsPressed)
           && (!this.#sKeyIsPressed);
       })
-      .on("drag", (e, d) => {
+      .on("drag", (e, d:GraphVisualizationNode) => {
         this.#justDragged = true;
 
         const nodesToDrag = Array.from(this.#selection)
@@ -464,7 +465,10 @@ export default class GraphVisualization {
   }
 
 
-  #select(values, addToOrRemoveFromExistingSelection = false) {
+  #select(
+    values:(GraphVisualizationNode | GraphVisualizationLink)[],
+    addToOrRemoveFromExistingSelection = false,
+  ):void {
     if (!addToOrRemoveFromExistingSelection) {
       this.#selection = new Set(values);
     } else {
@@ -486,7 +490,7 @@ export default class GraphVisualization {
   }
 
 
-  #handleMouseDownOnEdge(e, d) {
+  #handleMouseDownOnEdge(e, d:GraphVisualizationLink):void {
     e.stopPropagation();
 
     // when shift key is pressed down during mousedown,
@@ -495,7 +499,7 @@ export default class GraphVisualization {
   }
 
 
-  #handleMouseDownOnNode(e, d) {
+  #handleMouseDownOnNode(e, d:GraphVisualizationNode) {
     e.stopPropagation();
     this.#mouseDownNode = d;
     if (e.shiftKey) {
@@ -913,14 +917,14 @@ export default class GraphVisualization {
   }
 
 
-  getSelectedNodeIds() {
+  getSelectedNodeIds():NoteId[] {
     return Array.from(this.#selection)
       .filter(GraphVisualization.#isNode)
       .map((val) => val.id);
   }
 
 
-  setSearchValue(newSearchValue) {
+  setSearchValue(newSearchValue:string):void {
     if (typeof newSearchValue === "string") {
       this.#searchValue = newSearchValue;
     }
@@ -928,7 +932,7 @@ export default class GraphVisualization {
   }
 
 
-  inflateGraph(factor) {
+  inflateGraph(factor:number):void {
     this.#nodes
       .forEach((node) => {
         node.position.x *= factor;
@@ -942,18 +946,20 @@ export default class GraphVisualization {
   }
 
 
-  toggleTextRendering() {
+  toggleTextRendering():boolean {
     if (!this.#titleRenderingEnabled) {
       this.#titleRenderingEnabled = true;
       d3.selectAll("g." + GraphVisualization.#consts.nodeClassName)
-        .each((d, i, nodes) => {
-          const domElement = nodes[i];
+        .each((d:GraphVisualizationNode, i, domElements) => {
+          const domElement = domElements[i];
           this.#insertTitleLinebreaks(d3.select(domElement), d.title);
         });
     } else {
       d3.selectAll("text").remove();
       this.#titleRenderingEnabled = false;
     }
+
+    return this.#titleRenderingEnabled;
   }
 }
 
