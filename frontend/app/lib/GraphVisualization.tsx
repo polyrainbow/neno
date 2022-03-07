@@ -54,6 +54,10 @@ import ScreenPosition from "../../../lib/notes/interfaces/ScreenPosition";
 
 
 export default class GraphVisualization {
+  /** ********************
+    STATIC
+  ***********************/
+
   static #consts = {
     selectedClass: "selected",
     connectClass: "connect-node",
@@ -72,6 +76,7 @@ export default class GraphVisualization {
     // minimum and maximum zoom
     SCALE_EXTENT: [0.01, 10],
   };
+
 
   static prepareGraphObject = (
     backendGraph:BackendGraphVisualization,
@@ -105,6 +110,9 @@ export default class GraphVisualization {
     return !!(value[0] && value[1]);
   }
 
+  /** ********************
+    PRIVATE VARS
+  ***********************/
 
   #searchValue = "";
   #onHighlight;
@@ -143,6 +151,10 @@ export default class GraphVisualization {
   #shiftKeyIsPressed = false;
   #ctrlKeyIsPressed = false;
   #sKeyIsPressed = false;
+
+  /** ********************
+    CONSTRUCTOR
+  ***********************/
 
   constructor({
     parent,
@@ -377,6 +389,11 @@ export default class GraphVisualization {
       this.toggleTextRendering();
     }
   }
+
+
+  /** ********************
+    PRIVATE METHODS
+  ***********************/
 
 
   #updateConnectedNodeIds():void {
