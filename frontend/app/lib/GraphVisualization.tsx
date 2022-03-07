@@ -330,16 +330,27 @@ export default class GraphVisualization {
 
     // listen for dragging and zooming
     const zoom = d3.zoom()
-      .scaleExtent(GraphVisualization.#consts.SCALE_EXTENT);
+      .scaleExtent(GraphVisualization.#consts.SCALE_EXTENT)
+      .filter((e) => {
+        // enable graph dragging with left and middle mouse buttons
+        return e.button === 0 || e.button === 1;
+      });
 
     zoom.on("zoom", (e) => {
-      if (e.shiftKey) {
-        // TODO  the internal d3 state is still changing
-        return false;
-      } else {
-        this.#zoomed(e);
-      }
-      return true;
+      const x = e.transform.x;
+      const y = e.transform.y;
+      const k = e.transform.k;
+
+      this.#justScaleTransGraph = true;
+      d3.select("." + GraphVisualization.#consts.graphClass)
+        .attr(
+          "transform",
+          `translate(${x}, ${y}) scale(${k})`,
+        );
+
+      this.#screenPosition.translateX = x;
+      this.#screenPosition.translateY = y;
+      this.#screenPosition.scale = k;
     });
 
     zoom.on("start", (e) => {
@@ -868,24 +879,6 @@ export default class GraphVisualization {
     const nodeExitSelection = this.nodeElements.exit();
     nodeExitSelection.remove();
   */
-  }
-
-
-  #zoomed(e) {
-    const x = e.transform.x;
-    const y = e.transform.y;
-    const k = e.transform.k;
-
-    this.#justScaleTransGraph = true;
-    d3.select("." + GraphVisualization.#consts.graphClass)
-      .attr(
-        "transform",
-        `translate(${x}, ${y}) scale(${k})`,
-      );
-
-    this.#screenPosition.translateX = x;
-    this.#screenPosition.translateY = y;
-    this.#screenPosition.scale = k;
   }
 
 
