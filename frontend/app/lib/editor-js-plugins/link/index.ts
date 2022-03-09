@@ -465,8 +465,7 @@ export default class LinkTool {
    * @param {string} errorMessage
    */
   fetchingFailed() {
-    console.log("Link data fetching failed.");
-
+    console.error("Link data fetching failed.");
     this.applyErrorStyle();
   }
 }

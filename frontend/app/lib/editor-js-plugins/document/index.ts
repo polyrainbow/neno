@@ -484,7 +484,7 @@ export default class DocumentTool {
    * @param {string} errorMessage -  error message
    */
   uploadingFailed(errorMessage) {
-    console.log(errorMessage);
+    console.error(errorMessage);
     this.removeLoader();
   }
 

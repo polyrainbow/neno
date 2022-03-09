@@ -409,7 +409,7 @@ export default class ImageTool {
    * @return {void}
    */
   uploadingFailed(errorText) {
-    console.log("Image Tool: uploading failed because of", errorText);
+    console.error("Image Tool: uploading failed because of", errorText);
     this.ui.hidePreloader();
   }
 

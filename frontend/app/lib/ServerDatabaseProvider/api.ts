@@ -46,8 +46,6 @@ const callAPI = async ({
         : payload
     );
 
-  console.log("requestBody"); console.log(requestBody);
-
   const fetchOptions = {
     method,
     headers: {
@@ -232,8 +230,6 @@ const importLinksAsNotes = (links) => {
 
 
 const uploadFile = (file) => {
-  console.log("uploadFile");
-  console.log(file);
   return callGraphAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "file",

@@ -451,7 +451,7 @@ export default class AudioTool {
    * @param {string} errorMessage -  error message
    */
   uploadingFailed(errorMessage) {
-    console.log(errorMessage);
+    console.error(errorMessage);
     this.removeLoader();
   }
 
