@@ -1,3 +1,5 @@
+import APIResponse from "../../../../backend/interfaces/APIResponse";
+
 let API_URL;
 let GRAPH_ID;
 let GRAPH_ENDPOINT;
@@ -17,24 +19,41 @@ const setGraphId = (graphId) => {
 interface APICallParams {
   method?: string,
   url: string,
-  body?: string,
-  outputType: string,
-  bodyType?: string,
+  payload?: any, // can be string or file object
+  outputType?: string,
+  payloadType?: string, // the MIME type of the request body payload
+}
+
+interface EndpointCallParams {
+  method?: string,
+  endpoint: string,
+  payload?: any,
+  outputType?: string,
+  payloadType?: string,
 }
 
 const callAPI = async ({
   method = "GET",
   url,
-  body,
+  payload,
   outputType = "json",
-  bodyType = "application/json",
-}:APICallParams) => {
+  payloadType = "application/json",
+}:APICallParams): Promise<Blob | string | ReadableStream | APIResponse> => {
+  const requestBody
+    = payload ?? (
+      payloadType === "application/json"
+        ? JSON.stringify(payload)
+        : payload
+    );
+
+  console.log("requestBody"); console.log(requestBody);
+
   const fetchOptions = {
     method,
     headers: {
-      "Content-Type": bodyType,
+      "Content-Type": payloadType,
     },
-    body: body ?? bodyType === "application/json" ? JSON.stringify(body) : body,
+    body: requestBody,
   };
 
   const response = await fetch(url, fetchOptions);
@@ -55,38 +74,42 @@ const callAPI = async ({
 };
 
 
-const getJSONResponsePayloadIfSuccessful = (response) => {
-  if (!response.success) {
-    throw new Error(response.error);
+const getJSONResponsePayloadIfSuccessful = (responseObject:APIResponse):any => {
+  if (!responseObject.success) {
+    throw new Error(responseObject.error);
   }
 
-  return response.payload;
+  return responseObject.payload;
 };
 
 
-const callUserAPIAndGetJSONPayload = async (options) => {
+const callUserAPIAndGetJSONPayload = async (options:EndpointCallParams) => {
   const response = await callAPI({
     ...options,
-    url: USER_ENDPOINT + options.url,
-  });
+    url: USER_ENDPOINT + options.endpoint,
+  }) as APIResponse;
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const callGraphAPIAndGetJSONPayload = async (options) => {
+const callGraphAPIAndGetJSONPayload = async (options:EndpointCallParams) => {
   const response = await callAPI({
     ...options,
-    url: GRAPH_ENDPOINT + options.url,
-  });
+    url: GRAPH_ENDPOINT + options.endpoint,
+  }) as APIResponse;
   return getJSONResponsePayloadIfSuccessful(response);
 };
 
 
-const login = (username, password, mfaToken) => {
+const login = (
+  username: string,
+  password: string,
+  mfaToken: string,
+) => {
   return callUserAPIAndGetJSONPayload({
     method: "POST",
-    url: "login",
-    body: { username, password, mfaToken },
+    endpoint: "login",
+    payload: { username, password, mfaToken },
   });
 };
 
@@ -94,31 +117,31 @@ const login = (username, password, mfaToken) => {
 const logout = () => {
   return callUserAPIAndGetJSONPayload({
     method: "POST",
-    url: "logout",
+    endpoint: "logout",
   });
 };
 
 
 const isAuthenticated = () => {
   return callUserAPIAndGetJSONPayload({
-    url: "authenticated",
+    endpoint: "authenticated",
   });
 };
 
 
 const getNote = (noteId) => {
   return callGraphAPIAndGetJSONPayload({
-    url: "note/" + noteId,
+    endpoint: "note/" + noteId,
   });
 };
 
 
 const getNotes = (options) => {
   const params = new URLSearchParams(options);
-  const url = `notes?${params.toString()}`;
+  const endpoint = `notes?${params.toString()}`;
 
   return callGraphAPIAndGetJSONPayload({
-    url,
+    endpoint,
   });
 };
 
@@ -126,8 +149,8 @@ const getNotes = (options) => {
 const putNote = (note, options) => {
   return callGraphAPIAndGetJSONPayload({
     method: "PUT",
-    url: "note",
-    body: {
+    endpoint: "note",
+    payload: {
       note,
       options,
     },
@@ -138,31 +161,31 @@ const putNote = (note, options) => {
 const deleteNote = (noteId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
-    url: "note/" + noteId,
+    endpoint: "note/" + noteId,
   });
 };
 
 
 const getStats = (options) => {
   const searchParams = new URLSearchParams(options);
-  const url = "stats?" + searchParams.toString();
+  const endpoint = "stats?" + searchParams.toString();
 
   return callGraphAPIAndGetJSONPayload({
-    url,
+    endpoint,
   });
 };
 
 
 const getFiles = () => {
   return callGraphAPIAndGetJSONPayload({
-    url: "files",
+    endpoint: "files",
   });
 };
 
 
 const getGraphVisualization = () => {
   return callGraphAPIAndGetJSONPayload({
-    url: "graph-visualization",
+    endpoint: "graph-visualization",
   });
 };
 
@@ -170,8 +193,8 @@ const getGraphVisualization = () => {
 const saveGraphVisualization = (graphObject) => {
   return callGraphAPIAndGetJSONPayload({
     method: "POST",
-    url: "graph-visualization",
-    body: graphObject,
+    endpoint: "graph-visualization",
+    payload: graphObject,
   });
 };
 
@@ -202,18 +225,20 @@ const getReadableFileStream = async (fileId) => {
 const importLinksAsNotes = (links) => {
   return callGraphAPIAndGetJSONPayload({
     method: "PUT",
-    url: "import-links-as-notes",
-    body: { links },
+    endpoint: "import-links-as-notes",
+    payload: { links },
   });
 };
 
 
 const uploadFile = (file) => {
+  console.log("uploadFile");
+  console.log(file);
   return callGraphAPIAndGetJSONPayload({
     method: "POST",
-    url: "file",
-    body: file,
-    bodyType: file.type,
+    endpoint: "file",
+    payload: file,
+    payloadType: file.type,
   });
 };
 
@@ -221,8 +246,8 @@ const uploadFile = (file) => {
 const uploadFileByUrl = (data) => {
   return callGraphAPIAndGetJSONPayload({
     method: "POST",
-    url: "file-by-url",
-    body: data,
+    endpoint: "file-by-url",
+    payload: data,
   });
 };
 
@@ -230,7 +255,7 @@ const uploadFileByUrl = (data) => {
 const getUrlMetadata = (url) => {
   const requestUrl = "url-metadata?url=" + url;
   return callGraphAPIAndGetJSONPayload({
-    url: requestUrl,
+    endpoint: requestUrl,
   });
 };
 
@@ -238,8 +263,8 @@ const getUrlMetadata = (url) => {
 const pinNote = (noteId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "PUT",
-    url: "pins",
-    body: { noteId },
+    endpoint: "pins",
+    payload: { noteId },
   });
 };
 
@@ -247,15 +272,15 @@ const pinNote = (noteId) => {
 const unpinNote = (noteId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
-    url: "pins",
-    body: { noteId },
+    endpoint: "pins",
+    payload: { noteId },
   });
 };
 
 
 const getPins = () => {
   return callGraphAPIAndGetJSONPayload({
-    url: "pins",
+    endpoint: "pins",
   });
 };
 
