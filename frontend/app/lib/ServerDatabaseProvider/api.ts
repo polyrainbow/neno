@@ -40,7 +40,7 @@ const callAPI = async ({
   payloadType = "application/json",
 }:APICallParams): Promise<Blob | string | ReadableStream | APIResponse> => {
   const requestBody
-    = payload ?? (
+    = payload && (
       payloadType === "application/json"
         ? JSON.stringify(payload)
         : payload
@@ -81,7 +81,9 @@ const getJSONResponsePayloadIfSuccessful = (responseObject:APIResponse):any => {
 };
 
 
-const callUserAPIAndGetJSONPayload = async (options:EndpointCallParams) => {
+const callUserAPIAndGetJSONPayload = async (
+  options:EndpointCallParams,
+):Promise<any> => {
   const response = await callAPI({
     ...options,
     url: USER_ENDPOINT + options.endpoint,
@@ -90,7 +92,9 @@ const callUserAPIAndGetJSONPayload = async (options:EndpointCallParams) => {
 };
 
 
-const callGraphAPIAndGetJSONPayload = async (options:EndpointCallParams) => {
+const callGraphAPIAndGetJSONPayload = async (
+  options:EndpointCallParams,
+):Promise<any> => {
   const response = await callAPI({
     ...options,
     url: GRAPH_ENDPOINT + options.endpoint,
@@ -103,7 +107,7 @@ const login = (
   username: string,
   password: string,
   mfaToken: string,
-) => {
+):Promise<any> => {
   return callUserAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "login",
