@@ -4,10 +4,8 @@ import { emojis } from "../lib/config.js";
 import {
   makeTimestampHumanReadable,
   humanFileSize,
-  getAppPath,
 } from "../lib/utils.js";
-import { Link } from "react-router-dom";
-import { PathTemplate } from "../enum/PathTemplate";
+import StatsViewAnalysisTable from "./StatsViewAnalysisTable";
 
 const StatsView = ({
   databaseProvider,
@@ -32,12 +30,6 @@ const StatsView = ({
     updateStats();
   }, [databaseProvider]);
 
-  const percentageOfUnlinkedNotes
-    = (stats && (stats.numberOfAllNotes > 0))
-      ? Math.round(
-        (stats.numberOfUnlinkedNotes / stats.numberOfAllNotes) * 100 * 100,
-      ) / 100
-      : NaN;
 
   return <>
     <HeaderContainer
@@ -89,80 +81,7 @@ const StatsView = ({
               </tbody>
             </table>
             <h2>Analysis</h2>
-            <table className="data-table stats-table">
-              <tbody>
-                <tr>
-                  <td>{emojis.note} Notes</td>
-                  <td>{stats.numberOfAllNotes.toLocaleString()}</td>
-                </tr>
-                <tr>
-                  <td>{emojis.link} Links</td>
-                  <td>{stats.numberOfLinks.toLocaleString()}</td>
-                </tr>
-                <tr>
-                  <td>{emojis.unlinked} Unlinked notes</td>
-                  <td>{
-                    stats.numberOfUnlinkedNotes.toLocaleString()
-                    + (
-                      stats.numberOfAllNotes > 0
-                        ? ` (${percentageOfUnlinkedNotes.toLocaleString()} %)`
-                        : ""
-                    )
-                  }</td>
-                </tr>
-                <tr>
-                  <td><a
-                    href="https://en.wikipedia.org/wiki/Component_(graph_theory)"
-                    target="_blank"
-                    rel="noreferrer noopener"
-                  >Components</a></td>
-                  <td>{stats.numberOfComponents.toLocaleString()}</td>
-                </tr>
-                <tr>
-                  <td>Components with more than one node</td>
-                  <td>{
-                    stats.numberOfComponentsWithMoreThanOneNode
-                      .toLocaleString()
-                  }</td>
-                </tr>
-                <tr>
-                  <td>{emojis.hub} Hubs (nodes with more than 4 links)</td>
-                  <td>{
-                    stats.numberOfHubs.toLocaleString()
-                  }</td>
-                </tr>
-                <tr>
-                  <td>🔥 Nodes with highest number of links</td>
-                  <td>
-                    {
-                      stats.numberOfAllNotes > 0
-                        ? stats.nodesWithHighestNumberOfLinks.map((note) => {
-                          return <p
-                            key={
-                              `stats_nodesWithHighesNumberOfLinks_${note.id}`
-                            }
-                            style={{
-                              "margin": "0",
-                            }}
-                          >
-                            <Link to={
-                              getAppPath(
-                                PathTemplate.EDITOR_WITH_NOTE,
-                                new Map([["NOTE_ID", note.id]]),
-                              )
-                            }>
-                              {note.title}
-                            </Link>
-                            <span> </span>
-                            ({note.numberOfLinkedNotes.toLocaleString()})
-                          </p>;
-                        })
-                        : "There are no nodes yet."
-                    }
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <StatsViewAnalysisTable stats={stats} />
           </>
           : <p>Fetching stats...</p>
       }
