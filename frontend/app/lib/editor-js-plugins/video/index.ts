@@ -250,7 +250,7 @@ export default class VideoTool {
    * @return {HTMLDivElement}
    */
   render() {
-    const holder = make("div", this.CSS.baseClass);
+    const holder = make("div", [this.CSS.baseClass]);
 
     this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
