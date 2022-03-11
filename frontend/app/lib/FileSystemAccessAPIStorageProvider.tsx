@@ -138,7 +138,7 @@ export default class FileSystemAccessAPIStorageProvider {
     requestPath: string,
   ) {
     const subDirName = requestPath.substring(0, requestPath.indexOf(this.DS));
-    const subDir = this.#directoryHandle.getDirectoryHandle(subDirName);
+    const subDir = await this.#directoryHandle.getDirectoryHandle(subDirName);
     const filename = requestPath
       .substring(requestPath.indexOf(this.DS) + 1);
     await subDir.removeEntry(filename);

@@ -1,4 +1,7 @@
 import * as IDB from "idb-keyval";
+import { FileId } from "../../../lib/notes/interfaces/FileId.js";
+import { NoteId } from "../../../lib/notes/interfaces/NoteId.js";
+import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit.js";
 import FileSystemAccessAPIStorageProvider
   from "./FileSystemAccessAPIStorageProvider.js";
 import { streamToBlob } from "./utils.js";
@@ -132,7 +135,7 @@ export default class LocalDatabaseProvider {
   }
 
 
-  getNote(noteId) {
+  getNote(noteId:NoteId):NoteToTransmit {
     return this.#notesModule.get(noteId, LocalDatabaseProvider.graphId);
   }
 
@@ -204,6 +207,14 @@ export default class LocalDatabaseProvider {
   }
 
 
+  deleteFile(fileId:FileId) {
+    return this.#notesModule.deleteFile(
+      LocalDatabaseProvider.graphId,
+      fileId,
+    );
+  }
+
+
   getUrlMetadata(url) {
     return this.#notesModule.getUrlMetadata(url);
   }
@@ -211,6 +222,11 @@ export default class LocalDatabaseProvider {
 
   getFiles() {
     return this.#notesModule.getFiles();
+  }
+
+
+  getDanglingFiles() {
+    return this.#notesModule.getDanglingFiles();
   }
 
 
