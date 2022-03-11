@@ -109,10 +109,9 @@ SOFTWARE.
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
-    margin: 0 0 0 30px;
-    width: 65px;
-    height: 65px;
-    border-radius: 3px;
+    margin: 0 0 0 20px;
+    width: 90px;
+    height: 90px;
     float: right;
 }
 
@@ -153,10 +152,6 @@ SOFTWARE.
     to {
         filter: none;
     }
-}
-
-.codex-editor--narrow .link-tool__image {
-    display: none;
 }
 
 @keyframes progress {
