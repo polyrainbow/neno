@@ -185,6 +185,13 @@ const getFiles = () => {
 };
 
 
+const getDanglingFiles = () => {
+  return callGraphAPIAndGetJSONPayload({
+    endpoint: "dangling-files",
+  });
+};
+
+
 const getGraphVisualization = () => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "graph-visualization",
@@ -243,6 +250,14 @@ const uploadFile = (file) => {
 };
 
 
+const deleteFile = (fileId) => {
+  return callGraphAPIAndGetJSONPayload({
+    method: "DELETE",
+    endpoint: "file/" + fileId,
+  });
+};
+
+
 const uploadFileByUrl = (data) => {
   return callGraphAPIAndGetJSONPayload({
     method: "POST",
@@ -297,6 +312,7 @@ export {
   deleteNote,
   getStats,
   getFiles,
+  getDanglingFiles,
   getGraphVisualization,
   saveGraphVisualization,
   getReadableGraphStream,
@@ -304,6 +320,7 @@ export {
   uploadFile,
   uploadFileByUrl,
   getReadableFileStream,
+  deleteFile,
   getUrlMetadata,
   pinNote,
   unpinNote,

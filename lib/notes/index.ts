@@ -26,6 +26,7 @@ import {
   getNotesWithTitleContainingTokens,
   getNotesWithBlocksOfTypes,
   getNotesWithDuplicateTitles,
+  getFilesOfNote,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -448,6 +449,22 @@ const getFiles = async (
   return io.getFiles(graphId);
 };
 
+// get files not used in any note
+const getDanglingFiles = async (
+  graphId,
+):Promise<FileId[]> => {
+  const allFiles = await io.getFiles(graphId);
+  const graph = await io.getGraph(graphId);
+  const filesInNotes:FileId[] = graph.notes.reduce((accumulator, note) => {
+    const filesOfNote = getFilesOfNote(note);
+    return [...accumulator, ...filesOfNote];
+  }, []);
+  const danglingFiles = allFiles.filter((fileId) => {
+    return !filesInNotes.includes(fileId);
+  });
+  return danglingFiles;
+};
+
 
 const getReadableFileStream = (
   graphId: GraphId,
@@ -621,6 +638,7 @@ export {
   addFile,
   deleteFile,
   getFiles,
+  getDanglingFiles,
   getReadableFileStream,
   getFileSize,
   getReadableGraphStream,

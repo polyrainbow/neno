@@ -763,6 +763,42 @@ const startApp = async ({
   );
 
 
+  app.delete(
+    config.GRAPH_ENDPOINT + "file/:fileId",
+    sessionMiddleware,
+    verifyUser,
+    express.json(),
+    async function(req, res) {
+      const graphId = req.params.graphId;
+      const fileId = req.params.fileId;
+      await Notes.deleteFile(graphId, fileId);
+      const response:APIResponse = {
+        payload: fileId,
+        success: true,
+      };
+      res.json(response);
+    },
+  );
+
+
+  app.get(
+    config.GRAPH_ENDPOINT + "dangling-files",
+    sessionMiddleware,
+    verifyUser,
+    express.json(),
+    async function(req, res) {
+      const graphId = req.params.graphId;
+      const files = await Notes.getDanglingFiles(graphId);
+
+      const response:APIResponse = {
+        payload: files,
+        success: true,
+      };
+      res.json(response);
+    },
+  );
+
+
   app.get(
     config.GRAPH_ENDPOINT + "url-metadata",
     sessionMiddleware,

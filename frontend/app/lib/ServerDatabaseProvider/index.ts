@@ -71,6 +71,10 @@ export default class ServerDatabaseProvider {
     return API.getFiles();
   }
 
+  getDanglingFiles() {
+    return API.getDanglingFiles();
+  }
+
   deleteNote(noteId) {
     return API.deleteNote(noteId);
   }
@@ -101,6 +105,10 @@ export default class ServerDatabaseProvider {
 
   getReadableFileStream(fileId) {
     return API.getReadableFileStream(fileId);
+  }
+
+  deleteFile(fileId) {
+    return API.deleteFile(fileId);
   }
 
   uploadFileByUrl(data) {

@@ -74,7 +74,7 @@ const AppMenu = ({
         }}
       />
       <AppMenuItem
-        label="Images"
+        label="Files"
         icon="grid_view"
         onClick={async () => {
           const target = getAppPath(PathTemplate.FILES);
