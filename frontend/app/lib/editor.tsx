@@ -101,7 +101,7 @@ const loadInstance = async ({
 
             return {
               "success": true,
-              "url": url,
+              url,
               "meta": {
                 "title": metadata.title,
                 "description": metadata.description,

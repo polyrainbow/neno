@@ -1,5 +1,5 @@
 import React from "react";
-import { usePagination } from "@material-ui/lab/Pagination/index.js";
+import usePagination from "@mui/material/usePagination";
 
 
 const getNumberOfPages = (numberOfResults, searchResultsPerPage) => {
