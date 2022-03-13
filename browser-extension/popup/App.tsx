@@ -6,7 +6,7 @@ import {
   trimHostUrl,
 } from "../utils";
 
-export default () => {
+const App = () => {
   const [config, setConfig] = useState({
     apiKey: null,
     hostUrl: null,
@@ -46,3 +46,5 @@ export default () => {
     />
   </>;
 };
+
+export default App;

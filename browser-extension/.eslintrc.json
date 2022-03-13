@@ -19,7 +19,6 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:react/recommended",
-    "standard-react",
     "google",
     "plugin:@typescript-eslint/recommended"
   ],
