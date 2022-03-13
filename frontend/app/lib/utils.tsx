@@ -1,3 +1,8 @@
+import { FileId } from "../../../lib/notes/interfaces/FileId";
+import {
+  NoteContentBlockType,
+  NoteContentBlockWithFile,
+} from "../../../lib/notes/interfaces/NoteContentBlock";
 import { PathTemplate } from "../enum/PathTemplate";
 import ActiveNote from "../interfaces/ActiveNote";
 import * as Config from "./config";
@@ -29,10 +34,77 @@ const makeTimestampHumanReadable = (timestamp) => {
 };
 
 
-const getNewNoteObject = ():ActiveNote => {
+const getExtensionFromFilename = (filename: string):string | null => {
+  const posOfDot = filename.lastIndexOf(".");
+  if (posOfDot === -1) {
+    return null;
+  }
+
+  const extension = filename.substring(posOfDot + 1);
+  if (extension.length === 0) {
+    return null;
+  }
+
+  return extension;
+};
+
+
+const getFileTypeFromFilename = (
+  filename:string,
+):NoteContentBlockType | null => {
+  const map = new Map<string, NoteContentBlockType>(Object.entries({
+    "png": NoteContentBlockType.IMAGE,
+    "jpg": NoteContentBlockType.IMAGE,
+    "webp": NoteContentBlockType.IMAGE,
+    "gif": NoteContentBlockType.IMAGE,
+    "svg": NoteContentBlockType.IMAGE,
+    "pdf": NoteContentBlockType.DOCUMENT,
+    "mp3": NoteContentBlockType.AUDIO,
+    "mp4": NoteContentBlockType.VIDEO,
+    "webm": NoteContentBlockType.VIDEO,
+  }));
+
+  const extension = getExtensionFromFilename(filename);
+  if (!extension) {
+    return null;
+  }
+
+  return map.has(extension) ? map.get(extension) as NoteContentBlockType : null;
+};
+
+
+const getBlocksWithFileIds = (
+  fileIds: FileId[],
+):NoteContentBlockWithFile[] => {
+  return fileIds.map((fileId:FileId):NoteContentBlockWithFile => {
+    const type = getFileTypeFromFilename(fileId) as NoteContentBlockType;
+
+    return {
+      // @ts-ignore
+      type,
+      data: {
+        file: {
+          extension: getExtensionFromFilename(fileId) as string,
+          fileId,
+          name: fileId,
+          size: NaN,
+        },
+      },
+    };
+  });
+};
+
+
+const getNewNoteObject = (
+  fileIds?: FileId[],
+):ActiveNote => {
+  const blocks = fileIds
+    ? getBlocksWithFileIds(fileIds)
+    : Config.DEFAULT_NOTE_BLOCKS;
+
   const note:ActiveNote = {
     changes: [],
-    blocks: Config.DEFAULT_NOTE_BLOCKS,
+    blocks,
     id: NaN,
     isUnsaved: true,
     linkedNotes: [],
@@ -234,44 +306,21 @@ const getFileInfosOfNoteFiles = (note) => {
 const getAppPath = (
   pathTemplate:PathTemplate,
   params?:Map<string, string>,
+  urlParams?: URLSearchParams,
 ):string => {
   let path = `${Config.ROOT_PATH}${pathTemplate}`;
   params?.forEach((value, key) => {
     path = path.replace(`%${key}%`, value);
   });
+  if (urlParams) {
+    path += "?" + urlParams;
+  }
   return path;
 };
 
 
 const getIconSrc = (iconName) => {
   return Config.ICON_PATH + iconName + "_black_24dp.svg";
-};
-
-
-const getFileTypeFromFilename = (filename:string):string | null => {
-  const map = new Map(Object.entries({
-    "png": "image",
-    "jpg": "image",
-    "webp": "image",
-    "gif": "image",
-    "svg": "image",
-    "pdf": "document",
-    "mp3": "audio",
-    "mp4": "video",
-    "webm": "video",
-  }));
-
-  const posOfDot = filename.lastIndexOf(".");
-  if (posOfDot === -1) {
-    return null;
-  }
-
-  const extension = filename.substring(posOfDot + 1);
-  if (extension.length === 0) {
-    return null;
-  }
-
-  return map.has(extension) ? map.get(extension) as string : null;
 };
 
 

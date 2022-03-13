@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
 import FilesViewImageBox from "./FilesViewImageBox";
-import { getFileTypeFromFilename } from "../lib/utils";
+import { getAppPath, getFileTypeFromFilename } from "../lib/utils";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
+import {
+  useNavigate,
+} from "react-router-dom";
+import { PathTemplate } from "../enum/PathTemplate";
 
 
 const FilesView = ({
@@ -10,6 +14,7 @@ const FilesView = ({
   toggleAppMenu,
 }) => {
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
+  const navigate = useNavigate();
 
   const [files, setFiles] = useState<any>([]);
   const [danglingFiles, setDanglingFiles] = useState<any>([]);
@@ -100,6 +105,16 @@ const FilesView = ({
                     href={danglingFile.src}
                   >{danglingFile.id}</a>
                   <span> </span>
+                  <button
+                    onClick={async () => {
+                      navigate(getAppPath(
+                        PathTemplate.EDITOR_WITH_NEW_NOTE,
+                        undefined,
+                        new URLSearchParams([["attach-file", danglingFile.id]]),
+                      ));
+                    }}
+                    className="small-button"
+                  >Create note with file</button>
                   <button
                     onClick={async () => {
                       await confirm({

@@ -61,7 +61,7 @@
     "no-eq-null": ["error"],
     "no-extra-boolean-cast": ["error"],
     "no-label-var": ["error"],
-    "no-undefined": ["error"],
+    "no-undefined": [0],
     "no-mixed-requires": ["error"],
     "camelcase": ["error"],
     "no-mixed-spaces-and-tabs": ["error"],

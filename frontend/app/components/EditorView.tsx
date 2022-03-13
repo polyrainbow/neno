@@ -203,12 +203,22 @@ const EditorView = ({
       noteIdNumber = parseInt(noteIdNumber);
     }
 
+    /* if we don't have a note id, let's create a new note */
     if (isNaN(noteIdNumber)) {
+      /* optionally attach existing file to new note */
+      const searchParams = new URLSearchParams(location.search);
+      const fileIdToAttach = searchParams.get("attach-file");
+      const newNoteObject = Utils.getNewNoteObject(
+        fileIdToAttach ? [fileIdToAttach] : undefined,
+      );
+      setActiveNote(newNoteObject);
+
+      /* whatever has been written to the address bar, let's replace it with
+      the canonical path for a new note */
       navigate(
         Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
         { replace: true },
       );
-      setActiveNote(Utils.getNewNoteObject());
     } else {
       try {
         const noteFromServer = await databaseProvider.getNote(noteIdNumber);
