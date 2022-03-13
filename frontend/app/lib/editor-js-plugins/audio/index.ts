@@ -41,7 +41,6 @@ const LOADER_TIMEOUT = 500;
  * @typedef {object} AudioToolData
  * @description Audio Tool's output data format
  * @property {AudioFileData} file - object containing information about the file
- * @property {string} title - file's title
  */
 
 /**
@@ -109,7 +108,6 @@ export default class AudioTool {
 
     this._data = {
       file: {},
-      title: "",
     };
 
     this.config = {
@@ -236,9 +234,8 @@ export default class AudioTool {
      * If file was uploaded
      */
     if (this.pluginHasData()) {
-      const title = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
-
-      Object.assign(this.data, { title });
+      const name = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
+      this.data.file.name = name;
     }
 
     return this.data;
@@ -339,10 +336,9 @@ export default class AudioTool {
    * @return {boolean}
    */
   pluginHasData() {
-    return this.data.title !== ""
-      || Object.values(this.data.file).some(
-        (item) => typeof item !== "undefined",
-      );
+    return Object.values(this.data.file).some(
+      (item) => typeof item !== "undefined",
+    );
   }
 
 
@@ -362,7 +358,6 @@ export default class AudioTool {
           ...receivedFileData,
           extension,
         },
-        title: filename || "",
       };
 
       this.nodes.button.remove();
@@ -396,18 +391,16 @@ export default class AudioTool {
   async showFileData() {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
 
-    const { file: { size }, title } = this.data;
+    const { file: { size, name } } = this.data;
 
     const fileInfo = make("div", [this.CSS.fileInfo]);
 
-    if (title) {
-      this.nodes.title = make("div", [this.CSS.title], {
-        contentEditable: true,
-      });
+    this.nodes.title = make("div", [this.CSS.title], {
+      contentEditable: true,
+    });
 
-      this.nodes.title.textContent = title;
-      fileInfo.appendChild(this.nodes.title);
-    }
+    this.nodes.title.textContent = name;
+    fileInfo.appendChild(this.nodes.title);
 
     if (size) {
       const fileSize = make("div", [this.CSS.size]);
@@ -469,7 +462,7 @@ export default class AudioTool {
    *
    * @param {AudioToolData} data
    */
-  set data({ file, title }) {
+  set data({ file }) {
     this._data = Object.assign({}, {
       file: {
         url: (file && file.url) || this._data.file.url,
@@ -478,7 +471,6 @@ export default class AudioTool {
         size: (file && file.size) || this._data.file.size,
         ...file,
       },
-      title: title || this._data.title,
     });
   }
 

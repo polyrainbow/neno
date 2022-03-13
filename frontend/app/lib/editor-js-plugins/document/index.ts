@@ -42,7 +42,6 @@ const LOADER_TIMEOUT = 500;
  * @description Document Tool's output data format
  * @property {DocumentFileData} file - object containing information about the
  * file
- * @property {string} title - file's title
  */
 
 /**
@@ -111,7 +110,6 @@ export default class DocumentTool {
 
     this._data = {
       file: {},
-      title: "",
     };
 
     this.config = {
@@ -262,9 +260,8 @@ export default class DocumentTool {
      * If file was uploaded
      */
     if (this.pluginHasData()) {
-      const title = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
-
-      Object.assign(this.data, { title });
+      const name = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
+      this.data.file.name = name;
     }
 
     return this.data;
@@ -364,10 +361,9 @@ export default class DocumentTool {
    * @return {boolean}
    */
   pluginHasData() {
-    return this.data.title !== ""
-      || Object.values(this.data.file).some(
-        (item) => typeof item !== "undefined",
-      );
+    return Object.values(this.data.file).some(
+      (item) => typeof item !== "undefined",
+    );
   }
 
 
@@ -387,7 +383,6 @@ export default class DocumentTool {
           ...receivedFileData,
           extension,
         },
-        title: filename,
       };
 
       this.nodes.button.remove();
@@ -440,7 +435,7 @@ export default class DocumentTool {
   showFileData() {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
 
-    const { file: { size, url }, title } = this.data;
+    const { file: { size, url, name } } = this.data;
 
     this.appendFileIcon();
 
@@ -450,7 +445,7 @@ export default class DocumentTool {
       contentEditable: true,
     });
 
-    this.nodes.title.textContent = title;
+    this.nodes.title.textContent = name;
     fileInfo.appendChild(this.nodes.title);
 
     if (size) {
@@ -502,7 +497,7 @@ export default class DocumentTool {
    *
    * @param {DocumentToolData} data
    */
-  set data({ file, title }) {
+  set data({ file }) {
     this._data = Object.assign({}, {
       file: {
         name: (file && file.name) || this._data.file.name,
@@ -510,7 +505,6 @@ export default class DocumentTool {
         size: (file && file.size) || this._data.file.size,
         ...file,
       },
-      title: title || this._data.title,
     });
   }
 

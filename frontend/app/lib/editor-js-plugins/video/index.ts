@@ -41,7 +41,6 @@ const LOADER_TIMEOUT = 500;
  * @typedef {object} VideoToolData
  * @description Video Tool's output data format
  * @property {VideoFileData} file - object containing information about the file
- * @property {string} title - file's title
  */
 
 /**
@@ -109,7 +108,6 @@ export default class VideoTool {
 
     this._data = {
       file: {},
-      title: "",
     };
 
     this.config = {
@@ -236,9 +234,8 @@ export default class VideoTool {
      * If file was uploaded
      */
     if (this.pluginHasData()) {
-      const title = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
-
-      Object.assign(this.data, { title });
+      const name = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
+      this.data.file.name = name;
     }
 
     return this.data;
@@ -339,10 +336,9 @@ export default class VideoTool {
    * @return {boolean}
    */
   pluginHasData() {
-    return this.data.title !== ""
-      || Object.values(this.data.file).some(
-        (item) => typeof item !== "undefined",
-      );
+    return Object.values(this.data.file).some(
+      (item) => typeof item !== "undefined",
+    );
   }
 
 
@@ -362,7 +358,6 @@ export default class VideoTool {
           ...receivedFileData,
           extension,
         },
-        title: filename || "",
       };
 
       this.nodes.button.remove();
@@ -393,18 +388,17 @@ export default class VideoTool {
   async showFileData() {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
 
-    const { file: { size }, title } = this.data;
+    const { file: { size, name } } = this.data;
 
     const fileInfo = make("div", [this.CSS.fileInfo]);
 
-    if (title) {
-      this.nodes.title = make("div", [this.CSS.title], {
-        contentEditable: true,
-      });
+    this.nodes.title = make("div", [this.CSS.title], {
+      contentEditable: true,
+    });
 
-      this.nodes.title.textContent = title;
-      fileInfo.appendChild(this.nodes.title);
-    }
+    this.nodes.title.textContent = name;
+    fileInfo.appendChild(this.nodes.title);
+
 
     if (size) {
       const fileSize = make("div", [this.CSS.size]);
@@ -466,7 +460,7 @@ export default class VideoTool {
    *
    * @param {VideoToolData} data
    */
-  set data({ file, title }) {
+  set data({ file }) {
     this._data = Object.assign({}, {
       file: {
         url: (file && file.url) || this._data.file.url,
@@ -475,7 +469,6 @@ export default class VideoTool {
         size: (file && file.size) || this._data.file.size,
         ...file,
       },
-      title: title || this._data.title,
     });
   }
 
