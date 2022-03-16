@@ -4,7 +4,7 @@ import {
   useParams, Link,
 } from "react-router-dom";
 import NoteListItem from "../../../lib/notes/interfaces/NoteListItem";
-import { getAppPath } from "../lib/utils";
+import { getAppPath, getFileTypeFromFilename } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 
 
@@ -37,6 +37,8 @@ const FileView = ({
     getNotes();
   }, [databaseProvider, fileId]);
 
+  const type = fileId && getFileTypeFromFilename(fileId);
+
   return <>
     <HeaderContainer
       toggleAppMenu={toggleAppMenu}
@@ -50,14 +52,54 @@ const FileView = ({
           justifyContent: "center",
         }}
       >
-        <img
-          style={{
-            marginRight: "15px auto",
-            maxWidth: "95vw",
-          }}
-          src={src}
-          loading="lazy"
-        />
+        {
+          type === "image"
+            ? <img
+              style={{
+                marginRight: "15px auto",
+                maxWidth: "95vw",
+              }}
+              src={src}
+              loading="lazy"
+            />
+            : ""
+        }
+        {
+          type === "audio"
+            ? <audio
+              style={{
+                marginRight: "15px auto",
+                width: "95vw",
+              }}
+              src={src}
+              controls
+            />
+            : ""
+        }
+        {
+          type === "video"
+            ? <video
+              style={{
+                marginRight: "15px auto",
+                height: "80vh",
+              }}
+              src={src}
+              controls
+            />
+            : ""
+        }
+        {
+          type === "document"
+            ? <iframe
+              style={{
+                marginRight: "15px auto",
+                height: "80vh",
+                width: "60vw",
+              }}
+              src={src}
+            />
+            : ""
+        }
       </div>
       <h2>Used in</h2>
       {

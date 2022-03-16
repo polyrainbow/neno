@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
-import FilesViewImageBox from "./FilesViewImageBox";
-import { getAppPath, getFileTypeFromFilename } from "../lib/utils";
+import FilesViewPreviewBox from "./FilesViewPreviewBox";
+import { getAppPath } from "../lib/utils";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
 import {
   useNavigate,
@@ -70,10 +70,6 @@ const FilesView = ({
     updateFiles();
   }, [databaseProvider]);
 
-  const imageFiles:FileIdAndSrc[] = files.filter(
-    (file) => getFileTypeFromFilename(file.id) === "image",
-  );
-
   return <>
     <HeaderContainer
       toggleAppMenu={toggleAppMenu}
@@ -82,17 +78,17 @@ const FilesView = ({
       {
         status === "READY"
           ? <>
-            <h2>Images ({imageFiles.length})</h2>
+            <h2>Files ({files.length})</h2>
             <div
               style={{
                 display: "flex",
                 flexWrap: "wrap",
               }}
             >
-              {imageFiles.map((imageFile) => {
-                return <FilesViewImageBox
-                  imageFile={imageFile}
-                  key={"img_" + imageFile.id}
+              {files.map((file) => {
+                return <FilesViewPreviewBox
+                  file={file}
+                  key={"img_" + file.id}
                 />;
               })}
             </div>
