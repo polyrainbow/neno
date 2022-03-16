@@ -198,16 +198,16 @@ export default class DatabaseIO {
     const extension = fileId.substring(fileId.lastIndexOf(".") + 1)
       .toLocaleLowerCase();
 
-    const fileInfo = config.ALLOWED_FILE_TYPES
-      .find((filetype) => {
-        return filetype.extension === extension;
+    const fileType = config.ALLOWED_FILE_TYPES
+      .find((ft) => {
+        return ft.extension === extension;
       });
 
-    if (!fileInfo) {
+    if (!fileType) {
       throw Error(ErrorMessage.INVALID_FILENAME_EXTENSION);
     }
 
-    const mimeType = fileInfo.mimeType;
+    const mimeType = fileType.mimeType;
 
     return {
       readable: stream,

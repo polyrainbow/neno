@@ -1,4 +1,6 @@
-const ALLOWED_FILE_TYPES = [
+import FileType from "./interfaces/FileType";
+
+const ALLOWED_FILE_TYPES:FileType[] = [
   {
     mimeType: "image/png",
     extension: "png",
