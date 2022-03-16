@@ -8,8 +8,7 @@ import twofactor from "node-2fa";
 import qrcode from "qrcode-terminal";
 import User from "./interfaces/User";
 import * as logger from "./lib/logger.js";
-import MuteableStdout from "./lib/MuteableStdout";
-
+import MuteableStdout from "./lib/MuteableStdout.js";
 
 
 export default async (filepath) => {
