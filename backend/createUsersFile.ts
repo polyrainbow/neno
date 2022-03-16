@@ -1,32 +1,23 @@
 // @ts-ignore
 import * as readline from "node:readline/promises";
-import { stdin, stdout } from "process";
+import { stdin } from "process";
 import bcrypt from "bcryptjs";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import twofactor from "node-2fa";
 import qrcode from "qrcode-terminal";
 import User from "./interfaces/User";
-import { Writable } from "stream";
 import * as logger from "./lib/logger.js";
+import MuteableStdout from "./lib/MuteableStdout";
+
 
 
 export default async (filepath) => {
-  const mutableStdout = new Writable({
-    write: function(chunk, encoding, callback) {
-      // @ts-ignore
-      if (!this.muted)
-        stdout.write(chunk, encoding);
-      callback();
-    }
-  });
-
-  // @ts-ignore
-  mutableStdout.muted = false;
+  const muteableStdout = new MuteableStdout();
 
   const rl = readline.createInterface({
     input: stdin,
-    output: mutableStdout,
+    output: muteableStdout,
     terminal: true,
   });
 
@@ -39,13 +30,11 @@ export default async (filepath) => {
     logger.info(`Gathering info for user ${(i + 1)}/${numberOfUsers}`);
     const username = await rl.question("User name: ");
 
-    stdout.write("Password: ");
-    // @ts-ignore
-    mutableStdout.muted = true;
+    muteableStdout.write("Password: ");
+    muteableStdout.muted = true;
     const password = await rl.question();
-    // @ts-ignore
-    mutableStdout.muted = false;
-    stdout.write("\n");
+    muteableStdout.muted = false;
+    muteableStdout.write("\n");
 
     const salt = bcrypt.genSaltSync(12);
     const passwordHash = bcrypt.hashSync(password, salt);
