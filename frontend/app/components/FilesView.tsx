@@ -7,7 +7,12 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
+import { FileId } from "../../../lib/notes/interfaces/FileId";
 
+interface FileIdAndSrc {
+  id: FileId,
+  src: string,
+}
 
 const FilesView = ({
   databaseProvider,
@@ -16,21 +21,21 @@ const FilesView = ({
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
   const navigate = useNavigate();
 
-  const [files, setFiles] = useState<any>([]);
-  const [danglingFiles, setDanglingFiles] = useState<any>([]);
+  const [files, setFiles] = useState<FileIdAndSrc[]>([]);
+  const [danglingFiles, setDanglingFiles] = useState<FileIdAndSrc[]>([]);
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
 
   const updateDanglingFiles = async () => {
-    const danglingFileIds = await databaseProvider.getDanglingFiles();
-    const danglingFileSrcs
+    const danglingFileIds:FileId[] = await databaseProvider.getDanglingFiles();
+    const danglingFileSrcs:string[]
       = await Promise.all(
         danglingFileIds.map(
           (fileId) => databaseProvider.getUrlForFileId(fileId),
         ),
       );
 
-    const danglingFiles = danglingFileIds.map((fileId, i) => {
+    const danglingFiles:FileIdAndSrc[] = danglingFileIds.map((fileId, i) => {
       return {
         id: fileId,
         src: danglingFileSrcs[i],
@@ -44,13 +49,13 @@ const FilesView = ({
     if (!databaseProvider) return;
 
     const updateFiles = async () => {
-      const fileIds = await databaseProvider.getFiles();
-      const fileSrcs
+      const fileIds:FileId[] = await databaseProvider.getFiles();
+      const fileSrcs:string[]
         = await Promise.all(
           fileIds.map((fileId) => databaseProvider.getUrlForFileId(fileId)),
         );
 
-      const files = fileIds.map((fileId, i) => {
+      const files:FileIdAndSrc[] = fileIds.map((fileId, i) => {
         return {
           id: fileId,
           src: fileSrcs[i],
@@ -65,7 +70,7 @@ const FilesView = ({
     updateFiles();
   }, [databaseProvider]);
 
-  const imageFiles = files.filter(
+  const imageFiles:FileIdAndSrc[] = files.filter(
     (file) => getFileTypeFromFilename(file.id) === "image",
   );
 
@@ -77,7 +82,7 @@ const FilesView = ({
       {
         status === "READY"
           ? <>
-            <h2>Images</h2>
+            <h2>Images ({imageFiles.length})</h2>
             <div
               style={{
                 display: "flex",
