@@ -429,7 +429,7 @@ button[disabled]{
   background-color: var(--background-color);
   color: var(--font-color);
   margin-bottom: var(--default-margin);
-  width: calc(100% - 5px);
+  width: calc(100% - 6px);
   display: block;
   height: 200px;
 }
