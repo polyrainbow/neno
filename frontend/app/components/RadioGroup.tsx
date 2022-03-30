@@ -1,12 +1,22 @@
 import React from "react";
 
+interface RadioOptionProps {
+  key: string,
+  groupId:string,
+  value:string | number,
+  label:string,
+  onSelect: any,
+  isSelected: boolean,
+}
+
+
 const RadioOption = ({
   groupId,
   value,
   label,
   onSelect,
   isSelected,
-}) => {
+}:RadioOptionProps) => {
   const radioInputId = groupId + "_" + value;
 
   return <div

@@ -8,11 +8,8 @@ import {
 } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
 import { FileId } from "../../../lib/notes/interfaces/FileId";
+import FileIdAndSrc from "../interfaces/FileIdAndSrc";
 
-interface FileIdAndSrc {
-  id: FileId,
-  src: string,
-}
 
 const FilesView = ({
   databaseProvider,

@@ -1,11 +1,11 @@
 import React from "react";
 
-const Overlay = ({ children, onClick }) => {
+const Overlay = (props) => {
   return <div
-    onClick={onClick}
+    onClick={props.onClick}
     id="overlay"
   >
-    {children}
+    {props.children}
   </div>;
 };
 

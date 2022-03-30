@@ -2,9 +2,7 @@ import React from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
 import ConfirmationServiceContext from "./ConfirmationServiceContext";
 
-const ConfirmationServiceProvider = ({
-  children,
-}) => {
+const ConfirmationServiceProvider = (props) => {
   const [
     confirmationState,
     setConfirmationState,
@@ -46,7 +44,7 @@ const ConfirmationServiceProvider = ({
       // @ts-ignore
       value={openConfirmation}
     >
-      {children}
+      {props.children}
     </ConfirmationServiceContext.Provider>
   </>;
 };

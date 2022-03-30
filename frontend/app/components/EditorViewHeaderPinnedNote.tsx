@@ -1,11 +1,18 @@
 import React from "react";
 import { getIconSrc, shortenText } from "../lib/utils";
 
+interface EditorViewHeaderPinnedNoteProps {
+  key:string,
+  note:any,
+  isActive:boolean,
+  onClick:any,
+}
+
 const EditorViewHeaderPinnedNote = ({
   note,
   isActive,
   onClick,
-}) => {
+}:EditorViewHeaderPinnedNoteProps) => {
   return <div
     style={{
       padding: "0px 10px",

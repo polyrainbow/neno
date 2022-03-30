@@ -1,11 +1,13 @@
 import React from "react";
 import Overlay from "./Overlay";
 
-const Dialog = ({
-  children,
-  onClickOnOverlay,
-  className = "",
-}) => {
+const Dialog = (props) => {
+  const {
+    children,
+    onClickOnOverlay,
+    className = "",
+  } = props;
+
   return <Overlay
     onClick={onClickOnOverlay}
   >

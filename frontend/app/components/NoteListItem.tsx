@@ -2,6 +2,17 @@ import React from "react";
 import NoteListItemLinkedNotesIndicator
   from "./NoteListItemLinkedNotesIndicator";
 import NoteListItemInfo from "./NoteListItemInfo.js";
+import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
+
+interface NoteListItemProps {
+  key:string,
+  note:NoteListItemType,
+  isActive:boolean,
+  isLinked:boolean,
+  onSelect:any,
+  onLinkChange:any,
+  isLinkable:boolean,
+}
 
 
 const NoteListItem = ({
@@ -11,7 +22,7 @@ const NoteListItem = ({
   onSelect,
   onLinkChange,
   isLinkable,
-}) => {
+}:NoteListItemProps) => {
   const isHub = (
     typeof note.numberOfLinkedNotes === "number"
     && !isNaN(note.numberOfLinkedNotes)

@@ -3,12 +3,17 @@ import {
   Link,
 } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
+import FileIdAndSrc from "../interfaces/FileIdAndSrc";
 import { getAppPath, getFileTypeFromFilename, getIconSrc } from "../lib/utils";
 
+interface FilesViewPreviewBoxProps{
+  key: string,
+  file: FileIdAndSrc,
+}
 
 const FilesViewPreviewBox = ({
   file,
-}) => {
+}:FilesViewPreviewBoxProps) => {
   const type = getFileTypeFromFilename(file.id) || "unknown";
 
   const imageSrcMap = {

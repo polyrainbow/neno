@@ -169,8 +169,8 @@ const Note = ({
           <div id="links">
             {
               displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
-                note={displayedLinkedNote}
                 key={"note-link-list-item-" + displayedLinkedNote.id}
+                note={displayedLinkedNote}
                 onSelect={async () => {
                   if (unsavedChanges) {
                     await confirmDiscardingUnsavedChanges();
@@ -209,6 +209,7 @@ const Note = ({
               })
               .map((noteListItem) => {
                 return <NoteListItem
+                  key={"noteLinkAdditionSearchResult-" + noteListItem.id}
                   note={noteListItem}
                   onSelect={async () => {
                     if (unsavedChanges) {
@@ -220,7 +221,6 @@ const Note = ({
                   }}
                   isActive={false}
                   isLinked={false}
-                  key={"noteLinkAdditionSearchResult-" + noteListItem.id}
                   onLinkChange={() => onLinkAddition(noteListItem)}
                   isLinkable={true}
                 />;
