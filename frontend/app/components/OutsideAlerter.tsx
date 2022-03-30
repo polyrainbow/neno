@@ -1,10 +1,26 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 /**
  * @param {Object} ref
  * @param {Object} callback
  */
 function useOutsideAlerter(ref, callback) {
+  /*
+    with react 18, React now always synchronously flushes effect functions if
+    the update was triggered during a discrete user input event such as a click
+    or a keydown event.
+    that's why the callback is already triggered when performing a user input
+    that *renders* this OutsideAlerter component for the first time.
+    Because of this, we need to ignore the first outside click and only handle
+    the second one.
+
+    https://reactjs.org/blog/2022/03/08/react-18-upgrade-guide.html#other-breaking-changes
+  */
+  const [
+    hasAlreadyBeenTriggeredOnce,
+    setHasAlreadyBeenTriggeredOnce,
+  ] = useState(false);
+
   /**
    * Alert if clicked on outside of element
    * @param {Object} event
@@ -12,7 +28,11 @@ function useOutsideAlerter(ref, callback) {
   function handleClickOutside(event) {
     if (ref.current && !ref.current.contains(event.target)) {
       if (typeof callback === "function") {
-        callback();
+        if (hasAlreadyBeenTriggeredOnce) {
+          callback();
+        } else {
+          setHasAlreadyBeenTriggeredOnce(true);
+        }
       }
     }
   }

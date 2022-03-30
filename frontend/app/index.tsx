@@ -7,18 +7,9 @@ import {
 } from "react-router-dom";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
 import { API_URL } from "./lib/config";
-
-// import modules dynamically, so that webpack writes them into a separate
-// bundles
-const [
-  React,
-  ReactDOM,
-  App,
-] = (await Promise.all([
-  import("react"),
-  import("react-dom"),
-  import("./components/App"),
-])).map((module) => module.default);
+import React, { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./components/App";
 
 const localDatabaseProvider = new LocalDatabaseProvider();
 
@@ -31,12 +22,14 @@ const serverDatabaseProvider = new ServerDatabaseProvider(
 );
 
 const appContainer = document.getElementById("app");
-ReactDOM.render(
-  <Router>
-    <App
-      serverDatabaseProvider={serverDatabaseProvider}
-      localDatabaseProvider={localDatabaseProvider}
-    />
-  </Router>,
-  appContainer,
+const root = createRoot(appContainer);
+root.render(
+  <StrictMode>
+    <Router>
+      <App
+        serverDatabaseProvider={serverDatabaseProvider}
+        localDatabaseProvider={localDatabaseProvider}
+      />
+    </Router>
+  </StrictMode>,
 );

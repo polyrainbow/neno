@@ -19,6 +19,7 @@ const GraphView = ({
   const DEFAULT_STATUS = "";
   const mainElement = useRef<HTMLElement | null>(null);
   const graphVisualizationInstance = useRef<GraphVisualization | null>(null);
+  const startedLoadingGraphVis = useRef<boolean>(false);
   const [status, setStatus] = useState<string>(DEFAULT_STATUS);
   const [searchValue, setSearchValue] = useState<string>("");
 
@@ -99,9 +100,10 @@ const GraphView = ({
   const initializeGraphInstance = async () => {
     if (!databaseProvider) return;
 
-    const onHighlight = (highlightDetails) => {
-      setStatus(highlightDetails);
-    };
+    // Effects that should only run once can use a ref
+    // https://github.com/reactwg/react-18/discussions/18
+    if (startedLoadingGraphVis.current) return;
+    startedLoadingGraphVis.current = true;
 
     try {
       const graphObject = await databaseProvider.getGraphVisualization();
@@ -110,7 +112,9 @@ const GraphView = ({
         = new GraphVisualization({
           parent: mainElement.current,
           graphObject,
-          onHighlight,
+          onHighlight: (highlightDetails) => {
+            setStatus(highlightDetails);
+          },
           onChange,
           initialFocusNoteId: focusNoteId,
           openNote: openNoteInEditor,
