@@ -1,5 +1,5 @@
 import React from "react";
-import usePagination from "@mui/material/usePagination";
+import usePagination from "../hooks/usePagination";
 
 
 const getNumberOfPages = (numberOfResults, searchResultsPerPage) => {
@@ -52,7 +52,7 @@ const Pagination = (props) => {
           flexWrap: "wrap",
         }}>
           {items.map(({ page, type, selected, ...item }, index) => {
-            let children: JSX.Element | null = null;
+            let children: React.Element | null = null;
 
             if (type === "start-ellipsis" || type === "end-ellipsis") {
               children = <span className="pagination-ellipsis">…</span>;
