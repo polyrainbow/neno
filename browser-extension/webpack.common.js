@@ -21,7 +21,7 @@ export default {
   },
   resolve: {
     // Add .ts and .tsx as a resolvable extension.
-    extensions: [".ts", ".tsx", ".js"],
+    extensions: [".ts", ".tsx"],
   },
   module: {
     rules: [
@@ -30,21 +30,6 @@ export default {
         use: [
           "ts-loader",
         ],
-      },
-      {
-        test: /\.js?$/,
-        include: [
-          path.resolve(__dirname, "app"),
-        ],
-        loader: "babel-loader",
-        options: {
-          presets: [
-            "@babel/preset-react",
-          ],
-          plugins: [],
-          cacheDirectory: true,
-          cacheCompression: false,
-        },
       },
       {
         test: /\.css$/i,
