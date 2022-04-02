@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import NoteListItem from "./NoteListItem";
 import * as Editor from "../lib/editor";
 import NoteStats from "./NoteStats";
-import isEqual from "react-fast-compare";
 import NoteControls from "./NoteControls";
 import useGoToNote from "../hooks/useGoToNote";
 import SearchInput from "./SearchInput";
@@ -99,7 +98,7 @@ const Note = ({
     const parent = document.getElementById("editor");
     if (!parent) return;
 
-    if (isEqual(blocks, previousBlocks.current)) {
+    if (JSON.stringify(blocks) === JSON.stringify(previousBlocks.current)) {
       return;
     }
 
