@@ -13,7 +13,7 @@ const checkDataDirectory = async (directoryPath) => {
     logger.warn(
       `No data directory found at ${directoryPath}`,
     );
-    logger.info("Creating one...");
+    logger.info(`Creating new data directory at ${directoryPath}`);
     await fs.mkdir(directoryPath, { recursive: true });
   }
 };

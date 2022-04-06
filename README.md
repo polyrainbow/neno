@@ -29,7 +29,7 @@ The NENO server supports
 * as many users and graphs as you like
 * two-factor authentication with password and token
 
-[How to setup a NENO server](./docs/SettingUpNENOServer.md)
+[How to setup a NENO server](./docs/Server.md)
 
 ### Local mode
 
