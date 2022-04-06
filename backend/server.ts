@@ -12,6 +12,29 @@ const handleClientError = (err, socket) => {
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
 };
 
+
+const handleServerError = (error) => {
+  logger.error('An error occured when starting the server:');
+
+  if (error.code === 'EADDRINUSE') {
+    logger.error('EADDRINUSE: Address in use.');
+  }
+
+  if (error.code === 'EACCES') {
+    logger.error('EACCES: permission denied.');
+    logger.error('Maybe it helps if you run NENO with admin/sudo permission.');
+  }
+
+  logger.error("This is the original error:");
+  // eslint-disable-next-line
+  console.log(error);
+  logger.error("Exiting now.");
+  process.exit(1);
+}
+
+
+
+
 const startServer = async ({
   app,
   certKeyPath,
@@ -46,6 +69,7 @@ const startServer = async ({
       host,
     });
     httpsServer.on('clientError', handleClientError);
+    httpsServer.on('error', handleServerError);
     logger.info("HTTPS access ready on port " + httpsPort);
     
     if (httpPort === 80 && httpsPort === 443) {
@@ -61,6 +85,7 @@ const startServer = async ({
         host,
       });
       httpServer.on('clientError', handleClientError);
+      httpServer.on('error', handleServerError);
       logger.info(
         "HTTP requests to port "
         + httpPort + " will be redirected to HTTPS.",
@@ -75,6 +100,7 @@ const startServer = async ({
       host,
     });
     httpServer.on('clientError', handleClientError);
+    httpServer.on('error', handleServerError);
     logger.info("HTTP access ready on port " + httpPort);
   }
 };
