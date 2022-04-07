@@ -4,7 +4,7 @@ const program = new Command();
 import { REPO_PATH } from "./config.js";
 import { randomUUID } from "crypto";
 
-const getArguments = (version) => {
+const getArguments = (version:string) => {
   program.version(version);
   
   program

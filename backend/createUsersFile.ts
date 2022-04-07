@@ -11,7 +11,7 @@ import * as logger from "./lib/logger.js";
 import MuteableStdout from "./lib/MuteableStdout.js";
 
 
-export default async (filepath) => {
+export default async (filepath:string):Promise<void> => {
   const muteableStdout = new MuteableStdout();
 
   const rl = readline.createInterface({

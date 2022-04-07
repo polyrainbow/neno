@@ -14,7 +14,7 @@ const USERS_FILENAME = "users.json";
 let dataFolderPath:string | null = null;
 let users:User[] | null = null;
 
-const isValidUser = (user) => {
+const isValidUser = (user:User):boolean => {
   const idContainsOnlyValidChars = (id) => /^[A-Za-z0-9-]+$/.test(id);
 
   return (
@@ -29,7 +29,7 @@ const isValidUser = (user) => {
   );
 }
 
-const init = async (_dataFolderPath:string) => {
+const init = async (_dataFolderPath:string):Promise<void> => {
   dataFolderPath = _dataFolderPath;
   const usersFile = path.join(dataFolderPath, USERS_FILENAME);
 

@@ -1,5 +1,11 @@
+type IPAddress = string;
+type IPAdressMetadata = {
+  count:number,
+  nextTry:number,
+}
+
 export default class BruteForcePreventer {
-  #failures = new Map();
+  #failures = new Map<IPAddress, IPAdressMetadata>();
   #delayStep;
 
   constructor(
@@ -12,7 +18,8 @@ export default class BruteForcePreventer {
 
     setInterval(() => {
       for (const ip in this.#failures) {
-        if (Date.now() - this.#failures.get(ip).nextTry > MINS10) {
+        const ipMetadata = this.#failures.get(ip) as IPAdressMetadata;
+        if (Date.now() - ipMetadata.nextTry > MINS10) {
           this.#failures.delete(ip);
         }
       }
@@ -20,14 +27,14 @@ export default class BruteForcePreventer {
   }
 
 
-  successfulLogin(remoteIp) {
+  successfulLogin(remoteIp:IPAddress):void {
     this.#failures.delete(remoteIp);
   }
 
 
-  isLoginAttemptLegit(remoteIp) {
+  isLoginAttemptLegit(remoteIp:IPAddress):boolean {
     if (this.#failures.has(remoteIp)){
-      const failuresOfIp = this.#failures.get(remoteIp);
+      const failuresOfIp = this.#failures.get(remoteIp) as IPAdressMetadata;
       if (Date.now() < failuresOfIp.nextTry) {
         // Throttled. Can't try yet.
         return false;
@@ -39,9 +46,9 @@ export default class BruteForcePreventer {
   }
 
 
-  unsuccessfulLogin(remoteIp) {
+  unsuccessfulLogin(remoteIp:IPAddress):void {
     if (this.#failures.has(remoteIp)) {
-      const failuresOfIp = this.#failures.get(remoteIp);
+      const failuresOfIp = this.#failures.get(remoteIp) as IPAdressMetadata;
       failuresOfIp.count++;
       // Wait another two seconds for every failed attempt but not more than 20s
       const delay = this.#delayStep * failuresOfIp.count;

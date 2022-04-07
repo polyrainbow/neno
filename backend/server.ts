@@ -33,8 +33,6 @@ const handleServerError = (error) => {
 }
 
 
-
-
 const startServer = async ({
   app,
   certKeyPath,

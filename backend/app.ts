@@ -952,9 +952,15 @@ const startApp = async ({
     sessionMiddleware,
     express.json(),
     (req, res) => {
-      if (!bruteForcePreventer.isLoginAttemptLegit(req.socket.remoteAddress)) {
+      const remoteAddress = req.socket.remoteAddress
+      // remote address may be undefined if the client has disconnected
+      if (typeof remoteAddress !== "string") {
+        return;
+      }
+
+      if (!bruteForcePreventer.isLoginAttemptLegit(remoteAddress)) {
         logger.verbose(
-          `Login request denied due to brute force prevention. IP: ${req.socket.remoteAddress}`
+          `Login request denied due to brute force prevention. IP: ${remoteAddress}`
         );
 
         const response:APIResponse = {
@@ -1009,9 +1015,9 @@ const startApp = async ({
       req.session.userPlatform = req.headers["sec-ch-ua-platform"];
 
       logger.verbose(
-        `Successful login: ${req.session.userId} IP: ${req.socket.remoteAddress}`,
+        `Successful login: ${req.session.userId} IP: ${remoteAddress}`,
       );
-      bruteForcePreventer.successfulLogin(req.socket.remoteAddress);
+      bruteForcePreventer.successfulLogin(remoteAddress);
 
       const response:APIResponse = {
         success: true,
