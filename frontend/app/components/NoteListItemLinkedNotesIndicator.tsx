@@ -17,8 +17,8 @@ const NoteListItemLinkedNotesIndicator = ({
       : isActive
         ? "This is the currently selected note. It cannot be linked to itself."
         : isLinked
-          ? "Remove link to this note"
-          : "Add as link to selected note";
+          ? "Unlink selected note"
+          : "Link to selected note";
 
 
   return <Tooltip
