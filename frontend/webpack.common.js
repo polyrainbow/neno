@@ -13,7 +13,7 @@ export default {
     // (optional)
     chunkFilename: "[name].bundle.js",
     // `path` is the folder where Webpack will place your bundles
-    path: path.resolve(__dirname, "assets"),
+    path: path.resolve(__dirname, "js"),
   },
   resolve: {
     // Add .ts and .tsx as a resolvable extension.

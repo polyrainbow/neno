@@ -111,3 +111,5 @@ dist
 stats.json
 
 .DS_Store
+
+neno-local
