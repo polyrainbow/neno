@@ -170,7 +170,7 @@ export default class LocalDatabaseProvider {
   }
 
   saveGraphVisualization(graphVisualization) {
-    return this.#notesModule.setGraph(
+    return this.#notesModule.setGraphVisualization(
       graphVisualization,
       LocalDatabaseProvider.graphId,
     );
