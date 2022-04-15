@@ -91,7 +91,7 @@ const cleanUpNotes = (graph) => {
   graph.pinnedNotes = graph.pinnedNotes.filter((pinnedNoteId) => {
     return existingNoteIds.includes(pinnedNoteId);
   });
-}
+};
 
 
 // this function must be indempotent, since there is only one
@@ -99,6 +99,6 @@ const cleanUpNotes = (graph) => {
 const cleanUpGraph = (graph) => {
   cleanUpLinks(graph);
   cleanUpNotes(graph);
-}
+};
 
 export default cleanUpGraph;

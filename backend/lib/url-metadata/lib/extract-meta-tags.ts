@@ -5,16 +5,16 @@ export default function ($) {
   $metaTags.each(function () {
     if ($(this).attr('content')) {
       if ($(this).attr('name')) {
-        extracted[$(this).attr('name')] = $(this).attr('content')
+        extracted[$(this).attr('name')] = $(this).attr('content');
       }
       if ($(this).attr('property')) {
-        extracted[$(this).attr('property')] = $(this).attr('content')
+        extracted[$(this).attr('property')] = $(this).attr('content');
       }
       if ($(this).attr('itemprop')) {
-        extracted[$(this).attr('itemprop')] = $(this).attr('content')
+        extracted[$(this).attr('itemprop')] = $(this).attr('content');
       }
     }
-  })
+  });
 
   return extracted;
 }

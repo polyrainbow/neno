@@ -2,7 +2,7 @@ type IPAddress = string;
 type IPAdressMetadata = {
   count:number,
   nextTry:number,
-}
+};
 
 export default class BruteForcePreventer {
   #failures = new Map<IPAddress, IPAdressMetadata>();

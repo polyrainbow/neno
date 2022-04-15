@@ -8,9 +8,9 @@ export default function ($) {
   try {
     $scriptTags.each(function () {
       if ($(this).attr('type') && $(this).attr('type') === 'application/ld+json') {
-        extracted = JSON.parse($(this).text())
+        extracted = JSON.parse($(this).text());
       }
-    })
+    });
   } catch (e) {
     return;
   }

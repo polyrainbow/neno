@@ -41,6 +41,7 @@
       "error",
       2
     ],
+    "@typescript-eslint/semi": ["error", "always"],
     "linebreak-style": [
       "error",
       "unix"

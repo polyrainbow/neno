@@ -27,7 +27,7 @@ const isValidUser = (user:User):boolean => {
     // a graph id must not include special characters
     && user.graphIds.every(idContainsOnlyValidChars)
   );
-}
+};
 
 const init = async (_dataFolderPath:string):Promise<void> => {
   dataFolderPath = _dataFolderPath;
@@ -51,7 +51,7 @@ const init = async (_dataFolderPath:string):Promise<void> => {
   }
 
   users = usersFromFile;
-}
+};
 
 const getAll = ():User[] => {
   if (users === null) {
@@ -59,7 +59,7 @@ const getAll = ():User[] => {
   }
 
   return users;
-}
+};
 
 
 export default {

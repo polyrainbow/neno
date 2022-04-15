@@ -48,7 +48,7 @@ const startApp = async ({
   );
   logger.info("Initializing notes module...");
   await Notes.init(storageProvider, getUrlMetadata, randomUUID);
-  logger.info("Initializing routes...")
+  logger.info("Initializing routes...");
   const app = express();
 
   const bruteForcePreventer = new BruteForcePreventer();
@@ -90,7 +90,7 @@ const startApp = async ({
     }
   
     return user.graphIds;
-  }
+  };
 
 
   const verifyUser = (req, res, next) => {
@@ -610,7 +610,7 @@ const startApp = async ({
           };
           res.status(406).json(response);
         }
-      }
+      };
 
       if (url.startsWith("http://")) {
         http
@@ -904,8 +904,8 @@ const startApp = async ({
           } else {
             resolve(null);
           }
-        })
-      })
+        });
+      });
 
       return res
         .status(200)
@@ -925,7 +925,7 @@ const startApp = async ({
     const response:APIResponse = {
       success: true,
       payload: "Hello world!",
-    }
+    };
     res.json(response);
   });
 
@@ -944,7 +944,7 @@ const startApp = async ({
       error: APIError.INVALID_CREDENTIALS,
     };
     return res.status(401).json(response);
-  }
+  };
 
 
   app.post(
@@ -952,7 +952,7 @@ const startApp = async ({
     sessionMiddleware,
     express.json(),
     (req, res) => {
-      const remoteAddress = req.socket.remoteAddress
+      const remoteAddress = req.socket.remoteAddress;
       // remote address may be undefined if the client has disconnected
       if (typeof remoteAddress !== "string") {
         return;

@@ -126,7 +126,7 @@ export type NoteContentBlockWithFile = (
   | NoteContentBlockDocument
   | NoteContentBlockAudio
   | NoteContentBlockVideo
-)
+);
 
 
 type NoteContentBlock = (

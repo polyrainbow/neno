@@ -205,7 +205,7 @@ const getNotesList = async (
   const noteListPage:NoteListPage = {
     results: noteListItemsOfPage,
     numberOfResults: noteListItems.length,
-  }
+  };
 
   return noteListPage;
 };
@@ -230,7 +230,7 @@ const getGraphVisualization = async (graphId: GraphId):Promise<GraphVisualizatio
     links: graph.links,
     screenPosition: graph.screenPosition,
     initialNodePosition: graph.initialNodePosition,
-  }
+  };
 
   return graphVisualization;
 };
@@ -289,7 +289,7 @@ const getStats = async (
       nodesWithHighestNumberOfLinks: createNoteListItems(graph.notes, graph)
         .sort(getSortFunction(NoteListSortMode.NUMBER_OF_LINKS_DESCENDING))
         .slice(0, 3),
-    }
+    };
   }
 
   return stats;

@@ -30,7 +30,7 @@ const handleServerError = (error) => {
   console.log(error);
   logger.error("Exiting now.");
   process.exit(1);
-}
+};
 
 
 const startServer = async ({

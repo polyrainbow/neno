@@ -10,7 +10,7 @@ import clean from './clean.js';
  */
 
 function MetadataFields (options) {
-  this.options = options || {}
+  this.options = options || {};
   this.fields = {
 
     'url': '',
@@ -53,7 +53,7 @@ function MetadataFields (options) {
     'twitter:player:width': '',
     'twitter:player:height': '',
     'twitter:player:stream': ''
-  }
+  };
 }
 
 /**
@@ -68,7 +68,7 @@ function MetadataFields (options) {
  * TODO: music, audio, video
  */
 MetadataFields.prototype.configureType = function (type) {
-  if (!type || (typeof type !== 'string')) return this
+  if (!type || (typeof type !== 'string')) return this;
   const fieldsByType = {
     'article': {
       'article:published_time': '',
@@ -84,36 +84,36 @@ MetadataFields.prototype.configureType = function (type) {
       'og:article:section': '',
       'og:article:tag': ''
     }
-  }
-  if (fieldsByType[type]) this.fields = Object.assign({}, this.fields, fieldsByType[type])
-  return this
-}
+  };
+  if (fieldsByType[type]) this.fields = Object.assign({}, this.fields, fieldsByType[type]);
+  return this;
+};
 
 /**
  * @method `lockKeys` (chainable)
  * Freeze metadata keys via Object.seal
  */
 MetadataFields.prototype.lockKeys = function () {
-  Object.seal(this.fields)
-  return this
-}
+  Object.seal(this.fields);
+  return this;
+};
 
 /**
  * @method `set` (chainable)
  * @param obj must be in the form of {key: value}
  */
 MetadataFields.prototype.set = function (obj) {
-  if (obj) this.fields = Object.assign({}, this.fields, obj)
-  return this
-}
+  if (obj) this.fields = Object.assign({}, this.fields, obj);
+  return this;
+};
 
 /**
 * @method `get`
 * @param key {string}
 */
 MetadataFields.prototype.get = function (key) {
-  return this.fields[key]
-}
+  return this.fields[key];
+};
 
 /**
  * @method `clean` (chainable)
@@ -122,10 +122,10 @@ MetadataFields.prototype.clean = function () {
   // eslint-disable-next-line
   var self = this
   Object.keys(this.fields).forEach(function (key) {
-    self.fields[key] = clean(key, self.fields[key], self.options)
-  })
-  return this
-}
+    self.fields[key] = clean(key, self.fields[key], self.options);
+  });
+  return this;
+};
 
 /**
  * @method `finalize`
@@ -136,10 +136,10 @@ MetadataFields.prototype.finalize = function () {
   var self = this
   if (this.options.encode && typeof this.options.encode === 'function') {
     Object.keys(this.fields).forEach(function (key) {
-      self.fields[key] = self.options.encode(self.fields[key])
-    })
+      self.fields[key] = self.options.encode(self.fields[key]);
+    });
   }
-  return this.fields
-}
+  return this.fields;
+};
 
 export default MetadataFields;

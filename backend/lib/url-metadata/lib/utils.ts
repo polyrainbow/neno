@@ -1,25 +1,25 @@
 const cleanTitleString = function (value) {
-  if (typeof value !== 'string') return value
+  if (typeof value !== 'string') return value;
   // remove any newline characters, replace with space:
-  value = value.replace(/\n|\r/gm, ' ')
+  value = value.replace(/\n|\r/gm, ' ');
   // remove double (or more) spaces, replace with single space:
-  value = value.replace(/( {2,})/gm, ' ')
-  return value
+  value = value.replace(/( {2,})/gm, ' ');
+  return value;
 };
 
 const truncate = function (value, length) {
-  if (typeof value !== 'string') return ''
-  if (value.length <= length) return value
-  return value.substring(0, length)
+  if (typeof value !== 'string') return '';
+  if (value.length <= length) return value;
+  return value.substring(0, length);
 };
 
 const ensureSecureImageRequest = function (src) {
   if (src && src.indexOf('//') > 0) {
-    const arr = src.split('//')
-    arr[0] = 'https:'
-    src = arr.join('//')
+    const arr = src.split('//');
+    arr[0] = 'https:';
+    src = arr.join('//');
   }
-  return src
+  return src;
 };
 
 export {

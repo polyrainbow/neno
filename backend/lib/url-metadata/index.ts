@@ -23,7 +23,7 @@ export default async (
     },
     // options passed in override defaults
     options
-  )
+  );
 
   const requestOpts = {
     method: "GET",

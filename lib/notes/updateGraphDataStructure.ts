@@ -18,14 +18,14 @@ const updateNotes = (graph) => {
       }
     }
   });
-}
+};
 
 
 // this function must be indempotent, so that it always results in one
 // canonical data structure
 const updateGraphDataStructure = (graph) => {
   updateNotes(graph);
-}
+};
 
 
 export default updateGraphDataStructure;

@@ -239,7 +239,7 @@ export default class DatabaseIO {
       const directoryListing = await this.#storageProvider.listDirectory(
         graphId,
         this.#NAME_OF_FILES_SUBDIRECTORY,
-      )
+      );
       // filter out system files
       const files = directoryListing.filter(stringContainsUUID);
       return files;
@@ -295,7 +295,7 @@ export default class DatabaseIO {
       const directoryListing = await this.#storageProvider.listDirectory(
         graphId,
         this.#NAME_OF_FILES_SUBDIRECTORY,
-      )
+      );
       // filter out system files
       const files = directoryListing.filter(stringContainsUUID);
       return files.length;

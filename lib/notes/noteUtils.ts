@@ -54,7 +54,7 @@ const normalizeNoteTitle = (title:string) => {
   return title
     .replaceAll(/[\r\n]/g, " ")
     .trim();
-}
+};
 
 
 const removeDefaultTextParagraphs = (note:Note):void => {
@@ -124,7 +124,7 @@ const getLinksOfNote = (graph:Graph, noteId:NoteId):Link[] => {
     });
 
   return linksOfThisNote;
-}
+};
 
 
 const getLinkedNotes = (graph:Graph, noteId:NoteId):LinkedNote[] => {
@@ -144,7 +144,7 @@ const getLinkedNotes = (graph:Graph, noteId:NoteId):LinkedNote[] => {
         title: getNoteTitlePreview(note),
         creationTime: note.creationTime,
         updateTime: note.updateTime,
-      }
+      };
       return linkedNote;
     });
 
@@ -156,7 +156,7 @@ const getNumberOfLinkedNotes = (graph:Graph, noteId:NoteId):number => {
   const linksOfThisNote:Link[] = getLinksOfNote(graph, noteId);
   const numberOfLinkedNotes = linksOfThisNote.length;
   return numberOfLinkedNotes;
-}
+};
 
 
 const getNumberOfLinkedNotesForSeveralNotes = (
@@ -180,7 +180,7 @@ const getNumberOfLinkedNotesForSeveralNotes = (
   });
 
   return numbersOfLinkedNotes;
-}
+};
 
 
 const getNumberOfUnlinkedNotes = (graph:Graph):number => {
@@ -265,7 +265,7 @@ const createNoteToTransmit = (
   };
 
   return noteToTransmit;
-}
+};
 
 
 const createNoteListItem = (
@@ -312,7 +312,7 @@ const createNoteListItems = (
       graph,
       numbersOfLinkedNotes[databaseNote.id],
     );
-  })
+  });
 
   return noteListItems;
 };
@@ -370,7 +370,7 @@ const getSortKeyForTitle = (title) => {
     .toLowerCase()
     .replace(/(["'.“”„‘’—\-»#*[\]/])/g, "")
     .trim();
-}
+};
 
 
 /**
@@ -473,7 +473,7 @@ const getURLsOfNote = (note:SavedNote):string[] => {
     .map((block) => {
       return block.data.link;
     });
-}
+};
 
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
@@ -506,7 +506,7 @@ const breadthFirstSearch = (nodes, links, root: SavedNote):SavedNote[] => {
   }
 
   return discovered;
-}
+};
 
 
 // https://en.wikipedia.org/wiki/Component_(graph_theory)#Algorithms
@@ -529,7 +529,7 @@ const getNumberOfComponents = (nodes:SavedNote[], links:Link[]):number => {
   }
 
   return numberOfComponents;
-}
+};
 
 
 // this returns all notes that contain a url that is used in another note too
@@ -601,7 +601,7 @@ const getNotesByTitle = (
       ? title === query
       : title.toLowerCase() === query.toLowerCase();
   });
-}
+};
 
 
 const getNotesWithUrl = (
@@ -615,7 +615,7 @@ const getNotesWithUrl = (
       })
       .some((linkBlock) => linkBlock.data.link === url);
   });
-}
+};
 
 
 const getNotesWithFile = (
@@ -627,7 +627,7 @@ const getNotesWithFile = (
       .filter(blockHasFile)
       .some((block) => block.data.file.fileId === file);
   });
-}
+};
 
 
 const getConcatenatedTextOfNote = (note:SavedNote):string => {
@@ -678,7 +678,7 @@ const getNotesWithTitleContainingTokens = (
       });
     }
   });
-}
+};
 
 
 const getNotesThatContainTokens = (
@@ -699,7 +699,7 @@ const getNotesThatContainTokens = (
           : noteText.toLowerCase().includes(queryToken.toLowerCase());
       });
     });
-}
+};
 
 
 const getNotesWithBlocksOfTypes = (
@@ -720,7 +720,7 @@ const getNotesWithBlocksOfTypes = (
       .filter((note:SavedNote):boolean => {
         return note.blocks.some((block) => types.includes(block.type));
       });
-}
+};
 
 
 export {

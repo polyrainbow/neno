@@ -21,4 +21,4 @@ export {
   VERSION,
   SERVER_TIMEOUT,
   GRAPHS_DIRECTORY_NAME,
-}
+};

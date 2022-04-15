@@ -75,6 +75,6 @@ const getArguments = (version:string) => {
   const opts = program.opts();
 
   return opts;
-}
+};
 
 export default getArguments;
