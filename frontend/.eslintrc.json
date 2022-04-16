@@ -14,7 +14,7 @@
     "ecmaVersion": 2021,
     "sourceType": "module"
   },
-  "ignorePatterns": ["assets"],
+  "ignorePatterns": ["assets", "js"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
