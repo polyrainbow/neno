@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { Options, Result } from "./types";
 import parse from "./lib/parse.js";
 
