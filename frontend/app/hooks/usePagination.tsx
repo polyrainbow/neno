@@ -72,7 +72,7 @@ interface UsePaginationProps {
   /**
    * The current page.
    */
-  page?: number;
+  page: number;
   /**
    * If `true`, show the first-page button.
    * @default false
@@ -104,7 +104,7 @@ interface UsePaginationResult {
 }
 
 export default function usePagination(
-  props:UsePaginationProps = {},
+  props:UsePaginationProps,
 ):UsePaginationResult {
   // keep default values in sync with @default tags in Pagination.propTypes
   const {

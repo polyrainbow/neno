@@ -31,11 +31,11 @@ interface UseControlledProps<T = unknown> {
   /**
    * Holds the component value when it's controlled.
    */
-  controlled: T | undefined;
+  controlled: T;
   /**
    * The default value when uncontrolled.
    */
-  default: T | undefined;
+  default: T;
   /**
    * The component name displayed in warnings.
    */
@@ -53,7 +53,7 @@ export default function useControlled<T = unknown>({
   // isControlled is ignored in the hook dependency lists as it should never
   // change.
   const { current: isControlled } = React.useRef(controlled !== undefined);
-  const [valueState, setValue] = React.useState(defaultProp);
+  const [valueState, setValue] = React.useState<T>(defaultProp);
   const value = isControlled ? controlled : valueState;
 
   if (process.env.NODE_ENV !== "production") {

@@ -2,8 +2,8 @@ import React from "react";
 import AppTitle from "./AppTitle";
 
 interface HeaderContainerProps {
-  leftContent?: React.Element,
-  rightContent?: React.Element,
+  leftContent?: React.ReactNode,
+  rightContent?: React.ReactNode,
   toggleAppMenu?: any,
 }
 
