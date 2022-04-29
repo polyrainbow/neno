@@ -1,11 +1,11 @@
-import cheerio from 'cheerio';
+import { load } from 'cheerio';
 import MetadataFields from './metadata-fields.js';
 import extractMetaTags from './extract-meta-tags.js';
 import extractJsonLd from './extract-json-ld.js';
 import mapSources from './map-sources.js';
 
 export default function (url, body, options) {
-  const $ = cheerio.load(body);
+  const $ = load(body);
   const scrapedMetaTags = extractMetaTags($);
   const scrapedJsonLd = extractJsonLd($);
   const metadata = new MetadataFields(options)
