@@ -10,7 +10,16 @@ let currentLogLevel = "info";
 const LOG_LEVEL = process.env.LOG_LEVEL;
 
 if (LOG_LEVEL) {
-  currentLogLevel = LOG_LEVEL;
+  if (logLevels.includes(LOG_LEVEL)) {
+    currentLogLevel = LOG_LEVEL;
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "WARN: Environment variable LOG_LEVEL is set to an invalid value: "
+      + LOG_LEVEL
+      + " Proceeding with log level 'info'.",
+    );
+  }
 } else {
   // eslint-disable-next-line no-console
   console.warn(
