@@ -31,7 +31,9 @@ const StatsViewAnalysisTable = ({
 
   // not to be confused with meshedness coefficient because this is not a
   // planar graph
-  const meshedness = numberOfLinks / maxPossibleLinks;
+  const meshedness = (maxPossibleLinks > 0)
+    ? (numberOfLinks / maxPossibleLinks)
+    : 0;
 
   const meshednessPercentage = meshedness * 100;
 
