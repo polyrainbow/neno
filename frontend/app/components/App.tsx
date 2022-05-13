@@ -24,6 +24,7 @@ import FilesView from "./FilesView";
 import FileView from "./FileView";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
+import SwitchGraphsDialog from "./SwitchGraphsDialog";
 
 
 const App = ({
@@ -210,6 +211,18 @@ const App = ({
   };
 
 
+  const switchGraphs = (graphId) => {
+    databaseProvider.setGraphId(graphId);
+    setOpenDialog(DialogType.NONE);
+    navigate(
+      isSmallScreen
+        ? getAppPath(PathTemplate.LIST)
+        : getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
+    );
+    refreshNotesList();
+  };
+
+
   const startApp = async () => {
     if (await serverDatabaseProvider?.isAuthenticated()) {
       setDatabaseMode(DatabaseMode.SERVER);
@@ -389,6 +402,7 @@ const App = ({
           setUnsavedChanges={setUnsavedChanges}
           databaseProvider={databaseProvider}
           openImportLinksDialog={() => setOpenDialog(DialogType.IMPORT_LINKS)}
+          openSwitchGraphsDialog={() => setOpenDialog(DialogType.SWITCH_GRAPHS)}
         />
         : null
     }
@@ -404,6 +418,16 @@ const App = ({
       openDialog === DialogType.IMPORT_LINKS
         ? <ImportLinksDialog
           importLinksAsNotes={importLinksAsNotes}
+          onCancel={() => setOpenDialog(DialogType.NONE)}
+        />
+        : null
+    }
+    {
+      openDialog === DialogType.SWITCH_GRAPHS
+        ? <SwitchGraphsDialog
+          activeGraphId={databaseProvider.getActiveGraphId()}
+          graphIds={databaseProvider.getGraphIds()}
+          switchGraphs={switchGraphs}
           onCancel={() => setOpenDialog(DialogType.NONE)}
         />
         : null

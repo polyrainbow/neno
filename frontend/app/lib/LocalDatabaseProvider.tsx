@@ -73,7 +73,7 @@ export default class LocalDatabaseProvider {
   }
 
 
-  async getGraphId() {
+  getActiveGraphId() {
     return LocalDatabaseProvider.graphId;
   }
 

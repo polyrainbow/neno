@@ -18,6 +18,7 @@ const AppMenu = ({
   setUnsavedChanges,
   databaseProvider,
   openImportLinksDialog,
+  openSwitchGraphsDialog,
 }) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -114,6 +115,11 @@ const AppMenu = ({
         label="Import links as notes"
         icon="dynamic_feed"
         onClick={openImportLinksDialog}
+      />
+      <AppMenuItem
+        label="Switch graphs"
+        icon="cached"
+        onClick={openSwitchGraphsDialog}
       />
       <AppMenuItem
         label="Logout"

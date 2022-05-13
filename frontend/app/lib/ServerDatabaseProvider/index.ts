@@ -11,6 +11,7 @@ export default class ServerDatabaseProvider {
   static type = "SERVER";
 
   #graphIds = null;
+  #activeGraphId = null;
   #apiUrl = null;
 
   constructor(API_URL) {
@@ -18,14 +19,24 @@ export default class ServerDatabaseProvider {
     API.init(API_URL);
   }
 
-  async getGraphId() {
-    return this.#graphIds?.[0];
+  getActiveGraphId() {
+    return this.#activeGraphId;
+  }
+
+  getGraphIds() {
+    return this.#graphIds;
+  }
+
+  setGraphId(graphId) {
+    this.#activeGraphId = graphId;
+    API.setGraphId(this.#activeGraphId);
   }
 
   async login(username, password, mfaToken) {
     const response = await API.login(username, password, mfaToken);
     this.#graphIds = response.graphIds;
-    API.setGraphId(this.#graphIds?.[0]);
+    this.#activeGraphId = this.#graphIds?.[0] ?? null;
+    API.setGraphId(this.#activeGraphId);
     return response;
   }
 
@@ -33,7 +44,8 @@ export default class ServerDatabaseProvider {
     try {
       const response = await API.isAuthenticated();
       this.#graphIds = response.graphIds;
-      API.setGraphId(this.#graphIds?.[0]);
+      this.#activeGraphId = this.#graphIds?.[0] ?? null;
+      API.setGraphId(this.#activeGraphId);
       return true;
     } catch (e) {
       return false;
@@ -42,6 +54,7 @@ export default class ServerDatabaseProvider {
 
   async removeAccess() {
     this.#graphIds = null;
+    this.#activeGraphId = null;
     API.setGraphId(null);
 
     // we try to logout from the server but if the server fails to do this and
@@ -145,7 +158,7 @@ export default class ServerDatabaseProvider {
       return;
     }
 
-    let url = this.#apiUrl + "graph/" + this.#graphIds[0] + "/file/" + fileId;
+    let url = this.#apiUrl + "graph/" + this.#activeGraphId + "/file/" + fileId;
 
     if (typeof publicName === "string") {
       url += `/${encodeURIComponent(publicName)}`;
