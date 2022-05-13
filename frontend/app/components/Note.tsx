@@ -55,7 +55,6 @@ const Note = ({
       limit: 10,
     };
 
-    // @ts-ignore randomUUID not yet in types
     // const requestId = crypto.randomUUID();
     // currentRequestId.current = requestId;
     try {

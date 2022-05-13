@@ -123,7 +123,6 @@ const App = ({
         options.searchString = searchValue;
       }
 
-      // @ts-ignore randomUUID not yet in types
       const requestId = crypto.randomUUID();
       currentRequestId.current = requestId;
       try {
