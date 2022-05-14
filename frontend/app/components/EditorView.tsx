@@ -256,7 +256,7 @@ const EditorView = ({
 
 
   const prepareNoteToTransmit = async ():Promise<NoteFromUser> => {
-    const noteToTransmit = {
+    const noteToTransmit:NoteFromUser = {
       title: activeNote.title,
       blocks: await Editor.save(),
       changes: activeNote.changes,
