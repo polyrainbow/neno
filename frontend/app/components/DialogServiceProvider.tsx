@@ -8,7 +8,17 @@ import ImportLinksDialog from "./ImportLinksDialog";
 import SearchDialog from "./SearchDialog";
 import SwitchGraphsDialog from "./SwitchGraphsDialog";
 
+/*
+  This component renders a dialog when another component opens it via the
+  useDialog() hook.
+  It must be inserted into the component tree above all components that use
+  the useDialog() hook.
+*/
 const DialogServiceProvider = (props) => {
+  /*
+    In this state, we save the currently opened dialog and the callback that
+    should be executed when the dialog requests it.
+  */
   const [
     config,
     setConfig,
@@ -24,6 +34,7 @@ const DialogServiceProvider = (props) => {
     });
   };
 
+  /* close dialogs on Escape press */
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === "Escape") {
@@ -37,6 +48,7 @@ const DialogServiceProvider = (props) => {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [config.openDialog]);
+
 
   return <>
     <DialogServiceContext.Provider
