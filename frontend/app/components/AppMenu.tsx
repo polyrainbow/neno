@@ -10,15 +10,16 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
+import { DialogType } from "../enum/DialogType";
+import useDialog from "../hooks/useDialog";
 
 const AppMenu = ({
-  openExportDatabaseDialog,
+  importLinksAsNotes,
+  switchGraphs,
   onClose,
   unsavedChanges,
   setUnsavedChanges,
   databaseProvider,
-  openImportLinksDialog,
-  openSwitchGraphsDialog,
 }) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -27,6 +28,23 @@ const AppMenu = ({
   const pathname = location.pathname;
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
+
+  const openImportLinksDialog = useDialog(
+    DialogType.IMPORT_LINKS,
+    importLinksAsNotes,
+  );
+
+
+  const openSwitchGraphsDialog = useDialog(
+    DialogType.SWITCH_GRAPHS,
+    switchGraphs,
+  );
+
+  const openExportDatabaseDialog = useDialog(
+    DialogType.EXPORT_DATABASE,
+    null,
+  );
+
 
   return <OutsideAlerter
     onOutsideClick={onClose}

@@ -1,6 +1,6 @@
 import React from "react";
 import ConfirmationServiceContext
-  from "../components/ConfirmationServiceContext.js";
+  from "../contexts/ConfirmationServiceContext.js";
 import { texts } from "../lib/config.js";
 
 const useConfirmDiscardingUnsavedChangesDialog = () => {

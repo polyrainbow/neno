@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
 import { getAppPath } from "../lib/utils";
-import ConfirmationServiceContext from "./ConfirmationServiceContext";
+import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import {
   useNavigate,
 } from "react-router-dom";

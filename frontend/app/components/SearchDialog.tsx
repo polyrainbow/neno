@@ -3,59 +3,64 @@ import Dialog from "./Dialog";
 
 const SearchDialog = ({
   setSearchValue,
-  onCancel,
+  onClose,
 }) => {
+  const setSearchValueAndClose = (searchValue) => {
+    setSearchValue(searchValue);
+    onClose();
+  };
+
   return <Dialog
-    onClickOnOverlay={onCancel}
+    onClickOnOverlay={onClose}
     className="stats-dialog"
   >
     <h1>Search presets</h1>
     <p>
       <button
-        onClick={() => setSearchValue("exact:")}
+        onClick={() => setSearchValueAndClose("exact:")}
         className="default-button dialog-box-button"
       >Untitled notes</button>
     </p>
     <h2>Duplicates</h2>
     <p>
       <button
-        onClick={() => setSearchValue("duplicates:title")}
+        onClick={() => setSearchValueAndClose("duplicates:title")}
         className="default-button dialog-box-button"
       >Notes with duplicate titles</button>
     </p>
     <p>
       <button
-        onClick={() => setSearchValue("duplicates:url")}
+        onClick={() => setSearchValueAndClose("duplicates:url")}
         className="default-button dialog-box-button"
       >Notes with duplicate URLs</button>
     </p>
     <h2>Types</h2>
     <p>
       <button
-        onClick={() => setSearchValue("has:audio")}
+        onClick={() => setSearchValueAndClose("has:audio")}
         className="default-button dialog-box-button"
       >Notes with audio</button>
     </p>
     <p>
       <button
-        onClick={() => setSearchValue("has:video")}
+        onClick={() => setSearchValueAndClose("has:video")}
         className="default-button dialog-box-button"
       >Notes with video</button>
     </p>
     <p>
       <button
-        onClick={() => setSearchValue("has:document")}
+        onClick={() => setSearchValueAndClose("has:document")}
         className="default-button dialog-box-button"
       >Notes with documents</button>
     </p>
     <p>
       <button
-        onClick={() => setSearchValue("has:image")}
+        onClick={() => setSearchValueAndClose("has:image")}
         className="default-button dialog-box-button"
       >Notes with images</button>
     </p>
     <button
-      onClick={onCancel}
+      onClick={onClose}
       className="default-button dialog-box-button default-action"
     >Close</button>
   </Dialog>;

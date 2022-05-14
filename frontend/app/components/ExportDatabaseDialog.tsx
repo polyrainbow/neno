@@ -6,7 +6,7 @@ import { humanFileSize, yyyymmdd } from "../lib/utils";
 
 const ExportDatabaseDialog = ({
   databaseProvider,
-  onCancel,
+  onClose,
 }) => {
   const [withFiles, setWithFiles] = useState(false);
   // status can be READY, BUSY, DONE
@@ -61,7 +61,7 @@ const ExportDatabaseDialog = ({
 
   return <Dialog
     onClickOnOverlay={() => {
-      if (status !== "BUSY") onCancel();
+      if (status !== "BUSY") onClose();
     }}
     className="import-link-dialog"
   >
@@ -74,7 +74,7 @@ const ExportDatabaseDialog = ({
             {fileSizeWritten} written.
           </p>
           <button
-            onClick={onCancel}
+            onClick={onClose}
             className="default-button dialog-box-button default-action"
           >Close</button>
         </>
@@ -147,7 +147,7 @@ const ExportDatabaseDialog = ({
             className="default-button dialog-box-button default-action"
           >Export</button>
           <button
-            onClick={onCancel}
+            onClick={onClose}
             className="default-button dialog-box-button"
           >Cancel</button>
         </>

@@ -5,12 +5,12 @@ const SwitchGraphsDialog = ({
   activeGraphId,
   graphIds,
   switchGraphs,
-  onCancel,
+  onClose,
 }) => {
   const [selectedGraphId, setSelectedGraphId] = useState(activeGraphId);
 
   return <Dialog
-    onClickOnOverlay={onCancel}
+    onClickOnOverlay={onClose}
     className="import-link-dialog"
   >
     <h1>Switch graphs</h1>
@@ -32,11 +32,12 @@ const SwitchGraphsDialog = ({
     <button
       onClick={() => {
         switchGraphs(selectedGraphId);
+        onClose();
       }}
       className="default-button dialog-box-button default-action"
     >Switch</button>
     <button
-      onClick={onCancel}
+      onClick={onClose}
       className="default-button dialog-box-button"
     >Cancel</button>
   </Dialog>;

@@ -3,12 +3,10 @@ import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import { DialogType } from "../enum/DialogType";
-import SearchDialog from "./SearchDialog";
+import useDialog from "../hooks/useDialog";
 
 const ListView = ({
   toggleAppMenu,
-  openDialog,
-  setOpenDialog,
   refreshNotesList,
   stats,
   pinnedNotes,
@@ -27,6 +25,8 @@ const ListView = ({
   unsavedChanges,
   setUnsavedChanges,
 }) => {
+  const openSearchDialog = useDialog(DialogType.SEARCH, setSearchValue);
+
   return <>
     <EditorViewHeader
       stats={stats}
@@ -41,7 +41,7 @@ const ListView = ({
       value={searchValue}
       sortMode={sortMode}
       setSortMode={handleSortModeChange}
-      showSearchDialog={() => setOpenDialog(DialogType.SEARCH)}
+      openSearchDialog={openSearchDialog}
       refreshNoteList={refreshNotesList}
     />
     <NoteList
@@ -66,17 +66,6 @@ const ListView = ({
       setUnsavedChanges={setUnsavedChanges}
       unsavedChanges={unsavedChanges}
     />
-    {
-      openDialog === DialogType.SEARCH
-        ? <SearchDialog
-          setSearchValue={(newSearchValue) => {
-            setSearchValue(newSearchValue);
-            setOpenDialog(null);
-          }}
-          onCancel={() => setOpenDialog(null)}
-        />
-        : null
-    }
   </>;
 };
 

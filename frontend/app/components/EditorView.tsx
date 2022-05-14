@@ -8,7 +8,7 @@ import Note from "./Note";
 import * as Utils from "../lib/utils";
 import * as Config from "../lib/config";
 import * as Editor from "../lib/editor";
-import ConfirmationServiceContext from "./ConfirmationServiceContext";
+import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import {
   useNavigate,
   useParams,
@@ -23,17 +23,15 @@ import { DialogType } from "../enum/DialogType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useGoToNote from "../hooks/useGoToNote";
-import SearchDialog from "./SearchDialog";
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import { PathTemplate } from "../enum/PathTemplate";
+import useDialog from "../hooks/useDialog";
 
 const EditorView = ({
   databaseProvider,
   unsavedChanges,
   setUnsavedChanges,
   toggleAppMenu,
-  setOpenDialog,
-  openDialog,
   handleInvalidCredentialsError,
   refreshNotesList,
   stats,
@@ -361,6 +359,9 @@ const EditorView = ({
   };
 
 
+  const openSearchDialog = useDialog(DialogType.SEARCH, setSearchValue);
+
+
   return <>
     <EditorViewHeader
       stats={stats}
@@ -379,7 +380,7 @@ const EditorView = ({
               value={searchValue}
               sortMode={sortMode}
               setSortMode={handleSortModeChange}
-              showSearchDialog={() => setOpenDialog(DialogType.SEARCH)}
+              openSearchDialog={openSearchDialog}
               refreshNoteList={refreshNotesList}
             />
             <NoteList
@@ -440,17 +441,6 @@ const EditorView = ({
         />
       </div>
     </main>
-    {
-      openDialog === DialogType.SEARCH
-        ? <SearchDialog
-          setSearchValue={(newSearchValue) => {
-            setSearchValue(newSearchValue);
-            setOpenDialog(null);
-          }}
-          onCancel={() => setOpenDialog(null)}
-        />
-        : null
-    }
   </>;
 };
 

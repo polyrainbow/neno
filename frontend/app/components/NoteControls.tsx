@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen.js";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import ConfirmationServiceContext from "./ConfirmationServiceContext.js";
+import ConfirmationServiceContext
+  from "../contexts/ConfirmationServiceContext.js";
 import { getAppPath } from "../lib/utils.js";
 import { PathTemplate } from "../enum/PathTemplate.js";
 

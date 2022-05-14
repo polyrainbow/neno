@@ -5,7 +5,6 @@ import GraphView from "./GraphView";
 import LoginView from "./LoginView";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider";
 import AppMenu from "./AppMenu";
-import ExportDatabaseDialog from "./ExportDatabaseDialog";
 import {
   Routes,
   Route,
@@ -15,16 +14,14 @@ import {
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
 import { DatabaseMode } from "../enum/DatabaseMode.js";
-import { DialogType } from "../enum/DialogType";
 import StatsView from "./StatsView";
 import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
 import * as Config from "../lib/config";
-import ImportLinksDialog from "./ImportLinksDialog";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
-import SwitchGraphsDialog from "./SwitchGraphsDialog";
+import DialogServiceProvider from "./DialogServiceProvider";
 
 
 const App = ({
@@ -33,7 +30,6 @@ const App = ({
 }) => {
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState<boolean>(false);
-  const [openDialog, setOpenDialog] = useState<DialogType>(DialogType.NONE);
   const [databaseMode, setDatabaseMode]
     = useState<DatabaseMode>(DatabaseMode.NONE);
 
@@ -182,18 +178,10 @@ const App = ({
 
 
   useEffect(() => {
-    const handleKeyPress = (e) => {
-      if (e.key === "Escape") {
-        setOpenDialog(DialogType.NONE);
-      }
-    };
-
     window.addEventListener("beforeunload", beforeUnload);
-    document.addEventListener("keydown", handleKeyPress);
 
     return () => {
       window.removeEventListener("beforeunload", beforeUnload);
-      document.removeEventListener("keydown", handleKeyPress);
     };
   }, [beforeUnload]);
 
@@ -205,14 +193,12 @@ const App = ({
 
   const importLinksAsNotes = async (links) => {
     await databaseProvider.importLinksAsNotes(links);
-    setOpenDialog(DialogType.NONE);
     refreshNotesList();
   };
 
 
   const switchGraphs = (graphId) => {
     databaseProvider.setGraphId(graphId);
-    setOpenDialog(DialogType.NONE);
     navigate(
       isSmallScreen
         ? getAppPath(PathTemplate.LIST)
@@ -246,85 +232,56 @@ const App = ({
 
 
   return <ConfirmationServiceProvider>
-    <Routes>
-      {/*
-        this route is just to get rid of a react-router warning
-        startApp() will take care of navigating to the correct start route
-      */}
-      <Route
-        path="/"
-        element={
-          <></>
-        }
-      />
-      <Route
-        path={getAppPath(PathTemplate.LOGIN)}
-        element={
-          <LoginView
-            setDatabaseMode={setDatabaseMode}
-            serverDatabaseProvider={serverDatabaseProvider}
-            localDatabaseProvider={localDatabaseProvider}
-          />
-        }
-      />
-      <Route
-        path={getAppPath(PathTemplate.EDITOR)}
-        element={
-          <Navigate to={
-            getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE)
-          } replace />
-        }
-      />
-      <Route
-        path={
-          getAppPath(
-            PathTemplate.EDITOR_WITH_NOTE,
-            new Map([["NOTE_ID", ":activeNoteId"]]),
-          )
-        }
-        element={
-          databaseProvider
-            ? <EditorView
-              databaseProvider={databaseProvider}
-              unsavedChanges={unsavedChanges}
-              setUnsavedChanges={setUnsavedChanges}
-              toggleAppMenu={toggleAppMenu}
-              setOpenDialog={setOpenDialog}
-              openDialog={openDialog}
-              handleInvalidCredentialsError={handleInvalidCredentialsError}
-              refreshNotesList={refreshNotesList}
-              stats={stats}
-              pinnedNotes={pinnedNotes}
-              handleSearchInputChange={handleSearchInputChange}
-              setPinnedNotes={setPinnedNotes}
-              searchValue={searchValue}
-              sortMode={sortMode}
-              handleSortModeChange={handleSortModeChange}
-              noteListItems={noteListItems}
-              numberOfResults={numberOfResults}
-              noteListIsBusy={noteListIsBusy}
-              noteListScrollTop={noteListScrollTop}
-              setNoteListScrollTop={setNoteListScrollTop}
-              page={page}
-              setPage={setPage}
-              setSearchValue={setSearchValue}
+    <DialogServiceProvider databaseProvider={databaseProvider}>
+      <Routes>
+        {/*
+          this route is just to get rid of a react-router warning
+          startApp() will take care of navigating to the correct start route
+        */}
+        <Route
+          path="/"
+          element={
+            <></>
+          }
+        />
+        <Route
+          path={getAppPath(PathTemplate.LOGIN)}
+          element={
+            <LoginView
+              setDatabaseMode={setDatabaseMode}
+              serverDatabaseProvider={serverDatabaseProvider}
+              localDatabaseProvider={localDatabaseProvider}
             />
-            : null
-        }
-      />
-      <Route
-        path={getAppPath(PathTemplate.LIST)}
-        element={
-          databaseProvider
-            ? <>
-              <ListView
+          }
+        />
+        <Route
+          path={getAppPath(PathTemplate.EDITOR)}
+          element={
+            <Navigate to={
+              getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE)
+            } replace />
+          }
+        />
+        <Route
+          path={
+            getAppPath(
+              PathTemplate.EDITOR_WITH_NOTE,
+              new Map([["NOTE_ID", ":activeNoteId"]]),
+            )
+          }
+          element={
+            databaseProvider
+              ? <EditorView
+                databaseProvider={databaseProvider}
+                unsavedChanges={unsavedChanges}
+                setUnsavedChanges={setUnsavedChanges}
                 toggleAppMenu={toggleAppMenu}
-                openDialog={openDialog}
-                setOpenDialog={setOpenDialog}
+                handleInvalidCredentialsError={handleInvalidCredentialsError}
                 refreshNotesList={refreshNotesList}
                 stats={stats}
                 pinnedNotes={pinnedNotes}
                 handleSearchInputChange={handleSearchInputChange}
+                setPinnedNotes={setPinnedNotes}
                 searchValue={searchValue}
                 sortMode={sortMode}
                 handleSortModeChange={handleSortModeChange}
@@ -336,101 +293,102 @@ const App = ({
                 page={page}
                 setPage={setPage}
                 setSearchValue={setSearchValue}
-                unsavedChanges={unsavedChanges}
-                setUnsavedChanges={setUnsavedChanges}
               />
-              <FloatingActionButton
-                title="New note"
-                icon="add"
-                onClick={() => navigate(
-                  getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
-                )}
-              ></FloatingActionButton>
-            </>
-            : null
-        }
-      />
-      <Route
-        path={getAppPath(PathTemplate.GRAPH)}
-        element={
-          <GraphView
+              : null
+          }
+        />
+        <Route
+          path={getAppPath(PathTemplate.LIST)}
+          element={
+            databaseProvider
+              ? <>
+                <ListView
+                  toggleAppMenu={toggleAppMenu}
+                  refreshNotesList={refreshNotesList}
+                  stats={stats}
+                  pinnedNotes={pinnedNotes}
+                  handleSearchInputChange={handleSearchInputChange}
+                  searchValue={searchValue}
+                  sortMode={sortMode}
+                  handleSortModeChange={handleSortModeChange}
+                  noteListItems={noteListItems}
+                  numberOfResults={numberOfResults}
+                  noteListIsBusy={noteListIsBusy}
+                  noteListScrollTop={noteListScrollTop}
+                  setNoteListScrollTop={setNoteListScrollTop}
+                  page={page}
+                  setPage={setPage}
+                  setSearchValue={setSearchValue}
+                  unsavedChanges={unsavedChanges}
+                  setUnsavedChanges={setUnsavedChanges}
+                />
+                <FloatingActionButton
+                  title="New note"
+                  icon="add"
+                  onClick={() => navigate(
+                    getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
+                  )}
+                ></FloatingActionButton>
+              </>
+              : null
+          }
+        />
+        <Route
+          path={getAppPath(PathTemplate.GRAPH)}
+          element={
+            <GraphView
+              unsavedChanges={unsavedChanges}
+              setUnsavedChanges={setUnsavedChanges}
+              databaseProvider={databaseProvider}
+              toggleAppMenu={toggleAppMenu}
+              handleInvalidCredentialsError={handleInvalidCredentialsError}
+            />
+          }
+        />
+        <Route
+          path={getAppPath(PathTemplate.FILES)}
+          element={
+            <FilesView
+              databaseProvider={databaseProvider}
+              toggleAppMenu={toggleAppMenu}
+            />
+          }
+        />
+        <Route
+          path={getAppPath(
+            PathTemplate.FILE,
+            new Map([["FILE_ID", ":fileId"]]),
+          )}
+          element={
+            <FileView
+              databaseProvider={databaseProvider}
+              toggleAppMenu={toggleAppMenu}
+            />
+          }
+        />
+        <Route
+          path={getAppPath(PathTemplate.STATS)}
+          element={
+            <StatsView
+              databaseProvider={databaseProvider}
+              toggleAppMenu={toggleAppMenu}
+            />
+          }
+        />
+      </Routes>
+      {
+        isAppMenuOpen
+          ? <AppMenu
+            onClose={() => setIsAppMenuOpen(false)}
             unsavedChanges={unsavedChanges}
             setUnsavedChanges={setUnsavedChanges}
             databaseProvider={databaseProvider}
-            toggleAppMenu={toggleAppMenu}
-            handleInvalidCredentialsError={handleInvalidCredentialsError}
+            importLinksAsNotes={importLinksAsNotes}
+            switchGraphs={switchGraphs}
           />
-        }
-      />
-      <Route
-        path={getAppPath(PathTemplate.FILES)}
-        element={
-          <FilesView
-            databaseProvider={databaseProvider}
-            toggleAppMenu={toggleAppMenu}
-          />
-        }
-      />
-      <Route
-        path={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", ":fileId"]]))}
-        element={
-          <FileView
-            databaseProvider={databaseProvider}
-            toggleAppMenu={toggleAppMenu}
-          />
-        }
-      />
-      <Route
-        path={getAppPath(PathTemplate.STATS)}
-        element={
-          <StatsView
-            databaseProvider={databaseProvider}
-            toggleAppMenu={toggleAppMenu}
-          />
-        }
-      />
-    </Routes>
-    {
-      isAppMenuOpen
-        ? <AppMenu
-          openExportDatabaseDialog={
-            () => setOpenDialog(DialogType.EXPORT_DATABASE)
-          }
-          onClose={() => setIsAppMenuOpen(false)}
-          unsavedChanges={unsavedChanges}
-          setUnsavedChanges={setUnsavedChanges}
-          databaseProvider={databaseProvider}
-          openImportLinksDialog={() => setOpenDialog(DialogType.IMPORT_LINKS)}
-          openSwitchGraphsDialog={() => setOpenDialog(DialogType.SWITCH_GRAPHS)}
-        />
-        : null
-    }
-    {
-      openDialog === DialogType.EXPORT_DATABASE
-        ? <ExportDatabaseDialog
-          onCancel={() => setOpenDialog(DialogType.NONE)}
-          databaseProvider={databaseProvider}
-        />
-        : null
-    }
-    {
-      openDialog === DialogType.IMPORT_LINKS
-        ? <ImportLinksDialog
-          importLinksAsNotes={importLinksAsNotes}
-          onCancel={() => setOpenDialog(DialogType.NONE)}
-        />
-        : null
-    }
-    {
-      openDialog === DialogType.SWITCH_GRAPHS
-        ? <SwitchGraphsDialog
-          activeGraphId={databaseProvider.getActiveGraphId()}
-          graphIds={databaseProvider.getGraphIds()}
-          switchGraphs={switchGraphs}
-          onCancel={() => setOpenDialog(DialogType.NONE)}
-        />
-        : null
-    }
+          : null
+      }
+    </DialogServiceProvider>
   </ConfirmationServiceProvider>;
 };
 

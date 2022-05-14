@@ -7,7 +7,7 @@ const NoteListControls = ({
   onChange,
   sortMode,
   setSortMode,
-  showSearchDialog,
+  openSearchDialog,
   refreshNoteList,
 }) => {
   return <section id="section-search-input">
@@ -29,7 +29,7 @@ const NoteListControls = ({
         id="button_show_search dialog"
         title="Search presets"
         icon="saved_search"
-        onClick={showSearchDialog}
+        onClick={openSearchDialog}
       />
       <IconButton
         id="button_refresh-note-list"

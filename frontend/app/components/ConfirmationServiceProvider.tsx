@@ -1,6 +1,6 @@
 import React from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
-import ConfirmationServiceContext from "./ConfirmationServiceContext";
+import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 
 const ConfirmationServiceProvider = (props) => {
   const [

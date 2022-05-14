@@ -3,14 +3,14 @@ import Dialog from "./Dialog";
 
 const ImportLinksDialog = ({
   importLinksAsNotes,
-  onCancel,
+  onClose,
 }) => {
   const [text, setText] = useState("");
   const [isBusy, setIsBusy] = useState(false);
 
 
   return <Dialog
-    onClickOnOverlay={onCancel}
+    onClickOnOverlay={onClose}
     className="import-link-dialog"
   >
     <h1>Import links as notes</h1>
@@ -26,11 +26,13 @@ const ImportLinksDialog = ({
             onClick={() => {
               setIsBusy(true);
               importLinksAsNotes(text.split("\n"));
+              setIsBusy(false);
+              onClose();
             }}
             className="default-button dialog-box-button default-action"
           >Import as notes</button>
           <button
-            onClick={onCancel}
+            onClick={onClose}
             className="default-button dialog-box-button"
           >Cancel</button>
         </>
