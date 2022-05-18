@@ -130,16 +130,14 @@ const AppMenu = ({
           navigate(target);
         }}
       />
-      {
-        databaseProvider?.constructor.features.includes("EXPORT_DATABASE")
-          ? <AppMenuItem
-            disabled={!databaseProvider}
-            label={l("menu.export-database")}
-            icon="archive"
-            onClick={openExportDatabaseDialog}
-          />
-          : null
-      }
+      <AppMenuItem
+        disabled={
+          !databaseProvider?.constructor.features.includes("EXPORT_DATABASE")
+        }
+        label={l("menu.export-database")}
+        icon="archive"
+        onClick={openExportDatabaseDialog}
+      />
       <AppMenuItem
         disabled={!databaseProvider}
         label={l("menu.import-links")}
@@ -147,7 +145,9 @@ const AppMenu = ({
         onClick={openImportLinksDialog}
       />
       <AppMenuItem
-        disabled={!databaseProvider}
+        disabled={
+          !databaseProvider?.constructor.features.includes("MULTIPLE_GRAPHS")
+        }
         label={l("menu.switch-graphs")}
         icon="cached"
         onClick={openSwitchGraphsDialog}
