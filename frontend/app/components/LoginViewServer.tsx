@@ -4,6 +4,7 @@ import {
 } from "react-router-dom";
 import { DatabaseMode } from "../enum/DatabaseMode.js";
 import { PathTemplate } from "../enum/PathTemplate.js";
+import { l } from "../lib/intl.js";
 import { getAppPath } from "../lib/utils.js";
 
 const LoginViewServer = ({
@@ -36,46 +37,37 @@ const LoginViewServer = ({
 
   if (!serverDatabaseProvider) {
     return <>
-      <h1>Server database</h1>
-      <p>
-        This NENO instance does not support connecting to server databases.
-        However, you can <a
-          href="https://github.com/SebastianZimmer/neno"
-          target="_blank"
-          rel="noreferrer noopener"
-        >set up your own NENO server</a>.
-      </p>
+      <h1>{l("login.server.heading")}</h1>
+      <p>{l("login.server.no-support")}</p>
     </>;
   }
 
 
   return <>
-    <h1>Server database</h1>
+    <h1>{l("login.server.heading")}</h1>
     {
       disclaimer === "INVALID_CREDENTIALS"
         ? <p style={{ color: "red" }}>
-          Your combination of username, password, and 2FA token does not
-          seem to be correct. Please try again.
+          {l("login.server.invalid-credentials")}
         </p>
         : ""
     }
     {
       disclaimer === "TOO_EARLY"
         ? <p style={{ color: "red" }}>
-          Too many failed login attempts. Please wait a bit and try again.
+          {l("login.server.too-many-attempts")}
         </p>
         : ""
     }
     {
       disclaimer === "SERVER_ERROR"
         ? <p style={{ color: "red" }}>
-          Something is wrong with the server. How about creating a
-          local database instead?
+          {l("login.server.server-error")}
         </p>
         : ""
     }
     <p>
-      <label htmlFor="login_input_username">Username</label>
+      <label htmlFor="login_input_username">{l("login.server.username")}</label>
       <br />
       <input id="login_input_username" type="text"
         value={username}
@@ -88,7 +80,7 @@ const LoginViewServer = ({
       />
     </p>
     <p>
-      <label htmlFor="login_input_password">Password</label>
+      <label htmlFor="login_input_password">{l("login.server.password")}</label>
       <br />
       <input id="login_input_password" type="password"
         value={password}
@@ -101,7 +93,9 @@ const LoginViewServer = ({
       />
     </p>
     <p>
-      <label htmlFor="login_input_mfa-token">2FA Token</label>
+      <label htmlFor="login_input_mfa-token">{
+        l("login.server.mfa-token")
+      }</label>
       <br />
       <input id="login_input_mfa-token"
         type="number"
@@ -117,7 +111,7 @@ const LoginViewServer = ({
     <p>
       {
         isBusy
-          ? "Trying to log in ..."
+          ? l("login.server.trying-to-login")
           : <button
             type="button"
             className="default-button default-action"

@@ -9,6 +9,7 @@ import {
 import { PathTemplate } from "../enum/PathTemplate";
 import { FileId } from "../../../lib/notes/interfaces/FileId";
 import FileIdAndSrc from "../interfaces/FileIdAndSrc";
+import { l } from "../lib/intl";
 
 
 const FilesView = ({
@@ -75,7 +76,7 @@ const FilesView = ({
       {
         status === "READY"
           ? <>
-            <h2>Files ({files.length})</h2>
+            <h2>{l("files.files-heading", { numberOfFiles: files.length })}</h2>
             <div
               style={{
                 display: "flex",
@@ -89,12 +90,12 @@ const FilesView = ({
                 />;
               })}
             </div>
-            <h2>Dangling Files ({danglingFiles.length})</h2>
-            <p>Dangling files are files that are not used in any note.</p>
-            <div
-              style={{
-              }}
-            >
+            <h2>{l(
+              "files.dangling-files.heading",
+              { danglingFiles: danglingFiles.length },
+            )}</h2>
+            <p>{l("files.dangling-files.explainer")}</p>
+            <div>
               {danglingFiles.map((danglingFile) => {
                 return <p
                   key={"danglingFile_" + danglingFile.id}
@@ -112,14 +113,13 @@ const FilesView = ({
                       ));
                     }}
                     className="small-button"
-                  >Create note with file</button>
+                  >{l("files.create-note-with-file")}</button>
                   <button
                     onClick={async () => {
                       await confirm({
-                        text: "Do you really want to delete this file? "
-                          + "This action cannot be undone.",
-                        confirmText: "Delete file",
-                        cancelText: "Cancel",
+                        text: l("files.confirm-delete"),
+                        confirmText: l("files.confirm-delete.confirm"),
+                        cancelText: l("dialog.cancel"),
                         encourageConfirmation: false,
                       });
 
@@ -127,11 +127,11 @@ const FilesView = ({
                       await updateDanglingFiles();
                     }}
                     className="small-button"
-                  >Delete</button></p>;
+                  >{l("files.delete")}</button></p>;
               })}
             </div>
           </>
-          : <p>Fetching files...</p>
+          : <p>{l("files.fetching")}</p>
       }
     </section>
   </>;

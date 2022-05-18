@@ -1,5 +1,6 @@
 import React from "react";
 import usePagination from "../hooks/usePagination";
+import { l } from "../lib/intl";
 
 
 const getNumberOfPages = (numberOfResults, searchResultsPerPage) => {
@@ -74,7 +75,11 @@ const Pagination = (props) => {
                 <button
                   type="button"
                   className="small-button pagination-button-special"
-                  title={type === "previous" ? "Previous page" : "Next page"}
+                  title={
+                    type === "previous"
+                      ? l("list.pagination.previous-page")
+                      : l("list.pagination.next-page")
+                  }
                   {...item}
                 >
                   {type === "previous" ? "<" : ">"}

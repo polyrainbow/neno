@@ -1,5 +1,6 @@
 import React from "react";
 import { emojis } from "../lib/config.js";
+import { l } from "../lib/intl.js";
 import NoteListItemFeatures from "./NoteListItemFeatures";
 
 
@@ -20,9 +21,10 @@ const NoteListItemInfo = ({
     {(new Date(note.updateTime)).toLocaleDateString()}
     {
       note.numberOfFiles > 0
-        ? SPAN_SEPARATOR
-          + ` ${note.numberOfFiles} file`
-          + (note.numberOfFiles > 1 ? "s" : "")
+        ? SPAN_SEPARATOR + l(
+          note.numberOfFiles > 1 ? "list.item.files" : "list.item.file",
+          { files: note.numberOfFiles },
+        )
         : ""
     }
     {
@@ -36,7 +38,7 @@ const NoteListItemInfo = ({
     />
     {
       isHub
-        ? SPAN_SEPARATOR + emojis.hub + " Hub"
+        ? SPAN_SEPARATOR + emojis.hub + " " + l("list.item.hub")
         : ""
     }
   </div>;

@@ -12,6 +12,7 @@ import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { DialogType } from "../enum/DialogType";
 import useDialog from "../hooks/useDialog";
+import { l, setLanguage } from "../lib/intl";
 
 const AppMenu = ({
   importLinksAsNotes,
@@ -45,6 +46,11 @@ const AppMenu = ({
     null,
   );
 
+  const openChangeLanguageDialog = useDialog(
+    DialogType.CHANGE_LANGUAGE,
+    setLanguage,
+  );
+
 
   return <OutsideAlerter
     onOutsideClick={onClose}
@@ -61,7 +67,8 @@ const AppMenu = ({
       }
     >
       <AppMenuItem
-        label={isSmallScreen ? "Note list" : "Editor"}
+        disabled={!databaseProvider}
+        label={isSmallScreen ? l("menu.note-list") : l("menu.editor")}
         icon={isSmallScreen ? "list" : "create"}
         onClick={async () => {
           const target = isSmallScreen
@@ -79,7 +86,8 @@ const AppMenu = ({
         }}
       />
       <AppMenuItem
-        label="Graph"
+        disabled={!databaseProvider}
+        label={l("menu.graph")}
         icon="scatter_plot"
         onClick={async () => {
           const target = getAppPath(PathTemplate.GRAPH);
@@ -93,7 +101,8 @@ const AppMenu = ({
         }}
       />
       <AppMenuItem
-        label="Files"
+        disabled={!databaseProvider}
+        label={l("menu.files")}
         icon="grid_view"
         onClick={async () => {
           const target = getAppPath(PathTemplate.FILES);
@@ -107,7 +116,8 @@ const AppMenu = ({
         }}
       />
       <AppMenuItem
-        label="Stats"
+        disabled={!databaseProvider}
+        label={l("menu.stats")}
         icon="query_stats"
         onClick={async () => {
           const target = getAppPath(PathTemplate.STATS);
@@ -121,26 +131,35 @@ const AppMenu = ({
         }}
       />
       {
-        databaseProvider.constructor.features.includes("EXPORT_DATABASE")
+        databaseProvider?.constructor.features.includes("EXPORT_DATABASE")
           ? <AppMenuItem
-            label="Export database"
+            disabled={!databaseProvider}
+            label={l("menu.export-database")}
             icon="archive"
             onClick={openExportDatabaseDialog}
           />
           : null
       }
       <AppMenuItem
-        label="Import links as notes"
+        disabled={!databaseProvider}
+        label={l("menu.import-links")}
         icon="dynamic_feed"
         onClick={openImportLinksDialog}
       />
       <AppMenuItem
-        label="Switch graphs"
+        disabled={!databaseProvider}
+        label={l("menu.switch-graphs")}
         icon="cached"
         onClick={openSwitchGraphsDialog}
       />
       <AppMenuItem
-        label="Logout"
+        label={l("menu.change-language")}
+        icon="language"
+        onClick={openChangeLanguageDialog}
+      />
+      <AppMenuItem
+        disabled={!databaseProvider}
+        label={l("menu.logout")}
         icon="lock"
         onClick={async () => {
           if (unsavedChanges) {

@@ -1,4 +1,5 @@
 import React from "react";
+import { l } from "../lib/intl";
 import { getIconSrc } from "../lib/utils";
 
 const NoteListStatus = ({
@@ -6,15 +7,15 @@ const NoteListStatus = ({
 }) => {
   const map = {
     BUSY: {
-      label: "Loading notes ...",
+      label: l("list.status.busy"),
       icon: "pending",
     },
     SEARCH_VALUE_TOO_SHORT: {
-      label: "Please type at least 3 characters to search",
+      label: l("list.status.too-short"),
       icon: "looks_3",
     },
     NO_NOTES_FOUND: {
-      label: "No notes found",
+      label: l("list.status.no-notes-found"),
       icon: "radio_button_unchecked",
     },
   };

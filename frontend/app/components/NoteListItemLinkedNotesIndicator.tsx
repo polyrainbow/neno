@@ -2,6 +2,7 @@ import React from "react";
 import Tooltip from "./Tooltip";
 import { emojis } from "../lib/config.js";
 import { getIconSrc } from "../lib/utils";
+import { l } from "../lib/intl";
 
 
 const NoteListItemLinkedNotesIndicator = ({
@@ -13,12 +14,12 @@ const NoteListItemLinkedNotesIndicator = ({
 }) => {
   const linkControlLabel
     = (!isLinkable)
-      ? `This note is linked to ${numberOfLinkedNotes} other note(s).`
+      ? l("list.item.links.linked-to-x-notes", { numberOfLinkedNotes })
       : isActive
-        ? "This is the currently selected note. It cannot be linked to itself."
+        ? l("list.item.links.currently-selected")
         : isLinked
-          ? "Unlink selected note"
-          : "Link to selected note";
+          ? l("list.item.links.unlink")
+          : l("list.item.links.link");
 
 
   return <Tooltip
@@ -58,7 +59,7 @@ const NoteListItemLinkedNotesIndicator = ({
                 ? <span title={numberOfLinkedNotes + " Links"}>
                   {numberOfLinkedNotes}
                 </span>
-                : <span title="Not linked"
+                : <span title={l("list.item.links.not-linked")}
                   style={{
                     // style fix for
                     // https://stackoverflow.com/questions/70028281/emoji-font-displayed-in-web-pages-lose-color-when-bold

@@ -3,6 +3,7 @@ import HeaderContainer from "./HeaderContainer";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator";
 import IconButton from "./IconButton";
 import SearchInput from "./SearchInput";
+import { l } from "../lib/intl";
 
 const GraphViewHeader = ({
   unsavedChanges,
@@ -19,17 +20,17 @@ const GraphViewHeader = ({
       <>
         <IconButton
           icon="save"
-          title="Save"
+          title={l("graph.save")}
           onClick={saveGraphObject}
         />
         <IconButton
           icon="open_in_browser"
-          title="Open note in editor"
+          title={l("graph.open-in-editor")}
           onClick={openSelectedNoteInEditor}
         />
         <IconButton
           icon="zoom_out_map"
-          title="Inflate graph by 10%"
+          title={l("graph.inflate-10%")}
           onClick={async () => {
             if (!graphVisualizationInstance.current) return;
             graphVisualizationInstance.current.inflateGraph(1.1);
@@ -37,7 +38,7 @@ const GraphViewHeader = ({
         />
         <IconButton
           icon="title"
-          title="Toggle text rendering"
+          title={l("graph.toggle-text-rendering")}
           onClick={async () => {
             if (!graphVisualizationInstance.current) return;
             graphVisualizationInstance.current.toggleTextRendering();
@@ -48,7 +49,7 @@ const GraphViewHeader = ({
     rightContent={
       <>
         <SearchInput
-          placeholder="Search..."
+          placeholder={l("graph.search-placeholder")}
           value={searchValue}
           onChange={(value) => setSearchValue(value)}
           inputStyle={{

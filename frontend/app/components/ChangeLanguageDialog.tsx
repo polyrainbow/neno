@@ -2,41 +2,40 @@ import React, { useState } from "react";
 import { l } from "../lib/intl";
 import Dialog from "./Dialog";
 
-const SwitchGraphsDialog = ({
-  activeGraphId,
-  graphIds,
-  switchGraphs,
+const ChangeLanguageDialog = ({
+  activeLanguage,
+  languages,
+  changeLanguage,
   onClose,
 }) => {
-  const [selectedGraphId, setSelectedGraphId] = useState(activeGraphId);
+  const [selectedLanguage, setSelectedLanguage] = useState(activeLanguage);
 
   return <Dialog
     onClickOnOverlay={onClose}
-    className="import-link-dialog"
   >
-    <h1>{l("switch-graphs.heading")}</h1>
+    <h1>{l("change-language.heading")}</h1>
     <select
-      value={selectedGraphId}
-      onChange={(e) => setSelectedGraphId(e.target.value)}
+      value={selectedLanguage}
+      onChange={(e) => setSelectedLanguage(e.target.value)}
       style={{ width: "100%" }}
     >
       {
-        graphIds.map((graphId) => {
+        languages.map((language) => {
           return <option
-            value={graphId}
-            key={graphId}
-          >{graphId}</option>;
+            value={language}
+            key={language}
+          >{language}</option>;
         })
       }
     </select>
     <br/>
     <button
       onClick={() => {
-        switchGraphs(selectedGraphId);
+        changeLanguage(selectedLanguage);
         onClose();
       }}
       className="default-button dialog-box-button default-action"
-    >{l("switch-graphs.switch")}</button>
+    >{l("change-language.change")}</button>
     <button
       onClick={onClose}
       className="default-button dialog-box-button"
@@ -44,4 +43,4 @@ const SwitchGraphsDialog = ({
   </Dialog>;
 };
 
-export default SwitchGraphsDialog;
+export default ChangeLanguageDialog;

@@ -1,5 +1,6 @@
 import React from "react";
 import { emojis } from "../lib/config";
+import { l } from "../lib/intl";
 
 const GraphViewStatusIndicator = ({
   status,
@@ -15,7 +16,7 @@ const GraphViewStatusIndicator = ({
       = <span>{
         emojis.new
         + " "
-        + "Initial position for new nodes (drag and drop to move)"
+        + l("graph.initial-position-explainer")
       }</span>;
   } else if (status.type === "node") {
     statusSpan = <span>{emojis.note + " " + status.title}</span>;

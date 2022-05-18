@@ -1,6 +1,7 @@
 import React from "react";
 import SearchInput from "./SearchInput.js";
 import IconButton from "./IconButton";
+import { l } from "../lib/intl.js";
 
 const NoteListControls = ({
   value,
@@ -18,7 +19,7 @@ const NoteListControls = ({
       }}
     >
       <SearchInput
-        placeholder="Search notes..."
+        placeholder={l("list.search.placeholder")}
         value={value}
         onChange={onChange}
         inputStyle={{
@@ -27,13 +28,13 @@ const NoteListControls = ({
       />
       <IconButton
         id="button_show_search dialog"
-        title="Search presets"
+        title={l("list.search.presets")}
         icon="saved_search"
         onClick={openSearchDialog}
       />
       <IconButton
         id="button_refresh-note-list"
-        title="Refresh list"
+        title={l("list.refresh")}
         icon="refresh"
         onClick={refreshNoteList}
       />
@@ -51,40 +52,40 @@ const NoteListControls = ({
       >
         <option
           value="CREATION_DATE_ASCENDING"
-        >Creation date (ascending)</option>
+        >{l("list.sort-mode.creation-date-ascending")}</option>
         <option
           value="CREATION_DATE_DESCENDING"
-        >Creation date (descending)</option>
+        >{l("list.sort-mode.creation-date-descending")}</option>
         <option
           value="UPDATE_DATE_ASCENDING"
-        >Update date (ascending)</option>
+        >{l("list.sort-mode.update-date-ascending")}</option>
         <option
           value="UPDATE_DATE_DESCENDING"
-        >Update date (descending)</option>
+        >{l("list.sort-mode.update-date-descending")}</option>
         <option
           value="TITLE_ASCENDING"
-        >Title (A-Z)</option>
+        >{l("list.sort-mode.title-a-z")}</option>
         <option
           value="TITLE_DESCENDING"
-        >Title (Z-A)</option>
+        >{l("list.sort-mode.title-z-a")}</option>
         <option
           value="NUMBER_OF_LINKS_ASCENDING"
-        >Number of links (ascending)</option>
+        >{l("list.sort-mode.number-of-links-ascending")}</option>
         <option
           value="NUMBER_OF_LINKS_DESCENDING"
-        >Number of links (descending)</option>
+        >{l("list.sort-mode.number-of-links-descending")}</option>
         <option
           value="NUMBER_OF_FILES_ASCENDING"
-        >Number of files (ascending)</option>
+        >{l("list.sort-mode.number-of-files-ascending")}</option>
         <option
           value="NUMBER_OF_FILES_DESCENDING"
-        >Number of files (descending)</option>
+        >{l("list.sort-mode.number-of-files-descending")}</option>
         <option
           value="NUMBER_OF_CHARACTERS_ASCENDING"
-        >Number of chars (ascending)</option>
+        >{l("list.sort-mode.number-of-chars-ascending")}</option>
         <option
           value="NUMBER_OF_CHARACTERS_DESCENDING"
-        >Number of chars (descending)</option>
+        >{l("list.sort-mode.number-of-chars-descending")}</option>
       </select>
     </div>
   </section>;

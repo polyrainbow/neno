@@ -22,6 +22,7 @@ import FileView from "./FileView";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import DialogServiceProvider from "./DialogServiceProvider";
+import { l } from "../lib/intl";
 
 
 const App = ({
@@ -251,6 +252,7 @@ const App = ({
               setDatabaseMode={setDatabaseMode}
               serverDatabaseProvider={serverDatabaseProvider}
               localDatabaseProvider={localDatabaseProvider}
+              toggleAppMenu={toggleAppMenu}
             />
           }
         />
@@ -323,7 +325,7 @@ const App = ({
                   setUnsavedChanges={setUnsavedChanges}
                 />
                 <FloatingActionButton
-                  title="New note"
+                  title={l("editor.new-note")}
                   icon="add"
                   onClick={() => navigate(
                     getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),

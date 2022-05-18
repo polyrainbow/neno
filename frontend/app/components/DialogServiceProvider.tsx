@@ -3,10 +3,12 @@ import DialogServiceContext from "../contexts/DialogServiceContext";
 import { DialogType } from "../enum/DialogType";
 import DialogServiceConfiguration
   from "../interfaces/DialogServiceConfiguration";
+import ChangeLanguageDialog from "./ChangeLanguageDialog";
 import ExportDatabaseDialog from "./ExportDatabaseDialog";
 import ImportLinksDialog from "./ImportLinksDialog";
 import SearchDialog from "./SearchDialog";
 import SwitchGraphsDialog from "./SwitchGraphsDialog";
+import * as Localizer from "../lib/intl";
 
 /*
   This component renders a dialog when another component opens it via the
@@ -78,6 +80,16 @@ const DialogServiceProvider = (props) => {
           activeGraphId={props.databaseProvider.getActiveGraphId()}
           graphIds={props.databaseProvider.getGraphIds()}
           switchGraphs={config.callback}
+          onClose={resetDialogConfig}
+        />
+        : null
+    }
+    {
+      config.openDialog === DialogType.CHANGE_LANGUAGE
+        ? <ChangeLanguageDialog
+          activeLanguage={Localizer.getActiveLanguage()}
+          languages={Localizer.supportedLangs}
+          changeLanguage={config.callback}
           onClose={resetDialogConfig}
         />
         : null

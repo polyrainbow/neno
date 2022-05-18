@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Dialog from "./Dialog";
 import RadioGroup from "./RadioGroup";
 import { humanFileSize, yyyymmdd } from "../lib/utils";
+import { l } from "../lib/intl";
 
 
 const ExportDatabaseDialog = ({
@@ -65,18 +66,18 @@ const ExportDatabaseDialog = ({
     }}
     className="import-link-dialog"
   >
-    <h1>Export database</h1>
+    <h1>{l("export-database.heading")}</h1>
     {
       status === "DONE"
         ? <>
-          <p>Finished exporting database.
+          <p>{l("export-database.finished")}
             <br/>
-            {fileSizeWritten} written.
+            {l("export-database.file-size-written", { fileSizeWritten })}
           </p>
           <button
             onClick={onClose}
             className="default-button dialog-box-button default-action"
-          >Close</button>
+          >{l("dialog.close")}</button>
         </>
         : ""
     }
@@ -84,9 +85,9 @@ const ExportDatabaseDialog = ({
       status === "BUSY"
         ? <>
           <p>
-              Please wait while the database is being exported ...
+            {l("export-database.please-wait")}
             <br />
-            {fileSizeWritten} written.
+            {l("export-database.file-size-written", { fileSizeWritten })}
           </p>
         </>
         : ""
@@ -99,12 +100,11 @@ const ExportDatabaseDialog = ({
             options={[
               {
                 value: "false",
-                label: "Export graph file only (JSON)",
+                label: l("export-database.graph-file-only"),
               },
               {
                 value: "true",
-                label:
-                  "Export graph file and include uploaded files (ZIP)",
+                label: l("export-database.with-files"),
               },
             ]}
             selectedValue={withFiles.toString()}
@@ -145,11 +145,11 @@ const ExportDatabaseDialog = ({
               }
             }}
             className="default-button dialog-box-button default-action"
-          >Export</button>
+          >{l("export-database.export")}</button>
           <button
             onClick={onClose}
             className="default-button dialog-box-button"
-          >Cancel</button>
+          >{l("dialog.cancel")}</button>
         </>
         : ""
     }

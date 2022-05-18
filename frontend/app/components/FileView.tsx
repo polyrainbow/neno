@@ -6,6 +6,7 @@ import {
 import NoteListItem from "../../../lib/notes/interfaces/NoteListItem";
 import { getAppPath, getFileTypeFromFilename } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
+import { l } from "../lib/intl";
 
 
 const FileView = ({
@@ -44,7 +45,7 @@ const FileView = ({
       toggleAppMenu={toggleAppMenu}
     />
     <section className="content-section-wide">
-      <p><Link to="/files">See all files</Link></p>
+      <p><Link to="/files">{l("files.show-all-files")}</Link></p>
       <h1>{fileId}</h1>
       <div
         style={{
@@ -101,7 +102,7 @@ const FileView = ({
             : ""
         }
       </div>
-      <h2>Used in</h2>
+      <h2>{l("files.used-in")}</h2>
       {
         notes.map((note) => {
           return <p key={"notelink-" + note.id}>

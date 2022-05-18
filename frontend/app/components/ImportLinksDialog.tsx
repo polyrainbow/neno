@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { l } from "../lib/intl";
 import Dialog from "./Dialog";
 
 const ImportLinksDialog = ({
@@ -13,14 +14,14 @@ const ImportLinksDialog = ({
     onClickOnOverlay={onClose}
     className="import-link-dialog"
   >
-    <h1>Import links as notes</h1>
-    <p>Separate links by line breaks</p>
+    <h1>{l("import-links.heading")}</h1>
+    <p>{l("import-links.explainer")}</p>
     <textarea
       onChange={(e) => setText(e.target.value)}
     ></textarea>
     {
       isBusy
-        ? <p>Please wait while links are imported ...</p>
+        ? <p>{l("import-links.please-wait")}</p>
         : <>
           <button
             onClick={() => {
@@ -30,11 +31,11 @@ const ImportLinksDialog = ({
               onClose();
             }}
             className="default-button dialog-box-button default-action"
-          >Import as notes</button>
+          >{l("import-links.confirm")}</button>
           <button
             onClick={onClose}
             className="default-button dialog-box-button"
-          >Cancel</button>
+          >{l("dialog.cancel")}</button>
         </>
     }
   </Dialog>;

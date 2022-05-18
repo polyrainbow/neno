@@ -9,6 +9,7 @@ import ConfirmationServiceContext
   from "../contexts/ConfirmationServiceContext.js";
 import { getAppPath } from "../lib/utils.js";
 import { PathTemplate } from "../enum/PathTemplate.js";
+import { l } from "../lib/intl.js";
 
 const NoteControls = ({
   activeNote,
@@ -33,7 +34,7 @@ const NoteControls = ({
         isSmallScreen
           ? <IconButton
             id="button_list"
-            title="Go to list"
+            title={l("editor.go-to-list")}
             icon="list"
             onClick={async () => {
               if (unsavedChanges) {
@@ -49,7 +50,7 @@ const NoteControls = ({
         !isSmallScreen
           ? <IconButton
             id="button_new"
-            title="New note"
+            title={l("editor.new-note")}
             icon="add"
             onClick={createNewNote}
           />
@@ -57,23 +58,23 @@ const NoteControls = ({
       }
       <IconButton
         id="button_upload"
-        title="Save note"
+        title={l("editor.save-note")}
         icon="save"
         onClick={handleNoteSaveRequest}
       />
       <IconButton
         id="button_remove"
         disabled={activeNote.isUnsaved}
-        title="Remove note"
+        title={l("editor.remove-note")}
         icon={activeNote.isUnsaved
           ? "delete_disabled"
           : "delete"
         }
         onClick={async () => {
           await confirm({
-            text: "Do you really want to remove this note?",
-            confirmText: "Remove note",
-            cancelText: "Cancel",
+            text: l("editor.remove-note.confirm.text"),
+            confirmText: l("editor.remove-note.confirm.confirm"),
+            cancelText: l("dialog.cancel"),
             encourageConfirmation: false,
           });
 
@@ -83,7 +84,7 @@ const NoteControls = ({
       <IconButton
         id="button_duplicate"
         disabled={activeNote.isUnsaved}
-        title="Duplicate note"
+        title={l("editor.duplicate-note")}
         icon={activeNote.isUnsaved
           ? "content_copy_disabled"
           : "content_copy"
@@ -93,7 +94,7 @@ const NoteControls = ({
       <IconButton
         id="button_pin"
         disabled={activeNote.isUnsaved}
-        title="Pin note"
+        title={l("editor.pin-note")}
         icon={activeNote.isUnsaved
           ? "push_pin_disabled"
           : "push_pin"
@@ -103,7 +104,7 @@ const NoteControls = ({
       <IconButton
         id="button_open-in-graph-view"
         disabled={activeNote.isUnsaved}
-        title="Reveal note in Graph View"
+        title={l("editor.reveal-note-in-graph")}
         icon={activeNote.isUnsaved
           ? "center_focus_strong_disabled"
           : "center_focus_strong"

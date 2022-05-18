@@ -5,6 +5,7 @@ import {
 } from "../lib/utils.js";
 import { Link } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
+import { l, lf } from "../lib/intl.js";
 
 const StatsViewAnalysisTable = ({
   stats,
@@ -40,15 +41,15 @@ const StatsViewAnalysisTable = ({
   return <table className="data-table stats-table">
     <tbody>
       <tr>
-        <td>{emojis.note} Notes/Nodes</td>
+        <td>{emojis.note} {l("stats.analysis.nodes-notes")}</td>
         <td>{numberOfAllNotes.toLocaleString()}</td>
       </tr>
       <tr>
-        <td>{emojis.link} Links/Edges</td>
+        <td>{emojis.link} {l("stats.analysis.links-edges")}</td>
         <td>{numberOfLinks.toLocaleString()}</td>
       </tr>
       <tr>
-        <td>{emojis.unlinked} Unlinked notes</td>
+        <td>{emojis.unlinked} {l("stats.unlinked-notes")}</td>
         <td>{
           numberOfUnlinkedNotes.toLocaleString()
           + (
@@ -59,44 +60,36 @@ const StatsViewAnalysisTable = ({
         }</td>
       </tr>
       <tr>
-        <td><a
-          href="https://en.wikipedia.org/wiki/Component_(graph_theory)"
-          target="_blank"
-          rel="noreferrer noopener"
-        >Components</a></td>
+        <td>{lf("stats.analysis.components")}</td>
         <td>{numberOfComponents.toLocaleString()}</td>
       </tr>
       <tr>
-        <td>Components with more than one node</td>
+        <td>{l("stats.analysis.components-with-more-than-one-node")}</td>
         <td>{
           numberOfComponentsWithMoreThanOneNode.toLocaleString()
         }</td>
       </tr>
       <tr>
-        <td><a
-          href="https://en.wikipedia.org/wiki/Circuit_rank"
-          target="_blank"
-          rel="noreferrer noopener"
-        >Cyclomatic number</a></td>
+        <td>{lf("stats.analysis.cyclomatic-number")}</td>
         <td>{
           (numberOfLinks - numberOfAllNotes + numberOfComponents)
             .toLocaleString()
         }</td>
       </tr>
       <tr>
-        <td>Meshedness (edges / max. possible edges)</td>
+        <td>{l("stats.analysis.meshedness")}</td>
         <td>{
           meshednessPercentage.toLocaleString()
         } %</td>
       </tr>
       <tr>
-        <td>{emojis.hub} Hubs (nodes with more than 4 links)</td>
+        <td>{emojis.hub} {l("stats.analysis.hubs")}</td>
         <td>{
           numberOfHubs.toLocaleString()
         }</td>
       </tr>
       <tr>
-        <td>🔥 Nodes with highest number of links</td>
+        <td>🔥 {l("stats.analysis.nodes-with-most-links")}</td>
         <td>
           {
             numberOfAllNotes > 0
@@ -121,7 +114,7 @@ const StatsViewAnalysisTable = ({
                   ({note.numberOfLinkedNotes.toLocaleString()})
                 </p>;
               })
-              : "There are no nodes yet."
+              : l("stats.analysis.no-notes-yet")
           }
         </td>
       </tr>

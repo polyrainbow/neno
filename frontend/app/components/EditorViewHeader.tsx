@@ -5,6 +5,7 @@ import EditorViewHeaderPinnedNote from "./EditorViewHeaderPinnedNote";
 import useGoToNote from "../hooks/useGoToNote";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import { l } from "../lib/intl";
 
 const EditorViewHeader = ({
   stats,
@@ -54,7 +55,7 @@ const EditorViewHeader = ({
               style={{
                 padding: "0px 10px",
               }}
-            >Your pinned notes will appear here</p>
+            >{l("app.pinned-notes-placeholder")}</p>
         }
       </div>
       <AppStats stats={stats} />

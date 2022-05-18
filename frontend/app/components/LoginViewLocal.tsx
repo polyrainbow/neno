@@ -4,6 +4,7 @@ import {
 } from "react-router-dom";
 import { DatabaseMode } from "../enum/DatabaseMode";
 import { PathTemplate } from "../enum/PathTemplate";
+import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
 
 const LoginViewLocal = ({
@@ -31,12 +32,11 @@ const LoginViewLocal = ({
   }, [localDatabaseProvider]);
 
   return <>
-    <h1>Local database</h1>
+    <h1>{l("login.local.heading")}</h1>
     {
       localDisclaimer === "INVALID_FOLDER_HANDLE"
         ? <p style={{ color: "red" }}>
-          There was a problem accessing the database folder.
-          Have you moved or deleted it?
+          {l("login.local.error-accessing-folder")}
         </p>
         : ""
     }
@@ -44,7 +44,7 @@ const LoginViewLocal = ({
       typeof localDatabaseFolderHandleName === "string"
         ? <>
           <p>
-            You have already created a local database that you can just open.
+            {l("login.local.already-created-database")}
           </p>
           <button
             type="button"
@@ -64,14 +64,16 @@ const LoginViewLocal = ({
               }
             }}
           >
-            Open database {localDatabaseFolderHandleName}
+            {l(
+              "login.local.open-database-x",
+              { dbName: localDatabaseFolderHandleName },
+            )}
           </button>
         </>
         : ""
     }
     <p>
-      Select a folder to be used as database
-      (if no database in that folder exists yet, a new one will be created)
+      {l("login.local.select-folder.explainer")}
     </p>
     <button
       type="button"
@@ -88,7 +90,7 @@ const LoginViewLocal = ({
         }
       }}
     >
-      Select database folder
+      {l("login.local.select-folder")}
     </button>
   </>;
 };

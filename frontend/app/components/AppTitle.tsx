@@ -1,4 +1,5 @@
 import React from "react";
+import { l } from "../lib/intl";
 
 
 const AppTitle = ({ toggleAppMenu }) => {
@@ -8,7 +9,7 @@ const AppTitle = ({ toggleAppMenu }) => {
     style={{
       cursor: toggleAppMenu ? "pointer" : "inherit",
     }}
-  >NENO</h1>;
+  >{l("app.title")}</h1>;
 };
 
 export default AppTitle;

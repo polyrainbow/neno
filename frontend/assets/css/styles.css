@@ -107,8 +107,12 @@ h1 {
   z-index: 1;
 }
 
-.app-menu-item:hover{
+.app-menu-item:not(.disabled):hover{
   background-color: var(--accent-color-1-light);
+}
+
+.app-menu-item.disabled img.svg-icon {
+  filter: opacity(0.5);
 }
 
 
@@ -552,6 +556,7 @@ button[disabled]{
     grid-area: 1 / 1 / 2 / 2;
     width: var(--xl-list-width);
     box-shadow: var(--default-box-shadow);
+    z-index: 1;
   }
 
   #note-controls, #section-search-input {

@@ -1,6 +1,7 @@
 import React from "react";
 import Tooltip from "./Tooltip.js";
 import { emojis } from "../lib/config.js";
+import { l } from "../lib/intl.js";
 
 
 const NoteListItemFeatures = ({
@@ -12,43 +13,57 @@ const NoteListItemFeatures = ({
     {
       features?.containsText
         ? <Tooltip
-          title="Contains text"><span>{emojis.text}</span></Tooltip>
+          title={l("list.item.features.contains-text")}>
+          <span>{emojis.text}</span>
+        </Tooltip>
         : null
     }
     {
       features?.containsWeblink
         ? <Tooltip
-          title="Contains links"><span>{emojis.weblink}</span></Tooltip>
+          title={l("list.item.features.contains-links")}>
+          <span>{emojis.weblink}</span>
+        </Tooltip>
         : null
     }
     {
       features?.containsCode
         ? <Tooltip
-          title="Contains code"><span>{emojis.code}</span></Tooltip>
+          title={l("list.item.features.contains-code")}>
+          <span>{emojis.code}</span>
+        </Tooltip>
         : null
     }
     {
       features?.containsImages
         ? <Tooltip
-          title="Contains images"><span>{emojis.image}</span></Tooltip>
+          title={l("list.item.features.contains-images")}>
+          <span>{emojis.image}</span>
+        </Tooltip>
         : null
     }
     {
       features?.containsDocuments
         ? <Tooltip
-          title="Contains documents"><span>{emojis.document}</span></Tooltip>
+          title={l("list.item.features.contains-documents")}>
+          <span>{emojis.document}</span>
+        </Tooltip>
         : null
     }
     {
       features?.containsAudio
         ? <Tooltip
-          title="Contains audio"><span>{emojis.audio}</span></Tooltip>
+          title={l("list.item.features.contains-audio")}>
+          <span>{emojis.audio}</span>
+        </Tooltip>
         : null
     }
     {
       features?.containsVideo
         ? <Tooltip
-          title="Contains video"><span>{emojis.video}</span></Tooltip>
+          title={l("list.item.features.contains-video")}>
+          <span>{emojis.video}</span>
+        </Tooltip>
         : null
     }
   </span>;

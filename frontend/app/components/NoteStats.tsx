@@ -1,4 +1,5 @@
 import React from "react";
+import { l } from "../lib/intl.js";
 import {
   makeTimestampHumanReadable,
   getFileInfosOfNoteFiles,
@@ -18,31 +19,31 @@ const NoteStats = ({
     <table className="data-table">
       <tbody>
         <tr>
-          <td>ID</td>
+          <td>{l("editor.stats.id")}</td>
           <td>{note.id}</td>
         </tr>
         <tr>
-          <td>Creation time</td>
+          <td>{l("editor.stats.creation-time")}</td>
           <td>{makeTimestampHumanReadable(note.creationTime)}</td>
         </tr>
         <tr>
-          <td>Last update time</td>
+          <td>{l("editor.stats.last-update-time")}</td>
           <td>{makeTimestampHumanReadable(note.updateTime)}</td>
         </tr>
         <tr>
-          <td>Number of blocks</td>
+          <td>{l("editor.stats.number-of-blocks")}</td>
           <td>{note.blocks.length}</td>
         </tr>
         <tr>
-          <td>Number of links</td>
+          <td>{l("editor.stats.number-of-links")}</td>
           <td>{note.linkedNotes?.length || 0}</td>
         </tr>
         <tr>
-          <td>Number of characters</td>
+          <td>{l("editor.stats.number-of-characters")}</td>
           <td>{note.numberOfCharacters}</td>
         </tr>
         <tr>
-          <td>Files</td>
+          <td>{l("editor.stats.files")}</td>
           <td>{
             fileInfos.length > 0
               ? fileInfos
@@ -61,15 +62,15 @@ const NoteStats = ({
                     }
                   </React.Fragment>;
                 })
-              : "None"
+              : l("editor.stats.files.none")
           }</td>
         </tr>
         <tr>
-          <td>X coordinate</td>
+          <td>{l("editor.stats.x-coordinate")}</td>
           <td>{note.position.x}</td>
         </tr>
         <tr>
-          <td>Y coordinate</td>
+          <td>{l("editor.stats.y-coordinate")}</td>
           <td>{note.position.y}</td>
         </tr>
       </tbody>

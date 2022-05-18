@@ -1,4 +1,5 @@
 import React from "react";
+import { l } from "../lib/intl";
 
 const NoteSearchDisclaimer = ({
   searchValue,
@@ -13,10 +14,12 @@ const NoteSearchDisclaimer = ({
     ) {
       label = "";
     } else if (searchValue.length > 2) {
-      const text = numberOfResults === 1
-        ? "{number} note found"
-        : "{number} notes found";
-      label = text.replace("{number}", numberOfResults.toLocaleString());
+      label = l(
+        numberOfResults === 1
+          ? "list.search.x-note-found"
+          : "list.search.x-notes-found",
+        { number: numberOfResults.toLocaleString() },
+      );
     }
   } else if (searchValue.length > 0 && searchValue.length < 3) {
     label = "";

@@ -13,6 +13,7 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
+import { l } from "../lib/intl";
 
 const Note = ({
   note,
@@ -157,11 +158,14 @@ const Note = ({
         <div id="editor"></div>
         <hr/>
         <div id="links">
-          <h2>Linked notes ({displayedLinkedNotes.length})</h2>
+          <h2>{l(
+            "editor.linked-notes",
+            { linkedNotes: displayedLinkedNotes.length },
+          )}</h2>
           {
             displayedLinkedNotes.length === 0
               ? <p className="note-meta-paragraph"
-              >There are no notes linked to this one yet.</p>
+              >{l("editor.no-notes-linked-yet")}</p>
               : null
           }
           <div id="links">
@@ -187,7 +191,7 @@ const Note = ({
           <h2>Add links</h2>
           <SearchInput
             value={searchString}
-            placeholder="Search notes..."
+            placeholder={l("editor.note-search-placeholder")}
             onChange={(newValue) => setSearchString(newValue)}
             autoComplete="off"
             inputStyle={{

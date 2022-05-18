@@ -1,6 +1,7 @@
 import React from "react";
 import Tooltip from "./Tooltip.js";
 import { emojis } from "../lib/config";
+import { l } from "../lib/intl.js";
 
 const AppStatsItem = ({
   icon,
@@ -21,7 +22,7 @@ const AppStats = ({
   const showStats = !!stats;
 
   if (!showStats) {
-    return <div id="app-stats">Loading stats ...</div>;
+    return <div id="app-stats">{l("stats.loading-stats")}</div>;
   }
 
   let percentageOfUnlinkedNotes = NaN;
@@ -35,17 +36,17 @@ const AppStats = ({
     <div id="app-stats">
       <AppStatsItem
         icon={emojis.note}
-        label="Number of notes"
+        label={l("stats.number-of-notes")}
         value={stats.numberOfAllNotes.toLocaleString()}
       />
       <AppStatsItem
         icon={emojis.link}
-        label="Number of links"
+        label={l("stats.number-of-links")}
         value={stats.numberOfLinks.toLocaleString()}
       />
       <AppStatsItem
         icon={emojis.unlinked}
-        label="Unlinked notes"
+        label={l("stats.unlinked-notes")}
         value={
           `${stats.numberOfUnlinkedNotes.toLocaleString()}`
           + (

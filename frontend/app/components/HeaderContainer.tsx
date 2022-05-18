@@ -4,7 +4,7 @@ import AppTitle from "./AppTitle";
 interface HeaderContainerProps {
   leftContent?: React.ReactNode,
   rightContent?: React.ReactNode,
-  toggleAppMenu?: any,
+  toggleAppMenu: any,
 }
 
 const HeaderContainer = ({

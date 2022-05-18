@@ -8,6 +8,7 @@ import GraphViewHeader from "./GraphViewHeader";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useGoToNote from "../hooks/useGoToNote";
+import { l } from "../lib/intl.js";
 
 const GraphView = ({
   databaseProvider,
@@ -60,11 +61,11 @@ const GraphView = ({
     if (!graphVisualizationInstance.current) return;
     const ids = graphVisualizationInstance.current.getSelectedNodeIds();
     if (ids.length === 0) {
-      alert("Please select one note before opening it.");
+      alert(l("graph.select-note-before-opening"));
       return;
     }
     if (ids.length > 1) {
-      alert("Please select only one note to open it.");
+      alert(l("graph.select-only-one-note"));
       return;
     }
 

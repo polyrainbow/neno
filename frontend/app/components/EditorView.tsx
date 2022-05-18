@@ -26,6 +26,7 @@ import useGoToNote from "../hooks/useGoToNote";
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import { PathTemplate } from "../enum/PathTemplate";
 import useDialog from "../hooks/useDialog";
+import { l } from "../lib/intl";
 
 const EditorView = ({
   databaseProvider,
@@ -298,8 +299,8 @@ const EditorView = ({
       if (e.message === "NOTE_WITH_SAME_TITLE_EXISTS") {
         await confirm({
           text: Config.texts.titleAlreadyExistsConfirmation,
-          confirmText: "Save anyway",
-          cancelText: "Cancel",
+          confirmText: l("editor.save-anyway"),
+          cancelText: l("editor.cancel"),
           encourageConfirmation: false,
         });
 

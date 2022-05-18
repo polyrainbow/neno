@@ -6,16 +6,17 @@ const AppMenuItem = ({
   icon,
   label,
   onClick,
+  disabled = false,
 }) => {
   return <div
     style={{
       display: "flex",
       padding: "15px 10px",
       alignItems: "center",
-      cursor: "pointer",
+      cursor: disabled ? "default" : "pointer",
     }}
-    onClick={onClick}
-    className="app-menu-item"
+    onClick={disabled ? null : onClick}
+    className={"app-menu-item" + (disabled ? " disabled" : "")}
   >
     <img
       src={getIconSrc(icon)}
@@ -27,6 +28,7 @@ const AppMenuItem = ({
     <p style={{
       margin: "0",
       marginLeft: "15px",
+      color: disabled ? "#888888" : "inherit",
     }}>{label}</p>
   </div>;
 };
