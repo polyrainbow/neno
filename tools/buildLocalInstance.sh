@@ -1,4 +1,10 @@
-TARGET_DIRECTORY=../neno-local
+'''
+builds a NENO instance intended for local mode only.
+make sure, you set ROOT_PATH in frontend/lib/config.tsx to the correct basepath
+of your hosting environment before building
+'''
+
+TARGET_DIRECTORY=../neno-local-instance
 
 cd ..
 
@@ -30,3 +36,5 @@ sed -i '' -E "s/\/manifest.json/\/neno\/manifest.json/" $TARGET_DIRECTORY/index.
 echo "Creating 404.html for GitHub pages"
 cp $TARGET_DIRECTORY/index.html $TARGET_DIRECTORY/404.html
 # https://stackoverflow.com/a/59677657/3890888
+
+echo "Done."

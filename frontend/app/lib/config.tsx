@@ -45,6 +45,8 @@ const emojis = {
   "text": "✏️",
 };
 
+// base path of the hosting environment. if you want to serve the application on
+// domain.com/neno the ROOT_PATH must be set to "/neno/".
 const ROOT_PATH = "/";
 const ASSETS_PATH = `${ROOT_PATH}assets/`;
 const ICON_PATH = `${ASSETS_PATH}icons/`;
