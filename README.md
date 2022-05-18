@@ -4,14 +4,21 @@
 
 NENO is a note-taking app that helps you creating your personal knowledge graph. With NENO, you retain full control over your data because you decide where it is stored: On your local machine, on a cloud storage of your choice, or even on a server under your control.
 
-![NENO Editor view](./docs/img/editor%20view.png)
+![NENO Editor view](./docs/img/neno-light.png)
 ![NENO Graph view](./docs/img/graph%20view.png)
 
-## Sponsoring
+## Features
 
-This open source software comes free of charge and is made with ❤️. If it is helpful to you, please consider [buying me a coffee](https://www.buymeacoffee.com/szimr).
+* Full data ownership: You decide where your data is stored: On your local machine, on a cloud storage of your choice, or even on a server under your control.
+* WYSIWYG editor that allows to paste multiple media types: video, audio, PDF documents, images and code
+* Graph View: Drag and drop nodes and create your custom knowledge graph visualization
+* Powerful full-text search
+* Tap-to-link: One click is enough to link two notes
+* File overview: All uploaded files in one view
+* Lossless export: Export your data lossleslly to create backups or to move it to another NENO instance
+* Dark mode: Eye-friendly note-taking at night time
 
-[<img src="./docs/img/bmac%20button.png" alt="Buy me a coffee" width="200"/>](https://www.buymeacoffee.com/szimr)
+![NENO Editor view in dark mode](./docs/img/neno-dark.png)
 
 ## Getting started
 
@@ -41,6 +48,11 @@ web space capable of serving static files via HTTPS.
 
 [Deploying NENO for local mode usage](./docs/DeployNENOLocalMode.md)
 
+## Sponsoring
+
+This open source software comes free of charge and is made with ❤️. If it is helpful to you, please consider [buying me a coffee](https://www.buymeacoffee.com/szimr).
+
+[<img src="./docs/img/bmac%20button.png" alt="Buy me a coffee" width="200"/>](https://www.buymeacoffee.com/szimr)
 
 ## Further reading
 
