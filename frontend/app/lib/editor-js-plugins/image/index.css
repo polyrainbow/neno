@@ -24,11 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-.image-tool {
-  --bg-color: #cdd1e0;
-  --front-color: #388ae5;
-  --border-color: #e8e8eb;
-}
 
 .image-tool__image {
   border-radius: 0px;
@@ -103,7 +98,7 @@ SOFTWARE.
 
 .image-tool--withBackground .image-tool__image {
   padding: 15px;
-  background: var(--bg-color);
+  background: #848484;
 }
 
 .image-tool--withBackground .image-tool__image-picture {

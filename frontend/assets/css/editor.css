@@ -59,10 +59,6 @@
   --block-download-icon-fill-color: #7b7e89;
 }
 
-.ce-code__textarea {
-  font-size: 14px !important;
-  border: var(--block-border) !important;
-}
 
 @media (prefers-color-scheme: dark) {
   .ce-popover--opened {

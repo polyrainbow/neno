@@ -29,14 +29,15 @@ SOFTWARE.
     font-family: Menlo, Monaco, Consolas, Courier New, monospace;
     color: #41314e;
     line-height: 1.6em;
-    font-size: 12px;
     background: #f8f7fa;
     box-shadow: none;
     white-space: pre;
     word-wrap: normal;
     overflow-x: auto;
     resize: vertical;
-}
+    font-size: 14px;
+    border: var(--block-border);
+  }
 
 @media (prefers-color-scheme: dark) {
     .ce-code__textarea {
