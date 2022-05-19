@@ -33,6 +33,13 @@ SOFTWARE.
 
 import { make } from "../utils.js";
 
+
+enum UIStatus {
+  EMPTY = "empty",
+  UPLOADING = "uploading",
+  FILLED = "filled",
+}
+
 export default class Ui {
   nodes;
   api;
@@ -105,32 +112,16 @@ export default class Ui {
   }
 
   /**
-   * Ui statuses:
-   * - empty
-   * - uploading
-   * - filled
-   *
-   * @return {{EMPTY: string, UPLOADING: string, FILLED: string}}
-   */
-  static get status() {
-    return {
-      EMPTY: "empty",
-      UPLOADING: "loading",
-      FILLED: "filled",
-    };
-  }
-
-  /**
    * Renders tool UI
    *
    * @param {ImageToolData} toolData - saved tool data
    * @return {Element}
    */
   render(toolData) {
-    if (!toolData.file || Object.keys(toolData.file).length === 0) {
-      this.toggleStatus(Ui.status.EMPTY);
+    if (!toolData.file?.fileId) {
+      this.setStatus(UIStatus.EMPTY);
     } else {
-      this.toggleStatus(Ui.status.UPLOADING);
+      this.setStatus(UIStatus.FILLED);
     }
 
     return this.nodes.wrapper;
@@ -161,7 +152,7 @@ export default class Ui {
    */
   showPreloader() {
     this.nodes.imagePreloader.innerHTML = "Uploading...";
-    this.toggleStatus(Ui.status.UPLOADING);
+    this.setStatus(UIStatus.UPLOADING);
   }
 
   /**
@@ -171,7 +162,7 @@ export default class Ui {
    */
   hidePreloader() {
     this.nodes.imagePreloader.style.backgroundImage = "";
-    this.toggleStatus(Ui.status.EMPTY);
+    this.setStatus(UIStatus.EMPTY);
   }
 
   /**
@@ -200,7 +191,7 @@ export default class Ui {
      * Add load event listener
      */
     this.nodes.imageEl.addEventListener("load", () => {
-      this.toggleStatus(Ui.status.FILLED);
+      this.setStatus(UIStatus.FILLED);
 
       /**
        * Preloader does not exists on first rendering with presaved data
@@ -231,15 +222,8 @@ export default class Ui {
    * @param {string} status - see {@link Ui.status} constants
    * @return {void}
    */
-  toggleStatus(status) {
-    for (const statusType in Ui.status) {
-      if (Object.prototype.hasOwnProperty.call(Ui.status, statusType)) {
-        this.nodes.wrapper.classList.toggle(
-          `${this.CSS.wrapper}--${Ui.status[statusType]}`,
-          status === Ui.status[statusType],
-        );
-      }
-    }
+  setStatus(status:UIStatus):void {
+    this.nodes.wrapper.dataset.status = status;
   }
 
   /**
