@@ -50,6 +50,7 @@ export default class CodeTool {
   CSS;
   nodes;
   _data;
+  block;
 
   /**
    * Notify core that read-only mode is supported
@@ -84,8 +85,9 @@ export default class CodeTool {
    * @param {object} options.api - Editor.js API
    * @param {boolean} options.readOnly - read only mode flag
    */
-  constructor({ data, config, api, readOnly }) {
+  constructor({ data, config, api, readOnly, block }) {
     this.api = api;
+    this.block = block;
     this.readOnly = readOnly;
 
     this.placeholder = config.placeholder || CodeTool.DEFAULT_PLACEHOLDER;
@@ -141,6 +143,10 @@ export default class CodeTool {
           this.tabHandler(event);
           break;
       }
+    });
+
+    textarea.addEventListener("input", () => {
+      this.block.dispatchChange();
     });
 
     this.nodes.textarea = textarea;
@@ -228,7 +234,7 @@ export default class CodeTool {
    * @return {string}
    */
   static get DEFAULT_PLACEHOLDER() {
-    return "Enter a code";
+    return "";
   }
 
   /**
