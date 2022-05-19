@@ -18,17 +18,6 @@
   max-width: unset !important;
 }
 
-.ce-toolbar__actions {
-  right: 0px;
-}
-
-.ce-toolbar__plus {
-  left: unset !important;
-}
-
-.ce-toolbox--opened {
-  left: 32px !important;
-}
 
 .cdx-notify,
 .cdx-notify--error {
@@ -73,4 +62,18 @@
 .ce-code__textarea {
   font-size: 14px !important;
   border: var(--block-border) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ce-popover--opened {
+    background: black;
+  }
+
+  .ce-popover__item-icon {
+    background-color: black;;
+  }
+
+  .icon--plus, .icon--dots {
+    fill: white !important;
+  }
 }

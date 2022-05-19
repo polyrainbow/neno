@@ -4,7 +4,7 @@
   "description": "NENO is an app that helps you creating your personal knowledge graph.",
   "type": "module",
   "dependencies": {
-    "@editorjs/editorjs": "2.23.2",
+    "@editorjs/editorjs": "2.24.3",
     "@editorjs/header": "^2.6.2",
     "@editorjs/list": "^1.7.0",
     "@tippyjs/react": "^4.2.6",

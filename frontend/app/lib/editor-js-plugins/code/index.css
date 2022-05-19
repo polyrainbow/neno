@@ -31,10 +31,16 @@ SOFTWARE.
     line-height: 1.6em;
     font-size: 12px;
     background: #f8f7fa;
-    border: 1px solid #f1f1f4;
     box-shadow: none;
     white-space: pre;
     word-wrap: normal;
     overflow-x: auto;
     resize: vertical;
 }
+
+@media (prefers-color-scheme: dark) {
+    .ce-code__textarea {
+        color: white;
+        background: #303030;
+    }
+  }
