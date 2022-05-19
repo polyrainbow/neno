@@ -6,7 +6,7 @@
   "dialog.cancel": "Abbrechen",
   "dialog.close": "Schließen",
   "editor.cancel": "Abbrechen",
-  "editor.duplicate-note": "Duplikat",
+  "editor.duplicate-note": "Notiz duplizieren",
   "editor.go-to-list": "Zur Liste",
   "editor.linked-notes": "Verbundene Notizen ({linkedNotes})",
   "editor.new-note": "Neue Notiz",
