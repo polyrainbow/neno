@@ -37,7 +37,6 @@ const ExportDatabaseDialog = ({
 
 
   const getWritableStream = async (opts) => {
-    // @ts-ignore method is not yet in types
     const newHandle = await window.showSaveFilePicker(opts);
     // create a FileSystemWritableFileStream to write to
     const writableStream = await newHandle.createWritable();

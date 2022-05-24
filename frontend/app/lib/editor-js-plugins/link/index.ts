@@ -290,8 +290,7 @@ export default class LinkTool {
     let url = this.nodes.input.textContent;
 
     if (event.type === "paste") {
-      // @ts-ignore
-      url = (event.clipboardData || window.clipboardData).getData("text");
+      url = event.clipboardData.getData("text");
     }
 
     this.removeErrorStyle();

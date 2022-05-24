@@ -23,6 +23,12 @@ import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import DialogServiceProvider from "./DialogServiceProvider";
 import { l } from "../lib/intl";
+import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery";
+import {
+  NoteListSortMode,
+} from "../../../lib/notes/interfaces/NoteListSortMode";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 
 
 const App = ({
@@ -41,18 +47,21 @@ const App = ({
   const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [noteListIsBusy, setNoteListIsBusy] = useState<boolean>(true);
-  const [stats, setStats] = useState(null);
-  const [sortMode, setSortMode] = useState("UPDATE_DATE_DESCENDING");
+  const [stats, setStats] = useState<GraphStats | null>(null);
+  const [sortMode, setSortMode] = useState<NoteListSortMode>(
+    NoteListSortMode.UPDATE_DATE_DESCENDING,
+  );
   const [searchValue, setSearchValue] = useState<string>("");
   const [pinnedNotes, setPinnedNotes] = useState<any[]>([]);
 
-  const databaseProvider = databaseMode === DatabaseMode.LOCAL
-    ? localDatabaseProvider
-    : (
-      databaseMode === DatabaseMode.SERVER
-        ? serverDatabaseProvider
-        : null
-    );
+  const databaseProvider:DatabaseProvider | null
+    = databaseMode === DatabaseMode.LOCAL
+      ? localDatabaseProvider
+      : (
+        databaseMode === DatabaseMode.SERVER
+          ? serverDatabaseProvider
+          : null
+      );
 
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
@@ -85,7 +94,7 @@ const App = ({
 
 
   const handleInvalidCredentialsError = async () => {
-    await databaseProvider.removeAccess();
+    await databaseProvider?.removeAccess();
     setDatabaseMode(DatabaseMode.NONE);
     navigate(getAppPath(PathTemplate.LOGIN));
   };
@@ -109,7 +118,7 @@ const App = ({
 
       setNoteListIsBusy(true);
 
-      const options = {
+      const options:DatabaseQuery = {
         page,
         sortMode,
         searchString: "",
@@ -193,13 +202,13 @@ const App = ({
 
 
   const importLinksAsNotes = async (links) => {
-    await databaseProvider.importLinksAsNotes(links);
+    await databaseProvider?.importLinksAsNotes(links);
     refreshNotesList();
   };
 
 
   const switchGraphs = (graphId) => {
-    databaseProvider.setGraphId(graphId);
+    databaseProvider?.setGraphId?.(graphId);
     navigate(
       isSmallScreen
         ? getAppPath(PathTemplate.LIST)

@@ -282,7 +282,6 @@ export default class AudioTool {
 
 
   async #selectAndUploadFile() {
-    // @ts-ignore
     const [fileHandle] = await window.showOpenFilePicker({
       multiple: false,
       types: [

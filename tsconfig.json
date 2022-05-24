@@ -22,7 +22,8 @@
     "useDefineForClassFields": true,
     "types": [
       "node",
-      "chrome"
+      "chrome",
+      "wicg-file-system-access"
     ],
     "typeRoots": [
       "./custom_typings",

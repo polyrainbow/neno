@@ -1,6 +1,13 @@
+import { GraphId } from "../../../../backend/interfaces/GraphId.js";
+import { FileId } from "../../../../lib/notes/interfaces/FileId.js";
+import GraphStatsRetrievalOptions
+  from "../../../../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
+import { NoteId } from "../../../../lib/notes/interfaces/NoteId.js";
+import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit.js";
+import DatabaseProvider from "../../interfaces/DatabaseProvider.js";
 import * as API from "./api.js";
 
-export default class ServerDatabaseProvider {
+export default class ServerDatabaseProvider implements DatabaseProvider {
   static features = [
     "EXPORT_DATABASE",
     "AUTHENTICATION",
@@ -20,11 +27,11 @@ export default class ServerDatabaseProvider {
     API.init(API_URL);
   }
 
-  getActiveGraphId() {
+  getActiveGraphId():GraphId | null {
     return this.#activeGraphId;
   }
 
-  getGraphIds() {
+  getGraphIds():GraphId[] | null {
     return this.#graphIds;
   }
 
@@ -69,7 +76,7 @@ export default class ServerDatabaseProvider {
     }
   }
 
-  getNote(noteId) {
+  getNote(noteId:NoteId):Promise<NoteToTransmit | null> {
     return API.getNote(noteId);
   }
 
@@ -77,7 +84,7 @@ export default class ServerDatabaseProvider {
     return API.getNotes(options);
   }
 
-  getStats(options) {
+  getStats(options:GraphStatsRetrievalOptions) {
     return API.getStats(options);
   }
 
@@ -153,12 +160,7 @@ export default class ServerDatabaseProvider {
    * public name instead of the more technical fileId.
    * @return {string} url
   */
-  async getUrlForFileId(fileId, publicName) {
-    if (
-      (!Array.isArray(this.#graphIds))) {
-      return;
-    }
-
+  async getUrlForFileId(fileId:FileId, publicName?:string): Promise<string> {
     let url = this.#apiUrl + "graph/" + this.#activeGraphId + "/file/" + fileId;
 
     if (typeof publicName === "string") {

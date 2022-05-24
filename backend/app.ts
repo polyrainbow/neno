@@ -28,6 +28,7 @@ import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode.js";
 import { UserId } from "./interfaces/UserId.js";
 import { GraphId } from "./interfaces/GraphId.js";
 import BruteForcePreventer from "./BruteForcePreventer.js";
+import GraphStatsRetrievalOptions from "../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
 
 
 const startApp = async ({
@@ -47,7 +48,7 @@ const startApp = async ({
     "Maximum upload file size: " + maxUploadFileSize.toString() + " byte(s)",
   );
   logger.info("Initializing notes module...");
-  await Notes.init(storageProvider, getUrlMetadata, randomUUID);
+  await Notes.init(storageProvider, randomUUID, getUrlMetadata);
   logger.info("Initializing routes...");
   const app = express();
 
@@ -194,10 +195,10 @@ const startApp = async ({
       const graphId = req.params.graphId;
       const withFiles = req.query.withFiles === "true";
 
-      const databaseStream = await Notes.getReadableGraphStream(
+      const databaseStream = (await Notes.getReadableGraphStream(
         graphId,
         withFiles,
-      );
+      )) as NodeJS.ReadStream;
 
       // set the archive name
       const dateSuffix = yyyymmdd(new Date());
@@ -260,7 +261,7 @@ const startApp = async ({
     verifyUser,
     async function(req, res) {
       const graphId = req.params.graphId;
-      const options = {
+      const options:GraphStatsRetrievalOptions = {
         includeMetadata: req.query.includeMetadata === "true",
         includeAnalysis: req.query.includeAnalysis === "true",
       };
@@ -490,6 +491,7 @@ const startApp = async ({
 
         const {fileId, size: transmittedBytes} = await Notes.addFile(
           graphId,
+          // @ts-ignore
           req,
           mimeType,
         );

@@ -10,7 +10,6 @@
 
 import { stringContainsUUID } from "../utils.js";
 import { FileId } from "./interfaces/FileId.js";
-import { Readable } from "stream";
 import Graph from "./interfaces/Graph.js";
 import ReadableWithMimeType from "./interfaces/ReadableWithMimeType.js";
 import * as config from "./config.js";
@@ -134,7 +133,7 @@ export default class DatabaseIO {
   async addFile(
     graphId:GraphId,
     fileId:FileId,
-    source:Readable,
+    source:ReadableStream | NodeJS.ReadStream,
   ):Promise<number> {
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
@@ -166,7 +165,7 @@ export default class DatabaseIO {
   async getReadableGraphStream(
     graphId:GraphId,
     withFiles:boolean,
-  ):Promise<Readable> {
+  ):Promise<ReadableStream | NodeJS.ReadStream> {
     if (!withFiles) {
       const stream = await this.#storageProvider.getReadableStream(
         graphId,

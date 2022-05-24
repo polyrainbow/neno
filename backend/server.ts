@@ -4,7 +4,6 @@ import * as logger from "./lib/logger.js";
 import fs from "fs/promises";
 
 const handleClientError = (err, socket) => {
-  // @ts-ignore
   if (err.code === 'ECONNRESET' || !socket.writable) {
     return;
   }

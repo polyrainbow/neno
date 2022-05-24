@@ -1,7 +1,17 @@
 import * as IDB from "idb-keyval";
+import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery.js";
 import { FileId } from "../../../lib/notes/interfaces/FileId.js";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId.js";
+import GraphStats from "../../../lib/notes/interfaces/GraphStats.js";
+import GraphStatsRetrievalOptions
+  from "../../../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId.js";
+import NoteListPage from "../../../lib/notes/interfaces/NoteListPage.js";
+import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions.js";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit.js";
+import UrlMetadataResponse
+  from "../../../lib/notes/interfaces/UrlMetadataResponse.js";
+import DatabaseProvider from "../interfaces/DatabaseProvider.js";
 import FileSystemAccessAPIStorageProvider
   from "./FileSystemAccessAPIStorageProvider.js";
 import { streamToBlob } from "./utils.js";
@@ -26,22 +36,25 @@ async function verifyPermission(fileHandle, readWrite) {
 }
 
 
-export default class LocalDatabaseProvider {
+export default class LocalDatabaseProvider implements DatabaseProvider {
   static #handleStorageKey = "LOCAL_DB_FOLDER_HANDLE";
   #isDatabaseInitialized = false;
-  #folderHandle = null;
+  #folderHandle:FileSystemDirectoryHandle | null = null;
+  #notesModule: typeof import("../../../lib/notes/index");
 
   /* PUBLIC */
 
   static features = ["DATABASE_FOLDER"];
   static type = "LOCAL";
+  /* when using a local graph folder, we'll always call this graph the same */
+  static graphId:GraphId = "local-graph";
+
 
   // when we return that we have an access token, the app switches to editor
   // mode and the editor will start fetching data, so we need to be prepared
   // and initialize the database
-  async getFolderHandleName() {
+  async getFolderHandleName():Promise<string | null> {
     if (this.#folderHandle) {
-      // @ts-ignore
       return this.#folderHandle.name;
     }
 
@@ -50,18 +63,12 @@ export default class LocalDatabaseProvider {
       return null;
     }
 
-    this.#folderHandle = folderHandle;
-    // @ts-ignore
+    this.#folderHandle = folderHandle as FileSystemDirectoryHandle;
     return this.#folderHandle.name;
   }
 
 
-  /* when using a local graph folder, we'll always call this graph the same */
-  static graphId = "local-graph";
-
-  #notesModule;
-
-  async login(folderHandle) {
+  async login(folderHandle:FileSystemDirectoryHandle):Promise<void> {
     await IDB.set(
       LocalDatabaseProvider.#handleStorageKey,
       folderHandle,
@@ -73,12 +80,12 @@ export default class LocalDatabaseProvider {
   }
 
 
-  getActiveGraphId() {
+  getActiveGraphId():GraphId {
     return LocalDatabaseProvider.graphId;
   }
 
 
-  async removeAccess() {
+  async removeAccess():Promise<void> {
     this.#folderHandle = null;
     await IDB.del(LocalDatabaseProvider.#handleStorageKey);
 
@@ -118,7 +125,6 @@ export default class LocalDatabaseProvider {
     try {
       await this.#notesModule.init(
         storageProvider,
-        null,
         () => crypto.randomUUID(),
       );
     } catch (e) {
@@ -134,26 +140,26 @@ export default class LocalDatabaseProvider {
   }
 
 
-  getNote(noteId:NoteId):NoteToTransmit {
+  getNote(noteId:NoteId):Promise<NoteToTransmit | null> {
     return this.#notesModule.get(noteId, LocalDatabaseProvider.graphId);
   }
 
-  getNotes(options) {
+  getNotes(options:DatabaseQuery):Promise<NoteListPage> {
     return this.#notesModule.getNotesList(
       LocalDatabaseProvider.graphId,
       options,
     );
   }
 
-  getStats(options) {
+  getStats(options:GraphStatsRetrievalOptions):Promise<GraphStats> {
     return this.#notesModule.getStats(LocalDatabaseProvider.graphId, options);
   }
 
-  deleteNote(noteId) {
+  deleteNote(noteId:NoteId): Promise<void> {
     return this.#notesModule.remove(noteId, LocalDatabaseProvider.graphId);
   }
 
-  putNote(noteToTransmit, options) {
+  putNote(noteToTransmit:NoteToTransmit, options:NotePutOptions) {
     return this.#notesModule.put(
       noteToTransmit,
       LocalDatabaseProvider.graphId,
@@ -197,9 +203,10 @@ export default class LocalDatabaseProvider {
   }
 
 
-  uploadFile(file) {
+  uploadFile(file:File) {
     return this.#notesModule.addFile(
       LocalDatabaseProvider.graphId,
+      // @ts-ignore
       file.stream(),
       file.type,
     );
@@ -214,18 +221,18 @@ export default class LocalDatabaseProvider {
   }
 
 
-  getUrlMetadata(url) {
+  getUrlMetadata(url:string):Promise<UrlMetadataResponse> {
     return this.#notesModule.getUrlMetadata(url);
   }
 
 
   getFiles() {
-    return this.#notesModule.getFiles();
+    return this.#notesModule.getFiles(LocalDatabaseProvider.graphId);
   }
 
 
   getDanglingFiles() {
-    return this.#notesModule.getDanglingFiles();
+    return this.#notesModule.getDanglingFiles(LocalDatabaseProvider.graphId);
   }
 
 

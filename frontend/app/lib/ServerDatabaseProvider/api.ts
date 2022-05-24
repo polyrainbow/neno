@@ -1,4 +1,6 @@
 import APIResponse from "../../../../backend/interfaces/APIResponse";
+import { NoteId } from "../../../../lib/notes/interfaces/NoteId";
+import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit";
 
 let API_URL;
 let GRAPH_ID;
@@ -131,7 +133,7 @@ const isAuthenticated = () => {
 };
 
 
-const getNote = (noteId) => {
+const getNote = (noteId:NoteId):Promise<NoteToTransmit | null> => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "note/" + noteId,
   });

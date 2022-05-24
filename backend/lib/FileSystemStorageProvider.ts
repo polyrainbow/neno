@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import fsClassic from "fs";
 import * as path from "path";
-import { Readable } from "stream";
 import { finished } from "stream/promises";
 import archiver from "archiver";
 
@@ -51,13 +50,14 @@ export default class FileSystemStorageProvider {
   async writeObjectFromReadable(
     graphId: string,
     requestPath: string,
-    readableStream: Readable,
+    readableStream: fsClassic.ReadStream,
   ):Promise<number> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
     await fs.mkdir(path.dirname(finalPath), { recursive: true });
-    const writableStream = fsClassic.createWriteStream(finalPath);
+    const writableStream:fsClassic.WriteStream
+      = fsClassic.createWriteStream(finalPath);
     readableStream.pipe(writableStream);
 
     // One important caveat is that if the Readable stream emits an error
@@ -76,7 +76,6 @@ export default class FileSystemStorageProvider {
       await this.removeObject(graphId, requestPath);
       throw new Error(
         "Readable stream ended unexpectedly.",
-        // @ts-ignore
         {
           cause: e,
         }
@@ -104,7 +103,7 @@ export default class FileSystemStorageProvider {
     graphId: string,
     requestPath: string,
     range,
-  ):Promise<Readable> {
+  ):Promise<fsClassic.ReadStream> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );

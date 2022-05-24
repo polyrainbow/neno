@@ -274,7 +274,6 @@ export default class ImageTool {
   }
 
   async #selectAndUploadFile() {
-    // @ts-ignore
     const [fileHandle] = await window.showOpenFilePicker({
       multiple: false,
       types: [

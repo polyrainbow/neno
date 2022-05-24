@@ -45,7 +45,6 @@ import { FileId } from "./interfaces/FileId.js";
 import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
 import ImportLinkAsNoteFailure from "./interfaces/ImportLinkAsNoteFailure.js";
 import * as config from "./config.js";
-import { Readable } from "stream";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
@@ -53,8 +52,9 @@ import GraphObject from "./interfaces/Graph.js";
 import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import DatabaseQuery from "./interfaces/DatabaseQuery.js";
+import NotePutOptions from "./interfaces/NotePutOptions.js";
 
-let io;
+let io: DatabaseIO;
 let randomUUID;
 
 /* this is the fallback getUrlMetadata function that is used if the initializer
@@ -75,10 +75,10 @@ let getUrlMetadata = (url:string):Promise<UrlMetadataResponse> => {
 
 const init = async (
   storageProvider,
-  _getUrlMetadata: (string) => Promise<UrlMetadataResponse>,
   _randomUUID: () => string,
+  _getUrlMetadata?: (string) => Promise<UrlMetadataResponse>,
 ):Promise<void> => {
-  if (typeof _getUrlMetadata === "function") {
+  if (_getUrlMetadata) {
     getUrlMetadata = _getUrlMetadata;
   }
 
@@ -316,7 +316,7 @@ const setGraphVisualization = async (
 const put = async (
   noteFromUser:NoteFromUser,
   graphId:GraphId,
-  options
+  options?: NotePutOptions,
 ):Promise<NoteToTransmit> => {
   if (
     (!noteFromUser)
@@ -411,7 +411,7 @@ const importDB = (
 
 const addFile = async (
   graphId:GraphId,
-  readable:Readable,
+  readable:ReadableStream<any> | NodeJS.ReadStream,
   mimeType: string,
 ):Promise<{
   fileId: FileId,
@@ -444,14 +444,14 @@ const deleteFile = async (
 
 
 const getFiles = async (
-  graphId,
+  graphId: GraphId,
 ):Promise<FileId[]> => {
   return io.getFiles(graphId);
 };
 
 // get files not used in any note
 const getDanglingFiles = async (
-  graphId,
+  graphId: GraphId,
 ):Promise<FileId[]> => {
   const allFiles = await io.getFiles(graphId);
   const graph = await io.getGraph(graphId);

@@ -80,7 +80,6 @@ const LoginViewLocal = ({
       className="default-button default-action"
       onClick={async () => {
         try {
-          // @ts-ignore (window.showDirectoryPicker is not in types yet)
           const folderHandle = await window.showDirectoryPicker();
           await localDatabaseProvider.login(folderHandle);
           setDatabaseMode(DatabaseMode.LOCAL);
