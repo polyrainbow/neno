@@ -5,6 +5,7 @@ import { GraphId } from "../../../lib/notes/interfaces/GraphId.js";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats.js";
 import GraphStatsRetrievalOptions
   from "../../../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
+import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser.js";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId.js";
 import NoteListPage from "../../../lib/notes/interfaces/NoteListPage.js";
 import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions.js";
@@ -45,10 +46,10 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   static #graphIndexFileName = "graphs.json";
   #isDatabaseInitialized = false;
   #folderHandle:FileSystemDirectoryHandle | null = null;
-  #notesModule: typeof import("../../../lib/notes/index");
-  #graphIds:GraphId[];
-  #activeGraphId:string;
-  #storageProvider: FileSystemAccessAPIStorageProvider;
+  #notesModule: typeof import("../../../lib/notes/index") | null = null;
+  #graphIds:GraphId[] | null = null;
+  #activeGraphId:string | null = null;
+  #storageProvider: FileSystemAccessAPIStorageProvider | null = null;
 
   /* PUBLIC */
 
@@ -150,7 +151,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
         + "Removing folder handle because it could be outdated",
       );
       await this.removeAccess();
-      throw new Error(e);
+      throw e;
     }
 
     // try to get index file
@@ -160,7 +161,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
         LocalDatabaseProvider.#graphIndexFileName,
       );
 
-      this.#graphIds = JSON.parse(graphsJson).graphIds;
+      this.#graphIds = JSON.parse(graphsJson).graphIds as GraphId[];
     } catch (e) {
       // create new index file instead
       this.#graphIds = [LocalDatabaseProvider.#defaultFirstGraphId];
@@ -183,10 +184,20 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
 
   getNote(noteId:NoteId):Promise<NoteToTransmit | null> {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.get(noteId, this.#activeGraphId);
   }
 
   getNotes(options:DatabaseQuery):Promise<NoteListPage> {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.getNotesList(
       this.#activeGraphId,
       options,
@@ -194,14 +205,29 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
   getStats(options:GraphStatsRetrievalOptions):Promise<GraphStats> {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.getStats(this.#activeGraphId, options);
   }
 
   deleteNote(noteId:NoteId): Promise<void> {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.remove(noteId, this.#activeGraphId);
   }
 
-  putNote(noteToTransmit:NoteToTransmit, options:NotePutOptions) {
+  putNote(noteToTransmit:NoteFromUser, options:NotePutOptions) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.put(
       noteToTransmit,
       this.#activeGraphId,
@@ -210,6 +236,11 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
   importLinksAsNotes(links) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.importLinksAsNotes(
       this.#activeGraphId,
       links,
@@ -217,6 +248,11 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
   saveGraphVisualization(graphVisualization) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.setGraphVisualization(
       graphVisualization,
       this.#activeGraphId,
@@ -224,6 +260,11 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
   async getGraphVisualization() {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     const graphVisualization = await this.#notesModule.getGraphVisualization(
       this.#activeGraphId,
     );
@@ -238,6 +279,11 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
   getReadableGraphStream(withFiles) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.getReadableGraphStream(
       this.#activeGraphId,
       withFiles,
@@ -246,6 +292,11 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
 
   uploadFile(file:File) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.addFile(
       this.#activeGraphId,
       // @ts-ignore
@@ -256,6 +307,11 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
 
   deleteFile(fileId:FileId) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.deleteFile(
       this.#activeGraphId,
       fileId,
@@ -264,21 +320,41 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
 
   getUrlMetadata(url:string):Promise<UrlMetadataResponse> {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.getUrlMetadata(url);
   }
 
 
   getFiles() {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.getFiles(this.#activeGraphId);
   }
 
 
   getDanglingFiles() {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.getDanglingFiles(this.#activeGraphId);
   }
 
 
   getReadableFileStream(fileId) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.getReadableFileStream(
       this.#activeGraphId,
       fileId,
@@ -287,14 +363,29 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
 
   pinNote(noteId) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.pin(this.#activeGraphId, noteId);
   }
 
   unpinNote(noteId) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.unpin(this.#activeGraphId, noteId);
   }
 
   getPins() {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
     return this.#notesModule.getPins(this.#activeGraphId);
   }
 

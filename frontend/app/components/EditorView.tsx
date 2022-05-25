@@ -27,6 +27,34 @@ import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import { PathTemplate } from "../enum/PathTemplate";
 import useDialog from "../hooks/useDialog";
 import { l } from "../lib/intl";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+import { NoteListSortMode }
+  from "../../../lib/notes/interfaces/NoteListSortMode";
+import { ErrorMessage } from "../../../lib/notes/interfaces/ErrorMessage";
+
+interface EditorViewProps {
+  databaseProvider: DatabaseProvider,
+  unsavedChanges: boolean,
+  setUnsavedChanges: (boolean) => any,
+  toggleAppMenu: () => any,
+  handleInvalidCredentialsError,
+  refreshNotesList,
+  stats,
+  pinnedNotes,
+  handleSearchInputChange,
+  setPinnedNotes,
+  searchValue,
+  sortMode: NoteListSortMode,
+  handleSortModeChange,
+  noteListItems,
+  numberOfResults,
+  noteListIsBusy,
+  noteListScrollTop,
+  setNoteListScrollTop,
+  page: number,
+  setPage: (number) => any,
+  setSearchValue,
+}
 
 const EditorView = ({
   databaseProvider,
@@ -50,7 +78,7 @@ const EditorView = ({
   page,
   setPage,
   setSearchValue,
-}) => {
+}:EditorViewProps) => {
   const newNoteObject:ActiveNote = Utils.getNewNoteObject();
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
 
@@ -221,17 +249,21 @@ const EditorView = ({
     } else {
       try {
         const noteFromServer = await databaseProvider.getNote(noteIdNumber);
-        setActiveNote({
-          ...noteFromServer,
-          isUnsaved: false,
-          changes: [],
-        });
+        if (noteFromServer) {
+          setActiveNote({
+            ...noteFromServer,
+            isUnsaved: false,
+            changes: [],
+          });
+        } else {
+          throw new Error("No note received");
+        }
       } catch (e) {
         // if credentials are invalid, go to LoginView. If not, throw.
-        if (e.message === "INVALID_CREDENTIALS") {
+        if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
           await handleInvalidCredentialsError();
         } else {
-          throw new Error(e);
+          throw e;
         }
       }
     }
@@ -296,7 +328,10 @@ const EditorView = ({
     try {
       await saveActiveNote({ ignoreDuplicateTitles: false });
     } catch (e) {
-      if (e.message === "NOTE_WITH_SAME_TITLE_EXISTS") {
+      if (
+        e instanceof Error
+        && e.message === ErrorMessage.NOTE_WITH_SAME_TITLE_EXISTS
+      ) {
         await confirm({
           text: Config.texts.titleAlreadyExistsConfirmation,
           confirmText: l("editor.save-anyway"),

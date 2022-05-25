@@ -2,6 +2,7 @@ import { GraphId } from "../../../../backend/interfaces/GraphId.js";
 import { FileId } from "../../../../lib/notes/interfaces/FileId.js";
 import GraphStatsRetrievalOptions
   from "../../../../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
+import NoteFromUser from "../../../../lib/notes/interfaces/NoteFromUser.js";
 import { NoteId } from "../../../../lib/notes/interfaces/NoteId.js";
 import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit.js";
 import DatabaseProvider from "../../interfaces/DatabaseProvider.js";
@@ -19,7 +20,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
   static type = "SERVER";
 
   #graphIds = null;
-  #activeGraphId = null;
+  #activeGraphId;
   #apiUrl = null;
 
   constructor(API_URL) {
@@ -35,7 +36,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return this.#graphIds;
   }
 
-  setActiveGraph(graphId) {
+  setActiveGraph(graphId:GraphId):void {
     this.#activeGraphId = graphId;
     API.setGraphId(this.#activeGraphId);
   }
@@ -70,8 +71,8 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     try {
       await API.logout();
     } catch (e) {
-      if (e.message !== "INVALID_CREDENTIALS") {
-        throw new Error(e);
+      if (!(e instanceof Error && e.message === "INVALID_CREDENTIALS")) {
+        throw e;
       }
     }
   }
@@ -96,12 +97,12 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getDanglingFiles();
   }
 
-  deleteNote(noteId) {
+  deleteNote(noteId:NoteId):Promise<void> {
     return API.deleteNote(noteId);
   }
 
-  putNote(noteToTransmit, options) {
-    return API.putNote(noteToTransmit, options);
+  putNote(noteFromUser:NoteFromUser, options) {
+    return API.putNote(noteFromUser, options);
   }
 
   importLinksAsNotes(links) {

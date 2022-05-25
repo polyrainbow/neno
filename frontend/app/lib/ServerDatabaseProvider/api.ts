@@ -1,4 +1,6 @@
+import { APIError } from "../../../../backend/interfaces/APIError";
 import APIResponse from "../../../../backend/interfaces/APIResponse";
+import NoteFromUser from "../../../../lib/notes/interfaces/NoteFromUser";
 import { NoteId } from "../../../../lib/notes/interfaces/NoteId";
 import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit";
 
@@ -76,7 +78,13 @@ const callAPI = async ({
 
 const getJSONResponsePayloadIfSuccessful = (responseObject:APIResponse):any => {
   if (!responseObject.success) {
-    throw new Error(responseObject.error);
+    // if this is an error from the notes module, forward its message
+    // if not, just output the error from the API.
+    const errorMessage
+      = responseObject.error === APIError.NOTES_APPLICATION_ERROR
+        ? responseObject.errorMessage
+        : responseObject.error;
+    throw new Error(errorMessage);
   }
 
   return responseObject.payload;
@@ -150,7 +158,7 @@ const getNotes = (options) => {
 };
 
 
-const putNote = (note, options) => {
+const putNote = (note: NoteFromUser, options) => {
   return callGraphAPIAndGetJSONPayload({
     method: "PUT",
     endpoint: "note",

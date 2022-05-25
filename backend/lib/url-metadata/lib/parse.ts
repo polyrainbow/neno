@@ -4,11 +4,15 @@ import extractMetaTags from './extract-meta-tags.js';
 import extractJsonLd from './extract-json-ld.js';
 import mapSources from './map-sources.js';
 
+const elementIsTagElement = (el:cheerio.Element):el is cheerio.TagElement => {
+  return el.type === "tag";
+};
+
 export default function (url, body, options) {
   const $ = load(body);
   const scrapedMetaTags = extractMetaTags($);
   const scrapedJsonLd = extractJsonLd($);
-  const metadata = new MetadataFields(options)
+  const metadata = (new MetadataFields(options))
     .configureType(scrapedMetaTags['og:type'])
     .lockKeys()
     .set(scrapedMetaTags)
@@ -17,8 +21,12 @@ export default function (url, body, options) {
 
   // derive canonical url
   if (!metadata.get('canonical')) {
-    $('link').each(function (index, el) {
-      if (el.attribs && el.attribs.rel === 'canonical' && el.attribs.href) {
+    $('link').each(function (_index, el) {
+      if (
+        elementIsTagElement(el)
+        && el.attribs.rel === 'canonical'
+        && el.attribs.href
+      ) {
         metadata.set({ 'canonical': el.attribs.href });
       }
     });

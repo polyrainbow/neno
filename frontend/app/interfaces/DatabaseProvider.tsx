@@ -15,6 +15,7 @@ import GraphVisualizationFromUser
 import GraphVisualization from "../lib/GraphVisualization";
 import UrlMetadataResponse
   from "../../../lib/notes/interfaces/UrlMetadataResponse";
+import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 
 interface DatabaseProvider {
   removeAccess: () => Promise<void>;
@@ -30,7 +31,7 @@ interface DatabaseProvider {
   getDanglingFiles: (graphId: GraphId) => Promise<FileId[]>;
   deleteNote: (noteId:NoteId) => Promise<void>;
   putNote: (
-    noteToTransmit:NoteToTransmit,
+    noteToTransmit:NoteFromUser,
     options:NotePutOptions,
   ) => Promise<NoteToTransmit>;
   importLinksAsNotes: (links: string[]) => Promise<{

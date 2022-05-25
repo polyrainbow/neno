@@ -453,10 +453,13 @@ const getDanglingFiles = async (
 ):Promise<FileId[]> => {
   const allFiles = await io.getFiles(graphId);
   const graph = await io.getGraph(graphId);
-  const filesInNotes:FileId[] = graph.notes.reduce((accumulator, note) => {
-    const filesOfNote = getFilesOfNote(note);
-    return [...accumulator, ...filesOfNote];
-  }, []);
+  const filesInNotes:FileId[] = graph.notes.reduce(
+    (accumulator:string[], note) => {
+      const filesOfNote = getFilesOfNote(note);
+      return [...accumulator, ...filesOfNote];
+    },
+    [],
+  );
   const danglingFiles = allFiles.filter((fileId) => {
     return !filesInNotes.includes(fileId);
   });
@@ -551,10 +554,10 @@ const importLinksAsNotes = async (
       );
       notesToTransmit.push(noteToTransmit);
     } catch (e) {
-      const errorMessage:string = e.toString();
+      const errorMessage:string | false = e instanceof Error && e.toString();
       const failure:ImportLinkAsNoteFailure = {
         note: noteFromUser,
-        error: errorMessage,
+        error: errorMessage || "no error",
       };
       failures.push(failure);
     }

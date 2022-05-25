@@ -77,7 +77,7 @@ export default class FileSystemStorageProvider {
       throw new Error(
         "Readable stream ended unexpectedly.",
         {
-          cause: e,
+          cause: (e instanceof Error) ? e : undefined,
         }
       );
 

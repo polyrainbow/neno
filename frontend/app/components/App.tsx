@@ -148,10 +148,10 @@ const App = ({
         setPinnedNotes(pinnedNotes);
       } catch (e) {
         // if credentials are invalid, go to LoginView. If not, throw.
-        if (e.message === "INVALID_CREDENTIALS") {
+        if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
           await handleInvalidCredentialsError();
         } else {
-          throw new Error(e);
+          throw e;
         }
       }
     },

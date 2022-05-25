@@ -15,7 +15,7 @@
     "outDir": "dist",
     "preserveConstEnums": true,
     "allowUnusedLabels": true,
-    "noUnusedParameters": false,
+    "noUnusedParameters": true,
     "jsx": "react",
     "sourceMap": true,
     "target": "ESNext",
@@ -23,14 +23,15 @@
     "types": [
       "node",
       "chrome",
-      "wicg-file-system-access"
+      "wicg-file-system-access",
+      "cheerio"
     ],
     "typeRoots": [
       "./custom_typings",
       "./node_modules/@types"
     ],
     "resolveJsonModule": true,
-    "strictNullChecks": true
+    "strict": true,
   },
   "exclude": [
     "node_modules",

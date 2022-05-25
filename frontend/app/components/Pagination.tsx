@@ -35,7 +35,7 @@ const Pagination = (props) => {
   const { items } = usePagination({
     count: numberOfPages,
     page,
-    onChange: (event, newPage) => props.onChange(newPage),
+    onChange: (_event, newPage) => props.onChange(newPage),
   });
 
   if (!doRenderPageButtons) return null;

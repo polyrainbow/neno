@@ -353,7 +353,8 @@ const startApp = async ({
       } catch (e) {
         const response:APIResponse = {
           success: false,
-          error: e,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
         };
         res.json(response);
       }
@@ -385,7 +386,8 @@ const startApp = async ({
       } catch (e) {
         const response:APIResponse = {
           success: false,
-          error: e.message,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
         };
         res.json(response);
       }
@@ -429,7 +431,8 @@ const startApp = async ({
       } catch (e) {
         const response:APIResponse = {
           success: false,
-          error: e.message,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
         };
         res.json(response);
       }
@@ -525,7 +528,8 @@ const startApp = async ({
         logger.verbose(e);
         const response:APIResponse = {
           success: false,
-          error: e.message,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
         };
         res.status(406).json(response);
       }
@@ -608,7 +612,8 @@ const startApp = async ({
         } catch (e) {
           const response:APIResponse = {
             success: false,
-            error: e.message,
+            error: APIError.NOTES_APPLICATION_ERROR,
+            errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
           };
           res.status(406).json(response);
         }
@@ -621,7 +626,8 @@ const startApp = async ({
           .on("error", (e) => {
             const response:APIResponse = {
               success: false,
-              error: e.message as APIError,
+              error: APIError.HTTP_REQUEST_ERROR,
+              errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
             };
             res.status(406).json(response);
           });
@@ -632,7 +638,8 @@ const startApp = async ({
           .on("error", (e) => {
             const response:APIResponse = {
               success: false,
-              error: e.message as APIError,
+              error: APIError.HTTP_REQUEST_ERROR,
+              errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
             };
             res.status(406).json(response);
           });
@@ -739,7 +746,8 @@ const startApp = async ({
       } catch (e) {
         const response:APIResponse = {
           success: false,
-          error: e.message,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
         };
         res.json(response);
       }
@@ -820,7 +828,8 @@ const startApp = async ({
         logger.verbose(JSON.stringify(e));
         const response:APIResponse = {
           "success": false,
-          "error": e.message,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
         };
         res.json(response);
       }
@@ -923,7 +932,7 @@ const startApp = async ({
   *****************/
 
 
-  app.get(config.API_PATH, function(req, res) {
+  app.get(config.API_PATH, function(_req, res) {
     const response:APIResponse = {
       success: true,
       payload: "Hello world!",

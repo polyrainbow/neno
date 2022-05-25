@@ -137,9 +137,12 @@ const ExportDatabaseDialog = ({
               } catch (e) {
                 if (
                   // if user aborted the request, it's fine
-                  !e.message.includes("The user aborted a request.")
+                  !(
+                    e instanceof Error
+                    && e.message.includes("The user aborted a request.")
+                  )
                 ) {
-                  throw new Error(e);
+                  throw e;
                 }
               }
             }}

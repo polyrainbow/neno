@@ -136,7 +136,7 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
     // eslint-disable-next-line
-    range, // to be implemented
+    _range, // to be implemented
   ) {
     const finalPath = this.joinPath(graphId, requestPath);
     const fileHandle = await this.#getFileHandle(finalPath);

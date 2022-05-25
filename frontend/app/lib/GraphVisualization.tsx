@@ -278,15 +278,16 @@ export default class GraphVisualization {
           && (!this.#ctrlKeyIsPressed)
           && (!this.#sKeyIsPressed);
       })
-      .on("drag", (e, d:GraphVisualizationNode) => {
+      .on("drag", (e, d) => {
+        const node = d as GraphVisualizationNode;
         this.#justDragged = true;
 
         const nodesToDrag = Array.from(this.#selection)
           .filter(GraphVisualization.#isNode);
 
         // also drag mouse down node, regardless of if it's selected or not
-        if (!nodesToDrag.includes(d)) {
-          nodesToDrag.push(d);
+        if (!nodesToDrag.includes(node)) {
+          nodesToDrag.push(node);
         }
 
         nodesToDrag
@@ -297,7 +298,7 @@ export default class GraphVisualization {
             this.#updatedNodes.add(node);
           });
 
-        this.#updateGraph({ type: "NODE_DRAG", node: d });
+        this.#updateGraph({ type: "NODE_DRAG", node });
         this.#onChange();
       });
 
@@ -358,6 +359,7 @@ export default class GraphVisualization {
         d3.select("body").style("cursor", "move");
       }
     });
+    // @ts-ignore
     svg.call(zoom).on("dblclick.zoom", null);
 
     // when creating the graph, a zoom end event is initially dispatched.
@@ -380,6 +382,7 @@ export default class GraphVisualization {
         this.#screenPosition.translateY,
       )
       .scale(this.#screenPosition.scale);
+    // @ts-ignore
     zoom.transform(svg, initialZoomTranform);
 
     // listen for resize
@@ -744,7 +747,7 @@ export default class GraphVisualization {
         return "M" + d[0].position.x + "," + d[0].position.y
         + "L" + d[1].position.x + "," + d[1].position.y;
       })
-      .on("mouseover", (e, d:GraphVisualizationLink) => {
+      .on("mouseover", (_e, d:GraphVisualizationLink) => {
         this.#onHighlight({
           active: true,
           type: "edge",
@@ -950,9 +953,13 @@ export default class GraphVisualization {
     if (!this.#titleRenderingEnabled) {
       this.#titleRenderingEnabled = true;
       d3.selectAll("g." + GraphVisualization.#consts.nodeClassName)
-        .each((d:GraphVisualizationNode, i, domElements) => {
+        .each((d, i, domElements) => {
+          const node = d as GraphVisualizationNode;
           const domElement = domElements[i];
-          this.#insertTitleLinebreaks(d3.select(domElement), d.title);
+          this.#insertTitleLinebreaks(
+            d3.select(domElement),
+            node.title,
+          );
         });
     } else {
       d3.selectAll("text").remove();
