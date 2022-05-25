@@ -902,7 +902,7 @@ export default class GraphVisualization {
     });
 
     const nodePositionUpdates = Array.from(this.#updatedNodes)
-      .map((node:any) => {
+      .map((node:GraphVisualizationNode) => {
         return {
           id: node.id,
           position: node.position,

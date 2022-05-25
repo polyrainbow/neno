@@ -162,24 +162,26 @@ const getNumberOfLinkedNotes = (graph:Graph, noteId:NoteId):number => {
 const getNumberOfLinkedNotesForSeveralNotes = (
   graph:Graph,
   noteIds:NoteId[],
-):any => {
+):Map<NoteId, number> => {
 
-  const numbersOfLinkedNotes = {};
+  const map = new Map<NoteId, number>();
   noteIds.forEach((noteId) => {
-    numbersOfLinkedNotes[noteId] = 0;
+    map.set(noteId, 0);
   });
 
   graph.links.forEach((link) => {
-    if (typeof numbersOfLinkedNotes[link[0]] === "number"){
-      numbersOfLinkedNotes[link[0]]++;
+    if (map.has(link[0])){
+      const newLinkNumber = map.get(link[0]) as number + 1;
+      map.set(link[0], newLinkNumber);
     }
 
-    if (typeof numbersOfLinkedNotes[link[1]] === "number"){
-      numbersOfLinkedNotes[link[1]]++;
+    if (map.has(link[1])){
+      const newLinkNumber = map.get(link[1]) as number + 1;
+      map.set(link[1], newLinkNumber);
     }
   });
 
-  return numbersOfLinkedNotes;
+  return map;
 };
 
 
@@ -310,7 +312,7 @@ const createNoteListItems = (
     return createNoteListItem(
       databaseNote,
       graph,
-      numbersOfLinkedNotes[databaseNote.id],
+      numbersOfLinkedNotes.get(databaseNote.id),
     );
   });
 

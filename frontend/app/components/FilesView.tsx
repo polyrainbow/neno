@@ -76,7 +76,10 @@ const FilesView = ({
       {
         status === "READY"
           ? <>
-            <h2>{l("files.files-heading", { numberOfFiles: files.length })}</h2>
+            <h2>{l(
+              "files.files-heading",
+              { numberOfFiles: files.length.toString() },
+            )}</h2>
             <div
               style={{
                 display: "flex",
@@ -92,7 +95,7 @@ const FilesView = ({
             </div>
             <h2>{l(
               "files.dangling-files.heading",
-              { danglingFiles: danglingFiles.length },
+              { danglingFiles: danglingFiles.length.toString() },
             )}</h2>
             <p>{l("files.dangling-files.explainer")}</p>
             <div>

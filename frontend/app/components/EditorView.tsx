@@ -31,6 +31,9 @@ import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { NoteListSortMode }
   from "../../../lib/notes/interfaces/NoteListSortMode";
 import { ErrorMessage } from "../../../lib/notes/interfaces/ErrorMessage";
+import { NoteId } from "../../../lib/notes/interfaces/NoteId";
+import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
+import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
 
 interface EditorViewProps {
   databaseProvider: DatabaseProvider,
@@ -86,7 +89,10 @@ const EditorView = ({
 
   const navigate = useNavigate();
   const goToNote = useGoToNote();
-  const { activeNoteId } = useParams();
+  const params = useParams();
+  const activeNoteId:NoteId = params.activeNoteId
+    ? parseInt(params.activeNoteId)
+    : NaN;
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -190,7 +196,7 @@ const EditorView = ({
   };
 
 
-  const handleLinkRemoval = async (linkedNoteId) => {
+  const handleLinkRemoval = async (linkedNoteId:NoteId) => {
     if (activeNote.changes.some((change) => {
       return (
         change.type === UserNoteChangeType.LINKED_NOTE_DELETED
@@ -223,15 +229,9 @@ const EditorView = ({
   };
 
 
-  const loadNote = async (noteId) => {
-    let noteIdNumber = noteId;
-
-    if (typeof noteIdNumber !== "number") {
-      noteIdNumber = parseInt(noteIdNumber);
-    }
-
+  const loadNote = async (noteId:NoteId) => {
     /* if we don't have a note id, let's create a new note */
-    if (isNaN(noteIdNumber)) {
+    if (isNaN(noteId)) {
       /* optionally attach existing file to new note */
       const searchParams = new URLSearchParams(location.search);
       const fileIdToAttach = searchParams.get("attach-file");
@@ -248,7 +248,7 @@ const EditorView = ({
       );
     } else {
       try {
-        const noteFromServer = await databaseProvider.getNote(noteIdNumber);
+        const noteFromServer = await databaseProvider.getNote(noteId);
         if (noteFromServer) {
           setActiveNote({
             ...noteFromServer,
@@ -304,7 +304,7 @@ const EditorView = ({
   };
 
 
-  const saveActiveNote = async (options) => {
+  const saveActiveNote = async (options:NotePutOptions) => {
     const noteToTransmit = await prepareNoteToTransmit();
     const noteFromServer = await databaseProvider.putNote(
       noteToTransmit, options,
@@ -384,7 +384,7 @@ const EditorView = ({
 
 
   const pinOrUnpinNote = async () => {
-    let newPinnedNotes;
+    let newPinnedNotes:NoteToTransmit[];
     if (pinnedNotes.find((pinnedNote) => pinnedNote.id === activeNote.id)) {
       newPinnedNotes = await databaseProvider.unpinNote(activeNote.id);
     } else {

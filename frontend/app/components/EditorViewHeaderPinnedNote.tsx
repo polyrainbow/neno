@@ -1,9 +1,10 @@
 import React from "react";
+import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import { getIconSrc, shortenText } from "../lib/utils";
 
 interface EditorViewHeaderPinnedNoteProps {
   key:string,
-  note:any,
+  note:NoteToTransmit,
   isActive:boolean,
   onClick:any,
 }
