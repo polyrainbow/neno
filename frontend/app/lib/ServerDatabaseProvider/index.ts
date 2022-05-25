@@ -35,7 +35,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return this.#graphIds;
   }
 
-  setGraphId(graphId) {
+  setActiveGraph(graphId) {
     this.#activeGraphId = graphId;
     API.setGraphId(this.#activeGraphId);
   }

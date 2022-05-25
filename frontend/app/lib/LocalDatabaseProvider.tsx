@@ -37,17 +37,39 @@ async function verifyPermission(fileHandle, readWrite) {
 
 
 export default class LocalDatabaseProvider implements DatabaseProvider {
+  /* PRIVATE */
+
   static #handleStorageKey = "LOCAL_DB_FOLDER_HANDLE";
+  /* when using a local graph folder, we'll always call this graph the same */
+  static #defaultFirstGraphId:GraphId = "graph-1";
+  static #graphIndexFileName = "graphs.json";
   #isDatabaseInitialized = false;
   #folderHandle:FileSystemDirectoryHandle | null = null;
   #notesModule: typeof import("../../../lib/notes/index");
+  #graphIds:GraphId[];
+  #activeGraphId:string;
+  #storageProvider: FileSystemAccessAPIStorageProvider;
 
   /* PUBLIC */
 
-  static features = ["DATABASE_FOLDER"];
+  static features = [
+    "DATABASE_FOLDER",
+    "MULTIPLE_GRAPHS",
+  ];
+
   static type = "LOCAL";
-  /* when using a local graph folder, we'll always call this graph the same */
-  static graphId:GraphId = "local-graph";
+
+  getActiveGraphId():GraphId | null {
+    return this.#activeGraphId;
+  }
+
+  getGraphIds():GraphId[] | null {
+    return this.#graphIds;
+  }
+
+  setActiveGraph(graphId) {
+    this.#activeGraphId = graphId;
+  }
 
 
   // when we return that we have an access token, the app switches to editor
@@ -77,11 +99,6 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     this.#folderHandle = folderHandle;
 
     await this.initializeDatabase();
-  }
-
-
-  getActiveGraphId():GraphId {
-    return LocalDatabaseProvider.graphId;
   }
 
 
@@ -119,12 +136,12 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
     this.#notesModule = await import("../../../lib/notes/index");
 
-    const storageProvider
+    this.#storageProvider
       = new FileSystemAccessAPIStorageProvider(this.#folderHandle);
 
     try {
       await this.#notesModule.init(
-        storageProvider,
+        this.#storageProvider,
         () => crypto.randomUUID(),
       );
     } catch (e) {
@@ -136,40 +153,65 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
       throw new Error(e);
     }
 
+    // try to get index file
+    try {
+      const graphsJson = await this.#storageProvider.readObjectAsString(
+        "",
+        LocalDatabaseProvider.#graphIndexFileName,
+      );
+
+      this.#graphIds = JSON.parse(graphsJson).graphIds;
+    } catch (e) {
+      // create new index file instead
+      this.#graphIds = [LocalDatabaseProvider.#defaultFirstGraphId];
+
+      const graphsFileContent = {
+        graphIds: this.#graphIds,
+      };
+      const graphsFileContentString = JSON.stringify(graphsFileContent);
+      await this.#storageProvider.writeObject(
+        "",
+        LocalDatabaseProvider.#graphIndexFileName,
+        graphsFileContentString,
+      );
+    }
+
+    this.#activeGraphId = this.#graphIds[0];
+
     this.#isDatabaseInitialized = true;
   }
 
 
   getNote(noteId:NoteId):Promise<NoteToTransmit | null> {
-    return this.#notesModule.get(noteId, LocalDatabaseProvider.graphId);
+    return this.#notesModule.get(noteId, this.#activeGraphId);
   }
 
   getNotes(options:DatabaseQuery):Promise<NoteListPage> {
     return this.#notesModule.getNotesList(
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
       options,
     );
   }
 
   getStats(options:GraphStatsRetrievalOptions):Promise<GraphStats> {
-    return this.#notesModule.getStats(LocalDatabaseProvider.graphId, options);
+    return this.#notesModule.getStats(this.#activeGraphId, options);
   }
 
   deleteNote(noteId:NoteId): Promise<void> {
-    return this.#notesModule.remove(noteId, LocalDatabaseProvider.graphId);
+    return this.#notesModule.remove(noteId, this.#activeGraphId);
   }
 
   putNote(noteToTransmit:NoteToTransmit, options:NotePutOptions) {
     return this.#notesModule.put(
       noteToTransmit,
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
       options,
     );
   }
 
   importLinksAsNotes(links) {
     return this.#notesModule.importLinksAsNotes(
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
       links,
     );
   }
@@ -177,13 +219,13 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   saveGraphVisualization(graphVisualization) {
     return this.#notesModule.setGraphVisualization(
       graphVisualization,
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
     );
   }
 
   async getGraphVisualization() {
     const graphVisualization = await this.#notesModule.getGraphVisualization(
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
     );
 
     /*
@@ -197,7 +239,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
   getReadableGraphStream(withFiles) {
     return this.#notesModule.getReadableGraphStream(
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
       withFiles,
     );
   }
@@ -205,7 +247,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
   uploadFile(file:File) {
     return this.#notesModule.addFile(
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
       // @ts-ignore
       file.stream(),
       file.type,
@@ -215,7 +257,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
   deleteFile(fileId:FileId) {
     return this.#notesModule.deleteFile(
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
       fileId,
     );
   }
@@ -227,33 +269,33 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
 
   getFiles() {
-    return this.#notesModule.getFiles(LocalDatabaseProvider.graphId);
+    return this.#notesModule.getFiles(this.#activeGraphId);
   }
 
 
   getDanglingFiles() {
-    return this.#notesModule.getDanglingFiles(LocalDatabaseProvider.graphId);
+    return this.#notesModule.getDanglingFiles(this.#activeGraphId);
   }
 
 
   getReadableFileStream(fileId) {
     return this.#notesModule.getReadableFileStream(
-      LocalDatabaseProvider.graphId,
+      this.#activeGraphId,
       fileId,
     );
   }
 
 
   pinNote(noteId) {
-    return this.#notesModule.pin(LocalDatabaseProvider.graphId, noteId);
+    return this.#notesModule.pin(this.#activeGraphId, noteId);
   }
 
   unpinNote(noteId) {
-    return this.#notesModule.unpin(LocalDatabaseProvider.graphId, noteId);
+    return this.#notesModule.unpin(this.#activeGraphId, noteId);
   }
 
   getPins() {
-    return this.#notesModule.getPins(LocalDatabaseProvider.graphId);
+    return this.#notesModule.getPins(this.#activeGraphId);
   }
 
   /**

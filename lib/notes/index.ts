@@ -53,6 +53,7 @@ import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import DatabaseQuery from "./interfaces/DatabaseQuery.js";
 import NotePutOptions from "./interfaces/NotePutOptions.js";
+import GraphStatsRetrievalOptions from "./interfaces/GraphStatsRetrievalOptions.js";
 
 let io: DatabaseIO;
 let randomUUID;
@@ -237,15 +238,8 @@ const getGraphVisualization = async (graphId: GraphId):Promise<GraphVisualizatio
 
 
 const getStats = async (
-  graphId:GraphId,
-  /*
-    including a graph analysis is quite CPU-heavy, that's why we include it
-    only if explicitly asked for
-  */
-  options:{
-    includeMetadata: boolean,
-    includeAnalysis: boolean,
-  },
+  graphId: GraphId,
+  options: GraphStatsRetrievalOptions,
 ):Promise<GraphStats> => {
   const graph:GraphObject = await io.getGraph(graphId);
 
@@ -272,6 +266,10 @@ const getStats = async (
     };
   }
 
+  /*
+    including a graph analysis is quite CPU-heavy, that's why we include it
+    only if explicitly asked for
+  */
   if (options.includeAnalysis) {
     const numberOfComponents = getNumberOfComponents(graph.notes, graph.links);
 
@@ -483,12 +481,18 @@ const getFileSize = (
 };
 
 
-const getReadableGraphStream = async (graphId, withFiles) => {
+const getReadableGraphStream = async (
+  graphId:GraphId,
+  withFiles:boolean,
+) => {
   return await io.getReadableGraphStream(graphId, withFiles);
 };
 
 
-const importLinksAsNotes = async (graphId, links) => {
+const importLinksAsNotes = async (
+  graphId: GraphId,
+  links:string[],
+) => {
   const promises:Promise<UrlMetadataResponse>[]
     = links.map((url:string):Promise<UrlMetadataResponse> => {
       return getUrlMetadata(url);

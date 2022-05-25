@@ -19,10 +19,10 @@ import UrlMetadataResponse
 interface DatabaseProvider {
   removeAccess: () => Promise<void>;
   getActiveGraphId: () => GraphId | null;
-  // getGraphIds and setGraphId is currently only enabled on DatabaseProviders
-  // with MULTIPLE_GRAPHS feature
+  // getGraphIds and setActiveGraph is currently only enabled on
+  // DatabaseProviders with MULTIPLE_GRAPHS feature
   getGraphIds?: () => GraphId[] | null;
-  setGraphId?: (graphId: GraphId) => void;
+  setActiveGraph?: (graphId: GraphId) => void;
   getNote: (noteId: NoteId) => Promise<NoteToTransmit | null>;
   getNotes: (options:DatabaseQuery) => Promise<NoteListPage>;
   getStats: (options: GraphStatsRetrievalOptions) => Promise<GraphStats>;

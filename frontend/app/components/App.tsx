@@ -208,7 +208,7 @@ const App = ({
 
 
   const switchGraphs = (graphId) => {
-    databaseProvider?.setGraphId?.(graphId);
+    databaseProvider?.setActiveGraph?.(graphId);
     navigate(
       isSmallScreen
         ? getAppPath(PathTemplate.LIST)

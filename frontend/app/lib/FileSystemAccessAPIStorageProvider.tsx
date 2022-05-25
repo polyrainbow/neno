@@ -98,7 +98,8 @@ export default class FileSystemAccessAPIStorageProvider {
     requestPath: string,
     data,
   ):Promise<void> {
-    const fileHandle = await this.#getFileHandle(requestPath);
+    const finalPath = this.joinPath(graphId, requestPath);
+    const fileHandle = await this.#getFileHandle(finalPath);
     const writable = await fileHandle.createWritable();
     await writable.write(data);
     await writable.close();
@@ -110,7 +111,8 @@ export default class FileSystemAccessAPIStorageProvider {
     requestPath:string,
     readableStream,
   ):Promise<number> {
-    const fileHandle = await this.#getFileHandle(requestPath);
+    const finalPath = this.joinPath(graphId, requestPath);
+    const fileHandle = await this.#getFileHandle(finalPath);
     const writable = await fileHandle.createWritable();
     await readableStream.pipeTo(writable);
     const size = await this.getFileSize(graphId, requestPath);
@@ -122,7 +124,8 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
   ):Promise<string> {
-    const fileHandle = await this.#getFileHandle(requestPath);
+    const finalPath = this.joinPath(graphId, requestPath);
+    const fileHandle = await this.#getFileHandle(finalPath);
     const file = await fileHandle.getFile();
     const string = await file.text();
     return string;
@@ -135,7 +138,8 @@ export default class FileSystemAccessAPIStorageProvider {
     // eslint-disable-next-line
     range, // to be implemented
   ) {
-    const fileHandle = await this.#getFileHandle(requestPath);
+    const finalPath = this.joinPath(graphId, requestPath);
+    const fileHandle = await this.#getFileHandle(finalPath);
     const file = await fileHandle.getFile();
     const readable = file.stream();
     return readable;
@@ -146,8 +150,11 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
   ) {
-    const subDirName = requestPath.substring(0, requestPath.indexOf(this.DS));
-    const subDir = await this.#directoryHandle.getDirectoryHandle(subDirName);
+    const finalPath = this.joinPath(graphId, requestPath);
+    const subDir = await this.#getDescendantFolderHandle(
+      this.#directoryHandle,
+      finalPath,
+    );
     const filename = requestPath
       .substring(requestPath.indexOf(this.DS) + 1);
     await subDir.removeEntry(filename);
@@ -158,18 +165,12 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
   ):Promise<string[]> {
-    let dirHandle = this.#directoryHandle;
+    const finalPath = this.joinPath(graphId, requestPath);
 
-    if (requestPath.length > 0) {
-      const subfolders = this.splitPath(requestPath);
-
-      for (let i = 0; i < subfolders.length; i++) {
-        dirHandle = await this.#getSubFolderHandle(
-          dirHandle,
-          subfolders[i],
-        );
-      }
-    }
+    const dirHandle = await this.#getDescendantFolderHandle(
+      this.#directoryHandle,
+      finalPath,
+    );
 
     const values:(FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
     for await (const handle of dirHandle.values()) {
@@ -188,9 +189,11 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
   ):Promise<string[]> {
+    const finalPath = this.joinPath(graphId, requestPath);
+
     const dirHandle = await this.#getDescendantFolderHandle(
       this.#directoryHandle,
-      requestPath,
+      finalPath,
     );
 
     const values:(FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
@@ -206,7 +209,7 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   joinPath(...args:string[]):string {
-    return args.join(this.DS);
+    return args.filter((arg) => arg.length > 0).join(this.DS);
   }
 
 
@@ -219,7 +222,8 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
   ):Promise<number> {
-    const fileHandle = await this.#getFileHandle(requestPath);
+    const finalPath = this.joinPath(graphId, requestPath);
+    const fileHandle = await this.#getFileHandle(finalPath);
     const file = await fileHandle.getFile();
     const size = file.size;
     return size;
@@ -230,9 +234,10 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
   ):Promise<number> {
+    const finalPath = this.joinPath(graphId, requestPath);
     const folderHandle = await this.#getDescendantFolderHandle(
       this.#directoryHandle,
-      requestPath,
+      finalPath,
     );
 
     const values:(FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
