@@ -1,16 +1,16 @@
 import React from "react";
 import ConfirmationServiceContext
   from "../contexts/ConfirmationServiceContext.js";
-import { texts } from "../lib/config.js";
+import { l } from "../lib/intl.js";
 
 const useConfirmDiscardingUnsavedChangesDialog = () => {
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
   const confirmDiscardingUnsavedChanges = () => {
     return confirm({
-      text: texts.discardChangesConfirmation,
-      confirmText: "Discard changes",
-      cancelText: "Cancel",
+      text: l("editor.discard-changes-confirmation.text"),
+      confirmText: l("editor.discard-changes-confirmation.confirm"),
+      cancelText: l("dialog.cancel"),
       encourageConfirmation: false,
     });
   };

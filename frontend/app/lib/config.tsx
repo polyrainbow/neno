@@ -15,15 +15,6 @@ const DEFAULT_NOTE_BLOCKS:NoteContentBlock[] = [
 
 const API_URL = "/api/";
 
-const texts = {
-  titleAlreadyExistsConfirmation:
-    "A note with this title already exists. Do you want to save this note "
-    + "with the same title?",
-  discardChangesConfirmation:
-    "There are unsaved changes. Do you really want to discard them? "
-    + "If not, click cancel and save them first.",
-};
-
 const MINIMUM_SEARCH_QUERY_LENGTH = 3;
 
 const emojis = {
@@ -61,7 +52,6 @@ export {
   DEFAULT_NOTE_TITLE,
   DEFAULT_NOTE_BLOCKS,
   API_URL,
-  texts,
   MINIMUM_SEARCH_QUERY_LENGTH,
   emojis,
   ROOT_PATH,

@@ -333,7 +333,7 @@ const EditorView = ({
         && e.message === ErrorMessage.NOTE_WITH_SAME_TITLE_EXISTS
       ) {
         await confirm({
-          text: Config.texts.titleAlreadyExistsConfirmation,
+          text: l("editor.title-already-exists-confirmation"),
           confirmText: l("editor.save-anyway"),
           cancelText: l("editor.cancel"),
           encourageConfirmation: false,
