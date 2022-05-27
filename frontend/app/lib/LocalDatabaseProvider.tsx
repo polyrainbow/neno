@@ -18,18 +18,20 @@ import FileSystemAccessAPIStorageProvider
 import { streamToBlob } from "./utils.js";
 
 
-async function verifyPermission(fileHandle, readWrite) {
-  const options = {};
+async function verifyPermission(
+  fileSystemHandle:FileSystemHandle,
+  readWrite:boolean,
+):Promise<boolean> {
+  const options:FileSystemHandlePermissionDescriptor = {};
   if (readWrite) {
-    // @ts-ignore
     options.mode = "readwrite";
   }
   // Check if permission was already granted. If so, return true.
-  if ((await fileHandle.queryPermission(options)) === "granted") {
+  if ((await fileSystemHandle.queryPermission(options)) === "granted") {
     return true;
   }
   // Request permission. If the user grants permission, return true.
-  if ((await fileHandle.requestPermission(options)) === "granted") {
+  if ((await fileSystemHandle.requestPermission(options)) === "granted") {
     return true;
   }
   // The user didn't grant permission, so return false.
