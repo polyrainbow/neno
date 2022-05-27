@@ -3,7 +3,9 @@
   legacy schemas.
 */
 
-const updateNotes = (graph) => {
+import GraphObject from "./interfaces/Graph";
+
+const updateNotes = (graph:GraphObject):void => {
   graph.notes.forEach((note) => {
 
     // add new note title field if not present
@@ -23,7 +25,7 @@ const updateNotes = (graph) => {
 
 // this function must be indempotent, so that it always results in one
 // canonical data structure
-const updateGraphDataStructure = (graph) => {
+const updateGraphDataStructure = (graph:GraphObject):void => {
   updateNotes(graph);
 };
 

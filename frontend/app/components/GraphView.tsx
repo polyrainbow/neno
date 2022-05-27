@@ -9,6 +9,15 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useGoToNote from "../hooks/useGoToNote";
 import { l } from "../lib/intl.js";
+import DatabaseProvider from "../interfaces/DatabaseProvider.js";
+
+interface GraphViewProps {
+  databaseProvider: DatabaseProvider | null,
+  unsavedChanges: boolean,
+  setUnsavedChanges: (boolean) => void,
+  toggleAppMenu: () => void,
+  handleInvalidCredentialsError: () => void,
+}
 
 const GraphView = ({
   databaseProvider,
@@ -16,7 +25,7 @@ const GraphView = ({
   setUnsavedChanges,
   toggleAppMenu,
   handleInvalidCredentialsError,
-}) => {
+}:GraphViewProps) => {
   const DEFAULT_STATUS = "";
   const mainElement = useRef<HTMLElement | null>(null);
   const graphVisualizationInstance = useRef<GraphVisualization | null>(null);
@@ -38,7 +47,7 @@ const GraphView = ({
     }
     const graphVisualization = graphVisualizationInstance.current.getSaveData();
     try {
-      await databaseProvider.saveGraphVisualization(graphVisualization);
+      await databaseProvider?.saveGraphVisualization(graphVisualization);
       setUnsavedChanges(false);
     } catch (e) {
       console.error(e);

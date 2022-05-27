@@ -50,7 +50,7 @@ const getNoteTitlePreview = (note:Note, maxLength = 800):string => {
 };
 
 
-const normalizeNoteTitle = (title:string) => {
+const normalizeNoteTitle = (title:string):string => {
   return title
     .replaceAll(/[\r\n]/g, " ")
     .trim();
@@ -210,11 +210,10 @@ const getNumberOfUnlinkedNotes = (graph:Graph):number => {
 };
 
 
-const removeLinksOfNote = (graph: Graph, noteId: NoteId):true => {
+const removeLinksOfNote = (graph: Graph, noteId: NoteId):void => {
   graph.links = graph.links.filter((link) => {
     return (link[0] !== noteId) && (link[1] !== noteId);
   });
-  return true;
 };
 
 
@@ -367,7 +366,7 @@ const getNoteFeatures = (note:SavedNote):NoteListItemFeatures => {
 };
 
 
-const getSortKeyForTitle = (title) => {
+const getSortKeyForTitle = (title:string):string => {
   return title
     .toLowerCase()
     .replace(/(["'.“”„‘’—\-»#*[\]/])/g, "")
@@ -395,7 +394,7 @@ const blockHasFile = (
 };
 
 
-const getNumberOfFiles = (note:SavedNote) => {
+const getNumberOfFiles = (note:SavedNote):number => {
   return note.blocks.filter(blockHasFile).length;
 };
 
@@ -479,7 +478,11 @@ const getURLsOfNote = (note:SavedNote):string[] => {
 
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
-const breadthFirstSearch = (nodes, links, root: SavedNote):SavedNote[] => {
+const breadthFirstSearch = (
+  nodes:SavedNote[],
+  links,
+  root: SavedNote
+):SavedNote[] => {
   const queue:SavedNote[] = [];
   const discovered:SavedNote[] = [];
   discovered.push(root);
@@ -496,7 +499,7 @@ const breadthFirstSearch = (nodes, links, root: SavedNote):SavedNote[] => {
         // we are sure that the notes we are retrieving from noteIds in links
         // really exist. that's why we cast the result of findNote as
         // SavedNote
-        return nodes.find((n) => (n.id === linkedNoteId));
+        return nodes.find((n) => (n.id === linkedNoteId)) as SavedNote;
       });
     for (let i = 0; i < connectedNodes.length; i++){
       const w = connectedNodes[i];

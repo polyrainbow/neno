@@ -3,6 +3,7 @@ import fsClassic from "fs";
 import * as path from "path";
 import { finished } from "stream/promises";
 import archiver from "archiver";
+import ByteRange from "../interfaces/ByteRange";
 
 
 async function asyncFilter<T>(
@@ -102,7 +103,7 @@ export default class FileSystemStorageProvider {
   async getReadableStream(
     graphId: string,
     requestPath: string,
-    range,
+    range: ByteRange,
   ):Promise<fsClassic.ReadStream> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
@@ -157,7 +158,7 @@ export default class FileSystemStorageProvider {
   async listDirectory(
     graphId: string,
     requestPath: string,
-  ) {
+  ):Promise<string[]> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
@@ -169,7 +170,7 @@ export default class FileSystemStorageProvider {
   getArchiveStreamOfFolder(
     graphId: string,
     requestPath: string,
-  ) {
+  ):Promise<fsClassic.ReadStream> {
     const archive = archiver("zip");
   
     archive.on("error", function(err) {
@@ -185,7 +186,7 @@ export default class FileSystemStorageProvider {
   }
 
 
-  joinPath(...args) {
+  joinPath(...args:string[]):string {
     return path.join(...args);
   }
 
@@ -193,7 +194,7 @@ export default class FileSystemStorageProvider {
   async getFolderSize(
     graphId: string,
     requestPath: string,
-  ) {
+  ):Promise<number> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
