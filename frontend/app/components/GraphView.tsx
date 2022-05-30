@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import GraphVisualization from "../lib/GraphVisualization.js";
+import GraphVisualizer from "../lib/GraphVisualizer.js";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {
   useLocation,
@@ -10,6 +10,9 @@ import useConfirmDiscardingUnsavedChangesDialog
 import useGoToNote from "../hooks/useGoToNote";
 import { l } from "../lib/intl.js";
 import DatabaseProvider from "../interfaces/DatabaseProvider.js";
+import { HighlightDetails } from "../interfaces/GraphVisualizerConfig.js";
+import BackendGraphVisualization
+  from "../../../lib/notes/interfaces/GraphVisualization";
 
 interface GraphViewProps {
   databaseProvider: DatabaseProvider | null,
@@ -26,11 +29,13 @@ const GraphView = ({
   toggleAppMenu,
   handleInvalidCredentialsError,
 }:GraphViewProps) => {
-  const DEFAULT_STATUS = "";
+  const DEFAULT_STATUS: HighlightDetails = {
+    active: false,
+  };
   const mainElement = useRef<HTMLElement | null>(null);
-  const graphVisualizationInstance = useRef<GraphVisualization | null>(null);
+  const graphVisualizerInstance = useRef<GraphVisualizer | null>(null);
   const startedLoadingGraphVis = useRef<boolean>(false);
-  const [status, setStatus] = useState<string>(DEFAULT_STATUS);
+  const [status, setStatus] = useState<HighlightDetails>(DEFAULT_STATUS);
   const [searchValue, setSearchValue] = useState<string>("");
 
   const confirmDiscardingUnsavedChanges
@@ -42,10 +47,10 @@ const GraphView = ({
   const focusNoteId = parseInt(searchParams.get("focusNote") || "");
 
   const saveGraphObject = async () => {
-    if (!graphVisualizationInstance.current) {
+    if (!graphVisualizerInstance.current) {
       throw new Error("Error saving graph. Graph instance undefined.");
     }
-    const graphVisualization = graphVisualizationInstance.current.getSaveData();
+    const graphVisualization = graphVisualizerInstance.current.getSaveData();
     try {
       await databaseProvider?.saveGraphVisualization(graphVisualization);
       setUnsavedChanges(false);
@@ -67,8 +72,8 @@ const GraphView = ({
 
 
   const openSelectedNoteInEditor = async () => {
-    if (!graphVisualizationInstance.current) return;
-    const ids = graphVisualizationInstance.current.getSelectedNodeIds();
+    if (!graphVisualizerInstance.current) return;
+    const ids = graphVisualizerInstance.current.getSelectedNodeIds();
     if (ids.length === 0) {
       alert(l("graph.select-note-before-opening"));
       return;
@@ -116,11 +121,12 @@ const GraphView = ({
     startedLoadingGraphVis.current = true;
 
     try {
-      const graphObject = await databaseProvider.getGraphVisualization();
+      const graphObject:BackendGraphVisualization
+        = await databaseProvider.getGraphVisualization();
 
-      graphVisualizationInstance.current
-        = new GraphVisualization({
-          parent: mainElement.current,
+      graphVisualizerInstance.current
+        = new GraphVisualizer({
+          parent: mainElement.current as HTMLElement,
           graphObject,
           onHighlight: (highlightDetails) => {
             setStatus(highlightDetails);
@@ -144,8 +150,8 @@ const GraphView = ({
   }, [databaseProvider]);
 
   useEffect(() => {
-    if (!graphVisualizationInstance.current) return;
-    graphVisualizationInstance.current.setSearchValue(searchValue);
+    if (!graphVisualizerInstance.current) return;
+    graphVisualizerInstance.current.setSearchValue(searchValue);
   }, [searchValue]);
 
   return <>
@@ -156,7 +162,7 @@ const GraphView = ({
       setSearchValue={setSearchValue}
       openSelectedNoteInEditor={openSelectedNoteInEditor}
       saveGraphObject={saveGraphObject}
-      graphVisualizationInstance={graphVisualizationInstance}
+      graphVisualizerInstance={graphVisualizerInstance}
     />
     <main id="main" className="main-graph" ref={mainElement}></main>
     <GraphViewStatusIndicator status={status} />

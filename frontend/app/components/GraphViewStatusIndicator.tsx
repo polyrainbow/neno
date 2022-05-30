@@ -1,10 +1,15 @@
 import React from "react";
+import { HighlightDetails } from "../interfaces/GraphVisualizerConfig";
 import { emojis } from "../lib/config";
 import { l } from "../lib/intl";
 
+interface GraphViewStatusIndicatorProps {
+  status: HighlightDetails
+}
+
 const GraphViewStatusIndicator = ({
   status,
-}) => {
+}: GraphViewStatusIndicatorProps) => {
   if (!status.active) {
     return null;
   }
@@ -23,10 +28,10 @@ const GraphViewStatusIndicator = ({
   } else if (status.type === "edge") {
     statusSpan
       = <span>{emojis.link
-      + " " + status.titles[0]
+      + " " + status.titles?.[0]
       + " "}<span className="emoji">↔️</span>
       {
-        " " + status.titles[1]
+        " " + status.titles?.[1]
       }</span>;
   }
 

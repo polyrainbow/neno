@@ -16,6 +16,8 @@ import DatabaseProvider from "../interfaces/DatabaseProvider.js";
 import FileSystemAccessAPIStorageProvider
   from "./FileSystemAccessAPIStorageProvider.js";
 import { streamToBlob } from "./utils.js";
+import BackendGraphVisualization
+  from "../../../lib/notes/interfaces/GraphVisualization";
 
 
 async function verifyPermission(
@@ -261,7 +263,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     );
   }
 
-  async getGraphVisualization() {
+  async getGraphVisualization():Promise<BackendGraphVisualization> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -275,9 +277,9 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
       It's necessary to make the returned object from the notes module
       mutation-resistant, because the graph module would not work correctly
       otherwise: Node dragging would do weird things with INPI.
-      So let's serialize and re-parse
+      So let's create a clone.
     */
-    return JSON.parse(JSON.stringify(graphVisualization));
+    return structuredClone(graphVisualization);
   }
 
   getReadableGraphStream(withFiles) {

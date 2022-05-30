@@ -52,6 +52,7 @@ import GraphVisualizationFromUser
   from "../../../lib/notes/interfaces/GraphVisualizationFromUser";
 import ScreenPosition from "../../../lib/notes/interfaces/ScreenPosition";
 import NodePosition from "../../../lib/notes/interfaces/NodePosition";
+import GraphVisualizerConfig from "../interfaces/GraphVisualizerConfig";
 
 
 export default class GraphVisualization {
@@ -163,7 +164,7 @@ export default class GraphVisualization {
     onChange,
     initialFocusNoteId,
     openNote,
-  }) {
+  }: GraphVisualizerConfig) {
     const graphObjectPrepared:FrontendGraphVisualization
       = GraphVisualization.prepareGraphObject(graphObject);
     this.#parent = parent;

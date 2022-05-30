@@ -12,7 +12,8 @@ import ImportLinkAsNoteFailure
   from "../../../lib/notes/interfaces/ImportLinkAsNoteFailure";
 import GraphVisualizationFromUser
   from "../../../lib/notes/interfaces/GraphVisualizationFromUser";
-import GraphVisualization from "../lib/GraphVisualization";
+import BackendGraphVisualization
+  from "../../../lib/notes/interfaces/GraphVisualization";
 import UrlMetadataResponse
   from "../../../lib/notes/interfaces/UrlMetadataResponse";
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
@@ -41,7 +42,7 @@ interface DatabaseProvider {
   saveGraphVisualization: (
     graphVisualization:GraphVisualizationFromUser,
   ) => Promise<void>;
-  getGraphVisualization: () => Promise<GraphVisualization>;
+  getGraphVisualization: () => Promise<BackendGraphVisualization>;
   getReadableGraphStream: (withFiles:boolean) => Promise<any>;
   uploadFile: (file: File) => Promise<{
     fileId: string;
