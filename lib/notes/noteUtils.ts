@@ -648,6 +648,10 @@ const getConcatenatedTextOfNote = (note:SavedNote):string => {
       return accumulator + " " + itemsConcatenated;
     } else if (block.type === NoteContentBlockType.IMAGE) {
       return accumulator + " " + block.data.caption;
+    } else if (block.type === NoteContentBlockType.LINK) {
+      return accumulator
+        + " " + block.data.meta.title
+        + " " + block.data.meta.description;
     } else {
       return accumulator;
     }
