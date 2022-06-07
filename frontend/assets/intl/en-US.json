@@ -132,6 +132,7 @@
   "menu.graph": "Graph",
   "menu.import-links": "Import links as notes",
   "menu.logout": "Logout",
+  "menu.note-list": "Note List",
   "menu.stats": "Stats",
   "menu.switch-graphs": "Switch graphs",
   "stats.analysis": "Analysis",
