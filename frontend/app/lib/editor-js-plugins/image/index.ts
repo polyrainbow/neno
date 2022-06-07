@@ -92,7 +92,7 @@ export default class ImageTool {
   config;
   ui;
   tunes;
-  _data;
+  data;
 
   /**
    * Notify core that read-only mode is supported
@@ -145,11 +145,10 @@ export default class ImageTool {
       onChange: (tuneName) => this.tuneToggled(tuneName),
     });
 
-    /**
-     * Set saved state
-     */
-    this._data = {};
     this.data = data;
+    if (this.blockHasLoadedFile()) {
+      this.showFileData();
+    }
   }
 
   /**
@@ -256,11 +255,17 @@ export default class ImageTool {
    * @return {ImageToolData}
    */
   save() {
-    const caption = this.ui.nodes.caption;
-
-    this._data.caption = caption.innerHTML;
+    if (this.blockHasLoadedFile()) {
+      const caption = this.ui.nodes.caption;
+      this.data.caption = caption.innerHTML;
+    }
 
     return this.data;
+  }
+
+
+  blockHasLoadedFile() {
+    return typeof this.data.file === "object";
   }
 
   /**
@@ -319,70 +324,22 @@ export default class ImageTool {
    * Private methods
    */
 
-  /**
-   * Stores all Tool's data
-   *
-   * @private
-   *
-   * @param {ImageToolData} data - data in Image Tool format
-   */
-  set data(data) {
-    this.image = data.file;
 
-    this._data.caption = data.caption || "";
-    this.ui.fillCaption(this._data.caption);
+  async showFileData() {
+    this.ui.fillCaption(this.data.caption);
 
     Tunes.tunes.forEach(({ name: tune }) => {
-      const value = typeof data[tune] !== "undefined"
-        ? data[tune] === true || data[tune] === "true"
+      const value = typeof this.data[tune] !== "undefined"
+        ? this.data[tune] === true || this.data[tune] === "true"
         : false;
 
       this.setTune(tune, value);
     });
+
+    const url = await this.config.fileHandling.getUrl(this.data.file);
+    this.ui.fillImage(url);
   }
 
-  /**
-   * Return Tool data
-   *
-   * @private
-   *
-   * @return {ImageToolData}
-   */
-  get data() {
-    return this._data;
-  }
-
-
-  get image() {
-    return this._data.file;
-  }
-
-  /**
-   * Set new image file
-   *
-   * @private
-   *
-   * @param {object} file - uploaded file data
-   */
-  set image(file) {
-    this._data.file = file || {};
-
-    if (file) {
-      if (typeof this.config.fileHandling.getUrl === "function") {
-        this.config.fileHandling.getUrl(file)
-          .then((url) => {
-            this.ui.fillImage(url);
-          })
-          .catch((e) => {
-            throw new Error(e);
-          });
-      } else if (typeof file.url === "string") {
-        this.ui.fillImage(file.url);
-      } else {
-        throw new Error("Cannot set image url.");
-      }
-    }
-  }
 
   /**
    * File uploading callback
@@ -394,7 +351,19 @@ export default class ImageTool {
    */
   #onUploadFinished(response) {
     if (response.success && response.file) {
-      this.image = response.file;
+      const receivedFileData = response.file;
+      const filename = receivedFileData.name;
+      const extension = filename && filename.split(".").pop();
+
+      this.data = {
+        file: {
+          ...receivedFileData,
+          extension,
+        },
+        caption: "",
+      };
+
+      this.showFileData();
     } else {
       this.uploadingFailed("incorrect response: " + JSON.stringify(response));
     }
@@ -422,7 +391,7 @@ export default class ImageTool {
    */
   tuneToggled(tuneName) {
     // inverse tune state
-    this.setTune(tuneName, !this._data[tuneName]);
+    this.setTune(tuneName, !this.data[tuneName]);
   }
 
   /**
@@ -433,7 +402,7 @@ export default class ImageTool {
    * @return {void}
    */
   setTune(tuneName, value) {
-    this._data[tuneName] = value;
+    this.data[tuneName] = value;
 
     this.ui.applyTune(tuneName, value);
   }

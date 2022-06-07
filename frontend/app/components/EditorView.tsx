@@ -342,6 +342,8 @@ const EditorView = ({
         saveActiveNote({ ignoreDuplicateTitles: true }).catch((e) => {
           alert(e);
         });
+      } else {
+        alert(e);
       }
     }
   };

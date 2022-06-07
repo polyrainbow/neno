@@ -135,21 +135,18 @@ const loadInstance = async ({
         class: Document,
         config: {
           fileHandling: fileHandlingConfig,
-          types: "application/pdf",
         },
       },
       audio: {
         class: Audio,
         config: {
           fileHandling: fileHandlingConfig,
-          types: "audio/mp3, audio/mpeg, audio/flac",
         },
       },
       video: {
         class: Video,
         config: {
           fileHandling: fileHandlingConfig,
-          types: "video/mp4, video/webm",
         },
       },
     },
@@ -184,11 +181,17 @@ const save = async () => {
 
   // when the user did not enter anything, editor.js
   // decides to remove those blocks. but we want to have at least an empty
-  // heading block being present, so the user is always encouraged to give its
-  // note a title
+  // paragraph block being present, so the user can just start to type
   if (editorData.blocks.length === 0) {
     editorData.blocks = [...DEFAULT_NOTE_BLOCKS];
   }
+
+  // editor.js assigns ids to blocks, but we do not need or want them
+  // when saving the blocks
+  editorData.blocks.forEach((block) => {
+    delete block.id;
+  });
+
   return editorData.blocks;
 };
 

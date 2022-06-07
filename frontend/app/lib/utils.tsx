@@ -278,7 +278,7 @@ const getWindowDimensions = () => {
  * @param {NoteContentBlock} block
  * @return {boolean} true or false
  */
-const blockHasFile = (block) => {
+const blockHasLoadedFile = (block) => {
   return (
     [
       "image",
@@ -286,14 +286,14 @@ const blockHasFile = (block) => {
       "audio",
       "video",
     ].includes(block.type)
-    && (typeof block.data.file.fileId === "string")
+    && (typeof block.data.file === "object")
   );
 };
 
 
 const getFileInfosOfNoteFiles = (note) => {
   return note.blocks
-    .filter(blockHasFile)
+    .filter(blockHasLoadedFile)
     .map((block) => {
       return {
         type: block.type,
@@ -337,7 +337,7 @@ export {
   shortenText,
   streamToBlob,
   getWindowDimensions,
-  blockHasFile,
+  blockHasLoadedFile,
   getFileInfosOfNoteFiles,
   getAppPath,
   getIconSrc,

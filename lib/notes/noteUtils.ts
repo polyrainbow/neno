@@ -20,6 +20,7 @@ import NoteContentBlock, {
   NoteContentBlockParagraph,
   NoteContentBlockType,
   NoteContentBlockWithFile,
+  NoteContentBlockWithFileLoaded,
 } from "./interfaces/NoteContentBlock.js";
 import { NOTE_TITLE_PLACEHOLDER } from "./config.js";
 
@@ -219,8 +220,8 @@ const removeLinksOfNote = (graph: Graph, noteId: NoteId):void => {
 
 const getFilesOfNote = (note:SavedNote):FileId[] => {
   return note.blocks
-    .filter(blockHasFile)
-    .map((block: NoteContentBlockWithFile):FileId => {
+    .filter(blockHasLoadedFile)
+    .map((block: NoteContentBlockWithFileLoaded):FileId => {
       return block.data.file.fileId;
     });
 };
@@ -379,9 +380,9 @@ const getSortKeyForTitle = (title:string):string => {
  * @param block
  * @returns {boolean} true or false
  */
-const blockHasFile = (
+const blockHasLoadedFile = (
   block:NoteContentBlock,
-):block is NoteContentBlockWithFile => {
+):block is NoteContentBlockWithFileLoaded => {
   return (
     [
       NoteContentBlockType.IMAGE,
@@ -389,13 +390,13 @@ const blockHasFile = (
       NoteContentBlockType.AUDIO,
       NoteContentBlockType.VIDEO,
     ].includes(block.type)
-    && (typeof (block as NoteContentBlockWithFile).data.file.fileId === "string")
+    && (typeof (block as NoteContentBlockWithFile).data.file === "object")
   );
 };
 
 
 const getNumberOfFiles = (note:SavedNote):number => {
-  return note.blocks.filter(blockHasFile).length;
+  return note.blocks.filter(blockHasLoadedFile).length;
 };
 
 const getSortFunction = (
@@ -629,7 +630,7 @@ const getNotesWithFile = (
 ):SavedNote[] => {
   return notes.filter((note:SavedNote) => {
     return note.blocks
-      .filter(blockHasFile)
+      .filter(blockHasLoadedFile)
       .some((block) => block.data.file.fileId === file);
   });
 };
@@ -761,7 +762,7 @@ export {
   getNotesWithUrl,
   getNotesWithFile,
   getConcatenatedTextOfNote,
-  blockHasFile,
+  blockHasLoadedFile,
   getNotesWithTitleContainingTokens,
   getNotesThatContainTokens,
   getNotesWithBlocksOfTypes,

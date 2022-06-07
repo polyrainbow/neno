@@ -72,7 +72,6 @@ const LOADER_TIMEOUT = 500;
  * @description Config supported by Tool
  * @property {string} endpoint - file upload url
  * @property {string} field - field name for uploaded file
- * @property {string} types - available mime-types
  * @property {string} placeholder
  * @property {string} errorMessage
  * - allows to pass custom headers with Request
@@ -89,7 +88,7 @@ const LOADER_TIMEOUT = 500;
 export default class VideoTool {
   api;
   nodes;
-  _data;
+  data;
   config;
 
   /**
@@ -106,13 +105,8 @@ export default class VideoTool {
       title: null,
     };
 
-    this._data = {
-      file: {},
-    };
-
     this.config = {
       field: "file",
-      types: config.types || "*",
       buttonText: "Select video",
       errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
@@ -233,7 +227,7 @@ export default class VideoTool {
     /**
      * If file was uploaded
      */
-    if (this.pluginHasData()) {
+    if (this.blockHasLoadedFile()) {
       const name = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
       this.data.file.name = name;
     }
@@ -251,7 +245,7 @@ export default class VideoTool {
 
     this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
-    if (this.pluginHasData()) {
+    if (this.blockHasLoadedFile()) {
       this.showFileData();
     } else {
       this.prepareUploadButton();
@@ -329,15 +323,9 @@ export default class VideoTool {
     this.nodes.button.click();
   }
 
-  /**
-   * Checks if any of Tool's fields have data
-   *
-   * @return {boolean}
-   */
-  pluginHasData() {
-    return Object.values(this.data.file).some(
-      (item) => typeof item !== "undefined",
-    );
+
+  blockHasLoadedFile() {
+    return typeof this.data.file === "object";
   }
 
 
@@ -348,15 +336,13 @@ export default class VideoTool {
    */
   #onUploadFinished(response) {
     if (response.success && response.file) {
-      const receivedFileData = response.file || {};
+      const receivedFileData = response.file;
       const filename = receivedFileData.name;
       const extension = filename && filename.split(".").pop();
 
-      this.data = {
-        file: {
-          ...receivedFileData,
-          extension,
-        },
+      this.data.file = {
+        ...receivedFileData,
+        extension,
       };
 
       this.nodes.button.remove();
@@ -445,31 +431,6 @@ export default class VideoTool {
     this.removeLoader();
   }
 
-  /**
-   * Return Video Tool's data
-   *
-   * @return {VideoToolData}
-   */
-  get data() {
-    return this._data;
-  }
-
-  /**
-   * Stores all Tool's data
-   *
-   * @param {VideoToolData} data
-   */
-  set data({ file }) {
-    this._data = Object.assign({}, {
-      file: {
-        url: (file && file.url) || this._data.file.url,
-        name: (file && file.name) || this._data.file.name,
-        extension: (file && file.extension) || this._data.file.extension,
-        size: (file && file.size) || this._data.file.size,
-        ...file,
-      },
-    });
-  }
 
   /**
    * Moves caret to the end of contentEditable element

@@ -4,22 +4,30 @@
 */
 
 import GraphObject from "./interfaces/Graph";
+import NoteContentBlock from "./interfaces/NoteContentBlock";
+import SavedNote from "./interfaces/SavedNote";
+
+const updateBlock = (block:NoteContentBlock) => {
+  // @ts-ignore
+  delete block.id;
+
+  // if the file object does not have valid data inside (file id), remove it,
+  // so it is clear that this block is empty
+  // @ts-ignore
+  if (block.data.file && (!block.data.file.fileId)) {
+    // @ts-ignore
+    delete block.data.file;
+  }
+};
+
+
+const updateNote = (note:SavedNote) => {
+  note.blocks.forEach(updateBlock);
+};
+
 
 const updateNotes = (graph:GraphObject):void => {
-  graph.notes.forEach((note) => {
-
-    // add new note title field if not present
-    if (
-      typeof note.title !== "string"
-    ) {
-      if (note.blocks[0]?.type === "header") {
-        note.title = note.blocks[0].data.text;
-        note.blocks.shift();
-      } else {
-        note.title = "";
-      }
-    }
-  });
+  graph.notes.forEach(updateNote);
 };
 
 

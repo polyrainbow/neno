@@ -71,7 +71,6 @@ const LOADER_TIMEOUT = 500;
  * @typedef {object} AudioToolConfig
  * @description Config supported by Tool
  * @property {string} field - field name for uploaded file
- * @property {string} types - available mime-types
  * @property {string} placeholder
  * @property {string} errorMessage
  * @property {object} additionalRequestHeaders
@@ -89,7 +88,7 @@ const LOADER_TIMEOUT = 500;
 export default class AudioTool {
   api;
   nodes;
-  _data;
+  data;
   config;
 
   /**
@@ -106,13 +105,8 @@ export default class AudioTool {
       title: null,
     };
 
-    this._data = {
-      file: {},
-    };
-
     this.config = {
       field: "file",
-      types: config.types || "*",
       buttonText: "Select audio",
       errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
@@ -233,7 +227,7 @@ export default class AudioTool {
     /**
      * If file was uploaded
      */
-    if (this.pluginHasData()) {
+    if (this.blockHasLoadedFile()) {
       const name = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
       this.data.file.name = name;
     }
@@ -251,7 +245,7 @@ export default class AudioTool {
 
     this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
-    if (this.pluginHasData()) {
+    if (this.blockHasLoadedFile()) {
       this.showFileData();
     } else {
       this.prepareUploadButton();
@@ -286,7 +280,7 @@ export default class AudioTool {
       multiple: false,
       types: [
         {
-          description: "MP3 File",
+          description: "Audio File",
           accept: {
             "audio/mp3": [".mp3"],
             "audio/mpeg": [".mp3"],
@@ -330,15 +324,9 @@ export default class AudioTool {
     this.nodes.button.click();
   }
 
-  /**
-   * Checks if any of Tool's fields have data
-   *
-   * @return {boolean}
-   */
-  pluginHasData() {
-    return Object.values(this.data.file).some(
-      (item) => typeof item !== "undefined",
-    );
+
+  blockHasLoadedFile() {
+    return typeof this.data.file === "object";
   }
 
 
@@ -349,15 +337,13 @@ export default class AudioTool {
    */
   #onUploadFinished(response) {
     if (response.success && response.file) {
-      const receivedFileData = response.file || {};
+      const receivedFileData = response.file;
       const filename = receivedFileData.name;
       const extension = filename && filename.split(".").pop();
 
-      this.data = {
-        file: {
-          ...receivedFileData,
-          extension,
-        },
+      this.data.file = {
+        ...receivedFileData,
+        extension,
       };
 
       this.nodes.button.remove();
@@ -375,7 +361,6 @@ export default class AudioTool {
    * Removes tool's loader
    */
   removeLoader() {
-    // eslint-disable-next-line
     setTimeout(
       () => this.nodes.wrapper.classList.remove(
         this.CSS.wrapperLoading,
@@ -446,32 +431,6 @@ export default class AudioTool {
   uploadingFailed(errorMessage) {
     console.error(errorMessage);
     this.removeLoader();
-  }
-
-  /**
-   * Return Audio Tool's data
-   *
-   * @return {AudioToolData}
-   */
-  get data() {
-    return this._data;
-  }
-
-  /**
-   * Stores all Tool's data
-   *
-   * @param {AudioToolData} data
-   */
-  set data({ file }) {
-    this._data = Object.assign({}, {
-      file: {
-        url: (file && file.url) || this._data.file.url,
-        name: (file && file.name) || this._data.file.name,
-        extension: (file && file.extension) || this._data.file.extension,
-        size: (file && file.size) || this._data.file.size,
-        ...file,
-      },
-    });
   }
 
   /**

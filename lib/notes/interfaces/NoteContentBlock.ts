@@ -71,7 +71,7 @@ export interface NoteContentBlockCode {
 }
 
 
-interface NoteContentBlockFileMetadata {
+export interface NoteContentBlockFileMetadata {
   extension: string,
   fileId: FileId,
   name: string,
@@ -79,53 +79,65 @@ interface NoteContentBlockFileMetadata {
 }
 
 
-interface NoteContentBlockImageData {
-  file: NoteContentBlockFileMetadata,
-  caption: string,
-  withBackground: boolean,
+interface NoteContentBlockImageData<FileObjectType> {
+  file: FileObjectType,
+  caption?: string,
+  withBackground?: boolean,
 }
 
-export interface NoteContentBlockImage {
+export interface NoteContentBlockImage<FileObjectType> {
   readonly type: NoteContentBlockType.IMAGE,
-  data: NoteContentBlockImageData,
+  data: NoteContentBlockImageData<FileObjectType>,
 }
 
 
-interface NoteContentBlockDocumentData {
-  file: NoteContentBlockFileMetadata,
+interface NoteContentBlockDocumentData<FileObjectType> {
+  file: FileObjectType,
 }
 
-export interface NoteContentBlockDocument {
+export interface NoteContentBlockDocument<FileObjectType> {
   readonly type: NoteContentBlockType.DOCUMENT,
-  data: NoteContentBlockDocumentData,
+  data: NoteContentBlockDocumentData<FileObjectType>,
 }
 
 
-interface NoteContentBlockAudioData {
-  file: NoteContentBlockFileMetadata,
+interface NoteContentBlockAudioData<FileObjectType> {
+  file: FileObjectType,
 }
 
-export interface NoteContentBlockAudio {
+export interface NoteContentBlockAudio<FileObjectType> {
   readonly type: NoteContentBlockType.AUDIO,
-  data: NoteContentBlockAudioData,
+  data: NoteContentBlockAudioData<FileObjectType>,
 }
 
 
-interface NoteContentBlockVideoData {
-  file: NoteContentBlockFileMetadata,
+interface NoteContentBlockVideoData<FileObjectType> {
+  file: FileObjectType,
 }
 
-export interface NoteContentBlockVideo {
+export interface NoteContentBlockVideo<FileObjectType> {
   readonly type: NoteContentBlockType.VIDEO,
-  data: NoteContentBlockVideoData,
+  data: NoteContentBlockVideoData<FileObjectType>,
 }
 
 
+/*
+  NoteContentBlockWithFile = a block that may or may not contain file metadata 
+  NoteContentBlockWithFileLoaded = a NoteContentBlockWithFile that definitely
+  contains valid file metadata
+*/
 export type NoteContentBlockWithFile = (
-  NoteContentBlockImage
-  | NoteContentBlockDocument
-  | NoteContentBlockAudio
-  | NoteContentBlockVideo
+  NoteContentBlockImage<NoteContentBlockFileMetadata | undefined>
+  | NoteContentBlockDocument<NoteContentBlockFileMetadata | undefined>
+  | NoteContentBlockAudio<NoteContentBlockFileMetadata | undefined>
+  | NoteContentBlockVideo<NoteContentBlockFileMetadata | undefined>
+);
+
+export type NoteContentBlockWithFileLoaded = (
+  NoteContentBlockImage<NoteContentBlockFileMetadata>
+  | NoteContentBlockDocument<NoteContentBlockFileMetadata>
+  | NoteContentBlockAudio<NoteContentBlockFileMetadata>
+  | NoteContentBlockVideo<NoteContentBlockFileMetadata>
 );
 
 
@@ -135,10 +147,7 @@ type NoteContentBlock = (
   | NoteContentBlockList
   | NoteContentBlockHeading
   | NoteContentBlockCode
-  | NoteContentBlockImage
-  | NoteContentBlockDocument
-  | NoteContentBlockAudio
-  | NoteContentBlockVideo
+  | NoteContentBlockWithFile
 );
 
 

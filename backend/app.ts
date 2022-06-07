@@ -29,7 +29,11 @@ import { UserId } from "./interfaces/UserId.js";
 import { GraphId } from "./interfaces/GraphId.js";
 import BruteForcePreventer from "./BruteForcePreventer.js";
 import GraphStatsRetrievalOptions from "../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
-
+import Ajv from "ajv";
+import noteFromUserSchema from "../lib/notes/schemas/NoteFromUser.schema.json" assert { type: 'json' };
+import NoteFromUser from "../lib/notes/interfaces/NoteFromUser.js";
+import graphVisualizationFromUserSchema from "../lib/notes/schemas/GraphVisualizationFromUser.schema.json" assert { type: 'json' };
+import GraphVisualizationFromUser from "../lib/notes/interfaces/GraphVisualizationFromUser.js";
 
 const startApp = async ({
   users,
@@ -73,6 +77,11 @@ const startApp = async ({
     }),
   });
 
+
+  const ajv = new Ajv();
+
+  const validateNoteFromUser = ajv.compile(noteFromUserSchema);
+  const validateGraphVisualizationFromUser = ajv.compile(graphVisualizationFromUserSchema);
 
   const getUserByApiKey = (apiKey:string):User | null => {
     const user = users.find((user) => {
@@ -282,8 +291,26 @@ const startApp = async ({
     express.json({ limit: "1mb" }), // posting a graph can be somewhat larger
     async function(req, res) {
       const graphId = req.params.graphId;
+      const graphVisualizationFromUser = req.body;
+
+      const isValid = validateGraphVisualizationFromUser(
+        graphVisualizationFromUser,
+      );
+
+      if (!isValid) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.json(response);
+        return;
+      }
+
       try {
-        await Notes.setGraphVisualization(req.body, graphId);
+        await Notes.setGraphVisualization(
+          graphVisualizationFromUser as unknown as GraphVisualizationFromUser,
+          graphId,
+        );
         const response:APIResponse = {
           success: true,
         };
@@ -371,9 +398,22 @@ const startApp = async ({
       const graphId = req.params.graphId;
       const reqBody = req.body;
 
+      const noteFromUser = reqBody.note;
+
+      const isValid = validateNoteFromUser(noteFromUser);
+
+      if (!isValid) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.json(response);
+        return;
+      }
+
       try {
         const noteToTransmit:NoteToTransmit = await Notes.put(
-          reqBody.note,
+          noteFromUser as unknown as NoteFromUser,
           graphId,
           reqBody.options,
         );
