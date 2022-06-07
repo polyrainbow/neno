@@ -48,12 +48,6 @@ web space capable of serving static files via HTTPS.
 
 [Deploying NENO for local mode usage](./docs/DeployNENOLocalMode.md)
 
-## Sponsoring
-
-This open source software comes free of charge and is made with ❤️. If it is helpful to you, please consider [buying me a coffee](https://www.buymeacoffee.com/szimr).
-
-[<img src="./docs/img/bmac%20button.png" alt="Buy me a coffee" width="200"/>](https://www.buymeacoffee.com/szimr)
-
 ## Further reading
 
 * [Why I built NENO](https://webaudiotech.com/2021/02/13/serendipity-and-the-most-detailed-map-of-my-knowledge-that-ever-existed/)
