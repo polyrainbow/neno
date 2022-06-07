@@ -187,7 +187,7 @@ export default class AudioTool {
        * Drag n drop file from into the Editor
        */
       files: {
-        mimeTypes: ["audio/mp3", "audio/mpeg"],
+        mimeTypes: ["audio/mp3", "audio/mpeg", "audio/flac"],
         extensions: ["mp3"],
       },
     };
@@ -290,6 +290,7 @@ export default class AudioTool {
           accept: {
             "audio/mp3": [".mp3"],
             "audio/mpeg": [".mp3"],
+            "audio/flac": [".flac"],
           },
         },
       ],

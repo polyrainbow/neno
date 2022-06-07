@@ -60,6 +60,7 @@ const getFileTypeFromFilename = (
     "svg": NoteContentBlockType.IMAGE,
     "pdf": NoteContentBlockType.DOCUMENT,
     "mp3": NoteContentBlockType.AUDIO,
+    "flac": NoteContentBlockType.AUDIO,
     "mp4": NoteContentBlockType.VIDEO,
     "webm": NoteContentBlockType.VIDEO,
   }));

@@ -34,6 +34,10 @@ const ALLOWED_FILE_TYPES:FileType[] = [
     extension: "mp3",
   },
   {
+    mimeType: "audio/flac",
+    extension: "flac",
+  },
+  {
     mimeType: "video/mp4",
     extension: "mp4",
   },

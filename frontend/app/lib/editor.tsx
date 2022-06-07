@@ -142,7 +142,7 @@ const loadInstance = async ({
         class: Audio,
         config: {
           fileHandling: fileHandlingConfig,
-          types: "audio/mp3, audio/mpeg",
+          types: "audio/mp3, audio/mpeg, audio/flac",
         },
       },
       video: {
