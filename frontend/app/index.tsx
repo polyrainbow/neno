@@ -6,7 +6,7 @@ import {
   BrowserRouter as Router,
 } from "react-router-dom";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
-import { API_URL } from "./lib/config";
+import { API_URL } from "./config";
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./components/App";

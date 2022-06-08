@@ -1,4 +1,4 @@
-import { DEFAULT_NOTE_BLOCKS } from "./config";
+import { DEFAULT_NOTE_BLOCKS } from "../config";
 
 // this instance queue makes sure that there are not several editor instances
 // loaded in parallel and thus become visible on the screen. it queues all

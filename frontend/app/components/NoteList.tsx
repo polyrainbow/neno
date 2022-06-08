@@ -4,7 +4,7 @@ import NoteListItem from "./NoteListItem";
 import Pagination from "./Pagination";
 import NoteSearchDisclaimer from "./NoteSearchDisclaimer";
 import useGoToNote from "../hooks/useGoToNote";
-import { SEARCH_RESULTS_PER_PAGE } from "../lib/config";
+import { SEARCH_RESULTS_PER_PAGE } from "../config";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 

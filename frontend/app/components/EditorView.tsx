@@ -6,7 +6,7 @@ import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import Note from "./Note";
 import * as Utils from "../lib/utils";
-import * as Config from "../lib/config";
+import * as Config from "../config";
 import * as Editor from "../lib/editor";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import {

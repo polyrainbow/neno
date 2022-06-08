@@ -1,6 +1,6 @@
 import NoteContentBlock, {
   NoteContentBlockType,
-} from "../../../lib/notes/interfaces/NoteContentBlock";
+} from "../../lib/notes/interfaces/NoteContentBlock";
 
 const DEFAULT_NOTE_TITLE = "";
 

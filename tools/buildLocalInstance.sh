@@ -1,6 +1,6 @@
 '''
 builds a NENO instance intended for local mode only.
-make sure, you set ROOT_PATH in frontend/lib/config.tsx to the correct basepath
+make sure, you set ROOT_PATH in frontend/app/config.tsx to the correct basepath
 of your hosting environment before building
 '''
 

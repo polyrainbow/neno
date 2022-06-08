@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
-import { emojis } from "../lib/config.js";
+import { emojis } from "../config.js";
 import {
   makeTimestampHumanReadable,
   humanFileSize,

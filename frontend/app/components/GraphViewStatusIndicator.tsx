@@ -1,6 +1,6 @@
 import React from "react";
 import { HighlightDetails } from "../interfaces/GraphVisualizerConfig";
-import { emojis } from "../lib/config";
+import { emojis } from "../config";
 import { l } from "../lib/intl";
 
 interface GraphViewStatusIndicatorProps {

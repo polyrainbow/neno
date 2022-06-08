@@ -1,6 +1,6 @@
 import React from "react";
 import Tooltip from "./Tooltip";
-import { emojis } from "../lib/config.js";
+import { emojis } from "../config.js";
 import { getIconSrc } from "../lib/utils";
 import { l } from "../lib/intl";
 

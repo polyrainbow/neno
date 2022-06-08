@@ -5,7 +5,7 @@ import {
 } from "../../../lib/notes/interfaces/NoteContentBlock";
 import { PathTemplate } from "../enum/PathTemplate";
 import ActiveNote from "../interfaces/ActiveNote";
-import * as Config from "./config";
+import * as Config from "../config";
 
 
 const yyyymmdd = (date = new Date()) => {

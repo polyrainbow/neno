@@ -16,7 +16,7 @@ import FloatingActionButton from "./FloatingActionButton";
 import { DatabaseMode } from "../enum/DatabaseMode.js";
 import StatsView from "./StatsView";
 import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
-import * as Config from "../lib/config";
+import * as Config from "../config";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
 import { getAppPath } from "../lib/utils";

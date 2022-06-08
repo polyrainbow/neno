@@ -1,5 +1,5 @@
 import React from "react";
-import { ASSETS_PATH } from "../lib/config";
+import { ASSETS_PATH } from "../config";
 import { l } from "../lib/intl";
 
 

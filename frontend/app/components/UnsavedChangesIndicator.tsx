@@ -1,6 +1,6 @@
 import React from "react";
 import Tooltip from "./Tooltip.js";
-import { emojis } from "../lib/config.js";
+import { emojis } from "../config.js";
 import { l } from "../lib/intl.js";
 
 interface UnsavedChangesIndicatorProps {

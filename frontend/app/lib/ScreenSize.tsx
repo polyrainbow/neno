@@ -10,7 +10,7 @@
   https://www.measurethat.net/Benchmarks/Show/1213/3/matchmedia-vs-clientwidth
 */
 
-import { MAX_WIDTH_SMALL_SCREEN } from "./config";
+import { MAX_WIDTH_SMALL_SCREEN } from "../config";
 
 const QUERY = `(max-width: ${MAX_WIDTH_SMALL_SCREEN}px)`;
 let isSmallScreen;
