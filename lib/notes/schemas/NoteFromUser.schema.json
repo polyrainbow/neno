@@ -3,6 +3,13 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "additionalProperties": false,
     "definitions": {
+        "ListBlockStyle": {
+            "enum": [
+                "ordered",
+                "unordered"
+            ],
+            "type": "string"
+        },
         "NoteContentBlockAudio<NoteContentBlockFileMetadata|undefined>": {
             "additionalProperties": false,
             "properties": {
@@ -274,10 +281,14 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "style": {
+                    "$ref": "NoteFromUser#/definitions/ListBlockStyle"
                 }
             },
             "required": [
-                "items"
+                "items",
+                "style"
             ],
             "type": "object"
         },

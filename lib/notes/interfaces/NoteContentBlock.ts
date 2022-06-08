@@ -39,7 +39,6 @@ export interface NoteContentBlockLink {
   data: NoteContentBlockLinkData,
 }
 
-
 interface NoteContentBlockHeadingData {
   text: string,
   level: number,
@@ -50,16 +49,20 @@ export interface NoteContentBlockHeading {
   data: NoteContentBlockHeadingData,
 }
 
+enum ListBlockStyle {
+  UNORDERED = "unordered",
+  ORDERED = "ordered",
+}
 
 interface NoteContentBlockListData {
   items: string[],
+  style: ListBlockStyle,
 }
 
 export interface NoteContentBlockList {
   readonly type: NoteContentBlockType.LIST,
   data: NoteContentBlockListData,
 }
-
 
 interface NoteContentBlockCodeData {
   code: string,
