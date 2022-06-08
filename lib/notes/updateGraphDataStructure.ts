@@ -18,6 +18,19 @@ const updateBlock = (block:NoteContentBlock) => {
     // @ts-ignore
     delete block.data.file;
   }
+
+  // if extension property is missing, add it
+  if (
+    // @ts-ignore
+    block.data.file
+    // @ts-ignore
+    && block.data.file.fileId
+    // @ts-ignore
+    && (!block.data.file.extension)
+  ) {
+    // @ts-ignore
+    block.data.file.extension = block.data.file.fileId.split(".").pop();
+  }
 };
 
 
