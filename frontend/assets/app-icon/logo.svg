@@ -8,7 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.2 (dc2aeda, 2022-05-15)"
-   sodipodi:docname="logo blue 2.svg"
+   sodipodi:docname="logo.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,14 +24,14 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.9077568"
-     inkscape:cx="-72.074178"
-     inkscape:cy="140.21704"
-     inkscape:window-width="2560"
-     inkscape:window-height="1387"
-     inkscape:window-x="0"
+     inkscape:zoom="0.86019915"
+     inkscape:cx="-34.294384"
+     inkscape:cy="131.36493"
+     inkscape:window-width="1344"
+     inkscape:window-height="456"
+     inkscape:window-x="101"
      inkscape:window-y="25"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
      id="defs2" />
@@ -40,7 +40,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#4d87ff;fill-opacity:1;stroke-width:0.296816"
+       style="fill:#5bb3ff;fill-opacity:1;stroke-width:0.296816"
        id="rect413-5"
        width="10"
        height="57.04047"
@@ -48,7 +48,7 @@
        y="25.812885"
        transform="rotate(-28)" />
     <rect
-       style="fill:#4d87ff;fill-opacity:1;stroke-width:0.296816"
+       style="fill:#5bb3ff;fill-opacity:1;stroke-width:0.296816"
        id="rect413-5-5"
        width="10"
        height="57.04047"
@@ -56,7 +56,7 @@
        y="4.4193006"
        transform="rotate(12)" />
     <rect
-       style="fill:#4d87ff;fill-opacity:1;stroke-width:0.296816"
+       style="fill:#5bb3ff;fill-opacity:1;stroke-width:0.296816"
        id="rect413-5-5-4"
        width="10"
        height="57.04047"
@@ -64,25 +64,25 @@
        y="-1.1853994"
        transform="rotate(12)" />
     <circle
-       style="fill:#8405c3;fill-opacity:1;stroke-width:0.264583"
+       style="fill:#c65dfb;fill-opacity:1;stroke-width:0.264583"
        id="path61-6"
        cx="14"
        cy="61"
        r="14" />
     <circle
-       style="fill:#8405c3;fill-opacity:1;stroke-width:0.264583"
+       style="fill:#c65dfb;fill-opacity:1;stroke-width:0.264583"
        id="path61-6-7"
        cx="24.775824"
        cy="14"
        r="14" />
     <circle
-       style="fill:#8405c3;fill-opacity:1;stroke-width:0.264583"
+       style="fill:#c65dfb;fill-opacity:1;stroke-width:0.264583"
        id="path61-6-7-0"
        cx="51"
        cy="61"
        r="14" />
     <circle
-       style="fill:#8405c3;fill-opacity:1;stroke-width:0.264583"
+       style="fill:#c65dfb;fill-opacity:1;stroke-width:0.264583"
        id="path61-6-7-0-3"
        cx="60.816608"
        cy="14"
