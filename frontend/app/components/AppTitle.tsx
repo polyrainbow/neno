@@ -1,4 +1,5 @@
 import React from "react";
+import { ASSETS_PATH } from "../lib/config";
 import { l } from "../lib/intl";
 
 
@@ -8,7 +9,7 @@ const AppTitle = ({ toggleAppMenu }) => {
     height="40"
     onClick={toggleAppMenu}
     id="heading"
-    src="/assets/app-icon/logo-circle.svg"
+    src={ASSETS_PATH + "app-icon/logo-circle.svg"}
     alt={l("app.menu-button.alt")}
     style={{
       cursor: toggleAppMenu ? "pointer" : "inherit",
