@@ -1,41 +1,14 @@
 {
  "name": "NENO",
+ "theme_color": "#ff8598",
+ "background_color": "#46b8ff",
+ "display": "browser",
  "icons": [
   {
-   "src": "\/assets\/app-icon/android-icon-36x36.png",
-   "sizes": "36x36",
-   "type": "image\/png",
-   "density": "0.75"
-  },
-  {
-   "src": "\/assets\/app-icon/android-icon-48x48.png",
-   "sizes": "48x48",
-   "type": "image\/png",
-   "density": "1.0"
-  },
-  {
-   "src": "\/assets\/app-icon/android-icon-72x72.png",
-   "sizes": "72x72",
-   "type": "image\/png",
-   "density": "1.5"
-  },
-  {
-   "src": "\/assets\/app-icon/android-icon-96x96.png",
-   "sizes": "96x96",
-   "type": "image\/png",
-   "density": "2.0"
-  },
-  {
-   "src": "\/assets\/app-icon/android-icon-144x144.png",
-   "sizes": "144x144",
-   "type": "image\/png",
-   "density": "3.0"
-  },
-  {
-   "src": "\/assets\/app-icon/android-icon-192x192.png",
-   "sizes": "192x192",
-   "type": "image\/png",
-   "density": "4.0"
+   "src": "\/assets\/app-icon/logo.svg",
+   "sizes": "48x48 72x72 96x96 128x128 256x256 512x512",
+   "type": "image/svg+xml",
+   "purpose": "any"
   }
  ]
 }

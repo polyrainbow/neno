@@ -1,6 +1,13 @@
-# NENO
+<p align="center">
+  <img
+    style="text-align: center;"
+    src="./frontend/assets/app-icon/logo.svg"
+    alt="NENO Logo"
+    width="200" height="200" 
+  >
+</p>
 
-![Build](https://github.com/SebastianZimmer/neno/actions/workflows/build.yml/badge.svg)
+# NENO ![Build](https://github.com/SebastianZimmer/neno/actions/workflows/build.yml/badge.svg)
 
 NENO is a note-taking app that helps you creating your personal knowledge graph. With NENO, you retain full control over your data because you decide where it is stored: On your local machine, on a cloud storage of your choice, or even on a server under your control.
 

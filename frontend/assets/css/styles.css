@@ -212,7 +212,7 @@ header h1 {
 
 #heading {
   margin: 0px;
-  padding: 11px 10px;
+  padding: 5px 10px;
   font-size: var(--large-font-size);
   white-space: pre;
 }
