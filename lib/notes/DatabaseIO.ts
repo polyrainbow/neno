@@ -22,6 +22,8 @@ import cleanUpGraph from "./cleanUpGraph.js";
 export default class DatabaseIO {
   #storageProvider;
   #loadedGraphs:Map<GraphId, Graph> = new Map();
+  #graphRetrievalInProgress:Promise<void> = Promise.resolve();
+  #finishedObtainingGraph: (() => void) = () => {return;};
 
   #GRAPH_FILE_NAME = "graph.json";
   #NAME_OF_FILES_SUBDIRECTORY = "files";
@@ -43,18 +45,16 @@ export default class DatabaseIO {
   }
 
 
-  private async writeGraphFile (graphId: GraphId, value) {
+  private async writeGraphFile (graphId: GraphId, graph: Graph) {
     await this.#storageProvider.writeObject(
       graphId,
       this.#GRAPH_FILE_NAME,
-      JSON.stringify(value),
+      JSON.stringify(graph),
     );
   }
 
 
-  private async createGraph (
-    graphId: GraphId,
-  ): Promise<Graph> {
+  private createGraph (): Graph {
     const newGraph:Graph = {
       creationTime: Date.now(),
       updateTime: Date.now(),
@@ -72,7 +72,6 @@ export default class DatabaseIO {
       },
       pinnedNotes: [],
     };
-    await this.writeGraphFile(graphId, newGraph);
 
     return newGraph;
   }
@@ -88,14 +87,25 @@ export default class DatabaseIO {
 
 
   async getGraph(graphId: GraphId):Promise<Graph> {
-    // when we are trying to get a graph object, we can try it in 3 ways:
+    // We only want to get one graph at a time to reduce unnecessary disk usage
+    // that occurs when a consumer performs two or more API calls at the same
+    // time. To prevent accessing the disk twice or more for the same data,
+    // let's wait here until other executions of this function are finished.
+    await this.#graphRetrievalInProgress;
+    // and then make others wait
+    this.#graphRetrievalInProgress = new Promise((resolve) => {
+      this.#finishedObtainingGraph = resolve;
+    });
 
-    // Way 1: try to get it from loaded graph objects
+    // we try to get the requested graph object in 3 ways:
+
+    // Way 1: Fast memory access: try to get it from loaded graph objects
     if (this.#loadedGraphs.has(graphId)){
+      this.#finishedObtainingGraph();
       return this.#loadedGraphs.get(graphId) as Graph;
     }
 
-    // Way 2: try to get it from file
+    // Way 2: Slow disk access: try to get it from the file on the disk
     const graphFromFile:Graph | null
       = await this.readGraphFile(graphId);
     if (graphFromFile) {
@@ -107,26 +117,27 @@ export default class DatabaseIO {
       // flushing these changes will also save the graph in memory for
       // faster access the next time
       await this.flushChanges(graphId, graphFromFile);
-
-      // manually saving it in memory is not needed anymore here.
-      // this.#loadedGraphs.set(graphId, graphFromFile);
-  
+      this.#finishedObtainingGraph();
       return graphFromFile;
     }
 
-    // Way 3: Create a new graph object and return it
-    const newGraph:Graph = await this.createGraph(graphId);
+    // Way 3: If there is no graph object in memory or on the disk, create a new
+    // graph object
+    const newGraph:Graph = this.createGraph();
+    // write it to memory and disk
+    await this.flushChanges(graphId, newGraph);
+    this.#finishedObtainingGraph();
     return newGraph;
   }
 
+
   // flushChanges makes sure that the changes applied to the graph object are
   // written to the disk and thus are persistent. it should always be called
-  // after any operations on the main data object have been performed.
-  async flushChanges (graphId:GraphId, graph:Graph):Promise<boolean> {
+  // after any operation on the main data object has been performed.
+  async flushChanges (graphId:GraphId, graph:Graph):Promise<void> {
     graph.updateTime = Date.now();
     this.#loadedGraphs.set(graphId, graph);
     await this.writeGraphFile(graphId, graph);
-    return true;
   }
 
 

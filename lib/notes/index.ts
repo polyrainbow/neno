@@ -402,7 +402,7 @@ const remove = async (
 const importDB = (
   graph:GraphObject,
   graphId:GraphId,
-):Promise<boolean> => {
+):Promise<void> => {
   return io.flushChanges(graphId, graph);
 };
 

@@ -227,7 +227,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
-    function(req, res) {
+    async function(req, res) {
       const graphId = req.params.graphId;
       
       const response:APIResponse = {
@@ -235,8 +235,7 @@ const startApp = async ({
       };
     
       try {
-        const success = Notes.importDB(req.body, graphId);
-        if (!success) throw new Error("INTERNAL_SERVER_ERROR");
+        await Notes.importDB(req.body, graphId);
         response.success = true;
       } catch(e) {
         response.success = false;
