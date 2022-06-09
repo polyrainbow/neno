@@ -22,7 +22,7 @@ NENO is a note-taking app that helps you creating your personal knowledge graph.
 * Powerful full-text search
 * Tap-to-link: One click is enough to link two notes
 * File overview: All uploaded files in one view
-* Lossless export: Export your data lossleslly to create backups or to move it to another NENO instance
+* Lossless export: Export your data losslessly to create backups or to migrate to another NENO instance
 * Dark mode: Eye-friendly note-taking at night time
 
 ![NENO Editor view in dark mode](./docs/img/neno-dark.png)
