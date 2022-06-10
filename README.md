@@ -63,4 +63,4 @@ web space capable of serving static files via HTTPS.
 
 * [Tips and tricks for working with NENO](./docs/TipsAndTricks.md)
 
-* [Developer Notes](./docs/DeveloperNotes.md)
+* [Contributing](./CONTRIBUTING.md)
