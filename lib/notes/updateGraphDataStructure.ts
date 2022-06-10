@@ -31,6 +31,39 @@ const updateBlock = (block:NoteContentBlock) => {
     // @ts-ignore
     block.data.file.extension = block.data.file.fileId.split(".").pop();
   }
+
+  if (
+    (block.type === "image")
+    && (typeof block.data.file === "object")
+    && (!block.data.file.name)
+  ) {
+    block.data.file.name = block.data.file.fileId;
+  }
+
+  if (
+    (block.type === "image")
+    && (typeof block.data.file === "object")
+    && (block.data.file.size === null)
+  ) {
+    block.data.file.size = -1;
+  }
+
+  if (
+    (block.type === "image")
+    && (typeof block.data.file === "object")
+    && (!block.data.file.size)
+  ) {
+    block.data.file.size = -1;
+  }
+
+  if (
+    (block.type === "link")
+    && (!block.data.meta.image)
+  ) {
+    block.data.meta.image = {
+      url: null
+    };
+  }
 };
 
 
