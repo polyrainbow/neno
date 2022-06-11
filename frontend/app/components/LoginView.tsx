@@ -46,7 +46,9 @@ const LoginView = ({
         />
       </div>
       <footer>
-        <a href="https://github.com/SebastianZimmer/neno/docs/index.md">Read the user manual</a>
+        <a href="https://github.com/SebastianZimmer/neno/blob/main/docs/index.md">
+          {l("login.read-the-manual")}
+        </a>
       </footer>
     </section>
   </>;

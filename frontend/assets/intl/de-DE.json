@@ -119,6 +119,7 @@
   "login.local.select-folder": "Datenbankordner auswählen",
   "login.local.select-folder.explainer": "Wähle einen Datenbankordner aus (wenn es darin keine Datenbank gibt, wird eine neue erstellt)",
   "login.logo.alt": "NENO Logo",
+  "login.read-the-manual": "Lies das Benutzerhandbuch (englisch)",
   "login.server.heading": "Server-Datenbank",
   "login.server.invalid-credentials": "Die Kombination aus Benutzername, Passwort und 2FA-Token scheint nicht korrekt zu sein. Probier es noch einmal.",
   "login.server.mfa-token": "2FA-Token",
