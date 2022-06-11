@@ -487,18 +487,44 @@ button[disabled]{
 
 
 #section_login {
-  font-size: var(--large-font-size);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
   padding: 20px;
   box-sizing: border-box;
-  width: 100vw;
+  max-width: 800px;
   margin: auto;
   height: calc(100vh - var(--header-bar-height));
   overflow: auto;
 }
 
+#section_login #login_welcome {
+  grid-area: 1 / 1 / 2 / 3;
+  margin: auto;
+}
+
+#section_login #login_welcome #login_logo {
+  margin: auto;
+  width: 200px;
+  height: 200px;
+  display: block;
+}
+
+#section_login #login_welcome div {
+  margin: auto;
+  text-align: center;
+  display: block;
+}
+
+#login_welcome_app_title {
+  font-size: var(--h1-font-size);
+  font-weight: bold;
+}
+
 #section_login input {
   font-size: var(--large-font-size);
   color: var(--font-color);
+  margin: 0;
 }
 
 
@@ -608,6 +634,15 @@ button[disabled]{
 
   #note-content{
     padding: 0px var(--default-margin);
+  }
+
+  #section_login {
+    grid-template-columns: auto;
+    grid-template-rows: auto auto auto;
+  }
+
+  #section_login #login_welcome {
+    grid-area: 1 / 1 / 2 / 2;
   }
 }
 
