@@ -488,6 +488,7 @@ button[disabled]{
 
 #section_login {
   display: grid;
+  grid-gap: var(--default-margin);
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
   padding: 20px;
