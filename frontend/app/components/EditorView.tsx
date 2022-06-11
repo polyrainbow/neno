@@ -34,6 +34,7 @@ import { ErrorMessage } from "../../../lib/notes/interfaces/ErrorMessage";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
+import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
 
 interface EditorViewProps {
   databaseProvider: DatabaseProvider,
@@ -290,7 +291,13 @@ const EditorView = ({
     const noteToTransmit:NoteFromUser = {
       title: activeNote.title,
       blocks: await Editor.save(),
-      changes: activeNote.changes,
+      changes: activeNote.changes.map(
+        (change:FrontendUserNoteChange):UserNoteChange => {
+          return {
+            type: change.type,
+            noteId: change.noteId,
+          };
+        }),
       // eslint-disable-next-line no-undefined
       id: (!activeNote.isUnsaved) ? activeNote.id : undefined,
     };
