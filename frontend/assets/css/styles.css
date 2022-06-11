@@ -490,7 +490,7 @@ button[disabled]{
   display: grid;
   grid-gap: var(--default-margin);
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   padding: 20px;
   box-sizing: border-box;
   max-width: 800px;
@@ -500,7 +500,6 @@ button[disabled]{
 }
 
 #section_login #login_welcome {
-  grid-area: 1 / 1 / 2 / 3;
   margin: auto;
 }
 
@@ -523,6 +522,12 @@ button[disabled]{
 }
 
 #section_login input {
+  font-size: var(--large-font-size);
+  color: var(--font-color);
+  margin: 0;
+}
+
+#section_login footer {
   font-size: var(--large-font-size);
   color: var(--font-color);
   margin: 0;
@@ -607,6 +612,14 @@ button[disabled]{
     overflow-y: auto;
     margin: 0;
     height: calc(100vh - (2 * var(--header-bar-height)));
+  }
+
+  #section_login #login_welcome {
+    grid-area: 1 / 1 / 2 / 3;
+  }
+
+  #section_login footer {
+    grid-area: 3 / 1 / 4 / 3;
   }
 }
 

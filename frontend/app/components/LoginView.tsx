@@ -45,6 +45,9 @@ const LoginView = ({
           setDatabaseMode={setDatabaseMode}
         />
       </div>
+      <footer>
+        <a href="https://github.com/SebastianZimmer/neno/docs/index.md">Read the user manual</a>
+      </footer>
     </section>
   </>;
 };

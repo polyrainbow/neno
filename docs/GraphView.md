@@ -1,17 +1,18 @@
-# Graph View Manual
+# Graph view
 
 ![NENO Graph view example](./img/graph%20view%20simple.png)
 
-In the Graph View, your notes are shown as a network graph in which notes are
+One of NENO's best features is the Graph View. In the Graph View, your notes are shown as a network graph in which notes are
 displayed as graph nodes and links between notes are displayed as graph edges.
 You can zoom in and out with the mouse wheel, move notes and add/remove links. Please note, that you have to save
 the current state to make your modifications to the graph permanent.
 
 ## Accessing the Graph view
 
-Click on the NENO logo in the top left corner and you should be able to toggle between Graph view and Editor view.
+Click on the NENO logo in the top left corner to open the application menu.
+In there and click on "Graph".
 
-![NENO Locating Graph view example](./img/graph%20view%20locate.png)
+![NENO application menu](./img/menu.png)
 
 ## 🟩 The INPI (Initial Node Position Indicator)
 
