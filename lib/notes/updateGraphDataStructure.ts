@@ -58,6 +58,7 @@ const updateBlock = (block:NoteContentBlock) => {
 
   if (
     (block.type === "link")
+    && (block.data.meta)
     && (!block.data.meta.image)
   ) {
     block.data.meta.image = {
