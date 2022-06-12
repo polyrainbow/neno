@@ -41,10 +41,16 @@ There are two fundamental ways how NENO can be used: **Local mode** and **server
 
 In local mode, NENO stores the data in a folder of your choice on your
 device. If you want, you could also select a cloud storage folder so that your notes are synchronized to all your devices.
-In local mode, no note data is sent to the web server.
+In local mode, no note data is sent to a web server.
 
 To use NENO in local mode, you do not need technical knowledge, just go to this link to start:
 [NENO App](https://sebastianzimmer.github.io/neno/login)
+
+Beware that yor web browser has to support a feature called
+"File System Access API". At the time of writing, the desktop versions
+of Chrome, Edge, Opera, and Safari do support it.
+Mobile browser versions are not supported yet.
+We recommend to use a Chromium-based browser (Chrome, Opera, Edge, etc.).
 
 ### Server mode
 
