@@ -1,3 +1,9 @@
+import NoteContentBlock, {
+  NoteContentBlockLink,
+  NoteContentBlockParagraph,
+  NoteContentBlockType,
+} from "../lib/notes/interfaces/NoteContentBlock";
+
 export const fetchJSON = (url, options) => {
   // eslint-disable-next-line no-undef
   return fetch(url, options).then((response) => response.json());
@@ -15,37 +21,47 @@ export const trimHostUrl = (hostUrl) => {
 };
 
 
+interface GetNoteBlocksParams {
+  url: string,
+  pageTitle: string,
+  noteText: string,
+}
+
 export const getNoteBlocks = ({
   url,
   pageTitle,
   noteText,
-}) => {
-  const blocks = [
-    {
-      type: "link",
-      data: {
-        link: url,
-        meta: {
-          title: pageTitle,
-          description: "",
-          image: {
-            url: "",
-          },
+}:GetNoteBlocksParams):NoteContentBlock[] => {
+  const linkBlock:NoteContentBlockLink = {
+    type: NoteContentBlockType.LINK,
+    data: {
+      link: url,
+      meta: {
+        title: pageTitle,
+        description: "",
+        image: {
+          url: "",
         },
       },
     },
+  };
+
+  const blocks:NoteContentBlock[] = [
+    linkBlock,
   ];
 
   if (noteText.trim().length > 0) {
     const paragraphs = noteText.split("\n\n");
-    const paragraphBlocks = paragraphs.map((paragraph) => {
-      return {
-        type: "paragraph",
-        data: {
-          text: paragraph,
-        },
-      };
-    });
+    const paragraphBlocks:NoteContentBlockParagraph[] = paragraphs.map(
+      (paragraph) => {
+        return {
+          type: NoteContentBlockType.PARAGRAPH,
+          data: {
+            text: paragraph,
+          },
+        };
+      },
+    );
 
     blocks.push(...paragraphBlocks);
   }

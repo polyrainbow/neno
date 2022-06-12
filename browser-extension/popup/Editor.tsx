@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import NoteContentBlock from "../../lib/notes/interfaces/NoteContentBlock";
+import NoteFromUser from "../../lib/notes/interfaces/NoteFromUser";
 import {
   getNoteBlocks,
   putNote,
@@ -15,7 +17,7 @@ const Editor = ({ config, activeTab, graphId }) => {
   const [statusMessage, setStatusMessage] = useState("");
   const [noteTitle, setNoteTitle] = useState("");
   const [noteText, setNoteText] = useState("");
-  const [activeNoteId, setActiveNoteId] = useState(null);
+  const [activeNoteId, setActiveNoteId] = useState<number>(NaN);
   const [pushNoteButtonValue, setPushNoteButtonValue] = useState("Add");
 
   useEffect(() => {
@@ -31,18 +33,20 @@ const Editor = ({ config, activeTab, graphId }) => {
   const pushNote = async () => {
     if (typeof graphId !== "string") return;
 
-    const blocks = getNoteBlocks({
+    const blocks:NoteContentBlock[] = getNoteBlocks({
       url: activeTab.url,
       pageTitle: activeTab.title,
       noteText,
     });
 
+    const note:NoteFromUser = {
+      id: activeNoteId,
+      blocks,
+      title: noteTitle,
+    };
+
     const result = await putNote({
-      note: {
-        id: activeNoteId,
-        blocks,
-        title: noteTitle,
-      },
+      note,
       hostUrl: config.hostUrl,
       apiKey: config.apiKey,
       graphId,
