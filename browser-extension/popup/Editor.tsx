@@ -40,7 +40,8 @@ const Editor = ({ config, activeTab, graphId }) => {
     });
 
     const note:NoteFromUser = {
-      id: activeNoteId,
+      // eslint-disable-next-line no-undefined
+      id: activeNoteId || undefined,
       blocks,
       title: noteTitle,
     };
