@@ -23,7 +23,7 @@ if (localStorageValue && supportedLangs.includes(localStorageValue)) {
 
 localStorage.setItem("language", lang);
 
-const langFile = await import(`../../assets/intl/${lang}.json`);
+const langFile = await import(`../intl/${lang}.json`);
 
 export function l(key:string, replacements?:Replacements):string {
   if (typeof langFile[key] === "string") {

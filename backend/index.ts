@@ -37,7 +37,7 @@ logger.info("💡 Starting app...");
 const app = await startApp({
   users,
   dataPath: programArguments.dataFolderPath,
-  frontendPath: path.join(REPO_PATH, "frontend"),
+  frontendPath: path.join(REPO_PATH, "frontend", "public"),
   sessionSecret: programArguments.sessionSecret,
   sessionTTL: parseInt(programArguments.sessionTtl),
   maxUploadFileSize: parseInt(programArguments.maxUploadFileSize),
