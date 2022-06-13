@@ -7,7 +7,7 @@ builds a NENO release package
 # this will also be the name of the directory inside the archive
 TARGET_DIRECTORY_NAME=neno
 TARGET_DIRECTORY=./$TARGET_DIRECTORY_NAME
-VERSION=v1.0.0
+VERSION=v$(eval "cat ../package.json | jq -r '.version'")
 
 cd ..
 
