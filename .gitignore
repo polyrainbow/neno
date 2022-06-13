@@ -113,3 +113,5 @@ stats.json
 .DS_Store
 
 neno-local
+neno-release-package
+neno-*.tar.gz
