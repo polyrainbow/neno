@@ -1,0 +1,510 @@
+{
+  "$id": "GraphObject",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+      "ListBlockStyle": {
+          "enum": [
+              "ordered",
+              "unordered"
+          ],
+          "type": "string"
+      },
+      "NoteContentBlockAudio<NoteContentBlockFileMetadata|undefined>": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockAudioData<NoteContentBlockFileMetadata|undefined>"
+              },
+              "type": {
+                  "enum": [
+                      "audio"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockAudioData<NoteContentBlockFileMetadata|undefined>": {
+          "additionalProperties": false,
+          "properties": {
+              "file": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockFileMetadata"
+              }
+          },
+          "type": "object"
+      },
+      "NoteContentBlockCode": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockCodeData"
+              },
+              "type": {
+                  "enum": [
+                      "code"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockCodeData": {
+          "additionalProperties": false,
+          "properties": {
+              "code": {
+                  "type": "string"
+              }
+          },
+          "required": [
+              "code"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockDocument<NoteContentBlockFileMetadata|undefined>": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockDocumentData<NoteContentBlockFileMetadata|undefined>"
+              },
+              "type": {
+                  "enum": [
+                      "document"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockDocumentData<NoteContentBlockFileMetadata|undefined>": {
+          "additionalProperties": false,
+          "properties": {
+              "file": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockFileMetadata"
+              }
+          },
+          "type": "object"
+      },
+      "NoteContentBlockFileMetadata": {
+          "additionalProperties": false,
+          "properties": {
+              "extension": {
+                  "type": "string"
+              },
+              "fileId": {
+                  "type": "string"
+              },
+              "name": {
+                  "type": "string"
+              },
+              "size": {
+                  "type": "number"
+              }
+          },
+          "required": [
+              "extension",
+              "fileId",
+              "name",
+              "size"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockHeading": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockHeadingData"
+              },
+              "type": {
+                  "enum": [
+                      "header"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockHeadingData": {
+          "additionalProperties": false,
+          "properties": {
+              "level": {
+                  "type": "number"
+              },
+              "text": {
+                  "type": "string"
+              }
+          },
+          "required": [
+              "level",
+              "text"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockImage<NoteContentBlockFileMetadata|undefined>": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockImageData<NoteContentBlockFileMetadata|undefined>"
+              },
+              "type": {
+                  "enum": [
+                      "image"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockImageData<NoteContentBlockFileMetadata|undefined>": {
+          "additionalProperties": false,
+          "properties": {
+              "caption": {
+                  "type": "string"
+              },
+              "file": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockFileMetadata"
+              },
+              "withBackground": {
+                  "type": "boolean"
+              }
+          },
+          "type": "object"
+      },
+      "NoteContentBlockLink": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockLinkData"
+              },
+              "type": {
+                  "enum": [
+                      "link"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockLinkData": {
+          "additionalProperties": false,
+          "properties": {
+              "link": {
+                  "type": "string"
+              },
+              "meta": {
+                  "additionalProperties": false,
+                  "properties": {
+                      "description": {
+                          "type": "string"
+                      },
+                      "image": {
+                          "additionalProperties": false,
+                          "properties": {
+                              "url": {
+                                  "type": [
+                                      "null",
+                                      "string"
+                                  ]
+                              }
+                          },
+                          "required": [
+                              "url"
+                          ],
+                          "type": "object"
+                      },
+                      "title": {
+                          "type": "string"
+                      }
+                  },
+                  "required": [
+                      "description",
+                      "image",
+                      "title"
+                  ],
+                  "type": "object"
+              }
+          },
+          "required": [
+              "link",
+              "meta"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockList": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockListData"
+              },
+              "type": {
+                  "enum": [
+                      "list"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockListData": {
+          "additionalProperties": false,
+          "properties": {
+              "items": {
+                  "items": {
+                      "type": "string"
+                  },
+                  "type": "array"
+              },
+              "style": {
+                  "$ref": "GraphObject#/definitions/ListBlockStyle"
+              }
+          },
+          "required": [
+              "items",
+              "style"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockParagraph": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockParagraphData"
+              },
+              "type": {
+                  "enum": [
+                      "paragraph"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockParagraphData": {
+          "additionalProperties": false,
+          "properties": {
+              "text": {
+                  "type": "string"
+              }
+          },
+          "required": [
+              "text"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockVideo<NoteContentBlockFileMetadata|undefined>": {
+          "additionalProperties": false,
+          "properties": {
+              "data": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockVideoData<NoteContentBlockFileMetadata|undefined>"
+              },
+              "type": {
+                  "enum": [
+                      "video"
+                  ],
+                  "type": "string"
+              }
+          },
+          "required": [
+              "data",
+              "type"
+          ],
+          "type": "object"
+      },
+      "NoteContentBlockVideoData<NoteContentBlockFileMetadata|undefined>": {
+          "additionalProperties": false,
+          "properties": {
+              "file": {
+                  "$ref": "GraphObject#/definitions/NoteContentBlockFileMetadata"
+              }
+          },
+          "type": "object"
+      },
+      "default_1": {
+          "additionalProperties": false,
+          "properties": {
+              "blocks": {
+                  "items": {
+                      "anyOf": [
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockParagraph"
+                          },
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockLink"
+                          },
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockHeading"
+                          },
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockList"
+                          },
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockCode"
+                          },
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockImage<NoteContentBlockFileMetadata|undefined>"
+                          },
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockDocument<NoteContentBlockFileMetadata|undefined>"
+                          },
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockAudio<NoteContentBlockFileMetadata|undefined>"
+                          },
+                          {
+                              "$ref": "GraphObject#/definitions/NoteContentBlockVideo<NoteContentBlockFileMetadata|undefined>"
+                          }
+                      ]
+                  },
+                  "type": "array"
+              },
+              "creationTime": {
+                  "type": "number"
+              },
+              "id": {
+                  "type": "number"
+              },
+              "position": {
+                  "$ref": "GraphObject#/definitions/default_2"
+              },
+              "title": {
+                  "type": "string"
+              },
+              "updateTime": {
+                  "type": "number"
+              }
+          },
+          "required": [
+              "blocks",
+              "creationTime",
+              "id",
+              "position",
+              "title",
+              "updateTime"
+          ],
+          "type": "object"
+      },
+      "default_2": {
+          "additionalProperties": false,
+          "properties": {
+              "x": {
+                  "type": "number"
+              },
+              "y": {
+                  "type": "number"
+              }
+          },
+          "required": [
+              "x",
+              "y"
+          ],
+          "type": "object"
+      },
+      "default_4": {
+          "additionalProperties": false,
+          "properties": {
+              "scale": {
+                  "type": "number"
+              },
+              "translateX": {
+                  "type": "number"
+              },
+              "translateY": {
+                  "type": "number"
+              }
+          },
+          "required": [
+              "scale",
+              "translateX",
+              "translateY"
+          ],
+          "type": "object"
+      }
+  },
+  "properties": {
+      "creationTime": {
+          "type": "number"
+      },
+      "idCounter": {
+          "type": "number"
+      },
+      "initialNodePosition": {
+          "$ref": "GraphObject#/definitions/default_2"
+      },
+      "links": {
+          "items": {
+              "items": [
+                  {
+                      "type": "number"
+                  },
+                  {
+                      "type": "number"
+                  }
+              ],
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+          },
+          "type": "array"
+      },
+      "notes": {
+          "items": {
+              "$ref": "GraphObject#/definitions/default_1"
+          },
+          "type": "array"
+      },
+      "pinnedNotes": {
+          "items": {
+              "type": "number"
+          },
+          "type": "array"
+      },
+      "screenPosition": {
+          "$ref": "GraphObject#/definitions/default_4"
+      },
+      "updateTime": {
+          "type": "number"
+      }
+  },
+  "required": [
+      "creationTime",
+      "idCounter",
+      "initialNodePosition",
+      "links",
+      "notes",
+      "pinnedNotes",
+      "screenPosition",
+      "updateTime"
+  ],
+  "type": "object"
+}

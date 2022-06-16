@@ -184,6 +184,26 @@ const startApp = async ({
   app.use(cookieParser());
   app.use(allowCORS);
 
+  // express.json() strangely returns a HTML document on JSON parsing errors.
+  // Even worse, this HTML document contains the complete file path on the
+  // server of the JSON file. To close this major security flaw, we handle
+  // errors more gracefully
+  // See https://stackoverflow.com/a/58165719/3890888 + comment
+  const handleJSONParseErrors = (err, _req, res, next) => {
+    // @ts-ignore
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+      const response:APIResponse = {
+        success: false,
+        error: APIError.INVALID_REQUEST,
+        // @ts-ignore
+        errorMessage: err.message,
+      };
+      res.status(400).json(response);
+    } else {
+      next();
+    }
+  };
+
 
   /* ***************
     Endpoints
@@ -259,6 +279,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       
@@ -322,6 +343,7 @@ const startApp = async ({
     // posting a graph can be somewhat larger, so let's increase upload limit
     // from 100kb to 1mb
     express.json({ limit: "1mb" }),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const graphVisualizationFromUser = req.body;
@@ -427,6 +449,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -473,6 +496,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -615,6 +639,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -833,6 +858,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const files = await Notes.getFiles(graphId);
@@ -851,6 +877,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const fileId = req.params.fileId;
@@ -869,6 +896,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const files = await Notes.getDanglingFiles(graphId);
@@ -915,6 +943,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -936,6 +965,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -957,6 +987,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
       const pinnedNotes = await Notes.getPins(graphId);
@@ -974,6 +1005,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     express.json(),
+    handleJSONParseErrors,
     async function(req, res) {
       const response:APIResponse = {
         success: true,
@@ -1035,6 +1067,7 @@ const startApp = async ({
     config.USER_ENDOPINT + 'login',
     sessionMiddleware,
     express.json(),
+    handleJSONParseErrors,
     (req, res) => {
       const remoteAddress = req.socket.remoteAddress;
       // remote address may be undefined if the client has disconnected
