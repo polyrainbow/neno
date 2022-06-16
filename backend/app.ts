@@ -129,6 +129,19 @@ const startApp = async ({
 
       if (user) {
         req.userId = user.id;
+
+        // if the user passed a graph id as param, they must have the rights to
+        // access it
+        if (req.params.graphId) {
+          const graphIds = getGraphIdsForUser(req.userId);
+          if (!graphIds.includes(req.params.graphId)){
+            const response:APIResponse = {
+              success: false,
+              error: APIError.INVALID_REQUEST,
+            };
+            return res.status(406).json(response);
+          }
+        }
         next();
       } else {
         logger.verbose("User provided invalid API key: " + apiKey);
