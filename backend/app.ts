@@ -31,9 +31,11 @@ import BruteForcePreventer from "./BruteForcePreventer.js";
 import GraphStatsRetrievalOptions from "../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
 import Ajv from "ajv";
 import noteFromUserSchema from "../lib/notes/schemas/NoteFromUser.schema.json" assert { type: 'json' };
+import graphObjectSchema from "../lib/notes/schemas/GraphObject.schema.json" assert { type: 'json' };
 import NoteFromUser from "../lib/notes/interfaces/NoteFromUser.js";
 import graphVisualizationFromUserSchema from "../lib/notes/schemas/GraphVisualizationFromUser.schema.json" assert { type: 'json' };
 import GraphVisualizationFromUser from "../lib/notes/interfaces/GraphVisualizationFromUser.js";
+import GraphObject from "../lib/notes/interfaces/Graph.js";
 
 const startApp = async ({
   users,
@@ -82,6 +84,7 @@ const startApp = async ({
 
   const validateNoteFromUser = ajv.compile(noteFromUserSchema);
   const validateGraphVisualizationFromUser = ajv.compile(graphVisualizationFromUserSchema);
+  const validateGraphObject = ajv.compile(graphObjectSchema);
 
   const getUserByApiKey = (apiKey:string):User | null => {
     const user = users.find((user) => {
@@ -278,17 +281,31 @@ const startApp = async ({
     config.GRAPH_ENDPOINT,
     sessionMiddleware,
     verifyUser,
-    express.json(),
+    express.json(), // returns {} on non-JSON request bodies
     handleJSONParseErrors,
     async function(req, res) {
       const graphId = req.params.graphId;
+      const graphObject = req.body;
+
+      const isValid = validateGraphObject(
+        graphObject,
+      );
+
+      if (!isValid) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.json(response);
+        return;
+      }
       
       const response:APIResponse = {
         success: false,
       };
     
       try {
-        await Notes.importDB(req.body, graphId);
+        await Notes.importDB(graphObject as unknown as GraphObject, graphId);
         response.success = true;
       } catch(e) {
         response.success = false;
