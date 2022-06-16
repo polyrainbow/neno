@@ -204,20 +204,39 @@ const startApp = async ({
       const graphId = req.params.graphId;
       const withFiles = req.query.withFiles === "true";
 
-      const databaseStream = (await Notes.getReadableGraphStream(
-        graphId,
-        withFiles,
-      )) as NodeJS.ReadStream;
+      try {
+        const databaseStream = (await Notes.getReadableGraphStream(
+          graphId,
+          withFiles,
+        )) as NodeJS.ReadStream;
 
-      // set the archive name
-      const dateSuffix = yyyymmdd(new Date());
+        databaseStream.on('error', function(err) {
+          logger.verbose("Error on getting database stream");
+          logger.verbose(err);
 
-      const extension = withFiles ? "zip" : "json";
-      const filename = `neno-${graphId}-${dateSuffix}.db.${extension}`;
-      res.attachment(filename);
-
-      // this is the streaming magic
-      databaseStream.pipe(res);
+          const response:APIResponse = {
+            success: false,
+            error: APIError.INVALID_REQUEST,
+          };
+          res.status(400).json(response);
+        });
+  
+        // set the archive name
+        const dateSuffix = yyyymmdd(new Date());
+  
+        const extension = withFiles ? "zip" : "json";
+        const filename = `neno-${graphId}-${dateSuffix}.db.${extension}`;
+        res.attachment(filename);
+  
+        // this is the streaming magic
+        databaseStream.pipe(res);
+      } catch(e) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.status(400).json(response);
+      }
     },
   );
 
@@ -287,7 +306,9 @@ const startApp = async ({
     config.GRAPH_ENDPOINT + "graph-visualization",
     sessionMiddleware,
     verifyUser,
-    express.json({ limit: "1mb" }), // posting a graph can be somewhat larger
+    // posting a graph can be somewhat larger, so let's increase upload limit
+    // from 100kb to 1mb
+    express.json({ limit: "1mb" }),
     async function(req, res) {
       const graphId = req.params.graphId;
       const graphVisualizationFromUser = req.body;
