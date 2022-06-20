@@ -4,8 +4,9 @@ import {
 } from "react-router-dom";
 import { DatabaseMode } from "../enum/DatabaseMode.js";
 import { PathTemplate } from "../enum/PathTemplate.js";
-import { l } from "../lib/intl.js";
+import { l, lf } from "../lib/intl.js";
 import { getAppPath } from "../lib/utils.js";
+import { SERVER_DATABASE_ENABLED } from "../config.js";
 
 const LoginViewServer = ({
   serverDatabaseProvider,
@@ -35,10 +36,10 @@ const LoginViewServer = ({
       });
   };
 
-  if (!serverDatabaseProvider) {
+  if (!SERVER_DATABASE_ENABLED) {
     return <>
       <h1>{l("login.server.heading")}</h1>
-      <p>{l("login.server.no-support")}</p>
+      <p>{lf("login.server.no-support")}</p>
     </>;
   }
 

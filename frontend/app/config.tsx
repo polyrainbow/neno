@@ -48,6 +48,9 @@ const SEARCH_RESULTS_PER_PAGE = 100;
 
 const DEFAULT_DOCUMENT_TITLE = "NENO";
 
+// disable this if you want to build a local-only instance
+const SERVER_DATABASE_ENABLED = true;
+
 export {
   DEFAULT_NOTE_TITLE,
   DEFAULT_NOTE_BLOCKS,
@@ -60,4 +63,5 @@ export {
   MAX_WIDTH_SMALL_SCREEN,
   SEARCH_RESULTS_PER_PAGE,
   DEFAULT_DOCUMENT_TITLE,
+  SERVER_DATABASE_ENABLED,
 };
