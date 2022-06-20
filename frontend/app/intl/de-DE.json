@@ -119,6 +119,7 @@
   "login.local.open-database-x": "Öffne Datenbank {dbName}",
   "login.local.select-folder": "Datenbankordner auswählen",
   "login.local.select-folder.explainer": "Wähle einen Datenbankordner aus (wenn es darin keine Datenbank gibt, wird eine neue erstellt)",
+  "login.local.unsupported": "Dein Browser unterstützt leider keine lokalen Datenbanken.",
   "login.logo.alt": "NENO Logo",
   "login.read-the-manual": "Lies das Benutzerhandbuch (englisch)",
   "login.server.heading": "Server-Datenbank",

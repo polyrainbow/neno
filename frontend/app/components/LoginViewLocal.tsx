@@ -31,6 +31,15 @@ const LoginViewLocal = ({
     retrieveLocalDatabaseFolderHandle();
   }, [localDatabaseProvider]);
 
+  if (typeof window.showDirectoryPicker !== "function") {
+    return <>
+      <h1>{l("login.local.heading")}</h1>
+      <p>
+        {l("login.local.unsupported")}
+      </p>
+    </>;
+  }
+
   return <>
     <h1>{l("login.local.heading")}</h1>
     {
