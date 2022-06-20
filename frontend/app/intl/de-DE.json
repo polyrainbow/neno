@@ -7,6 +7,7 @@
   "dialog.cancel": "Abbrechen",
   "dialog.close": "Schließen",
   "editor.cancel": "Abbrechen",
+  "editor.add-links": "Notiz verbinden",
   "editor.discard-changes-confirmation.confirm": "Änderungen verwerfen",
   "editor.discard-changes-confirmation.text": "Einige Änderungen wurden noch nicht gespeichert. Möchtest du diese verwerfen?",
   "editor.duplicate-note": "Notiz duplizieren",

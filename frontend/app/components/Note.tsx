@@ -188,7 +188,7 @@ const Note = ({
               />)
             }
           </div>
-          <h2>Add links</h2>
+          <h2>{l("editor.add-links")}</h2>
           <SearchInput
             value={searchString}
             placeholder={l("editor.note-search-placeholder")}
