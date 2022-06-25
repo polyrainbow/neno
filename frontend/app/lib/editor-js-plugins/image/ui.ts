@@ -188,20 +188,15 @@ export default class Ui {
     this.nodes.imageEl.setAttribute("data-mutation-free", "true");
 
     /**
-     * Add load event listener
+     * Preloader does not exist on first rendering with presaved data
      */
-    this.nodes.imageEl.addEventListener("load", () => {
-      this.setStatus(UIStatus.FILLED);
-
-      /**
-       * Preloader does not exists on first rendering with presaved data
-       */
-      if (this.nodes.imagePreloader) {
-        this.nodes.imagePreloader.style.backgroundImage = "";
-      }
-    });
+    if (this.nodes.imagePreloader) {
+      this.nodes.imagePreloader.style.backgroundImage = "";
+    }
 
     this.nodes.imageContainer.appendChild(this.nodes.imageEl);
+
+    this.setStatus(UIStatus.FILLED);
   }
 
   /**
