@@ -62,7 +62,7 @@ const Editor = ({ config, activeTab, graphId }) => {
     }
   };
 
-  const link = typeof activeNoteId === "number"
+  const link = ((typeof activeNoteId === "number") && (!isNaN(activeNoteId)))
     ? <a
       href={config.hostUrl + "/editor/" + activeNoteId}
       target="_blank" rel="noreferrer"
