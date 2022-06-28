@@ -17,7 +17,7 @@ import http from "http";
 import https from "https";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
 import twofactor from "node-2fa";
-import fallback from "express-history-api-fallback";
+import historyAPIFallback from "./lib/HistoryAPIFallback.js";
 import * as path from "path";
 import session from "express-session";
 import User from "./interfaces/User.js";
@@ -1166,7 +1166,7 @@ const startApp = async ({
 
 
   app.use(
-    fallback(
+    historyAPIFallback(
       'index.html',
       {
         root: path.resolve(frontendPath),

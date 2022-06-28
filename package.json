@@ -12,7 +12,6 @@
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.0",
-    "express-history-api-fallback": "^2.2.1",
     "express-session": "^1.17.2",
     "node-2fa": "^2.0.3",
     "qrcode-terminal": "^0.12.0"
