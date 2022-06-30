@@ -214,7 +214,7 @@ const init = async ({
 const save = async ():Promise<NoteContentBlock[]> => {
   if (!instanceQueue) {
     throw new Error(
-      "Could not save editor content because there is no instance yet.",
+      "NO_INSTANCE_AVAILABLE",
     );
   }
 
