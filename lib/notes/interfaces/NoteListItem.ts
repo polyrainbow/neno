@@ -6,7 +6,7 @@ export default interface NoteListItem {
   readonly creationTime: number,
   readonly updateTime: number,
   readonly features: NoteListItemFeatures,
-  readonly numberOfLinkedNotes?: number,
+  readonly numberOfLinkedNotes: number,
   readonly numberOfCharacters: number,
   readonly numberOfFiles: number,
 }
