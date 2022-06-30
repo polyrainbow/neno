@@ -29,7 +29,7 @@ const getParameterByName = (name, url) => {
 };
 
 
-const makeTimestampHumanReadable = (timestamp) => {
+const makeTimestampHumanReadable = (timestamp:number):string => {
   return (new Date(timestamp)).toLocaleString();
 };
 

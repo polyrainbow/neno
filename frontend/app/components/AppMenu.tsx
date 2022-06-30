@@ -21,7 +21,7 @@ interface AppMenuProps {
   switchGraphs,
   onClose,
   unsavedChanges: boolean,
-  setUnsavedChanges,
+  setUnsavedChanges: (boolean) => void,
   databaseProvider: DatabaseProvider | null,
 }
 

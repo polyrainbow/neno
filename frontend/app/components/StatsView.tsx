@@ -7,14 +7,19 @@ import {
 } from "../lib/utils.js";
 import StatsViewAnalysisTable from "./StatsViewAnalysisTable";
 import { l } from "../lib/intl";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+import GraphStats from "../../../lib/notes/interfaces/GraphStats";
+
+interface StatsViewProps {
+  databaseProvider: DatabaseProvider,
+  toggleAppMenu: () => void,
+}
 
 const StatsView = ({
   databaseProvider,
   toggleAppMenu,
-}) => {
-  const [stats, setStats] = useState<any>(null);
-  // status can be READY, BUSY
-  const [status, setStatus] = useState("BUSY");
+}: StatsViewProps) => {
+  const [stats, setStats] = useState<Required<GraphStats> | null>(null);
 
   useEffect(() => {
     if (!databaseProvider) return;
@@ -23,14 +28,15 @@ const StatsView = ({
       const stats = await databaseProvider.getStats({
         includeMetadata: true,
         includeAnalysis: true,
-      });
+      }) as Required<GraphStats>;
       setStats(stats);
-      setStatus("READY");
     };
 
     updateStats();
   }, [databaseProvider]);
 
+  // @ts-ignore calling constructor via instance
+  const databaseType = databaseProvider.constructor.type;
 
   return <>
     <HeaderContainer
@@ -39,7 +45,7 @@ const StatsView = ({
     <section className="content-section">
       <h1>{l("stats.graph-stats")}</h1>
       {
-        status === "READY"
+        stats !== null
           ? <>
             <h2>{l("stats.metadata")}</h2>
             <table className="data-table stats-table">
@@ -50,7 +56,7 @@ const StatsView = ({
                 </tr>
                 <tr>
                   <td>{l("stats.metadata.type")}</td>
-                  <td>{databaseProvider.constructor.type}</td>
+                  <td>{databaseType}</td>
                 </tr>
                 <tr>
                   <td>{l("stats.metadata.creation-time")}</td>

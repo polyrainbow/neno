@@ -29,6 +29,7 @@ import {
 } from "../../../lib/notes/interfaces/NoteListSortMode";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
+import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -51,12 +52,12 @@ const App = ({
   const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [noteListIsBusy, setNoteListIsBusy] = useState<boolean>(true);
-  const [stats, setStats] = useState<GraphStats | null>(null);
+  const [headerStats, setHeaderStats] = useState<GraphStats | null>(null);
   const [sortMode, setSortMode] = useState<NoteListSortMode>(
     NoteListSortMode.UPDATE_DATE_DESCENDING,
   );
   const [searchValue, setSearchValue] = useState<string>("");
-  const [pinnedNotes, setPinnedNotes] = useState<any[]>([]);
+  const [pinnedNotes, setPinnedNotes] = useState<NoteToTransmit[]>([]);
 
   const databaseProvider:DatabaseProvider | null
     = databaseMode === DatabaseMode.LOCAL
@@ -85,7 +86,7 @@ const App = ({
       includeAnalysis: false,
     })
       .then((stats) => {
-        setStats(stats);
+        setHeaderStats(stats);
       })
       .catch((e) => {
         // if credentials are invalid, it's fine, refeshNotesList takes care of
@@ -293,7 +294,7 @@ const App = ({
                 toggleAppMenu={toggleAppMenu}
                 handleInvalidCredentialsError={handleInvalidCredentialsError}
                 refreshNotesList={refreshNotesList}
-                stats={stats}
+                headerStats={headerStats}
                 pinnedNotes={pinnedNotes}
                 handleSearchInputChange={handleSearchInputChange}
                 setPinnedNotes={setPinnedNotes}
@@ -320,7 +321,7 @@ const App = ({
                 <ListView
                   toggleAppMenu={toggleAppMenu}
                   refreshNotesList={refreshNotesList}
-                  stats={stats}
+                  stats={headerStats}
                   pinnedNotes={pinnedNotes}
                   handleSearchInputChange={handleSearchInputChange}
                   searchValue={searchValue}

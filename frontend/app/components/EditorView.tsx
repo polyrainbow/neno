@@ -40,6 +40,7 @@ import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
 import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
 import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
 import { MainNoteListItem } from "../interfaces/NoteListItem";
+import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 
 interface EditorViewProps {
   databaseProvider: DatabaseProvider,
@@ -48,7 +49,7 @@ interface EditorViewProps {
   toggleAppMenu: () => any,
   handleInvalidCredentialsError,
   refreshNotesList,
-  stats,
+  headerStats: GraphStats | null,
   pinnedNotes,
   handleSearchInputChange,
   setPinnedNotes,
@@ -72,7 +73,7 @@ const EditorView = ({
   toggleAppMenu,
   handleInvalidCredentialsError,
   refreshNotesList,
-  stats,
+  headerStats,
   pinnedNotes,
   handleSearchInputChange,
   setPinnedNotes,
@@ -444,7 +445,7 @@ const EditorView = ({
 
   return <>
     <EditorViewHeader
-      stats={stats}
+      stats={headerStats}
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
       activeNote={activeNote}
@@ -480,7 +481,7 @@ const EditorView = ({
                 setPage(page);
                 setNoteListScrollTop(0);
               }}
-              stats={stats}
+              stats={headerStats}
               itemsAreLinkable={true}
               setUnsavedChanges={setUnsavedChanges}
               unsavedChanges={unsavedChanges}
