@@ -13,6 +13,17 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { DialogType } from "../enum/DialogType";
 import useDialog from "../hooks/useDialog";
 import { l, setLanguage } from "../lib/intl";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+
+
+interface AppMenuProps {
+  importLinksAsNotes,
+  switchGraphs,
+  onClose,
+  unsavedChanges: boolean,
+  setUnsavedChanges,
+  databaseProvider: DatabaseProvider | null,
+}
 
 const AppMenu = ({
   importLinksAsNotes,
@@ -21,7 +32,7 @@ const AppMenu = ({
   unsavedChanges,
   setUnsavedChanges,
   databaseProvider,
-}) => {
+}: AppMenuProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
@@ -132,6 +143,7 @@ const AppMenu = ({
       />
       <AppMenuItem
         disabled={
+          // @ts-ignore calling static property via class instance
           !databaseProvider?.constructor.features.includes("EXPORT_DATABASE")
         }
         label={l("menu.export-database")}
@@ -146,6 +158,7 @@ const AppMenu = ({
       />
       <AppMenuItem
         disabled={
+          // @ts-ignore calling static property via class instance
           !databaseProvider?.constructor.features.includes("MULTIPLE_GRAPHS")
         }
         label={l("menu.switch-graphs")}
@@ -167,7 +180,7 @@ const AppMenu = ({
             setUnsavedChanges(false);
           }
 
-          await databaseProvider.removeAccess();
+          await databaseProvider?.removeAccess();
           navigate(getAppPath(PathTemplate.LOGIN));
         }}
       />

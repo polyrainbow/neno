@@ -49,7 +49,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return response;
   }
 
-  async isAuthenticated() {
+  async isAuthenticated():Promise<boolean> {
     try {
       const response = await API.isAuthenticated();
       this.#graphIds = response.graphIds;

@@ -8,12 +8,43 @@ import SearchInput from "./SearchInput";
 import {
   useNavigate,
 } from "react-router-dom";
-import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
+import ActiveNote from "../interfaces/ActiveNote";
+import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
+import {
+  FrontendUserNoteChangeNote,
+} from "../interfaces/FrontendUserNoteChange";
+import { NoteId } from "../../../lib/notes/interfaces/NoteId";
+import {
+  MainNoteListItem,
+} from "../interfaces/NoteListItem";
+import NoteContentBlock from "../../../lib/notes/interfaces/NoteContentBlock";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery";
+import {
+  NoteListSortMode,
+} from "../../../lib/notes/interfaces/NoteListSortMode";
+
+interface NoteComponentProps {
+  note: ActiveNote,
+  setNoteTitle: (title:string) => void,
+  displayedLinkedNotes: (LinkedNote | FrontendUserNoteChangeNote)[],
+  onLinkAddition: (note: MainNoteListItem) => void,
+  onLinkRemoval: (noteId:NoteId) => void,
+  setUnsavedChanges,
+  databaseProvider: DatabaseProvider,
+  createNewNote,
+  handleNoteSaveRequest,
+  removeActiveNote,
+  unsavedChanges: boolean,
+  pinOrUnpinNote,
+  duplicateNote,
+  openInGraphView,
+}
 
 const Note = ({
   note,
@@ -30,12 +61,12 @@ const Note = ({
   pinOrUnpinNote,
   duplicateNote,
   openInGraphView,
-}) => {
-  const previousBlocks = useRef(null);
+}:NoteComponentProps) => {
+  const previousBlocks = useRef<NoteContentBlock[]>([]);
   const blocks = note?.blocks;
   const goToNote = useGoToNote();
   const [searchString, setSearchString] = useState("");
-  const [searchResults, setSearchResults] = useState<NoteListItemType[]>([]);
+  const [searchResults, setSearchResults] = useState<MainNoteListItem[]>([]);
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
   const confirmDiscardingUnsavedChanges
@@ -48,9 +79,9 @@ const Note = ({
   };
 
   const refreshNotesList = async () => {
-    const options = {
+    const options: DatabaseQuery = {
       page: 1,
-      sortMode: "UPDATE_DATE_DESCENDING",
+      sortMode: NoteListSortMode.UPDATE_DATE_DESCENDING,
       searchString,
       caseSensitive: false,
       limit: 10,
@@ -160,7 +191,7 @@ const Note = ({
         <div id="links">
           <h2>{l(
             "editor.linked-notes",
-            { linkedNotes: displayedLinkedNotes.length },
+            { linkedNotes: displayedLinkedNotes.length.toString() },
           )}</h2>
           {
             displayedLinkedNotes.length === 0

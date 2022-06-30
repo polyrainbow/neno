@@ -19,6 +19,7 @@ import UrlMetadataResponse
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 
 interface DatabaseProvider {
+  isAuthenticated?: () => Promise<boolean>,
   removeAccess: () => Promise<void>;
   getActiveGraphId: () => GraphId | null;
   // getGraphIds and setActiveGraph is currently only enabled on

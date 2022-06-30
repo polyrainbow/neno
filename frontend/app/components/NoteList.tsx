@@ -7,6 +7,35 @@ import useGoToNote from "../hooks/useGoToNote";
 import { SEARCH_RESULTS_PER_PAGE } from "../config";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import {
+  FrontendNoteListItem,
+  MainNoteListItem,
+} from "../interfaces/NoteListItem";
+import ActiveNote from "../interfaces/ActiveNote";
+import {
+  NoteListSortMode,
+} from "../../../lib/notes/interfaces/NoteListSortMode";
+
+
+interface NoteListProps {
+  notes: MainNoteListItem[],
+  numberOfResults: number,
+  activeNote: ActiveNote | null,
+  onLinkAddition,
+  onLinkRemoval,
+  displayedLinkedNotes: (FrontendNoteListItem)[],
+  isBusy: boolean,
+  searchValue: string,
+  scrollTop: number,
+  setScrollTop,
+  sortMode: NoteListSortMode,
+  page: number,
+  setPage,
+  stats,
+  itemsAreLinkable: boolean,
+  unsavedChanges: boolean,
+  setUnsavedChanges,
+}
 
 const NoteList = ({
   notes,
@@ -26,7 +55,7 @@ const NoteList = ({
   itemsAreLinkable,
   unsavedChanges,
   setUnsavedChanges,
-}) => {
+}:NoteListProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const goToNote = useGoToNote();
   const confirmDiscardingUnsavedChanges
@@ -97,9 +126,10 @@ const NoteList = ({
       {
         notes.map((note) => {
           const isActive
-            = activeNote
+            = !!activeNote
               && (!activeNote.isUnsaved)
               && (note.id === activeNote.id);
+
           const isLinked
             = itemsAreLinkable && displayedLinkedNotes.some(
               (linkedNote) => {

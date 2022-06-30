@@ -62,7 +62,7 @@ const ListView = ({
       itemsAreLinkable={false}
       onLinkAddition={null}
       onLinkRemoval={null}
-      displayedLinkedNotes={null}
+      displayedLinkedNotes={[]}
       setUnsavedChanges={setUnsavedChanges}
       unsavedChanges={unsavedChanges}
     />

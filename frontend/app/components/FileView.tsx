@@ -3,24 +3,28 @@ import HeaderContainer from "./HeaderContainer";
 import {
   useParams, Link,
 } from "react-router-dom";
-import NoteListItem from "../../../lib/notes/interfaces/NoteListItem";
+import { MainNoteListItem } from "../interfaces/NoteListItem";
 import { getAppPath, getFileTypeFromFilename } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
 
 
 const FileView = ({
   databaseProvider,
   toggleAppMenu,
+}: {
+  databaseProvider: DatabaseProvider,
+  toggleAppMenu: () => void,
 }) => {
   const [src, setSrc] = useState<string>("");
   // status can be READY, BUSY
-  const [notes, setNotes] = useState<NoteListItem[]>([]);
+  const [notes, setNotes] = useState<MainNoteListItem[]>([]);
 
   const { fileId } = useParams();
 
   useEffect(() => {
-    if (!databaseProvider) return;
+    if (typeof fileId !== "string") return;
 
     const updateSrc = async () => {
       const src = await databaseProvider.getUrlForFileId(fileId);

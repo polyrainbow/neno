@@ -2,16 +2,20 @@ import React from "react";
 import Tooltip from "./Tooltip.js";
 import { emojis } from "../config.js";
 import { l } from "../lib/intl.js";
+import NoteListItemFeaturesType
+  from "../../../lib/notes/interfaces/NoteListItemFeatures.js";
 
 
 const NoteListItemFeatures = ({
   features,
+}: {
+  features: NoteListItemFeaturesType,
 }) => {
   return <span
     className="note-features"
   >
     {
-      features?.containsText
+      features.containsText
         ? <Tooltip
           title={l("list.item.features.contains-text")}>
           <span>{emojis.text}</span>
@@ -19,7 +23,7 @@ const NoteListItemFeatures = ({
         : null
     }
     {
-      features?.containsWeblink
+      features.containsWeblink
         ? <Tooltip
           title={l("list.item.features.contains-links")}>
           <span>{emojis.weblink}</span>
@@ -27,7 +31,7 @@ const NoteListItemFeatures = ({
         : null
     }
     {
-      features?.containsCode
+      features.containsCode
         ? <Tooltip
           title={l("list.item.features.contains-code")}>
           <span>{emojis.code}</span>
@@ -35,7 +39,7 @@ const NoteListItemFeatures = ({
         : null
     }
     {
-      features?.containsImages
+      features.containsImages
         ? <Tooltip
           title={l("list.item.features.contains-images")}>
           <span>{emojis.image}</span>
@@ -43,7 +47,7 @@ const NoteListItemFeatures = ({
         : null
     }
     {
-      features?.containsDocuments
+      features.containsDocuments
         ? <Tooltip
           title={l("list.item.features.contains-documents")}>
           <span>{emojis.document}</span>
@@ -51,7 +55,7 @@ const NoteListItemFeatures = ({
         : null
     }
     {
-      features?.containsAudio
+      features.containsAudio
         ? <Tooltip
           title={l("list.item.features.contains-audio")}>
           <span>{emojis.audio}</span>
@@ -59,7 +63,7 @@ const NoteListItemFeatures = ({
         : null
     }
     {
-      features?.containsVideo
+      features.containsVideo
         ? <Tooltip
           title={l("list.item.features.contains-video")}>
           <span>{emojis.video}</span>

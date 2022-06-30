@@ -18,7 +18,10 @@ import {
   UserNoteChangeType,
 } from "../../../lib/notes/interfaces/UserNoteChangeType";
 import ActiveNote from "../interfaces/ActiveNote";
-import FrontendUserNoteChange from "../interfaces/FrontendUserNoteChange";
+import FrontendUserNoteChange, {
+  FrontendUserNoteAdditionChange,
+  FrontendUserNoteChangeNote,
+} from "../interfaces/FrontendUserNoteChange";
 import { DialogType } from "../enum/DialogType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
@@ -35,6 +38,8 @@ import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
 import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
+import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
+import { MainNoteListItem } from "../interfaces/NoteListItem";
 
 interface EditorViewProps {
   databaseProvider: DatabaseProvider,
@@ -98,29 +103,41 @@ const EditorView = ({
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
-  const displayedLinkedNotes = useMemo(() => [
-    ...(!activeNote.isUnsaved)
-      ? activeNote.linkedNotes.filter((note) => {
-        const isRemoved = activeNote.changes.some((change) => {
-          return (
-            change.type === UserNoteChangeType.LINKED_NOTE_DELETED
-            && change.noteId === note.id
-          );
-        });
-        return !isRemoved;
-      })
-      : [],
-    ...activeNote.changes
-      .filter((change) => {
-        return change.type === UserNoteChangeType.LINKED_NOTE_ADDED;
-      })
-      .map((change) => {
-        return change.note;
-      }),
-  ], [activeNote]);
+  /*
+    Below the active note, we want to display a list of all notes that are
+    currently linked to the main note with two modifications:
+    1. In addition we want to show links that the user just has
+    created but not saved yet.
+    2. And we want to hide those saved linked notes that the user just has
+    deleted but not saved yet.
+
+    All in all we show a list of the saved state with the updates the user has
+    done but not saved yet.
+  */
+  const displayedLinkedNotes: (LinkedNote | FrontendUserNoteChangeNote)[]
+    = useMemo(() => [
+      ...(!activeNote.isUnsaved)
+        ? activeNote.linkedNotes.filter((note) => {
+          const isRemoved = activeNote.changes.some((change) => {
+            return (
+              change.type === UserNoteChangeType.LINKED_NOTE_DELETED
+              && change.noteId === note.id
+            );
+          });
+          return !isRemoved;
+        })
+        : [],
+      ...activeNote.changes
+        .filter((change):change is FrontendUserNoteAdditionChange => {
+          return change.type === UserNoteChangeType.LINKED_NOTE_ADDED;
+        })
+        .map((change:FrontendUserNoteAdditionChange) => {
+          return change.note;
+        }),
+    ], [activeNote]);
 
 
-  const handleLinkAddition = async (note) => {
+  const handleLinkAddition = async (note:MainNoteListItem):Promise<void> => {
     // return if linked note has already been added
     if (activeNote.changes.some((change) => {
       return (
@@ -311,7 +328,7 @@ const EditorView = ({
   };
 
 
-  const saveActiveNote = async (options:NotePutOptions) => {
+  const saveActiveNote = async (options:NotePutOptions):Promise<void> => {
     const noteToTransmit = await prepareNoteToTransmit();
     const noteFromServer = await databaseProvider.putNote(
       noteToTransmit, options,
@@ -331,7 +348,7 @@ const EditorView = ({
   };
 
 
-  const handleNoteSaveRequest = async () => {
+  const handleNoteSaveRequest = async ():Promise<void> => {
     try {
       await saveActiveNote({ ignoreDuplicateTitles: false });
     } catch (e) {
@@ -457,7 +474,7 @@ const EditorView = ({
         <Note
           note={activeNote}
           setNoteTitle={
-            (newTitle) => {
+            (newTitle:string):void => {
               setActiveNote({
                 ...activeNote,
                 title: newTitle,

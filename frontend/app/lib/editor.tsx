@@ -1,9 +1,20 @@
 import { DEFAULT_NOTE_BLOCKS } from "../config";
+import NoteContentBlock from "../../../lib/notes/interfaces/NoteContentBlock";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
 
-// this instance queue makes sure that there are not several editor instances
-// loaded in parallel and thus become visible on the screen. it queues all
-// incoming promises and executes them only when their previous promise has
-// fulfilled
+interface LoadParams {
+  data: NoteContentBlock[],
+  parent: HTMLElement,
+  onChange: (any) => void,
+  databaseProvider: DatabaseProvider
+}
+
+/*
+  this instance queue makes sure that there are not several editor instances
+  loaded in parallel and thus become visible on the screen. it queues all
+  incoming load requests via a promise chain and executes one request only
+  when the previous promise is fulfilled.
+*/
 let instanceQueue:Promise<any> | null = null;
 
 
@@ -12,7 +23,7 @@ const loadInstance = async ({
   parent,
   onChange,
   databaseProvider,
-}) => {
+}: LoadParams) => {
   const modules = await Promise.all([
     import("@editorjs/editorjs"),
     import("@editorjs/header"),
@@ -40,7 +51,7 @@ const loadInstance = async ({
   // several plugins are able to upload and download files. the following
   // config object is passed to all of them
   const fileHandlingConfig = {
-    uploadByFile: async (file) => {
+    uploadByFile: async (file:File) => {
       const { fileId } = await databaseProvider.uploadFile(file);
       return {
         success: true,
@@ -52,6 +63,18 @@ const loadInstance = async ({
       };
     },
     uploadByUrl: async (url) => {
+      // TODO: handle this case gracefully when using local database provider
+
+      // @ts-ignore
+      if (!databaseProvider.constructor.features.includes(
+        "UPLOAD_BY_URL",
+      )) {
+        return {
+          success: false,
+        };
+      }
+
+      // @ts-ignore
       const { fileId, size } = await databaseProvider.uploadFileByUrl({
         url,
       });
@@ -63,7 +86,7 @@ const loadInstance = async ({
         },
       };
     },
-    onDownload: async (file) => {
+    onDownload: async (file):Promise<void> => {
       const fileId = file.fileId;
       const name = file.name;
       const url = await databaseProvider.getUrlForFileId(fileId, name);
@@ -96,7 +119,7 @@ const loadInstance = async ({
       link: {
         class: Link,
         config: {
-          customRequestFunction: async (url) => {
+          customRequestFunction: async (url:string) => {
             const metadata = await databaseProvider.getUrlMetadata(url);
 
             return {
@@ -158,7 +181,14 @@ const loadInstance = async ({
 };
 
 
-const load = async ({ data, parent, onChange, databaseProvider }) => {
+/** EXPORTS */
+
+const load = async ({
+  data,
+  parent,
+  onChange,
+  databaseProvider,
+}: LoadParams):Promise<void> => {
   if (instanceQueue === null) {
     instanceQueue = loadInstance({ data, parent, onChange, databaseProvider });
   } else {
@@ -168,13 +198,17 @@ const load = async ({ data, parent, onChange, databaseProvider }) => {
     });
   }
 
-  const instance = await instanceQueue;
-  return instance;
+  await instanceQueue;
 };
 
 
-const save = async () => {
-  if (!instanceQueue) return false;
+const save = async ():Promise<NoteContentBlock[]> => {
+  if (!instanceQueue) {
+    throw new Error(
+      "Could not save editor content because there is no instance yet.",
+    );
+  }
+
   const instance = await instanceQueue;
   await instance.isReady;
   const editorData = await instance.save();
@@ -186,17 +220,23 @@ const save = async () => {
     editorData.blocks = [...DEFAULT_NOTE_BLOCKS];
   }
 
-  // editor.js assigns ids to blocks, but we do not need or want them
+  // editor.js assigns IDs to blocks, but we do not need or want them
   // when saving the blocks
   editorData.blocks.forEach((block) => {
     delete block.id;
   });
 
-  return editorData.blocks;
+  return editorData.blocks as NoteContentBlock[];
 };
 
 
-const focus = async () => {
+const focus = async ():Promise<void> => {
+  if (!instanceQueue) {
+    throw new Error(
+      "Could not focus editor content because there is no instance yet.",
+    );
+  }
+
   (await instanceQueue).focus();
 };
 

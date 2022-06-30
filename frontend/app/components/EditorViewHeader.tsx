@@ -1,6 +1,6 @@
 import React from "react";
 import AppTitle from "./AppTitle";
-import AppStats from "./AppStats";
+import AppHeaderStats from "./AppHeaderStats";
 import EditorViewHeaderPinnedNote from "./EditorViewHeaderPinnedNote";
 import useGoToNote from "../hooks/useGoToNote";
 import useConfirmDiscardingUnsavedChangesDialog
@@ -58,7 +58,7 @@ const EditorViewHeader = ({
             >{l("app.pinned-notes-placeholder")}</p>
         }
       </div>
-      <AppStats stats={stats} />
+      <AppHeaderStats stats={stats} />
     </header>
   );
 };

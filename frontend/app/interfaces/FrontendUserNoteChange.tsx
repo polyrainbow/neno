@@ -1,13 +1,24 @@
 import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
+import {
+  UserNoteChangeType,
+} from "../../../lib/notes/interfaces/UserNoteChangeType";
 
-interface FrontendUserNoteChangeNote {
-  id: number,
-  updateTime: number,
-  title: string,
+export interface FrontendUserNoteChangeNote {
+  readonly id: number,
+  readonly updateTime: number,
+  readonly title: string,
 }
 
-interface FrontendUserNoteChange extends UserNoteChange {
-  note?: FrontendUserNoteChangeNote,
+export interface FrontendUserNoteAdditionChange extends UserNoteChange {
+  type: UserNoteChangeType.LINKED_NOTE_ADDED
+  note: FrontendUserNoteChangeNote,
 }
+
+export interface FrontendUserNoteDeletionChange extends UserNoteChange {
+  type: UserNoteChangeType.LINKED_NOTE_DELETED
+}
+
+type FrontendUserNoteChange
+  = FrontendUserNoteAdditionChange | FrontendUserNoteDeletionChange;
 
 export default FrontendUserNoteChange;

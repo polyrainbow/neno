@@ -1,16 +1,28 @@
 import React from "react";
 import { emojis } from "../config.js";
+import {
+  FrontendNoteListItem,
+  MainNoteListItem,
+} from "../interfaces/NoteListItem.js";
 import { l } from "../lib/intl.js";
 import NoteListItemFeatures from "./NoteListItemFeatures";
 
 
 const NoteListItemInfo = ({
   note,
+}: {
+  note: FrontendNoteListItem
 }) => {
   const SPAN_SEPARATOR = " · ";
 
+  const isMainNoteListItem = (
+    noteListItem:(FrontendNoteListItem),
+  ):noteListItem is MainNoteListItem => {
+    return "features" in noteListItem;
+  };
+
   const isHub = (
-    typeof note.numberOfLinkedNotes === "number"
+    isMainNoteListItem(note)
     && !isNaN(note.numberOfLinkedNotes)
     && note.numberOfLinkedNotes >= 5
   );
@@ -20,22 +32,25 @@ const NoteListItemInfo = ({
   >
     {(new Date(note.updateTime)).toLocaleDateString()}
     {
-      note.numberOfFiles > 0
+      isMainNoteListItem(note) && (note.numberOfFiles > 0)
         ? SPAN_SEPARATOR + l(
           note.numberOfFiles > 1 ? "list.item.files" : "list.item.file",
-          { files: note.numberOfFiles },
+          { files: note.numberOfFiles.toString() },
         )
         : ""
     }
     {
-      /* if note contains at least one feature, show the separator */
-      Object.values(note.features || {}).some((val) => val === true)
-        ? SPAN_SEPARATOR
+      /* if note contains at least one feature, show the separator and the
+      features */
+      (
+        isMainNoteListItem(note)
+        && Object.values(note.features).some((val) => val === true)
+      )
+        ? <>{SPAN_SEPARATOR}<NoteListItemFeatures
+          features={note.features}
+        /></>
         : ""
     }
-    <NoteListItemFeatures
-      features={note.features}
-    />
     {
       isHub
         ? SPAN_SEPARATOR + emojis.hub + " " + l("list.item.hub")

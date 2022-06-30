@@ -15,7 +15,7 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
 import { DatabaseMode } from "../enum/DatabaseMode.js";
 import StatsView from "./StatsView";
-import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
+import { MainNoteListItem } from "../interfaces/NoteListItem";
 import * as Config from "../config";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
@@ -30,11 +30,15 @@ import {
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 
+interface AppProps {
+  localDatabaseProvider: DatabaseProvider,
+  serverDatabaseProvider: DatabaseProvider,
+}
 
 const App = ({
   localDatabaseProvider,
   serverDatabaseProvider,
-}) => {
+}: AppProps) => {
   const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
   const [isAppMenuOpen, setIsAppMenuOpen] = useState<boolean>(false);
   const [databaseMode, setDatabaseMode]
@@ -42,7 +46,7 @@ const App = ({
 
   /* states for note list */
   const currentRequestId = useRef<string>("");
-  const [noteListItems, setNoteListItems] = useState<NoteListItemType[]>([]);
+  const [noteListItems, setNoteListItems] = useState<MainNoteListItem[]>([]);
   const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
   const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
@@ -219,7 +223,7 @@ const App = ({
 
 
   const startApp = async () => {
-    if (await serverDatabaseProvider?.isAuthenticated()) {
+    if (await serverDatabaseProvider.isAuthenticated?.()) {
       setDatabaseMode(DatabaseMode.SERVER);
       if (
         location.pathname.startsWith(getAppPath(PathTemplate.LOGIN))
@@ -341,7 +345,9 @@ const App = ({
                   )}
                 ></FloatingActionButton>
               </>
-              : null
+              : <Navigate to={
+                getAppPath(PathTemplate.LOGIN)
+              } />
           }
         />
         <Route
@@ -371,19 +377,27 @@ const App = ({
             new Map([["FILE_ID", ":fileId"]]),
           )}
           element={
-            <FileView
-              databaseProvider={databaseProvider}
-              toggleAppMenu={toggleAppMenu}
-            />
+            databaseProvider
+              ? <FileView
+                databaseProvider={databaseProvider}
+                toggleAppMenu={toggleAppMenu}
+              />
+              : <Navigate to={
+                getAppPath(PathTemplate.LOGIN)
+              } />
           }
         />
         <Route
           path={getAppPath(PathTemplate.STATS)}
           element={
-            <StatsView
-              databaseProvider={databaseProvider}
-              toggleAppMenu={toggleAppMenu}
-            />
+            databaseProvider
+              ? <StatsView
+                databaseProvider={databaseProvider}
+                toggleAppMenu={toggleAppMenu}
+              />
+              : <Navigate to={
+                getAppPath(PathTemplate.LOGIN)
+              } />
           }
         />
       </Routes>

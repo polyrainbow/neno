@@ -2,11 +2,14 @@ import React from "react";
 import NoteListItemLinkedNotesIndicator
   from "./NoteListItemLinkedNotesIndicator";
 import NoteListItemInfo from "./NoteListItemInfo.js";
-import NoteListItemType from "../../../lib/notes/interfaces/NoteListItem";
+import {
+  FrontendNoteListItem,
+  MainNoteListItem,
+} from "../interfaces/NoteListItem";
 
 interface NoteListItemProps {
   key:string,
-  note:NoteListItemType,
+  note:FrontendNoteListItem,
   isActive:boolean,
   isLinked:boolean,
   onSelect:any,
@@ -23,8 +26,14 @@ const NoteListItem = ({
   onLinkChange,
   isLinkable,
 }:NoteListItemProps) => {
+  const isMainNoteListItem = (
+    noteListItem:(FrontendNoteListItem),
+  ):noteListItem is MainNoteListItem => {
+    return "features" in noteListItem;
+  };
+
   const isHub = (
-    typeof note.numberOfLinkedNotes === "number"
+    isMainNoteListItem(note)
     && !isNaN(note.numberOfLinkedNotes)
     && note.numberOfLinkedNotes >= 5
   );
@@ -64,7 +73,7 @@ const NoteListItem = ({
       isLinked={isLinked}
       isLinkable={isLinkable}
       isActive={isActive}
-      numberOfLinkedNotes={note.numberOfLinkedNotes}
+      numberOfLinkedNotes={isMainNoteListItem(note) && note.numberOfLinkedNotes}
       onLinkChange={onLinkChange}
     />
   </div>;

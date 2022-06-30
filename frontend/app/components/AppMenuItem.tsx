@@ -1,13 +1,20 @@
 import React from "react";
 import { getIconSrc } from "../lib/utils";
 
+interface AppMenuItemProps {
+  icon: string,
+  label: string,
+  onClick: () => void,
+  disabled?: boolean,
+}
+
 
 const AppMenuItem = ({
   icon,
   label,
   onClick,
   disabled = false,
-}) => {
+}:AppMenuItemProps) => {
   return <div
     style={{
       display: "flex",
@@ -15,7 +22,7 @@ const AppMenuItem = ({
       alignItems: "center",
       cursor: disabled ? "default" : "pointer",
     }}
-    onClick={disabled ? null : onClick}
+    onClick={disabled ? undefined : onClick}
     className={"app-menu-item" + (disabled ? " disabled" : "")}
   >
     <img
