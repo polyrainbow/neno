@@ -121,6 +121,11 @@ const FileView = ({
           </p>;
         })
       }
+      {
+        notes.length === 0
+          ? <p>{l("files.used-in.none")}</p>
+          : ""
+      }
     </section>
   </>;
 };

@@ -55,6 +55,7 @@
   "files.files-heading": "Files ({numberOfFiles})",
   "files.show-all-files": "Show all files",
   "files.used-in": "Used in",
+  "files.used-in.none": "This file is not used by any note.",
   "graph.inflate-10%": "Inflate graph by 10%",
   "graph.initial-position-explainer": "Initial position for new nodes (drag and drop to move)",
   "graph.open-in-editor": "Open note in editor",

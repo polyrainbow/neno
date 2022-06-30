@@ -55,6 +55,7 @@
   "files.files-heading": "Dateien ({numberOfFiles})",
   "files.show-all-files": "Zeige alle Dateien",
   "files.used-in": "Benutzt in",
+  "files.used-in.none": "Diese Datei wird von keiner Notiz benutzt.",
   "graph.inflate-10%": "Graph um 10% aufblähen",
   "graph.initial-position-explainer": "Anfängliche Position für neue Notizen (kann woanders hin bewegt werden)",
   "graph.open-in-editor": "Notiz im Editor öffnen",
