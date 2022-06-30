@@ -51,12 +51,15 @@ export function lf(key:string, replacements?:Replacements):React.ReactFragment {
     const outerParts = output.split(regex);
     let i = 0;
     for (const match of output.matchAll(regex)) {
-      nodes.push(<span>{outerParts[i]}</span>);
+      nodes.push(<span
+        key={`translation_${key}_op_${match.groups?.label}`}
+      >{outerParts[i]}</span>);
       nodes.push(
         <a
           href={match.groups?.url}
           target="_blank"
           rel="noreferrer noopener"
+          key={`translation_${key}_match_${match.groups?.label}`}
         >{match.groups?.label}</a>,
       );
       i++;
