@@ -22,7 +22,6 @@ import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import {
   MainNoteListItem,
 } from "../interfaces/NoteListItem";
-import NoteContentBlock from "../../../lib/notes/interfaces/NoteContentBlock";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery";
 import {
@@ -62,8 +61,7 @@ const Note = ({
   duplicateNote,
   openInGraphView,
 }:NoteComponentProps) => {
-  const previousBlocks = useRef<NoteContentBlock[]>([]);
-  const blocks = note?.blocks;
+  const blocks = note.blocks;
   const goToNote = useGoToNote();
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState<MainNoteListItem[]>([]);
@@ -126,27 +124,35 @@ const Note = ({
 
 
   useEffect(() => {
+    Editor.isReady()
+      .then(() => {
+        return Editor.update(blocks);
+      });
+  }, [note]);
+
+
+  useEffect(() => {
     const parent = document.getElementById("editor");
     if (!parent) return;
 
-    if (JSON.stringify(blocks) === JSON.stringify(previousBlocks.current)) {
-      return;
-    }
-
-    Editor.load({
+    Editor.init({
       data: blocks,
       parent,
       onChange: () => setUnsavedChanges(true),
       databaseProvider,
     })
       .then(() => {
-        previousBlocks.current = blocks;
+        Editor.focus();
+      })
+      .catch((e) => {
+        if (
+          e instanceof Error
+          && e.message !== "INITIALIZING_ALREADY_STARTED"
+        ) {
+          throw new Error(e.message);
+        }
       });
-
-  // it is important that we only perform this effect when the block content
-  // changes, because otherwise it is executed more often and editor loading
-  // takes some time
-  }, [blocks]);
+  }, []);
 
   useEffect(() => {
     if (noteTitleElementRef.current === null) return;

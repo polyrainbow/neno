@@ -288,8 +288,26 @@ const EditorView = ({
   };
 
 
-  const createNewNote = () => {
-    navigate(Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
+  const createNewNote = async () => {
+    if (unsavedChanges) {
+      await confirmDiscardingUnsavedChanges();
+      setUnsavedChanges(false);
+    }
+    // in order for the editor loader to better reflect that possible changes
+    // have been done, let's save the current state of the editor before
+    // reloading
+    setActiveNote({
+      ...activeNote,
+      blocks: await Editor.save(),
+    });
+
+    // if the active note is already NaN, we need to manually reload the note
+    // because navigating to it again won't change the state at all
+    if (isNaN(activeNoteId)) {
+      await loadNote(NaN);
+    } else {
+      navigate(Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
+    }
   };
 
 

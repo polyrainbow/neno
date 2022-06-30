@@ -2,12 +2,44 @@ import { DEFAULT_NOTE_BLOCKS } from "../config";
 import NoteContentBlock from "../../../lib/notes/interfaces/NoteContentBlock";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 
+const modules = await Promise.all([
+  import("@editorjs/editorjs"),
+  import("@editorjs/header"),
+  import("./editor-js-plugins/link/index"),
+  import("./editor-js-plugins/image/index"),
+  import("@editorjs/list"),
+  import("./editor-js-plugins/code/index"),
+  import("./editor-js-plugins/document/index"),
+  import("./editor-js-plugins/audio/index"),
+  import("./editor-js-plugins/video/index"),
+]);
+
+const [
+  EditorJS,
+  Header,
+  Link,
+  Image,
+  List,
+  Code,
+  Document,
+  Audio,
+  Video,
+] = modules.map((module) => module.default);
+
 interface LoadParams {
   data: NoteContentBlock[],
   parent: HTMLElement,
   onChange: (any) => void,
   databaseProvider: DatabaseProvider
 }
+
+interface EditorConfig {
+  parent: HTMLElement,
+  onChange: (any) => void,
+  databaseProvider: DatabaseProvider,
+}
+
+let config:EditorConfig;
 
 /*
   this instance queue makes sure that there are not several editor instances
@@ -17,36 +49,11 @@ interface LoadParams {
 */
 let instanceQueue:Promise<any> | null = null;
 
+let initializingStarted = false;
 
-const loadInstance = async ({
-  data,
-  parent,
-  onChange,
-  databaseProvider,
-}: LoadParams) => {
-  const modules = await Promise.all([
-    import("@editorjs/editorjs"),
-    import("@editorjs/header"),
-    import("./editor-js-plugins/link/index"),
-    import("./editor-js-plugins/image/index"),
-    import("@editorjs/list"),
-    import("./editor-js-plugins/code/index"),
-    import("./editor-js-plugins/document/index"),
-    import("./editor-js-plugins/audio/index"),
-    import("./editor-js-plugins/video/index"),
-  ]);
 
-  const [
-    EditorJS,
-    Header,
-    Link,
-    Image,
-    List,
-    Code,
-    Document,
-    Audio,
-    Video,
-  ] = modules.map((module) => module.default);
+const loadInstance = async (data: NoteContentBlock[]) => {
+  const { parent, onChange, databaseProvider } = config;
 
   // several plugins are able to upload and download files. the following
   // config object is passed to all of them
@@ -183,21 +190,23 @@ const loadInstance = async ({
 
 /** EXPORTS */
 
-const load = async ({
+const init = async ({
   data,
   parent,
   onChange,
   databaseProvider,
 }: LoadParams):Promise<void> => {
-  if (instanceQueue === null) {
-    instanceQueue = loadInstance({ data, parent, onChange, databaseProvider });
-  } else {
-    instanceQueue = instanceQueue.then((instance) => {
-      instance.destroy();
-      return loadInstance({ data, parent, onChange, databaseProvider });
-    });
+  if (initializingStarted) {
+    throw new Error("INITIALIZING_ALREADY_STARTED");
   }
 
+  initializingStarted = true;
+
+  config = {
+    parent, onChange, databaseProvider,
+  };
+
+  instanceQueue = loadInstance(data);
   await instanceQueue;
 };
 
@@ -230,6 +239,31 @@ const save = async ():Promise<NoteContentBlock[]> => {
 };
 
 
+const update = async (newData: NoteContentBlock[]):Promise<void> => {
+  if (!instanceQueue) {
+    throw new Error("UPDATE_BEFORE_INIT");
+  }
+
+  const currentData = await save();
+
+  if (JSON.stringify(newData) === JSON.stringify(currentData)) {
+    return;
+  }
+
+  instanceQueue = instanceQueue.then((instance) => {
+    instance.destroy();
+    return loadInstance(newData);
+  });
+
+  await instanceQueue;
+};
+
+
+const isReady = async () => {
+  await instanceQueue;
+};
+
+
 const focus = async ():Promise<void> => {
   if (!instanceQueue) {
     throw new Error(
@@ -242,7 +276,9 @@ const focus = async ():Promise<void> => {
 
 
 export {
-  load,
+  init,
+  update,
   save,
+  isReady,
   focus,
 };
