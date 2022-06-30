@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 
@@ -32,6 +32,21 @@ const ConfirmationServiceProvider = (props) => {
 
     setConfirmationState(null);
   };
+
+  /* close dialog on Escape press */
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === "Escape") {
+        handleCancel();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [confirmationState]);
 
   return <>
     <ConfirmationDialog
