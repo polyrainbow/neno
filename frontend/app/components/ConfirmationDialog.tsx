@@ -23,6 +23,8 @@ const ConfirmationDialog = ({
     >{text}</p>
     <button
       onClick={onConfirm}
+      autoFocus={encourageConfirmation}
+      tabIndex={0}
       className={
         "default-button dialog-box-button "
         + (encourageConfirmation ? "default-action" : "")
@@ -30,6 +32,8 @@ const ConfirmationDialog = ({
     >{confirmText}</button>
     <button
       onClick={onCancel}
+      autoFocus={!encourageConfirmation}
+      tabIndex={1}
       className={
         "default-button dialog-box-button "
         + (!encourageConfirmation ? "default-action" : "")

@@ -74,6 +74,7 @@
     var(--input-border-width) solid var(--main-content-color) !important;
   --content-element-border-radius: 0px;
   --input-padding: 5px;
+  --focus-outline: var(--font-color) auto 1px;
 }
 
 .content-section {
@@ -450,6 +451,11 @@ button[disabled]{
   margin-right: 10px;
   padding: 10px 20px;
   margin-bottom: var(--default-margin);
+  user-select: none;
+}
+
+.default-button:focus {
+  outline: var(--focus-outline);
 }
 
 .default-button.default-action {
