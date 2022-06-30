@@ -15,7 +15,7 @@ const NoteStats = ({
   return <div
     id="stats"
   >
-    <h2>Stats</h2>
+    <h2>{l("editor.stats.heading")}</h2>
     <table className="data-table">
       <tbody>
         <tr>

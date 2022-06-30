@@ -28,6 +28,7 @@
   "editor.stats.creation-time": "Creation time",
   "editor.stats.files": "Files",
   "editor.stats.files.none": "None",
+  "editor.stats.heading": "Stats",
   "editor.stats.id": "ID",
   "editor.stats.last-update-time": "Last update time",
   "editor.stats.number-of-blocks": "Number of blocks",
