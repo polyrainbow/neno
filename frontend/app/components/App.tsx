@@ -346,9 +346,7 @@ const App = ({
                   )}
                 ></FloatingActionButton>
               </>
-              : <Navigate to={
-                getAppPath(PathTemplate.LOGIN)
-              } />
+              : null
           }
         />
         <Route
@@ -383,9 +381,7 @@ const App = ({
                 databaseProvider={databaseProvider}
                 toggleAppMenu={toggleAppMenu}
               />
-              : <Navigate to={
-                getAppPath(PathTemplate.LOGIN)
-              } />
+              : null
           }
         />
         <Route
@@ -396,9 +392,7 @@ const App = ({
                 databaseProvider={databaseProvider}
                 toggleAppMenu={toggleAppMenu}
               />
-              : <Navigate to={
-                getAppPath(PathTemplate.LOGIN)
-              } />
+              : null
           }
         />
       </Routes>
