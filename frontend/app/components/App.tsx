@@ -223,7 +223,7 @@ const App = ({
   };
 
 
-  const startApp = async () => {
+  const checkAuthentication = async () => {
     if (await serverDatabaseProvider.isAuthenticated?.()) {
       setDatabaseMode(DatabaseMode.SERVER);
       if (
@@ -242,7 +242,7 @@ const App = ({
   };
 
   useEffect(() => {
-    startApp();
+    checkAuthentication();
   }, []);
 
 

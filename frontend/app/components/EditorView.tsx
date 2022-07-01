@@ -181,7 +181,6 @@ const EditorView = ({
 
     setActiveNote({
       ...activeNote,
-      blocks: await Editor.save(),
       changes: newChanges,
     });
 
@@ -199,7 +198,7 @@ const EditorView = ({
 
     const noteToTransmit:NoteFromUser = {
       title: activeNote.title,
-      blocks: activeNote.blocks,
+      blocks: await Editor.save(),
       changes: activeNote.linkedNotes.map((linkedNote) => {
         return {
           type: UserNoteChangeType.LINKED_NOTE_ADDED,
@@ -227,7 +226,6 @@ const EditorView = ({
 
     setActiveNote({
       ...activeNote,
-      blocks: await Editor.save(),
       changes: [
         ...activeNote.changes.filter(
           (change:FrontendUserNoteChange):boolean => {
@@ -251,20 +249,22 @@ const EditorView = ({
   const loadNote = async (noteId:NoteId) => {
     /* if we don't have a note id, let's create a new note */
     if (isNaN(noteId)) {
-      /* optionally attach existing file to new note */
-      const searchParams = new URLSearchParams(location.search);
-      const fileIdToAttach = searchParams.get("attach-file");
-      const newNoteObject = Utils.getNewNoteObject(
-        fileIdToAttach ? [fileIdToAttach] : undefined,
-      );
-      setActiveNote(newNoteObject);
-
       /* whatever has been written to the address bar, let's replace it with
       the canonical path for a new note */
       navigate(
         Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
         { replace: true },
       );
+
+      /* optionally attach existing file to new note */
+      const searchParams = new URLSearchParams(location.search);
+      const fileIdToAttach = searchParams.get("attach-file");
+      const newNoteObject = Utils.getNewNoteObject();
+      setActiveNote(newNoteObject);
+      const newBlocks = Utils.getNewNoteBlocks(
+        fileIdToAttach ? [fileIdToAttach] : undefined,
+      );
+      await Editor.update(newBlocks);
     } else {
       try {
         const noteFromServer = await databaseProvider.getNote(noteId);
@@ -274,6 +274,7 @@ const EditorView = ({
             isUnsaved: false,
             changes: [],
           });
+          await Editor.update(noteFromServer.blocks);
         } else {
           throw new Error("No note received");
         }
@@ -294,13 +295,6 @@ const EditorView = ({
       await confirmDiscardingUnsavedChanges();
       setUnsavedChanges(false);
     }
-    // in order for the editor loader to better reflect that possible changes
-    // have been done, let's save the current state of the editor before
-    // reloading
-    setActiveNote({
-      ...activeNote,
-      blocks: await Editor.save(),
-    });
 
     // if the active note is already NaN, we need to manually reload the note
     // because navigating to it again won't change the state at all

@@ -51,7 +51,6 @@ let instanceQueue:Promise<any> | null = null;
 
 let initializingStarted = false;
 
-
 const loadInstance = async (data: NoteContentBlock[]) => {
   const { parent, onChange, databaseProvider } = config;
 
@@ -244,6 +243,8 @@ const update = async (newData: NoteContentBlock[]):Promise<void> => {
     throw new Error("UPDATE_BEFORE_INIT");
   }
 
+  await instanceQueue;
+
   const currentData = await save();
 
   if (JSON.stringify(newData) === JSON.stringify(currentData)) {
@@ -260,6 +261,10 @@ const update = async (newData: NoteContentBlock[]):Promise<void> => {
 
 
 const isReady = async () => {
+  if (!instanceQueue) {
+    throw new Error("READY_QUERY_BEFORE_INIT");
+  }
+
   await instanceQueue;
 };
 

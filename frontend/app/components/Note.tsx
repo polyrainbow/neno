@@ -27,6 +27,7 @@ import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery";
 import {
   NoteListSortMode,
 } from "../../../lib/notes/interfaces/NoteListSortMode";
+import { DEFAULT_NOTE_BLOCKS } from "../config";
 
 interface NoteComponentProps {
   note: ActiveNote,
@@ -61,7 +62,6 @@ const Note = ({
   duplicateNote,
   openInGraphView,
 }:NoteComponentProps) => {
-  const blocks = note.blocks;
   const goToNote = useGoToNote();
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState<MainNoteListItem[]>([]);
@@ -124,19 +124,11 @@ const Note = ({
 
 
   useEffect(() => {
-    Editor.isReady()
-      .then(() => {
-        return Editor.update(blocks);
-      });
-  }, [note]);
-
-
-  useEffect(() => {
     const parent = document.getElementById("editor");
     if (!parent) return;
 
     Editor.init({
-      data: blocks,
+      data: DEFAULT_NOTE_BLOCKS,
       parent,
       onChange: () => setUnsavedChanges(true),
       databaseProvider,

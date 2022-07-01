@@ -1,5 +1,5 @@
 import { FileId } from "../../../lib/notes/interfaces/FileId";
-import {
+import NoteContentBlock, {
   NoteContentBlockType,
   NoteContentBlockWithFile,
 } from "../../../lib/notes/interfaces/NoteContentBlock";
@@ -96,16 +96,18 @@ const getBlocksWithFileIds = (
 };
 
 
-const getNewNoteObject = (
+const getNewNoteBlocks = (
   fileIds?: FileId[],
-):ActiveNote => {
-  const blocks = fileIds
+):NoteContentBlock[] => {
+  return fileIds
     ? getBlocksWithFileIds(fileIds)
     : Config.DEFAULT_NOTE_BLOCKS;
+};
 
+
+const getNewNoteObject = ():ActiveNote => {
   const note:ActiveNote = {
     changes: [],
-    blocks,
     id: NaN,
     isUnsaved: true,
     linkedNotes: [],
@@ -330,6 +332,7 @@ export {
   getParameterByName,
   makeTimestampHumanReadable,
   getNewNoteObject,
+  getNewNoteBlocks,
   setNoteTitleByLinkTitleIfUnset,
   binaryArrayFind,
   binaryArrayIncludes,
