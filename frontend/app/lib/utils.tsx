@@ -4,7 +4,7 @@ import NoteContentBlock, {
   NoteContentBlockWithFile,
 } from "../../../lib/notes/interfaces/NoteContentBlock";
 import { PathTemplate } from "../enum/PathTemplate";
-import ActiveNote from "../interfaces/ActiveNote";
+import { UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Config from "../config";
 
 
@@ -105,12 +105,10 @@ const getNewNoteBlocks = (
 };
 
 
-const getNewNoteObject = ():ActiveNote => {
-  const note:ActiveNote = {
-    changes: [],
-    id: NaN,
+const getNewNoteObject = ():UnsavedActiveNote => {
+  const note:UnsavedActiveNote = {
     isUnsaved: true,
-    linkedNotes: [],
+    changes: [],
     title: Config.DEFAULT_NOTE_TITLE,
   };
 

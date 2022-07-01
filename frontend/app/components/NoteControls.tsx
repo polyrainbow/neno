@@ -99,7 +99,7 @@ const NoteControls = ({
           ? "push_pin_disabled"
           : "push_pin"
         }
-        onClick={pinOrUnpinNote}
+        onClick={() => pinOrUnpinNote(activeNote.id)}
       />
       <IconButton
         id="button_open-in-graph-view"

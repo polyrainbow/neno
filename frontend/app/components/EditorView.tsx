@@ -17,7 +17,7 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import {
   UserNoteChangeType,
 } from "../../../lib/notes/interfaces/UserNoteChangeType";
-import ActiveNote from "../interfaces/ActiveNote";
+import ActiveNote, { UnsavedActiveNote } from "../interfaces/ActiveNote";
 import FrontendUserNoteChange, {
   FrontendUserNoteAdditionChange,
   FrontendUserNoteChangeNote,
@@ -41,6 +41,7 @@ import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
 import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
 import { MainNoteListItem } from "../interfaces/NoteListItem";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
+
 
 interface EditorViewProps {
   databaseProvider: DatabaseProvider,
@@ -89,7 +90,7 @@ const EditorView = ({
   setPage,
   setSearchValue,
 }:EditorViewProps) => {
-  const newNoteObject:ActiveNote = Utils.getNewNoteObject();
+  const newNoteObject:UnsavedActiveNote = Utils.getNewNoteObject();
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
 
   const isSmallScreen = useIsSmallScreen();
@@ -167,9 +168,10 @@ const EditorView = ({
     // if linkedNote is NOT already there and saved,
     // let's add a LINKED_NOTE_ADDED change
     if (
-      !activeNote.linkedNotes.find((linkedNote) => {
+      activeNote.isUnsaved
+      || (!activeNote.linkedNotes.find((linkedNote) => {
         return linkedNote.id === note.id;
-      })
+      }))
     ) {
       newChanges.push(
         {
@@ -264,7 +266,7 @@ const EditorView = ({
       /* optionally attach existing file to new note */
       const searchParams = new URLSearchParams(location.search);
       const fileIdToAttach = searchParams.get("attach-file");
-      const newNoteObject = Utils.getNewNoteObject();
+      const newNoteObject:UnsavedActiveNote = Utils.getNewNoteObject();
       setActiveNote(newNoteObject);
       const newBlocks = Utils.getNewNoteBlocks(
         fileIdToAttach ? [fileIdToAttach] : undefined,
@@ -278,6 +280,7 @@ const EditorView = ({
             ...noteFromServer,
             isUnsaved: false,
             changes: [],
+            numberOfBlocks: noteFromServer.blocks.length,
           });
           await Editor.update(noteFromServer.blocks);
         } else {
@@ -348,12 +351,19 @@ const EditorView = ({
 
   const saveActiveNote = async (options:NotePutOptions):Promise<void> => {
     const noteToTransmit = await prepareNoteToTransmit();
-    const noteFromServer = await databaseProvider.putNote(
+    const noteFromDatabase = await databaseProvider.putNote(
       noteToTransmit, options,
     );
     setActiveNote({
-      ...noteFromServer,
       isUnsaved: false,
+      id: noteFromDatabase.id,
+      title: noteFromDatabase.title,
+      creationTime: noteFromDatabase.creationTime,
+      updateTime: noteFromDatabase.updateTime,
+      linkedNotes: noteFromDatabase.linkedNotes,
+      position: noteFromDatabase.position,
+      numberOfCharacters: noteFromDatabase.numberOfCharacters,
+      numberOfBlocks: noteFromDatabase.blocks.length,
       changes: [],
     });
     setUnsavedChanges(false);
@@ -362,7 +372,7 @@ const EditorView = ({
       when saving the new note for the first time, we get its id from the
       databaseProvider. then we update the address bar to include the new id
     */
-    goToNote(noteFromServer.id, true);
+    goToNote(noteFromDatabase.id, true);
   };
 
 
@@ -427,12 +437,12 @@ const EditorView = ({
   }, [activeNote]);
 
 
-  const pinOrUnpinNote = async () => {
+  const pinOrUnpinNote = async (noteId:NoteId) => {
     let newPinnedNotes:NoteToTransmit[];
-    if (pinnedNotes.find((pinnedNote) => pinnedNote.id === activeNote.id)) {
-      newPinnedNotes = await databaseProvider.unpinNote(activeNote.id);
+    if (pinnedNotes.find((pinnedNote) => pinnedNote.id === noteId)) {
+      newPinnedNotes = await databaseProvider.unpinNote(noteId);
     } else {
-      newPinnedNotes = await databaseProvider.pinNote(activeNote.id);
+      newPinnedNotes = await databaseProvider.pinNote(noteId);
     }
 
     setPinnedNotes(newPinnedNotes);
@@ -511,6 +521,10 @@ const EditorView = ({
           pinOrUnpinNote={pinOrUnpinNote}
           duplicateNote={duplicateNote}
           openInGraphView={() => {
+            if (activeNote.isUnsaved) {
+              throw new Error("Cannot open an unsaved note in graph view");
+            }
+
             navigate(
               Utils.getAppPath(
                 PathTemplate.GRAPH_WITH_FOCUS_NOTE,

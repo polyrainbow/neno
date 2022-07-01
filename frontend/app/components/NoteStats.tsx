@@ -1,4 +1,6 @@
 import React from "react";
+import { SavedActiveNote } from "../interfaces/ActiveNote.js";
+import DatabaseProvider from "../interfaces/DatabaseProvider.js";
 import { l } from "../lib/intl.js";
 import {
   makeTimestampHumanReadable,
@@ -6,10 +8,15 @@ import {
 } from "../lib/utils.js";
 import NoteStatsFileLink from "./NoteStatsFileLink";
 
+interface NoteStatsProps {
+  note: SavedActiveNote,
+  databaseProvider: DatabaseProvider
+}
+
 const NoteStats = ({
   note,
   databaseProvider,
-}) => {
+}: NoteStatsProps) => {
   const fileInfos = getFileInfosOfNoteFiles(note);
 
   return <div
@@ -32,7 +39,7 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-blocks")}</td>
-          <td>{note.blocks.length}</td>
+          <td>{note.numberOfBlocks}</td>
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-links")}</td>

@@ -231,6 +231,13 @@ const Note = ({
           {
             searchResults
               .filter((noteListItem) => {
+                // if the note is unsaved, we can be sure that every search
+                // result is a valid one for displaying
+                if (note.isUnsaved) return true;
+
+                // if the note already exists, only show the search result if
+                // is not the currently active note or if the result is already
+                // added as linked note
                 return (
                   noteListItem.id !== note.id
                   && !displayedLinkedNotes
