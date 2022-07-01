@@ -1,6 +1,7 @@
 import React from "react";
 import { SavedActiveNote } from "../interfaces/ActiveNote.js";
 import DatabaseProvider from "../interfaces/DatabaseProvider.js";
+import NoteStatsFileInfo from "../interfaces/NoteStatsFileInfo.js";
 import { l } from "../lib/intl.js";
 import {
   makeTimestampHumanReadable,
@@ -17,7 +18,7 @@ const NoteStats = ({
   note,
   databaseProvider,
 }: NoteStatsProps) => {
-  const fileInfos = getFileInfosOfNoteFiles(note);
+  const fileInfos:NoteStatsFileInfo[] = getFileInfosOfNoteFiles(note);
 
   return <div
     id="stats"
@@ -39,7 +40,7 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-blocks")}</td>
-          <td>{note.numberOfBlocks}</td>
+          <td>{note.blocks.length}</td>
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-links")}</td>
@@ -56,7 +57,7 @@ const NoteStats = ({
               ? fileInfos
                 .map((fileInfo, i, array) => {
                   return <React.Fragment
-                    key={"nsfwt_" + fileInfo.fileId + note.id}
+                    key={"nsfwt_" + fileInfo.id + note.id}
                   >
                     <NoteStatsFileLink
                       fileInfo={fileInfo}

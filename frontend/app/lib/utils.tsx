@@ -2,10 +2,12 @@ import { FileId } from "../../../lib/notes/interfaces/FileId";
 import NoteContentBlock, {
   NoteContentBlockType,
   NoteContentBlockWithFile,
+  NoteContentBlockWithFileLoaded,
 } from "../../../lib/notes/interfaces/NoteContentBlock";
 import { PathTemplate } from "../enum/PathTemplate";
-import { UnsavedActiveNote } from "../interfaces/ActiveNote";
+import { SavedActiveNote, UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Config from "../config";
+import NoteStatsFileInfo from "../interfaces/NoteStatsFileInfo";
 
 
 const yyyymmdd = (date = new Date()) => {
@@ -278,7 +280,9 @@ const getWindowDimensions = () => {
  * @param {NoteContentBlock} block
  * @return {boolean} true or false
  */
-const blockHasLoadedFile = (block) => {
+const blockHasLoadedFile = (
+  block:NoteContentBlock,
+):block is NoteContentBlockWithFileLoaded => {
   return (
     [
       "image",
@@ -286,18 +290,20 @@ const blockHasLoadedFile = (block) => {
       "audio",
       "video",
     ].includes(block.type)
-    && (typeof block.data.file === "object")
+    && (typeof (block as NoteContentBlockWithFile).data.file === "object")
   );
 };
 
 
-const getFileInfosOfNoteFiles = (note) => {
+const getFileInfosOfNoteFiles = (
+  note:SavedActiveNote,
+):NoteStatsFileInfo[] => {
   return note.blocks
     .filter(blockHasLoadedFile)
-    .map((block) => {
+    .map((block:NoteContentBlockWithFileLoaded):NoteStatsFileInfo => {
       return {
         type: block.type,
-        fileId: block.data.file.fileId,
+        id: block.data.file.fileId,
         name: block.data.file.name,
       };
     });

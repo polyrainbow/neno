@@ -1,3 +1,9 @@
+
+/*
+  This module is a wrapper for providing editor.js functionality to the
+  React app.
+  See event queue comment below for more details.
+*/
 import { DEFAULT_NOTE_BLOCKS } from "../config";
 import NoteContentBlock from "../../../lib/notes/interfaces/NoteContentBlock";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
@@ -26,33 +32,42 @@ const [
   Video,
 ] = modules.map((module) => module.default);
 
-interface LoadParams {
+interface InstanceInitParams {
   data: NoteContentBlock[],
   parent: HTMLElement,
   onChange: (any) => void,
   databaseProvider: DatabaseProvider
 }
 
-interface EditorConfig {
-  parent: HTMLElement,
-  onChange: (any) => void,
-  databaseProvider: DatabaseProvider,
+interface Instance {
+  editorJSInstance: any, // extends { save: Promise<any> },
+  params: InstanceInitParams,
+  instanceId: number,
 }
 
-let config:EditorConfig;
 
 /*
-  this instance queue makes sure that there are not several editor instances
+  this event queue makes sure that there are not several editor instances
   loaded in parallel and thus become visible on the screen. it queues all
-  incoming load requests via a promise chain and executes one request only
-  when the previous promise is fulfilled.
+  incoming init/update/focus/destroy requests via a promise chain and executes
+  one request only when the previous promise is fulfilled.
+
+  This fancy setup is necessary since React with its reactive UI and editor.js
+  with its async init and destroy procedures do not fit nicely together out of
+  the box. We also need a simple mechanism to update the data in the editor
+  which is provided by this module.
+
+  Event order has restrictions: Editor.scheduleInit() must have been run before
+  Editor.scheduleUpdate(), Editor.scheduleFocus() and Editor.scheduleDetroy().
+  These functions are synchronous, because they only schedule those events.
+  They don't wait until these things are finished.
 */
-let instanceQueue:Promise<any> | null = null;
+let eventQueue:Promise<Instance | null> = Promise.resolve(null);
 
-let initializingStarted = false;
+let idCounter = 0;
 
-const loadInstance = async (data: NoteContentBlock[]) => {
-  const { parent, onChange, databaseProvider } = config;
+const loadEditorJSInstance = async (params: InstanceInitParams) => {
+  const { data, parent, onChange, databaseProvider } = params;
 
   // several plugins are able to upload and download files. the following
   // config object is passed to all of them
@@ -189,37 +204,24 @@ const loadInstance = async (data: NoteContentBlock[]) => {
 
 /** EXPORTS */
 
-const init = async ({
-  data,
-  parent,
-  onChange,
-  databaseProvider,
-}: LoadParams):Promise<void> => {
-  if (initializingStarted) {
-    throw new Error("INITIALIZING_ALREADY_STARTED");
-  }
-
-  initializingStarted = true;
-
-  config = {
-    parent, onChange, databaseProvider,
-  };
-
-  instanceQueue = loadInstance(data);
-  await instanceQueue;
+const scheduleInit = (params: InstanceInitParams):void => {
+  eventQueue = eventQueue.then(async () => {
+    const instanceId = idCounter++;
+    const editorJSInstance = await loadEditorJSInstance(params);
+    const instance:Instance = {
+      editorJSInstance,
+      params,
+      instanceId,
+    };
+    return instance;
+  });
 };
 
 
-const save = async ():Promise<NoteContentBlock[]> => {
-  if (!instanceQueue) {
-    throw new Error(
-      "NO_INSTANCE_AVAILABLE",
-    );
-  }
-
-  const instance = await instanceQueue;
-  await instance.isReady;
-  const editorData = await instance.save();
+const saveInstance = async (
+  instance: Instance,
+):Promise<NoteContentBlock[]> => {
+  const editorData = await instance.editorJSInstance.save();
 
   // when the user did not enter anything, editor.js
   // decides to remove those blocks. but we want to have at least an empty
@@ -238,52 +240,104 @@ const save = async ():Promise<NoteContentBlock[]> => {
 };
 
 
-const update = async (newData: NoteContentBlock[]):Promise<void> => {
-  if (!instanceQueue) {
-    throw new Error("UPDATE_BEFORE_INIT");
+const save = async ():Promise<NoteContentBlock[]> => {
+  const currentInstance = await eventQueue;
+
+  if (!currentInstance) {
+    throw new Error(
+      "NO_INSTANCE_AVAILABLE",
+    );
   }
 
-  await instanceQueue;
+  const blocks = await saveInstance(currentInstance);
+  return blocks;
+};
 
-  const currentData = await save();
 
+const createUpdatedInstance = async (
+  currentInstance: Instance | null,
+  newData: NoteContentBlock[],
+):Promise<Instance> => {
+  if (!currentInstance) {
+    throw new Error("NO_INSTANCE_INITIALIZED_FOR_UPDATE");
+  }
+  const currentData = await saveInstance(currentInstance);
   if (JSON.stringify(newData) === JSON.stringify(currentData)) {
-    return;
+    // nothing to do, just return current instance
+    return currentInstance;
   }
+  currentInstance.editorJSInstance.destroy();
+  const newParams = {
+    ...currentInstance.params,
+    data: newData,
+  };
+  const instanceId = idCounter++;
+  const newInstance:Instance = {
+    editorJSInstance: await loadEditorJSInstance(newParams),
+    params: newParams,
+    instanceId,
+  };
+  return newInstance;
+};
 
-  instanceQueue = instanceQueue.then((instance) => {
-    instance.destroy();
-    return loadInstance(newData);
-  });
 
-  await instanceQueue;
+// push update event to event queue
+const scheduleUpdate = (newData: NoteContentBlock[]):void => {
+  eventQueue = eventQueue.then(
+    (currentInstance: Instance | null):Promise<Instance> => {
+      const newInstancePromise
+        = createUpdatedInstance(currentInstance, newData);
+      return newInstancePromise;
+    },
+  );
 };
 
 
 const isReady = async () => {
-  if (!instanceQueue) {
+  const currentInstance = await eventQueue;
+
+  if (!currentInstance) {
     throw new Error("READY_QUERY_BEFORE_INIT");
   }
-
-  await instanceQueue;
 };
 
 
-const focus = async ():Promise<void> => {
-  if (!instanceQueue) {
-    throw new Error(
-      "Could not focus editor content because there is no instance yet.",
-    );
-  }
+// append focus event to event queue
+const scheduleFocus = ():void => {
+  eventQueue = eventQueue.then(
+    async (currentInstance: Instance | null):Promise<Instance> => {
+      if (!currentInstance) {
+        throw new Error(
+          "NO_INSTANCE_INITIALIZED_FOR_FOCUS",
+        );
+      }
 
-  (await instanceQueue).focus();
+      currentInstance.editorJSInstance.focus();
+      return currentInstance;
+    },
+  );
+};
+
+
+const scheduleDestroy = ():void => {
+  eventQueue = eventQueue.then(async (currentInstance) => {
+    if (!currentInstance) {
+      throw new Error(
+        "NO_INSTANCE_INITIALIZED_TO_DESTROY",
+      );
+    }
+
+    currentInstance.editorJSInstance.destroy();
+    return null;
+  });
 };
 
 
 export {
-  init,
-  update,
+  scheduleInit,
+  scheduleUpdate,
   save,
   isReady,
-  focus,
+  scheduleFocus,
+  scheduleDestroy,
 };

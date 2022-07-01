@@ -127,23 +127,18 @@ const Note = ({
     const parent = document.getElementById("editor");
     if (!parent) return;
 
-    Editor.init({
+    Editor.scheduleInit({
       data: DEFAULT_NOTE_BLOCKS,
       parent,
       onChange: () => setUnsavedChanges(true),
       databaseProvider,
-    })
-      .then(() => {
-        Editor.focus();
-      })
-      .catch((e) => {
-        if (
-          e instanceof Error
-          && e.message !== "INITIALIZING_ALREADY_STARTED"
-        ) {
-          throw new Error(e.message);
-        }
-      });
+    });
+
+    Editor.scheduleFocus();
+
+    return () => {
+      Editor.scheduleDestroy();
+    };
   }, []);
 
   useEffect(() => {
@@ -179,7 +174,7 @@ const Note = ({
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-              Editor.focus();
+              Editor.scheduleFocus();
             }
           }}
         />

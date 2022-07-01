@@ -271,7 +271,7 @@ const EditorView = ({
       const newBlocks = Utils.getNewNoteBlocks(
         fileIdToAttach ? [fileIdToAttach] : undefined,
       );
-      await Editor.update(newBlocks);
+      await Editor.scheduleUpdate(newBlocks);
     } else {
       try {
         const noteFromServer = await databaseProvider.getNote(noteId);
@@ -280,9 +280,9 @@ const EditorView = ({
             ...noteFromServer,
             isUnsaved: false,
             changes: [],
-            numberOfBlocks: noteFromServer.blocks.length,
+            blocks: noteFromServer.blocks,
           });
-          await Editor.update(noteFromServer.blocks);
+          await Editor.scheduleUpdate(noteFromServer.blocks);
         } else {
           throw new Error("No note received");
         }
@@ -363,7 +363,7 @@ const EditorView = ({
       linkedNotes: noteFromDatabase.linkedNotes,
       position: noteFromDatabase.position,
       numberOfCharacters: noteFromDatabase.numberOfCharacters,
-      numberOfBlocks: noteFromDatabase.blocks.length,
+      blocks: noteFromDatabase.blocks,
       changes: [],
     });
     setUnsavedChanges(false);
