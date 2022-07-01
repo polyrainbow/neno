@@ -1,5 +1,6 @@
 import { FileId } from "../../../lib/notes/interfaces/FileId";
 import NoteContentBlock, {
+  NoteContentBlockLink,
   NoteContentBlockType,
   NoteContentBlockWithFile,
   NoteContentBlockWithFileLoaded,
@@ -8,9 +9,10 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { SavedActiveNote, UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Config from "../config";
 import NoteStatsFileInfo from "../interfaces/NoteStatsFileInfo";
+import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 
 
-const yyyymmdd = (date = new Date()) => {
+const yyyymmdd = (date = new Date()):string => {
   const yyyy = date.getFullYear().toString();
   const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
   const dd = date.getDate().toString();
@@ -20,7 +22,7 @@ const yyyymmdd = (date = new Date()) => {
 };
 
 
-const getParameterByName = (name, url) => {
+const getParameterByName = (name:string, url:string):string | null => {
   if (!url) url = window.location.href;
   name = name.replace(/[[\]]/g, "\\$&");
   const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
@@ -120,11 +122,16 @@ const getNewNoteObject = ():UnsavedActiveNote => {
 
 
 // if the note has no title yet, take the title of the link metadata
-const setNoteTitleByLinkTitleIfUnset = (note, defaultNoteTitle) => {
+const setNoteTitleByLinkTitleIfUnset = (
+  note:NoteFromUser,
+  defaultNoteTitle: string,
+):void => {
   if (note.blocks.length === 0) return;
 
   const firstLinkBlock = note.blocks.find(
-    (block) => block.type === "link",
+    (block:NoteContentBlock):block is NoteContentBlockLink => {
+      return block.type === "link";
+    },
   );
 
   if (!firstLinkBlock) return;
@@ -160,7 +167,11 @@ const setNoteTitleByLinkTitleIfUnset = (note, defaultNoteTitle) => {
   @param sortKeyKey:
     The sort key we want to find.
 */
-const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind) {
+const binaryArrayFind = function<T>(
+  sortedArray: T[],
+  sortKeyKey: string,
+  sortKeyToFind: string,
+):T | null {
   let start = 0;
   let end = sortedArray.length - 1;
 
@@ -193,7 +204,10 @@ const binaryArrayFind = function(sortedArray, sortKeyKey, sortKeyToFind) {
   @param valueToLookFor:
     The value we want to find.
 */
-const binaryArrayIncludes = function(sortedArray, valueToLookFor):boolean {
+const binaryArrayIncludes = function<T>(
+  sortedArray: T[],
+  valueToLookFor: T,
+):boolean {
   let start = 0;
   let end = sortedArray.length - 1;
 
@@ -246,7 +260,7 @@ function humanFileSize(bytes: number, si = false, dp = 1): string {
 }
 
 
-const shortenText = (text:string, maxLength:number) => {
+const shortenText = (text:string, maxLength:number):string => {
   if (text.length > maxLength) {
     return text.trim().substring(0, maxLength) + "…";
   } else {
@@ -255,7 +269,7 @@ const shortenText = (text:string, maxLength:number) => {
 };
 
 
-const streamToBlob = async (stream, mimeType) => {
+const streamToBlob = async (stream, mimeType:string):Promise<Blob> => {
   const response = new Response(
     stream,
     {
@@ -267,7 +281,7 @@ const streamToBlob = async (stream, mimeType) => {
 };
 
 
-const getWindowDimensions = () => {
+const getWindowDimensions = (): {width: number, height: number} => {
   const docEl = document.documentElement;
   const width = window.innerWidth || docEl.clientWidth;
   const height = window.innerHeight || docEl.clientHeight;
@@ -326,7 +340,7 @@ const getAppPath = (
 };
 
 
-const getIconSrc = (iconName) => {
+const getIconSrc = (iconName:string):string => {
   return Config.ICON_PATH + iconName + "_black_24dp.svg";
 };
 
