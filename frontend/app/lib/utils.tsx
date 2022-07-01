@@ -326,6 +326,8 @@ const getIconSrc = (iconName) => {
   return Config.ICON_PATH + iconName + "_black_24dp.svg";
 };
 
+const stringContainsOnlyDigits = (val:string):boolean => /^\d+$/.test(val);
+
 
 export {
   yyyymmdd,
@@ -345,4 +347,5 @@ export {
   getAppPath,
   getIconSrc,
   getFileTypeFromFilename,
+  stringContainsOnlyDigits,
 };

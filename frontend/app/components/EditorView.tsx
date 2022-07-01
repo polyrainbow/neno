@@ -97,9 +97,14 @@ const EditorView = ({
   const navigate = useNavigate();
   const goToNote = useGoToNote();
   const params = useParams();
-  const activeNoteId:NoteId = params.activeNoteId
-    ? parseInt(params.activeNoteId)
-    : NaN;
+  const activeNoteId:NoteId
+    = (
+      typeof params.activeNoteId === "string"
+      && Utils.stringContainsOnlyDigits(params.activeNoteId)
+    )
+      ? parseInt(params.activeNoteId)
+      : NaN;
+
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
