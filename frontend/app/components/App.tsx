@@ -364,10 +364,12 @@ const App = ({
         <Route
           path={getAppPath(PathTemplate.FILES)}
           element={
-            <FilesView
-              databaseProvider={databaseProvider}
-              toggleAppMenu={toggleAppMenu}
-            />
+            databaseProvider
+              ? <FilesView
+                databaseProvider={databaseProvider}
+                toggleAppMenu={toggleAppMenu}
+              />
+              : null
           }
         />
         <Route

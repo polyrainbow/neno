@@ -51,7 +51,7 @@ interface EditorViewProps {
   handleInvalidCredentialsError,
   refreshNotesList,
   headerStats: GraphStats | null,
-  pinnedNotes,
+  pinnedNotes: NoteToTransmit[],
   handleSearchInputChange,
   setPinnedNotes,
   searchValue,

@@ -3,12 +3,19 @@ import Dialog from "./Dialog";
 import RadioGroup from "./RadioGroup";
 import { humanFileSize, yyyymmdd } from "../lib/utils";
 import { l } from "../lib/intl";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+
+
+interface ExportDatabaseDialogProps {
+  databaseProvider: DatabaseProvider,
+  onClose,
+}
 
 
 const ExportDatabaseDialog = ({
   databaseProvider,
   onClose,
-}) => {
+}: ExportDatabaseDialogProps) => {
   const [withFiles, setWithFiles] = useState(false);
   // status can be READY, BUSY, DONE
   const [status, setStatus] = useState("READY");

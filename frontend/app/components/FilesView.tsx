@@ -10,12 +10,17 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { FileId } from "../../../lib/notes/interfaces/FileId";
 import FileIdAndSrc from "../interfaces/FileIdAndSrc";
 import { l } from "../lib/intl";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
 
+interface FilesViewProps {
+  databaseProvider: DatabaseProvider,
+  toggleAppMenu,
+}
 
 const FilesView = ({
   databaseProvider,
   toggleAppMenu,
-}) => {
+}: FilesViewProps) => {
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
   const navigate = useNavigate();
 

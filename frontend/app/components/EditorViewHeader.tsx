@@ -6,6 +6,18 @@ import useGoToNote from "../hooks/useGoToNote";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { l } from "../lib/intl";
+import GraphStats from "../../../lib/notes/interfaces/GraphStats";
+import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
+import ActiveNote from "../interfaces/ActiveNote";
+
+interface EditorViewHeaderProps {
+  stats: GraphStats | null,
+  toggleAppMenu,
+  pinnedNotes: NoteToTransmit[],
+  activeNote: ActiveNote | null,
+  unsavedChanges: boolean,
+  setUnsavedChanges,
+}
 
 const EditorViewHeader = ({
   stats,
@@ -14,7 +26,7 @@ const EditorViewHeader = ({
   activeNote,
   unsavedChanges,
   setUnsavedChanges,
-}) => {
+}: EditorViewHeaderProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const goToNote = useGoToNote();
@@ -48,7 +60,11 @@ const EditorViewHeader = ({
 
                   goToNote(pinnedNote.id);
                 }}
-                isActive={activeNote && (pinnedNote.id === activeNote.id)}
+                isActive={
+                  (!!activeNote)
+                  && (!activeNote.isUnsaved)
+                  && (pinnedNote.id === activeNote.id)
+                }
               />;
             })
             : <p
@@ -58,7 +74,11 @@ const EditorViewHeader = ({
             >{l("app.pinned-notes-placeholder")}</p>
         }
       </div>
-      <AppHeaderStats stats={stats} />
+      {
+        stats
+          ? <AppHeaderStats stats={stats} />
+          : ""
+      }
     </header>
   );
 };

@@ -29,8 +29,8 @@ interface DatabaseProvider {
   getNote: (noteId: NoteId) => Promise<NoteToTransmit | null>;
   getNotes: (options:DatabaseQuery) => Promise<NoteListPage>;
   getStats: (options: GraphStatsRetrievalOptions) => Promise<GraphStats>;
-  getFiles: (graphId: GraphId) => Promise<FileId[]>
-  getDanglingFiles: (graphId: GraphId) => Promise<FileId[]>;
+  getFiles: () => Promise<FileId[]>
+  getDanglingFiles: () => Promise<FileId[]>;
   deleteNote: (noteId:NoteId) => Promise<void>;
   putNote: (
     noteToTransmit:NoteFromUser,

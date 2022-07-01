@@ -3,10 +3,10 @@ import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import { getIconSrc, shortenText } from "../lib/utils";
 
 interface EditorViewHeaderPinnedNoteProps {
-  key:string,
-  note:NoteToTransmit,
-  isActive:boolean,
-  onClick:any,
+  key: string,
+  note: NoteToTransmit,
+  isActive: boolean,
+  onClick: any,
 }
 
 const EditorViewHeaderPinnedNote = ({
