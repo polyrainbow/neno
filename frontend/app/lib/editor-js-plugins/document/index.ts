@@ -35,8 +35,6 @@ import {
   humanFileSize,
 } from "../../utils";
 
-const LOADER_TIMEOUT = 500;
-
 /**
  * @typedef {object} DocumentToolData
  * @description Document Tool's output data format
@@ -316,16 +314,16 @@ export default class DocumentTool {
 
     const file = await fileHandle.getFile();
 
-    this.nodes.wrapper.classList.add(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-
     await this.#uploadFileAndRefreshUI(file);
   }
 
 
   async #uploadFileByUrlAndRefreshUI(url) {
+    this.nodes.wrapper.classList.add(
+      this.CSS.wrapperLoading,
+      this.CSS.loader,
+    );
+
     const result = await this.config.fileHandling.uploadByUrl(url);
     const filename = getFilenameFromUrl(url);
     result.file.name = filename;
@@ -334,6 +332,11 @@ export default class DocumentTool {
 
 
   async #uploadFileAndRefreshUI(file) {
+    this.nodes.wrapper.classList.add(
+      this.CSS.wrapperLoading,
+      this.CSS.loader,
+    );
+
     const result = await this.config.fileHandling.uploadByFile(file);
     this.#onUploadFinished(result);
   }
@@ -403,14 +406,9 @@ export default class DocumentTool {
    * Removes tool's loader
    */
   removeLoader() {
-    setTimeout(
-      () => {
-        this.nodes.wrapper.classList.remove(
-          this.CSS.wrapperLoading,
-          this.CSS.loader,
-        );
-      },
-      LOADER_TIMEOUT,
+    this.nodes.wrapper.classList.remove(
+      this.CSS.wrapperLoading,
+      this.CSS.loader,
     );
   }
 
