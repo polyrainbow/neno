@@ -1,23 +1,32 @@
 import React from "react";
+import {
+  NoteContentBlockFileMetadata,
+} from "../../../lib/notes/interfaces/NoteContentBlock";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+
+interface NoteStatsFileLinkProps {
+  fileMetadata: NoteContentBlockFileMetadata,
+  databaseProvider: DatabaseProvider
+}
 
 const NoteStatsFileLink = ({
-  fileInfo,
+  fileMetadata,
   databaseProvider,
-}) => {
+}: NoteStatsFileLinkProps) => {
   return <a
-    key={"note-stats-link-" + fileInfo.fileId}
+    key={"note-stats-link-" + fileMetadata.fileId}
     style={{
       "cursor": "pointer",
     }}
     onClick={async () => {
       const url = await databaseProvider.getUrlForFileId(
-        fileInfo.fileId,
-        fileInfo.name,
+        fileMetadata.fileId,
+        fileMetadata.name,
       );
       window.open(url, "_blank");
     }}
   >
-    {fileInfo.name ?? fileInfo.fileId}
+    {fileMetadata.name ?? fileMetadata.fileId}
   </a>;
 };
 

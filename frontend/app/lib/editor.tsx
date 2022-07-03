@@ -5,8 +5,11 @@
   See event queue comment below for more details.
 */
 import { DEFAULT_NOTE_BLOCKS } from "../config";
-import NoteContentBlock from "../../../lib/notes/interfaces/NoteContentBlock";
+import NoteContentBlock, {
+  NoteContentBlockFileMetadata,
+} from "../../../lib/notes/interfaces/NoteContentBlock";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
+import { getFileTypeFromFilename } from "./utils";
 
 const modules = await Promise.all([
   import("@editorjs/editorjs"),
@@ -72,48 +75,28 @@ const loadEditorJSInstance = async (params: InstanceInitParams) => {
   // several plugins are able to upload and download files. the following
   // config object is passed to all of them
   const fileHandlingConfig = {
-    uploadByFile: async (file:File) => {
+    uploadByFile: async (file:File):Promise<NoteContentBlockFileMetadata> => {
       const { fileId } = await databaseProvider.uploadFile(file);
-      return {
-        success: true,
-        file: {
-          fileId,
-          name: file.name,
-          size: file.size,
-        },
-      };
-    },
-    uploadByUrl: async (url) => {
-      // TODO: handle this case gracefully when using local database provider
 
-      // @ts-ignore
-      if (!databaseProvider.constructor.features.includes(
-        "UPLOAD_BY_URL",
-      )) {
-        return {
-          success: false,
-        };
+      const type = getFileTypeFromFilename(file.name);
+
+      if (!type) {
+        throw new Error("Unknown file type");
       }
 
-      // @ts-ignore
-      const { fileId, size } = await databaseProvider.uploadFileByUrl({
-        url,
-      });
       return {
-        success: true,
-        file: {
-          fileId,
-          size,
-        },
+        fileId,
+        name: file.name,
+        size: file.size,
       };
     },
-    onDownload: async (file):Promise<void> => {
+    onDownload: async (file:NoteContentBlockFileMetadata):Promise<void> => {
       const fileId = file.fileId;
       const name = file.name;
       const url = await databaseProvider.getUrlForFileId(fileId, name);
       window.open(url, "_blank");
     },
-    getUrl: async (file) => {
+    getUrl: async (file:NoteContentBlockFileMetadata) => {
       const fileId = file.fileId;
       const name = file.name;
       const url = await databaseProvider.getUrlForFileId(fileId, name);

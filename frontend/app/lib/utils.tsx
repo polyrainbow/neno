@@ -1,5 +1,6 @@
 import { FileId } from "../../../lib/notes/interfaces/FileId";
 import NoteContentBlock, {
+  NoteContentBlockFileMetadata,
   NoteContentBlockLink,
   NoteContentBlockType,
   NoteContentBlockWithFile,
@@ -8,7 +9,6 @@ import NoteContentBlock, {
 import { PathTemplate } from "../enum/PathTemplate";
 import { SavedActiveNote, UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Config from "../config";
-import NoteStatsFileInfo from "../interfaces/NoteStatsFileInfo";
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 
 
@@ -78,7 +78,7 @@ const getFileTypeFromFilename = (
 };
 
 
-const getBlocksWithFileIds = (
+const createBlocksFromFileIds = (
   fileIds: FileId[],
 ):NoteContentBlockWithFile[] => {
   return fileIds.map((fileId:FileId):NoteContentBlockWithFile => {
@@ -89,7 +89,6 @@ const getBlocksWithFileIds = (
       type,
       data: {
         file: {
-          extension: getExtensionFromFilename(fileId) as string,
           fileId,
           name: fileId,
           size: NaN,
@@ -104,7 +103,7 @@ const getNewNoteBlocks = (
   fileIds?: FileId[],
 ):NoteContentBlock[] => {
   return fileIds
-    ? getBlocksWithFileIds(fileIds)
+    ? createBlocksFromFileIds(fileIds)
     : Config.DEFAULT_NOTE_BLOCKS;
 };
 
@@ -309,18 +308,16 @@ const blockHasLoadedFile = (
 };
 
 
-const getFileInfosOfNoteFiles = (
+const getMetadataOfFilesInNote = (
   note:SavedActiveNote,
-):NoteStatsFileInfo[] => {
+):NoteContentBlockFileMetadata[] => {
   return note.blocks
     .filter(blockHasLoadedFile)
-    .map((block:NoteContentBlockWithFileLoaded):NoteStatsFileInfo => {
-      return {
-        type: block.type,
-        id: block.data.file.fileId,
-        name: block.data.file.name,
-      };
-    });
+    .map(
+      (block:NoteContentBlockWithFileLoaded):NoteContentBlockFileMetadata => {
+        return block.data.file;
+      },
+    );
 };
 
 
@@ -361,9 +358,10 @@ export {
   streamToBlob,
   getWindowDimensions,
   blockHasLoadedFile,
-  getFileInfosOfNoteFiles,
+  getMetadataOfFilesInNote,
   getAppPath,
   getIconSrc,
   getFileTypeFromFilename,
   stringContainsOnlyDigits,
+  getExtensionFromFilename,
 };

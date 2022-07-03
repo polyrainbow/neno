@@ -268,15 +268,6 @@ const deleteFile = (fileId) => {
 };
 
 
-const uploadFileByUrl = (data) => {
-  return callGraphAPIAndGetJSONPayload({
-    method: "POST",
-    endpoint: "file-by-url",
-    payload: data,
-  });
-};
-
-
 const getUrlMetadata = (url) => {
   const requestUrl = "url-metadata?url=" + url;
   return callGraphAPIAndGetJSONPayload({
@@ -328,7 +319,6 @@ export {
   getReadableGraphStream,
   importLinksAsNotes,
   uploadFile,
-  uploadFileByUrl,
   getReadableFileStream,
   deleteFile,
   getUrlMetadata,

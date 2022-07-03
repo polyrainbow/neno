@@ -100,9 +100,6 @@
         "NoteContentBlockFileMetadata": {
             "additionalProperties": false,
             "properties": {
-                "extension": {
-                    "type": "string"
-                },
                 "fileId": {
                     "type": "string"
                 },
@@ -114,7 +111,6 @@
                 }
             },
             "required": [
-                "extension",
                 "fileId",
                 "name",
                 "size"
@@ -188,6 +184,10 @@
                     "type": "boolean"
                 }
             },
+            "required": [
+                "caption",
+                "withBackground"
+            ],
             "type": "object"
         },
         "NoteContentBlockLink": {

@@ -13,7 +13,6 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     "EXPORT_DATABASE",
     "AUTHENTICATION",
     "GET_URL_METADATA",
-    "UPLOAD_BY_URL",
     "MULTIPLE_GRAPHS",
   ];
 
@@ -117,7 +116,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getGraphVisualization();
   }
 
-  getReadableGraphStream(withFiles) {
+  getReadableGraphStream(withFiles:boolean) {
     return API.getReadableGraphStream(withFiles);
   }
 
@@ -125,27 +124,23 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.uploadFile(file);
   }
 
-  getReadableFileStream(fileId) {
+  getReadableFileStream(fileId:FileId) {
     return API.getReadableFileStream(fileId);
   }
 
-  deleteFile(fileId) {
+  deleteFile(fileId:FileId) {
     return API.deleteFile(fileId);
   }
 
-  uploadFileByUrl(data) {
-    return API.uploadFileByUrl(data);
-  }
-
-  getUrlMetadata(url) {
+  getUrlMetadata(url:string) {
     return API.getUrlMetadata(url);
   }
 
-  pinNote(noteId) {
+  pinNote(noteId:NoteId) {
     return API.pinNote(noteId);
   }
 
-  unpinNote(noteId) {
+  unpinNote(noteId:NoteId) {
     return API.unpinNote(noteId);
   }
 

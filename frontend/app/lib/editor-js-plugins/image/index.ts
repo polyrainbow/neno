@@ -50,30 +50,13 @@ SOFTWARE.
 
 // eslint-disable-next-line
 import "./index.css";
-import Ui from "./ui";
 import Tunes from "./tunes";
 import * as svgs from "./svgs.js";
+import ToolWithFileUpload from "../ToolWithFileUpload";
+import { make } from "../utils.js";
 import {
-  getFilenameFromUrl,
-} from "../utils";
-
-/**
- * @typedef {object} ImageConfig
- * @description Config supported by Tool
- * @property {object} endpoints - upload endpoints
- * @property {string} endpoints.byFile - upload by file
- * @property {string} endpoints.byUrl - upload by URL
- * @property {string} captionPlaceholder - placeholder for Caption field
- * @property {object} additionalRequestData - any data to send with requests
- * @property {object} additionalRequestHeaders - allows to pass custom headers
- * with Request
- * @property {string} buttonContent - overrides for Select File button
- * @property {object} [uploader] - optional custom uploader
- * @property {function(File): Promise.<UploadResponseFormat>}
- * [uploader.uploadByFile] - method that upload image by File
- * @property {function(string): Promise.<UploadResponseFormat>}
- * [uploader.uploadByUrl] - method that upload image by URL
- */
+  NoteContentBlockFileMetadata,
+} from "../../../../../lib/notes/interfaces/NoteContentBlock";
 
 
 /**
@@ -86,13 +69,19 @@ import {
  *                           saved and passed back
  * @property {string} file.url - [Required] image source URL
  */
-export default class ImageTool {
+export default class ImageTool extends ToolWithFileUpload {
   api;
   readOnly;
   config;
   ui;
   tunes;
-  data;
+  data:{
+    file: NoteContentBlockFileMetadata,
+    caption: string,
+    withBackground: boolean,
+  };
+
+  nodes;
 
   /**
    * Notify core that read-only mode is supported
@@ -110,32 +99,38 @@ export default class ImageTool {
    * @param {object} tool.api - Editor.js API
    * @param {boolean} tool.readOnly - read-only mode flag
    */
-  constructor({ data, config, api, readOnly }) {
+  constructor({ data, config, api }) {
+    super();
+
     this.api = api;
-    this.readOnly = readOnly;
+
+    this.nodes = {
+      wrapper: null,
+      button: null,
+      title: null,
+      caption: null,
+    };
 
     /**
      * Tool's initial config
      */
     this.config = {
-      endpoints: config.endpoints || "",
-      additionalRequestData: config.additionalRequestData || {},
-      additionalRequestHeaders: config.additionalRequestHeaders || {},
-      captionPlaceholder: config.captionPlaceholder || "Caption",
-      buttonContent: config.buttonContent || "",
+      captionPlaceholder: "Caption",
+      buttonText: "Select image",
       fileHandling: config.fileHandling,
+      filePickerAcceptTypes: [
+        {
+          description: "Image",
+          accept: {
+            "image/png": [".png"],
+            "image/jpeg": [".jpg"],
+            "image/webp": [".webp"],
+            "image/gif": [".gif"],
+            "image/svg+xml": [".svg"],
+          },
+        },
+      ],
     };
-
-
-    /**
-     * Module for working with UI
-     */
-    this.ui = new Ui({
-      api,
-      config: this.config,
-      onSelectFile: () => this.#selectAndUploadFile(),
-      readOnly,
-    });
 
     /**
      * Module for working with tunes
@@ -146,10 +141,8 @@ export default class ImageTool {
     });
 
     this.data = data;
-    if (this.blockHasLoadedFile()) {
-      this.showFileData();
-    }
   }
+
 
   /**
    * Get Tool toolbox settings
@@ -164,6 +157,34 @@ export default class ImageTool {
       title: "Image",
     };
   }
+
+
+  /**
+   * CSS classes
+   *
+   * @return {object}
+   */
+  get CSS() {
+    return {
+      baseClass: this.api.styles.block,
+      loader: this.api.styles.loader,
+      input: this.api.styles.input,
+      button: this.api.styles.button,
+      apiButton: this.api.styles.button,
+
+      /**
+       * Tool's classes
+       */
+      wrapper: "image-tool",
+      wrapperWithFile: "image-tool--with-file",
+      wrapperLoading: "image-tool--loading",
+      imageContainer: "image-tool__image",
+      imagePreloader: "image-tool__image-preloader",
+      imageEl: "image-tool__image-picture",
+      caption: "image-tool__caption",
+    };
+  }
+
 
   /**
    * Specify paste substitutes
@@ -206,47 +227,6 @@ export default class ImageTool {
     };
   }
 
-  /**
-   * Specify paste handlers
-   *
-   * @public
-   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @param {CustomEvent} event - editor.js custom paste event
-   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
-   * @return {void}
-   */
-  onPaste(event) {
-    switch (event.type) {
-      case "tag": {
-        const image = event.detail.data;
-
-        /** Images from PDF */
-        if (/^blob:/.test(image.src)) {
-          fetch(image.src)
-            .then((response) => response.blob())
-            .then((file) => {
-              this.#uploadFileByUrlAndRefreshUI(file);
-            });
-
-          break;
-        }
-
-        this.#uploadFileByUrlAndRefreshUI(image.src);
-        break;
-      }
-      case "pattern": {
-        const url = event.detail.data;
-        this.#uploadFileByUrlAndRefreshUI(url);
-        break;
-      }
-      case "file": {
-        const file = event.detail.file;
-
-        this.#uploadFileAndRefreshUI(file);
-        break;
-      }
-    }
-  }
 
   /**
    * Return Block data
@@ -256,17 +236,16 @@ export default class ImageTool {
    */
   save() {
     if (this.blockHasLoadedFile()) {
-      const caption = this.ui.nodes.caption;
-      this.data.caption = caption.innerHTML;
+      const caption = this.nodes.caption;
+      this.data.caption = caption.innerText;
+    } else {
+      this.data.caption = "";
+      this.data.withBackground = false;
     }
 
     return this.data;
   }
 
-
-  blockHasLoadedFile() {
-    return typeof this.data.file === "object";
-  }
 
   /**
    * Renders Block content
@@ -275,29 +254,19 @@ export default class ImageTool {
    * @return {HTMLDivElement}
    */
   render() {
-    return this.ui.render(this.data);
+    const holder = make("div", [this.CSS.baseClass]);
+    this.nodes.wrapper = make("div", [this.CSS.wrapper]);
+
+    if (this.blockHasLoadedFile()) {
+      this.renderLoadedBlock();
+    } else {
+      this.renderUploadButton();
+    }
+
+    holder.appendChild(this.nodes.wrapper);
+    return holder;
   }
 
-  async #selectAndUploadFile() {
-    const [fileHandle] = await window.showOpenFilePicker({
-      multiple: false,
-      types: [
-        {
-          description: "Image",
-          accept: {
-            "image/png": [".png"],
-            "image/jpeg": [".jpg"],
-            "image/webp": [".webp"],
-            "image/gif": [".gif"],
-            "image/svg+xml": [".svg"],
-          },
-        },
-      ],
-    });
-
-    const file = await fileHandle.getFile();
-    await this.#uploadFileAndRefreshUI(file);
-  }
 
   /**
    * Makes buttons with tunes: add background, add border, stretch image
@@ -310,23 +279,16 @@ export default class ImageTool {
     return this.tunes.render(this.data);
   }
 
-  /**
-   * Fires after clicks on the Toolbox Image Icon
-   * Initiates click on the Select File button
-   *
-   * @public
-   */
-  appendCallback() {
-    this.ui.nodes.fileButton.click();
-  }
 
-  /**
-   * Private methods
-   */
-
-
-  async showFileData() {
-    this.ui.fillCaption(this.data.caption);
+  async renderLoadedBlock() {
+    this.nodes.caption = make("div", [this.CSS.input, this.CSS.caption], {
+      contentEditable: true,
+    });
+    this.nodes.caption.dataset.placeholder = this.config.captionPlaceholder;
+    this.nodes.imageContainer = make("div", [this.CSS.imageContainer]);
+    this.nodes.wrapper.appendChild(this.nodes.imageContainer);
+    this.nodes.wrapper.appendChild(this.nodes.caption);
+    this.nodes.caption.innerHTML = this.data.caption || "";
 
     Tunes.tunes.forEach(({ name: tune }) => {
       const value = typeof this.data[tune] !== "undefined"
@@ -337,49 +299,31 @@ export default class ImageTool {
     });
 
     const url = await this.config.fileHandling.getUrl(this.data.file);
-    this.ui.fillImage(url);
-  }
+    const attributes = {
+      src: url,
+    };
 
+    /**
+     * Compose tag with defined attributes
+     *
+     * @type {Element}
+     */
+    this.nodes.imageEl = make("img", [this.CSS.imageEl], attributes);
 
-  /**
-   * File uploading callback
-   *
-   * @private
-   *
-   * @param {UploadResponseFormat} response - uploading server response
-   * @return {void}
-   */
-  #onUploadFinished(response) {
-    if (response.success && response.file) {
-      const receivedFileData = response.file;
-      const filename = receivedFileData.name;
-      const extension = filename && filename.split(".").pop();
+    // this prevents editor.js from triggering the onChange callback as soon
+    // as the image loads
+    this.nodes.imageEl.setAttribute("data-mutation-free", "true");
 
-      this.data = {
-        file: {
-          ...receivedFileData,
-          extension,
-        },
-        caption: "",
-      };
-
-      this.showFileData();
-    } else {
-      this.uploadingFailed("incorrect response: " + JSON.stringify(response));
+    /**
+     * Preloader does not exist on first rendering with presaved data
+     */
+    if (this.nodes.imagePreloader) {
+      this.nodes.imagePreloader.style.backgroundImage = "";
     }
+
+    this.nodes.imageContainer.appendChild(this.nodes.imageEl);
   }
 
-  /**
-   * Handle uploader errors
-   *
-   * @private
-   * @param {string} errorText - uploading error text
-   * @return {void}
-   */
-  uploadingFailed(errorText) {
-    console.error("Image Tool: uploading failed because of", errorText);
-    this.ui.hidePreloader();
-  }
 
   /**
    * Callback fired when Block Tune is activated
@@ -403,33 +347,20 @@ export default class ImageTool {
    */
   setTune(tuneName, value) {
     this.data[tuneName] = value;
-
-    this.ui.applyTune(tuneName, value);
+    this.applyTune(tuneName, value);
   }
 
-  /**
-   * Show preloader and upload image file
-   *
-   * @param {File} file - file that is currently uploading (from paste)
-   * @return {void}
-   */
-  async #uploadFileAndRefreshUI(file) {
-    this.ui.showPreloader();
-    const result = await this.config.fileHandling.uploadByFile(file);
-    this.#onUploadFinished(result);
-  }
 
   /**
-   * Show preloader and upload image by target url
+   * Apply visual representation of activated tune
    *
-   * @param {string} url - url pasted
+   * @param {string} tuneName - one of available tunes {@link Tunes.tunes}
+   * @param {boolean} status - true for enable, false for disable
    * @return {void}
    */
-  async #uploadFileByUrlAndRefreshUI(url) {
-    this.ui.showPreloader();
-    const result = await this.config.fileHandling.uploadByUrl(url);
-    const filename = getFilenameFromUrl(url);
-    result.file.name = filename;
-    this.#onUploadFinished(result);
+  applyTune(tuneName, status) {
+    this.nodes.wrapper.classList.toggle(
+      `${this.CSS.wrapper}--${tuneName}`, status,
+    );
   }
 }

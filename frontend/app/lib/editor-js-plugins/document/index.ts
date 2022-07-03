@@ -29,74 +29,29 @@ import "./index.css";
 import * as svgs from "./svgs";
 import {
   make,
-  getFilenameFromUrl,
 } from "../utils";
 import {
+  getExtensionFromFilename,
   humanFileSize,
 } from "../../utils";
+import {
+  NoteContentBlockFileMetadata,
+} from "../../../../../lib/notes/interfaces/NoteContentBlock";
+import ToolWithFileUpload from "../ToolWithFileUpload";
 
-/**
- * @typedef {object} DocumentToolData
- * @description Document Tool's output data format
- * @property {DocumentFileData} file - object containing information about the
- * file
- */
 
-/**
- * @typedef {object} DocumentFileData
- * @description Document Tool's file format
- * @property {string} [url] - file's upload url
- * @property {string} [size] - file's size
- * @property {string} [extension] - file's extension
- * @property {string} [name] - file's name
- */
-
-/**
- * @typedef {object} FileData
- * @description Document Tool's response from backend
- * @property {string} url - file's url
- * @property {string} name - file's name with extension
- * @property {string} extension - file's extension
- */
-
-/**
- * @typedef {object} UploadResponseFormat
- * @description This format expected from backend on file upload
- * @property {number} success  - 1 for successful uploading, 0 for failure
- * @property {FileData} file - backend response with uploaded file data.
- */
-
-/**
- * @typedef {object} DocumentToolConfig
- * @description Config supported by Tool
- * @property {string} endpoint - file upload url
- * @property {string} field - field name for uploaded file
- * @property {string} placeholder
- * @property {string} errorMessage
- * @property {object} additionalRequestHeaders - allows to pass custom headers
- * with Request
- */
-
-/**
- * @class DocumentTool
- * @classdesc DocumentTool for Editor.js 2.0
- *
- * @property {API} api - Editor.js API
- * @property {DocumentToolData} data
- * @property {DocumentToolConfig} config
- */
-export default class DocumentTool {
+export default class DocumentTool extends ToolWithFileUpload {
   api;
   nodes;
-  data;
+  data:{
+    file: NoteContentBlockFileMetadata,
+  };
+
   config;
 
-  /**
-   * @param {DocumentToolData} data
-   * @param {object} config
-   * @param {API} api
-   */
   constructor({ data, config, api }) {
+    super();
+
     this.api = api;
 
     this.nodes = {
@@ -106,15 +61,21 @@ export default class DocumentTool {
     };
 
     this.config = {
-      endpoint: config.endpoint || "",
-      field: config.field || "file",
       buttonText: "Select document",
-      errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
+      filePickerAcceptTypes: [
+        {
+          description: "PDF file",
+          accept: {
+            "application/pdf": [".pdf"],
+          },
+        },
+      ],
     };
 
     this.data = data;
   }
+
 
   /**
    * Get Tool toolbox settings
@@ -127,6 +88,7 @@ export default class DocumentTool {
       title: "Document",
     };
   }
+
 
   /**
    * Tool's CSS classes
@@ -152,9 +114,9 @@ export default class DocumentTool {
   }
 
   /**
-   * Possible files' extension colors
+   * Colors for file thumbnails
    */
-  get EXTENSIONS() {
+  get EXTENSIONS_COLORS() {
     return {
       doc: "#3e74da",
       docx: "#3e74da",
@@ -202,9 +164,9 @@ export default class DocumentTool {
        * We have disabled this because we want to be able to insert a
        * url without turning it into an audio block
        */
-      patterns: {
+      /* patterns: {
         document: /https?:\/\/\S+\.pdf$/i,
-      },
+      },*/
 
       /**
        * Drag n drop file from into the Editor
@@ -216,43 +178,16 @@ export default class DocumentTool {
     };
   }
 
-  /**
-   * Specify paste handlers
-   *
-   * @public
-   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @param {CustomEvent} event - editor.js custom paste event
-   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
-   * @return {void}
-   */
-  onPaste(event) {
-    switch (event.type) {
-      case "pattern": {
-        const url = event.detail.data;
-        this.#uploadFileByUrlAndRefreshUI(url);
-        break;
-      }
-      case "file": {
-        const file = event.detail.file;
-        this.#uploadFileAndRefreshUI(file);
-        break;
-      }
-    }
-  }
-
 
   /**
    * Return Block data
    *
-   * @param {HTMLElement} toolsContent
+   * @param {HTMLElement} toolContent
    * @return {DocumentToolData}
    */
-  save(toolsContent) {
-    /**
-     * If file was uploaded
-     */
+  save(toolContent) {
     if (this.blockHasLoadedFile()) {
-      const name = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
+      const name = toolContent.querySelector(`.${this.CSS.title}`).innerHTML;
       this.data.file.name = name;
     }
 
@@ -266,129 +201,26 @@ export default class DocumentTool {
    */
   render() {
     const holder = make("div", [this.CSS.baseClass]);
-
     this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
     if (this.blockHasLoadedFile()) {
-      this.showFileData();
+      this.renderLoadedBlock();
     } else {
-      this.prepareUploadButton();
+      this.renderUploadButton();
     }
 
     holder.appendChild(this.nodes.wrapper);
-
     return holder;
   }
 
-  /**
-   * Prepares button for file uploading
-   */
-  prepareUploadButton() {
-    this.nodes.button = make("div", [this.CSS.apiButton, this.CSS.button]);
-    this.nodes.button.innerHTML = this.config.buttonText;
-    /*
-      editorjs core will automatically click on this button because we assign
-      it CSS classes defined by the editorjs core API.
-      that is why we need to use an arrow function here because otherwise "this"
-      is not this class anymore and the event handler does not work.
-    */
-    this.nodes.button.addEventListener("click", () => {
-      this.#selectAndUploadFile();
-    });
-    this.nodes.wrapper.appendChild(this.nodes.button);
-  }
 
-
-  async #selectAndUploadFile() {
-    const [fileHandle] = await window.showOpenFilePicker({
-      multiple: false,
-      types: [
-        {
-          description: "PDF file",
-          accept: {
-            "application/pdf": [".pdf"],
-          },
-        },
-      ],
-    });
-
-    const file = await fileHandle.getFile();
-
-    await this.#uploadFileAndRefreshUI(file);
-  }
-
-
-  async #uploadFileByUrlAndRefreshUI(url) {
-    this.nodes.wrapper.classList.add(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-
-    const result = await this.config.fileHandling.uploadByUrl(url);
-    const filename = getFilenameFromUrl(url);
-    result.file.name = filename;
-    this.#onUploadFinished(result);
-  }
-
-
-  async #uploadFileAndRefreshUI(file) {
-    this.nodes.wrapper.classList.add(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-
-    const result = await this.config.fileHandling.uploadByFile(file);
-    this.#onUploadFinished(result);
-  }
-
-  /**
-   * Fires after clicks on the Toolbox DocumentTool Icon
-   * Initiates click on the Select File button
-   *
-   * @public
-   */
-  appendCallback() {
-    this.nodes.button.click();
-  }
-
-
-  blockHasLoadedFile() {
-    return typeof this.data.file === "object";
-  }
-
-
-  /**
-   * File uploading callback
-   *
-   * @param {UploadResponseFormat} response
-   */
-  #onUploadFinished(response) {
-    if (response.success && response.file) {
-      const receivedFileData = response.file;
-      const filename = receivedFileData.name;
-      const extension = filename && filename.split(".").pop();
-
-      this.data.file = {
-        ...receivedFileData,
-        extension,
-      };
-
-      this.nodes.button.remove();
-      this.showFileData();
-      this.moveCaretToEnd(this.nodes.title);
-      this.nodes.title.focus();
-      this.removeLoader();
-    } else {
-      this.uploadingFailed(this.config.errorMessage);
-    }
-  }
-
-  /**
-   * Handles uploaded file's extension and appends corresponding icon
-   */
   appendFileIcon() {
-    const extension = this.data.file.extension || "";
-    const extensionColor = this.EXTENSIONS[extension];
+    const extension = getExtensionFromFilename(this.data.file.fileId);
+    if (!extension) {
+      return;
+    }
+
+    const extensionColor = this.EXTENSIONS_COLORS[extension];
 
     const fileIcon = make("div", [this.CSS.fileIcon], {
       innerHTML: extensionColor ? svgs.custom : svgs.standard,
@@ -402,23 +234,14 @@ export default class DocumentTool {
     this.nodes.wrapper.appendChild(fileIcon);
   }
 
-  /**
-   * Removes tool's loader
-   */
-  removeLoader() {
-    this.nodes.wrapper.classList.remove(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-  }
 
   /**
    * If upload is successful, show info about the file
    */
-  showFileData() {
+  renderLoadedBlock() {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
 
-    const { file: { size, url, name } } = this.data;
+    const { file: { size, name } } = this.data;
 
     this.appendFileIcon();
 
@@ -443,41 +266,10 @@ export default class DocumentTool {
       innerHTML: svgs.arrowDownload,
     }) as HTMLAnchorElement;
 
-    if (typeof this.config.fileHandling.onDownload === "function") {
-      downloadIcon.addEventListener("click", () => {
-        this.config.fileHandling.onDownload(this.data.file);
-      });
-    } else {
-      downloadIcon.href = url;
-      downloadIcon.target = "_blank";
-      downloadIcon.rel = "nofollow noindex noreferrer";
-    }
+    downloadIcon.addEventListener("click", () => {
+      this.config.fileHandling.onDownload(this.data.file);
+    });
 
     this.nodes.wrapper.appendChild(downloadIcon);
-  }
-
-  /**
-   * If file uploading failed, remove loader and show notification
-   *
-   * @param {string} errorMessage -  error message
-   */
-  uploadingFailed(errorMessage) {
-    console.error(errorMessage);
-    this.removeLoader();
-  }
-
-  /**
-   * Moves caret to the end of contentEditable element
-   *
-   * @param {HTMLElement} element - contentEditable element
-   */
-  moveCaretToEnd(element) {
-    const range = document.createRange();
-    const selection = window.getSelection();
-
-    range.selectNodeContents(element);
-    range.collapse(false);
-    selection?.removeAllRanges();
-    selection?.addRange(range);
   }
 }

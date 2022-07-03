@@ -29,72 +29,28 @@ import "./index.css";
 import * as svgs from "./svgs";
 import {
   make,
-  getFilenameFromUrl,
 } from "../utils";
 import {
   humanFileSize,
 } from "../../utils";
+import {
+  NoteContentBlockFileMetadata,
+} from "../../../../../lib/notes/interfaces/NoteContentBlock";
+import ToolWithFileUpload from "../ToolWithFileUpload";
 
-/**
- * @typedef {object} AudioToolData
- * @description Audio Tool's output data format
- * @property {AudioFileData} file - object containing information about the file
- */
 
-/**
- * @typedef {object} AudioFileData
- * @description Audio Tool's file format
- * @property {string} [url] - file's upload url
- * @property {string} [size] - file's size
- * @property {string} [extension] - file's extension
- * @property {string} [name] - file's name
- */
-
-/**
- * @typedef {object} FileData
- * @description Audio Tool's response from backend
- * @property {string} url - file's url
- * @property {string} name - file's name with extension
- * @property {string} extension - file's extension
- */
-
-/**
- * @typedef {object} UploadResponseFormat
- * @description This format expected from backend on file upload
- * @property {number} success  - 1 for successful uploading, 0 for failure
- * @property {FileData} file - backend response with uploaded file data.
- */
-
-/**
- * @typedef {object} AudioToolConfig
- * @description Config supported by Tool
- * @property {string} field - field name for uploaded file
- * @property {string} placeholder
- * @property {string} errorMessage
- * @property {object} additionalRequestHeaders
- * - allows to pass custom headers with Request
- */
-
-/**
- * @class AudioTool
- * @classdesc AudioTool for Editor.js 2.0
- *
- * @property {API} api - Editor.js API
- * @property {AudioToolData} data
- * @property {AudioToolConfig} config
- */
-export default class AudioTool {
+export default class AudioTool extends ToolWithFileUpload {
   api;
   nodes;
-  data;
+  data:{
+    file: NoteContentBlockFileMetadata,
+  };
+
   config;
 
-  /**
-   * @param {AudioToolData} data
-   * @param {object} config
-   * @param {API} api
-   */
   constructor({ data, config, api }) {
+    super();
+
     this.api = api;
 
     this.nodes = {
@@ -104,10 +60,18 @@ export default class AudioTool {
     };
 
     this.config = {
-      field: "file",
       buttonText: "Select audio",
-      errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
+      filePickerAcceptTypes: [
+        {
+          description: "Audio File",
+          accept: {
+            "audio/mp3": [".mp3"],
+            "audio/mpeg": [".mp3"],
+            "audio/flac": [".flac"],
+          },
+        },
+      ],
     };
 
     this.data = data;
@@ -164,7 +128,7 @@ export default class AudioTool {
       /**
        * Paste HTML into Editor
        */
-      tags: ["audio"],
+      // tags: ["audio"],
 
       /**
        * Paste URL of audio into the Editor
@@ -185,48 +149,16 @@ export default class AudioTool {
     };
   }
 
-  /**
-   * Specify paste handlers
-   *
-   * @public
-   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @param {CustomEvent} event - editor.js custom paste event
-   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
-   * @return {void}
-   */
-  onPaste(event) {
-    switch (event.type) {
-      case "tag": {
-        const audio = event.detail.data;
-        this.#uploadFileByUrlAndRefreshUI(audio.src);
-        break;
-      }
-      case "pattern": {
-        const url = event.detail.data;
-        this.#uploadFileByUrlAndRefreshUI(url);
-        break;
-      }
-      case "file": {
-        const file = event.detail.file;
-        this.#uploadFileAndRefreshUI(file);
-        break;
-      }
-    }
-  }
-
 
   /**
    * Return Block data
    *
-   * @param {HTMLElement} toolsContent
+   * @param {HTMLElement} toolContent
    * @return {AudioToolData}
    */
-  save(toolsContent) {
-    /**
-     * If file was uploaded
-     */
+  save(toolContent) {
     if (this.blockHasLoadedFile()) {
-      const name = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
+      const name = toolContent.querySelector(`.${this.CSS.title}`).innerHTML;
       this.data.file.name = name;
     }
 
@@ -240,140 +172,23 @@ export default class AudioTool {
    */
   render() {
     const holder = make("div", [this.CSS.baseClass]);
-
     this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
     if (this.blockHasLoadedFile()) {
-      this.showFileData();
+      this.renderLoadedBlock();
     } else {
-      this.prepareUploadButton();
+      this.renderUploadButton();
     }
 
     holder.appendChild(this.nodes.wrapper);
-
     return holder;
   }
 
-  /**
-   * Prepares button for file uploading
-   */
-  prepareUploadButton() {
-    this.nodes.button = make("div", [this.CSS.apiButton, this.CSS.button]);
-    this.nodes.button.innerHTML = this.config.buttonText;
-    /*
-      editorjs core will automatically click on this button because we assign
-      it CSS classes defined by the editorjs core API.
-      that is why we need to use an arrow function here because otherwise "this"
-      is not this class anymore and the event handler does not work.
-    */
-    this.nodes.button.addEventListener("click", () => {
-      this.#selectAndUploadFile();
-    });
-    this.nodes.wrapper.appendChild(this.nodes.button);
-  }
-
-
-  async #selectAndUploadFile() {
-    const [fileHandle] = await window.showOpenFilePicker({
-      multiple: false,
-      types: [
-        {
-          description: "Audio File",
-          accept: {
-            "audio/mp3": [".mp3"],
-            "audio/mpeg": [".mp3"],
-            "audio/flac": [".flac"],
-          },
-        },
-      ],
-    });
-
-    const file = await fileHandle.getFile();
-
-    await this.#uploadFileAndRefreshUI(file);
-  }
-
-
-  async #uploadFileByUrlAndRefreshUI(url) {
-    this.nodes.wrapper.classList.add(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-
-    const result = await this.config.fileHandling.uploadByUrl(url);
-    const filename = getFilenameFromUrl(url);
-    result.file.name = filename;
-    this.#onUploadFinished(result);
-  }
-
-
-  async #uploadFileAndRefreshUI(file) {
-    this.nodes.wrapper.classList.add(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-
-    const result = await this.config.fileHandling.uploadByFile(file);
-    this.#onUploadFinished(result);
-  }
-
-  /**
-   * Fires after clicks on the Toolbox AudioTool Icon
-   * Initiates click on the Select File button
-   *
-   * @public
-   */
-  appendCallback() {
-    this.nodes.button.click();
-  }
-
-
-  blockHasLoadedFile() {
-    return typeof this.data.file === "object";
-  }
-
-
-  /**
-   * File uploading callback
-   *
-   * @param {UploadResponseFormat} response
-   */
-  #onUploadFinished(response) {
-    if (response.success && response.file) {
-      const receivedFileData = response.file;
-      const filename = receivedFileData.name;
-      const extension = filename && filename.split(".").pop();
-
-      this.data.file = {
-        ...receivedFileData,
-        extension,
-      };
-
-      this.nodes.button.remove();
-      this.showFileData();
-      this.moveCaretToEnd(this.nodes.title);
-      this.nodes.title.focus();
-      this.removeLoader();
-    } else {
-      this.uploadingFailed(this.config.errorMessage);
-    }
-  }
-
-
-  /**
-   * Removes tool's loader
-   */
-  removeLoader() {
-    this.nodes.wrapper.classList.remove(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-  }
 
   /**
    * If upload is successful, show info about the file
    */
-  async showFileData() {
+  async renderLoadedBlock() {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
 
     const { file: { size, name } } = this.data;
@@ -421,32 +236,5 @@ export default class AudioTool {
 
     this.nodes.wrapper.appendChild(firstLine);
     this.nodes.wrapper.appendChild(secondLine);
-  }
-
-  /**
-   * If file uploading failed, remove loader and show notification
-   *
-   * @param {string} errorMessage -  error message
-   */
-  uploadingFailed(errorMessage) {
-    console.error(errorMessage);
-    this.removeLoader();
-  }
-
-  /**
-   * Moves caret to the end of contentEditable element
-   *
-   * @param {HTMLElement} element - contentEditable element
-   */
-  moveCaretToEnd(element) {
-    // eslint-disable-next-line no-undef
-    const range = document.createRange();
-    // eslint-disable-next-line no-undef
-    const selection = window.getSelection();
-
-    range.selectNodeContents(element);
-    range.collapse(false);
-    selection?.removeAllRanges();
-    selection?.addRange(range);
   }
 }

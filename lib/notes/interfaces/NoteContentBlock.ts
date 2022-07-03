@@ -75,7 +75,6 @@ export interface NoteContentBlockCode {
 
 
 export interface NoteContentBlockFileMetadata {
-  extension: string,
   fileId: FileId,
   name: string,
   size: number,
@@ -84,8 +83,8 @@ export interface NoteContentBlockFileMetadata {
 
 interface NoteContentBlockImageData<FileObjectType> {
   file: FileObjectType,
-  caption?: string,
-  withBackground?: boolean,
+  caption: string,
+  withBackground: boolean,
 }
 
 export interface NoteContentBlockImage<FileObjectType> {

@@ -29,72 +29,28 @@ import "./index.css";
 import * as svgs from "./svgs.js";
 import {
   make,
-  getFilenameFromUrl,
 } from "../utils.js";
 import {
   humanFileSize,
 } from "../../utils";
+import {
+  NoteContentBlockFileMetadata,
+} from "../../../../../lib/notes/interfaces/NoteContentBlock";
+import ToolWithFileUpload from "../ToolWithFileUpload";
 
-/**
- * @typedef {object} VideoToolData
- * @description Video Tool's output data format
- * @property {VideoFileData} file - object containing information about the file
- */
 
-/**
- * @typedef {object} VideoFileData
- * @description Video Tool's file format
- * @property {string} [url] - file's upload url
- * @property {string} [size] - file's size
- * @property {string} [extension] - file's extension
- * @property {string} [name] - file's name
- */
-
-/**
- * @typedef {object} FileData
- * @description Video Tool's response from backend
- * @property {string} url - file's url
- * @property {string} name - file's name with extension
- * @property {string} extension - file's extension
- */
-
-/**
- * @typedef {object} UploadResponseFormat
- * @description This format expected from backend on file upload
- * @property {number} success  - 1 for successful uploading, 0 for failure
- * @property {FileData} file - backend response with uploaded file data.
- */
-
-/**
- * @typedef {object} VideoToolConfig
- * @description Config supported by Tool
- * @property {string} endpoint - file upload url
- * @property {string} field - field name for uploaded file
- * @property {string} placeholder
- * @property {string} errorMessage
- * - allows to pass custom headers with Request
- */
-
-/**
- * @class VideoTool
- * @classdesc VideoTool for Editor.js 2.0
- *
- * @property {API} api - Editor.js API
- * @property {VideoToolData} data
- * @property {VideoToolConfig} config
- */
-export default class VideoTool {
+export default class VideoTool extends ToolWithFileUpload {
   api;
   nodes;
-  data;
+  data:{
+    file: NoteContentBlockFileMetadata,
+  };
+
   config;
 
-  /**
-   * @param {VideoToolData} data
-   * @param {object} config
-   * @param {API} api
-   */
   constructor({ data, config, api }) {
+    super();
+
     this.api = api;
 
     this.nodes = {
@@ -104,10 +60,17 @@ export default class VideoTool {
     };
 
     this.config = {
-      field: "file",
       buttonText: "Select video",
-      errorMessage: "File upload failed",
       fileHandling: config.fileHandling,
+      filePickerAcceptTypes: [
+        {
+          description: "Video file",
+          accept: {
+            "video/mp4": [".mp4"],
+            "video/webm": [".webm"],
+          },
+        },
+      ],
     };
 
     this.data = data;
@@ -164,7 +127,7 @@ export default class VideoTool {
       /**
        * Paste HTML into Editor
        */
-      tags: ["video"],
+      // tags: ["video"],
 
       /**
        * Paste URL of audio into the Editor
@@ -185,48 +148,16 @@ export default class VideoTool {
     };
   }
 
-  /**
-   * Specify paste handlers
-   *
-   * @public
-   * @see {@link https://github.com/codex-team/editor.js/blob/master/docs/tools.md#paste-handling}
-   * @param {CustomEvent} event - editor.js custom paste event
-   *                              {@link https://github.com/codex-team/editor.js/blob/master/types/tools/paste-events.d.ts}
-   * @return {void}
-   */
-  onPaste(event) {
-    switch (event.type) {
-      case "tag": {
-        const video = event.detail.data;
-        this.#uploadFileByUrlAndRefreshUI(video.src);
-        break;
-      }
-      case "pattern": {
-        const url = event.detail.data;
-        this.#uploadFileByUrlAndRefreshUI(url);
-        break;
-      }
-      case "file": {
-        const file = event.detail.file;
-        this.#uploadFileAndRefreshUI(file);
-        break;
-      }
-    }
-  }
-
 
   /**
    * Return Block data
    *
-   * @param {HTMLElement} toolsContent
+   * @param {HTMLElement} toolContent
    * @return {VideoToolData}
    */
-  save(toolsContent) {
-    /**
-     * If file was uploaded
-     */
+  save(toolContent) {
     if (this.blockHasLoadedFile()) {
-      const name = toolsContent.querySelector(`.${this.CSS.title}`).innerHTML;
+      const name = toolContent.querySelector(`.${this.CSS.title}`).innerHTML;
       this.data.file.name = name;
     }
 
@@ -238,145 +169,24 @@ export default class VideoTool {
    *
    * @return {HTMLDivElement}
    */
-  render() {
+  render():HTMLElement {
     const holder = make("div", [this.CSS.baseClass]);
-
     this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
     if (this.blockHasLoadedFile()) {
-      this.showFileData();
+      this.renderLoadedBlock();
     } else {
-      this.prepareUploadButton();
+      this.renderUploadButton();
     }
 
     holder.appendChild(this.nodes.wrapper);
-
     return holder;
   }
 
-  /**
-   * Prepares button for file uploading
-   */
-  prepareUploadButton() {
-    this.nodes.button = make("div", [this.CSS.apiButton, this.CSS.button]);
-    this.nodes.button.innerHTML = this.config.buttonText;
-    /*
-      editorjs core will automatically click on this button because we assign
-      it CSS classes defined by the editorjs core API.
-      that is why we need to use an arrow function here because otherwise "this"
-      is not this class anymore and the event handler does not work.
-    */
-    this.nodes.button.addEventListener("click", () => {
-      this.#selectAndUploadFile();
-    });
-    this.nodes.wrapper.appendChild(this.nodes.button);
-  }
 
-
-  async #selectAndUploadFile() {
-    const [fileHandle] = await window.showOpenFilePicker({
-      multiple: false,
-      types: [
-        {
-          description: "Video file",
-          accept: {
-            "video/mp4": [".mp4"],
-            "video/webm": [".webm"],
-          },
-        },
-      ],
-    });
-
-    const file = await fileHandle.getFile();
-
-    await this.#uploadFileAndRefreshUI(file);
-  }
-
-
-  async #uploadFileByUrlAndRefreshUI(url) {
-    this.nodes.wrapper.classList.add(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-
-    const result = await this.config.fileHandling.uploadByUrl(url);
-    const filename = getFilenameFromUrl(url);
-    result.file.name = filename;
-    this.#onUploadFinished(result);
-  }
-
-
-  async #uploadFileAndRefreshUI(file) {
-    this.nodes.wrapper.classList.add(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-
-    const result = await this.config.fileHandling.uploadByFile(file);
-    this.#onUploadFinished(result);
-  }
-
-  /**
-   * Fires after clicks on the Toolbox VideoTool Icon
-   * Initiates click on the Select File button
-   *
-   * @public
-   */
-  appendCallback() {
-    this.nodes.button.click();
-  }
-
-
-  blockHasLoadedFile() {
-    return typeof this.data.file === "object";
-  }
-
-
-  /**
-   * File uploading callback
-   *
-   * @param {UploadResponseFormat} response
-   */
-  #onUploadFinished(response) {
-    if (response.success && response.file) {
-      const receivedFileData = response.file;
-      const filename = receivedFileData.name;
-      const extension = filename && filename.split(".").pop();
-
-      this.data.file = {
-        ...receivedFileData,
-        extension,
-      };
-
-      this.nodes.button.remove();
-      this.showFileData();
-      this.moveCaretToEnd(this.nodes.title);
-      this.nodes.title.focus();
-      this.removeLoader();
-    } else {
-      this.uploadingFailed(this.config.errorMessage);
-    }
-  }
-
-
-  /**
-   * Removes tool's loader
-   */
-  removeLoader() {
-    this.nodes.wrapper.classList.remove(
-      this.CSS.wrapperLoading,
-      this.CSS.loader,
-    );
-  }
-
-  /**
-   * If upload is successful, show info about the file
-   */
-  async showFileData() {
+  async renderLoadedBlock():Promise<void> {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
-
     const { file: { size, name } } = this.data;
-
     const fileInfo = make("div", [this.CSS.fileInfo]);
 
     this.nodes.title = make("div", [this.CSS.title], {
@@ -421,35 +231,5 @@ export default class VideoTool {
 
     this.nodes.wrapper.appendChild(firstLine);
     this.nodes.wrapper.appendChild(secondLine);
-  }
-
-  /**
-   * If file uploading failed, remove loader and show notification
-   *
-   * @param {string} errorMessage -  error message
-   */
-  uploadingFailed(errorMessage) {
-    console.error(errorMessage);
-    this.removeLoader();
-  }
-
-
-  /**
-   * Moves caret to the end of contentEditable element
-   *
-   * @param {HTMLElement} element - contentEditable element
-   */
-  moveCaretToEnd(element) {
-    // eslint-disable-next-line no-undef
-    const range = document.createRange();
-    // eslint-disable-next-line no-undef
-    const selection = window.getSelection();
-
-    range.selectNodeContents(element);
-    range.collapse(false);
-    if (selection) {
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
   }
 }

@@ -1,11 +1,15 @@
 import React from "react";
+import {
+  NoteContentBlockFileMetadata,
+} from "../../../lib/notes/interfaces/NoteContentBlock.js";
 import { SavedActiveNote } from "../interfaces/ActiveNote.js";
 import DatabaseProvider from "../interfaces/DatabaseProvider.js";
-import NoteStatsFileInfo from "../interfaces/NoteStatsFileInfo.js";
 import { l } from "../lib/intl.js";
 import {
   makeTimestampHumanReadable,
-  getFileInfosOfNoteFiles,
+  getMetadataOfFilesInNote,
+  humanFileSize,
+  getFileTypeFromFilename,
 } from "../lib/utils.js";
 import NoteStatsFileLink from "./NoteStatsFileLink";
 
@@ -18,7 +22,8 @@ const NoteStats = ({
   note,
   databaseProvider,
 }: NoteStatsProps) => {
-  const fileInfos:NoteStatsFileInfo[] = getFileInfosOfNoteFiles(note);
+  const fileMetadataObjects:NoteContentBlockFileMetadata[]
+    = getMetadataOfFilesInNote(note);
 
   return <div
     id="stats"
@@ -53,16 +58,18 @@ const NoteStats = ({
         <tr>
           <td>{l("editor.stats.files")}</td>
           <td>{
-            fileInfos.length > 0
-              ? fileInfos
-                .map((fileInfo, i, array) => {
+            fileMetadataObjects.length > 0
+              ? fileMetadataObjects
+                .map((fileMetadata, i, array) => {
+                  const fileType = getFileTypeFromFilename(fileMetadata.fileId);
+
                   return <React.Fragment
-                    key={"nsfwt_" + fileInfo.id + note.id}
+                    key={"nsfwt_" + fileMetadata.fileId + note.id}
                   >
                     <NoteStatsFileLink
-                      fileInfo={fileInfo}
+                      fileMetadata={fileMetadata}
                       databaseProvider={databaseProvider}
-                    /> ({fileInfo.type})
+                    /> ({fileType}, {humanFileSize(fileMetadata.size)})
                     {
                       i < array.length - 1
                         ? <br />

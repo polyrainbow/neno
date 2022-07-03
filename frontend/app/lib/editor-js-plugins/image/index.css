@@ -42,6 +42,10 @@ SOFTWARE.
   margin: auto;
 }
 
+.cdx-loader .cdx-button {
+  opacity: 0;
+}
+
 .image-tool__caption[contentEditable="true"][data-placeholder]::before {
   position: absolute !important;
   content: attr(data-placeholder);
