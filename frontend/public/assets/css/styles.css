@@ -10,6 +10,8 @@
     --accent-color-1-light: rgb(168, 222, 255);
     --accent-color-2: rgb(255, 133, 152);
     --accent-color-interactible: #e0e0e0;
+    --error-and-danger-background-color: #f65a5a;
+    --error-and-danger-text-color: #FF0000;
     --background-color: white;
     --main-content-color: black;
     --alt-content-color: #7b7e89;
@@ -24,6 +26,8 @@
     --accent-color-1-light: rgb(4, 53, 65);
     --accent-color-2: #6d2433;
     --accent-color-interactible: #303030;
+    --error-and-danger-background-color: #911313;
+    --error-and-danger-text-color: #FF0000;
     --background-color: black;
     --main-content-color: rgb(255, 255, 255);
     --alt-content-color: #949494;
@@ -416,7 +420,7 @@ button[disabled]{
 .dialog-box {
   background-color: var(--background-color);
   color: var(--font-color);
-  max-width: 400px;
+  max-width: min(450px, 100%);
   display: block;
   padding: var(--default-margin);
   margin: auto;
@@ -462,8 +466,16 @@ button[disabled]{
   background-color: var(--accent-color-1);
 }
 
+.default-button.dangerous-action {
+  background-color: var(--error-and-danger-background-color);
+}
+
 .default-button.dialog-box-button {
   margin-bottom: 0px;
+}
+
+.error-text {
+  color: var(--error-and-danger-text-color);
 }
 
 .data-table {

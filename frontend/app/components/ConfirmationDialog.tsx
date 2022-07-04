@@ -27,7 +27,7 @@ const ConfirmationDialog = ({
       tabIndex={0}
       className={
         "default-button dialog-box-button "
-        + (encourageConfirmation ? "default-action" : "")
+        + (encourageConfirmation ? "default-action" : "dangerous-action")
       }
     >{confirmText}</button>
     <button

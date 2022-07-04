@@ -44,7 +44,7 @@ const LoginViewLocal = ({
     <h1>{l("login.local.heading")}</h1>
     {
       localDisclaimer === "INVALID_FOLDER_HANDLE"
-        ? <p style={{ color: "red" }}>
+        ? <p className="error-text">
           {l("login.local.error-accessing-folder")}
         </p>
         : ""
