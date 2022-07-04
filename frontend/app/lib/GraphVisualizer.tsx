@@ -111,6 +111,30 @@ export default class GraphVisualization {
     return !!(value[0] && value[1]);
   }
 
+
+  /*
+    This class uses the top left corner of the SVG element as reference
+    position for translations. From a user's perspective however, it makes
+    more sense to have the center position as reference. That way, the user
+    sees the same content in the middle of the screen when using multiple
+    devices with different screen sizes or simply resizes the browser window.
+    That means we want to save the center position of the graph visualization
+    in the database graph object.
+    So every time we get a screen position object from the database or
+    save one to the database, we need to transform it first with this function.
+  */
+  static #transformScreenPosition = (
+    center: ScreenPosition,
+    svgRect: DOMRect,
+  ):ScreenPosition => {
+    return {
+      translateX: (-center.translateX) + (svgRect.width / 2),
+      translateY: (-center.translateY) + (svgRect.height / 2),
+      scale: center.scale,
+    };
+  };
+
+
   /** ********************
     PRIVATE VARS
   ***********************/
@@ -184,8 +208,7 @@ export default class GraphVisualization {
     this.#nodes = graphObjectPrepared.nodes;
     this.#links = graphObjectPrepared.links;
 
-    // by default, we're using the screenPosition from the given data object ...
-    this.#screenPosition = graphObjectPrepared.screenPosition;
+    const svgRect:DOMRect = this.#svg.node().getBoundingClientRect();
 
     // ... we'll overwrite it if a valid note to focus is given
     if (typeof initialFocusNoteId === "number" && !isNaN(initialFocusNoteId)) {
@@ -195,14 +218,25 @@ export default class GraphVisualization {
       );
 
       if (typeof node === "object") {
-        const { width, height } = this.#svg.node().getBoundingClientRect();
         const SCALE = 1.5;
         this.#screenPosition = {
-          translateX: (-node.position.x * SCALE) + (width / 2),
-          translateY: (-node.position.y * SCALE) + (height / 2),
+          translateX: (-node.position.x * SCALE) + (svgRect.width / 2),
+          translateY: (-node.position.y * SCALE) + (svgRect.height / 2),
           scale: SCALE,
         };
+      } else {
+        // by default, we're using the screenPosition from the database ...
+        this.#screenPosition = GraphVisualization.#transformScreenPosition(
+          graphObjectPrepared.screenPosition,
+          svgRect,
+        );
       }
+    } else {
+      // by default, we're using the screenPosition from the database ...
+      this.#screenPosition = GraphVisualization.#transformScreenPosition(
+        graphObjectPrepared.screenPosition,
+        svgRect,
+      );
     }
 
     this.#initialNodePosition = graphObjectPrepared.initialNodePosition;
@@ -910,10 +944,15 @@ export default class GraphVisualization {
         };
       });
 
+    const svgRect = this.#svg.node().getBoundingClientRect();
+
     const graphObject:GraphVisualizationFromUser = {
       nodePositionUpdates,
       links: linksToTransmit,
-      screenPosition: this.#screenPosition,
+      screenPosition: GraphVisualization.#transformScreenPosition(
+        this.#screenPosition,
+        svgRect,
+      ),
       initialNodePosition: this.#initialNodePosition,
     };
 
