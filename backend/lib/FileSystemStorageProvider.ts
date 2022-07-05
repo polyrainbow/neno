@@ -5,6 +5,22 @@ import { finished } from "stream/promises";
 import archiver from "archiver";
 import ByteRange from "../interfaces/ByteRange";
 
+/*
+  A word of warning:
+  The notes module will pass every error thrown by this module unaltered to
+  its consumers.
+  Since we are on a server, we should make sure, we don't pass
+  senstitive information in the error messages (like Node.js does).
+  The server will only return error messages as response to clients, so it is
+  save to append an Error.cause with additional information.
+*/
+  
+
+enum StorageProviderErrorMessage {
+  FILE_NOT_FOUND = "FILE_NOT_FOUND",
+  READABLE_STREAM_ENDED_UNEXPECTEDLY = "READABLE_STREAM_ENDED_UNEXPECTEDLY",
+  UNKNOWN_ERROR = "UNKNOWN_ERROR",
+}
 
 async function asyncFilter<T>(
   arr:Array<T>,
@@ -26,6 +42,25 @@ async function asyncFilter<T>(
 
   return passedValues;
 }
+
+
+const handleNodeJsFsApiError = (e: unknown):never => {
+  if (e instanceof Error && e.message.startsWith("ENOENT")) {
+    throw new Error(
+      StorageProviderErrorMessage.FILE_NOT_FOUND,
+      {
+        cause: (e instanceof Error) ? e : undefined,
+      }
+    );
+  } else {
+    throw new Error(
+      StorageProviderErrorMessage.UNKNOWN_ERROR,
+      {
+        cause: (e instanceof Error) ? e : undefined,
+      }
+    );
+  }
+};
 
 
 export default class FileSystemStorageProvider {
@@ -76,7 +111,7 @@ export default class FileSystemStorageProvider {
       readableStream.destroy();
       await this.removeObject(graphId, requestPath);
       throw new Error(
-        "Readable stream ended unexpectedly.",
+        StorageProviderErrorMessage.READABLE_STREAM_ENDED_UNEXPECTEDLY,
         {
           cause: (e instanceof Error) ? e : undefined,
         }
@@ -108,8 +143,12 @@ export default class FileSystemStorageProvider {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
-    const readableStream = fsClassic.createReadStream(finalPath, range);
-    return readableStream;
+    try {
+      const readableStream = fsClassic.createReadStream(finalPath, range);
+      return readableStream;
+    } catch (e) {
+      return handleNodeJsFsApiError(e);
+    }
   }
 
   async getFileSize(
@@ -119,9 +158,13 @@ export default class FileSystemStorageProvider {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
-    const stats = await fs.stat(finalPath);
-    const size = stats.size;
-    return size;
+    try {
+      const stats = await fs.stat(finalPath);
+      const size = stats.size;
+      return size;
+    } catch (e) {
+      return handleNodeJsFsApiError(e);
+    }
   }
 
   async removeObject(
@@ -131,7 +174,12 @@ export default class FileSystemStorageProvider {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
-    await fs.unlink(finalPath);
+    try {
+      await fs.unlink(finalPath);
+    } catch (e) {
+      return handleNodeJsFsApiError(e);
+    }
+
   }
 
   async listSubDirectories(

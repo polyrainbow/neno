@@ -4,7 +4,7 @@ import Stats from "../lib/notes/interfaces/GraphStats.js";
 import { yyyymmdd } from "../lib/utils.js";
 import * as config from "./config.js";
 import compression from "compression";
-import express from "express";
+import express, { Response } from "express";
 import * as Notes from "../lib/notes/index.js";
 import bcrypt from "bcryptjs";
 import APIResponse from "./interfaces/APIResponse.js";
@@ -779,12 +779,21 @@ const startApp = async ({
     async function(req, res) {
       const graphId = req.params.graphId;
       const fileId = req.params.fileId;
-      await Notes.deleteFile(graphId, fileId);
-      const response:APIResponse = {
-        payload: fileId,
-        success: true,
-      };
-      res.json(response);
+      try {
+        await Notes.deleteFile(graphId, fileId);
+        const response:APIResponse = {
+          payload: fileId,
+          success: true,
+        };
+        res.json(response);
+      } catch (e) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
+        };
+        res.json(response);
+      }
     },
   );
 
@@ -1054,6 +1063,10 @@ const startApp = async ({
       },
     ),
   );
+
+  app.use((_req, res:Response) => {
+    res.status(404).end("Not found");
+  });
 
   return app;
 };
