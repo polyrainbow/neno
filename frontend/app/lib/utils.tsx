@@ -91,7 +91,12 @@ const createBlocksFromFileIds = (
         file: {
           fileId,
           name: fileId,
-          size: NaN,
+          /*
+            TODO: use real size from server
+            size must not be NaN, because when stringified, it becomes null
+            which is invalid
+          */
+          size: -1,
         },
       },
     };
