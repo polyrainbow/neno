@@ -10,6 +10,7 @@ import * as Config from "../config";
 import * as Editor from "../lib/editor";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import {
+  useLocation,
   useNavigate,
   useParams,
 } from "react-router-dom";
@@ -96,6 +97,7 @@ const EditorView = ({
   const isSmallScreen = useIsSmallScreen();
 
   const navigate = useNavigate();
+  const location = useLocation();
   const goToNote = useGoToNote();
   const params = useParams();
   const activeNoteId:NoteId
@@ -259,7 +261,11 @@ const EditorView = ({
       /* whatever has been written to the address bar, let's replace it with
       the canonical path for a new note */
       navigate(
-        Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
+        Utils.getAppPath(
+          PathTemplate.EDITOR_WITH_NEW_NOTE,
+          undefined,
+          new URLSearchParams(location.search),
+        ),
         { replace: true },
       );
 
