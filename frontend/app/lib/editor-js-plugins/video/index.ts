@@ -196,8 +196,9 @@ export default class VideoTool extends ToolWithFileUpload {
     this.nodes.title.textContent = name;
     fileInfo.appendChild(this.nodes.title);
 
-
-    if (size) {
+    // Currently size might be -1 when the note was created from a dangling
+    // file. We can remove this condition if this is not the case anymore.
+    if (size > 0) {
       const fileSize = make("div", [this.CSS.size]);
       fileSize.textContent = humanFileSize(size);
       fileInfo.appendChild(fileSize);
