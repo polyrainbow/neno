@@ -16,10 +16,7 @@ const ConfirmationDialog = ({
     onClickOnOverlay={onCancel}
   >
     <p
-      style={{
-        marginTop: "0px",
-        fontSize: "24px",
-      }}
+      className="dialog-text"
     >{text}</p>
     <button
       onClick={onConfirm}

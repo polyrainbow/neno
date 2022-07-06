@@ -29,11 +29,7 @@ const NoteSearchDisclaimer = ({
     return null;
   }
 
-  return <p style={{
-    fontSize: "16px",
-    marginTop: "0",
-    textAlign: "center",
-  }}>{label}</p>;
+  return <p className="note-search-disclaimer">{label}</p>;
 };
 
 export default NoteSearchDisclaimer;

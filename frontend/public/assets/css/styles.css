@@ -64,7 +64,7 @@
   --xl-list-width: 720px;
   --small-font-size: 13px;
   --default-font-size: 16px;
-  --large-font-size: 24px;
+  --large-font-size: 20px;
   --h1-font-size: 28px;
   --header-bar-height: 50px;
   --max-content-width: 1000px;
@@ -79,6 +79,10 @@
   --content-element-border-radius: 0px;
   --input-padding: 5px;
   --focus-outline: var(--font-color) auto 1px;
+}
+
+html {
+  font-size: var(--default-font-size);
 }
 
 .content-section {
@@ -252,6 +256,11 @@ main {
   margin: auto;
 }
 
+
+.note-meta-paragraph {
+  font-size: var(--default-font-size);
+}
+
 .icon-button {
   height: 50px;
   display: inline-block;
@@ -335,10 +344,25 @@ button[disabled]{
   overflow: hidden;
 }
 
+
+.note-search-disclaimer {
+  font-size: var(--default-font-size);
+  margin-top: 0;
+  text-align: center;
+}
+
 #note-list {
   border-collapse: collapse;
   width: 100%;
 }
+
+
+.note-list-status {
+  font-size: var(--large-font-size);
+  text-align: center;
+  margin: 30px auto;
+}
+
 
 .note-list-item {
   text-align: left;
@@ -432,6 +456,12 @@ button[disabled]{
 
 .dialog-box h1 {
   margin-top: 0px;
+}
+
+
+.dialog-text {
+  margin-top: 0px;
+  font-size: var(--large-font-size);
 }
 
 .import-link-dialog textarea {

@@ -23,12 +23,7 @@ const NoteListStatus = ({
   const activeState = map[status];
 
   return <div
-    style={{
-      fontSize: "20px",
-      textAlign: "center",
-      margin: "30px auto",
-    }}
-    className="noteListStatus"
+    className="note-list-status"
   >
     <img
       style={{
