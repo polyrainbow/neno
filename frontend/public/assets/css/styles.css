@@ -488,15 +488,15 @@ button[disabled]{
   user-select: none;
 }
 
-.default-button:focus {
+button:focus {
   outline: var(--focus-outline);
 }
 
-.default-button.default-action {
+button.default-action {
   background-color: var(--accent-color-1);
 }
 
-.default-button.dangerous-action {
+button.dangerous-action {
   background-color: var(--error-and-danger-background-color);
 }
 

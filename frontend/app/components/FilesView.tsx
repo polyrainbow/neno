@@ -105,13 +105,14 @@ const FilesView = ({
             <p>{l("files.dangling-files.explainer")}</p>
             <div>
               {danglingFiles.map((danglingFile) => {
-                return <p
+                return <div
                   key={"danglingFile_" + danglingFile.id}
                 >
-                  <a
-                    href={danglingFile.src}
-                  >{danglingFile.id}</a>
-                  <span> </span>
+                  <p>
+                    <a
+                      href={danglingFile.src}
+                    >{danglingFile.id}</a>
+                  </p>
                   <button
                     onClick={async () => {
                       navigate(getAppPath(
@@ -120,7 +121,7 @@ const FilesView = ({
                         new URLSearchParams([["attach-file", danglingFile.id]]),
                       ));
                     }}
-                    className="small-button"
+                    className="small-button default-action"
                   >{l("files.create-note-with-file")}</button>
                   <button
                     onClick={async () => {
@@ -134,8 +135,9 @@ const FilesView = ({
                       await databaseProvider.deleteFile(danglingFile.id);
                       await updateDanglingFiles();
                     }}
-                    className="small-button"
-                  >{l("files.delete")}</button></p>;
+                    className="small-button dangerous-action"
+                  >{l("files.delete")}</button>
+                </div>;
               })}
             </div>
           </>
