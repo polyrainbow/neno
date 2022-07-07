@@ -18,6 +18,10 @@ const ConfirmationServiceProvider = (props) => {
   };
 
   const handleCancel = () => {
+    if (!confirmationState) {
+      return;
+    }
+
     if (confirmationState.catchOnCancel && awaitingPromiseRef.current) {
       awaitingPromiseRef.current.reject();
     }
