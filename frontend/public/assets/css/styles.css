@@ -17,6 +17,8 @@
     --alt-content-color: #7b7e89;
     --link-color: rgb(0, 40, 216);
     --overlay-gradient: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(9,9,121,0.5) 35%, rgba(0,212,255,1) 100%);
+    --icon-button-enabled-filter: none;
+    --icon-button-disabled-filter: contrast(0.2);
   }
 }
 
@@ -33,6 +35,8 @@
     --alt-content-color: #949494;
     --link-color: rgb(122, 146, 255);
     --overlay-gradient: linear-gradient(45deg, rgb(17 10 146) 0%, rgba(9, 9, 121, 0.5) 35%, rgb(0 125 151) 100%);
+    --icon-button-enabled-filter: invert(1);
+    --icon-button-disabled-filter: contrast(0.1);
   }
 
   img.svg-icon {
@@ -274,10 +278,12 @@ main {
 }
 
 .icon-button[disabled]{
-  color: grey;
-  fill: grey;
   cursor: inherit;
   border: none;
+}
+
+.icon-button[disabled] img{
+  filter: var(--icon-button-disabled-filter);
 }
 
 .icon-button img {

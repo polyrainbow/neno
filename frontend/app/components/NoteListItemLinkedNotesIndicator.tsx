@@ -40,7 +40,7 @@ const NoteListItemLinkedNotesIndicator = ({
         }}
       >
         <img
-          style={{ "verticalAlign": "bottom" }}
+          style={{ "verticalAlign": "bottom", "height": "30px" }}
           src={
             getIconSrc(isLinked ? "link_off" : "link")
           }

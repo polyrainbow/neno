@@ -343,7 +343,7 @@ const getAppPath = (
 
 
 const getIconSrc = (iconName:string):string => {
-  return Config.ICON_PATH + iconName + "_black_24dp.svg";
+  return Config.ICON_PATH + iconName + ".svg";
 };
 
 const stringContainsOnlyDigits = (val:string):boolean => /^\d+$/.test(val);

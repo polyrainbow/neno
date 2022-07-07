@@ -66,10 +66,7 @@ const NoteControls = ({
         id="button_remove"
         disabled={activeNote.isUnsaved}
         title={l("editor.remove-note")}
-        icon={activeNote.isUnsaved
-          ? "delete_disabled"
-          : "delete"
-        }
+        icon={"delete"}
         onClick={async () => {
           await confirm({
             text: l("editor.remove-note.confirm.text"),
@@ -85,30 +82,21 @@ const NoteControls = ({
         id="button_duplicate"
         disabled={activeNote.isUnsaved}
         title={l("editor.duplicate-note")}
-        icon={activeNote.isUnsaved
-          ? "content_copy_disabled"
-          : "content_copy"
-        }
+        icon="content_copy"
         onClick={duplicateNote}
       />
       <IconButton
         id="button_pin"
         disabled={activeNote.isUnsaved}
         title={l("editor.pin-note")}
-        icon={activeNote.isUnsaved
-          ? "push_pin_disabled"
-          : "push_pin"
-        }
+        icon="push_pin"
         onClick={() => pinOrUnpinNote(activeNote.id)}
       />
       <IconButton
         id="button_open-in-graph-view"
         disabled={activeNote.isUnsaved}
         title={l("editor.reveal-note-in-graph")}
-        icon={activeNote.isUnsaved
-          ? "center_focus_strong_disabled"
-          : "center_focus_strong"
-        }
+        icon="center_focus_strong"
         onClick={openInGraphView}
       />
     </div>
