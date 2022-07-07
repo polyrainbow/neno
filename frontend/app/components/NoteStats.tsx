@@ -1,7 +1,7 @@
 import React from "react";
 import {
-  NoteContentBlockFileMetadata,
-} from "../../../lib/notes/interfaces/NoteContentBlock.js";
+  FileInfo,
+} from "../../../lib/notes/interfaces/FileInfo.js";
 import { SavedActiveNote } from "../interfaces/ActiveNote.js";
 import DatabaseProvider from "../interfaces/DatabaseProvider.js";
 import { l } from "../lib/intl.js";
@@ -22,7 +22,7 @@ const NoteStats = ({
   note,
   databaseProvider,
 }: NoteStatsProps) => {
-  const fileMetadataObjects:NoteContentBlockFileMetadata[]
+  const fileMetadataObjects:FileInfo[]
     = getMetadataOfFilesInNote(note);
 
   return <div

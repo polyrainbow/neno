@@ -34,17 +34,15 @@ import {
   getExtensionFromFilename,
   humanFileSize,
 } from "../../utils";
-import {
-  NoteContentBlockFileMetadata,
-} from "../../../../../lib/notes/interfaces/NoteContentBlock";
 import ToolWithFileUpload from "../ToolWithFileUpload";
+import { FileInfo } from "../../../../../lib/notes/interfaces/FileInfo";
 
 
 export default class DocumentTool extends ToolWithFileUpload {
   api;
   nodes;
   data:{
-    file: NoteContentBlockFileMetadata,
+    file: FileInfo,
   };
 
   config;

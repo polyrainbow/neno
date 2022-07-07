@@ -10,11 +10,11 @@
             ],
             "type": "string"
         },
-        "NoteContentBlockAudio<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockAudio<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "$ref": "NoteFromUser#/definitions/NoteContentBlockAudioData<NoteContentBlockFileMetadata|undefined>"
+                    "$ref": "NoteFromUser#/definitions/NoteContentBlockAudioData<FileInfo|undefined>"
                 },
                 "type": {
                     "enum": [
@@ -29,11 +29,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockAudioData<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockAudioData<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "file": {
-                    "$ref": "NoteFromUser#/definitions/NoteContentBlockFileMetadata"
+                    "$ref": "NoteFromUser#/definitions/FileInfo"
                 }
             },
             "type": "object"
@@ -69,11 +69,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockDocument<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockDocument<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "$ref": "NoteFromUser#/definitions/NoteContentBlockDocumentData<NoteContentBlockFileMetadata|undefined>"
+                    "$ref": "NoteFromUser#/definitions/NoteContentBlockDocumentData<FileInfo|undefined>"
                 },
                 "type": {
                     "enum": [
@@ -88,16 +88,16 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockDocumentData<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockDocumentData<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "file": {
-                    "$ref": "NoteFromUser#/definitions/NoteContentBlockFileMetadata"
+                    "$ref": "NoteFromUser#/definitions/FileInfo"
                 }
             },
             "type": "object"
         },
-        "NoteContentBlockFileMetadata": {
+        "FileInfo": {
             "additionalProperties": false,
             "properties": {
                 "fileId": {
@@ -152,11 +152,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockImage<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockImage<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "$ref": "NoteFromUser#/definitions/NoteContentBlockImageData<NoteContentBlockFileMetadata|undefined>"
+                    "$ref": "NoteFromUser#/definitions/NoteContentBlockImageData<FileInfo|undefined>"
                 },
                 "type": {
                     "enum": [
@@ -171,14 +171,14 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockImageData<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockImageData<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "caption": {
                     "type": "string"
                 },
                 "file": {
-                    "$ref": "NoteFromUser#/definitions/NoteContentBlockFileMetadata"
+                    "$ref": "NoteFromUser#/definitions/FileInfo"
                 },
                 "withBackground": {
                     "type": "boolean"
@@ -323,11 +323,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockVideo<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockVideo<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "$ref": "NoteFromUser#/definitions/NoteContentBlockVideoData<NoteContentBlockFileMetadata|undefined>"
+                    "$ref": "NoteFromUser#/definitions/NoteContentBlockVideoData<FileInfo|undefined>"
                 },
                 "type": {
                     "enum": [
@@ -342,11 +342,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockVideoData<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockVideoData<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "file": {
-                    "$ref": "NoteFromUser#/definitions/NoteContentBlockFileMetadata"
+                    "$ref": "NoteFromUser#/definitions/FileInfo"
                 }
             },
             "type": "object"
@@ -395,16 +395,16 @@
                         "$ref": "NoteFromUser#/definitions/NoteContentBlockCode"
                     },
                     {
-                        "$ref": "NoteFromUser#/definitions/NoteContentBlockImage<NoteContentBlockFileMetadata|undefined>"
+                        "$ref": "NoteFromUser#/definitions/NoteContentBlockImage<FileInfo|undefined>"
                     },
                     {
-                        "$ref": "NoteFromUser#/definitions/NoteContentBlockDocument<NoteContentBlockFileMetadata|undefined>"
+                        "$ref": "NoteFromUser#/definitions/NoteContentBlockDocument<FileInfo|undefined>"
                     },
                     {
-                        "$ref": "NoteFromUser#/definitions/NoteContentBlockAudio<NoteContentBlockFileMetadata|undefined>"
+                        "$ref": "NoteFromUser#/definitions/NoteContentBlockAudio<FileInfo|undefined>"
                     },
                     {
-                        "$ref": "NoteFromUser#/definitions/NoteContentBlockVideo<NoteContentBlockFileMetadata|undefined>"
+                        "$ref": "NoteFromUser#/definitions/NoteContentBlockVideo<FileInfo|undefined>"
                     }
                 ]
             },

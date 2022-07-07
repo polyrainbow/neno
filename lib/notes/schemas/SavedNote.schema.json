@@ -10,11 +10,11 @@
             ],
             "type": "string"
         },
-        "NoteContentBlockAudio<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockAudio<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "$ref": "SavedNote#/definitions/NoteContentBlockAudioData<NoteContentBlockFileMetadata|undefined>"
+                    "$ref": "SavedNote#/definitions/NoteContentBlockAudioData<FileInfo|undefined>"
                 },
                 "type": {
                     "enum": [
@@ -29,11 +29,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockAudioData<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockAudioData<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "file": {
-                    "$ref": "SavedNote#/definitions/NoteContentBlockFileMetadata"
+                    "$ref": "SavedNote#/definitions/FileInfo"
                 }
             },
             "type": "object"
@@ -69,11 +69,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockDocument<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockDocument<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "$ref": "SavedNote#/definitions/NoteContentBlockDocumentData<NoteContentBlockFileMetadata|undefined>"
+                    "$ref": "SavedNote#/definitions/NoteContentBlockDocumentData<FileInfo|undefined>"
                 },
                 "type": {
                     "enum": [
@@ -88,16 +88,16 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockDocumentData<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockDocumentData<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "file": {
-                    "$ref": "SavedNote#/definitions/NoteContentBlockFileMetadata"
+                    "$ref": "SavedNote#/definitions/FileInfo"
                 }
             },
             "type": "object"
         },
-        "NoteContentBlockFileMetadata": {
+        "FileInfo": {
             "additionalProperties": false,
             "properties": {
                 "fileId": {
@@ -152,11 +152,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockImage<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockImage<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "$ref": "SavedNote#/definitions/NoteContentBlockImageData<NoteContentBlockFileMetadata|undefined>"
+                    "$ref": "SavedNote#/definitions/NoteContentBlockImageData<FileInfo|undefined>"
                 },
                 "type": {
                     "enum": [
@@ -171,14 +171,14 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockImageData<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockImageData<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "caption": {
                     "type": "string"
                 },
                 "file": {
-                    "$ref": "SavedNote#/definitions/NoteContentBlockFileMetadata"
+                    "$ref": "SavedNote#/definitions/FileInfo"
                 },
                 "withBackground": {
                     "type": "boolean"
@@ -323,11 +323,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockVideo<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockVideo<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "data": {
-                    "$ref": "SavedNote#/definitions/NoteContentBlockVideoData<NoteContentBlockFileMetadata|undefined>"
+                    "$ref": "SavedNote#/definitions/NoteContentBlockVideoData<FileInfo|undefined>"
                 },
                 "type": {
                     "enum": [
@@ -342,11 +342,11 @@
             ],
             "type": "object"
         },
-        "NoteContentBlockVideoData<NoteContentBlockFileMetadata|undefined>": {
+        "NoteContentBlockVideoData<FileInfo|undefined>": {
             "additionalProperties": false,
             "properties": {
                 "file": {
-                    "$ref": "SavedNote#/definitions/NoteContentBlockFileMetadata"
+                    "$ref": "SavedNote#/definitions/FileInfo"
                 }
             },
             "type": "object"
@@ -388,16 +388,16 @@
                         "$ref": "SavedNote#/definitions/NoteContentBlockCode"
                     },
                     {
-                        "$ref": "SavedNote#/definitions/NoteContentBlockImage<NoteContentBlockFileMetadata|undefined>"
+                        "$ref": "SavedNote#/definitions/NoteContentBlockImage<FileInfo|undefined>"
                     },
                     {
-                        "$ref": "SavedNote#/definitions/NoteContentBlockDocument<NoteContentBlockFileMetadata|undefined>"
+                        "$ref": "SavedNote#/definitions/NoteContentBlockDocument<FileInfo|undefined>"
                     },
                     {
-                        "$ref": "SavedNote#/definitions/NoteContentBlockAudio<NoteContentBlockFileMetadata|undefined>"
+                        "$ref": "SavedNote#/definitions/NoteContentBlockAudio<FileInfo|undefined>"
                     },
                     {
-                        "$ref": "SavedNote#/definitions/NoteContentBlockVideo<NoteContentBlockFileMetadata|undefined>"
+                        "$ref": "SavedNote#/definitions/NoteContentBlockVideo<FileInfo|undefined>"
                     }
                 ]
             },

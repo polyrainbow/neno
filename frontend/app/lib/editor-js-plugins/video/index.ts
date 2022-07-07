@@ -34,8 +34,8 @@ import {
   humanFileSize,
 } from "../../utils";
 import {
-  NoteContentBlockFileMetadata,
-} from "../../../../../lib/notes/interfaces/NoteContentBlock";
+  FileInfo,
+} from "../../../../../lib/notes/interfaces/FileInfo";
 import ToolWithFileUpload from "../ToolWithFileUpload";
 
 
@@ -43,7 +43,7 @@ export default class VideoTool extends ToolWithFileUpload {
   api;
   nodes;
   data:{
-    file: NoteContentBlockFileMetadata,
+    file: FileInfo,
   };
 
   config;

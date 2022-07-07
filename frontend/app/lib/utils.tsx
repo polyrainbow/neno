@@ -1,6 +1,5 @@
 import { FileId } from "../../../lib/notes/interfaces/FileId";
 import NoteContentBlock, {
-  NoteContentBlockFileMetadata,
   NoteContentBlockLink,
   NoteContentBlockType,
   NoteContentBlockWithFile,
@@ -10,6 +9,7 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { SavedActiveNote, UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Config from "../config";
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 
 
 const yyyymmdd = (date = new Date()):string => {
@@ -315,11 +315,11 @@ const blockHasLoadedFile = (
 
 const getMetadataOfFilesInNote = (
   note:SavedActiveNote,
-):NoteContentBlockFileMetadata[] => {
+):FileInfo[] => {
   return note.blocks
     .filter(blockHasLoadedFile)
     .map(
-      (block:NoteContentBlockWithFileLoaded):NoteContentBlockFileMetadata => {
+      (block:NoteContentBlockWithFileLoaded):FileInfo => {
         return block.data.file;
       },
     );

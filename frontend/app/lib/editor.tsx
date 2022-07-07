@@ -5,11 +5,10 @@
   See event queue comment below for more details.
 */
 import { DEFAULT_NOTE_BLOCKS } from "../config";
-import NoteContentBlock, {
-  NoteContentBlockFileMetadata,
-} from "../../../lib/notes/interfaces/NoteContentBlock";
+import NoteContentBlock from "../../../lib/notes/interfaces/NoteContentBlock";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { getFileTypeFromFilename } from "./utils";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 
 const modules = await Promise.all([
   import("@editorjs/editorjs"),
@@ -75,7 +74,7 @@ const loadEditorJSInstance = async (params: InstanceInitParams) => {
   // several plugins are able to upload and download files. the following
   // config object is passed to all of them
   const fileHandlingConfig = {
-    uploadByFile: async (file:File):Promise<NoteContentBlockFileMetadata> => {
+    uploadByFile: async (file:File):Promise<FileInfo> => {
       const { fileId } = await databaseProvider.uploadFile(file);
 
       const type = getFileTypeFromFilename(file.name);
@@ -90,13 +89,13 @@ const loadEditorJSInstance = async (params: InstanceInitParams) => {
         size: file.size,
       };
     },
-    onDownload: async (file:NoteContentBlockFileMetadata):Promise<void> => {
+    onDownload: async (file:FileInfo):Promise<void> => {
       const fileId = file.fileId;
       const name = file.name;
       const url = await databaseProvider.getUrlForFileId(fileId, name);
       window.open(url, "_blank");
     },
-    getUrl: async (file:NoteContentBlockFileMetadata) => {
+    getUrl: async (file:FileInfo) => {
       const fileId = file.fileId;
       const name = file.name;
       const url = await databaseProvider.getUrlForFileId(fileId, name);

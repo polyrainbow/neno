@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  NoteContentBlockFileMetadata,
-} from "../../../lib/notes/interfaces/NoteContentBlock";
+  FileInfo,
+} from "../../../lib/notes/interfaces/FileInfo";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 
 interface NoteStatsFileLinkProps {
-  fileMetadata: NoteContentBlockFileMetadata,
+  fileMetadata: FileInfo,
   databaseProvider: DatabaseProvider
 }
 

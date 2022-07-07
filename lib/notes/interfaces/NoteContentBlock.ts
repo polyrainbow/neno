@@ -1,4 +1,4 @@
-import { FileId } from "./FileId";
+import { FileInfo } from "./FileInfo";
 
 export enum NoteContentBlockType {
   PARAGRAPH = "paragraph",
@@ -74,13 +74,6 @@ export interface NoteContentBlockCode {
 }
 
 
-export interface NoteContentBlockFileMetadata {
-  fileId: FileId,
-  name: string,
-  size: number,
-}
-
-
 interface NoteContentBlockImageData<FileObjectType> {
   file: FileObjectType,
   caption: string,
@@ -129,17 +122,17 @@ export interface NoteContentBlockVideo<FileObjectType> {
   contains valid file metadata
 */
 export type NoteContentBlockWithFile = (
-  NoteContentBlockImage<NoteContentBlockFileMetadata | undefined>
-  | NoteContentBlockDocument<NoteContentBlockFileMetadata | undefined>
-  | NoteContentBlockAudio<NoteContentBlockFileMetadata | undefined>
-  | NoteContentBlockVideo<NoteContentBlockFileMetadata | undefined>
+  NoteContentBlockImage<FileInfo | undefined>
+  | NoteContentBlockDocument<FileInfo | undefined>
+  | NoteContentBlockAudio<FileInfo | undefined>
+  | NoteContentBlockVideo<FileInfo | undefined>
 );
 
 export type NoteContentBlockWithFileLoaded = (
-  NoteContentBlockImage<NoteContentBlockFileMetadata>
-  | NoteContentBlockDocument<NoteContentBlockFileMetadata>
-  | NoteContentBlockAudio<NoteContentBlockFileMetadata>
-  | NoteContentBlockVideo<NoteContentBlockFileMetadata>
+  NoteContentBlockImage<FileInfo>
+  | NoteContentBlockDocument<FileInfo>
+  | NoteContentBlockAudio<FileInfo>
+  | NoteContentBlockVideo<FileInfo>
 );
 
 

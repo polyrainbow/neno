@@ -55,8 +55,8 @@ import * as svgs from "./svgs.js";
 import ToolWithFileUpload from "../ToolWithFileUpload";
 import { make } from "../utils.js";
 import {
-  NoteContentBlockFileMetadata,
-} from "../../../../../lib/notes/interfaces/NoteContentBlock";
+  FileInfo,
+} from "../../../../../lib/notes/interfaces/FileInfo";
 
 
 /**
@@ -76,7 +76,7 @@ export default class ImageTool extends ToolWithFileUpload {
   ui;
   tunes;
   data:{
-    file: NoteContentBlockFileMetadata,
+    file: FileInfo,
     caption: string,
     withBackground: boolean,
   };

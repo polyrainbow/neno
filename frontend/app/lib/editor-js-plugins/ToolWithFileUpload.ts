@@ -1,6 +1,6 @@
 import {
-  NoteContentBlockFileMetadata,
-} from "../../../../lib/notes/interfaces/NoteContentBlock";
+  FileInfo,
+} from "../../../../lib/notes/interfaces/FileInfo";
 import { getFileFromUserSelection, make, moveCaretToEnd } from "./utils";
 
 /*
@@ -19,7 +19,7 @@ export default abstract class ToolWithFileUpload {
   abstract nodes;
   abstract CSS;
   abstract data:{
-    file: NoteContentBlockFileMetadata,
+    file: FileInfo,
     [key: string]: any,
   };
 
@@ -47,7 +47,7 @@ export default abstract class ToolWithFileUpload {
   async #uploadFileAndRefreshUI(file:File):Promise<void> {
     this.#showUploadIndicator();
     try {
-      const response:NoteContentBlockFileMetadata
+      const response:FileInfo
         = await this.config.fileHandling.uploadByFile(file);
       this.#handleDatabaseResponse(response);
     } catch (e) {
@@ -56,7 +56,7 @@ export default abstract class ToolWithFileUpload {
   }
 
 
-  #handleDatabaseResponse(fileMetadata:NoteContentBlockFileMetadata):void {
+  #handleDatabaseResponse(fileMetadata:FileInfo):void {
     this.#addFileMetadataToState(fileMetadata);
     this.nodes.button.remove();
     this.#hideUploadIndicator();
@@ -122,7 +122,7 @@ export default abstract class ToolWithFileUpload {
   }
 
 
-  #addFileMetadataToState(fileMetadata:NoteContentBlockFileMetadata):void {
+  #addFileMetadataToState(fileMetadata:FileInfo):void {
     this.data.file = fileMetadata;
   }
 
