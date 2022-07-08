@@ -50,7 +50,7 @@
     --main-content-color: black;
     --alt-content-color: var(--neno-gray-5);
     --link-color: var(--neno-blue-5);
-    --overlay-gradient: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(9,9,121,0.5) 35%, rgba(0,212,255,1) 100%);
+    --overlay-gradient: linear-gradient( 105.5deg,  rgba(31,212,248,0.8) 11%, rgba(218,15,183,0.8) 74.9% );
     --icon-button-enabled-filter: none;
     --icon-button-disabled-filter: contrast(0) brightness(1.3);
     --default-border: 1px solid var(--neno-gray-2);
