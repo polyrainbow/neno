@@ -6,6 +6,7 @@ import {
   FrontendNoteListItem,
   MainNoteListItem,
 } from "../interfaces/NoteListItem";
+import { l } from "../lib/intl";
 
 interface NoteListItemProps {
   key:string,
@@ -63,7 +64,7 @@ const NoteListItem = ({
       <div
         className="title"
       >
-        {note.title}
+        {note.title || l("list.untitled-note")}
       </div>
       <div className="note-list-item-second-row">
         <NoteListItemInfo note={note} />

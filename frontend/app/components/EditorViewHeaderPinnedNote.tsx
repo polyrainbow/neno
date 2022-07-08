@@ -1,5 +1,6 @@
 import React from "react";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
+import { l } from "../lib/intl";
 import { getIconSrc, shortenText } from "../lib/utils";
 
 interface EditorViewHeaderPinnedNoteProps {
@@ -38,7 +39,7 @@ const EditorViewHeaderPinnedNote = ({
       style={{
         whiteSpace: "pre",
       }}
-    >{shortenText(note.title, 35)}</p>
+    >{note.title ? shortenText(note.title, 35) : l("list.untitled-note")}</p>
   </div>;
 };
 

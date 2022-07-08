@@ -22,7 +22,6 @@ import NoteContentBlock, {
   NoteContentBlockWithFile,
   NoteContentBlockWithFileLoaded,
 } from "./interfaces/NoteContentBlock.js";
-import { NOTE_TITLE_PLACEHOLDER } from "./config.js";
 
 
 const shortenText = (text:string, maxLength:number):string => {
@@ -35,18 +34,8 @@ const shortenText = (text:string, maxLength:number):string => {
 
 
 const getNoteTitlePreview = (note:Note, maxLength = 800):string => {
-  if (note.title.length === 0) {
-    return NOTE_TITLE_PLACEHOLDER;
-  }
-
   const titleTrimmed = note.title.trim();
-
   const titleShortened = shortenText(titleTrimmed, maxLength);
-
-  if (titleShortened.length === 0) {
-    return NOTE_TITLE_PLACEHOLDER;
-  }
-
   return titleShortened;
 };
 
