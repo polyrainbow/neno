@@ -1,6 +1,5 @@
 import React from "react";
 import Tooltip from "./Tooltip";
-import { emojis } from "../config.js";
 import { getIconSrc } from "../lib/utils";
 import { l } from "../lib/intl";
 
@@ -59,13 +58,10 @@ const NoteListItemLinkedNotesIndicator = ({
                 ? <span title={numberOfLinkedNotes + " Links"}>
                   {numberOfLinkedNotes}
                 </span>
-                : <span title={l("list.item.links.not-linked")}
-                  style={{
-                    // style fix for
-                    // https://stackoverflow.com/questions/70028281/emoji-font-displayed-in-web-pages-lose-color-when-bold
-                    fontWeight: "normal",
-                  }}
-                >{emojis.unlinked}</span>
+                : <div
+                  title={l("list.item.links.not-linked")}
+                  className="unlinked-note-indicator"
+                />
               : ""
           }
         </div>
