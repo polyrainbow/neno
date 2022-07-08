@@ -1,7 +1,7 @@
 import React from "react";
 import Tooltip from "./Tooltip.js";
-import { emojis } from "../config.js";
 import { l } from "../lib/intl.js";
+import Icon from "./Icon.js";
 
 interface UnsavedChangesIndicatorProps {
   isUnsaved?: boolean,
@@ -16,24 +16,28 @@ const UnsavedChangesIndicator = ({
     ? l("editor.unsaved-changes")
     : l("editor.no-unsaved-changes");
 
-  const unsavedChangesSymbol = unsavedChanges
-    ? emojis.unsavedChanges
-    : emojis.noUnsavedChanges;
-
   return <>
     {
       isUnsaved
         ? <Tooltip
           title={l("editor.note-has-not-been-saved-yet")}
         >
-          <span>{emojis.new}</span>
+          <Icon
+            icon={"fiber_new"}
+            title={l("editor.note-has-not-been-saved-yet")}
+            size={24}
+          />
         </Tooltip>
         : ""
     }
     <Tooltip
       title={unsavedChangesText}
     >
-      <span>{unsavedChangesSymbol}</span>
+      <Icon
+        icon={unsavedChanges ? "stream" : "done"}
+        title={unsavedChangesText}
+        size={24}
+      />
     </Tooltip>
   </>;
 };

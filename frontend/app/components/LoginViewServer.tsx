@@ -48,21 +48,21 @@ const LoginViewServer = ({
     <h1>{l("login.server.heading")}</h1>
     {
       disclaimer === "INVALID_CREDENTIALS"
-        ? <p style={{ color: "red" }}>
+        ? <p className="error-text">
           {l("login.server.invalid-credentials")}
         </p>
         : ""
     }
     {
       disclaimer === "TOO_EARLY"
-        ? <p style={{ color: "red" }}>
+        ? <p className="error-text">
           {l("login.server.too-many-attempts")}
         </p>
         : ""
     }
     {
       disclaimer === "SERVER_ERROR"
-        ? <p style={{ color: "red" }}>
+        ? <p className="error-text">
           {l("login.server.server-error")}
         </p>
         : ""

@@ -1,6 +1,6 @@
 import React from "react";
 import Tooltip from "./Tooltip.js";
-import { getIconSrc } from "../lib/utils";
+import Icon from "./Icon.js";
 
 interface IconButtonProps {
   id?: string,
@@ -26,12 +26,10 @@ const IconButton = ({
       onClick={onClick}
       disabled={disabled}
     >
-      <img
-        src={getIconSrc(icon)}
-        alt={title}
-        width="24"
-        height="24"
-        className="svg-icon"
+      <Icon
+        icon={icon}
+        title={title}
+        size={24}
       />
     </button>
   </Tooltip>;

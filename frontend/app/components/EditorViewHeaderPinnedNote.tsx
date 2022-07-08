@@ -16,12 +16,6 @@ const EditorViewHeaderPinnedNote = ({
   onClick,
 }:EditorViewHeaderPinnedNoteProps) => {
   return <div
-    style={{
-      padding: "0px 10px",
-      display: "flex",
-      alignItems: "center",
-      cursor: "pointer",
-    }}
     className={"pinned-note " + (isActive ? "active" : "")}
     onClick={onClick}
   >

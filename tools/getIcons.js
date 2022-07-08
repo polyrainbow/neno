@@ -7,7 +7,6 @@ for (let i = 0; i < iconIds.length; i++) {
   const iconId = iconIds[i];
   console.log(`Fetching ${i + 1}/${iconIds.length}: ${iconId}`);
   const url = `https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/${iconId}/wght300/48px.svg`;
-  console.log("URL: " + url);
   const response = await fetch(url);
   if (!response.ok) {
     console.error("Could not download " + iconId);

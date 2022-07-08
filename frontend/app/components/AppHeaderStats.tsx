@@ -1,8 +1,8 @@
 import React from "react";
 import Tooltip from "./Tooltip.js";
-import { emojis } from "../config";
 import { l } from "../lib/intl.js";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats.js";
+import Icon from "./Icon.js";
 
 interface AppHeaderStatsItemProps {
   icon: string,
@@ -18,7 +18,13 @@ const AppHeaderStatsItem = ({
   return <Tooltip
     title={label}
   >
-    <span className="app-stats-item">{icon} {value}</span>
+    <div
+      style={{
+        "display": "flex",
+        "alignItems": "center",
+        "gap": "2px",
+      }}
+    ><Icon icon={icon} size={24} title={label}/> {value}</div>
   </Tooltip>;
 };
 
@@ -47,17 +53,17 @@ const AppHeaderStats = ({
   return (
     <div id="app-stats">
       <AppHeaderStatsItem
-        icon={emojis.note}
+        icon={"note"}
         label={l("stats.number-of-notes")}
         value={stats.numberOfAllNotes.toLocaleString()}
       />
       <AppHeaderStatsItem
-        icon={emojis.link}
+        icon={"link"}
         label={l("stats.number-of-links")}
         value={stats.numberOfLinks.toLocaleString()}
       />
       <AppHeaderStatsItem
-        icon={emojis.unlinked}
+        icon={"link_off"}
         label={l("stats.unlinked-notes")}
         value={
           `${stats.numberOfUnlinkedNotes.toLocaleString()}`

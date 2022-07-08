@@ -10,6 +10,7 @@ cancel
 cancel_presentation
 center_focus_strong
 clear
+code
 content_copy
 create
 crop_free
@@ -18,6 +19,7 @@ description
 done
 dynamic_feed
 edit_location
+edit_note
 favorite
 favorite_border
 fiber_manual_record
@@ -29,6 +31,8 @@ help
 help_outline
 home
 hourglass_full
+hub
+image
 info
 label
 label_off
@@ -44,7 +48,9 @@ looks_3
 loyalty
 menu
 mode_standby
+movie
 not_interested
+note
 note_add
 open_in_browser
 pending
@@ -65,8 +71,10 @@ send
 settings
 short_text
 sort
+speaker
 star
 star_border
+stream
 title
 tour
 trip_origin
