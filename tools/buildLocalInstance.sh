@@ -4,13 +4,12 @@ make sure, you set ROOT_PATH in frontend/app/config.tsx to the correct basepath
 of your hosting environment before building
 '''
 
-TARGET_DIRECTORY=../neno-local-instance
-
-cd ..
+TARGET_DIRECTORY=../../neno-local-instance
+FRONTEND_PUBLIC_PATH=../frontend/public
 
 echo "Removing old bundles..."
-rm frontend/js/*
-rm frontend/assets/*.js
+rm $FRONTEND_PUBLIC_PATH/js/*
+rm $FRONTEND_PUBLIC_PATH/assets/*.js
 echo "Creating new bundles..."
 npm run build-frontend-production
 
@@ -23,9 +22,9 @@ echo "Creating target directory"
 mkdir -p $TARGET_DIRECTORY
 
 echo "Copying files to target directory"
-cp frontend/index.html $TARGET_DIRECTORY/
-cp -R frontend/js $TARGET_DIRECTORY/
-cp -R frontend/assets $TARGET_DIRECTORY/
+cp $FRONTEND_PUBLIC_PATH/index.html $TARGET_DIRECTORY/
+cp -R $FRONTEND_PUBLIC_PATH/js $TARGET_DIRECTORY/
+cp -R $FRONTEND_PUBLIC_PATH/assets $TARGET_DIRECTORY/
 
 echo "Copying assets to target directory"
 sed -i '' -E "s/\/assets/\/neno\/assets/" $TARGET_DIRECTORY/index.html
