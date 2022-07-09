@@ -9,10 +9,20 @@
 
 # NENO ![Build](https://github.com/SebastianZimmer/neno/actions/workflows/build.yml/badge.svg)
 
+## What is NENO?
+
 NENO is a powerful note-taking app that helps you create your personal knowledge graph. With NENO, you retain full control over your data because you decide where it is stored: On your device, on a cloud storage of your choice, or even on a server under your control.
 
+## Screenshots
+
 ![NENO Editor view](./docs/img/neno-light.png)
+*NENO Editor view*
+
 ![NENO Graph view](./docs/img/graph%20view.png)
+*NENO Graph view*
+
+![NENO Editor view in dark mode](./docs/img/neno-dark.png)
+*NENO Editor view in dark mode*
 
 ## Features
 
@@ -25,11 +35,10 @@ NENO is a powerful note-taking app that helps you create your personal knowledge
 * Lossless export: Export your data losslessly to create backups or to migrate to another NENO instance
 * Dark mode: Eye-friendly note-taking at night time
 
-![NENO Editor view in dark mode](./docs/img/neno-dark.png)
-
 ## Getting started
 
-Read the [user manual](./docs/index.md) or just [go to the app](https://sebastianzimmer.github.io/neno/login), select a folder on your device, and start taking notes.
+Read the [user manual](./docs/index.md) or just [go to the app](https://sebastianzimmer.github.io/neno/login), select a folder on your device, and start taking notes. Please note that your browser
+[must meet certain criteria](./docs/index.md#local-mode).
 
 ## Further reading
 
