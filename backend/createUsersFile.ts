@@ -47,7 +47,9 @@ export default async (filepath:string):Promise<void> => {
       passwordHash: passwordHash,
       mfaSecret: mfa.secret,
       mfaUri: uri,
-      apiKeys: [],
+      apiKeys: [
+        randomUUID(),
+      ],
       // start with one graph per user
       graphIds: [
         randomUUID(),

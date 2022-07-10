@@ -9,5 +9,5 @@ export default interface User {
   mfaSecret: string,
   mfaUri?: string,
   qrCode?: string,
-  apiKeys?: string[],
+  apiKeys: string[],
 }
