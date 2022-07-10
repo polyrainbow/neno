@@ -25,13 +25,13 @@ const StatusBar = ({ config, setGraphId }) => {
           "Server ready. Graph ID: " + result.payload.graphIds[0],
         );
         setGraphId(result.payload.graphIds[0]);
-        setStatusColor("green");
+        setStatusColor("#40c940");
       } else {
         setStatusMessage(
           "Authentication error. Please check server and API key. Error: "
           + result.error,
         );
-        setStatusColor("red");
+        setStatusColor("#ff4c4c");
         // TODO: pushNoteButton.disabled = true;
       }
     };

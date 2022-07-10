@@ -1,7 +1,14 @@
 import React from "react";
 
 const Header = () => {
-  return <header><h1 id="heading">NENO</h1></header>;
+  return <header>
+    <img
+      alt="NENO Logo"
+      src="/assets/images/logo-circle.svg"
+      width="40"
+      height="40"
+    />
+  </header>;
 };
 
 export default Header;

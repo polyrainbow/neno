@@ -3,8 +3,12 @@ body {
   margin: 0px;
 }
 
-header, main {
+main {
   padding: 10px;
+}
+
+header {
+  padding: 5px 10px;
 }
 
 header {
