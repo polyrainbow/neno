@@ -13,8 +13,6 @@ import cookieParser from "cookie-parser";
 import AppStartOptions from "./interfaces/AppStartOptions.js";
 import NoteListPage from "../lib/notes/interfaces/NoteListPage.js";
 import FileSystemStorageProvider from "./lib/FileSystemStorageProvider.js";
-import http from "http";
-import https from "https";
 import getUrlMetadata from "./lib/getUrlMetadata.js";
 import twofactor from "node-2fa";
 import historyAPIFallback from "./lib/HistoryAPIFallback.js";
