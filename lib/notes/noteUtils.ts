@@ -319,7 +319,21 @@ const getNoteFeatures = (note:SavedNote):NoteListItemFeatures => {
   let containsVideo = false;
 
   note.blocks.forEach((block) => {
-    if (block.type === NoteContentBlockType.PARAGRAPH) {
+    if (
+      (
+        (block.type === NoteContentBlockType.PARAGRAPH)
+        && block.data.text.trim().length > 0
+      )
+      || (
+        (block.type === NoteContentBlockType.HEADING)
+        && block.data.text.trim().length > 0
+      )
+      || (
+        (block.type === NoteContentBlockType.LIST)
+        && block.data.items.length > 0
+        && block.data.items[0].trim().length > 0
+      )
+    ) {
       containsText = true;
     }
     if (block.type === NoteContentBlockType.LINK) {
@@ -328,17 +342,19 @@ const getNoteFeatures = (note:SavedNote):NoteListItemFeatures => {
     if (block.type === NoteContentBlockType.CODE) {
       containsCode = true;
     }
-    if (block.type === NoteContentBlockType.IMAGE) {
-      containsImages = true;
-    }
-    if (block.type === NoteContentBlockType.DOCUMENT) {
-      containsDocuments = true;
-    }
-    if (block.type === NoteContentBlockType.AUDIO) {
-      containsAudio = true;
-    }
-    if (block.type === NoteContentBlockType.VIDEO) {
-      containsVideo = true;
+    if (blockHasLoadedFile(block)) {
+      if (block.type === NoteContentBlockType.IMAGE) {
+        containsImages = true;
+      }
+      if (block.type === NoteContentBlockType.DOCUMENT) {
+        containsDocuments = true;
+      }
+      if (block.type === NoteContentBlockType.AUDIO) {
+        containsAudio = true;
+      }
+      if (block.type === NoteContentBlockType.VIDEO) {
+        containsVideo = true;
+      }
     }
   });
 
