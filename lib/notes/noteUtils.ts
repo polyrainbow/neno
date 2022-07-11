@@ -345,14 +345,11 @@ const getNoteFeatures = (note:SavedNote):NoteListItemFeatures => {
     if (blockHasLoadedFile(block)) {
       if (block.type === NoteContentBlockType.IMAGE) {
         containsImages = true;
-      }
-      if (block.type === NoteContentBlockType.DOCUMENT) {
+      } else if (block.type === NoteContentBlockType.DOCUMENT) {
         containsDocuments = true;
-      }
-      if (block.type === NoteContentBlockType.AUDIO) {
+      } else if (block.type === NoteContentBlockType.AUDIO) {
         containsAudio = true;
-      }
-      if (block.type === NoteContentBlockType.VIDEO) {
+      } else if (block.type === NoteContentBlockType.VIDEO) {
         containsVideo = true;
       }
     }
