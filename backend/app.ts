@@ -1,6 +1,6 @@
 import NoteToTransmit from "../lib/notes/interfaces/NoteToTransmit.js";
 import { NoteId } from "../lib/notes/interfaces/NoteId.js";
-import Stats from "../lib/notes/interfaces/GraphStats.js";
+import Stats, { GraphSize } from "../lib/notes/interfaces/GraphStats.js";
 import { yyyymmdd } from "../lib/utils.js";
 import * as config from "./config.js";
 import compression from "compression";
@@ -43,6 +43,7 @@ const startApp = async ({
   sessionTTL,
   maxUploadFileSize,
   sessionCookieName,
+  maxGraphSize,
 }:AppStartOptions):Promise<Express.Application> => {
   const graphsDirectoryPath = path.join(dataPath, config.GRAPHS_DIRECTORY_NAME);
   const storageProvider = new FileSystemStorageProvider(graphsDirectoryPath);
@@ -569,9 +570,9 @@ const startApp = async ({
         return;
       }
 
-      const size = parseInt(sizeString);
+      const fileSize = parseInt(sizeString);
 
-      if (isNaN(size) || size < 1) {
+      if (isNaN(fileSize) || fileSize < 1) {
         const response:APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
@@ -580,10 +581,27 @@ const startApp = async ({
         return;
       }
 
-      if (size > maxUploadFileSize) {
+      if (fileSize > maxUploadFileSize) {
         const response:APIResponse = {
           success: false,
-          error: APIError.RESOURCE_EXCEEDS_FILE_SIZE,
+          error: APIError.RESOURCE_EXCEEDS_MAX_FILE_SIZE,
+        };
+        res.status(406).json(response);
+        return;
+      }
+
+      const stats = await Notes.getStats(graphId, {
+        includeMetadata: true,
+        includeAnalysis: false,
+      });
+
+      const graphSize = stats.size as GraphSize;
+      const currentGraphSize = graphSize.graph + graphSize.files;
+
+      if ((currentGraphSize + fileSize) > maxGraphSize) {
+        const response:APIResponse = {
+          success: false,
+          error: APIError.MAX_GRAPH_SIZE_REACHED,
         };
         res.status(406).json(response);
         return;
@@ -612,9 +630,9 @@ const startApp = async ({
         );
 
         logger.verbose(
-          `Expected size: ${size} Transmitted: ${transmittedBytes}`,
+          `Expected size: ${fileSize} Transmitted: ${transmittedBytes}`,
         );
-        if (size !== transmittedBytes) {
+        if (fileSize !== transmittedBytes) {
           /* this looks like the request was not completed. we'll remove the
           file */
           logger.verbose("Removing file due to incomplete upload");
@@ -631,7 +649,7 @@ const startApp = async ({
           success: true,
           payload: {
             fileId,
-            size,
+            size: fileSize,
           },
         };
         res.json(response);

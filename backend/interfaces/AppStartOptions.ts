@@ -9,4 +9,5 @@ export default interface AppStartOptions {
   sessionTTL: number,
   maxUploadFileSize: number,
   sessionCookieName: string,
+  maxGraphSize: number,
 }

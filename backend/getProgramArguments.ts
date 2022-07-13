@@ -68,6 +68,11 @@ const getArguments = (version:string) => {
     .option(
       '--ipv6-only',
       "only allow IPv6 connections",
+    )
+    .option(
+      '--max-graph-size <value>',
+      "The maximum size of one graph in bytes",
+      "107374182400", // 100 GB
     );
   
   program.parse(process.argv);

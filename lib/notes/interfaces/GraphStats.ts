@@ -1,5 +1,10 @@
 import NoteListItem from "./NoteListItem";
 
+export interface GraphSize {
+  graph: number,
+  files: number,
+}
+
 export default interface GraphStats {
   readonly numberOfAllNotes: number,
   readonly numberOfLinks: number,
@@ -14,8 +19,5 @@ export default interface GraphStats {
   readonly creationTime?: number,
   readonly updateTime?: number,
   readonly id?: string,
-  readonly size?: {
-    graph: number,
-    files: number,
-  },
+  readonly size?: GraphSize,
 }

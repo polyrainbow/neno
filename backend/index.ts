@@ -42,6 +42,7 @@ const app = await startApp({
   sessionTTL: parseInt(programArguments.sessionTtl),
   maxUploadFileSize: parseInt(programArguments.maxUploadFileSize),
   sessionCookieName: programArguments.sessionCookieName,
+  maxGraphSize: programArguments.maxGraphSize,
 });
 
 logger.info("💡 Starting server...");
