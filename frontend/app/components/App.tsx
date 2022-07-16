@@ -28,9 +28,9 @@ import {
   NoteListSortMode,
 } from "../../../lib/notes/interfaces/NoteListSortMode";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
-import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import useWarnBeforeUnload from "../hooks/useWarnBeforeUnload";
+import useHeaderStats from "../hooks/useHeaderStats";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -46,20 +46,6 @@ const App = ({
   const [databaseMode, setDatabaseMode]
     = useState<DatabaseMode>(DatabaseMode.NONE);
 
-  /* states for note list */
-  const currentRequestId = useRef<string>("");
-  const [noteListItems, setNoteListItems] = useState<MainNoteListItem[]>([]);
-  const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
-  const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
-  const [noteListIsBusy, setNoteListIsBusy] = useState<boolean>(true);
-  const [headerStats, setHeaderStats] = useState<GraphStats | null>(null);
-  const [sortMode, setSortMode] = useState<NoteListSortMode>(
-    NoteListSortMode.UPDATE_DATE_DESCENDING,
-  );
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [pinnedNotes, setPinnedNotes] = useState<NoteToTransmit[]>([]);
-
   const databaseProvider: DatabaseProvider | null
     = databaseMode === DatabaseMode.LOCAL
       ? localDatabaseProvider
@@ -69,33 +55,27 @@ const App = ({
           : null
       );
 
+  /* states for note list */
+  const currentRequestId = useRef<string>("");
+  const [noteListItems, setNoteListItems] = useState<MainNoteListItem[]>([]);
+  const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
+  const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [noteListIsBusy, setNoteListIsBusy] = useState<boolean>(true);
+  const [sortMode, setSortMode] = useState<NoteListSortMode>(
+    NoteListSortMode.UPDATE_DATE_DESCENDING,
+  );
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [pinnedNotes, setPinnedNotes] = useState<NoteToTransmit[]>([]);
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
+  const [headerStats, refreshHeaderStats] = useHeaderStats(databaseProvider);
+
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
     setNoteListScrollTop(0);
     setPage(1);
-  };
-
-
-  const refreshStats = () => {
-    if (!databaseProvider) return;
-
-    databaseProvider.getStats({
-      includeMetadata: false,
-      includeAnalysis: false,
-    })
-      .then((stats) => {
-        setHeaderStats(stats);
-      })
-      .catch((e) => {
-        // if credentials are invalid, it's fine, refeshNotesList takes care of
-        // this. if there is another error, throw.
-        if (e.message !== "INVALID_CREDENTIALS") {
-          throw new Error(e);
-        }
-      });
   };
 
 
@@ -110,7 +90,7 @@ const App = ({
     async () => {
       if (!databaseProvider) return;
 
-      refreshStats();
+      refreshHeaderStats();
       setNoteListItems([]);
 
       // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
@@ -218,6 +198,7 @@ const App = ({
       navigate(getAppPath(PathTemplate.LOGIN));
     }
   };
+
 
   useEffect(() => {
     checkAuthentication();
