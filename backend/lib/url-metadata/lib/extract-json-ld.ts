@@ -1,7 +1,7 @@
 // More info on JSON-LD (Linked Data):
 // https://moz.com/blog/json-ld-for-beginners
 
-export default function ($:cheerio.Root) {
+export default function ($: cheerio.Root) {
   const $scriptTags = $('script');
   let extracted = {};
 

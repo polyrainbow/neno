@@ -42,7 +42,7 @@ const callAPI = async ({
   payload,
   outputType = "json",
   payloadType = "application/json",
-}:APICallParams): Promise<Blob | string | ReadableStream | APIResponse> => {
+}: APICallParams): Promise<Blob | string | ReadableStream | APIResponse> => {
   const requestBody
     = payload && (
       payloadType === "application/json"
@@ -76,7 +76,9 @@ const callAPI = async ({
 };
 
 
-const getJSONResponsePayloadIfSuccessful = (responseObject:APIResponse):any => {
+const getJSONResponsePayloadIfSuccessful = (
+  responseObject: APIResponse,
+): any => {
   if (!responseObject.success) {
     // if this is an error from the notes module, forward its message
     // if not, just output the error from the API.
@@ -92,8 +94,8 @@ const getJSONResponsePayloadIfSuccessful = (responseObject:APIResponse):any => {
 
 
 const callUserAPIAndGetJSONPayload = async (
-  options:EndpointCallParams,
-):Promise<any> => {
+  options: EndpointCallParams,
+): Promise<any> => {
   const response = await callAPI({
     ...options,
     url: USER_ENDPOINT + options.endpoint,
@@ -103,8 +105,8 @@ const callUserAPIAndGetJSONPayload = async (
 
 
 const callGraphAPIAndGetJSONPayload = async (
-  options:EndpointCallParams,
-):Promise<any> => {
+  options: EndpointCallParams,
+): Promise<any> => {
   const response = await callAPI({
     ...options,
     url: GRAPH_ENDPOINT + options.endpoint,
@@ -117,7 +119,7 @@ const login = (
   username: string,
   password: string,
   mfaToken: string,
-):Promise<any> => {
+): Promise<any> => {
   return callUserAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "login",
@@ -141,7 +143,7 @@ const isAuthenticated = () => {
 };
 
 
-const getNote = (noteId:NoteId):Promise<NoteToTransmit | null> => {
+const getNote = (noteId: NoteId): Promise<NoteToTransmit | null> => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "note/" + noteId,
   });

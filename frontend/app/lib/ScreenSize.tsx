@@ -14,7 +14,7 @@ import { MAX_WIDTH_SMALL_SCREEN } from "../config";
 
 const QUERY = `(max-width: ${MAX_WIDTH_SMALL_SCREEN}px)`;
 let isSmallScreen;
-let changeCallbacks:any[] = [];
+let changeCallbacks: any[] = [];
 
 const getIsSmallScreenFromBrowser = () => {
   return window.matchMedia(QUERY).matches;

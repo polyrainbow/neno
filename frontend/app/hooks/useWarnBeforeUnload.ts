@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export default (isEnabled:boolean):void => {
+export default (isEnabled: boolean): void => {
   const beforeUnload = function(e) {
     if (isEnabled) {
       // Cancel the event

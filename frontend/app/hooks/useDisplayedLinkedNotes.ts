@@ -37,10 +37,10 @@ export default (
         })
         : [],
       ...activeNote.changes
-        .filter((change):change is FrontendUserNoteAdditionChange => {
+        .filter((change): change is FrontendUserNoteAdditionChange => {
           return change.type === UserNoteChangeType.LINKED_NOTE_ADDED;
         })
-        .map((change:FrontendUserNoteAdditionChange) => {
+        .map((change: FrontendUserNoteAdditionChange) => {
           return change.note;
         }),
     ], [activeNote]);

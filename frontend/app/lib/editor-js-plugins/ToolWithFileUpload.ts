@@ -18,14 +18,14 @@ export default abstract class ToolWithFileUpload {
   abstract config;
   abstract nodes;
   abstract CSS;
-  abstract data:{
+  abstract data: {
     file: FileInfo,
     [key: string]: any,
   };
 
   abstract save(toolContent: HTMLElement);
-  abstract render():void;
-  abstract renderLoadedBlock():void;
+  abstract render(): void;
+  abstract renderLoadedBlock(): void;
 
   /**
    * Specify paste handlers
@@ -44,10 +44,10 @@ export default abstract class ToolWithFileUpload {
   }
 
 
-  async #uploadFileAndRefreshUI(file:File):Promise<void> {
+  async #uploadFileAndRefreshUI(file: File): Promise<void> {
     this.#showUploadIndicator();
     try {
-      const response:FileInfo
+      const response: FileInfo
         = await this.config.fileHandling.uploadByFile(file);
       this.#handleDatabaseResponse(response);
     } catch (e) {
@@ -56,7 +56,7 @@ export default abstract class ToolWithFileUpload {
   }
 
 
-  #handleDatabaseResponse(fileMetadata:FileInfo):void {
+  #handleDatabaseResponse(fileMetadata: FileInfo): void {
     this.#addFileMetadataToState(fileMetadata);
     this.nodes.button.remove();
     this.#hideUploadIndicator();
@@ -66,7 +66,7 @@ export default abstract class ToolWithFileUpload {
   }
 
 
-  protected renderUploadButton():void {
+  protected renderUploadButton(): void {
     this.nodes.button = make("div", [this.CSS.apiButton, this.CSS.button]);
     this.nodes.button.innerHTML = this.config.buttonText;
     /*
@@ -82,7 +82,7 @@ export default abstract class ToolWithFileUpload {
   }
 
 
-  async #getAndUploadFile():Promise<void> {
+  async #getAndUploadFile(): Promise<void> {
     const file = await getFileFromUserSelection(
       this.config.filePickerAcceptTypes,
     );
@@ -90,7 +90,7 @@ export default abstract class ToolWithFileUpload {
   }
 
 
-  #showUploadIndicator():void {
+  #showUploadIndicator(): void {
     this.nodes.wrapper.classList.add(
       this.CSS.wrapperLoading,
       this.CSS.loader,
@@ -98,7 +98,7 @@ export default abstract class ToolWithFileUpload {
   }
 
 
-  #hideUploadIndicator():void {
+  #hideUploadIndicator(): void {
     this.nodes.wrapper.classList.remove(
       this.CSS.wrapperLoading,
       this.CSS.loader,
@@ -112,17 +112,17 @@ export default abstract class ToolWithFileUpload {
    *
    * @public
    */
-  appendCallback():void {
+  appendCallback(): void {
     this.nodes.button.click();
   }
 
 
-  blockHasLoadedFile():boolean {
+  blockHasLoadedFile(): boolean {
     return typeof this.data.file === "object";
   }
 
 
-  #addFileMetadataToState(fileMetadata:FileInfo):void {
+  #addFileMetadataToState(fileMetadata: FileInfo): void {
     this.data.file = fileMetadata;
   }
 

@@ -75,7 +75,7 @@ export default class ImageTool extends ToolWithFileUpload {
   config;
   ui;
   tunes;
-  data:{
+  data: {
     file: FileInfo,
     caption: string,
     withBackground: boolean,

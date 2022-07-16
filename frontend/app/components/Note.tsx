@@ -31,10 +31,10 @@ import { DEFAULT_NOTE_BLOCKS } from "../config";
 
 interface NoteComponentProps {
   note: ActiveNote,
-  setNoteTitle: (title:string) => void,
+  setNoteTitle: (title: string) => void,
   displayedLinkedNotes: (LinkedNote | FrontendUserNoteChangeNote)[],
   onLinkAddition: (note: MainNoteListItem) => void,
-  onLinkRemoval: (noteId:NoteId) => void,
+  onLinkRemoval: (noteId: NoteId) => void,
   setUnsavedChanges,
   databaseProvider: DatabaseProvider,
   createNewNote,
@@ -61,7 +61,7 @@ const Note = ({
   pinOrUnpinNote,
   duplicateNote,
   openInGraphView,
-}:NoteComponentProps) => {
+}: NoteComponentProps) => {
   const goToNote = useGoToNote();
   const [searchString, setSearchString] = useState("");
   const [searchResults, setSearchResults] = useState<MainNoteListItem[]>([]);

@@ -5,7 +5,7 @@
 */
 
 export default class FileSystemAccessAPIStorageProvider {
-  constructor(directoryHandle:FileSystemDirectoryHandle) {
+  constructor(directoryHandle: FileSystemDirectoryHandle) {
     this.#directoryHandle = directoryHandle;
   }
 
@@ -15,13 +15,13 @@ export default class FileSystemAccessAPIStorageProvider {
   ****************/
 
 
-  #directoryHandle:FileSystemDirectoryHandle;
+  #directoryHandle: FileSystemDirectoryHandle;
 
 
   async #getSubFolderHandle(
-    folderHandle:FileSystemDirectoryHandle,
-    subDirName:string,
-  ):Promise<FileSystemDirectoryHandle> {
+    folderHandle: FileSystemDirectoryHandle,
+    subDirName: string,
+  ): Promise<FileSystemDirectoryHandle> {
     const subDir = await folderHandle.getDirectoryHandle(
       subDirName,
       {
@@ -33,9 +33,9 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async #getDescendantFolderHandle(
-    folderHandle:FileSystemDirectoryHandle,
-    descendantFolderPath:string,
-  ):Promise<FileSystemDirectoryHandle> {
+    folderHandle: FileSystemDirectoryHandle,
+    descendantFolderPath: string,
+  ): Promise<FileSystemDirectoryHandle> {
     const pathSegments = descendantFolderPath.length > 0
       ? this.splitPath(descendantFolderPath)
       : [];
@@ -54,9 +54,9 @@ export default class FileSystemAccessAPIStorageProvider {
 
 
   async #getDescendantFileHandle(
-    folderHandle:FileSystemDirectoryHandle,
-    filePath:string,
-  ):Promise<FileSystemFileHandle> {
+    folderHandle: FileSystemDirectoryHandle,
+    filePath: string,
+  ): Promise<FileSystemFileHandle> {
     const pathSegments = this.splitPath(filePath);
     const folderPathSegments = pathSegments.slice(0, pathSegments.length - 1);
     const filename = pathSegments[pathSegments.length - 1];
@@ -78,7 +78,7 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  async #getFileHandle(requestPath:string):Promise<FileSystemFileHandle> {
+  async #getFileHandle(requestPath: string): Promise<FileSystemFileHandle> {
     return await this.#getDescendantFileHandle(
       this.#directoryHandle,
       requestPath,
@@ -97,7 +97,7 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
     data,
-  ):Promise<void> {
+  ): Promise<void> {
     const finalPath = this.joinPath(graphId, requestPath);
     const fileHandle = await this.#getFileHandle(finalPath);
     const writable = await fileHandle.createWritable();
@@ -108,9 +108,9 @@ export default class FileSystemAccessAPIStorageProvider {
 
   async writeObjectFromReadable(
     graphId: string,
-    requestPath:string,
+    requestPath: string,
     readableStream,
-  ):Promise<number> {
+  ): Promise<number> {
     const finalPath = this.joinPath(graphId, requestPath);
     const fileHandle = await this.#getFileHandle(finalPath);
     const writable = await fileHandle.createWritable();
@@ -123,7 +123,7 @@ export default class FileSystemAccessAPIStorageProvider {
   async readObjectAsString(
     graphId: string,
     requestPath: string,
-  ):Promise<string> {
+  ): Promise<string> {
     const finalPath = this.joinPath(graphId, requestPath);
     const fileHandle = await this.#getFileHandle(finalPath);
     const file = await fileHandle.getFile();
@@ -164,7 +164,7 @@ export default class FileSystemAccessAPIStorageProvider {
   async listSubDirectories(
     graphId: string,
     requestPath: string,
-  ):Promise<string[]> {
+  ): Promise<string[]> {
     const finalPath = this.joinPath(graphId, requestPath);
 
     const dirHandle = await this.#getDescendantFolderHandle(
@@ -172,7 +172,7 @@ export default class FileSystemAccessAPIStorageProvider {
       finalPath,
     );
 
-    const values:(FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
+    const values: (FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
     for await (const handle of dirHandle.values()) {
       values.push(handle);
     }
@@ -188,7 +188,7 @@ export default class FileSystemAccessAPIStorageProvider {
   async listDirectory(
     graphId: string,
     requestPath: string,
-  ):Promise<string[]> {
+  ): Promise<string[]> {
     const finalPath = this.joinPath(graphId, requestPath);
 
     const dirHandle = await this.#getDescendantFolderHandle(
@@ -196,7 +196,7 @@ export default class FileSystemAccessAPIStorageProvider {
       finalPath,
     );
 
-    const values:(FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
+    const values: (FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
     for await (const handle of dirHandle.values()) {
       values.push(handle);
     }
@@ -208,12 +208,12 @@ export default class FileSystemAccessAPIStorageProvider {
   }
 
 
-  joinPath(...args:string[]):string {
+  joinPath(...args: string[]): string {
     return args.filter((arg) => arg.length > 0).join(this.DS);
   }
 
 
-  splitPath(path:string):string[] {
+  splitPath(path: string): string[] {
     return path.split(this.DS);
   }
 
@@ -221,7 +221,7 @@ export default class FileSystemAccessAPIStorageProvider {
   async getFileSize(
     graphId: string,
     requestPath: string,
-  ):Promise<number> {
+  ): Promise<number> {
     const finalPath = this.joinPath(graphId, requestPath);
     const fileHandle = await this.#getFileHandle(finalPath);
     const file = await fileHandle.getFile();
@@ -233,20 +233,20 @@ export default class FileSystemAccessAPIStorageProvider {
   async getFolderSize(
     graphId: string,
     requestPath: string,
-  ):Promise<number> {
+  ): Promise<number> {
     const finalPath = this.joinPath(graphId, requestPath);
     const folderHandle = await this.#getDescendantFolderHandle(
       this.#directoryHandle,
       finalPath,
     );
 
-    const values:(FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
+    const values: (FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
     for await (const handle of folderHandle.values()) {
       values.push(handle);
     }
 
     const entryNames = values
-      .filter((value):value is FileSystemFileHandle => value.kind === "file");
+      .filter((value): value is FileSystemFileHandle => value.kind === "file");
 
     const filePromises = entryNames
       .map((fileHandle) => {

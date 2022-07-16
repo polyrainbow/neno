@@ -4,7 +4,7 @@ import extractMetaTags from './extract-meta-tags.js';
 import extractJsonLd from './extract-json-ld.js';
 import mapSources from './map-sources.js';
 
-const elementIsTagElement = (el:cheerio.Element):el is cheerio.TagElement => {
+const elementIsTagElement = (el: cheerio.Element): el is cheerio.TagElement => {
   return el.type === "tag";
 };
 

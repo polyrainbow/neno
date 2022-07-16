@@ -42,7 +42,7 @@ import ToolWithFileUpload from "../ToolWithFileUpload";
 export default class VideoTool extends ToolWithFileUpload {
   api;
   nodes;
-  data:{
+  data: {
     file: FileInfo,
   };
 
@@ -169,7 +169,7 @@ export default class VideoTool extends ToolWithFileUpload {
    *
    * @return {HTMLDivElement}
    */
-  render():HTMLElement {
+  render(): HTMLElement {
     const holder = make("div", [this.CSS.baseClass]);
     this.nodes.wrapper = make("div", [this.CSS.wrapper]);
 
@@ -184,7 +184,7 @@ export default class VideoTool extends ToolWithFileUpload {
   }
 
 
-  async renderLoadedBlock():Promise<void> {
+  async renderLoadedBlock(): Promise<void> {
     this.nodes.wrapper.classList.add(this.CSS.wrapperWithFile);
     const { file: { size, name } } = this.data;
     const fileInfo = make("div", [this.CSS.fileInfo]);

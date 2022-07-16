@@ -42,7 +42,7 @@ import ToolWithFileUpload from "../ToolWithFileUpload";
 export default class AudioTool extends ToolWithFileUpload {
   api;
   nodes;
-  data:{
+  data: {
     file: FileInfo,
   };
 

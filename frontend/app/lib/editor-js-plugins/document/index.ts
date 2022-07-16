@@ -41,7 +41,7 @@ import { FileInfo } from "../../../../../lib/notes/interfaces/FileInfo";
 export default class DocumentTool extends ToolWithFileUpload {
   api;
   nodes;
-  data:{
+  data: {
     file: FileInfo,
   };
 

@@ -50,12 +50,12 @@ const linkExists = (linkToTest, links) => {
 };
 
 
-const removeDuplicateLinks = (graph:DatabaseMainData) => {
+const removeDuplicateLinks = (graph: DatabaseMainData) => {
   const oldLinks = graph.links;
-  const newLinks:Link[] = [];
+  const newLinks: Link[] = [];
 
   for (let i = 0; i < oldLinks.length; i++) {
-    const link:Link = oldLinks[i];
+    const link: Link = oldLinks[i];
 
     if (!linkExists(link, newLinks)) {
       newLinks.push(link);
@@ -73,7 +73,7 @@ const cleanUpLinks = (graph) => {
 
 
 const cleanUpNotes = (graph) => {
-  const existingNoteIds:NoteId[] = [];
+  const existingNoteIds: NoteId[] = [];
 
   graph.notes.forEach((note) => {
     // assign id to id-less notes

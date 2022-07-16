@@ -30,15 +30,15 @@ const FilesView = ({
   const [status, setStatus] = useState("BUSY");
 
   const updateDanglingFiles = async () => {
-    const danglingFileIds:FileId[] = await databaseProvider.getDanglingFiles();
-    const danglingFileSrcs:string[]
+    const danglingFileIds: FileId[] = await databaseProvider.getDanglingFiles();
+    const danglingFileSrcs: string[]
       = await Promise.all(
         danglingFileIds.map(
           (fileId) => databaseProvider.getUrlForFileId(fileId),
         ),
       );
 
-    const danglingFiles:FileIdAndSrc[] = danglingFileIds.map((fileId, i) => {
+    const danglingFiles: FileIdAndSrc[] = danglingFileIds.map((fileId, i) => {
       return {
         id: fileId,
         src: danglingFileSrcs[i],
@@ -52,13 +52,13 @@ const FilesView = ({
     if (!databaseProvider) return;
 
     const updateFiles = async () => {
-      const fileIds:FileId[] = await databaseProvider.getFiles();
-      const fileSrcs:string[]
+      const fileIds: FileId[] = await databaseProvider.getFiles();
+      const fileSrcs: string[]
         = await Promise.all(
           fileIds.map((fileId) => databaseProvider.getUrlForFileId(fileId)),
         );
 
-      const files:FileIdAndSrc[] = fileIds.map((fileId, i) => {
+      const files: FileIdAndSrc[] = fileIds.map((fileId, i) => {
         return {
           id: fileId,
           src: fileSrcs[i],

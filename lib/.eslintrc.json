@@ -18,6 +18,7 @@
     "@typescript-eslint/indent": [
       "error",
       2
-    ]
+    ],
+    "@typescript-eslint/type-annotation-spacing": "error"
   }
 }

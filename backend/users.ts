@@ -11,10 +11,10 @@ import createUsersFile from "./createUsersFile.js";
 import * as logger from "./lib/logger.js";
 
 const USERS_FILENAME = "users.json";
-let dataFolderPath:string | null = null;
-let users:User[] | null = null;
+let dataFolderPath: string | null = null;
+let users: User[] | null = null;
 
-const isValidUser = (user:User):boolean => {
+const isValidUser = (user: User): boolean => {
   const idContainsOnlyValidChars = (id) => /^[A-Za-z0-9-]+$/.test(id);
 
   return (
@@ -29,7 +29,7 @@ const isValidUser = (user:User):boolean => {
   );
 };
 
-const init = async (_dataFolderPath:string):Promise<void> => {
+const init = async (_dataFolderPath: string): Promise<void> => {
   dataFolderPath = _dataFolderPath;
   const usersFile = path.join(dataFolderPath, USERS_FILENAME);
 
@@ -44,7 +44,7 @@ const init = async (_dataFolderPath:string):Promise<void> => {
 
   logger.info("Loading users file...");
   const json = (await fs.readFile(usersFile)).toString();
-  const usersFromFile:User[] = JSON.parse(json);
+  const usersFromFile: User[] = JSON.parse(json);
 
   if (!usersFromFile.every(isValidUser)){
     throw new Error("Invalid users file.");
@@ -53,7 +53,7 @@ const init = async (_dataFolderPath:string):Promise<void> => {
   users = usersFromFile;
 };
 
-const getAll = ():User[] => {
+const getAll = (): User[] => {
   if (users === null) {
     throw new Error("Users module not correctly initialized.");
   }

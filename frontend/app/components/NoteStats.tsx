@@ -22,7 +22,7 @@ const NoteStats = ({
   note,
   databaseProvider,
 }: NoteStatsProps) => {
-  const fileMetadataObjects:FileInfo[]
+  const fileMetadataObjects: FileInfo[]
     = getMetadataOfFilesInNote(note);
 
   return <div

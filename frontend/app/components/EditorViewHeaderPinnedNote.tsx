@@ -14,7 +14,7 @@ const EditorViewHeaderPinnedNote = ({
   note,
   isActive,
   onClick,
-}:EditorViewHeaderPinnedNoteProps) => {
+}: EditorViewHeaderPinnedNoteProps) => {
   return <div
     className={"pinned-note " + (isActive ? "active" : "")}
     onClick={onClick}

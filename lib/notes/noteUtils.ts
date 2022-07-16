@@ -24,7 +24,7 @@ import NoteContentBlock, {
 } from "./interfaces/NoteContentBlock.js";
 
 
-const shortenText = (text:string, maxLength:number):string => {
+const shortenText = (text: string, maxLength: number): string => {
   if (text.length > maxLength) {
     return text.trim().substring(0, maxLength) + "…";
   } else {
@@ -33,21 +33,21 @@ const shortenText = (text:string, maxLength:number):string => {
 };
 
 
-const getNoteTitlePreview = (note:Note, maxLength = 800):string => {
+const getNoteTitlePreview = (note: Note, maxLength = 800): string => {
   const titleTrimmed = note.title.trim();
   const titleShortened = shortenText(titleTrimmed, maxLength);
   return titleShortened;
 };
 
 
-const normalizeNoteTitle = (title:string):string => {
+const normalizeNoteTitle = (title: string): string => {
   return title
     .replaceAll(/[\r\n]/g, " ")
     .trim();
 };
 
 
-const removeDefaultTextParagraphs = (note:Note):void => {
+const removeDefaultTextParagraphs = (note: Note): void => {
   note.blocks = note.blocks.filter((block) => {
     const isDefaultTextParagraph = (
       block.type === "paragraph"
@@ -58,7 +58,7 @@ const removeDefaultTextParagraphs = (note:Note):void => {
   });
 };
 
-const removeEmptyLinkBlocks = (note:Note):void => {
+const removeEmptyLinkBlocks = (note: Note): void => {
   note.blocks = note.blocks.filter((block) => {
     const isEmptyLinkBlock = (
       block.type === "link"
@@ -71,10 +71,10 @@ const removeEmptyLinkBlocks = (note:Note):void => {
 
 
 const noteWithSameTitleExists = (
-  userNote:NoteFromUser,
-  graph:Graph,
-):boolean => {
-  return graph.notes.some((noteFromDB:SavedNote):boolean => {
+  userNote: NoteFromUser,
+  graph: Graph,
+): boolean => {
+  return graph.notes.some((noteFromDB: SavedNote): boolean => {
     return (
       (noteFromDB.title === userNote.title)
       && (noteFromDB.id !== userNote.id)
@@ -83,22 +83,22 @@ const noteWithSameTitleExists = (
 };
 
 
-const findNote = (graph:Graph, noteId:NoteId):SavedNote | null => {
+const findNote = (graph: Graph, noteId: NoteId): SavedNote | null => {
   return Utils.binaryArrayFind(graph.notes, "id", noteId);
 };
 
 
-const getNewNoteId = (graph:Graph):NoteId => {
+const getNewNoteId = (graph: Graph): NoteId => {
   graph.idCounter = graph.idCounter + 1;
   return graph.idCounter;
 };
 
 
 const updateNotePosition = (
-  graph:Graph,
+  graph: Graph,
   nodePositionUpdate: GraphNodePositionUpdate,
 ): boolean => {
-  const note:SavedNote | null = findNote(graph, nodePositionUpdate.id);
+  const note: SavedNote | null = findNote(graph, nodePositionUpdate.id);
   if (note === null) {
     return false;
   }
@@ -107,9 +107,9 @@ const updateNotePosition = (
 };
 
 
-const getLinksOfNote = (graph:Graph, noteId:NoteId):Link[] => {
-  const linksOfThisNote:Link[] = graph.links
-    .filter((link:Link):boolean => {
+const getLinksOfNote = (graph: Graph, noteId: NoteId): Link[] => {
+  const linksOfThisNote: Link[] = graph.links
+    .filter((link: Link): boolean => {
       return (link[0] === noteId) || (link[1] === noteId);
     });
 
@@ -117,9 +117,9 @@ const getLinksOfNote = (graph:Graph, noteId:NoteId):Link[] => {
 };
 
 
-const getLinkedNotes = (graph:Graph, noteId:NoteId):LinkedNote[] => {
-  const notes:SavedNote[] = getLinksOfNote(graph, noteId)
-    .map((link:Link):SavedNote => {
+const getLinkedNotes = (graph: Graph, noteId: NoteId): LinkedNote[] => {
+  const notes: SavedNote[] = getLinksOfNote(graph, noteId)
+    .map((link: Link): SavedNote => {
       const linkedNoteId = (link[0] === noteId) ? link[1] : link[0];
       // we are sure that the notes we are retrieving from noteIds in links
       // really exist. that's why we cast the result of findNote as
@@ -127,9 +127,9 @@ const getLinkedNotes = (graph:Graph, noteId:NoteId):LinkedNote[] => {
       return findNote(graph, linkedNoteId) as SavedNote;
     });
 
-  const linkedNotes:LinkedNote[] = notes
-    .map((note:SavedNote) => {
-      const linkedNote:LinkedNote = {
+  const linkedNotes: LinkedNote[] = notes
+    .map((note: SavedNote) => {
+      const linkedNote: LinkedNote = {
         id: note.id,
         title: getNoteTitlePreview(note),
         creationTime: note.creationTime,
@@ -142,17 +142,17 @@ const getLinkedNotes = (graph:Graph, noteId:NoteId):LinkedNote[] => {
 };
 
 
-const getNumberOfLinkedNotes = (graph:Graph, noteId:NoteId):number => {
-  const linksOfThisNote:Link[] = getLinksOfNote(graph, noteId);
+const getNumberOfLinkedNotes = (graph: Graph, noteId: NoteId): number => {
+  const linksOfThisNote: Link[] = getLinksOfNote(graph, noteId);
   const numberOfLinkedNotes = linksOfThisNote.length;
   return numberOfLinkedNotes;
 };
 
 
 const getNumberOfLinkedNotesForSeveralNotes = (
-  graph:Graph,
-  noteIds:NoteId[],
-):Map<NoteId, number> => {
+  graph: Graph,
+  noteIds: NoteId[],
+): Map<NoteId, number> => {
 
   const map = new Map<NoteId, number>();
   noteIds.forEach((noteId) => {
@@ -175,7 +175,7 @@ const getNumberOfLinkedNotesForSeveralNotes = (
 };
 
 
-const getNumberOfUnlinkedNotes = (graph:Graph):number => {
+const getNumberOfUnlinkedNotes = (graph: Graph): number => {
   /*
   We could do it like this but then the links array is traversed as many times
   as there are notes. So we don't do it like this. We do it faster.
@@ -200,31 +200,31 @@ const getNumberOfUnlinkedNotes = (graph:Graph):number => {
 };
 
 
-const removeLinksOfNote = (graph: Graph, noteId: NoteId):void => {
+const removeLinksOfNote = (graph: Graph, noteId: NoteId): void => {
   graph.links = graph.links.filter((link) => {
     return (link[0] !== noteId) && (link[1] !== noteId);
   });
 };
 
 
-const getFilesOfNote = (note:SavedNote):FileId[] => {
+const getFilesOfNote = (note: SavedNote): FileId[] => {
   return note.blocks
     .filter(blockHasLoadedFile)
-    .map((block: NoteContentBlockWithFileLoaded):FileId => {
+    .map((block: NoteContentBlockWithFileLoaded): FileId => {
       return block.data.file.fileId;
     });
 };
 
 
 const incorporateUserChangesIntoNote = (
-  changes:UserNoteChange[] | undefined,
-  note:SavedNote,
-  graph:Graph,
-):void => {
+  changes: UserNoteChange[] | undefined,
+  note: SavedNote,
+  graph: Graph,
+): void => {
   if (Array.isArray(changes)) {
     changes.forEach((change) => {
       if (change.type === UserNoteChangeType.LINKED_NOTE_ADDED) {
-        const link:Link = [note.id, change.noteId];
+        const link: Link = [note.id, change.noteId];
         graph.links.push(link);
       }
 
@@ -241,10 +241,10 @@ const incorporateUserChangesIntoNote = (
 
 
 const createNoteToTransmit = (
-  databaseNote:NonNullable<SavedNote>,
+  databaseNote: NonNullable<SavedNote>,
   graph: NonNullable<Graph>,
-):NoteToTransmit => {
-  const noteToTransmit:NoteToTransmit = {
+): NoteToTransmit => {
+  const noteToTransmit: NoteToTransmit = {
     id: databaseNote.id,
     blocks: databaseNote.blocks,
     title: databaseNote.title,
@@ -260,14 +260,14 @@ const createNoteToTransmit = (
 
 
 const createNoteListItem = (
-  databaseNote:SavedNote,
+  databaseNote: SavedNote,
   graph: Graph,
   // for performance reasons, numberOfLinkedNotes can be given as argument,
   // so that this function does not have to find it out by itself for each
   // NoteListItem to be created
-  numberOfLinkedNotes?:number,
-):NoteListItem => {
-  const noteListItem:NoteListItem = {
+  numberOfLinkedNotes?: number,
+): NoteListItem => {
+  const noteListItem: NoteListItem = {
     id: databaseNote.id,
     title: getNoteTitlePreview(databaseNote),
     creationTime: databaseNote.creationTime,
@@ -285,9 +285,9 @@ const createNoteListItem = (
 
 
 const createNoteListItems = (
-  databaseNotes:SavedNote[],
+  databaseNotes: SavedNote[],
   graph: Graph,
-):NoteListItem[] => {
+): NoteListItem[] => {
   /*
     Before we transform every SavedNote to a NoteListItem, we get the
     number of linked notes for every note in one batch. This is more performant
@@ -309,7 +309,7 @@ const createNoteListItems = (
 };
 
 
-const getNoteFeatures = (note:SavedNote):NoteListItemFeatures => {
+const getNoteFeatures = (note: SavedNote): NoteListItemFeatures => {
   let containsText = false;
   let containsWeblink = false;
   let containsCode = false;
@@ -355,7 +355,7 @@ const getNoteFeatures = (note:SavedNote):NoteListItemFeatures => {
     }
   });
 
-  const features:NoteListItemFeatures = {
+  const features: NoteListItemFeatures = {
     containsText,
     containsWeblink,
     containsCode,
@@ -369,7 +369,7 @@ const getNoteFeatures = (note:SavedNote):NoteListItemFeatures => {
 };
 
 
-const getSortKeyForTitle = (title:string):string => {
+const getSortKeyForTitle = (title: string): string => {
   return title
     .toLowerCase()
     .replace(/(["'.“”„‘’—\-»#*[\]/])/g, "")
@@ -383,8 +383,8 @@ const getSortKeyForTitle = (title:string):string => {
  * @returns {boolean} true or false
  */
 const blockHasLoadedFile = (
-  block:NoteContentBlock,
-):block is NoteContentBlockWithFileLoaded => {
+  block: NoteContentBlock,
+): block is NoteContentBlockWithFileLoaded => {
   return (
     [
       NoteContentBlockType.IMAGE,
@@ -397,13 +397,13 @@ const blockHasLoadedFile = (
 };
 
 
-const getNumberOfFiles = (note:SavedNote):number => {
+const getNumberOfFiles = (note: SavedNote): number => {
   return note.blocks.filter(blockHasLoadedFile).length;
 };
 
 const getSortFunction = (
-  sortMode:NoteListSortMode,
-):((a:NoteListItem, b:NoteListItem) => number) => {
+  sortMode: NoteListSortMode,
+):((a: NoteListItem, b: NoteListItem) => number) => {
   const sortFunctions = {
     [NoteListSortMode.CREATION_DATE_ASCENDING]: (a, b) => {
       return a.creationTime - b.creationTime;
@@ -453,7 +453,7 @@ const getSortFunction = (
 };
 
 
-const getNumberOfCharacters = (note:SavedNote):number => {
+const getNumberOfCharacters = (note: SavedNote): number => {
   return note.blocks.reduce((accumulator, block) => {
     if ([
       NoteContentBlockType.PARAGRAPH,
@@ -469,9 +469,9 @@ const getNumberOfCharacters = (note:SavedNote):number => {
 };
 
 
-const getURLsOfNote = (note:SavedNote):string[] => {
+const getURLsOfNote = (note: SavedNote): string[] => {
   return note.blocks
-    .filter((block):block is NoteContentBlockLink => {
+    .filter((block): block is NoteContentBlockLink => {
       return block.type === NoteContentBlockType.LINK;
     })
     .map((block) => {
@@ -482,22 +482,22 @@ const getURLsOfNote = (note:SavedNote):string[] => {
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
 const breadthFirstSearch = (
-  nodes:SavedNote[],
+  nodes: SavedNote[],
   links,
   root: SavedNote
-):SavedNote[] => {
-  const queue:SavedNote[] = [];
-  const discovered:SavedNote[] = [];
+): SavedNote[] => {
+  const queue: SavedNote[] = [];
+  const discovered: SavedNote[] = [];
   discovered.push(root);
   queue.push(root);
 
   while (queue.length > 0) {
     const v = queue.shift() as SavedNote;
     const connectedNodes = links
-      .filter((link:Link):boolean => {
+      .filter((link: Link): boolean => {
         return (link[0] === v.id) || (link[1] === v.id);
       })
-      .map((link:Link):SavedNote => {
+      .map((link: Link): SavedNote => {
         const linkedNoteId = (link[0] === v.id) ? link[1] : link[0];
         // we are sure that the notes we are retrieving from noteIds in links
         // really exist. that's why we cast the result of findNote as
@@ -518,8 +518,8 @@ const breadthFirstSearch = (
 
 
 // https://en.wikipedia.org/wiki/Component_(graph_theory)#Algorithms
-const getNumberOfComponents = (nodes:SavedNote[], links:Link[]):number => {
-  let totallyDiscovered:SavedNote[] = [];
+const getNumberOfComponents = (nodes: SavedNote[], links: Link[]): number => {
+  let totallyDiscovered: SavedNote[] = [];
   let numberOfComponents = 0;
 
   let i = 0;
@@ -541,10 +541,10 @@ const getNumberOfComponents = (nodes:SavedNote[], links:Link[]):number => {
 
 
 // this returns all notes that contain a url that is used in another note too
-const getNotesWithDuplicateUrls = (notes:SavedNote[]):SavedNote[] => {
+const getNotesWithDuplicateUrls = (notes: SavedNote[]): SavedNote[] => {
   const urlIndex = new Map<string, Set<SavedNote>>();
 
-  notes.forEach((note:SavedNote):void => {
+  notes.forEach((note: SavedNote): void => {
     const urls = getURLsOfNote(note);
 
     urls.forEach((url) => {
@@ -556,7 +556,7 @@ const getNotesWithDuplicateUrls = (notes:SavedNote[]):SavedNote[] => {
     });
   });
 
-  const duplicates:Set<SavedNote> = new Set();
+  const duplicates: Set<SavedNote> = new Set();
 
   for (const notesWithUrl of urlIndex.values()) {
     if (notesWithUrl.size > 1) {
@@ -570,10 +570,10 @@ const getNotesWithDuplicateUrls = (notes:SavedNote[]):SavedNote[] => {
 };
 
 
-const getNotesWithDuplicateTitles = (notes:SavedNote[]):SavedNote[] => {
+const getNotesWithDuplicateTitles = (notes: SavedNote[]): SavedNote[] => {
   const titleIndex = new Map<string, Set<SavedNote>>();
 
-  notes.forEach((note:SavedNote):void => {
+  notes.forEach((note: SavedNote): void => {
     const noteTitle = note.title;
 
     if (titleIndex.has(noteTitle)) {
@@ -583,7 +583,7 @@ const getNotesWithDuplicateTitles = (notes:SavedNote[]):SavedNote[] => {
     }
   });
 
-  const duplicates:Set<SavedNote> = new Set();
+  const duplicates: Set<SavedNote> = new Set();
 
   for (const notesWithOneTitle of titleIndex.values()) {
     if (notesWithOneTitle.size > 1) {
@@ -598,11 +598,11 @@ const getNotesWithDuplicateTitles = (notes:SavedNote[]):SavedNote[] => {
 
 
 const getNotesByTitle = (
-  notes:SavedNote[],
+  notes: SavedNote[],
   query: string,
   caseSensitive: boolean,
-):SavedNote[] => {
-  return notes.filter((note:SavedNote) => {
+): SavedNote[] => {
+  return notes.filter((note: SavedNote) => {
     const title = note.title;
 
     return caseSensitive
@@ -613,12 +613,12 @@ const getNotesByTitle = (
 
 
 const getNotesWithUrl = (
-  notes:SavedNote[],
+  notes: SavedNote[],
   url: string,
-):SavedNote[] => {
-  return notes.filter((note:SavedNote) => {
+): SavedNote[] => {
+  return notes.filter((note: SavedNote) => {
     return note.blocks
-      .filter((block):block is NoteContentBlockLink => {
+      .filter((block): block is NoteContentBlockLink => {
         return block.type === NoteContentBlockType.LINK;
       })
       .some((linkBlock) => linkBlock.data.link === url);
@@ -629,8 +629,8 @@ const getNotesWithUrl = (
 const getNotesWithFile = (
   notes: SavedNote[],
   file: FileId,
-):SavedNote[] => {
-  return notes.filter((note:SavedNote) => {
+): SavedNote[] => {
+  return notes.filter((note: SavedNote) => {
     return note.blocks
       .filter(blockHasLoadedFile)
       .some((block) => block.data.file.fileId === file);
@@ -638,7 +638,7 @@ const getNotesWithFile = (
 };
 
 
-const getConcatenatedTextOfNote = (note:SavedNote):string => {
+const getConcatenatedTextOfNote = (note: SavedNote): string => {
   const blockText = note.blocks.reduce((accumulator, block) => {
     if (block.type === NoteContentBlockType.PARAGRAPH) {
       return accumulator + " " + block.data.text;
@@ -668,8 +668,8 @@ const getNotesWithTitleContainingTokens = (
   notes: SavedNote[],
   query: string,
   caseSensitive: boolean
-):SavedNote[] => {
-  return notes.filter((note:SavedNote) => {
+): SavedNote[] => {
+  return notes.filter((note: SavedNote) => {
     if (query.length === 0) {
       return true;
     }
@@ -694,14 +694,14 @@ const getNotesWithTitleContainingTokens = (
 
 
 const getNotesThatContainTokens = (
-  notes:SavedNote[],
+  notes: SavedNote[],
   query: string,
   caseSensitive: boolean,
-):SavedNote[] => {
+): SavedNote[] => {
   const queryTokens = query.split(" ");
 
   return notes
-    .filter((note:SavedNote) => {
+    .filter((note: SavedNote) => {
       const noteText = getConcatenatedTextOfNote(note);
 
       // the note text must include every query token to be a positive
@@ -715,21 +715,21 @@ const getNotesThatContainTokens = (
 
 
 const getNotesWithBlocksOfTypes = (
-  notes:SavedNote[],
+  notes: SavedNote[],
   types: NoteContentBlockType[],
-  notesMustContainAllBlockTypes:boolean,
-):SavedNote[] => {
+  notesMustContainAllBlockTypes: boolean,
+): SavedNote[] => {
   return notesMustContainAllBlockTypes
     ? notes
       // every single note must contain blocks from all the types
-      .filter((note:SavedNote):boolean => {
+      .filter((note: SavedNote): boolean => {
         return types.every((type) => {
           return note.blocks.some((block) => block.type === type);
         });
       })
     // every note must contain one block with only one type of types:
     : notes
-      .filter((note:SavedNote):boolean => {
+      .filter((note: SavedNote): boolean => {
         return note.blocks.some((block) => types.includes(block.type));
       });
 };

@@ -64,7 +64,7 @@ interface Instance {
   These functions are synchronous, because they only schedule those events.
   They don't wait until these things are finished.
 */
-let eventQueue:Promise<Instance | null> = Promise.resolve(null);
+let eventQueue: Promise<Instance | null> = Promise.resolve(null);
 
 let idCounter = 0;
 
@@ -74,7 +74,7 @@ const loadEditorJSInstance = async (params: InstanceInitParams) => {
   // several plugins are able to upload and download files. the following
   // config object is passed to all of them
   const fileHandlingConfig = {
-    uploadByFile: async (file:File):Promise<FileInfo> => {
+    uploadByFile: async (file: File): Promise<FileInfo> => {
       const { fileId } = await databaseProvider.uploadFile(file);
 
       const type = getFileTypeFromFilename(file.name);
@@ -89,13 +89,13 @@ const loadEditorJSInstance = async (params: InstanceInitParams) => {
         size: file.size,
       };
     },
-    onDownload: async (file:FileInfo):Promise<void> => {
+    onDownload: async (file: FileInfo): Promise<void> => {
       const fileId = file.fileId;
       const name = file.name;
       const url = await databaseProvider.getUrlForFileId(fileId, name);
       window.open(url, "_blank");
     },
-    getUrl: async (file:FileInfo) => {
+    getUrl: async (file: FileInfo) => {
       const fileId = file.fileId;
       const name = file.name;
       const url = await databaseProvider.getUrlForFileId(fileId, name);
@@ -122,7 +122,7 @@ const loadEditorJSInstance = async (params: InstanceInitParams) => {
       link: {
         class: Link,
         config: {
-          customRequestFunction: async (url:string) => {
+          customRequestFunction: async (url: string) => {
             const metadata = await databaseProvider.getUrlMetadata(url);
 
             return {
@@ -186,11 +186,11 @@ const loadEditorJSInstance = async (params: InstanceInitParams) => {
 
 /** EXPORTS */
 
-const scheduleInit = (params: InstanceInitParams):void => {
+const scheduleInit = (params: InstanceInitParams): void => {
   eventQueue = eventQueue.then(async () => {
     const instanceId = idCounter++;
     const editorJSInstance = await loadEditorJSInstance(params);
-    const instance:Instance = {
+    const instance: Instance = {
       editorJSInstance,
       params,
       instanceId,
@@ -202,7 +202,7 @@ const scheduleInit = (params: InstanceInitParams):void => {
 
 const saveInstance = async (
   instance: Instance,
-):Promise<NoteContentBlock[]> => {
+): Promise<NoteContentBlock[]> => {
   const editorData = await instance.editorJSInstance.save();
 
   // when the user did not enter anything, editor.js
@@ -222,7 +222,7 @@ const saveInstance = async (
 };
 
 
-const save = async ():Promise<NoteContentBlock[]> => {
+const save = async (): Promise<NoteContentBlock[]> => {
   const currentInstance = await eventQueue;
 
   if (!currentInstance) {
@@ -239,7 +239,7 @@ const save = async ():Promise<NoteContentBlock[]> => {
 const createUpdatedInstance = async (
   currentInstance: Instance | null,
   newData: NoteContentBlock[],
-):Promise<Instance> => {
+): Promise<Instance> => {
   if (!currentInstance) {
     throw new Error("NO_INSTANCE_INITIALIZED_FOR_UPDATE");
   }
@@ -254,7 +254,7 @@ const createUpdatedInstance = async (
     data: newData,
   };
   const instanceId = idCounter++;
-  const newInstance:Instance = {
+  const newInstance: Instance = {
     editorJSInstance: await loadEditorJSInstance(newParams),
     params: newParams,
     instanceId,
@@ -264,9 +264,9 @@ const createUpdatedInstance = async (
 
 
 // push update event to event queue
-const scheduleUpdate = (newData: NoteContentBlock[]):void => {
+const scheduleUpdate = (newData: NoteContentBlock[]): void => {
   eventQueue = eventQueue.then(
-    (currentInstance: Instance | null):Promise<Instance> => {
+    (currentInstance: Instance | null): Promise<Instance> => {
       const newInstancePromise
         = createUpdatedInstance(currentInstance, newData);
       return newInstancePromise;
@@ -285,9 +285,9 @@ const isReady = async () => {
 
 
 // append focus event to event queue
-const scheduleFocus = ():void => {
+const scheduleFocus = (): void => {
   eventQueue = eventQueue.then(
-    async (currentInstance: Instance | null):Promise<Instance> => {
+    async (currentInstance: Instance | null): Promise<Instance> => {
       if (!currentInstance) {
         throw new Error(
           "NO_INSTANCE_INITIALIZED_FOR_FOCUS",
@@ -301,7 +301,7 @@ const scheduleFocus = ():void => {
 };
 
 
-const scheduleDestroy = ():void => {
+const scheduleDestroy = (): void => {
   eventQueue = eventQueue.then(async (currentInstance) => {
     if (!currentInstance) {
       throw new Error(

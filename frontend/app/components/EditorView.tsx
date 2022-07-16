@@ -88,8 +88,8 @@ const EditorView = ({
   page,
   setPage,
   setSearchValue,
-}:EditorViewProps) => {
-  const newNoteObject:UnsavedActiveNote = Utils.getNewNoteObject();
+}: EditorViewProps) => {
+  const newNoteObject: UnsavedActiveNote = Utils.getNewNoteObject();
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
 
   const isSmallScreen = useIsSmallScreen();
@@ -98,7 +98,7 @@ const EditorView = ({
   const location = useLocation();
   const goToNote = useGoToNote();
   const params = useParams();
-  const activeNoteId:NoteId
+  const activeNoteId: NoteId
     = (
       typeof params.activeNoteId === "string"
       && Utils.stringContainsOnlyDigits(params.activeNoteId)
@@ -112,7 +112,7 @@ const EditorView = ({
 
   const displayedLinkedNotes = useDisplayedLinkedNotes(activeNote);
 
-  const handleLinkAddition = async (note:MainNoteListItem):Promise<void> => {
+  const handleLinkAddition = async (note: MainNoteListItem): Promise<void> => {
     // return if linked note has already been added
     if (activeNote.changes.some((change) => {
       return (
@@ -171,7 +171,7 @@ const EditorView = ({
       setUnsavedChanges(false);
     }
 
-    const noteToTransmit:NoteFromUser = {
+    const noteToTransmit: NoteFromUser = {
       title: activeNote.title,
       blocks: await Editor.save(),
       changes: activeNote.linkedNotes.map((linkedNote) => {
@@ -189,7 +189,7 @@ const EditorView = ({
   };
 
 
-  const handleLinkRemoval = async (linkedNoteId:NoteId) => {
+  const handleLinkRemoval = async (linkedNoteId: NoteId) => {
     if (activeNote.changes.some((change) => {
       return (
         change.type === UserNoteChangeType.LINKED_NOTE_DELETED
@@ -203,7 +203,7 @@ const EditorView = ({
       ...activeNote,
       changes: [
         ...activeNote.changes.filter(
-          (change:FrontendUserNoteChange):boolean => {
+          (change: FrontendUserNoteChange): boolean => {
             return !(
               change.type === UserNoteChangeType.LINKED_NOTE_ADDED
               && change.noteId === linkedNoteId
@@ -221,7 +221,7 @@ const EditorView = ({
   };
 
 
-  const loadNote = async (noteId:NoteId) => {
+  const loadNote = async (noteId: NoteId) => {
     /* if we don't have a note id, let's create a new note */
     if (isNaN(noteId)) {
       /* whatever has been written to the address bar, let's replace it with
@@ -238,7 +238,7 @@ const EditorView = ({
       /* optionally attach existing file to new note */
       const searchParams = new URLSearchParams(location.search);
       const fileIdToAttach = searchParams.get("attach-file");
-      const newNoteObject:UnsavedActiveNote = Utils.getNewNoteObject();
+      const newNoteObject: UnsavedActiveNote = Utils.getNewNoteObject();
       setActiveNote(newNoteObject);
       const newBlocks = Utils.getNewNoteBlocks(
         fileIdToAttach ? [fileIdToAttach] : undefined,
@@ -297,12 +297,12 @@ const EditorView = ({
   };
 
 
-  const prepareNoteToTransmit = async ():Promise<NoteFromUser> => {
-    const noteToTransmit:NoteFromUser = {
+  const prepareNoteToTransmit = async (): Promise<NoteFromUser> => {
+    const noteToTransmit: NoteFromUser = {
       title: activeNote.title,
       blocks: await Editor.save(),
       changes: activeNote.changes.map(
-        (change:FrontendUserNoteChange):UserNoteChange => {
+        (change: FrontendUserNoteChange): UserNoteChange => {
           return {
             type: change.type,
             noteId: change.noteId,
@@ -321,7 +321,7 @@ const EditorView = ({
   };
 
 
-  const saveActiveNote = async (options:NotePutOptions):Promise<void> => {
+  const saveActiveNote = async (options: NotePutOptions): Promise<void> => {
     const noteToTransmit = await prepareNoteToTransmit();
     const noteFromDatabase = await databaseProvider.putNote(
       noteToTransmit, options,
@@ -348,7 +348,7 @@ const EditorView = ({
   };
 
 
-  const handleNoteSaveRequest = async ():Promise<void> => {
+  const handleNoteSaveRequest = async (): Promise<void> => {
     try {
       await saveActiveNote({ ignoreDuplicateTitles: false });
     } catch (e) {
@@ -393,8 +393,8 @@ const EditorView = ({
   }, [activeNote]);
 
 
-  const pinOrUnpinNote = async (noteId:NoteId) => {
-    let newPinnedNotes:NoteToTransmit[];
+  const pinOrUnpinNote = async (noteId: NoteId) => {
+    let newPinnedNotes: NoteToTransmit[];
     if (pinnedNotes.find((pinnedNote) => pinnedNote.id === noteId)) {
       newPinnedNotes = await databaseProvider.unpinNote(noteId);
     } else {
@@ -458,7 +458,7 @@ const EditorView = ({
         <Note
           note={activeNote}
           setNoteTitle={
-            (newTitle:string):void => {
+            (newTitle: string): void => {
               setActiveNote({
                 ...activeNote,
                 title: newTitle,

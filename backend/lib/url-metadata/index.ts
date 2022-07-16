@@ -3,8 +3,8 @@ import parse from "./lib/parse.js";
 
 export default async (
   url,
-  options?:Options,
-):Promise<Result> => {
+  options?: Options,
+): Promise<Result> => {
   if (typeof options !== 'object') options = {};
 
   const opts = Object.assign(

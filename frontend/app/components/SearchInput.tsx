@@ -16,7 +16,7 @@ const SearchInput = ({
   placeholder,
   inputStyle = {},
   autoComplete,
-}:SearchInputProps) => {
+}: SearchInputProps) => {
   return <>
     {
       label

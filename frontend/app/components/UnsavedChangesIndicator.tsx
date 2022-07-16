@@ -11,7 +11,7 @@ interface UnsavedChangesIndicatorProps {
 const UnsavedChangesIndicator = ({
   isUnsaved,
   unsavedChanges,
-}:UnsavedChangesIndicatorProps) => {
+}: UnsavedChangesIndicatorProps) => {
   const unsavedChangesText = unsavedChanges
     ? l("editor.unsaved-changes")
     : l("editor.no-unsaved-changes");

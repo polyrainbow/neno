@@ -17,7 +17,7 @@ const NoteListItemInfo = ({
 
   const isMainNoteListItem = (
     noteListItem:(FrontendNoteListItem),
-  ):noteListItem is MainNoteListItem => {
+  ): noteListItem is MainNoteListItem => {
     return "features" in noteListItem;
   };
 

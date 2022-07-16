@@ -80,12 +80,12 @@ export default class GraphVisualization {
 
 
   static prepareGraphObject = (
-    backendGraph:BackendGraphVisualization,
+    backendGraph: BackendGraphVisualization,
   ): FrontendGraphVisualization => {
-    const frontendGraph:FrontendGraphVisualization = {
+    const frontendGraph: FrontendGraphVisualization = {
       ...backendGraph,
       links: backendGraph.links.map(
-        (link: Link):GraphVisualizationLink => {
+        (link: Link): GraphVisualizationLink => {
           return [
             backendGraph.nodes.find(
               (node) => node.id === link[0],
@@ -126,7 +126,7 @@ export default class GraphVisualization {
   static #transformScreenPosition = (
     center: ScreenPosition,
     svgRect: DOMRect,
-  ):ScreenPosition => {
+  ): ScreenPosition => {
     return {
       translateX: (-center.translateX) + (svgRect.width / 2),
       translateY: (-center.translateY) + (svgRect.height / 2),
@@ -151,13 +151,13 @@ export default class GraphVisualization {
   #svg;
   #idsOfAllNodesWithLinkedNote: NoteId[] = [];
   #updatedNodes = new Set<GraphVisualizationNode>();
-  #mouseDownNode:GraphVisualizationNode | null = null;
+  #mouseDownNode: GraphVisualizationNode | null = null;
   #justDragged = false;
   #justScaleTransGraph = false;
   #lastKeyDown = -1;
   #newLinkCreationInProgress = false;
   #selection = new Set<GraphVisualizationNode | GraphVisualizationLink>();
-  #connectedNodeIdsOfSelection:NoteId[] = [];
+  #connectedNodeIdsOfSelection: NoteId[] = [];
   #titleRenderingEnabled = false;
 
   #mainSVGGroup;
@@ -189,7 +189,7 @@ export default class GraphVisualization {
     initialFocusNoteId,
     openNote,
   }: GraphVisualizerConfig) {
-    const graphObjectPrepared:FrontendGraphVisualization
+    const graphObjectPrepared: FrontendGraphVisualization
       = GraphVisualization.prepareGraphObject(graphObject);
     this.#parent = parent;
     const { width, height } = this.#parent.getBoundingClientRect();
@@ -208,7 +208,7 @@ export default class GraphVisualization {
     this.#nodes = graphObjectPrepared.nodes;
     this.#links = graphObjectPrepared.links;
 
-    const svgRect:DOMRect = this.#svg.node().getBoundingClientRect();
+    const svgRect: DOMRect = this.#svg.node().getBoundingClientRect();
 
     // ... we'll overwrite it if a valid note to focus is given
     if (typeof initialFocusNoteId === "number" && !isNaN(initialFocusNoteId)) {
@@ -439,7 +439,7 @@ export default class GraphVisualization {
   ***********************/
 
 
-  #updateConnectedNodeIds():void {
+  #updateConnectedNodeIds(): void {
     this.#idsOfAllNodesWithLinkedNote = this.#links
       .reduce((accumulator: NoteId[], link) => {
         accumulator.push(link[0].id);
@@ -450,7 +450,7 @@ export default class GraphVisualization {
   }
 
 
-  #newPathMove(e, originNode):void {
+  #newPathMove(e, originNode): void {
     if (!this.#newLinkCreationInProgress) {
       return;
     }
@@ -470,7 +470,7 @@ export default class GraphVisualization {
 
   // insert svg line breaks: taken from
   // http://stackoverflow.com/questions/13241475/how-do-i-include-newlines-in-labels-in-d3-charts
-  #insertTitleLinebreaks(gEl, title:string):void {
+  #insertTitleLinebreaks(gEl, title: string): void {
     const titleShortened = shortenText(
       title,
       GraphVisualization.#consts.MAX_NODE_TEXT_LENGTH,
@@ -488,12 +488,12 @@ export default class GraphVisualization {
   }
 
 
-  #getConnectedNodeIdsOfSelection(selection):NoteId[] {
+  #getConnectedNodeIdsOfSelection(selection): NoteId[] {
     return selection.reduce((accumulator, newValue) => {
       if (GraphVisualization.#isEdge(newValue)) {
         accumulator.push(newValue[0].id, newValue[1].id);
       } else {
-        const linkedNoteIds:NoteId[]
+        const linkedNoteIds: NoteId[]
           = newValue.linkedNotes.map((node) => node.id);
         accumulator.push(...linkedNoteIds);
       }
@@ -504,9 +504,9 @@ export default class GraphVisualization {
 
 
   #select(
-    values:(GraphVisualizationNode | GraphVisualizationLink)[],
+    values: (GraphVisualizationNode | GraphVisualizationLink)[],
     addToOrRemoveFromExistingSelection = false,
-  ):void {
+  ): void {
     if (!addToOrRemoveFromExistingSelection) {
       this.#selection = new Set(values);
     } else {
@@ -528,7 +528,7 @@ export default class GraphVisualization {
   }
 
 
-  #handleMouseDownOnEdge(e, d:GraphVisualizationLink):void {
+  #handleMouseDownOnEdge(e, d: GraphVisualizationLink): void {
     e.stopPropagation();
 
     // when shift key is pressed down during mousedown,
@@ -537,7 +537,7 @@ export default class GraphVisualization {
   }
 
 
-  #handleMouseDownOnNode(e, d:GraphVisualizationNode) {
+  #handleMouseDownOnNode(e, d: GraphVisualizationNode) {
     e.stopPropagation();
     this.#mouseDownNode = d;
     if (e.shiftKey) {
@@ -572,7 +572,7 @@ export default class GraphVisualization {
     if (mouseDownNode !== mouseUpNode) {
       // we're in a different node:
       // create new edge for mousedown edge and add to graph
-      const newEdge:GraphVisualizationLink = [mouseDownNode, mouseUpNode];
+      const newEdge: GraphVisualizationLink = [mouseDownNode, mouseUpNode];
 
       // check if such an edge is already there ...
       const edgeAlreadyExists = this
@@ -682,7 +682,7 @@ export default class GraphVisualization {
 
 
   // call to propagate changes to graph
-  #updateGraph(event?):void {
+  #updateGraph(event?): void {
     const consts = GraphVisualization.#consts;
 
     this.#initialNodePositionIndicator
@@ -754,11 +754,11 @@ export default class GraphVisualization {
       .classed(consts.selectedClass, (edge) => {
         return this.#selection.has(edge);
       })
-      .attr("d", (d:GraphVisualizationLink) => {
+      .attr("d", (d: GraphVisualizationLink) => {
         return "M" + d[0].position.x + "," + d[0].position.y
           + "L" + d[1].position.x + "," + d[1].position.y;
       })
-      .classed("connected-to-selected", (edge:GraphVisualizationLink) => {
+      .classed("connected-to-selected", (edge: GraphVisualizationLink) => {
         // only nodes can be connected to a link, links cannot be connected to
         // other links
 
@@ -778,11 +778,11 @@ export default class GraphVisualization {
       .enter()
       .append("path")
       .classed("link", true)
-      .attr("d", (d:GraphVisualizationLink) => {
+      .attr("d", (d: GraphVisualizationLink) => {
         return "M" + d[0].position.x + "," + d[0].position.y
         + "L" + d[1].position.x + "," + d[1].position.y;
       })
-      .on("mouseover", (_e, d:GraphVisualizationLink) => {
+      .on("mouseover", (_e, d: GraphVisualizationLink) => {
         this.#onHighlight({
           active: true,
           type: "edge",
@@ -928,8 +928,8 @@ export default class GraphVisualization {
   ********************/
 
 
-  getSaveData():GraphVisualizationFromUser {
-    const linksToTransmit:Link[] = this.#links.map((link) => {
+  getSaveData(): GraphVisualizationFromUser {
+    const linksToTransmit: Link[] = this.#links.map((link) => {
       return [
         link[0].id,
         link[1].id,
@@ -937,7 +937,7 @@ export default class GraphVisualization {
     });
 
     const nodePositionUpdates = Array.from(this.#updatedNodes)
-      .map((node:GraphVisualizationNode) => {
+      .map((node: GraphVisualizationNode) => {
         return {
           id: node.id,
           position: node.position,
@@ -946,7 +946,7 @@ export default class GraphVisualization {
 
     const svgRect = this.#svg.node().getBoundingClientRect();
 
-    const graphObject:GraphVisualizationFromUser = {
+    const graphObject: GraphVisualizationFromUser = {
       nodePositionUpdates,
       links: linksToTransmit,
       screenPosition: GraphVisualization.#transformScreenPosition(
@@ -960,14 +960,14 @@ export default class GraphVisualization {
   }
 
 
-  getSelectedNodeIds():NoteId[] {
+  getSelectedNodeIds(): NoteId[] {
     return Array.from(this.#selection)
       .filter(GraphVisualization.#isNode)
       .map((val) => val.id);
   }
 
 
-  setSearchValue(newSearchValue:string):void {
+  setSearchValue(newSearchValue: string): void {
     if (typeof newSearchValue === "string") {
       this.#searchValue = newSearchValue;
     }
@@ -975,7 +975,7 @@ export default class GraphVisualization {
   }
 
 
-  inflateGraph(factor:number):void {
+  inflateGraph(factor: number): void {
     this.#nodes
       .forEach((node) => {
         node.position.x *= factor;
@@ -989,7 +989,7 @@ export default class GraphVisualization {
   }
 
 
-  toggleTextRendering():boolean {
+  toggleTextRendering(): boolean {
     if (!this.#titleRenderingEnabled) {
       this.#titleRenderingEnabled = true;
       d3.selectAll("g." + GraphVisualization.#consts.nodeClassName)

@@ -55,7 +55,7 @@ const NoteList = ({
   itemsAreLinkable,
   unsavedChanges,
   setUnsavedChanges,
-}:NoteListProps) => {
+}: NoteListProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const goToNote = useGoToNote();
   const confirmDiscardingUnsavedChanges

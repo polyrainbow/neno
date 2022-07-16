@@ -12,7 +12,7 @@ import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 
 
-const yyyymmdd = (date = new Date()):string => {
+const yyyymmdd = (date = new Date()): string => {
   const yyyy = date.getFullYear().toString();
   const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
   const dd = date.getDate().toString();
@@ -22,7 +22,7 @@ const yyyymmdd = (date = new Date()):string => {
 };
 
 
-const getParameterByName = (name:string, url:string):string | null => {
+const getParameterByName = (name: string, url: string): string | null => {
   if (!url) url = window.location.href;
   name = name.replace(/[[\]]/g, "\\$&");
   const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
@@ -33,12 +33,12 @@ const getParameterByName = (name:string, url:string):string | null => {
 };
 
 
-const makeTimestampHumanReadable = (timestamp:number):string => {
+const makeTimestampHumanReadable = (timestamp: number): string => {
   return (new Date(timestamp)).toLocaleString();
 };
 
 
-const getExtensionFromFilename = (filename: string):string | null => {
+const getExtensionFromFilename = (filename: string): string | null => {
   const posOfDot = filename.lastIndexOf(".");
   if (posOfDot === -1) {
     return null;
@@ -54,8 +54,8 @@ const getExtensionFromFilename = (filename: string):string | null => {
 
 
 const getFileTypeFromFilename = (
-  filename:string,
-):NoteContentBlockType | null => {
+  filename: string,
+): NoteContentBlockType | null => {
   const map = new Map<string, NoteContentBlockType>(Object.entries({
     "png": NoteContentBlockType.IMAGE,
     "jpg": NoteContentBlockType.IMAGE,
@@ -80,8 +80,8 @@ const getFileTypeFromFilename = (
 
 const createBlocksFromFileIds = (
   fileIds: FileId[],
-):NoteContentBlockWithFile[] => {
-  return fileIds.map((fileId:FileId):NoteContentBlockWithFile => {
+): NoteContentBlockWithFile[] => {
+  return fileIds.map((fileId: FileId): NoteContentBlockWithFile => {
     const type = getFileTypeFromFilename(fileId) as NoteContentBlockType;
 
     return {
@@ -106,15 +106,15 @@ const createBlocksFromFileIds = (
 
 const getNewNoteBlocks = (
   fileIds?: FileId[],
-):NoteContentBlock[] => {
+): NoteContentBlock[] => {
   return fileIds
     ? createBlocksFromFileIds(fileIds)
     : Config.DEFAULT_NOTE_BLOCKS;
 };
 
 
-const getNewNoteObject = ():UnsavedActiveNote => {
-  const note:UnsavedActiveNote = {
+const getNewNoteObject = (): UnsavedActiveNote => {
+  const note: UnsavedActiveNote = {
     isUnsaved: true,
     changes: [],
     title: Config.DEFAULT_NOTE_TITLE,
@@ -127,13 +127,13 @@ const getNewNoteObject = ():UnsavedActiveNote => {
 
 // if the note has no title yet, take the title of the link metadata
 const setNoteTitleByLinkTitleIfUnset = (
-  note:NoteFromUser,
+  note: NoteFromUser,
   defaultNoteTitle: string,
-):void => {
+): void => {
   if (note.blocks.length === 0) return;
 
   const firstLinkBlock = note.blocks.find(
-    (block:NoteContentBlock):block is NoteContentBlockLink => {
+    (block: NoteContentBlock): block is NoteContentBlockLink => {
       return block.type === "link";
     },
   );
@@ -175,7 +175,7 @@ const binaryArrayFind = function<T>(
   sortedArray: T[],
   sortKeyKey: string,
   sortKeyToFind: string,
-):T | null {
+): T | null {
   let start = 0;
   let end = sortedArray.length - 1;
 
@@ -211,7 +211,7 @@ const binaryArrayFind = function<T>(
 const binaryArrayIncludes = function<T>(
   sortedArray: T[],
   valueToLookFor: T,
-):boolean {
+): boolean {
   let start = 0;
   let end = sortedArray.length - 1;
 
@@ -264,7 +264,7 @@ function humanFileSize(bytes: number, si = false, dp = 1): string {
 }
 
 
-const shortenText = (text:string, maxLength:number):string => {
+const shortenText = (text: string, maxLength: number): string => {
   if (text.length > maxLength) {
     return text.trim().substring(0, maxLength) + "…";
   } else {
@@ -273,7 +273,7 @@ const shortenText = (text:string, maxLength:number):string => {
 };
 
 
-const streamToBlob = async (stream, mimeType:string):Promise<Blob> => {
+const streamToBlob = async (stream, mimeType: string): Promise<Blob> => {
   const response = new Response(
     stream,
     {
@@ -299,8 +299,8 @@ const getWindowDimensions = (): {width: number, height: number} => {
  * @return {boolean} true or false
  */
 const blockHasLoadedFile = (
-  block:NoteContentBlock,
-):block is NoteContentBlockWithFileLoaded => {
+  block: NoteContentBlock,
+): block is NoteContentBlockWithFileLoaded => {
   return (
     [
       "image",
@@ -314,12 +314,12 @@ const blockHasLoadedFile = (
 
 
 const getMetadataOfFilesInNote = (
-  note:SavedActiveNote,
-):FileInfo[] => {
+  note: SavedActiveNote,
+): FileInfo[] => {
   return note.blocks
     .filter(blockHasLoadedFile)
     .map(
-      (block:NoteContentBlockWithFileLoaded):FileInfo => {
+      (block: NoteContentBlockWithFileLoaded): FileInfo => {
         return block.data.file;
       },
     );
@@ -327,10 +327,10 @@ const getMetadataOfFilesInNote = (
 
 
 const getAppPath = (
-  pathTemplate:PathTemplate,
-  params?:Map<string, string>,
+  pathTemplate: PathTemplate,
+  params?: Map<string, string>,
   urlParams?: URLSearchParams,
-):string => {
+): string => {
   let path = `${Config.ROOT_PATH}${pathTemplate}`;
   params?.forEach((value, key) => {
     path = path.replace(`%${key}%`, value);
@@ -342,11 +342,11 @@ const getAppPath = (
 };
 
 
-const getIconSrc = (iconName:string):string => {
+const getIconSrc = (iconName: string): string => {
   return Config.ICON_PATH + iconName + ".svg";
 };
 
-const stringContainsOnlyDigits = (val:string):boolean => /^\d+$/.test(val);
+const stringContainsOnlyDigits = (val: string): boolean => /^\d+$/.test(val);
 
 
 export {

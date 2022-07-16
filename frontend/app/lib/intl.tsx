@@ -1,7 +1,7 @@
 import React from "react";
 
 interface Replacements {
-  [key:string]: string
+  [key: string]: string
 }
 
 export const supportedLangs = [
@@ -25,7 +25,7 @@ localStorage.setItem("language", lang);
 
 const langFile = await import(`../intl/${lang}.json`);
 
-export function l(key:string, replacements?:Replacements):string {
+export function l(key: string, replacements?: Replacements): string {
   if (typeof langFile[key] === "string") {
     let output = langFile[key];
     for (const replacement in replacements) {
@@ -41,11 +41,14 @@ export function l(key:string, replacements?:Replacements):string {
 }
 
 /* localize and return fragment with react components */
-export function lf(key:string, replacements?:Replacements):React.ReactFragment {
+export function lf(
+  key: string,
+  replacements?: Replacements,
+): React.ReactFragment {
   const output = l(key, replacements);
 
   if (output.includes("%EXTERNAL_LINK")) {
-    const nodes:React.ReactNode[] = [];
+    const nodes: React.ReactNode[] = [];
 
     const regex = /%EXTERNAL_LINK\[(?<label>[^\]]*)\]\((?<url>[^)]*)\)/gm;
     const outerParts = output.split(regex);

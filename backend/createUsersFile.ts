@@ -11,7 +11,7 @@ import * as logger from "./lib/logger.js";
 import MuteableStdout from "./lib/MuteableStdout.js";
 
 
-export default async (filepath:string):Promise<void> => {
+export default async (filepath: string): Promise<void> => {
   const muteableStdout = new MuteableStdout();
 
   const rl = readline.createInterface({
@@ -20,7 +20,7 @@ export default async (filepath:string):Promise<void> => {
     terminal: true,
   });
 
-  const users:User[] = [];
+  const users: User[] = [];
 
   const numberOfUsers
     = (await rl.question("How many users do you wish to create? (1) ")) || 1;

@@ -4,7 +4,7 @@ import NoteContentBlock, {
 
 const DEFAULT_NOTE_TITLE = "";
 
-const DEFAULT_NOTE_BLOCKS:NoteContentBlock[] = [
+const DEFAULT_NOTE_BLOCKS: NoteContentBlock[] = [
   {
     "type": NoteContentBlockType.PARAGRAPH,
     "data": {

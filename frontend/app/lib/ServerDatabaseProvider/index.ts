@@ -27,15 +27,15 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     API.init(API_URL);
   }
 
-  getActiveGraphId():GraphId | null {
+  getActiveGraphId(): GraphId | null {
     return this.#activeGraphId;
   }
 
-  getGraphIds():GraphId[] | null {
+  getGraphIds(): GraphId[] | null {
     return this.#graphIds;
   }
 
-  setActiveGraph(graphId:GraphId):void {
+  setActiveGraph(graphId: GraphId): void {
     this.#activeGraphId = graphId;
     API.setGraphId(this.#activeGraphId);
   }
@@ -48,7 +48,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return response;
   }
 
-  async isAuthenticated():Promise<boolean> {
+  async isAuthenticated(): Promise<boolean> {
     try {
       const response = await API.isAuthenticated();
       this.#graphIds = response.graphIds;
@@ -76,7 +76,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     }
   }
 
-  getNote(noteId:NoteId):Promise<NoteToTransmit | null> {
+  getNote(noteId: NoteId): Promise<NoteToTransmit | null> {
     return API.getNote(noteId);
   }
 
@@ -84,7 +84,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getNotes(options);
   }
 
-  getStats(options:GraphStatsRetrievalOptions) {
+  getStats(options: GraphStatsRetrievalOptions) {
     return API.getStats(options);
   }
 
@@ -96,11 +96,11 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getDanglingFiles();
   }
 
-  deleteNote(noteId:NoteId):Promise<void> {
+  deleteNote(noteId: NoteId): Promise<void> {
     return API.deleteNote(noteId);
   }
 
-  putNote(noteFromUser:NoteFromUser, options) {
+  putNote(noteFromUser: NoteFromUser, options) {
     return API.putNote(noteFromUser, options);
   }
 
@@ -116,7 +116,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getGraphVisualization();
   }
 
-  getReadableGraphStream(withFiles:boolean) {
+  getReadableGraphStream(withFiles: boolean) {
     return API.getReadableGraphStream(withFiles);
   }
 
@@ -124,23 +124,23 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.uploadFile(file);
   }
 
-  getReadableFileStream(fileId:FileId) {
+  getReadableFileStream(fileId: FileId) {
     return API.getReadableFileStream(fileId);
   }
 
-  deleteFile(fileId:FileId) {
+  deleteFile(fileId: FileId) {
     return API.deleteFile(fileId);
   }
 
-  getUrlMetadata(url:string) {
+  getUrlMetadata(url: string) {
     return API.getUrlMetadata(url);
   }
 
-  pinNote(noteId:NoteId) {
+  pinNote(noteId: NoteId) {
     return API.pinNote(noteId);
   }
 
-  unpinNote(noteId:NoteId) {
+  unpinNote(noteId: NoteId) {
     return API.unpinNote(noteId);
   }
 
@@ -156,7 +156,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
    * public name instead of the more technical fileId.
    * @return {string} url
   */
-  async getUrlForFileId(fileId:FileId, publicName?:string): Promise<string> {
+  async getUrlForFileId(fileId: FileId, publicName?: string): Promise<string> {
     let url = this.#apiUrl + "graph/" + this.#activeGraphId + "/file/" + fileId;
 
     if (typeof publicName === "string") {

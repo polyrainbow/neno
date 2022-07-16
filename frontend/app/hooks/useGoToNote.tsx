@@ -8,7 +8,7 @@ import { getAppPath } from "../lib/utils";
 const useGoToNote = () => {
   const navigate = useNavigate();
 
-  const goToNote = (noteId:NoteId, replace = false) => {
+  const goToNote = (noteId: NoteId, replace = false) => {
     const path = getAppPath(
       PathTemplate.EDITOR_WITH_NOTE,
       new Map([["NOTE_ID", noteId.toString()]]),

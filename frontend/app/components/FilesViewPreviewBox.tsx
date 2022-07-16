@@ -13,7 +13,7 @@ interface FilesViewPreviewBoxProps{
 
 const FilesViewPreviewBox = ({
   file,
-}:FilesViewPreviewBoxProps) => {
+}: FilesViewPreviewBoxProps) => {
   const type = getFileTypeFromFilename(file.id) || "unknown";
 
   const imageSrcMap = {

@@ -27,35 +27,35 @@ interface DatabaseProvider {
   getGraphIds?: () => GraphId[] | null;
   setActiveGraph?: (graphId: GraphId) => void;
   getNote: (noteId: NoteId) => Promise<NoteToTransmit | null>;
-  getNotes: (options:DatabaseQuery) => Promise<NoteListPage>;
+  getNotes: (options: DatabaseQuery) => Promise<NoteListPage>;
   getStats: (options: GraphStatsRetrievalOptions) => Promise<GraphStats>;
   getFiles: () => Promise<FileId[]>
   getDanglingFiles: () => Promise<FileId[]>;
-  deleteNote: (noteId:NoteId) => Promise<void>;
+  deleteNote: (noteId: NoteId) => Promise<void>;
   putNote: (
-    noteToTransmit:NoteFromUser,
-    options:NotePutOptions,
+    noteToTransmit: NoteFromUser,
+    options: NotePutOptions,
   ) => Promise<NoteToTransmit>;
   importLinksAsNotes: (links: string[]) => Promise<{
     notesToTransmit: NoteToTransmit[];
     failures: ImportLinkAsNoteFailure[];
   }>;
   saveGraphVisualization: (
-    graphVisualization:GraphVisualizationFromUser,
+    graphVisualization: GraphVisualizationFromUser,
   ) => Promise<void>;
   getGraphVisualization: () => Promise<BackendGraphVisualization>;
-  getReadableGraphStream: (withFiles:boolean) => Promise<any>;
+  getReadableGraphStream: (withFiles: boolean) => Promise<any>;
   uploadFile: (file: File) => Promise<{
     fileId: string;
     size: number;
   }>;
   getReadableFileStream: (fileId: FileId) => Promise<any>;
-  deleteFile: (fileId:FileId) => Promise<void>;
-  getUrlMetadata: (url:string) => Promise<UrlMetadataResponse>;
+  deleteFile: (fileId: FileId) => Promise<void>;
+  getUrlMetadata: (url: string) => Promise<UrlMetadataResponse>;
   pinNote: (noteId: NoteId) => Promise<NoteToTransmit[]>;
   unpinNote: (noteId: NoteId) => Promise<NoteToTransmit[]>;
   getPins: () => Promise<NoteToTransmit[]>;
-  getUrlForFileId: (fileId: FileId, publicName?:string) => Promise<string>;
+  getUrlForFileId: (fileId: FileId, publicName?: string) => Promise<string>;
 }
 
 

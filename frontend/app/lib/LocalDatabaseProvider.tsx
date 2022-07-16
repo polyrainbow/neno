@@ -21,10 +21,10 @@ import BackendGraphVisualization
 
 
 async function verifyPermission(
-  fileSystemHandle:FileSystemHandle,
-  readWrite:boolean,
-):Promise<boolean> {
-  const options:FileSystemHandlePermissionDescriptor = {};
+  fileSystemHandle: FileSystemHandle,
+  readWrite: boolean,
+): Promise<boolean> {
+  const options: FileSystemHandlePermissionDescriptor = {};
   if (readWrite) {
     options.mode = "readwrite";
   }
@@ -46,13 +46,13 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
   static #handleStorageKey = "LOCAL_DB_FOLDER_HANDLE";
   /* when using a local graph folder, we'll always call this graph the same */
-  static #defaultFirstGraphId:GraphId = "graph-1";
+  static #defaultFirstGraphId: GraphId = "graph-1";
   static #graphIndexFileName = "graphs.json";
   #isDatabaseInitialized = false;
-  #folderHandle:FileSystemDirectoryHandle | null = null;
+  #folderHandle: FileSystemDirectoryHandle | null = null;
   #notesModule: typeof import("../../../lib/notes/index") | null = null;
-  #graphIds:GraphId[] | null = null;
-  #activeGraphId:string | null = null;
+  #graphIds: GraphId[] | null = null;
+  #activeGraphId: string | null = null;
   #storageProvider: FileSystemAccessAPIStorageProvider | null = null;
 
   /* PUBLIC */
@@ -64,11 +64,11 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
   static type = "LOCAL";
 
-  getActiveGraphId():GraphId | null {
+  getActiveGraphId(): GraphId | null {
     return this.#activeGraphId;
   }
 
-  getGraphIds():GraphId[] | null {
+  getGraphIds(): GraphId[] | null {
     return this.#graphIds;
   }
 
@@ -80,7 +80,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   // when we return that we have an access token, the app switches to editor
   // mode and the editor will start fetching data, so we need to be prepared
   // and initialize the database
-  async getFolderHandleName():Promise<string | null> {
+  async getFolderHandleName(): Promise<string | null> {
     if (this.#folderHandle) {
       return this.#folderHandle.name;
     }
@@ -95,7 +95,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  async login(folderHandle:FileSystemDirectoryHandle):Promise<void> {
+  async login(folderHandle: FileSystemDirectoryHandle): Promise<void> {
     await IDB.set(
       LocalDatabaseProvider.#handleStorageKey,
       folderHandle,
@@ -107,7 +107,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  async removeAccess():Promise<void> {
+  async removeAccess(): Promise<void> {
     this.#folderHandle = null;
     await IDB.del(LocalDatabaseProvider.#handleStorageKey);
 
@@ -187,7 +187,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  getNote(noteId:NoteId):Promise<NoteToTransmit | null> {
+  getNote(noteId: NoteId): Promise<NoteToTransmit | null> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -196,7 +196,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     return this.#notesModule.get(noteId, this.#activeGraphId);
   }
 
-  getNotes(options:DatabaseQuery):Promise<NoteListPage> {
+  getNotes(options: DatabaseQuery): Promise<NoteListPage> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -208,7 +208,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     );
   }
 
-  getStats(options:GraphStatsRetrievalOptions):Promise<GraphStats> {
+  getStats(options: GraphStatsRetrievalOptions): Promise<GraphStats> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -217,7 +217,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     return this.#notesModule.getStats(this.#activeGraphId, options);
   }
 
-  deleteNote(noteId:NoteId): Promise<void> {
+  deleteNote(noteId: NoteId): Promise<void> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -226,7 +226,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     return this.#notesModule.remove(noteId, this.#activeGraphId);
   }
 
-  putNote(noteToTransmit:NoteFromUser, options:NotePutOptions) {
+  putNote(noteToTransmit: NoteFromUser, options: NotePutOptions) {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -263,7 +263,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     );
   }
 
-  async getGraphVisualization():Promise<BackendGraphVisualization> {
+  async getGraphVisualization(): Promise<BackendGraphVisualization> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -295,7 +295,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  uploadFile(file:File) {
+  uploadFile(file: File) {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -310,7 +310,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  deleteFile(fileId:FileId) {
+  deleteFile(fileId: FileId) {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -323,7 +323,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  getUrlMetadata(url:string):Promise<UrlMetadataResponse> {
+  getUrlMetadata(url: string): Promise<UrlMetadataResponse> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",

@@ -11,7 +11,7 @@ const HeaderContainer = ({
   leftContent,
   rightContent,
   toggleAppMenu,
-}:HeaderContainerProps) => {
+}: HeaderContainerProps) => {
   return (
     <header>
       <div id="header-left">

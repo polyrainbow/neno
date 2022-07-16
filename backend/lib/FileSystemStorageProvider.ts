@@ -23,19 +23,19 @@ enum StorageProviderErrorMessage {
 }
 
 async function asyncFilter<T>(
-  arr:Array<T>,
+  arr: Array<T>,
   callback,
-):Promise<Array<T>> {
+): Promise<Array<T>> {
   const fail: unique symbol = Symbol();
 
   const values: Array<T | symbol> = await Promise.all(
     arr.map(
-      async (item:T) => (await callback(item)) ? item : fail
+      async (item: T) => (await callback(item)) ? item : fail
     ),
   );
 
-  const passedValues:Array<T> = values.filter(
-    (val: T | symbol):boolean => {
+  const passedValues: Array<T> = values.filter(
+    (val: T | symbol): boolean => {
       return val !== fail;
     },
   ) as Array<T>;
@@ -44,7 +44,7 @@ async function asyncFilter<T>(
 }
 
 
-const handleNodeJsFsApiError = (e: unknown):never => {
+const handleNodeJsFsApiError = (e: unknown): never => {
   if (e instanceof Error && e.message.startsWith("ENOENT")) {
     throw new Error(
       StorageProviderErrorMessage.FILE_NOT_FOUND,
@@ -75,7 +75,7 @@ export default class FileSystemStorageProvider {
     graphId: string,
     requestPath: string,
     data: string | Buffer,
-  ):Promise<void> {
+  ): Promise<void> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
@@ -87,12 +87,12 @@ export default class FileSystemStorageProvider {
     graphId: string,
     requestPath: string,
     readableStream: fsClassic.ReadStream,
-  ):Promise<number> {
+  ): Promise<number> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
     await fs.mkdir(path.dirname(finalPath), { recursive: true });
-    const writableStream:fsClassic.WriteStream
+    const writableStream: fsClassic.WriteStream
       = fsClassic.createWriteStream(finalPath);
     readableStream.pipe(writableStream);
 
@@ -126,7 +126,7 @@ export default class FileSystemStorageProvider {
   async readObjectAsString(
     graphId: string,
     requestPath: string,
-  ):Promise<string> {
+  ): Promise<string> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
@@ -139,7 +139,7 @@ export default class FileSystemStorageProvider {
     graphId: string,
     requestPath: string,
     range: ByteRange,
-  ):Promise<fsClassic.ReadStream> {
+  ): Promise<fsClassic.ReadStream> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
@@ -154,7 +154,7 @@ export default class FileSystemStorageProvider {
   async getFileSize(
     graphId: string,
     requestPath: string,
-  ):Promise<number> {
+  ): Promise<number> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
@@ -170,7 +170,7 @@ export default class FileSystemStorageProvider {
   async removeObject(
     graphId: string,
     requestPath: string,
-  ):Promise<void> {
+  ): Promise<void> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
@@ -185,16 +185,16 @@ export default class FileSystemStorageProvider {
   async listSubDirectories(
     graphId: string,
     requestPath: string,
-  ):Promise<string[]> {
+  ): Promise<string[]> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
 
-    const entries:string[] = await fs.readdir(finalPath);
+    const entries: string[] = await fs.readdir(finalPath);
     
-    const directories:string[] = await asyncFilter(
+    const directories: string[] = await asyncFilter(
       entries,
-      async (objectName:string):Promise<boolean> => {
+      async (objectName: string): Promise<boolean> => {
         const stat = await fs.stat(this.joinPath(finalPath, objectName));
         return stat.isDirectory();
       },
@@ -206,7 +206,7 @@ export default class FileSystemStorageProvider {
   async listDirectory(
     graphId: string,
     requestPath: string,
-  ):Promise<string[]> {
+  ): Promise<string[]> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
@@ -218,7 +218,7 @@ export default class FileSystemStorageProvider {
   getArchiveStreamOfFolder(
     graphId: string,
     requestPath: string,
-  ):Promise<fsClassic.ReadStream> {
+  ): Promise<fsClassic.ReadStream> {
     const archive = archiver("zip");
   
     archive.on("error", function(err) {
@@ -234,7 +234,7 @@ export default class FileSystemStorageProvider {
   }
 
 
-  joinPath(...args:string[]):string {
+  joinPath(...args: string[]): string {
     return path.join(...args);
   }
 
@@ -242,7 +242,7 @@ export default class FileSystemStorageProvider {
   async getFolderSize(
     graphId: string,
     requestPath: string,
-  ):Promise<number> {
+  ): Promise<number> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );

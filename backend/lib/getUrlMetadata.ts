@@ -3,8 +3,8 @@ import urlMetadata from "./url-metadata/index.js";
 import UrlMetadataResponse from "../../lib/notes/interfaces/UrlMetadataResponse";
 
 const getUrlMetadata = async (
-  url:string,
-):Promise<UrlMetadataResponse> => {
+  url: string,
+): Promise<UrlMetadataResponse> => {
   const metadata = await urlMetadata(url);
 
   logger.verbose("URL metadata received:");

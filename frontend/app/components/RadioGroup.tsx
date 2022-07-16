@@ -2,9 +2,9 @@ import React from "react";
 
 interface RadioOptionProps {
   key: string,
-  groupId:string,
-  value:string | number,
-  label:string,
+  groupId: string,
+  value: string | number,
+  label: string,
   onSelect: any,
   isSelected: boolean,
 }
@@ -16,7 +16,7 @@ const RadioOption = ({
   label,
   onSelect,
   isSelected,
-}:RadioOptionProps) => {
+}: RadioOptionProps) => {
   const radioInputId = groupId + "_" + value;
 
   return <div

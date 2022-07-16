@@ -60,7 +60,7 @@ const App = ({
   const [searchValue, setSearchValue] = useState<string>("");
   const [pinnedNotes, setPinnedNotes] = useState<NoteToTransmit[]>([]);
 
-  const databaseProvider:DatabaseProvider | null
+  const databaseProvider: DatabaseProvider | null
     = databaseMode === DatabaseMode.LOCAL
       ? localDatabaseProvider
       : (
@@ -124,7 +124,7 @@ const App = ({
 
       setNoteListIsBusy(true);
 
-      const options:DatabaseQuery = {
+      const options: DatabaseQuery = {
         page,
         sortMode,
         caseSensitive: false,
@@ -164,7 +164,7 @@ const App = ({
   );
 
 
-  const handleSortModeChange = (sortMode:NoteListSortMode):void => {
+  const handleSortModeChange = (sortMode: NoteListSortMode): void => {
     setNoteListScrollTop(0);
     setSortMode(sortMode);
     setPage(1);
@@ -184,7 +184,7 @@ const App = ({
   };
 
 
-  const importLinksAsNotes = async (links:string[]):Promise<void> => {
+  const importLinksAsNotes = async (links: string[]): Promise<void> => {
     await databaseProvider?.importLinksAsNotes(links);
     refreshNotesList();
   };

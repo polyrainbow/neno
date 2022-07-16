@@ -1,8 +1,8 @@
 const getKeySortFunction = function(
   key: string | number,
   doCaseInsensitiveSort: boolean,
-):(a:any, b:any) => number {
-  return function(a, b):number {
+): (a: any, b: any) => number {
+  return function(a, b): number {
     let x = a[key];
     let y = b[key];
 
@@ -30,7 +30,7 @@ const getKeySortFunction = function(
     The sort key we want to find.
 */
 function binaryArrayFind<T> (
-  sortedArray:T[],
+  sortedArray: T[],
   sortKeyKey: string | number,
   sortKeyToFind: number | string,
 ): T | null {
@@ -96,7 +96,7 @@ function binaryArrayFindIndex(
 const binaryArrayIncludes = function<T>(
   sortedArray: T[],
   valueToLookFor: T
-):boolean {
+): boolean {
   let start = 0;
   let end = sortedArray.length - 1;
 
@@ -119,7 +119,7 @@ const binaryArrayIncludes = function<T>(
 };
 
 
-const yyyymmdd = (date:Date):string => {
+const yyyymmdd = (date: Date): string => {
   const yyyy = date.getFullYear().toString();
   const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
   const dd = date.getDate().toString();
@@ -159,9 +159,9 @@ function isNotFalse<TValue>(value: TValue | false): value is TValue {
 
 const getPagedMatches = <T>(
   allMatches: Array<T>,
-  page:number,
-  rows:number,
-):Array<T> => {
+  page: number,
+  rows: number,
+): Array<T> => {
   const startIndex = (page - 1) * rows;
 
   if (allMatches.length < startIndex) {
@@ -178,7 +178,7 @@ const getPagedMatches = <T>(
 };
 
 
-const stringContainsUUID = (string:string):boolean => {
+const stringContainsUUID = (string: string): boolean => {
   return Array.isArray(
     string.match(
       /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/g,

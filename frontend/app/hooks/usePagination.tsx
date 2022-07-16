@@ -104,8 +104,8 @@ interface UsePaginationResult {
 }
 
 export default function usePagination(
-  props:UsePaginationProps,
-):UsePaginationResult {
+  props: UsePaginationProps,
+): UsePaginationResult {
   // keep default values in sync with @default tags in Pagination.propTypes
   const {
     boundaryCount = 1,
@@ -222,7 +222,7 @@ export default function usePagination(
   };
 
   // Convert the basic item list to PaginationItem props objects
-  const items:UsePaginationItem[] = itemList.map((item) => {
+  const items: UsePaginationItem[] = itemList.map((item) => {
     return typeof item === "number"
       ? {
         "onClick": (event) => {

@@ -3,7 +3,7 @@ import { constants } from 'fs';
 import * as logger from "./lib/logger.js";
 
 // Makes sure that the data directory exists. If not, create it.
-const checkDataDirectory = async (directoryPath:string):Promise<void> => {
+const checkDataDirectory = async (directoryPath: string): Promise<void> => {
   try {
     await fs.access(
       directoryPath,

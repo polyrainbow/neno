@@ -54,7 +54,7 @@ export interface Result {
   'twitter:player': string
   'twitter:player:width': string
   'twitter:player:height': string
-  'twitter:player:stream':string
+  'twitter:player:stream': string
 
   'article:published_time'?: string
   'article:modified_time'?: string

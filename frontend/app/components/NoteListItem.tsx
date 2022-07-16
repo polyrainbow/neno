@@ -9,13 +9,13 @@ import {
 import { l } from "../lib/intl";
 
 interface NoteListItemProps {
-  key:string,
-  note:FrontendNoteListItem,
-  isActive:boolean,
-  isLinked:boolean,
-  onSelect:any,
-  onLinkChange:any,
-  isLinkable:boolean,
+  key: string,
+  note: FrontendNoteListItem,
+  isActive: boolean,
+  isLinked: boolean,
+  onSelect: any,
+  onLinkChange: any,
+  isLinkable: boolean,
 }
 
 
@@ -26,10 +26,10 @@ const NoteListItem = ({
   onSelect,
   onLinkChange,
   isLinkable,
-}:NoteListItemProps) => {
+}: NoteListItemProps) => {
   const isMainNoteListItem = (
     noteListItem:(FrontendNoteListItem),
-  ):noteListItem is MainNoteListItem => {
+  ): noteListItem is MainNoteListItem => {
     return "features" in noteListItem;
   };
 

@@ -17,7 +17,11 @@ export const getFilenameFromUrl = (url) => {
 * @param {object} attributes
 * @return {HTMLElement}
 */
-export const make = (tagName:string, classNames:string[], attributes = {}) => {
+export const make = (
+  tagName: string,
+  classNames: string[],
+  attributes = {},
+) => {
   // eslint-disable-next-line no-undef
   const el = document.createElement(tagName);
 
@@ -33,7 +37,7 @@ export const make = (tagName:string, classNames:string[], attributes = {}) => {
 
 
 /* Moves caret to the end of contentEditable element */
-export const moveCaretToEnd = (element:HTMLElement):void => {
+export const moveCaretToEnd = (element: HTMLElement): void => {
   const range = document.createRange();
   const selection = window.getSelection();
 
@@ -47,8 +51,8 @@ export const moveCaretToEnd = (element:HTMLElement):void => {
 
 
 export const getFileFromUserSelection = async (
-  types:FilePickerAcceptType[],
-):Promise<File> => {
+  types: FilePickerAcceptType[],
+): Promise<File> => {
   const [fileHandle] = await window.showOpenFilePicker({
     multiple: false,
     types,

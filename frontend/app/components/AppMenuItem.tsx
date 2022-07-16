@@ -14,7 +14,7 @@ const AppMenuItem = ({
   label,
   onClick,
   disabled = false,
-}:AppMenuItemProps) => {
+}: AppMenuItemProps) => {
   return <div
     style={{
       display: "flex",

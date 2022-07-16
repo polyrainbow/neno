@@ -1,7 +1,7 @@
 type IPAddress = string;
 type IPAdressMetadata = {
-  count:number,
-  nextTry:number,
+  count: number,
+  nextTry: number,
 };
 
 export default class BruteForcePreventer {
@@ -27,12 +27,12 @@ export default class BruteForcePreventer {
   }
 
 
-  successfulLogin(remoteIp:IPAddress):void {
+  successfulLogin(remoteIp: IPAddress): void {
     this.#failures.delete(remoteIp);
   }
 
 
-  isLoginAttemptLegit(remoteIp:IPAddress):boolean {
+  isLoginAttemptLegit(remoteIp: IPAddress): boolean {
     if (this.#failures.has(remoteIp)){
       const failuresOfIp = this.#failures.get(remoteIp) as IPAdressMetadata;
       if (Date.now() < failuresOfIp.nextTry) {
@@ -46,7 +46,7 @@ export default class BruteForcePreventer {
   }
 
 
-  unsuccessfulLogin(remoteIp:IPAddress):void {
+  unsuccessfulLogin(remoteIp: IPAddress): void {
     if (this.#failures.has(remoteIp)) {
       const failuresOfIp = this.#failures.get(remoteIp) as IPAdressMetadata;
       failuresOfIp.count++;

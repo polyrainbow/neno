@@ -60,7 +60,7 @@ let randomUUID;
 
 /* this is the fallback getUrlMetadata function that is used if the initializer
 does not provide a better one */
-let getUrlMetadata = (url:string):Promise<UrlMetadataResponse> => {
+let getUrlMetadata = (url: string): Promise<UrlMetadataResponse> => {
   return Promise.resolve({
     "url": url,
     "title": url,
@@ -78,7 +78,7 @@ const init = async (
   storageProvider,
   _randomUUID: () => string,
   _getUrlMetadata?: (string) => Promise<UrlMetadataResponse>,
-):Promise<void> => {
+): Promise<void> => {
   if (_getUrlMetadata) {
     getUrlMetadata = _getUrlMetadata;
   }
@@ -92,14 +92,14 @@ const init = async (
 const get = async (
   noteId: NoteId,
   graphId: GraphId,
-):Promise<NoteToTransmit> => {
+): Promise<NoteToTransmit> => {
   const graph = await io.getGraph(graphId);
-  const noteFromDB:SavedNote | null = findNote(graph, noteId);
+  const noteFromDB: SavedNote | null = findNote(graph, noteId);
   if (!noteFromDB) {
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
 
-  const noteToTransmit:NoteToTransmit = createNoteToTransmit(noteFromDB, graph);
+  const noteToTransmit: NoteToTransmit = createNoteToTransmit(noteFromDB, graph);
   return noteToTransmit;
 };
 
@@ -188,7 +188,7 @@ const getNotesList = async (
 
   // now we need to transform all notes into NoteListItems before we can
   // sort those
-  let noteListItems:NoteListItem[] = createNoteListItems(matchingNotes, graph)
+  let noteListItems: NoteListItem[] = createNoteListItems(matchingNotes, graph)
     .sort(getSortFunction(sortMode));
 
   // let's only slice the array if it makes sense to do so
@@ -197,13 +197,13 @@ const getNotesList = async (
   }
 
   // let's extract the list items for the requested page
-  const noteListItemsOfPage:NoteListItem[] = Utils.getPagedMatches(
+  const noteListItemsOfPage: NoteListItem[] = Utils.getPagedMatches(
     noteListItems,
     page,
     config.NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE,
   );
 
-  const noteListPage:NoteListPage = {
+  const noteListPage: NoteListPage = {
     results: noteListItemsOfPage,
     numberOfResults: noteListItems.length,
   };
@@ -212,11 +212,11 @@ const getNotesList = async (
 };
 
 
-const getGraphVisualization = async (graphId: GraphId):Promise<GraphVisualization> => {
+const getGraphVisualization = async (graphId: GraphId): Promise<GraphVisualization> => {
   const graph = await io.getGraph(graphId);
 
-  const graphNodes:GraphNode[] = graph.notes.map((note) => {
-    const graphNode:GraphNode = {
+  const graphNodes: GraphNode[] = graph.notes.map((note) => {
+    const graphNode: GraphNode = {
       id: note.id,
       title: getNoteTitlePreview(note),
       position: note.position,
@@ -226,7 +226,7 @@ const getGraphVisualization = async (graphId: GraphId):Promise<GraphVisualizatio
     return graphNode;
   });
 
-  const graphVisualization:GraphVisualization = {
+  const graphVisualization: GraphVisualization = {
     nodes: graphNodes,
     links: graph.links,
     screenPosition: graph.screenPosition,
@@ -240,12 +240,12 @@ const getGraphVisualization = async (graphId: GraphId):Promise<GraphVisualizatio
 const getStats = async (
   graphId: GraphId,
   options: GraphStatsRetrievalOptions,
-):Promise<GraphStats> => {
-  const graph:GraphObject = await io.getGraph(graphId);
+): Promise<GraphStats> => {
+  const graph: GraphObject = await io.getGraph(graphId);
 
   const numberOfUnlinkedNotes = getNumberOfUnlinkedNotes(graph);  
 
-  let stats:GraphStats = {
+  let stats: GraphStats = {
     numberOfAllNotes: graph.notes.length,
     numberOfLinks: graph.links.length,
     numberOfFiles: await io.getNumberOfFiles(graphId),
@@ -295,12 +295,12 @@ const getStats = async (
 
 
 const setGraphVisualization = async (
-  graphVisualizationFromUser:GraphVisualizationFromUser,
-  graphId:GraphId,
-):Promise<void> => {
-  const graph:Graph = await io.getGraph(graphId);
+  graphVisualizationFromUser: GraphVisualizationFromUser,
+  graphId: GraphId,
+): Promise<void> => {
+  const graph: Graph = await io.getGraph(graphId);
   graphVisualizationFromUser.nodePositionUpdates.forEach(
-    (nodePositionUpdate:GraphNodePositionUpdate):void => {
+    (nodePositionUpdate: GraphNodePositionUpdate): void => {
       updateNotePosition(graph, nodePositionUpdate);
     },
   );
@@ -312,10 +312,10 @@ const setGraphVisualization = async (
 
 
 const put = async (
-  noteFromUser:NoteFromUser,
-  graphId:GraphId,
+  noteFromUser: NoteFromUser,
+  graphId: GraphId,
   options?: NotePutOptions,
-):Promise<NoteToTransmit> => {
+): Promise<NoteToTransmit> => {
   if (
     (!noteFromUser)
     || (!Array.isArray(noteFromUser.blocks))
@@ -332,13 +332,13 @@ const put = async (
     ignoreDuplicateTitles = false;
   }
 
-  const graph:Graph = await io.getGraph(graphId);
+  const graph: Graph = await io.getGraph(graphId);
 
   if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, graph)) {
     throw new Error(ErrorMessage.NOTE_WITH_SAME_TITLE_EXISTS);
   }
 
-  let savedNote:SavedNote | null = null;
+  let savedNote: SavedNote | null = null;
 
   if (
     typeof noteFromUser.id === "number"
@@ -347,7 +347,7 @@ const put = async (
   }
 
   if (savedNote === null) {
-    const noteId:NoteId = getNewNoteId(graph);
+    const noteId: NoteId = getNewNoteId(graph);
     savedNote = {
       id: noteId,
       // Let's make sure that when manipulating the position object at some
@@ -379,16 +379,16 @@ const put = async (
 
   await io.flushChanges(graphId, graph);
 
-  const noteToTransmit:NoteToTransmit
+  const noteToTransmit: NoteToTransmit
     = createNoteToTransmit(savedNote, graph);
   return noteToTransmit;
 };
 
 
 const remove = async (
-  noteId:NoteId,
-  graphId:GraphId,
-):Promise<void> => {
+  noteId: NoteId,
+  graphId: GraphId,
+): Promise<void> => {
   const graph = await io.getGraph(graphId);
   const noteIndex = Utils.binaryArrayFindIndex(graph.notes, "id", noteId);
   if ((noteIndex === -1) || (noteIndex === null)) {
@@ -410,18 +410,18 @@ const remove = async (
 
 
 const importDB = (
-  graph:GraphObject,
-  graphId:GraphId,
-):Promise<void> => {
+  graph: GraphObject,
+  graphId: GraphId,
+): Promise<void> => {
   return io.flushChanges(graphId, graph);
 };
 
 
 const addFile = async (
-  graphId:GraphId,
-  readable:ReadableStream<any> | NodeJS.ReadStream,
+  graphId: GraphId,
+  readable: ReadableStream<any> | NodeJS.ReadStream,
   mimeType: string,
-):Promise<{
+): Promise<{
   fileId: FileId,
   size: number,
 }> => {
@@ -434,7 +434,7 @@ const addFile = async (
     throw new Error(ErrorMessage.INVALID_MIME_TYPE);
   }
 
-  const fileId:FileId = randomUUID() + "." + fileType.extension;
+  const fileId: FileId = randomUUID() + "." + fileType.extension;
   const size = await io.addFile(graphId, fileId, readable);
   return {
     fileId,
@@ -446,25 +446,25 @@ const addFile = async (
 const deleteFile = async (
   graphId: GraphId,
   fileId: FileId,
-):Promise<void> => {
+): Promise<void> => {
   return io.deleteFile(graphId, fileId);
 };
 
 
 const getFiles = async (
   graphId: GraphId,
-):Promise<FileId[]> => {
+): Promise<FileId[]> => {
   return io.getFiles(graphId);
 };
 
 // get files not used in any note
 const getDanglingFiles = async (
   graphId: GraphId,
-):Promise<FileId[]> => {
+): Promise<FileId[]> => {
   const allFiles = await io.getFiles(graphId);
   const graph = await io.getGraph(graphId);
-  const filesInNotes:FileId[] = graph.notes.reduce(
-    (accumulator:string[], note) => {
+  const filesInNotes: FileId[] = graph.notes.reduce(
+    (accumulator: string[], note) => {
       const filesOfNote = getFilesOfNote(note);
       return [...accumulator, ...filesOfNote];
     },
@@ -479,24 +479,24 @@ const getDanglingFiles = async (
 
 const getReadableFileStream = (
   graphId: GraphId,
-  fileId:FileId,
+  fileId: FileId,
   range?,
-):Promise<ReadableWithType> => {
+): Promise<ReadableWithType> => {
   return io.getReadableFileStream(graphId, fileId, range);
 };
 
 
 const getFileSize = (
   graphId: GraphId,
-  fileId:FileId,
-):Promise<number> => {
+  fileId: FileId,
+): Promise<number> => {
   return io.getFileSize(graphId, fileId);
 };
 
 
 const getReadableGraphStream = async (
-  graphId:GraphId,
-  withFiles:boolean,
+  graphId: GraphId,
+  withFiles: boolean,
 ) => {
   return await io.getReadableGraphStream(graphId, withFiles);
 };
@@ -504,29 +504,29 @@ const getReadableGraphStream = async (
 
 const importLinksAsNotes = async (
   graphId: GraphId,
-  links:string[],
+  links: string[],
 ) => {
-  const promises:Promise<UrlMetadataResponse>[]
-    = links.map((url:string):Promise<UrlMetadataResponse> => {
+  const promises: Promise<UrlMetadataResponse>[]
+    = links.map((url: string): Promise<UrlMetadataResponse> => {
       return getUrlMetadata(url);
     });
 
   const promiseSettledResults = await Promise.allSettled(promises);
 
-  const fulfilledPromises:PromiseSettledResult<UrlMetadataResponse>[]
+  const fulfilledPromises: PromiseSettledResult<UrlMetadataResponse>[]
     = promiseSettledResults.filter((response) => {
       return response.status === "fulfilled";
     });
   
-  const urlMetadataResults:UrlMetadataResponse[]
+  const urlMetadataResults: UrlMetadataResponse[]
     = fulfilledPromises.map((response) => {
       return (response.status === "fulfilled") && response.value;
     })
       .filter(Utils.isNotFalse);
 
-  const notesFromUser:NoteFromUser[]
+  const notesFromUser: NoteFromUser[]
     = urlMetadataResults.map((urlMetadataObject) => {
-      const noteFromUser:NoteFromUser = {
+      const noteFromUser: NoteFromUser = {
         title: urlMetadataObject.title,
         blocks: [
           {
@@ -548,14 +548,14 @@ const importLinksAsNotes = async (
       return noteFromUser;
     });
 
-  const notesToTransmit:NoteToTransmit[] = [];
-  const failures:ImportLinkAsNoteFailure[] = [];
+  const notesToTransmit: NoteToTransmit[] = [];
+  const failures: ImportLinkAsNoteFailure[] = [];
 
   for (let i = 0; i < notesFromUser.length; i++) {
-    const noteFromUser:NoteFromUser = notesFromUser[i];
+    const noteFromUser: NoteFromUser = notesFromUser[i];
 
     try {
-      const noteToTransmit:NoteToTransmit = await put(
+      const noteToTransmit: NoteToTransmit = await put(
         noteFromUser,
         graphId,
         {
@@ -564,8 +564,8 @@ const importLinksAsNotes = async (
       );
       notesToTransmit.push(noteToTransmit);
     } catch (e) {
-      const errorMessage:string | false = e instanceof Error && e.toString();
-      const failure:ImportLinkAsNoteFailure = {
+      const errorMessage: string | false = e instanceof Error && e.toString();
+      const failure: ImportLinkAsNoteFailure = {
         note: noteFromUser,
         error: errorMessage || "no error",
       };
@@ -581,9 +581,9 @@ const importLinksAsNotes = async (
 
 
 const pin = async (
-  graphId:GraphId,
-  noteId:NoteId,
-):Promise<NoteToTransmit[]> => {
+  graphId: GraphId,
+  noteId: NoteId,
+): Promise<NoteToTransmit[]> => {
   const graph = await io.getGraph(graphId);
   const noteIndex = Utils.binaryArrayFindIndex(graph.notes, "id", noteId);
   if (noteIndex === -1) {
@@ -596,7 +596,7 @@ const pin = async (
 
   await io.flushChanges(graphId, graph);
 
-  const pinnedNotes:NoteToTransmit[] = await Promise.all(
+  const pinnedNotes: NoteToTransmit[] = await Promise.all(
     graph.pinnedNotes
       .map((noteId) => {
         return get(noteId, graphId);
@@ -608,16 +608,16 @@ const pin = async (
 
 
 const unpin = async (
-  graphId:GraphId,
-  noteId:NoteId,
-):Promise<NoteToTransmit[]> => {
+  graphId: GraphId,
+  noteId: NoteId,
+): Promise<NoteToTransmit[]> => {
   const graph = await io.getGraph(graphId);
 
   graph.pinnedNotes = graph.pinnedNotes.filter((nId) => nId !== noteId);
 
   await io.flushChanges(graphId, graph);
 
-  const pinnedNotes:NoteToTransmit[] = await Promise.all(
+  const pinnedNotes: NoteToTransmit[] = await Promise.all(
     graph.pinnedNotes
       .map((noteId) => {
         return get(noteId, graphId);
@@ -628,10 +628,10 @@ const unpin = async (
 };
 
 
-const getPins = async (graphId:GraphId):Promise<NoteToTransmit[]> => {
+const getPins = async (graphId: GraphId): Promise<NoteToTransmit[]> => {
   const graph = await io.getGraph(graphId);
 
-  const pinnedNotes:NoteToTransmit[] = await Promise.all(
+  const pinnedNotes: NoteToTransmit[] = await Promise.all(
     graph.pinnedNotes
       .map((noteId) => {
         return get(noteId, graphId);

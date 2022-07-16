@@ -4,7 +4,7 @@ interface KeyboardShortCutHandlers {
   onSave?: () => void,
 }
 
-export default (handlers:KeyboardShortCutHandlers):void => {
+export default (handlers: KeyboardShortCutHandlers): void => {
   const handleKeydown = (e) => {
     if (
       handlers.onSave

@@ -28,7 +28,7 @@ const GraphView = ({
   setUnsavedChanges,
   toggleAppMenu,
   handleInvalidCredentialsError,
-}:GraphViewProps) => {
+}: GraphViewProps) => {
   const DEFAULT_STATUS: HighlightDetails = {
     active: false,
   };
@@ -121,7 +121,7 @@ const GraphView = ({
     startedLoadingGraphVis.current = true;
 
     try {
-      const graphObject:BackendGraphVisualization
+      const graphObject: BackendGraphVisualization
         = await databaseProvider.getGraphVisualization();
 
       graphVisualizerInstance.current

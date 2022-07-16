@@ -7,7 +7,7 @@ import GraphObject from "./interfaces/Graph";
 import NoteContentBlock from "./interfaces/NoteContentBlock";
 import SavedNote from "./interfaces/SavedNote";
 
-const updateBlock = (block:NoteContentBlock) => {
+const updateBlock = (block: NoteContentBlock) => {
   // @ts-ignore
   delete block.id;
 
@@ -68,19 +68,19 @@ const updateBlock = (block:NoteContentBlock) => {
 };
 
 
-const updateNote = (note:SavedNote) => {
+const updateNote = (note: SavedNote) => {
   note.blocks.forEach(updateBlock);
 };
 
 
-const updateNotes = (graph:GraphObject):void => {
+const updateNotes = (graph: GraphObject): void => {
   graph.notes.forEach(updateNote);
 };
 
 
 // this function must be indempotent, so that it always results in one
 // canonical data structure
-const updateGraphDataStructure = (graph:GraphObject):void => {
+const updateGraphDataStructure = (graph: GraphObject): void => {
   updateNotes(graph);
 };
 

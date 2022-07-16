@@ -44,7 +44,7 @@ const startApp = async ({
   maxUploadFileSize,
   sessionCookieName,
   maxGraphSize,
-}:AppStartOptions):Promise<Express.Application> => {
+}: AppStartOptions): Promise<Express.Application> => {
   const graphsDirectoryPath = path.join(dataPath, config.GRAPHS_DIRECTORY_NAME);
   const storageProvider = new FileSystemStorageProvider(graphsDirectoryPath);
   logger.info("File system storage ready at " + graphsDirectoryPath);
@@ -85,7 +85,7 @@ const startApp = async ({
   const validateGraphVisualizationFromUser = ajv.compile(graphVisualizationFromUserSchema);
   const validateGraphObject = ajv.compile(graphObjectSchema);
 
-  const getUserByApiKey = (apiKey:string):User | null => {
+  const getUserByApiKey = (apiKey: string): User | null => {
     const user = users.find((user) => {
       return user.apiKeys?.includes(apiKey);
     });
@@ -94,7 +94,7 @@ const startApp = async ({
   };
 
 
-  const getGraphIdsForUser = (userId:UserId):GraphId[] => {
+  const getGraphIdsForUser = (userId: UserId): GraphId[] => {
     const user = users.find((user) => user.id === userId);
   
     if (!user) {
@@ -115,7 +115,7 @@ const startApp = async ({
       if (req.params.graphId) {
         const graphIds = getGraphIdsForUser(req.userId);
         if (!graphIds.includes(req.params.graphId)){
-          const response:APIResponse = {
+          const response: APIResponse = {
             success: false,
             error: APIError.INVALID_REQUEST,
           };
@@ -137,7 +137,7 @@ const startApp = async ({
         if (req.params.graphId) {
           const graphIds = getGraphIdsForUser(req.userId);
           if (!graphIds.includes(req.params.graphId)){
-            const response:APIResponse = {
+            const response: APIResponse = {
               success: false,
               error: APIError.INVALID_REQUEST,
             };
@@ -147,14 +147,14 @@ const startApp = async ({
         next();
       } else {
         logger.verbose("User provided invalid API key: " + apiKey);
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INVALID_CREDENTIALS,
         };
         return res.status(401).json(response);
       }
     } else {
-      const response:APIResponse = {
+      const response: APIResponse = {
         success: false,
         error: APIError.UNAUTHORIZED,
       };
@@ -194,7 +194,7 @@ const startApp = async ({
   const handleJSONParseErrors = (err, _req, res, next) => {
     // @ts-ignore
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-      const response:APIResponse = {
+      const response: APIResponse = {
         success: false,
         error: APIError.INVALID_REQUEST,
         // @ts-ignore
@@ -220,7 +220,7 @@ const startApp = async ({
     sessionMiddleware,
     verifyUser,
     async function(req, res) {
-      const response:APIResponse = {
+      const response: APIResponse = {
         success: true,
         payload: {
           graphIds: getGraphIdsForUser(req.userId),
@@ -249,7 +249,7 @@ const startApp = async ({
           logger.verbose("Error on getting database stream");
           logger.verbose(err);
 
-          const response:APIResponse = {
+          const response: APIResponse = {
             success: false,
             error: APIError.INVALID_REQUEST,
           };
@@ -266,7 +266,7 @@ const startApp = async ({
         // this is the streaming magic
         databaseStream.pipe(res);
       } catch(e) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
         };
@@ -291,7 +291,7 @@ const startApp = async ({
       );
 
       if (!isValid) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
         };
@@ -299,7 +299,7 @@ const startApp = async ({
         return;
       }
       
-      const response:APIResponse = {
+      const response: APIResponse = {
         success: false,
       };
     
@@ -323,7 +323,7 @@ const startApp = async ({
     async function(req, res) {
       const graphId = req.params.graphId;
       const graph = await Notes.getGraphVisualization(graphId);
-      const response:APIResponse = {
+      const response: APIResponse = {
         success: true,
         payload: graph,
       };
@@ -338,12 +338,12 @@ const startApp = async ({
     verifyUser,
     async function(req, res) {
       const graphId = req.params.graphId;
-      const options:GraphStatsRetrievalOptions = {
+      const options: GraphStatsRetrievalOptions = {
         includeMetadata: req.query.includeMetadata === "true",
         includeAnalysis: req.query.includeAnalysis === "true",
       };
-      const stats:Stats = await Notes.getStats(graphId, options);
-      const response:APIResponse = {
+      const stats: Stats = await Notes.getStats(graphId, options);
+      const response: APIResponse = {
         success: true,
         payload: stats,
       };
@@ -369,7 +369,7 @@ const startApp = async ({
       );
 
       if (!isValid) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
         };
@@ -382,12 +382,12 @@ const startApp = async ({
           graphVisualizationFromUser as unknown as GraphVisualizationFromUser,
           graphId,
         );
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: true,
         };
         res.json(response);
       } catch (e) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INTERNAL_SERVER_ERROR,
         };
@@ -413,7 +413,7 @@ const startApp = async ({
         ? parseInt(req.query.limit)
         : 0;
 
-      const notesListPage:NoteListPage = await Notes.getNotesList(
+      const notesListPage: NoteListPage = await Notes.getNotesList(
         graphId,
         {
           searchString,
@@ -424,7 +424,7 @@ const startApp = async ({
         },
       );
 
-      const response:APIResponse = {
+      const response: APIResponse = {
         success: true,
         payload: notesListPage,
       };
@@ -439,17 +439,17 @@ const startApp = async ({
     verifyUser,
     async function(req, res) {
       const graphId = req.params.graphId;
-      const noteId:NoteId = parseInt(req.params.noteId);
+      const noteId: NoteId = parseInt(req.params.noteId);
 
       try {
-        const note:NoteToTransmit = await Notes.get(noteId, graphId);
-        const response:APIResponse = {
+        const note: NoteToTransmit = await Notes.get(noteId, graphId);
+        const response: APIResponse = {
           success: true,
           payload: note,
         };
         res.json(response);
       } catch (e) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.NOTES_APPLICATION_ERROR,
           errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
@@ -475,7 +475,7 @@ const startApp = async ({
       const isValid = validateNoteFromUser(noteFromUser);
 
       if (!isValid) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
         };
@@ -484,19 +484,19 @@ const startApp = async ({
       }
 
       try {
-        const noteToTransmit:NoteToTransmit = await Notes.put(
+        const noteToTransmit: NoteToTransmit = await Notes.put(
           noteFromUser as unknown as NoteFromUser,
           graphId,
           reqBody.options,
         );
 
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: true,
           payload: noteToTransmit,
         };
         res.json(response);
       } catch (e) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.NOTES_APPLICATION_ERROR,
           errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
@@ -516,11 +516,11 @@ const startApp = async ({
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
-      const links:string[] = reqBody.links;
+      const links: string[] = reqBody.links;
 
       const result = await Notes.importLinksAsNotes(graphId, links);
 
-      const response:APIResponse = {
+      const response: APIResponse = {
         payload: result,
         success: true,
       };
@@ -537,12 +537,12 @@ const startApp = async ({
       try {
         const graphId = req.params.graphId;
         await Notes.remove(parseInt(req.params.noteId), graphId);
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: true,
         };
         res.json(response);
       } catch (e) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.NOTES_APPLICATION_ERROR,
           errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
@@ -562,7 +562,7 @@ const startApp = async ({
       const sizeString = req.headers["content-length"];
 
       if (typeof sizeString !== "string") {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
         };
@@ -573,7 +573,7 @@ const startApp = async ({
       const fileSize = parseInt(sizeString);
 
       if (isNaN(fileSize) || fileSize < 1) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
         };
@@ -582,7 +582,7 @@ const startApp = async ({
       }
 
       if (fileSize > maxUploadFileSize) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.RESOURCE_EXCEEDS_MAX_FILE_SIZE,
         };
@@ -599,7 +599,7 @@ const startApp = async ({
       const currentGraphSize = graphSize.graph + graphSize.files;
 
       if ((currentGraphSize + fileSize) > maxGraphSize) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.MAX_GRAPH_SIZE_REACHED,
         };
@@ -610,7 +610,7 @@ const startApp = async ({
       const mimeType = req.headers["content-type"];
 
       if (!mimeType) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
         };
@@ -638,14 +638,14 @@ const startApp = async ({
           logger.verbose("Removing file due to incomplete upload");
           await Notes.deleteFile(graphId, fileId);
 
-          const response:APIResponse = {
+          const response: APIResponse = {
             success: false,
             error: APIError.INVALID_REQUEST,
           };
           res.status(406).json(response);
           return;
         }
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: true,
           payload: {
             fileId,
@@ -656,7 +656,7 @@ const startApp = async ({
       } catch (e) {
         logger.verbose("Catched an error trying to upload a file:");
         logger.verbose(e);
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.NOTES_APPLICATION_ERROR,
           errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
@@ -719,7 +719,7 @@ const startApp = async ({
             );
 
           readable.on("error", () => {
-            const response:APIResponse = {
+            const response: APIResponse = {
               success: false,
               error: APIError.FILE_NOT_FOUND,
             };
@@ -741,7 +741,7 @@ const startApp = async ({
             = await Notes.getReadableFileStream(graphId, req.params.fileId);
 
           readable.on("error", () => {
-            const response:APIResponse = {
+            const response: APIResponse = {
               success: false,
               error: APIError.FILE_NOT_FOUND,
             };
@@ -756,7 +756,7 @@ const startApp = async ({
           readable.pipe(res);
         }
       } catch (e) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.NOTES_APPLICATION_ERROR,
           errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
@@ -777,7 +777,7 @@ const startApp = async ({
       const graphId = req.params.graphId;
       const files = await Notes.getFiles(graphId);
 
-      const response:APIResponse = {
+      const response: APIResponse = {
         payload: files,
         success: true,
       };
@@ -797,13 +797,13 @@ const startApp = async ({
       const fileId = req.params.fileId;
       try {
         await Notes.deleteFile(graphId, fileId);
-        const response:APIResponse = {
+        const response: APIResponse = {
           payload: fileId,
           success: true,
         };
         res.json(response);
       } catch (e) {
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.NOTES_APPLICATION_ERROR,
           errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
@@ -824,7 +824,7 @@ const startApp = async ({
       const graphId = req.params.graphId;
       const files = await Notes.getDanglingFiles(graphId);
 
-      const response:APIResponse = {
+      const response: APIResponse = {
         payload: files,
         success: true,
       };
@@ -842,7 +842,7 @@ const startApp = async ({
 
       try {
         const metadata = await Notes.getUrlMetadata(url as string);
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: true,
           payload: metadata,
         };
@@ -850,7 +850,7 @@ const startApp = async ({
       } catch (e) {
         logger.verbose("Error while getting URL metadata");
         logger.verbose(JSON.stringify(e));
-        const response:APIResponse = {
+        const response: APIResponse = {
           "success": false,
           error: APIError.NOTES_APPLICATION_ERROR,
           errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
@@ -874,7 +874,7 @@ const startApp = async ({
 
       const pinnedNotes = await Notes.pin(graphId, noteId);
 
-      const response:APIResponse = {
+      const response: APIResponse = {
         payload: pinnedNotes,
         success: true,
       };
@@ -896,7 +896,7 @@ const startApp = async ({
 
       const pinnedNotes = await Notes.unpin(graphId, noteId);
 
-      const response:APIResponse = {
+      const response: APIResponse = {
         payload: pinnedNotes,
         success: true,
       };
@@ -915,7 +915,7 @@ const startApp = async ({
       const graphId = req.params.graphId;
       const pinnedNotes = await Notes.getPins(graphId);
 
-      const response:APIResponse = {
+      const response: APIResponse = {
         payload: pinnedNotes,
         success: true,
       };
@@ -930,7 +930,7 @@ const startApp = async ({
     express.json(),
     handleJSONParseErrors,
     async function(req, res) {
-      const response:APIResponse = {
+      const response: APIResponse = {
         success: true,
       };
 
@@ -961,7 +961,7 @@ const startApp = async ({
 
 
   app.get(config.API_PATH, function(_req, res) {
-    const response:APIResponse = {
+    const response: APIResponse = {
       success: true,
       payload: "Hello world!",
     };
@@ -978,7 +978,7 @@ const startApp = async ({
 
     bruteForcePreventer.unsuccessfulLogin(req.socket.remoteAddress);
 
-    const response:APIResponse = {
+    const response: APIResponse = {
       success: false,
       error: APIError.INVALID_CREDENTIALS,
     };
@@ -1003,7 +1003,7 @@ const startApp = async ({
           `Login request denied due to brute force prevention. IP: ${remoteAddress}`
         );
 
-        const response:APIResponse = {
+        const response: APIResponse = {
           success: false,
           error: APIError.TOO_EARLY,
         };
@@ -1059,7 +1059,7 @@ const startApp = async ({
       );
       bruteForcePreventer.successfulLogin(remoteAddress);
 
-      const response:APIResponse = {
+      const response: APIResponse = {
         success: true,
         payload: {
           graphIds: user.graphIds,
@@ -1080,7 +1080,7 @@ const startApp = async ({
     ),
   );
 
-  app.use((_req, res:Response) => {
+  app.use((_req, res: Response) => {
     res.status(404).end("Not found");
   });
 

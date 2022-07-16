@@ -16,7 +16,7 @@ const IconButton = ({
   icon,
   onClick,
   disabled = false,
-}:IconButtonProps) => {
+}: IconButtonProps) => {
   return <Tooltip
     title={title}
   >

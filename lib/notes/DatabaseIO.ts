@@ -21,8 +21,8 @@ import cleanUpGraph from "./cleanUpGraph.js";
 
 export default class DatabaseIO {
   #storageProvider;
-  #loadedGraphs:Map<GraphId, Graph> = new Map();
-  #graphRetrievalInProgress:Promise<void> = Promise.resolve();
+  #loadedGraphs: Map<GraphId, Graph> = new Map();
+  #graphRetrievalInProgress: Promise<void> = Promise.resolve();
   #finishedObtainingGraph: (() => void) = () => {return;};
 
   #GRAPH_FILE_NAME = "graph.json";
@@ -31,13 +31,13 @@ export default class DatabaseIO {
 
   private async readGraphFile(
     graphId: GraphId,
-  ):Promise<Graph | null> {
+  ): Promise<Graph | null> {
     try {
       const json = await this.#storageProvider.readObjectAsString(
         graphId,
         this.#GRAPH_FILE_NAME,
       );
-      const object:Graph = JSON.parse(json);
+      const object: Graph = JSON.parse(json);
       return object;
     } catch (e) {
       return null;
@@ -55,7 +55,7 @@ export default class DatabaseIO {
 
 
   private createGraph (): Graph {
-    const newGraph:Graph = {
+    const newGraph: Graph = {
       creationTime: Date.now(),
       updateTime: Date.now(),
       notes: [],
@@ -86,7 +86,7 @@ export default class DatabaseIO {
   }
 
 
-  async getGraph(graphId: GraphId):Promise<Graph> {
+  async getGraph(graphId: GraphId): Promise<Graph> {
     // We only want to get one graph at a time to reduce unnecessary disk usage
     // that occurs when a consumer performs two or more API calls at the same
     // time. To prevent accessing the disk twice or more for the same data,
@@ -106,7 +106,7 @@ export default class DatabaseIO {
     }
 
     // Way 2: Slow disk access: try to get it from the file on the disk
-    const graphFromFile:Graph | null
+    const graphFromFile: Graph | null
       = await this.readGraphFile(graphId);
     if (graphFromFile) {
       // when we open a graph from file for the first time, let's make sure
@@ -123,7 +123,7 @@ export default class DatabaseIO {
 
     // Way 3: If there is no graph object in memory or on the disk, create a new
     // graph object
-    const newGraph:Graph = this.createGraph();
+    const newGraph: Graph = this.createGraph();
     // write it to memory and disk
     await this.flushChanges(graphId, newGraph);
     this.#finishedObtainingGraph();
@@ -134,7 +134,7 @@ export default class DatabaseIO {
   // flushChanges makes sure that the changes applied to the graph object are
   // written to the disk and thus are persistent. it should always be called
   // after any operation on the main data object has been performed.
-  async flushChanges (graphId:GraphId, graph:Graph):Promise<void> {
+  async flushChanges (graphId: GraphId, graph: Graph): Promise<void> {
     graph.updateTime = Date.now();
     this.#loadedGraphs.set(graphId, graph);
     await this.writeGraphFile(graphId, graph);
@@ -142,10 +142,10 @@ export default class DatabaseIO {
 
 
   async addFile(
-    graphId:GraphId,
-    fileId:FileId,
-    source:ReadableStream | NodeJS.ReadStream,
-  ):Promise<number> {
+    graphId: GraphId,
+    fileId: FileId,
+    source: ReadableStream | NodeJS.ReadStream,
+  ): Promise<number> {
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
       fileId,
@@ -160,9 +160,9 @@ export default class DatabaseIO {
 
 
   async deleteFile(
-    graphId:GraphId,
-    fileId:FileId,
-  ):Promise<void> {
+    graphId: GraphId,
+    fileId: FileId,
+  ): Promise<void> {
     await this.#storageProvider.removeObject(
       graphId,
       this.#storageProvider.joinPath(
@@ -174,9 +174,9 @@ export default class DatabaseIO {
 
 
   async getReadableGraphStream(
-    graphId:GraphId,
-    withFiles:boolean,
-  ):Promise<ReadableStream | NodeJS.ReadStream> {
+    graphId: GraphId,
+    withFiles: boolean,
+  ): Promise<ReadableStream | NodeJS.ReadStream> {
     if (!withFiles) {
       const stream = await this.#storageProvider.getReadableStream(
         graphId,
@@ -191,9 +191,9 @@ export default class DatabaseIO {
 
   async getReadableFileStream(
     graphId: GraphId,
-    fileId:FileId,
+    fileId: FileId,
     range,
-  ):Promise<ReadableWithMimeType> {
+  ): Promise<ReadableWithMimeType> {
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
       fileId,
@@ -228,8 +228,8 @@ export default class DatabaseIO {
 
   async getFileSize(
     graphId: GraphId,
-    fileId:FileId,
-  ):Promise<number> {
+    fileId: FileId,
+  ): Promise<number> {
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
       fileId,
@@ -243,7 +243,7 @@ export default class DatabaseIO {
 
   async getFiles(
     graphId: GraphId
-  ):Promise<FileId[]> {
+  ): Promise<FileId[]> {
     // it could be that the directory does not exist yet
     try {
       const directoryListing = await this.#storageProvider.listDirectory(
@@ -261,7 +261,7 @@ export default class DatabaseIO {
 
   async getSizeOfGraphFiles(
     graphId: GraphId,
-  ):Promise<number> {
+  ): Promise<number> {
     // maybe the file folder was not created yet, so let's just try
     try {
       const size = await this.#storageProvider.getFolderSize(
@@ -277,7 +277,7 @@ export default class DatabaseIO {
 
   async getSizeOfGraph(
     graphId: GraphId,
-  ):Promise<number> {
+  ): Promise<number> {
     const fileSize
       = await this.#storageProvider.getFileSize(graphId, this.#GRAPH_FILE_NAME);
 
@@ -287,7 +287,7 @@ export default class DatabaseIO {
 
   async getSizeOfGraphWithFiles(
     graphId: GraphId,
-  ):Promise<number> {
+  ): Promise<number> {
     const sizes = await Promise.all([
       this.getSizeOfGraph(graphId),
       this.getSizeOfGraphFiles(graphId),
@@ -299,7 +299,7 @@ export default class DatabaseIO {
 
   async getNumberOfFiles(
     graphId: GraphId,
-  ):Promise<number> {
+  ): Promise<number> {
     // it could be that the directory does not exist yet
     try {
       const directoryListing = await this.#storageProvider.listDirectory(
