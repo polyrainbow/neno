@@ -165,7 +165,7 @@ const App = ({
   );
 
 
-  const handleSortModeChange = (sortMode) => {
+  const handleSortModeChange = (sortMode:NoteListSortMode):void => {
     setNoteListScrollTop(0);
     setSortMode(sortMode);
     setPage(1);
@@ -185,7 +185,7 @@ const App = ({
   };
 
 
-  const importLinksAsNotes = async (links) => {
+  const importLinksAsNotes = async (links:string[]):Promise<void> => {
     await databaseProvider?.importLinksAsNotes(links);
     refreshNotesList();
   };
