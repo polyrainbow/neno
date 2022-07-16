@@ -42,6 +42,7 @@ import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
 import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
 import { MainNoteListItem } from "../interfaces/NoteListItem";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
+import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 
 
 interface EditorViewProps {
@@ -407,25 +408,9 @@ const EditorView = ({
   };
 
 
-  const handleKeydown = (e) => {
-    if (
-      // navigator.platform is deprecated and should be replaced with
-      // navigator.userAgentData.platform at some point
-      (window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
-      && e.key === "s"
-    ) {
-      handleNoteSaveRequest();
-      e.preventDefault();
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeydown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeydown);
-    };
-  }, [handleKeydown]);
+  useKeyboardShortcuts({
+    onSave: handleNoteSaveRequest,
+  });
 
 
   useEffect(() => {
