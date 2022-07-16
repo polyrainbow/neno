@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import EditorView from "./EditorView";
 import ListView from "./ListView";
 import GraphView from "./GraphView";
@@ -15,15 +15,12 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import FloatingActionButton from "./FloatingActionButton";
 import { DatabaseMode } from "../enum/DatabaseMode.js";
 import StatsView from "./StatsView";
-import { MainNoteListItem } from "../interfaces/NoteListItem";
-import * as Config from "../config";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import DialogServiceProvider from "./DialogServiceProvider";
 import { l } from "../lib/intl";
-import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery";
 import {
   NoteListSortMode,
 } from "../../../lib/notes/interfaces/NoteListSortMode";
@@ -31,6 +28,8 @@ import DatabaseProvider from "../interfaces/DatabaseProvider";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import useWarnBeforeUnload from "../hooks/useWarnBeforeUnload";
 import useHeaderStats from "../hooks/useHeaderStats";
+import useNoteList from "../hooks/useNoteList";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -55,13 +54,7 @@ const App = ({
           : null
       );
 
-  /* states for note list */
-  const currentRequestId = useRef<string>("");
-  const [noteListItems, setNoteListItems] = useState<MainNoteListItem[]>([]);
-  const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
   const [noteListScrollTop, setNoteListScrollTop] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
-  const [noteListIsBusy, setNoteListIsBusy] = useState<boolean>(true);
   const [sortMode, setSortMode] = useState<NoteListSortMode>(
     NoteListSortMode.UPDATE_DATE_DESCENDING,
   );
@@ -70,7 +63,7 @@ const App = ({
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
   const [headerStats, refreshHeaderStats] = useHeaderStats(databaseProvider);
-
+  const [page, setPage] = useState<number>(1);
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
@@ -86,66 +79,26 @@ const App = ({
   };
 
 
-  const refreshNoteList = useCallback(
-    async () => {
-      if (!databaseProvider) return;
-
-      setNoteListItems([]);
-
-      // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
-      // we don't do anything and leave the note list empty
-      if (
-        searchValue.length > 0
-        && searchValue.length < Config.MINIMUM_SEARCH_QUERY_LENGTH
-      ) {
-        return;
-      }
-
-      setNoteListIsBusy(true);
-
-      const options: DatabaseQuery = {
-        page,
-        sortMode,
-        caseSensitive: false,
-      };
-
-      if (searchValue.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
-        options.searchString = searchValue;
-      }
-
-      const requestId = crypto.randomUUID();
-      currentRequestId.current = requestId;
-      try {
-        const {
-          results,
-          numberOfResults,
-        } = await databaseProvider.getNotes(options);
-
-        // ... some time later - check if this is the current request
-        if (currentRequestId.current === requestId) {
-          setNoteListItems(results);
-          setNumberOfResults(numberOfResults);
-          setNoteListIsBusy(false);
-        }
-
-        const pinnedNotes = await databaseProvider.getPins();
-        setPinnedNotes(pinnedNotes);
-      } catch (e) {
-        // if credentials are invalid, go to LoginView. If not, throw.
-        if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
-          await handleInvalidCredentialsError();
-        } else {
-          throw e;
-        }
-      }
-    },
-    [searchValue, page, sortMode, databaseProvider],
-  );
+  const [
+    noteListItems,
+    numberOfResults,
+    noteListIsBusy,
+    refreshNoteList,
+  ] = useNoteList(databaseProvider, {
+    searchValue,
+    sortMode,
+    page,
+    handleInvalidCredentialsError,
+  });
 
 
-  const refreshContentViews = () => {
-    refreshNoteList();
+  const refreshContentViews = (): void => {
     refreshHeaderStats();
+    refreshNoteList()
+      .then(() => {
+        databaseProvider?.getPins()
+          .then((pinnedNotes) => setPinnedNotes(pinnedNotes));
+      });
   };
 
 
@@ -175,7 +128,7 @@ const App = ({
   };
 
 
-  const switchGraphs = (graphId) => {
+  const switchGraphs = (graphId: GraphId): void => {
     databaseProvider?.setActiveGraph?.(graphId);
     navigate(
       isSmallScreen
