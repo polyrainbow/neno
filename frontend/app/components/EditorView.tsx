@@ -48,7 +48,7 @@ interface EditorViewProps {
   setUnsavedChanges: (boolean) => any,
   toggleAppMenu: () => any,
   handleInvalidCredentialsError,
-  refreshNotesList,
+  refreshContentViews: () => void,
   headerStats: GraphStats | null,
   pinnedNotes: NoteToTransmit[],
   handleSearchInputChange,
@@ -72,7 +72,7 @@ const EditorView = ({
   setUnsavedChanges,
   toggleAppMenu,
   handleInvalidCredentialsError,
-  refreshNotesList,
+  refreshContentViews,
   headerStats,
   pinnedNotes,
   handleSearchInputChange,
@@ -184,7 +184,7 @@ const EditorView = ({
     const noteFromServer = await databaseProvider.putNote(
       noteToTransmit, { ignoreDuplicateTitles: true },
     );
-    refreshNotesList();
+    refreshContentViews();
     goToNote(noteFromServer.id);
   };
 
@@ -292,7 +292,7 @@ const EditorView = ({
     }
 
     await databaseProvider.deleteNote(activeNote.id);
-    refreshNotesList();
+    refreshContentViews();
     navigate(Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
   };
 
@@ -339,7 +339,7 @@ const EditorView = ({
       changes: [],
     });
     setUnsavedChanges(false);
-    refreshNotesList();
+    refreshContentViews();
     /*
       when saving the new note for the first time, we get its id from the
       databaseProvider. then we update the address bar to include the new id
@@ -427,7 +427,7 @@ const EditorView = ({
               sortMode={sortMode}
               setSortMode={handleSortModeChange}
               openSearchDialog={openSearchDialog}
-              refreshNoteList={refreshNotesList}
+              refreshNoteList={refreshContentViews}
             />
             <NoteList
               notes={noteListItems}

@@ -7,7 +7,7 @@ import useDialog from "../hooks/useDialog";
 
 const ListView = ({
   toggleAppMenu,
-  refreshNotesList,
+  refreshContentViews,
   stats,
   pinnedNotes,
   handleSearchInputChange,
@@ -42,7 +42,7 @@ const ListView = ({
       sortMode={sortMode}
       setSortMode={handleSortModeChange}
       openSearchDialog={openSearchDialog}
-      refreshNoteList={refreshNotesList}
+      refreshNoteList={refreshContentViews}
     />
     <NoteList
       notes={noteListItems}

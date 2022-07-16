@@ -86,11 +86,10 @@ const App = ({
   };
 
 
-  const refreshNotesList = useCallback(
+  const refreshNoteList = useCallback(
     async () => {
       if (!databaseProvider) return;
 
-      refreshHeaderStats();
       setNoteListItems([]);
 
       // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
@@ -144,6 +143,12 @@ const App = ({
   );
 
 
+  const refreshContentViews = () => {
+    refreshNoteList();
+    refreshHeaderStats();
+  };
+
+
   const handleSortModeChange = (sortMode: NoteListSortMode): void => {
     setNoteListScrollTop(0);
     setSortMode(sortMode);
@@ -152,7 +157,7 @@ const App = ({
 
 
   useEffect(() => {
-    refreshNotesList();
+    refreshContentViews();
   }, [searchValue, page, sortMode, databaseProvider]);
 
 
@@ -166,7 +171,7 @@ const App = ({
 
   const importLinksAsNotes = async (links: string[]): Promise<void> => {
     await databaseProvider?.importLinksAsNotes(links);
-    refreshNotesList();
+    refreshContentViews();
   };
 
 
@@ -177,7 +182,7 @@ const App = ({
         ? getAppPath(PathTemplate.LIST)
         : getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
     );
-    refreshNotesList();
+    refreshContentViews();
   };
 
 
@@ -252,7 +257,7 @@ const App = ({
                 setUnsavedChanges={setUnsavedChanges}
                 toggleAppMenu={toggleAppMenu}
                 handleInvalidCredentialsError={handleInvalidCredentialsError}
-                refreshNotesList={refreshNotesList}
+                refreshContentViews={refreshContentViews}
                 headerStats={headerStats}
                 pinnedNotes={pinnedNotes}
                 handleSearchInputChange={handleSearchInputChange}
@@ -279,7 +284,7 @@ const App = ({
               ? <>
                 <ListView
                   toggleAppMenu={toggleAppMenu}
-                  refreshNotesList={refreshNotesList}
+                  refreshContentViews={refreshContentViews}
                   stats={headerStats}
                   pinnedNotes={pinnedNotes}
                   handleSearchInputChange={handleSearchInputChange}
