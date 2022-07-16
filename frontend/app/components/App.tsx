@@ -30,6 +30,7 @@ import {
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
+import useWarnBeforeUnload from "../hooks/useWarnBeforeUnload";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -176,29 +177,7 @@ const App = ({
   }, [searchValue, page, sortMode, databaseProvider]);
 
 
-  const beforeUnload = function(e) {
-    if (unsavedChanges) {
-      // Cancel the event
-      e.preventDefault();
-      // If you prevent default behavior in Mozilla Firefox prompt will
-      // always be shown
-      // Chrome requires returnValue to be set
-      e.returnValue = "";
-    } else {
-      // the absence of a returnValue property on the event will guarantee
-      // the browser unload happens
-      delete e.returnValue;
-    }
-  };
-
-
-  useEffect(() => {
-    window.addEventListener("beforeunload", beforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnload);
-    };
-  }, [beforeUnload]);
+  useWarnBeforeUnload(unsavedChanges);
 
 
   const toggleAppMenu = () => {
