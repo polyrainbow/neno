@@ -1,33 +1,7 @@
 import React from "react";
-import Tooltip from "./Tooltip.js";
 import { l } from "../lib/intl.js";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats.js";
-import Icon from "./Icon.js";
-
-interface AppHeaderStatsItemProps {
-  icon: string,
-  label: string,
-  value: string,
-}
-
-const AppHeaderStatsItem = ({
-  icon,
-  label,
-  value,
-}: AppHeaderStatsItemProps) => {
-  return <Tooltip
-    title={label}
-  >
-    <div
-      style={{
-        "display": "flex",
-        "alignItems": "center",
-        "gap": "2px",
-      }}
-    ><Icon icon={icon} size={24} title={label}/> {value}</div>
-  </Tooltip>;
-};
-
+import AppHeaderStatsItem from "./AppHeaderStatsItem.js";
 
 interface AppHeaderStatsProps {
   stats: GraphStats,
