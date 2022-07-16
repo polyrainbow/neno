@@ -1,5 +1,5 @@
 import React, {
-  useEffect, useState, useMemo,
+  useEffect, useState,
 } from "react";
 import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
@@ -19,10 +19,7 @@ import {
   UserNoteChangeType,
 } from "../../../lib/notes/interfaces/UserNoteChangeType";
 import ActiveNote, { UnsavedActiveNote } from "../interfaces/ActiveNote";
-import FrontendUserNoteChange, {
-  FrontendUserNoteAdditionChange,
-  FrontendUserNoteChangeNote,
-} from "../interfaces/FrontendUserNoteChange";
+import FrontendUserNoteChange from "../interfaces/FrontendUserNoteChange";
 import { DialogType } from "../enum/DialogType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
@@ -39,10 +36,10 @@ import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
 import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
-import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
 import { MainNoteListItem } from "../interfaces/NoteListItem";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
+import useDisplayedLinkedNotes from "../hooks/useDisplayedLinkedNotes";
 
 
 interface EditorViewProps {
@@ -113,39 +110,7 @@ const EditorView = ({
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
-  /*
-    Below the active note, we want to display a list of all notes that are
-    currently linked to the main note with two modifications:
-    1. In addition we want to show links that the user just has
-    created but not saved yet.
-    2. And we want to hide those saved linked notes that the user just has
-    deleted but not saved yet.
-
-    All in all we show a list of the saved state with the updates the user has
-    done but not saved yet.
-  */
-  const displayedLinkedNotes: (LinkedNote | FrontendUserNoteChangeNote)[]
-    = useMemo(() => [
-      ...(!activeNote.isUnsaved)
-        ? activeNote.linkedNotes.filter((note) => {
-          const isRemoved = activeNote.changes.some((change) => {
-            return (
-              change.type === UserNoteChangeType.LINKED_NOTE_DELETED
-              && change.noteId === note.id
-            );
-          });
-          return !isRemoved;
-        })
-        : [],
-      ...activeNote.changes
-        .filter((change):change is FrontendUserNoteAdditionChange => {
-          return change.type === UserNoteChangeType.LINKED_NOTE_ADDED;
-        })
-        .map((change:FrontendUserNoteAdditionChange) => {
-          return change.note;
-        }),
-    ], [activeNote]);
-
+  const displayedLinkedNotes = useDisplayedLinkedNotes(activeNote);
 
   const handleLinkAddition = async (note:MainNoteListItem):Promise<void> => {
     // return if linked note has already been added

@@ -1,11 +1,16 @@
 import { useEffect } from "react";
 
-export default (handlers) => {
+interface KeyboardShortCutHandlers {
+  onSave?: () => void,
+}
+
+export default (handlers:KeyboardShortCutHandlers):void => {
   const handleKeydown = (e) => {
     if (
+      handlers.onSave
       // navigator.platform is deprecated and should be replaced with
       // navigator.userAgentData.platform at some point
-      (window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
+      && (window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
       && e.key === "s"
     ) {
       handlers.onSave();
