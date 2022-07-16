@@ -127,7 +127,6 @@ const App = ({
       const options:DatabaseQuery = {
         page,
         sortMode,
-        searchString: "",
         caseSensitive: false,
       };
 
