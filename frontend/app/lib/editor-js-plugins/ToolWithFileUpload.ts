@@ -107,10 +107,8 @@ export default abstract class ToolWithFileUpload {
 
 
   /**
-   * Fires after clicks on the Toolbox AudioTool Icon
+   * Fires after clicks on the Toolbox Icon
    * Initiates click on the Select File button
-   *
-   * @public
    */
   appendCallback(): void {
     this.nodes.button.click();
