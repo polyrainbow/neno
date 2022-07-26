@@ -67,7 +67,8 @@
     "start-dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",
     "start": "npm run build && npm run start-server-dev",
     "start-tls": "npm run build && npm run start-server-dev-tls",
-    "dev": "concurrently -i --default-input-target 0 --kill-others \"npm run compile-typescript-backend && npm run start-server-dev\" \"npm run build-frontend-development\""
+    "dev": "concurrently -i --default-input-target 0 --kill-others \"npm run compile-typescript-backend && npm run start-server-dev\" \"npm run build-frontend-development\"",
+    "unit-test-notes-module": "npx tsc -p lib && node dist/lib/notes/index.spec.js"
   },
   "author": "Sebastian Zimmer",
   "license": "Apache License 2.0"
