@@ -19,6 +19,7 @@
       "error",
       2
     ],
-    "@typescript-eslint/type-annotation-spacing": "error"
+    "@typescript-eslint/type-annotation-spacing": "error",
+    "max-len": ["error", { "code": 80 }]
   }
 }

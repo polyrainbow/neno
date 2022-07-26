@@ -17,10 +17,12 @@ import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import { GraphId } from "../../backend/interfaces/GraphId.js";
 import updateGraphDataStructure from "./updateGraphDataStructure.js";
 import cleanUpGraph from "./cleanUpGraph.js";
+import StorageProvider from "./interfaces/StorageProvider.js";
+import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 
 
 export default class DatabaseIO {
-  #storageProvider;
+  #storageProvider: StorageProvider;
   #loadedGraphs: Map<GraphId, Graph> = new Map();
   #graphRetrievalInProgress: Promise<void> = Promise.resolve();
   #finishedObtainingGraph: (() => void) = () => {return;};
@@ -144,7 +146,7 @@ export default class DatabaseIO {
   async addFile(
     graphId: GraphId,
     fileId: FileId,
-    source: ReadableStream | NodeJS.ReadStream,
+    source: SomeReadableStream,
   ): Promise<number> {
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
@@ -176,7 +178,11 @@ export default class DatabaseIO {
   async getReadableGraphStream(
     graphId: GraphId,
     withFiles: boolean,
-  ): Promise<ReadableStream | NodeJS.ReadStream> {
+  ): Promise<SomeReadableStream> {
+    if (!this.#storageProvider.getArchiveStreamOfFolder) {
+      throw new Error(ErrorMessage.NOT_SUPPORTED_BY_STORAGE_PROVIDER);
+    }
+
     if (!withFiles) {
       const stream = await this.#storageProvider.getReadableStream(
         graphId,

@@ -4,7 +4,11 @@
   More info: https://web.dev/file-system-access/
 */
 
-export default class FileSystemAccessAPIStorageProvider {
+import ByteRange from "../../../lib/notes/interfaces/ByteRange";
+import StorageProvider from "../../../lib/notes/interfaces/StorageProvider";
+
+export default class FileSystemAccessAPIStorageProvider
+implements StorageProvider {
   constructor(directoryHandle: FileSystemDirectoryHandle) {
     this.#directoryHandle = directoryHandle;
   }
@@ -136,8 +140,8 @@ export default class FileSystemAccessAPIStorageProvider {
     graphId: string,
     requestPath: string,
     // eslint-disable-next-line
-    _range, // to be implemented
-  ) {
+    _range?: ByteRange, // to be implemented
+  ): Promise<ReadableStream<Uint8Array>> {
     const finalPath = this.joinPath(graphId, requestPath);
     const fileHandle = await this.#getFileHandle(finalPath);
     const file = await fileHandle.getFile();

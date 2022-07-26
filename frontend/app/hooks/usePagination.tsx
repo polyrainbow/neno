@@ -109,7 +109,6 @@ export default function usePagination(
   // keep default values in sync with @default tags in Pagination.propTypes
   const {
     boundaryCount = 1,
-    componentName = "usePagination",
     count = 1,
     defaultPage = 1,
     disabled = false,
@@ -126,8 +125,6 @@ export default function usePagination(
   const [page, setPageState] = useControlled({
     controlled: pageProp,
     default: defaultPage,
-    name: componentName,
-    state: "page",
   });
 
   const handleClick = (event, value) => {

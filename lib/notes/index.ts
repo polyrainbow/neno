@@ -53,7 +53,10 @@ import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import DatabaseQuery from "./interfaces/DatabaseQuery.js";
 import NotePutOptions from "./interfaces/NotePutOptions.js";
-import GraphStatsRetrievalOptions from "./interfaces/GraphStatsRetrievalOptions.js";
+import GraphStatsRetrievalOptions
+  from "./interfaces/GraphStatsRetrievalOptions.js";
+import StorageProvider from "./interfaces/StorageProvider.js";
+import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 
 let io: DatabaseIO;
 let randomUUID;
@@ -75,7 +78,7 @@ let getUrlMetadata = (url: string): Promise<UrlMetadataResponse> => {
 
 
 const init = async (
-  storageProvider,
+  storageProvider: StorageProvider,
   _randomUUID: () => string,
   _getUrlMetadata?: (string) => Promise<UrlMetadataResponse>,
 ): Promise<void> => {
@@ -99,7 +102,8 @@ const get = async (
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
 
-  const noteToTransmit: NoteToTransmit = createNoteToTransmit(noteFromDB, graph);
+  const noteToTransmit: NoteToTransmit
+    = createNoteToTransmit(noteFromDB, graph);
   return noteToTransmit;
 };
 
@@ -140,13 +144,15 @@ const getNotesList = async (
 
   // search for notes with specific urls
   } else if (searchString.includes("has-url:")) {
-    const startOfExactQuery = searchString.indexOf("has-url:") + "has-url:".length;
+    const startOfExactQuery
+      = searchString.indexOf("has-url:") + "has-url:".length;
     const url = searchString.substring(startOfExactQuery);
     matchingNotes = getNotesWithUrl(graph.notes, url);
 
   // search for notes with specific fileIds
   } else if (searchString.includes("has-file:")) {
-    const startOfExactQuery = searchString.indexOf("has-file:") + "has-file:".length;
+    const startOfExactQuery
+      = searchString.indexOf("has-file:") + "has-file:".length;
     const fileId = searchString.substring(startOfExactQuery);
     matchingNotes = getNotesWithFile(graph.notes, fileId);
 
@@ -212,7 +218,9 @@ const getNotesList = async (
 };
 
 
-const getGraphVisualization = async (graphId: GraphId): Promise<GraphVisualization> => {
+const getGraphVisualization = async (
+  graphId: GraphId,
+): Promise<GraphVisualization> => {
   const graph = await io.getGraph(graphId);
 
   const graphNodes: GraphNode[] = graph.notes.map((note) => {
@@ -351,7 +359,7 @@ const put = async (
     savedNote = {
       id: noteId,
       // Let's make sure that when manipulating the position object at some
-      // point, we don't accidentally manipulate the initialNodePosition object. 
+      // point, we don't accidentally manipulate the initialNodePosition object.
       // So let's copy the primitive values one by one. This actually
       // prevents bugs from occuring in local mode, where API output from this
       // module is not consistently serialized and re-parsed. It could also be
@@ -419,7 +427,7 @@ const importDB = (
 
 const addFile = async (
   graphId: GraphId,
-  readable: ReadableStream<any> | NodeJS.ReadStream,
+  readable: SomeReadableStream,
   mimeType: string,
 ): Promise<{
   fileId: FileId,

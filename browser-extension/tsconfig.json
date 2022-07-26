@@ -1,0 +1,8 @@
+{
+  "extends": "../base.tsconfig",
+  "compilerOptions": {
+    "types": [
+      "chrome"
+    ],
+  }
+}

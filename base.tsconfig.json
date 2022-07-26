@@ -6,7 +6,7 @@
     "lib": [
       "esnext",
       "es2020",
-      "dom",
+      "dom"
     ],
     "module": "esnext",
     "moduleResolution": "node",
@@ -20,18 +20,8 @@
     "sourceMap": true,
     "target": "ESNext",
     "useDefineForClassFields": true,
-    "types": [
-      "node",
-      "chrome",
-      "wicg-file-system-access",
-      "cheerio"
-    ],
-    "typeRoots": [
-      "./custom_typings",
-      "./node_modules/@types"
-    ],
     "resolveJsonModule": true,
-    "strict": true,
+    "strict": true
   },
   "exclude": [
     "node_modules",

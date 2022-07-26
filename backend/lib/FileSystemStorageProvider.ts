@@ -3,7 +3,8 @@ import fsClassic from "fs";
 import * as path from "path";
 import { finished } from "stream/promises";
 import archiver from "archiver";
-import ByteRange from "../interfaces/ByteRange";
+import ByteRange from "../../lib/notes/interfaces/ByteRange";
+import StorageProvider from "../../lib/notes/interfaces/StorageProvider";
 
 /*
   A word of warning:
@@ -63,7 +64,7 @@ const handleNodeJsFsApiError = (e: unknown): never => {
 };
 
 
-export default class FileSystemStorageProvider {
+export default class FileSystemStorageProvider implements StorageProvider {
   #graphsDirectoryPath;
 
   constructor(graphsDirectoryPath: string) {
@@ -138,7 +139,7 @@ export default class FileSystemStorageProvider {
   async getReadableStream(
     graphId: string,
     requestPath: string,
-    range: ByteRange,
+    range?: ByteRange,
   ): Promise<fsClassic.ReadStream> {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
