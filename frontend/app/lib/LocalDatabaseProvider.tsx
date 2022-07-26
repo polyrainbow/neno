@@ -303,7 +303,6 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     }
     return this.#notesModule.addFile(
       this.#activeGraphId,
-      // @ts-ignore
       file.stream(),
       file.type,
     );

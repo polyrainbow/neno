@@ -620,11 +620,9 @@ const startApp = async ({
 
       try {
         logger.verbose("Starting file upload. Type: " + mimeType);
-        //console.log(req)
 
         const {fileId, size: transmittedBytes} = await Notes.addFile(
           graphId,
-          // @ts-ignore
           req,
           mimeType,
         );

@@ -12,8 +12,7 @@ export default class MuteableStdout extends Writable{
   ): boolean;
   write(
     chunk: any,
-    // @ts-ignore
-    encoding?: BufferEncoding | ((error: Error | null | undefined) => void),
+    _encoding?: BufferEncoding | ((error: Error | null | undefined) => void),
     callback?: (error: Error | null | undefined) => void
   ): boolean {
     if (!this.muted)
