@@ -123,10 +123,10 @@ export const getExistingNotesWithThisUrl = (url, graphId, hostUrl, apiKey) => {
 };
 
 
-export const isAuthenticated = ({
-  hostUrl,
-  apiKey,
-}) => {
+export const isAuthenticated = (
+  hostUrl: string,
+  apiKey: string,
+):Promise<any> => {
   const url = hostUrl + "/api/user/authenticated";
 
   return fetchJSON(url, {

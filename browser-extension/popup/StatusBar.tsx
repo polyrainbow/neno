@@ -3,22 +3,22 @@ import {
   isAuthenticated,
 } from "../utils";
 
-const StatusBar = ({ config, setGraphId }) => {
+const StatusBar = ({ apiKey, hostUrl, setGraphId }) => {
   const [statusMessage, setStatusMessage] = useState("Verifying server ...");
   const [statusColor, setStatusColor] = useState("");
 
   useEffect(() => {
     const updateStatusBar = async () => {
       if (
-        (typeof config.hostUrl !== "string")
-        || (config.hostUrl.length === 0)
-        || (typeof config.apiKey !== "string")
-        || (config.apiKey.length === 0)
+        (typeof hostUrl !== "string")
+        || (hostUrl.length === 0)
+        || (typeof apiKey !== "string")
+        || (apiKey.length === 0)
       ) {
         return;
       }
 
-      const result = await isAuthenticated(config);
+      const result = await isAuthenticated(hostUrl, apiKey);
 
       if (result.success) {
         setStatusMessage(
@@ -37,7 +37,7 @@ const StatusBar = ({ config, setGraphId }) => {
     };
 
     updateStatusBar();
-  }, [config.hostUrl, config.apiKey]);
+  }, [hostUrl, apiKey]);
 
   return <footer
     style={{

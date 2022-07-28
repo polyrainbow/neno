@@ -13,7 +13,7 @@ const forbiddenUrlStartStrings = [
   "chrome-extension://",
 ];
 
-const Editor = ({ config, activeTab, graphId }) => {
+const Editor = ({ apiKey, hostUrl, activeTab, graphId }) => {
   const [statusMessage, setStatusMessage] = useState("");
   const [noteTitle, setNoteTitle] = useState("");
   const [noteText, setNoteText] = useState("");
@@ -48,8 +48,8 @@ const Editor = ({ config, activeTab, graphId }) => {
 
     const result = await putNote({
       note,
-      hostUrl: config.hostUrl,
-      apiKey: config.apiKey,
+      hostUrl,
+      apiKey,
       graphId,
     });
 
@@ -64,7 +64,7 @@ const Editor = ({ config, activeTab, graphId }) => {
 
   const link = ((typeof activeNoteId === "number") && (!isNaN(activeNoteId)))
     ? <a
-      href={config.hostUrl + "/editor/" + activeNoteId}
+      href={hostUrl + "/editor/" + activeNoteId}
       target="_blank" rel="noreferrer"
     >Click here to open it in NENO.</a>
     : "";
@@ -93,7 +93,8 @@ const Editor = ({ config, activeTab, graphId }) => {
       <p id="note-status">{statusMessage} {link}</p>
     </div>
     <ExistingNotes
-      config={config}
+      apiKey={apiKey}
+      hostUrl={hostUrl}
       activeTab={activeTab}
       graphId={graphId}
     />

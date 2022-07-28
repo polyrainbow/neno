@@ -1,13 +1,25 @@
 import React from "react";
 
-const Header = () => {
+interface HeaderProps {
+  hostUrl: string | null,
+}
+
+const Header = ({
+  hostUrl,
+}: HeaderProps) => {
   return <header>
-    <img
-      alt="NENO Logo"
-      src="/assets/images/logo-circle.svg"
-      width="40"
-      height="40"
-    />
+    <a
+      href={hostUrl || ""}
+      target="_blank"
+      rel="noreferrer"
+    >
+      <img
+        alt="NENO Logo"
+        src="/assets/images/logo-circle.svg"
+        width="40"
+        height="40"
+      />
+    </a>
   </header>;
 };
 

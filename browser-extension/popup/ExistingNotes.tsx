@@ -6,16 +6,16 @@ interface Note {
   id: number,
 }
 
-const ExistingNotes = ({ config, activeTab, graphId }) => {
+const ExistingNotes = ({ apiKey, hostUrl, activeTab, graphId }) => {
   const [existingNotes, setExistingNotes] = useState<Note[]>([]);
 
   useEffect(() => {
     const updateExistingNotes = async () => {
       if (
-        typeof config.hostUrl !== "string"
-        || config.hostUrl.length === 0
-        || typeof config.apiKey !== "string"
-        || config.apiKey.length === 0
+        typeof hostUrl !== "string"
+        || hostUrl.length === 0
+        || typeof apiKey !== "string"
+        || apiKey.length === 0
         || typeof graphId !== "string"
       ) {
         return;
@@ -25,8 +25,8 @@ const ExistingNotes = ({ config, activeTab, graphId }) => {
         const response = await getExistingNotesWithThisUrl(
           activeTab.url,
           graphId,
-          config.hostUrl,
-          config.apiKey,
+          hostUrl,
+          apiKey,
         );
         setExistingNotes(response.payload.results);
       } catch (e) {
@@ -50,7 +50,7 @@ const ExistingNotes = ({ config, activeTab, graphId }) => {
               key={"existing-note-" + note.id}
             >
               <a
-                href={config.hostUrl + "/editor/" + note.id}
+                href={hostUrl + "/editor/" + note.id}
                 target="_blank" rel="noreferrer"
               >{note.title}</a>
             </p>;
