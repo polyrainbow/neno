@@ -70,6 +70,7 @@ export default class GraphVisualization {
     ENTER_KEY: 13,
     ESCAPE_KEY: 27,
     C_KEY: 67,
+    L_KEY: 76,
     S_KEY: 83,
     nodeRadius: 50,
     newNodeIndicatorSize: 4 * 50,
@@ -503,21 +504,10 @@ export default class GraphVisualization {
   }
 
 
-  #select(
+  #setSelection(
     values: (GraphVisualizationNode | GraphVisualizationLink)[],
-    addToOrRemoveFromExistingSelection = false,
   ): void {
-    if (!addToOrRemoveFromExistingSelection) {
-      this.#selection = new Set(values);
-    } else {
-      values.forEach((value) => {
-        if (this.#selection.has(value)) {
-          this.#selection.delete(value);
-        } else {
-          this.#selection.add(value);
-        }
-      });
-    }
+    this.#selection = new Set(values);
 
     this.#connectedNodeIdsOfSelection
       = this.#getConnectedNodeIdsOfSelection(
@@ -528,12 +518,111 @@ export default class GraphVisualization {
   }
 
 
+  #addToSelection(
+    values: (GraphVisualizationNode | GraphVisualizationLink)[],
+  ): void {
+    values.forEach((value) => {
+      this.#selection.add(value);
+    });
+
+    this.#connectedNodeIdsOfSelection
+      = this.#getConnectedNodeIdsOfSelection(
+        Array.from(this.#selection),
+      );
+
+    this.#updateGraph();
+  }
+
+
+  #removeFromSelection(
+    values: (GraphVisualizationNode | GraphVisualizationLink)[],
+  ): void {
+    values.forEach((value) => {
+      if (this.#selection.has(value)) {
+        this.#selection.delete(value);
+      }
+    });
+
+    this.#connectedNodeIdsOfSelection
+      = this.#getConnectedNodeIdsOfSelection(
+        Array.from(this.#selection),
+      );
+
+    this.#updateGraph();
+  }
+
+
+  #toggleSelection(
+    values: (GraphVisualizationNode | GraphVisualizationLink)[],
+  ): void {
+    values.forEach((value) => {
+      if (this.#selection.has(value)) {
+        this.#selection.delete(value);
+      } else {
+        this.#selection.add(value);
+      }
+    });
+
+    this.#connectedNodeIdsOfSelection
+      = this.#getConnectedNodeIdsOfSelection(
+        Array.from(this.#selection),
+      );
+
+    this.#updateGraph();
+  }
+
+
+  #getLinksOfNode(node) {
+    const linksOfThisNote = this.#links
+      .filter((link) => {
+        return (link[0] === node) || (link[1] === node);
+      });
+
+    return linksOfThisNote;
+  }
+
+
+  #getLinkedNodes(node) {
+    const linkedNodes = this.#getLinksOfNode(node)
+      .map((link) => {
+        const linkedNote
+          = (link[0] === node) ? link[1] : link[0];
+        return linkedNote;
+      });
+
+    return linkedNodes;
+  }
+
+
+  /*
+    Adds all linked nodes of the currently selected nodes to the selection.
+    The number maxLinksOfLinkedNotes limits the addition to nodes that have
+    not more than this number of links. This is useful when the user
+    wants to select a hub with its surrounding satellite nodes, but not other
+    nodes connected to the hub. Set this value to 0, NaN or -1 to disable the
+    filter.
+  */
+  #addLinkedNodesToSelection(maxLinksOfLinkedNotes: number): void {
+    Array.from(this.#selection).forEach((value) => {
+      if (GraphVisualization.#isEdge(value)) return;
+      let nodesToAdd = this.#getLinkedNodes(value);
+      if (maxLinksOfLinkedNotes > 0) {
+        nodesToAdd = nodesToAdd
+          .filter((node) => node.linkedNotes.length <= maxLinksOfLinkedNotes);
+      }
+      this.#addToSelection(nodesToAdd);
+    });
+  }
+
+
   #handleMouseDownOnEdge(e, d: GraphVisualizationLink): void {
     e.stopPropagation();
 
     // when shift key is pressed down during mousedown,
     // add edge to current selection
-    this.#select([d], e.shiftKey);
+    e.shiftKey
+      ? this.#addToSelection([d])
+      : this.#setSelection([d]);
   }
 
 
@@ -551,7 +640,7 @@ export default class GraphVisualization {
           + "L" + d.position.x + "," + d.position.y,
         );
     } else if (this.#sKeyIsPressed) {
-      this.#select([d], true);
+      this.#toggleSelection([d]);
     }
   }
 
@@ -656,14 +745,17 @@ export default class GraphVisualization {
           });
 
         this.#onChange();
-        this.#select([]);
+        this.#setSelection([]);
         this.#updateConnectedNodeIds();
         this.#updateGraph();
 
         break;
       case consts.ESCAPE_KEY:
       case consts.C_KEY:
-        this.#select([]);
+        this.#setSelection([]);
+        break;
+      case consts.L_KEY:
+        this.#addLinkedNodesToSelection(0);
         break;
     }
   }
