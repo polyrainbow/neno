@@ -3,15 +3,19 @@ import it, { describe } from 'node:test';
 import * as Notes from "./index.js";
 import NoteFromUser from './interfaces/NoteFromUser';
 import MockStorageProvider from './test/MockStorageProvider.js';
+import { randomUUID } from 'node:crypto';
+import { UserNoteChangeType } from './interfaces/UserNoteChangeType.js';
 
-const TEST_GRAPH_ID = "graph";
+
 
 Notes.init(
   new MockStorageProvider(),
-  () => Math.floor(Math.random() * 10e10).toString()
+  () => randomUUID(),
 );
 
 describe("Notes module", () => {
+  const TEST_GRAPH_ID = randomUUID();
+
   it("should create and output notes", async () => {
     const noteFromUser1: NoteFromUser = {
       blocks: [],
@@ -30,12 +34,31 @@ describe("Notes module", () => {
   it("should output correct graph stats", async () => {
     const stats = await Notes.getStats(TEST_GRAPH_ID, {
       includeMetadata: true,
-      includeAnalysis: true,
+      includeAnalysis: false,
     });
     assert.strictEqual(stats.numberOfAllNotes, 2);
     assert.strictEqual(stats.numberOfLinks, 0);
     assert.strictEqual(stats.numberOfFiles, 0);
     assert.strictEqual(stats.numberOfPins, 0);
     assert.strictEqual(stats.numberOfUnlinkedNotes, 2);
+  });
+
+  it("should correctly create links", async () => {
+    const noteFromUser: NoteFromUser = {
+      blocks: [],
+      title: "Note 3",
+      changes: [
+        {
+          type: UserNoteChangeType.LINKED_NOTE_ADDED,
+          noteId: 1,
+        }
+      ]
+    };
+    await Notes.put(noteFromUser, TEST_GRAPH_ID);
+    const stats = await Notes.getStats(TEST_GRAPH_ID, {
+      includeMetadata: false,
+      includeAnalysis: false,
+    });
+    assert.strictEqual(stats.numberOfLinks, 1);
   });
 });
