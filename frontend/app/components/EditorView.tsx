@@ -1,5 +1,5 @@
 import React, {
-  useEffect, useState,
+  useEffect, useRef, useState,
 } from "react";
 import EditorViewHeader from "./EditorViewHeader";
 import NoteList from "./NoteList";
@@ -19,7 +19,9 @@ import {
   UserNoteChangeType,
 } from "../../../lib/notes/interfaces/UserNoteChangeType";
 import ActiveNote, { UnsavedActiveNote } from "../interfaces/ActiveNote";
-import FrontendUserNoteChange from "../interfaces/FrontendUserNoteChange";
+import FrontendUserNoteChange, {
+  FrontendUserNoteChangeNote,
+} from "../interfaces/FrontendUserNoteChange";
 import { DialogType } from "../enum/DialogType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
@@ -89,8 +91,11 @@ const EditorView = ({
   setPage,
   setSearchValue,
 }: EditorViewProps) => {
-  const newNoteObject: UnsavedActiveNote = Utils.getNewNoteObject();
+  const newNoteObject: UnsavedActiveNote = Utils.getNewNoteObject([]);
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
+  /* The value of this ref can be set to add linked notes to newly created
+  notes. it is always reset after creating a new note */
+  const linkedNotesToAddRef = useRef<FrontendUserNoteChangeNote[]>([]);
 
   const isSmallScreen = useIsSmallScreen();
 
@@ -221,7 +226,7 @@ const EditorView = ({
   };
 
 
-  const loadNote = async (noteId: NoteId) => {
+  const loadNote = async (noteId: NoteId): Promise<void> => {
     /* if we don't have a note id, let's create a new note */
     if (isNaN(noteId)) {
       /* whatever has been written to the address bar, let's replace it with
@@ -238,8 +243,11 @@ const EditorView = ({
       /* optionally attach existing file to new note */
       const searchParams = new URLSearchParams(location.search);
       const fileIdToAttach = searchParams.get("attach-file");
-      const newNoteObject: UnsavedActiveNote = Utils.getNewNoteObject();
+      const linkedNotes = linkedNotesToAddRef.current;
+      const newNoteObject: UnsavedActiveNote
+        = Utils.getNewNoteObject(linkedNotes);
       setActiveNote(newNoteObject);
+      linkedNotesToAddRef.current = [];
       const newBlocks = Utils.getNewNoteBlocks(
         fileIdToAttach ? [fileIdToAttach] : undefined,
       );
@@ -283,6 +291,22 @@ const EditorView = ({
     } else {
       navigate(Utils.getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
     }
+  };
+
+
+  const createNewLinkedNote = () => {
+    if (activeNote.isUnsaved) {
+      throw new Error("Cannot create linked note of unsaved note");
+    }
+
+    const linkedNote: FrontendUserNoteChangeNote = {
+      id: activeNote.id,
+      updateTime: activeNote.updateTime,
+      title: activeNote.title,
+    };
+
+    linkedNotesToAddRef.current = [linkedNote];
+    createNewNote();
   };
 
 
@@ -471,6 +495,7 @@ const EditorView = ({
           setUnsavedChanges={setUnsavedChanges}
           databaseProvider={databaseProvider}
           createNewNote={createNewNote}
+          createNewLinkedNote={createNewLinkedNote}
           handleNoteSaveRequest={handleNoteSaveRequest}
           removeActiveNote={removeActiveNote}
           unsavedChanges={unsavedChanges}

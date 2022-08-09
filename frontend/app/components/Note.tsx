@@ -38,6 +38,7 @@ interface NoteComponentProps {
   setUnsavedChanges,
   databaseProvider: DatabaseProvider,
   createNewNote,
+  createNewLinkedNote,
   handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges: boolean,
@@ -55,6 +56,7 @@ const Note = ({
   setUnsavedChanges,
   databaseProvider,
   createNewNote,
+  createNewLinkedNote,
   handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges,
@@ -152,6 +154,7 @@ const Note = ({
     <NoteControls
       activeNote={note}
       createNewNote={createNewNote}
+      createNewLinkedNote={createNewLinkedNote}
       handleNoteSaveRequest={handleNoteSaveRequest}
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}

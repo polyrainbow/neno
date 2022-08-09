@@ -8,6 +8,7 @@
   "dialog.close": "Close",
   "editor.add-links": "Add links",
   "editor.cancel": "Cancel",
+  "editor.create-linked-note": "New linked note",
   "editor.discard-changes-confirmation.confirm": "Discard changes",
   "editor.discard-changes-confirmation.text": "There are unsaved changes. Do you really want to discard them? If not, click cancel and save them first.",
   "editor.duplicate-note": "Duplicate note",
