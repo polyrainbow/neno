@@ -1,5 +1,7 @@
 account_tree
 add
+add_circle
+add_link
 add_location_alt
 add_location
 adjust

@@ -10,6 +10,10 @@ import { SavedActiveNote, UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Config from "../config";
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import FrontendUserNoteChange, { FrontendUserNoteChangeNote }
+  from "../interfaces/FrontendUserNoteChange";
+import { UserNoteChangeType }
+  from "../../../lib/notes/interfaces/UserNoteChangeType";
 
 
 const yyyymmdd = (date = new Date()): string => {
@@ -113,10 +117,20 @@ const getNewNoteBlocks = (
 };
 
 
-const getNewNoteObject = (): UnsavedActiveNote => {
+const getNewNoteObject = (
+  linkedNotes: FrontendUserNoteChangeNote[],
+): UnsavedActiveNote => {
   const note: UnsavedActiveNote = {
     isUnsaved: true,
-    changes: [],
+    changes: linkedNotes.map(
+      (note: FrontendUserNoteChangeNote): FrontendUserNoteChange => {
+        return {
+          type: UserNoteChangeType.LINKED_NOTE_ADDED,
+          note,
+          noteId: note.id,
+        };
+      },
+    ),
     title: Config.DEFAULT_NOTE_TITLE,
   };
 
@@ -345,6 +359,7 @@ const getAppPath = (
 const getIconSrc = (iconName: string): string => {
   return Config.ICON_PATH + iconName + ".svg";
 };
+
 
 const stringContainsOnlyDigits = (val: string): boolean => /^\d+$/.test(val);
 

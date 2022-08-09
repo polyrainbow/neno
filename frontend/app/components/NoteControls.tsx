@@ -14,6 +14,7 @@ import { l } from "../lib/intl.js";
 const NoteControls = ({
   activeNote,
   createNewNote,
+  createNewLinkedNote,
   handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges,
@@ -48,12 +49,21 @@ const NoteControls = ({
       }
       {
         !isSmallScreen
-          ? <IconButton
-            id="button_new"
-            title={l("editor.new-note")}
-            icon="add"
-            onClick={createNewNote}
-          />
+          ? <>
+            <IconButton
+              id="button_new"
+              title={l("editor.new-note")}
+              icon="add"
+              onClick={createNewNote}
+            />
+            <IconButton
+              id="button_create-linked-note"
+              disabled={activeNote.isUnsaved}
+              title={l("editor.create-linked-note")}
+              icon="add_circle"
+              onClick={createNewLinkedNote}
+            />
+          </>
           : null
       }
       <IconButton
