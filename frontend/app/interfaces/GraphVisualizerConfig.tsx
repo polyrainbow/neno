@@ -15,7 +15,7 @@ interface GraphVisualizerConfig {
   onHighlight: (highlightDetails: HighlightDetails) => void,
   onChange?: () => void,
   initialFocusNoteId?: NoteId,
-  openNote: (NoteId) => void,
+  openNote: (noteId: NoteId) => void,
 }
 
 export default GraphVisualizerConfig;

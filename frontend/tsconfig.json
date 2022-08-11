@@ -3,6 +3,7 @@
   "compilerOptions": {
     "types": [
       "wicg-file-system-access",
+      "d3"
     ],
   }
 }

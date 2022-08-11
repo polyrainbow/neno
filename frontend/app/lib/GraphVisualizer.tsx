@@ -52,7 +52,9 @@ import GraphVisualizationFromUser
   from "../../../lib/notes/interfaces/GraphVisualizationFromUser";
 import ScreenPosition from "../../../lib/notes/interfaces/ScreenPosition";
 import NodePosition from "../../../lib/notes/interfaces/NodePosition";
-import GraphVisualizerConfig from "../interfaces/GraphVisualizerConfig";
+import GraphVisualizerConfig, {
+  HighlightDetails,
+} from "../interfaces/GraphVisualizerConfig";
 
 
 export default class GraphVisualization {
@@ -77,6 +79,7 @@ export default class GraphVisualization {
     MAX_NODE_TEXT_LENGTH: 55,
     // minimum and maximum zoom
     SCALE_EXTENT: [0.01, 10] as [number, number],
+    MIN_LINKS_HUB: 8,
   };
 
 
@@ -112,6 +115,9 @@ export default class GraphVisualization {
     return !!(value[0] && value[1]);
   }
 
+  static #isHub(node: GraphVisualizationNode): boolean {
+    return node.linkedNotes.length >= GraphVisualization.#consts.MIN_LINKS_HUB;
+  }
 
   /*
     This class uses the top left corner of the SVG element as reference
@@ -141,15 +147,15 @@ export default class GraphVisualization {
   ***********************/
 
   #searchValue = "";
-  #onHighlight;
-  #onChange;
-  #openNote;
+  #onHighlight: (highlightDetails: HighlightDetails) => void;
+  #onChange: (() => void) | undefined;
+  #openNote: (noteId: NoteId) => void;
   #nodes: GraphVisualizationNode[];
   #links: GraphVisualizationLink[];
   #screenPosition: ScreenPosition;
   #initialNodePosition: NodePosition;
-  #parent;
-  #svg;
+  #parent: HTMLElement;
+  #svg: d3.Selection<SVGSVGElement, unknown, null, undefined>;
   #idsOfAllNodesWithLinkedNote: NoteId[] = [];
   #updatedNodes = new Set<GraphVisualizationNode>();
   #mouseDownNode: GraphVisualizationNode | null = null;
@@ -161,9 +167,10 @@ export default class GraphVisualization {
   #connectedNodeIdsOfSelection: NoteId[] = [];
   #titleRenderingEnabled = false;
 
-  #mainSVGGroup;
-  #gridLines;
-  #initialNodePositionIndicator;
+  #mainSVGGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
+  #gridLines: d3.Selection<SVGGElement, unknown, null, undefined>;
+  // eslint-disable-next-line max-len
+  #initialNodePositionIndicator: d3.Selection<SVGRectElement, unknown, null, undefined>;
   #nodeHighlighterContainer;
   #newLinkLine;
   #linksContainer;
@@ -209,7 +216,9 @@ export default class GraphVisualization {
     this.#nodes = graphObjectPrepared.nodes;
     this.#links = graphObjectPrepared.links;
 
-    const svgRect: DOMRect = this.#svg.node().getBoundingClientRect();
+    const svgElement = this.#svg.node();
+    if (!svgElement) throw new Error("No SVG element found");
+    const svgRect: DOMRect = svgElement.getBoundingClientRect();
 
     // ... we'll overwrite it if a valid note to focus is given
     if (typeof initialFocusNoteId === "number" && !isNaN(initialFocusNoteId)) {
@@ -335,7 +344,7 @@ export default class GraphVisualization {
           });
 
         this.#updateGraph({ type: "NODE_DRAG", node });
-        this.#onChange();
+        this.#onChange?.();
       });
 
     // drag intitial node position indicator
@@ -346,7 +355,7 @@ export default class GraphVisualization {
       .on("drag", (e) => {
         this.#initialNodePosition.x += e.dx;
         this.#initialNodePosition.y += e.dy;
-        this.#onChange();
+        this.#onChange?.();
         this.#updateGraph();
       });
 
@@ -406,7 +415,7 @@ export default class GraphVisualization {
     zoom.on("end", () => {
       d3.select("body").style("cursor", "auto");
       if (firstZoomEndHappened) {
-        this.#onChange();
+        this.#onChange?.();
       } else {
         firstZoomEndHappened = true;
       }
@@ -680,7 +689,7 @@ export default class GraphVisualization {
       // ... if not, create it
       if (!edgeAlreadyExists) {
         this.#links.push(newEdge);
-        this.#onChange();
+        this.#onChange?.();
         this.#updateConnectedNodeIds();
         this.#updateGraph();
       }
@@ -744,7 +753,7 @@ export default class GraphVisualization {
             this.#links.splice(this.#links.indexOf(edge), 1);
           });
 
-        this.#onChange();
+        this.#onChange?.();
         this.#setSelection([]);
         this.#updateConnectedNodeIds();
         this.#updateGraph();
@@ -776,6 +785,10 @@ export default class GraphVisualization {
   // call to propagate changes to graph
   #updateGraph(event?): void {
     const consts = GraphVisualization.#consts;
+
+    /** ********************
+      Initial node position indicator
+    ***********************/
 
     this.#initialNodePositionIndicator
       .attr("x",
@@ -949,13 +962,11 @@ export default class GraphVisualization {
       .enter()
       .append("g")
       .classed(consts.nodeClassName, true)
-      .classed("new", (d) => {
+      .classed("new", (d: GraphVisualizationNode) => {
         const MAX_NEW_AGE = 1000 * 60 * 60 * 24 * 10; // 10 days
         return Date.now() - d.creationTime < MAX_NEW_AGE;
       })
-      .classed("hub", (d) => {
-        return d.linkedNotes.length > 7;
-      })
+      .classed("hub", GraphVisualization.#isHub)
       .classed("unconnected", (d) => {
         return !binaryArrayIncludes(
           this.#idsOfAllNodesWithLinkedNote,
@@ -1002,10 +1013,10 @@ export default class GraphVisualization {
 
     // currently it's not possible to remove nodes in Graph View
     /*
-    // remove old nodes
-    const nodeExitSelection = this.nodeElements.exit();
-    nodeExitSelection.remove();
-  */
+      // remove old nodes
+      const nodeExitSelection = this.nodeElements.exit();
+      nodeExitSelection.remove();
+    */
   }
 
 
@@ -1036,7 +1047,9 @@ export default class GraphVisualization {
         };
       });
 
-    const svgRect = this.#svg.node().getBoundingClientRect();
+    const svgElement = this.#svg.node();
+    if (!svgElement) throw new Error("No SVG element found");
+    const svgRect = svgElement.getBoundingClientRect();
 
     const graphObject: GraphVisualizationFromUser = {
       nodePositionUpdates,
@@ -1077,7 +1090,7 @@ export default class GraphVisualization {
       });
 
     this.#updateGraph({ type: "INFLATION" });
-    this.#onChange();
+    this.#onChange?.();
   }
 
 
