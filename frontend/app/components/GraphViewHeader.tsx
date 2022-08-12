@@ -59,6 +59,12 @@ const GraphViewHeader = ({
             <option
               value={GraphVisualizationMode.HUBS_ONLY}
             >{l("graph.mode.hubs-only")}</option>
+            <option
+              value={GraphVisualizationMode.VORONOY}
+            >{l("graph.mode.voronoy")}</option>
+            <option
+              value={GraphVisualizationMode.VORONOY_HUBS}
+            >{l("graph.mode.voronoy-hubs")}</option>
           </select>
         </div>
       </>

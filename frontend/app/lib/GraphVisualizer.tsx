@@ -58,6 +58,7 @@ import NodePosition from "../../../lib/notes/interfaces/NodePosition";
 import GraphVisualizerConfig, {
   HighlightDetails,
 } from "../interfaces/GraphVisualizerConfig";
+import { Delaunay } from "d3";
 
 
 export default class GraphVisualization {
@@ -174,6 +175,7 @@ export default class GraphVisualization {
 
   #mainSVGGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
   #inpiGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
+  #voronoyGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
   #gridLines: d3.Selection<SVGGElement, unknown, null, undefined>;
   // eslint-disable-next-line max-len
   #initialNodePositionIndicator: d3.Selection<SVGRectElement, unknown, null, undefined> | null = null;
@@ -282,6 +284,9 @@ export default class GraphVisualization {
 
     this.#inpiGroup = this.#mainSVGGroup.append("g")
       .classed("new-node-position-indicator", true);
+
+    this.#voronoyGroup = this.#mainSVGGroup.append("g")
+      .classed("voronoy-group", true);
 
     this.#nodeHighlighterContainer = mainSVGGroup.append("g")
       .classed("note-highlighters", true);
@@ -474,6 +479,26 @@ export default class GraphVisualization {
       const tspan = el.append("tspan").text(words[i]);
       if (i > 0) {tspan.attr("x", 0).attr("dy", "15");}
     }
+  }
+
+
+  #getBoundaries(): { xmin: number, ymin: number, xmax: number, ymax: number } {
+    return this.#nodes.reduce(
+      (boundaries, node) => {
+        const pos = node.position;
+        if (pos.x < boundaries.xmin) boundaries.xmin = pos.x;
+        if (pos.x > boundaries.xmax) boundaries.xmax = pos.x;
+        if (pos.y < boundaries.ymin) boundaries.ymin = pos.y;
+        if (pos.y > boundaries.ymax) boundaries.ymax = pos.y;
+        return boundaries;
+      },
+      {
+        xmin: 0,
+        ymin: 0,
+        xmax: 0,
+        ymax: 0,
+      },
+    );
   }
 
 
@@ -763,8 +788,6 @@ export default class GraphVisualization {
 
   // call to propagate changes to graph
   #updateGraph(event?): void {
-    // eslint-disable-next-line
-    console.log(this.#mode);
     const consts = GraphVisualization.#consts;
 
     /** ********************
@@ -1080,6 +1103,7 @@ export default class GraphVisualization {
     this.#mode = mode;
     this.#setSelection([]);
     this.#inpiGroup.select("rect").remove();
+    this.#voronoyGroup.selectAll("path").remove();
 
     if (
       this.#mode === GraphVisualizationMode.DEFAULT
@@ -1115,6 +1139,39 @@ export default class GraphVisualization {
           });
         })
         .call(this.#inpIndicatorDrag);
+    }
+
+    if (
+      mode === GraphVisualizationMode.VORONOY
+      || mode === GraphVisualizationMode.VORONOY_HUBS
+    ) {
+      const nodes = mode === GraphVisualizationMode.VORONOY_HUBS
+        ? this.#nodes.filter(GraphVisualization.#isHub)
+        : this.#nodes;
+      const points = nodes.map(
+        (node) => [node.position.x, node.position.y],
+      );
+      const delaunay = Delaunay.from(points);
+      const boundaries = this.#getBoundaries();
+      const voronoy = delaunay.voronoi([
+        boundaries.xmin,
+        boundaries.ymin,
+        boundaries.xmax,
+        boundaries.ymax,
+      ]);
+      const svgPath = voronoy.render();
+
+      this.#voronoyGroup
+        .append("path")
+        .attr("d", voronoy.renderBounds())
+        .style("stroke", "white")
+        .style("stroke-width", "20");
+
+      this.#voronoyGroup
+        .append("path")
+        .attr("d", svgPath)
+        .style("stroke", "white")
+        .style("stroke-width", "10");
     }
 
     this.#updateGraph();
