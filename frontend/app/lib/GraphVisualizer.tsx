@@ -856,9 +856,12 @@ export default class GraphVisualization {
     this.#linkElements = this.#linksContainer
       .selectAll("path.link")
       .data(
-        this.#mode === GraphVisualizationMode.HUBS_ONLY
-          ? []
-          : this.#links,
+        (
+          this.#mode === GraphVisualizationMode.DEFAULT
+          || this.#mode === GraphVisualizationMode.NO_LABELS
+        )
+          ? this.#links
+          : [],
       );
 
     // update existing links
@@ -921,12 +924,19 @@ export default class GraphVisualization {
     // create node selection
     this.#nodeElements = this.#nodesContainer.selectAll("g.node");
 
+    const nodesData = this.#mode === GraphVisualizationMode.HUBS_ONLY
+      ? this.#nodes.filter(GraphVisualization.#isHub)
+      : (
+        this.#mode === GraphVisualizationMode.DEFAULT
+        || this.#mode === GraphVisualizationMode.NO_LABELS
+      )
+        ? this.#nodes
+        : [];
+
     // append new node data
     this.#nodeElements = this.#nodeElements
       .data(
-        this.#mode === GraphVisualizationMode.HUBS_ONLY
-          ? this.#nodes.filter(GraphVisualization.#isHub)
-          : this.#nodes,
+        nodesData,
         (d) => d.id,
       );
 
@@ -1104,6 +1114,8 @@ export default class GraphVisualization {
     this.#setSelection([]);
     this.#inpiGroup.select("rect").remove();
     this.#voronoyGroup.selectAll("path").remove();
+    d3.selectAll("text").remove();
+    this.#titleRenderingEnabled = false;
 
     if (
       this.#mode === GraphVisualizationMode.DEFAULT
@@ -1159,7 +1171,6 @@ export default class GraphVisualization {
         boundaries.xmax,
         boundaries.ymax,
       ]);
-      const svgPath = voronoy.render();
 
       this.#voronoyGroup
         .append("path")
@@ -1167,11 +1178,30 @@ export default class GraphVisualization {
         .style("stroke", "white")
         .style("stroke-width", "20");
 
-      this.#voronoyGroup
-        .append("path")
-        .attr("d", svgPath)
-        .style("stroke", "white")
-        .style("stroke-width", "10");
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+
+        const svgPath = voronoy.renderCell(i);
+        this.#voronoyGroup
+          .append("path")
+          .attr("d", svgPath)
+          .style("stroke", "white")
+          .style("fill", d3.schemeCategory10[i % 10])
+          .style("stroke-width", "10");
+
+        this.#voronoyGroup
+          .append("text")
+          .attr(
+            "transform",
+            "translate(" + node.position.x + "," + node.position.y + ")",
+          )
+          .text(nodes[i].title)
+          .attr("text-anchor", "middle")
+          .style(
+            "font-size",
+            mode === GraphVisualizationMode.VORONOY_HUBS ? "72px" : "36px",
+          );
+      }
     }
 
     this.#updateGraph();
@@ -1187,9 +1217,6 @@ export default class GraphVisualization {
             node.title,
           );
         });
-    } else {
-      d3.selectAll("text").remove();
-      this.#titleRenderingEnabled = false;
     }
   }
 
