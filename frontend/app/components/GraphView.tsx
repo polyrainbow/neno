@@ -13,6 +13,7 @@ import DatabaseProvider from "../interfaces/DatabaseProvider.js";
 import { HighlightDetails } from "../interfaces/GraphVisualizerConfig.js";
 import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
+import { GraphVisualizationMode } from "../interfaces/GraphVisualization.js";
 
 interface GraphViewProps {
   databaseProvider: DatabaseProvider | null,
@@ -36,6 +37,9 @@ const GraphView = ({
   const graphVisualizerInstance = useRef<GraphVisualizer | null>(null);
   const startedLoadingGraphVis = useRef<boolean>(false);
   const [status, setStatus] = useState<HighlightDetails>(DEFAULT_STATUS);
+  const [mode, setMode] = useState<GraphVisualizationMode>(
+    GraphVisualizationMode.DEFAULT,
+  );
   const [searchValue, setSearchValue] = useState<string>("");
 
   const confirmDiscardingUnsavedChanges
@@ -163,6 +167,11 @@ const GraphView = ({
       openSelectedNoteInEditor={openSelectedNoteInEditor}
       saveGraphObject={saveGraphObject}
       graphVisualizerInstance={graphVisualizerInstance}
+      mode={mode}
+      setMode={(mode: GraphVisualizationMode) => {
+        graphVisualizerInstance.current?.setMode(mode);
+        setMode(mode);
+      }}
     />
     <main id="main" className="main-graph" ref={mainElement}></main>
     <GraphViewStatusIndicator status={status} />

@@ -4,6 +4,7 @@ import UnsavedChangesIndicator from "./UnsavedChangesIndicator";
 import IconButton from "./IconButton";
 import SearchInput from "./SearchInput";
 import { l } from "../lib/intl";
+import { GraphVisualizationMode } from "../interfaces/GraphVisualization";
 
 const GraphViewHeader = ({
   unsavedChanges,
@@ -13,6 +14,8 @@ const GraphViewHeader = ({
   saveGraphObject,
   graphVisualizerInstance,
   openSelectedNoteInEditor,
+  mode,
+  setMode,
 }) => {
   return <HeaderContainer
     toggleAppMenu={toggleAppMenu}
@@ -36,14 +39,28 @@ const GraphViewHeader = ({
             graphVisualizerInstance.current.inflateGraph(1.1);
           }}
         />
-        <IconButton
-          icon="title"
-          title={l("graph.toggle-text-rendering")}
-          onClick={async () => {
-            if (!graphVisualizerInstance.current) return;
-            graphVisualizerInstance.current.toggleTextRendering();
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
           }}
-        />
+        >
+          <select
+            id="graphModeSelect"
+            value={mode}
+            onChange={(e) => setMode(e.target.value)}
+          >
+            <option
+              value={GraphVisualizationMode.DEFAULT}
+            >{l("graph.mode.default")}</option>
+            <option
+              value={GraphVisualizationMode.NO_LABELS}
+            >{l("graph.mode.no-labels")}</option>
+            <option
+              value={GraphVisualizationMode.HUBS_ONLY}
+            >{l("graph.mode.hubs-only")}</option>
+          </select>
+        </div>
       </>
     }
     rightContent={

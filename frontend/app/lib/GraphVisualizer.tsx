@@ -42,7 +42,10 @@ import {
 } from "./utils";
 import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
-import FrontendGraphVisualization, { GraphVisualizationLink }
+import FrontendGraphVisualization, {
+  GraphVisualizationLink,
+  GraphVisualizationMode,
+}
   from "../interfaces/GraphVisualization";
 import GraphVisualizationNode
   from "../../../lib/notes/interfaces/GraphVisualizationNode";
@@ -75,6 +78,7 @@ export default class GraphVisualization {
     L_KEY: 76,
     S_KEY: 83,
     nodeRadius: 50,
+    nodeRadiusHubsOnly: 150,
     newNodeIndicatorSize: 4 * 50,
     MAX_NODE_TEXT_LENGTH: 55,
     // minimum and maximum zoom
@@ -166,11 +170,13 @@ export default class GraphVisualization {
   #selection = new Set<GraphVisualizationNode | GraphVisualizationLink>();
   #connectedNodeIdsOfSelection: NoteId[] = [];
   #titleRenderingEnabled = false;
+  #mode: GraphVisualizationMode | null = null;
 
   #mainSVGGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
+  #inpiGroup: d3.Selection<SVGGElement, unknown, null, undefined>;
   #gridLines: d3.Selection<SVGGElement, unknown, null, undefined>;
   // eslint-disable-next-line max-len
-  #initialNodePositionIndicator: d3.Selection<SVGRectElement, unknown, null, undefined>;
+  #initialNodePositionIndicator: d3.Selection<SVGRectElement, unknown, null, undefined> | null = null;
   #nodeHighlighterContainer;
   #newLinkLine;
   #linksContainer;
@@ -274,24 +280,8 @@ export default class GraphVisualization {
       .attr("y", -50)
       .classed("grid-line", true);
 
-    this.#initialNodePositionIndicator = mainSVGGroup.append("g")
-      .classed("new-node-position-indicator", true)
-      .append("rect")
-      .attr("width", String(GraphVisualization.#consts.newNodeIndicatorSize))
-      .attr("height", String(GraphVisualization.#consts.newNodeIndicatorSize))
-      .attr("rx", 4)
-      .attr("ry", 4)
-      .on("mouseover", () => {
-        this.#onHighlight({
-          active: true,
-          type: "new-nodes-position-indicator",
-        });
-      })
-      .on("mouseout", () => {
-        this.#onHighlight({
-          active: false,
-        });
-      });
+    this.#inpiGroup = this.#mainSVGGroup.append("g")
+      .classed("new-node-position-indicator", true);
 
     this.#nodeHighlighterContainer = mainSVGGroup.append("g")
       .classed("note-highlighters", true);
@@ -321,7 +311,8 @@ export default class GraphVisualization {
       .filter(() => {
         return (!this.#shiftKeyIsPressed)
           && (!this.#ctrlKeyIsPressed)
-          && (!this.#sKeyIsPressed);
+          && (!this.#sKeyIsPressed)
+          && this.#mode !== GraphVisualizationMode.HUBS_ONLY;
       })
       .on("drag", (e, d) => {
         const node = d as GraphVisualizationNode;
@@ -345,18 +336,6 @@ export default class GraphVisualization {
 
         this.#updateGraph({ type: "NODE_DRAG", node });
         this.#onChange?.();
-      });
-
-    // drag intitial node position indicator
-    this.#inpIndicatorDrag = d3.drag()
-      .subject((event) => {
-        return { x: event.x, y: event.y };
-      })
-      .on("drag", (e) => {
-        this.#initialNodePosition.x += e.dx;
-        this.#initialNodePosition.y += e.dy;
-        this.#onChange?.();
-        this.#updateGraph();
       });
 
     // listen for key events
@@ -435,12 +414,12 @@ export default class GraphVisualization {
 
     this.#updateConnectedNodeIds();
 
-    this.#updateGraph();
-
     // by default, text rendering is activated, if the number of nodes is <= 500
-    if (this.#nodes.length <= 500) {
-      this.toggleTextRendering();
-    }
+    this.setMode(
+      this.#nodes.length <= 500
+        ? GraphVisualizationMode.DEFAULT
+        : GraphVisualizationMode.NO_LABELS,
+    );
   }
 
 
@@ -784,6 +763,8 @@ export default class GraphVisualization {
 
   // call to propagate changes to graph
   #updateGraph(event?): void {
+    // eslint-disable-next-line
+    console.log(this.#mode);
     const consts = GraphVisualization.#consts;
 
     /** ********************
@@ -791,13 +772,12 @@ export default class GraphVisualization {
     ***********************/
 
     this.#initialNodePositionIndicator
-      .attr("x",
+      ?.attr("x",
         this.#initialNodePosition.x - (consts.newNodeIndicatorSize / 2),
       )
       .attr("y",
         this.#initialNodePosition.y - (consts.newNodeIndicatorSize / 2),
-      )
-      .call(this.#inpIndicatorDrag);
+      );
 
     /** ********************
       node highlighter circles
@@ -852,7 +832,11 @@ export default class GraphVisualization {
     // create link selection
     this.#linkElements = this.#linksContainer
       .selectAll("path.link")
-      .data(this.#links);
+      .data(
+        this.#mode === GraphVisualizationMode.HUBS_ONLY
+          ? []
+          : this.#links,
+      );
 
     // update existing links
     this.#linkElements
@@ -917,7 +901,9 @@ export default class GraphVisualization {
     // append new node data
     this.#nodeElements = this.#nodeElements
       .data(
-        this.#nodes,
+        this.#mode === GraphVisualizationMode.HUBS_ONLY
+          ? this.#nodes.filter(GraphVisualization.#isHub)
+          : this.#nodes,
         (d) => d.id,
       );
 
@@ -954,11 +940,17 @@ export default class GraphVisualization {
       })
       .classed("connected-to-selected", (node) => {
         return this.#connectedNodeIdsOfSelection.includes(node.id);
-      });
+      })
+      .select("circle")
+      .attr("r", String(
+        this.#mode === GraphVisualizationMode.HUBS_ONLY
+          ? consts.nodeRadiusHubsOnly
+          : consts.nodeRadius,
+      ));
 
 
     // add new nodes
-    const nodeG = this.#nodeElements
+    this.#nodeElements
       .enter()
       .append("g")
       .classed(consts.nodeClassName, true)
@@ -1006,17 +998,19 @@ export default class GraphVisualization {
           this.#openNote(d.id);
         }
       })
-      .call(this.#nodeDrag);
+      .call(this.#nodeDrag)
+      .append("circle")
+      .attr("r", String(
+        this.#mode === GraphVisualizationMode.HUBS_ONLY
+          ? consts.nodeRadiusHubsOnly
+          : consts.nodeRadius,
+      ));
 
-    nodeG.append("circle")
-      .attr("r", String(consts.nodeRadius));
 
-    // currently it's not possible to remove nodes in Graph View
-    /*
-      // remove old nodes
-      const nodeExitSelection = this.nodeElements.exit();
-      nodeExitSelection.remove();
-    */
+    // remove old nodes
+    this.#nodeElements
+      .exit()
+      .remove();
   }
 
 
@@ -1080,22 +1074,52 @@ export default class GraphVisualization {
   }
 
 
-  inflateGraph(factor: number): void {
-    this.#nodes
-      .forEach((node) => {
-        node.position.x *= factor;
-        node.position.y *= factor;
+  setMode(mode: GraphVisualizationMode): void {
+    if (this.#mode === mode) return;
 
-        this.#updatedNodes.add(node);
-      });
+    this.#mode = mode;
+    this.#setSelection([]);
+    this.#inpiGroup.select("rect").remove();
 
-    this.#updateGraph({ type: "INFLATION" });
-    this.#onChange?.();
-  }
+    if (
+      this.#mode === GraphVisualizationMode.DEFAULT
+      || this.#mode === GraphVisualizationMode.NO_LABELS
+    ) {
+      // drag intitial node position indicator
+      this.#inpIndicatorDrag = d3.drag()
+        .subject((event) => {
+          return { x: event.x, y: event.y };
+        })
+        .on("drag", (e) => {
+          this.#initialNodePosition.x += e.dx;
+          this.#initialNodePosition.y += e.dy;
+          this.#onChange?.();
+          this.#updateGraph();
+        });
 
+      this.#initialNodePositionIndicator = this.#inpiGroup
+        .append("rect")
+        .attr("width", String(GraphVisualization.#consts.newNodeIndicatorSize))
+        .attr("height", String(GraphVisualization.#consts.newNodeIndicatorSize))
+        .attr("rx", 4)
+        .attr("ry", 4)
+        .on("mouseover", () => {
+          this.#onHighlight({
+            active: true,
+            type: "new-nodes-position-indicator",
+          });
+        })
+        .on("mouseout", () => {
+          this.#onHighlight({
+            active: false,
+          });
+        })
+        .call(this.#inpIndicatorDrag);
+    }
 
-  toggleTextRendering(): boolean {
-    if (!this.#titleRenderingEnabled) {
+    this.#updateGraph();
+
+    if (this.#mode !== GraphVisualizationMode.NO_LABELS) {
       this.#titleRenderingEnabled = true;
       d3.selectAll("g." + GraphVisualization.#consts.nodeClassName)
         .each((d, i, domElements) => {
@@ -1110,8 +1134,20 @@ export default class GraphVisualization {
       d3.selectAll("text").remove();
       this.#titleRenderingEnabled = false;
     }
+  }
 
-    return this.#titleRenderingEnabled;
+
+  inflateGraph(factor: number): void {
+    this.#nodes
+      .forEach((node) => {
+        node.position.x *= factor;
+        node.position.y *= factor;
+
+        this.#updatedNodes.add(node);
+      });
+
+    this.#updateGraph({ type: "INFLATION" });
+    this.#onChange?.();
   }
 }
 

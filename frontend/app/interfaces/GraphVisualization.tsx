@@ -8,6 +8,12 @@ import ScreenPosition from "../../../lib/notes/interfaces/ScreenPosition";
   objects.
 */
 
+export enum GraphVisualizationMode {
+  DEFAULT = "DEFAULT",
+  NO_LABELS = "NO_LABELS",
+  HUBS_ONLY = "HUBS_ONLY",
+}
+
 export type GraphVisualizationLink
   = [GraphVisualizationNode, GraphVisualizationNode];
 
