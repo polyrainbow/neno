@@ -12,6 +12,8 @@ export enum GraphVisualizationMode {
   DEFAULT = "DEFAULT",
   NO_LABELS = "NO_LABELS",
   HUBS_ONLY = "HUBS_ONLY",
+  VORONOY = "VORONOY",
+  VORONOY_HUBS = "VORONOY_HUBS",
 }
 
 export type GraphVisualizationLink
