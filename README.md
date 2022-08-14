@@ -44,6 +44,6 @@ Read the [user manual](./docs/index.md) or just [go to the app](https://sebastia
 
 * [NENO user manual](./docs/index.md)
 
-* [Why I built NENO](https://webaudiotech.com/2021/02/13/serendipity-and-the-most-detailed-map-of-my-knowledge-that-ever-existed/)
+* [Why I built NENO](./docs/Serendipity.md)
 
 * [Contributing](./CONTRIBUTING.md)
