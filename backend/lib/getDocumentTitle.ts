@@ -1,5 +1,13 @@
 import * as logger from "./logger.js";
 
+
+export const getDocumentTitleFromHtml = (html: string): string => {
+  const REGEX = /<title.*>(.*)<\/title>/g;
+  const result = REGEX.exec(html);
+  if (!result) throw new Error("Document contains no title element");
+  return result[1];
+};
+
 const getDocumentTitle = async (
   url: string,
 ): Promise<string> => {
@@ -16,15 +24,9 @@ const getDocumentTitle = async (
   }
 
   const bodyText = await response.text();
-
-  const REGEX = /<title>(.*)<\/title>/g;
-  const result = REGEX.exec(bodyText);
-  if (!result) throw new Error("Document contains no title element");
-  const documentTitle = result[1];
-
+  const documentTitle = getDocumentTitleFromHtml(bodyText);
   logger.verbose("Document title received:");
   logger.verbose(JSON.stringify(documentTitle));
-
   return documentTitle;
 };
 
