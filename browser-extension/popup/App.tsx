@@ -25,7 +25,8 @@ const App = () => {
           "hostUrl",
         ],
         ({ apiKey: apiKeyFromStorage, hostUrl: hostUrlFromStorage }) => {
-          const hostUrlFromStorageTrimmed = trimHostUrl(hostUrlFromStorage || "");
+          const hostUrlFromStorageTrimmed
+            = trimHostUrl(hostUrlFromStorage || "");
           setApiKey(apiKeyFromStorage || "");
           setHostUrl(hostUrlFromStorageTrimmed);
         },

@@ -75,7 +75,11 @@ const NoteControls = ({
       }
       <IconButton
         id="button_upload"
-        title={l(contentMode === ContentMode.EDITOR ? "editor.finish-editing" : "editor.edit-note")}
+        title={l(
+          contentMode === ContentMode.EDITOR
+            ? "editor.finish-editing"
+            : "editor.edit-note",
+        )}
         icon={contentMode === ContentMode.EDITOR ? "preview" : "create"}
         onClick={toggleEditMode}
       />

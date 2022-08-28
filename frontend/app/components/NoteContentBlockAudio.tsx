@@ -23,8 +23,8 @@ const NoteContentBlockAudio = ({
     getUrl(file, databaseProvider)
       .then((url) => {
         setUrl(url);
-      })
-  })
+      });
+  });
 
   return <div
     className="preview-block-file-wrapper"
@@ -44,7 +44,9 @@ const NoteContentBlockAudio = ({
           display: "flex",
         }}
       >
-        <Link to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))}>
+        <Link to={
+          getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))
+        }>
           <Icon
             icon="info"
             title="File details"

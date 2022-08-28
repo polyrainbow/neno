@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { PathTemplate } from "../enum/PathTemplate";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
-import { l } from "../lib/intl";
-import { getAppPath, getExtensionFromFilename, getUrl, humanFileSize, onDownload } from "../lib/utils";
-import Icon from "./Icon";
+import {
+  getAppPath,
+  getUrl,
+} from "../lib/utils";
 
 interface NoteContentBlockAudioProps {
   file: FileInfo,
@@ -25,8 +26,8 @@ const NoteContentBlockImage = ({
     getUrl(file, databaseProvider)
       .then((url) => {
         setUrl(url);
-      })
-  })
+      });
+  });
 
 
   return <div

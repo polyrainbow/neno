@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import NoteView from "./NoteView";
 import ListView from "./ListView";
 import GraphView from "./GraphView";
@@ -37,12 +37,16 @@ import ActiveNote, { UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Utils from "../lib/utils";
 import useGoToNote from "../hooks/useGoToNote";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
-import useConfirmDiscardingUnsavedChangesDialog from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import FrontendUserNoteChange, { FrontendUserNoteChangeNote } from "../interfaces/FrontendUserNoteChange";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import FrontendUserNoteChange, { FrontendUserNoteChangeNote }
+  from "../interfaces/FrontendUserNoteChange";
 import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
 import * as Config from "../config";
 import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
-import { UserNoteChangeType } from "../../../lib/notes/interfaces/UserNoteChangeType";
+import {
+  UserNoteChangeType,
+} from "../../../lib/notes/interfaces/UserNoteChangeType";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -121,8 +125,14 @@ const AppWithConfirmationServiceProvider = ({
         files,
       );
     setActiveNote(newNoteObject);
-  }
+  };
 
+
+  const handleInvalidCredentialsError = async () => {
+    await databaseProvider?.removeAccess();
+    setDatabaseMode(DatabaseMode.NONE);
+    navigate(getAppPath(PathTemplate.LOGIN));
+  };
 
 
   const loadNote = async (noteId: NoteId): Promise<void> => {
@@ -151,13 +161,6 @@ const AppWithConfirmationServiceProvider = ({
         throw e;
       }
     }
-  };
-
-
-  const handleInvalidCredentialsError = async () => {
-    await databaseProvider?.removeAccess();
-    setDatabaseMode(DatabaseMode.NONE);
-    navigate(getAppPath(PathTemplate.LOGIN));
   };
 
 
@@ -570,6 +573,6 @@ const App = (props) => {
   return <ConfirmationServiceProvider>
     <AppWithConfirmationServiceProvider {...props} />
   </ConfirmationServiceProvider>;
-}
+};
 
 export default App;
