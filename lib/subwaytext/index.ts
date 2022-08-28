@@ -59,11 +59,13 @@ export default (input: string): Block[] => {
             return blocks;
           }
 
+          const lineValue = (line === "\\<>") ? "<>" : line;
+
           if (codeBlockJustStarted) {
-            currentBlock.data.code += line;
+            currentBlock.data.code += lineValue;
             codeBlockJustStarted = false;
           } else {
-            currentBlock.data.code += "\n" + line;
+            currentBlock.data.code += "\n" + lineValue;
           }
           return blocks;
         }
@@ -122,7 +124,7 @@ export default (input: string): Block[] => {
 
           return blocks;
         } else if (
-          line === "<>"
+          line.startsWith("<>")
         ) {
           withinBlock = true;
           codeBlockJustStarted = true;
@@ -131,6 +133,7 @@ export default (input: string): Block[] => {
             type: BlockType.CODE,
             data: {
               code: "",
+              contentType: line.substring(2).trim(),
             },
           };
 
