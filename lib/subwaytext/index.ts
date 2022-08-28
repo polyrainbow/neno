@@ -10,6 +10,9 @@ import {
   ListBlockStyle,
 } from "./interfaces/Block.js";
 
+export const HEADING_SIGIL = "#";
+export const CODE_SIGIL = "```";
+export const SLASHLINK_SIGIL = "/";
 
 export default (input: string): Block[] => {
   const lines = input.replaceAll("\r", "").split("\n");
@@ -54,12 +57,14 @@ export default (input: string): Block[] => {
             return blocks;
           }
         } else if (currentBlock.type === BlockType.CODE) {
-          if (line === "<>") {
+          if (line === CODE_SIGIL) {
             withinBlock = false;
             return blocks;
           }
 
-          const lineValue = (line === "\\<>") ? "<>" : line;
+          const lineValue = (line === "\\" + CODE_SIGIL)
+            ? CODE_SIGIL
+            : line;
 
           if (codeBlockJustStarted) {
             currentBlock.data.code += lineValue;
@@ -72,7 +77,7 @@ export default (input: string): Block[] => {
       }
 
       if (!withinBlock) {
-        if (line.startsWith("#")) {
+        if (line.startsWith(HEADING_SIGIL)) {
           const newBlock: BlockHeading = {
             type: BlockType.HEADING,
             data: {
@@ -109,7 +114,7 @@ export default (input: string): Block[] => {
           blocks.push(newBlock);
 
           return blocks;
-        } else if (line.startsWith("/")) {
+        } else if (line.startsWith(SLASHLINK_SIGIL)) {
           const link = line.substring(1).trim().split(/\s+/)[0];
           const text = line.substring(1).substring(link.length).trim();
           const newBlock: BlockSlashlink = {
@@ -124,7 +129,7 @@ export default (input: string): Block[] => {
 
           return blocks;
         } else if (
-          line.startsWith("<>")
+          line.startsWith(CODE_SIGIL)
         ) {
           withinBlock = true;
           codeBlockJustStarted = true;
@@ -133,7 +138,7 @@ export default (input: string): Block[] => {
             type: BlockType.CODE,
             data: {
               code: "",
-              contentType: line.substring(2).trim(),
+              contentType: line.substring(CODE_SIGIL.length).trim(),
             },
           };
 
