@@ -17,4 +17,5 @@ jobs:
     - run: npm i
     - run: npm run lint
     - run: npm run unit-test-notes-module
+    - run: npm run unit-test-subwaytext
     - run: npm run build
