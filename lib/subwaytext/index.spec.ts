@@ -25,7 +25,7 @@ text
 /file:y.mp3     Some description
 here starts another paragraph
 
-<>
+<>javascript
 and here we have some multiline code
 
 
@@ -93,7 +93,8 @@ https://example.com Link to example.com
         type: BlockType.CODE,
         data: {
           // eslint-disable-next-line max-len
-          code: "and here we have some multiline code\n\n\nconst x = [{}];\n!@#$%&*()"
+          code: "and here we have some multiline code\n\n\nconst x = [{}];\n!@#$%&*()",
+          contentType: "javascript",
         }
       },
       {
@@ -104,6 +105,24 @@ https://example.com Link to example.com
         }
       },
     ];
+
+    assert.deepEqual(subwaytext(input), result);
+  });
+
+  it("should unescape escaped code block signals within a code block", () => {
+    const input = `<>
+\\<>
+code
+\\<>
+<>`;
+
+    const result = [{
+      type: BlockType.CODE,
+      data: {
+        code: "<>\ncode\n<>",
+        contentType: "",
+      }
+    }];
 
     assert.deepEqual(subwaytext(input), result);
   });

@@ -64,6 +64,7 @@ export interface ListBlock {
 
 interface BlockCodeData {
   code: string,
+  contentType: string,
 }
 
 export interface BlockCode {
