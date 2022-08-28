@@ -19,7 +19,7 @@ export default {
     // Add .ts and .tsx as a resolvable extension.
     extensions: [".ts", ".tsx"],
     extensionAlias: {
-      '.js': ['.ts', '.js'],
+      ".js": [".ts", ".js"],
     },
   },
   module: {

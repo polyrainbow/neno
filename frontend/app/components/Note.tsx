@@ -10,7 +10,11 @@ import {
 } from "react-router-dom";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import { getAppPath, getFileFromUserSelection, insertDocumentTitles } from "../lib/utils";
+import {
+  getAppPath,
+  getFileFromUserSelection,
+  insertDocumentTitles,
+} from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import ActiveNote from "../interfaces/ActiveNote";
@@ -33,8 +37,6 @@ import NoteContent from "./NoteContent";
 import * as IDB from "idb-keyval";
 import { ContentMode } from "../interfaces/ContentMode";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
-import subwaytext from "../../../lib/subwaytext";
-import { Block, BlockType, BlockUrl } from "../../../lib/subwaytext/interfaces/Block";
 
 interface NoteComponentProps {
   note: ActiveNote,
@@ -79,7 +81,9 @@ const Note = ({
   const goToNote = useGoToNote();
   const [searchString, setSearchString] = useState<string>("");
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
-  const [contentMode, setContentMode] = useState<ContentMode>(ContentMode.LOADING);
+  const [contentMode, setContentMode] = useState<ContentMode>(
+    ContentMode.LOADING,
+  );
   const [searchResults, setSearchResults] = useState<MainNoteListItem[]>([]);
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
@@ -105,7 +109,7 @@ const Note = ({
     } else {
       separator = "\n\n";
     }
-  
+
     setNoteContent(
       `${note.content}${separator}/file:${response.fileId}`,
     );
@@ -168,7 +172,9 @@ const Note = ({
   const toggleEditMode = async () => {
     if (contentMode === ContentMode.LOADING) return;
 
-    const newContentMode = contentMode === ContentMode.EDITOR ? ContentMode.VIEWER : ContentMode.EDITOR;
+    const newContentMode = contentMode === ContentMode.EDITOR
+      ? ContentMode.VIEWER
+      : ContentMode.EDITOR;
     setContentMode(newContentMode);
     await IDB.set("CONTENT_MODE", newContentMode);
 
@@ -210,7 +216,7 @@ const Note = ({
       // Use DataTransferItemList interface to access the file(s)
       [...e.dataTransfer.items].forEach((item) => {
         // If dropped items aren't files, reject them
-        if (item.kind === 'file') {
+        if (item.kind === "file") {
           const file = item.getAsFile();
           setUploadInProgress(true);
           databaseProvider.uploadFile(file)
@@ -230,7 +236,7 @@ const Note = ({
           });
       });
     }
-  }
+  };
 
 
   useEffect(() => {
@@ -239,7 +245,8 @@ const Note = ({
 
     noteTitleElementRef.current.style.height = "0px";
     noteTitleElementRef.current.style.height
-      = (noteTitleElementRef.current.scrollHeight - TOTAL_VERTICAL_PADDING) + "px";
+      = (noteTitleElementRef.current.scrollHeight - TOTAL_VERTICAL_PADDING)
+      + "px";
   }, [note.title, contentMode]);
 
 
@@ -258,7 +265,7 @@ const Note = ({
       })
       .catch(() => {
         setContentMode(ContentMode.VIEWER);
-      })
+      });
   }, []);
 
 

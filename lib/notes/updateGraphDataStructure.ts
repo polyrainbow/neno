@@ -34,7 +34,10 @@ const transformBlocksToSubwaytext = (blocks) => {
             .split("\n- ");
       } else {
         block.data.items.forEach((item, i, items) => {
-          const newItemValue = (item.endsWith("<br>") ? item.substring(0, item.length - 4) : item)
+          const newItemValue = (item.endsWith("<br>")
+            ? item.substring(0, item.length - 4)
+            : item
+          )
             .replaceAll("<br>", "\n");
           content += (i + 1).toString() + ". " + newItemValue;
           if (i < items.length - 1) {
@@ -62,10 +65,10 @@ const transformBlocksToSubwaytext = (blocks) => {
     content += "\n\n";
     return content;
   }, "");
-}
+};
 
 
-const getFilesFromBlocks = (note, getFileSize):Promise<FileInfo[]> => {
+const getFilesFromBlocks = (note, getFileSize): Promise<FileInfo[]> => {
   return Promise.all(
     note.blocks
       .filter((block) => {
@@ -77,10 +80,10 @@ const getFilesFromBlocks = (note, getFileSize):Promise<FileInfo[]> => {
           && typeof block.data.file.fileId === "string"
         );
       })
-      .map(async (block):Promise<FileInfo> => {
+      .map(async (block): Promise<FileInfo> => {
         let size;
         try {
-          size = await getFileSize(block.data.file.fileId)
+          size = await getFileSize(block.data.file.fileId);
         } catch (e) {
           size = -1;
         }
@@ -90,10 +93,10 @@ const getFilesFromBlocks = (note, getFileSize):Promise<FileInfo[]> => {
           name: block.data.file.name || block.data.file.fileId,
           size,
           creationTime: note.creationTime,
-        }
+        };
       }),
   );
-}
+};
 
 
 const updateNote = async (note, getFileSize, graph) => {

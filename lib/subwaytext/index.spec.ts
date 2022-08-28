@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import it, { describe } from 'node:test';
 import { Block, BlockType, ListBlockStyle } from './interfaces/Block.js';
-import subwaytext from "./index.js"
+import subwaytext from "./index.js";
 
 
 describe("subwaytext", () => {
@@ -92,6 +92,7 @@ https://example.com Link to example.com
       {
         type: BlockType.CODE,
         data: {
+          // eslint-disable-next-line max-len
           code: "and here we have some multiline code\n\n\nconst x = [{}];\n!@#$%&*()"
         }
       },

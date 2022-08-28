@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
-import {
-  useNavigate,
-} from "react-router-dom";
 import FileInfoAndSrc from "../interfaces/FileInfoAndSrc";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
@@ -22,8 +19,6 @@ const FilesView = ({
   createNewNote,
 }: FilesViewProps) => {
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
-  const navigate = useNavigate();
-
   const [files, setFiles] = useState<FileInfoAndSrc[]>([]);
   const [danglingFiles, setDanglingFiles] = useState<FileInfoAndSrc[]>([]);
   // status can be READY, BUSY

@@ -17,10 +17,12 @@ import * as Utils from "../utils.js";
 import { MediaType } from "./interfaces/MediaType.js";
 import { NoteContent } from "./interfaces/NoteContent.js";
 import { FileInfo } from "./interfaces/FileInfo.js";
-import { GraphId } from "./interfaces/GraphId.js";
-import DatabaseIO from "./DatabaseIO.js";
 import subwaytext from "../subwaytext/index.js";
-import { Block, BlockSlashlink, BlockType } from "../subwaytext/interfaces/Block.js";
+import {
+  Block,
+  BlockSlashlink,
+  BlockType,
+} from "../subwaytext/interfaces/Block.js";
 
 
 const getExtensionFromFilename = (filename: string): string | null => {

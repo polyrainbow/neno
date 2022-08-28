@@ -10,7 +10,12 @@ import { UserNoteChangeType }
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
-import { Block, BlockSlashlink, BlockType, BlockUrl } from "../../../lib/subwaytext/interfaces/Block";
+import {
+  Block,
+  BlockSlashlink,
+  BlockType,
+  BlockUrl,
+} from "../../../lib/subwaytext/interfaces/Block";
 import subwaytext from "../../../lib/subwaytext";
 
 
@@ -303,12 +308,7 @@ const getFileId = (noteContent: string): FileId | null => {
 };
 
 
-/**
- * Checks if the block contains a valid file.
- * @param block
- * @returns {boolean} true or false
- */
- const blockHasLoadedFile = (
+const blockHasLoadedFile = (
   block: Block,
 ): block is BlockSlashlink => {
   if (
@@ -389,7 +389,7 @@ const base64Encode = async (string: string): Promise<string> => {
       const base64String = result.substring(posOfSignal + signal.length);
       resolve(base64String);
     };
-  
+
     fileReader.readAsDataURL(new Blob(Array.from(string)));
   });
 };
@@ -403,7 +403,7 @@ const insertDocumentTitles = async (
     subwaytext(noteContent)
       .filter((block: Block): block is BlockUrl => {
         return block.type === BlockType.URL
-          && block.data.text.length === 0
+          && block.data.text.length === 0;
       })
       .map(async (block): Promise<[string, string]> => {
         return [
@@ -419,7 +419,7 @@ const insertDocumentTitles = async (
       .replace(
         url,
         url + " " + docTitle,
-      )
+      );
   });
 
   return newNoteContent;

@@ -1,4 +1,3 @@
-import { response } from "express";
 import { APIError } from "../../../../backend/interfaces/APIError";
 import APIResponse from "../../../../backend/interfaces/APIResponse";
 import { FileId } from "../../../../lib/notes/interfaces/FileId";

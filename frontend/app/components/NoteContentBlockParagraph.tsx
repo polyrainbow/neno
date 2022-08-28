@@ -8,13 +8,12 @@ interface NoteContentBlockAudioProps {
 const NoteContentBlockParagraph = ({
   text,
 }: NoteContentBlockAudioProps) => {
-
   const lines = text.split("\n");
   const markup = lines.map((lineText, lineIndex, lines) => {
+    // eslint-disable-next-line max-len
+    const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
 
-    const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g;
-
-    const line:React.ReactElement[] = [];
+    const line: React.ReactElement[] = [];
     const outerParts = lineText.split(regex);
     let i = 0;
     for (const match of lineText.matchAll(regex)) {

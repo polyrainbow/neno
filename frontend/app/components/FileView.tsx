@@ -32,7 +32,7 @@ const FileView = ({
     const getFileInfo = async () => {
       const fileInfo = await databaseProvider.getFileInfo(fileId);
       setFileInfo(fileInfo);
-    }
+    };
 
     const updateSrc = async () => {
       const src = await databaseProvider.getUrlForFileId(fileId);

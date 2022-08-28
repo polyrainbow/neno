@@ -1,10 +1,16 @@
 import React from "react";
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import subwaytext from "../../../lib/subwaytext/index";
-import { BlockType, ListBlockStyle } from "../../../lib/subwaytext/interfaces/Block";
+import {
+  BlockType,
+  ListBlockStyle,
+} from "../../../lib/subwaytext/interfaces/Block";
 import ActiveNote from "../interfaces/ActiveNote";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
-import { getFileId, getMediaTypeFromFilename, parseFileIds } from "../lib/utils";
+import {
+  getFileId,
+  getMediaTypeFromFilename,
+} from "../lib/utils";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
 import NoteContentBlockDocument from "./NoteContentBlockDocument";
 import NoteContentBlockEmptyFile from "./NoteContentBlockEmptyFile";
@@ -31,7 +37,7 @@ const NoteContent = ({
   if (blocks.length === 0) {
     return <NoteContentEmptyDisclaimer
       toggleEditMode={toggleEditMode}
-    />
+    />;
   }
 
   return <div>
@@ -85,7 +91,7 @@ const NoteContent = ({
               className="preview-block-list-unordered"
             >
               {block.data.items.map((item) => {
-                return <li key={Math.random()}>{item}</li>
+                return <li key={Math.random()}>{item}</li>;
               })}
             </ul>;
           } else {
@@ -94,7 +100,7 @@ const NoteContent = ({
               className="preview-block-list-ordered"
             >
               {block.data.items.map((item) => {
-                return <li key={Math.random()}>{item}</li>
+                return <li key={Math.random()}>{item}</li>;
               })}
             </ol>;
           }
@@ -102,7 +108,7 @@ const NoteContent = ({
           return <NoteContentBlockParagraph
             text={block.data.text}
             key={Math.random()}
-          />
+          />;
         } else if (block.type === BlockType.CODE) {
           return <pre
             key={Math.random()}
@@ -111,12 +117,14 @@ const NoteContent = ({
             {block.data.code}
           </pre>;
         } else if (block.type === BlockType.HEADING) {
-          return <h2 key={Math.random()}>{block.data.text}</h2>
+          return <h2 key={Math.random()}>{block.data.text}</h2>;
         } else if (block.type === BlockType.URL) {
           return <NoteContentBlockUrl
             key={Math.random()}
             blockData={block.data}
           />;
+        } else {
+          throw new Error("Unexpected block type");
         }
       })
     }
