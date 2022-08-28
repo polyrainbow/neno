@@ -25,13 +25,13 @@ text
 /file:y.mp3     Some description
 here starts another paragraph
 
-<>javascript
+\`\`\`javascript
 and here we have some multiline code
 
 
 const x = [{}];
 !@#$%&*()
-<>
+\`\`\`
 
 https://example.com Link to example.com
 `;
@@ -110,16 +110,16 @@ https://example.com Link to example.com
   });
 
   it("should unescape escaped code block signals within a code block", () => {
-    const input = `<>
-\\<>
+    const input = `\`\`\`
+\\\`\`\`
 code
-\\<>
-<>`;
+\\\`\`\`
+\`\`\``;
 
     const result = [{
       type: BlockType.CODE,
       data: {
-        code: "<>\ncode\n<>",
+        code: "```\ncode\n```",
         contentType: "",
       }
     }];

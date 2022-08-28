@@ -5,6 +5,7 @@
   sense to type-check this file.
 */
 
+import { CODE_SIGIL } from "../subwaytext/index.js";
 import { FileInfo } from "./interfaces/FileInfo";
 
 // What to do with formatted text and inline links (<i>, <b>, <a>)?
@@ -46,7 +47,7 @@ const transformBlocksToSubwaytext = (blocks) => {
         });
       }
     } else if (block.type === "code") {
-      content += "<>\n" + block.data.code + "\n<>";
+      content += CODE_SIGIL + "\n" + block.data.code + "\n" + CODE_SIGIL;
     } else if (block.type === "header") {
       content += "# " + block.data.text;
     } else if (
