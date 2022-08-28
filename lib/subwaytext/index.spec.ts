@@ -99,7 +99,7 @@ https://example.com Link to example.com
       {
         type: BlockType.URL,
         data: {
-          url: "https;//example.com",
+          url: "https://example.com",
           text: "Link to example.com",
         }
       },
