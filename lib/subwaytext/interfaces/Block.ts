@@ -1,3 +1,5 @@
+import { SpanType } from "./SpanType";
+
 export enum BlockType {
   PARAGRAPH = "paragraph",
   URL = "url",
@@ -8,8 +10,15 @@ export enum BlockType {
 }
 
 
-interface BlockParagraphData {
+export interface Span {
+  type: SpanType,
   text: string,
+}
+
+export type RunningText = Span[];
+
+interface BlockParagraphData {
+  text: RunningText,
 }
 
 export interface BlockParagraph {
@@ -53,7 +62,7 @@ export enum ListBlockStyle {
 }
 
 interface BlockListData {
-  items: string[],
+  items: RunningText[],
   type: ListBlockStyle,
 }
 

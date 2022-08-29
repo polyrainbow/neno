@@ -19,6 +19,7 @@ import NoteContentBlockVideo from "./NoteContentBlockVideo";
 import NoteContentBlockImage from "./NoteContentBlockImage";
 import NoteContentEmptyDisclaimer from "./NoteContentEmptyDisclaimer";
 import NoteContentBlockUrl from "./NoteContentBlockUrl";
+import NoteContentRunningText from "./NoteContentRunningText";
 
 interface NoteContentProps {
   note: ActiveNote,
@@ -32,7 +33,7 @@ const NoteContent = ({
   databaseProvider,
   toggleEditMode,
 }: NoteContentProps) => {
-  const blocks = subwaytext(note.content);
+  const blocks = subwaytext(note.content); // TODO adapt to new swt structure
 
   if (blocks.length === 0) {
     return <NoteContentEmptyDisclaimer
@@ -91,7 +92,9 @@ const NoteContent = ({
               className="preview-block-list-unordered"
             >
               {block.data.items.map((item) => {
-                return <li key={Math.random()}>{item}</li>;
+                return <li key={Math.random()}>
+                  <NoteContentRunningText runningText={item} />
+                </li>;
               })}
             </ul>;
           } else {
@@ -100,13 +103,15 @@ const NoteContent = ({
               className="preview-block-list-ordered"
             >
               {block.data.items.map((item) => {
-                return <li key={Math.random()}>{item}</li>;
+                return <li key={Math.random()}>
+                  <NoteContentRunningText runningText={item} />
+                </li>;
               })}
             </ol>;
           }
         } else if (block.type === BlockType.PARAGRAPH) {
           return <NoteContentBlockParagraph
-            text={block.data.text}
+            runningText={block.data.text}
             key={Math.random()}
           />;
         } else if (block.type === BlockType.CODE) {

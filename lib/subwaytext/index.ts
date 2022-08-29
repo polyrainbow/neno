@@ -9,18 +9,24 @@ import {
   ListBlock,
   ListBlockStyle,
 } from "./interfaces/Block.js";
+import { parseText } from "./utils.js";
 
 export const HEADING_SIGIL = "#";
 export const CODE_SIGIL = "```";
 export const SLASHLINK_SIGIL = "/";
 
+
 export default (input: string): Block[] => {
   const lines = input.replaceAll("\r", "").split("\n");
+  let lineIndex = -1;
   let withinBlock = false;
   let codeBlockJustStarted = false;
+  let multilineTextCollector = "";
 
   const blocks: Block[] = lines.reduce(
     (blocks: Block[], line: string): Block[] => {
+      lineIndex++;
+
       if (withinBlock) {
         /* within block, let's consider multiline blocks */
 
@@ -31,7 +37,9 @@ export default (input: string): Block[] => {
             && currentBlock.data.type === ListBlockStyle.UNORDERED
         ) {
           if (line.startsWith("-")) {
-            currentBlock.data.items.push(line.substring(1).trimStart());
+            currentBlock.data.items.push(
+              parseText(line.substring(1).trimStart()),
+            );
             return blocks;
           } else {
             withinBlock = false;
@@ -43,7 +51,7 @@ export default (input: string): Block[] => {
           if (line.match(/^[0-9]+\./g) !== null) {
             const posOfDot = line.indexOf(".");
             currentBlock.data.items
-              .push(line.substring(posOfDot + 1).trimStart());
+              .push(parseText(line.substring(posOfDot + 1).trimStart()));
             return blocks;
           } else {
             withinBlock = false;
@@ -51,9 +59,17 @@ export default (input: string): Block[] => {
         } else if (currentBlock.type === BlockType.PARAGRAPH) {
           if (line.trim().length === 0) {
             withinBlock = false;
+            currentBlock.data.text = parseText(multilineTextCollector);
+            multilineTextCollector = "";
+            return blocks;
+          } else if (lineIndex === lines.length - 1) {
+            withinBlock = false;
+            multilineTextCollector += "\n" + line;
+            currentBlock.data.text = parseText(multilineTextCollector);
+            multilineTextCollector = "";
             return blocks;
           } else {
-            currentBlock.data.text += "\n" + line;
+            multilineTextCollector += "\n" + line;
             return blocks;
           }
         } else if (currentBlock.type === BlockType.CODE) {
@@ -93,7 +109,7 @@ export default (input: string): Block[] => {
           const newBlock: ListBlock = {
             type: BlockType.LIST,
             data: {
-              items: [line.substring(1).trimStart()],
+              items: [parseText(line.substring(1).trimStart())],
               type: ListBlockStyle.UNORDERED,
             },
           };
@@ -106,7 +122,7 @@ export default (input: string): Block[] => {
           const newBlock: ListBlock = {
             type: BlockType.LIST,
             data: {
-              items: [line.substring(2).trimStart()],
+              items: [parseText(line.substring(2).trimStart())],
               type: ListBlockStyle.ORDERED,
             },
           };
@@ -167,19 +183,28 @@ export default (input: string): Block[] => {
           return blocks;
         } else {
           withinBlock = true;
+          multilineTextCollector = line;
           const newBlock: BlockParagraph = {
             type: BlockType.PARAGRAPH,
             data: {
-              text: line,
+              text: [],
             },
           };
 
           blocks.push(newBlock);
 
+          if (lineIndex === lines.length - 1) {
+            withinBlock = false;
+            newBlock.data.text
+              = parseText(multilineTextCollector);
+            multilineTextCollector = "";
+            return blocks;
+          }
+
           return blocks;
         }
       }
-
+      
       return blocks;
     },
     [],
