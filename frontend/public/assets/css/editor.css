@@ -124,6 +124,10 @@ FILE PREVIEW
   line-height: 1.6em;
 }
 
+.preview-block-paragraph span {
+  white-space: break-spaces;
+}
+
 .preview-block-list-unordered li, .preview-block-list-ordered li {
   padding: 5.5px 0 5.5px 3px;
 }
