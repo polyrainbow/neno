@@ -27,8 +27,9 @@ NENO is a powerful note-taking app that helps you create your personal knowledge
 ## Features
 
 * Full data ownership: You decide where your data is stored: On your device, on a cloud storage of your choice, or even on your own NENO server.
-* WYSIWYG editor that allows to paste multiple media types: video, audio, PDF documents, images and code
+* Multiple media types: Paste video, audio, PDF documents, images and code into your note
 * Graph View: Drag and drop nodes and create your custom knowledge graph visualization
+* Super-simple plaintext editor
 * Powerful full-text search
 * Tap-to-link: One click is enough to link two notes
 * File overview: All uploaded files in one view
