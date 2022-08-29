@@ -1,8 +1,12 @@
+import { response } from "express";
 import { APIError } from "../../../../backend/interfaces/APIError";
 import APIResponse from "../../../../backend/interfaces/APIResponse";
+import { FileId } from "../../../../lib/notes/interfaces/FileId";
+import { FileInfo } from "../../../../lib/notes/interfaces/FileInfo";
 import NoteFromUser from "../../../../lib/notes/interfaces/NoteFromUser";
 import { NoteId } from "../../../../lib/notes/interfaces/NoteId";
 import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit";
+import { base64Encode } from "../utils";
 
 let API_URL;
 let GRAPH_ID;
@@ -26,6 +30,9 @@ interface APICallParams {
   payload?: any, // can be string or file object
   outputType?: string,
   payloadType?: string, // the MIME type of the request body payload
+  additionalHeaders?: {
+    [key: string]: string,
+  }
 }
 
 interface EndpointCallParams {
@@ -34,6 +41,9 @@ interface EndpointCallParams {
   payload?: any,
   outputType?: string,
   payloadType?: string,
+  additionalHeaders?: {
+    [key: string]: string,
+  }
 }
 
 const callAPI = async ({
@@ -42,6 +52,7 @@ const callAPI = async ({
   payload,
   outputType = "json",
   payloadType = "application/json",
+  additionalHeaders = {},
 }: APICallParams): Promise<Blob | string | ReadableStream | APIResponse> => {
   const requestBody
     = payload && (
@@ -54,6 +65,7 @@ const callAPI = async ({
     method,
     headers: {
       "Content-Type": payloadType,
+      ...additionalHeaders,
     },
     body: requestBody,
   };
@@ -197,6 +209,13 @@ const getFiles = () => {
 };
 
 
+const getFileInfo = (fileId: FileId) => {
+  return callGraphAPIAndGetJSONPayload({
+    endpoint: "file-info/" + fileId,
+  });
+};
+
+
 const getDanglingFiles = () => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "dangling-files",
@@ -243,22 +262,18 @@ const getReadableFileStream = async (fileId) => {
 };
 
 
-const importLinksAsNotes = (links) => {
-  return callGraphAPIAndGetJSONPayload({
-    method: "PUT",
-    endpoint: "import-links-as-notes",
-    payload: { links },
-  });
-};
-
-
-const uploadFile = (file) => {
-  return callGraphAPIAndGetJSONPayload({
+const uploadFile = async (file: File): Promise<FileInfo> => {
+  const response = await callGraphAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "file",
     payload: file,
     payloadType: file.type,
+    additionalHeaders: {
+      filename: await base64Encode(file.name),
+    },
   });
+
+  return response;
 };
 
 
@@ -266,14 +281,6 @@ const deleteFile = (fileId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
     endpoint: "file/" + fileId,
-  });
-};
-
-
-const getUrlMetadata = (url) => {
-  const requestUrl = "url-metadata?url=" + url;
-  return callGraphAPIAndGetJSONPayload({
-    endpoint: requestUrl,
   });
 };
 
@@ -303,6 +310,17 @@ const getPins = () => {
 };
 
 
+const getDocumentTitle = async (url: string): Promise<string> => {
+  const requestUrl = "document-title?url=" + url;
+  const response = (await callAPI({
+    url: API_URL + requestUrl,
+    outputType: "json",
+  })) as APIResponse;
+
+  return getJSONResponsePayloadIfSuccessful(response) as string;
+};
+
+
 export {
   init,
   setGraphId,
@@ -319,13 +337,13 @@ export {
   getGraphVisualization,
   saveGraphVisualization,
   getReadableGraphStream,
-  importLinksAsNotes,
   uploadFile,
   getReadableFileStream,
   deleteFile,
-  getUrlMetadata,
   pinNote,
   unpinNote,
   getPins,
+  getFileInfo,
+  getDocumentTitle,
 };
 

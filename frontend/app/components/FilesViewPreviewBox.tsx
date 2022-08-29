@@ -2,9 +2,10 @@ import React from "react";
 import {
   Link,
 } from "react-router-dom";
+import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { PathTemplate } from "../enum/PathTemplate";
-import FileIdAndSrc from "../interfaces/FileIdAndSrc";
-import { getAppPath, getFileTypeFromFilename, getIconSrc } from "../lib/utils";
+import FileIdAndSrc from "../interfaces/FileInfoAndSrc";
+import { getAppPath, getMediaTypeFromFilename, getIconSrc } from "../lib/utils";
 
 interface FilesViewPreviewBoxProps{
   key: string,
@@ -14,19 +15,19 @@ interface FilesViewPreviewBoxProps{
 const FilesViewPreviewBox = ({
   file,
 }: FilesViewPreviewBoxProps) => {
-  const type = getFileTypeFromFilename(file.id) || "unknown";
+  const type = getMediaTypeFromFilename(file.fileId) || "unknown";
 
   const imageSrcMap = {
-    "image": file.src,
-    "audio": getIconSrc("audiotrack"),
-    "video": getIconSrc("videocam"),
-    "document": getIconSrc("description"),
+    [MediaType.IMAGE]: file.src,
+    [MediaType.AUDIO]: getIconSrc("audiotrack"),
+    [MediaType.VIDEO]: getIconSrc("videocam"),
+    [MediaType.PDF]: getIconSrc("description"),
   };
 
   const imageSrc = imageSrcMap[type];
 
   return <Link
-    to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.id]]))}
+    to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))}
     style={{
       lineHeight: "0",
     }}

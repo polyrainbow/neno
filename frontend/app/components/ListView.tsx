@@ -1,5 +1,5 @@
 import React from "react";
-import EditorViewHeader from "./EditorViewHeader";
+import NoteViewHeader from "./NoteViewHeader";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import { DialogType } from "../enum/DialogType";
@@ -28,7 +28,7 @@ const ListView = ({
   const openSearchDialog = useDialog(DialogType.SEARCH, setSearchValue);
 
   return <>
-    <EditorViewHeader
+    <NoteViewHeader
       stats={stats}
       toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}

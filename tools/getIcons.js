@@ -1,7 +1,10 @@
 import { readFile, writeFile } from "fs/promises";
 import * as path from "path";
 
-const iconIds = (await readFile("icons.txt", "utf8")).split("\n");
+
+const iconIds = process.argv[2]
+  ? process.argv[2].split(",")
+  : (await readFile("icons.txt", "utf8")).split("\n");
 
 for (let i = 0; i < iconIds.length; i++) {
   const iconId = iconIds[i];

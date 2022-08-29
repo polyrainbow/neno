@@ -3,8 +3,6 @@ import * as Utils from "../utils.js";
 import {
   getNoteTitlePreview,
   normalizeNoteTitle,
-  removeDefaultTextParagraphs,
-  removeEmptyLinkBlocks,
   noteWithSameTitleExists,
   findNote,
   getNewNoteId,
@@ -26,7 +24,8 @@ import {
   getNotesWithTitleContainingTokens,
   getNotesWithBlocksOfTypes,
   getNotesWithDuplicateTitles,
-  getFilesOfNote,
+  parseFileIds,
+  getNotesWithMediaTypes,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -42,14 +41,11 @@ import GraphVisualizationFromUser
   from "./interfaces/GraphVisualizationFromUser.js";
 import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import { FileId } from "./interfaces/FileId.js";
-import UrlMetadataResponse from "./interfaces/UrlMetadataResponse.js";
-import ImportLinkAsNoteFailure from "./interfaces/ImportLinkAsNoteFailure.js";
 import * as config from "./config.js";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
 import GraphObject from "./interfaces/Graph.js";
-import { NoteContentBlockType } from "./interfaces/NoteContentBlock.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import DatabaseQuery from "./interfaces/DatabaseQuery.js";
 import NotePutOptions from "./interfaces/NotePutOptions.js";
@@ -57,20 +53,12 @@ import GraphStatsRetrievalOptions
   from "./interfaces/GraphStatsRetrievalOptions.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
+import { FileInfo } from "./interfaces/FileInfo.js";
+import { BlockType } from "../subwaytext/interfaces/Block.js";
+import { MediaType } from "./interfaces/MediaType.js";
 
 let io: DatabaseIO;
-let randomUUID;
-
-/* this is the fallback getUrlMetadata function that is used if the initializer
-does not provide a better one */
-let getUrlMetadata = (url: string): Promise<UrlMetadataResponse> => {
-  return Promise.resolve({
-    "url": url,
-    "title": url,
-    "description": "",
-    "image": null,
-  });
-};
+let randomUUID: () => string;
 
 /**
   EXPORTS
@@ -80,12 +68,7 @@ let getUrlMetadata = (url: string): Promise<UrlMetadataResponse> => {
 const init = async (
   storageProvider: StorageProvider,
   _randomUUID: () => string,
-  _getUrlMetadata?: (string) => Promise<UrlMetadataResponse>,
 ): Promise<void> => {
-  if (_getUrlMetadata) {
-    getUrlMetadata = _getUrlMetadata;
-  }
-
   randomUUID = _randomUUID;
 
   io = new DatabaseIO({storageProvider});
@@ -103,7 +86,7 @@ const get = async (
   }
 
   const noteToTransmit: NoteToTransmit
-    = createNoteToTransmit(noteFromDB, graph);
+    = await createNoteToTransmit(noteFromDB, graph);
   return noteToTransmit;
 };
 
@@ -161,15 +144,32 @@ const getNotesList = async (
     const startOfExactQuery = searchString.indexOf("has:") + "has:".length;
     const typesString = searchString.substring(startOfExactQuery);
     /*
-      has:audio+video - show all notes that contain audio as well as video
-      has:audio|video - show all notes that contain audio or video
+      has:list+paragraph - show all notes that contain list as well as paragraph
+      has:list|paragraph - show all notes that contain list or paragraph
     */
     if (typesString.includes("+")) {
-      const types = typesString.split("+") as NoteContentBlockType[];
+      const types = typesString.split("+") as BlockType[];
       matchingNotes = getNotesWithBlocksOfTypes(graph.notes, types, true);
     } else {
-      const types = typesString.split("|") as NoteContentBlockType[];
+      const types = typesString.split("|") as BlockType[];
       matchingNotes = getNotesWithBlocksOfTypes(graph.notes, types, false);
+    }
+
+    // search for notes with specific media types
+  } else if (searchString.includes("has-media:")) {
+    const startOfExactQuery = searchString.indexOf("has-media:")
+      + "has-media:".length;
+    const typesString = searchString.substring(startOfExactQuery);
+    /*
+      has-media:audio+video - show all notes that contain audio as well as video
+      has-media:audio|video - show all notes that contain audio or video
+    */
+    if (typesString.includes("+")) {
+      const types = typesString.split("+") as MediaType[];
+      matchingNotes = getNotesWithMediaTypes(graph.notes, types, true);
+    } else {
+      const types = typesString.split("|") as MediaType[];
+      matchingNotes = getNotesWithMediaTypes(graph.notes, types, false);
     }
 
 
@@ -326,7 +326,7 @@ const put = async (
 ): Promise<NoteToTransmit> => {
   if (
     (!noteFromUser)
-    || (!Array.isArray(noteFromUser.blocks))
+    || (typeof noteFromUser.content !== "string")
     || (typeof noteFromUser.title !== "string")
   ) {
     throw new Error(ErrorMessage.INVALID_NOTE_STRUCTURE);
@@ -370,25 +370,23 @@ const put = async (
         y: graph.initialNodePosition.y,
       },
       title: normalizeNoteTitle(noteFromUser.title),
-      blocks: noteFromUser.blocks,
+      content: noteFromUser.content,
       creationTime: Date.now(),
       updateTime: Date.now(),
     };
     graph.notes.push(savedNote);
   } else {
-    savedNote.blocks = noteFromUser.blocks;
+    savedNote.content = noteFromUser.content;
     savedNote.title = normalizeNoteTitle(noteFromUser.title);
     savedNote.updateTime = Date.now();
   }
 
-  removeDefaultTextParagraphs(savedNote);
-  removeEmptyLinkBlocks(savedNote);
   incorporateUserChangesIntoNote(noteFromUser.changes, savedNote, graph);
 
   await io.flushChanges(graphId, graph);
 
   const noteToTransmit: NoteToTransmit
-    = createNoteToTransmit(savedNote, graph);
+    = await createNoteToTransmit(savedNote, graph);
   return noteToTransmit;
 };
 
@@ -429,10 +427,8 @@ const addFile = async (
   graphId: GraphId,
   readable: SomeReadableStream,
   mimeType: string,
-): Promise<{
-  fileId: FileId,
-  size: number,
-}> => {
+  filename: string,
+): Promise<FileInfo> => {
   const fileType = config.ALLOWED_FILE_TYPES
     .find((filetype) => {
       return filetype.mimeType === mimeType;
@@ -444,10 +440,18 @@ const addFile = async (
 
   const fileId: FileId = randomUUID() + "." + fileType.extension;
   const size = await io.addFile(graphId, fileId, readable);
-  return {
+
+  const graph = await io.getGraph(graphId);
+  const fileInfo: FileInfo = {
     fileId,
+    name: filename,
     size,
+    creationTime: Date.now(),
   };
+  graph.files.push(fileInfo);
+  await io.flushChanges(graphId, graph);
+
+  return fileInfo;
 };
 
 
@@ -455,50 +459,63 @@ const deleteFile = async (
   graphId: GraphId,
   fileId: FileId,
 ): Promise<void> => {
-  return io.deleteFile(graphId, fileId);
+  await io.deleteFile(graphId, fileId);
+
+  const graph = await io.getGraph(graphId);
+  graph.files = graph.files.filter((file) => file.fileId !== fileId);
+  await io.flushChanges(graphId, graph);
 };
 
 
 const getFiles = async (
   graphId: GraphId,
-): Promise<FileId[]> => {
-  return io.getFiles(graphId);
+): Promise<FileInfo[]> => {
+  const graph = await io.getGraph(graphId);
+  return graph.files;
 };
 
 // get files not used in any note
 const getDanglingFiles = async (
   graphId: GraphId,
-): Promise<FileId[]> => {
-  const allFiles = await io.getFiles(graphId);
+): Promise<FileInfo[]> => {
   const graph = await io.getGraph(graphId);
-  const filesInNotes: FileId[] = graph.notes.reduce(
+  const fileIdsInNotes: FileId[] = graph.notes.reduce(
     (accumulator: string[], note) => {
-      const filesOfNote = getFilesOfNote(note);
-      return [...accumulator, ...filesOfNote];
+      const fileIdsOfNote = parseFileIds(note.content);
+      return [...accumulator, ...fileIdsOfNote];
     },
     [],
   );
-  const danglingFiles = allFiles.filter((fileId) => {
-    return !filesInNotes.includes(fileId);
+  const danglingFiles = graph.files.filter((file) => {
+    return !fileIdsInNotes.includes(file.fileId);
   });
   return danglingFiles;
 };
 
 
-const getReadableFileStream = (
+const getReadableFileStream = async (
   graphId: GraphId,
   fileId: FileId,
   range?,
 ): Promise<ReadableWithType> => {
+  const graph = await io.getGraph(graphId);
+  if (!graph.files.map((file) => file.fileId).includes(fileId)) {
+    throw new Error(ErrorMessage.FILE_NOT_FOUND);
+  }
   return io.getReadableFileStream(graphId, fileId, range);
 };
 
 
-const getFileSize = (
+const getFileInfo = async (
   graphId: GraphId,
   fileId: FileId,
-): Promise<number> => {
-  return io.getFileSize(graphId, fileId);
+): Promise<FileInfo> => {
+  const graph = await io.getGraph(graphId);
+  const fileInfo = graph.files.find((file) => file.fileId === fileId);
+  if (!fileInfo) {
+    throw new Error(ErrorMessage.FILE_NOT_FOUND);
+  }
+  return fileInfo;
 };
 
 
@@ -507,84 +524,6 @@ const getReadableGraphStream = async (
   withFiles: boolean,
 ) => {
   return await io.getReadableGraphStream(graphId, withFiles);
-};
-
-
-const importLinksAsNotes = async (
-  graphId: GraphId,
-  links: string[],
-) => {
-  const promises: Promise<UrlMetadataResponse>[]
-    = links.map((url: string): Promise<UrlMetadataResponse> => {
-      return getUrlMetadata(url);
-    });
-
-  const promiseSettledResults = await Promise.allSettled(promises);
-
-  const fulfilledPromises: PromiseSettledResult<UrlMetadataResponse>[]
-    = promiseSettledResults.filter((response) => {
-      return response.status === "fulfilled";
-    });
-  
-  const urlMetadataResults: UrlMetadataResponse[]
-    = fulfilledPromises.map((response) => {
-      return (response.status === "fulfilled") && response.value;
-    })
-      .filter(Utils.isNotFalse);
-
-  const notesFromUser: NoteFromUser[]
-    = urlMetadataResults.map((urlMetadataObject) => {
-      const noteFromUser: NoteFromUser = {
-        title: urlMetadataObject.title,
-        blocks: [
-          {
-            "type": NoteContentBlockType.LINK,
-            "data": {
-              "link": urlMetadataObject.url,
-              "meta": {
-                "title": urlMetadataObject.title,
-                "description": urlMetadataObject.description,
-                "image": {
-                  "url": urlMetadataObject.image,
-                },
-              }
-            },
-          },
-        ],
-      };
-
-      return noteFromUser;
-    });
-
-  const notesToTransmit: NoteToTransmit[] = [];
-  const failures: ImportLinkAsNoteFailure[] = [];
-
-  for (let i = 0; i < notesFromUser.length; i++) {
-    const noteFromUser: NoteFromUser = notesFromUser[i];
-
-    try {
-      const noteToTransmit: NoteToTransmit = await put(
-        noteFromUser,
-        graphId,
-        {
-          ignoreDuplicateTitles: true,
-        },
-      );
-      notesToTransmit.push(noteToTransmit);
-    } catch (e) {
-      const errorMessage: string | false = e instanceof Error && e.toString();
-      const failure: ImportLinkAsNoteFailure = {
-        note: noteFromUser,
-        error: errorMessage || "no error",
-      };
-      failures.push(failure);
-    }
-  }
-
-  return {
-    notesToTransmit,
-    failures,
-  };
 };
 
 
@@ -665,10 +604,8 @@ export {
   getFiles,
   getDanglingFiles,
   getReadableFileStream,
-  getFileSize,
+  getFileInfo,
   getReadableGraphStream,
-  importLinksAsNotes,
-  getUrlMetadata,
   pin,
   unpin,
   getPins,

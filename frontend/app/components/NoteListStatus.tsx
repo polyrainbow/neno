@@ -23,7 +23,7 @@ const NoteListStatus = ({
   const activeState = map[status];
 
   return <div
-    className="note-list-status"
+    className="splash-message"
   >
     <img
       style={{

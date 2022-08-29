@@ -1,19 +1,26 @@
 import { FileId } from "../../../lib/notes/interfaces/FileId";
-import NoteContentBlock, {
-  NoteContentBlockLink,
-  NoteContentBlockType,
-  NoteContentBlockWithFile,
-  NoteContentBlockWithFileLoaded,
-} from "../../../lib/notes/interfaces/NoteContentBlock";
 import { PathTemplate } from "../enum/PathTemplate";
-import { SavedActiveNote, UnsavedActiveNote } from "../interfaces/ActiveNote";
+import { UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Config from "../config";
 import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
-import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import FrontendUserNoteChange, { FrontendUserNoteChangeNote }
   from "../interfaces/FrontendUserNoteChange";
 import { UserNoteChangeType }
   from "../../../lib/notes/interfaces/UserNoteChangeType";
+import { MediaType } from "../../../lib/notes/interfaces/MediaType";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+import { Block, BlockSlashlink, BlockType, BlockUrl } from "../../../lib/subwaytext/interfaces/Block";
+import subwaytext from "../../../lib/subwaytext";
+
+
+const shortenText = (text: string, maxLength: number): string => {
+  if (text.length > maxLength) {
+    return text.trim().substring(0, maxLength) + "…";
+  } else {
+    return text;
+  }
+};
 
 
 const yyyymmdd = (date = new Date()): string => {
@@ -57,68 +64,54 @@ const getExtensionFromFilename = (filename: string): string | null => {
 };
 
 
-const getFileTypeFromFilename = (
+const getMediaTypeFromFilename = (
   filename: string,
-): NoteContentBlockType | null => {
-  const map = new Map<string, NoteContentBlockType>(Object.entries({
-    "png": NoteContentBlockType.IMAGE,
-    "jpg": NoteContentBlockType.IMAGE,
-    "webp": NoteContentBlockType.IMAGE,
-    "gif": NoteContentBlockType.IMAGE,
-    "svg": NoteContentBlockType.IMAGE,
-    "pdf": NoteContentBlockType.DOCUMENT,
-    "mp3": NoteContentBlockType.AUDIO,
-    "flac": NoteContentBlockType.AUDIO,
-    "mp4": NoteContentBlockType.VIDEO,
-    "webm": NoteContentBlockType.VIDEO,
+): MediaType | null => {
+  const map = new Map<string, MediaType>(Object.entries({
+    "png": MediaType.IMAGE,
+    "jpg": MediaType.IMAGE,
+    "webp": MediaType.IMAGE,
+    "gif": MediaType.IMAGE,
+    "svg": MediaType.IMAGE,
+    "pdf": MediaType.PDF,
+    "mp3": MediaType.AUDIO,
+    "flac": MediaType.AUDIO,
+    "mp4": MediaType.VIDEO,
+    "webm": MediaType.VIDEO,
   }));
 
   const extension = getExtensionFromFilename(filename);
   if (!extension) {
-    return null;
+    return MediaType.OTHER;
   }
 
-  return map.has(extension) ? map.get(extension) as NoteContentBlockType : null;
+  return map.has(extension) ? map.get(extension) as MediaType : MediaType.OTHER;
 };
 
 
-const createBlocksFromFileIds = (
+const createContentFromFileIds = (
   fileIds: FileId[],
-): NoteContentBlockWithFile[] => {
-  return fileIds.map((fileId: FileId): NoteContentBlockWithFile => {
-    const type = getFileTypeFromFilename(fileId) as NoteContentBlockType;
-
-    return {
-      // @ts-ignore
-      type,
-      data: {
-        file: {
-          fileId,
-          name: fileId,
-          /*
-            TODO: use real size from server
-            size must not be NaN, because when stringified, it becomes null
-            which is invalid
-          */
-          size: -1,
-        },
-      },
-    };
-  });
+): string => {
+  return fileIds
+    .reduce((content, fileId) => {
+      return content + "/file:" + fileId + "\n\n";
+    }, "")
+    .trim();
 };
 
 
-const getNewNoteBlocks = (
+const getNewNoteContent = (
   fileIds?: FileId[],
-): NoteContentBlock[] => {
+): string => {
   return fileIds
-    ? createBlocksFromFileIds(fileIds)
-    : Config.DEFAULT_NOTE_BLOCKS;
+    ? createContentFromFileIds(fileIds)
+    : Config.DEFAULT_NOTE_CONTENT;
 };
 
 
 const getNewNoteObject = (
   linkedNotes: FrontendUserNoteChangeNote[],
+  fileInfos?: FileInfo[],
 ): UnsavedActiveNote => {
   const note: UnsavedActiveNote = {
     isUnsaved: true,
@@ -132,6 +125,8 @@ const getNewNoteObject = (
       },
     ),
     title: Config.DEFAULT_NOTE_TITLE,
+    content: getNewNoteContent(fileInfos?.map((fileInfo) => fileInfo.fileId)),
+    files: fileInfos || [],
   };
 
   Object.seal(note);
@@ -139,34 +134,25 @@ const getNewNoteObject = (
 };
 
 
+const getNoteTitleFromContent = (content: string): string => {
+  return shortenText(content, 100);
+};
+
+
 // if the note has no title yet, take the title of the link metadata
-const setNoteTitleByLinkTitleIfUnset = (
+const setNoteTitleByContentIfUnset = (
   note: NoteFromUser,
   defaultNoteTitle: string,
 ): void => {
-  if (note.blocks.length === 0) return;
-
-  const firstLinkBlock = note.blocks.find(
-    (block: NoteContentBlock): block is NoteContentBlockLink => {
-      return block.type === "link";
-    },
-  );
-
-  if (!firstLinkBlock) return;
-
-  const linkBlockHasValidTitle
-    = typeof firstLinkBlock.data.meta.title === "string"
-    && firstLinkBlock.data.meta.title.length > 0;
-
-  if (!linkBlockHasValidTitle) return;
+  if (note.content.length === 0) return;
 
   const noteHasNoTitle = (
     note.title === defaultNoteTitle
     || note.title === ""
   );
 
-  if (noteHasNoTitle && linkBlockHasValidTitle) {
-    const newNoteTitle = firstLinkBlock.data.meta.title;
+  if (noteHasNoTitle) {
+    const newNoteTitle = getNoteTitleFromContent(note.content);
     note.title = newNoteTitle;
   }
 };
@@ -278,15 +264,6 @@ function humanFileSize(bytes: number, si = false, dp = 1): string {
 }
 
 
-const shortenText = (text: string, maxLength: number): string => {
-  if (text.length > maxLength) {
-    return text.trim().substring(0, maxLength) + "…";
-  } else {
-    return text;
-  }
-};
-
-
 const streamToBlob = async (stream, mimeType: string): Promise<Blob> => {
   const response = new Response(
     stream,
@@ -307,36 +284,37 @@ const getWindowDimensions = (): {width: number, height: number} => {
 };
 
 
-/**
- * Checks if the block contains a valid file.
- * @param {NoteContentBlock} block
- * @return {boolean} true or false
- */
-const blockHasLoadedFile = (
-  block: NoteContentBlock,
-): block is NoteContentBlockWithFileLoaded => {
-  return (
-    [
-      "image",
-      "document",
-      "audio",
-      "video",
-    ].includes(block.type)
-    && (typeof (block as NoteContentBlockWithFile).data.file === "object")
-  );
+const parseFileIds = (noteContent: string): FileId[] => {
+  // eslint-disable-next-line max-len
+  const regex = /\/file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{3,4})/g;
+  return [...noteContent.matchAll(regex)].map((match) => match[1]);
 };
 
 
-const getMetadataOfFilesInNote = (
-  note: SavedActiveNote,
-): FileInfo[] => {
-  return note.blocks
-    .filter(blockHasLoadedFile)
-    .map(
-      (block: NoteContentBlockWithFileLoaded): FileInfo => {
-        return block.data.file;
-      },
-    );
+const getFileId = (noteContent: string): FileId | null => {
+  // eslint-disable-next-line max-len
+  const regex = /file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{3,4})/g;
+  const results = [...noteContent.matchAll(regex)].map((match) => match[1]);
+  if (results.length > 0) {
+    return results[0];
+  } else {
+    return null;
+  }
+};
+
+
+/**
+ * Checks if the block contains a valid file.
+ * @param block
+ * @returns {boolean} true or false
+ */
+ const blockHasLoadedFile = (
+  block: Block,
+): block is BlockSlashlink => {
+  if (
+    block.type !== BlockType.SLASHLINK) return false;
+
+  return !!parseFileIds(block.data.link)[0];
 };
 
 
@@ -364,13 +342,96 @@ const getIconSrc = (iconName: string): string => {
 const stringContainsOnlyDigits = (val: string): boolean => /^\d+$/.test(val);
 
 
+const getFileFromUserSelection = async (
+  types: FilePickerAcceptType[],
+): Promise<File> => {
+  const [fileHandle] = await window.showOpenFilePicker({
+    multiple: false,
+    types,
+  });
+
+  const file = await fileHandle.getFile();
+  return file;
+};
+
+
+export const onDownload = async (
+  file: FileInfo,
+  databaseProvider: DatabaseProvider,
+): Promise<void> => {
+  const fileId = file.fileId;
+  const name = file.name;
+  const url = await databaseProvider.getUrlForFileId(fileId, name);
+  window.open(url, "_blank");
+};
+
+
+export const getUrl = async (
+  file: FileInfo,
+  databaseProvider: DatabaseProvider,
+) => {
+  const fileId = file.fileId;
+  const name = file.name;
+  const url = await databaseProvider.getUrlForFileId(fileId, name);
+  return url;
+};
+
+
+// also works with utf-8/16 strings in constrast to btoa()
+const base64Encode = async (string: string): Promise<string> => {
+  return new Promise((resolve) => {
+    const fileReader = new FileReader();
+
+    fileReader.onload = function() {
+      const result = fileReader.result as string;
+      const signal = "base64,";
+      const posOfSignal = result.indexOf(signal);
+      const base64String = result.substring(posOfSignal + signal.length);
+      resolve(base64String);
+    };
+  
+    fileReader.readAsDataURL(new Blob(Array.from(string)));
+  });
+};
+
+
+const insertDocumentTitles = async (
+  noteContent: string,
+  databaseProvider: DatabaseProvider,
+): Promise<string> => {
+  const urlsWithDocTitles = await Promise.all(
+    subwaytext(noteContent)
+      .filter((block: Block): block is BlockUrl => {
+        return block.type === BlockType.URL
+          && block.data.text.length === 0
+      })
+      .map(async (block): Promise<[string, string]> => {
+        return [
+          block.data.url,
+          (await databaseProvider.getDocumentTitle?.(block.data.url)) as string,
+        ];
+      }),
+  );
+
+  let newNoteContent = noteContent;
+  urlsWithDocTitles.forEach(([url, docTitle]) => {
+    newNoteContent = newNoteContent
+      .replace(
+        url,
+        url + " " + docTitle,
+      )
+  });
+
+  return newNoteContent;
+};
+
+
 export {
   yyyymmdd,
   getParameterByName,
   makeTimestampHumanReadable,
   getNewNoteObject,
-  getNewNoteBlocks,
-  setNoteTitleByLinkTitleIfUnset,
+  setNoteTitleByContentIfUnset,
   binaryArrayFind,
   binaryArrayIncludes,
   humanFileSize,
@@ -378,10 +439,16 @@ export {
   streamToBlob,
   getWindowDimensions,
   blockHasLoadedFile,
-  getMetadataOfFilesInNote,
   getAppPath,
   getIconSrc,
-  getFileTypeFromFilename,
+  getNewNoteContent,
   stringContainsOnlyDigits,
   getExtensionFromFilename,
+  getMediaTypeFromFilename,
+  getNoteTitleFromContent,
+  getFileFromUserSelection,
+  base64Encode,
+  parseFileIds,
+  getFileId,
+  insertDocumentTitles,
 };

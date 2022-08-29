@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
-import { emojis } from "../config.js";
+import { emojis } from "../config";
 import {
   makeTimestampHumanReadable,
   humanFileSize,
-} from "../lib/utils.js";
+} from "../lib/utils";
 import StatsViewAnalysisTable from "./StatsViewAnalysisTable";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";

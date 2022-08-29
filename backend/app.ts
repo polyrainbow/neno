@@ -13,7 +13,6 @@ import cookieParser from "cookie-parser";
 import AppStartOptions from "./interfaces/AppStartOptions.js";
 import NoteListPage from "../lib/notes/interfaces/NoteListPage.js";
 import FileSystemStorageProvider from "./lib/FileSystemStorageProvider.js";
-import getUrlMetadata from "./lib/getUrlMetadata.js";
 import twofactor from "node-2fa";
 import historyAPIFallback from "./lib/HistoryAPIFallback.js";
 import * as path from "path";
@@ -34,6 +33,7 @@ import NoteFromUser from "../lib/notes/interfaces/NoteFromUser.js";
 import graphVisualizationFromUserSchema from "../lib/notes/schemas/GraphVisualizationFromUser.schema.json" assert { type: 'json' };
 import GraphVisualizationFromUser from "../lib/notes/interfaces/GraphVisualizationFromUser.js";
 import GraphObject from "../lib/notes/interfaces/Graph.js";
+import getDocumentTitle from "./lib/getDocumentTitle.js";
 
 const startApp = async ({
   users,
@@ -53,7 +53,7 @@ const startApp = async ({
     "Maximum upload file size: " + maxUploadFileSize.toString() + " byte(s)",
   );
   logger.info("Initializing notes module...");
-  await Notes.init(storageProvider, randomUUID, getUrlMetadata);
+  await Notes.init(storageProvider, randomUUID);
   logger.info("Initializing routes...");
   const app = express();
 
@@ -507,28 +507,6 @@ const startApp = async ({
   );
 
 
-  app.put(
-    config.GRAPH_ENDPOINT + "import-links-as-notes",
-    sessionMiddleware,
-    verifyUser,
-    express.json(),
-    handleJSONParseErrors,
-    async function(req, res) {
-      const graphId = req.params.graphId;
-      const reqBody = req.body;
-      const links: string[] = reqBody.links;
-
-      const result = await Notes.importLinksAsNotes(graphId, links);
-
-      const response: APIResponse = {
-        payload: result,
-        success: true,
-      };
-      res.json(response);
-    },
-  );
-
-
   app.delete(
     config.GRAPH_ENDPOINT + "note/:noteId",
     sessionMiddleware,
@@ -618,13 +596,31 @@ const startApp = async ({
         return;
       }
 
+      const filenameBase64 = req.headers["filename"];
+
+      if (typeof filenameBase64 !== "string" || (filenameBase64.length === 0)) {
+        const response: APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+        res.status(406).json(response);
+        return;
+      }
+
+      const filename = Buffer.from(filenameBase64, "base64").toString();
+
       try {
         logger.verbose("Starting file upload. Type: " + mimeType);
 
-        const {fileId, size: transmittedBytes} = await Notes.addFile(
+        const {
+          name,
+          fileId,
+          size: transmittedBytes,
+        } = await Notes.addFile(
           graphId,
           req,
           mimeType,
+          filename,
         );
 
         logger.verbose(
@@ -648,6 +644,7 @@ const startApp = async ({
           payload: {
             fileId,
             size: fileSize,
+            name,
           },
         };
         res.json(response);
@@ -677,8 +674,7 @@ const startApp = async ({
       try {
         const graphId = req.params.graphId;
 
-        /** Calculate Size of file */
-        const size = await Notes.getFileSize(graphId, req.params.fileId);
+        const { size } = await Notes.getFileInfo(graphId, req.params.fileId);
         const range = req.headers.range;
 
         /** Check for Range header */
@@ -724,16 +720,18 @@ const startApp = async ({
             res.json(response);
           });
 
-          /** Sending Partial Content With HTTP Code 206 */
-          res.writeHead(206, {
-            "Content-Range": `bytes ${start}-${end}/${size}`,
-            "Accept-Ranges": "bytes",
-            "Content-Length": end - start + 1,
-            "Content-Type": mimeType,
+          // https://nodejs.org/en/knowledge/advanced/streams/how-to-use-fs-create-read-stream/
+          readable.on("open", () => {
+            /** Sending Partial Content With HTTP Code 206 */
+            res.writeHead(206, {
+              "Content-Range": `bytes ${start}-${end}/${size}`,
+              "Accept-Ranges": "bytes",
+              "Content-Length": end - start + 1,
+              "Content-Type": mimeType,
+            });
+
+            readable.pipe(res);
           });
-
-          readable.pipe(res);
-
         } else { // no range request
           const { readable, mimeType }
             = await Notes.getReadableFileStream(graphId, req.params.fileId);
@@ -743,15 +741,18 @@ const startApp = async ({
               success: false,
               error: APIError.FILE_NOT_FOUND,
             };
-            res.json(response);
+            res.status(404).json(response);
           });
 
-          res.writeHead(200, {
-            "Content-Length": size,
-            "Content-Type": mimeType
+          // https://nodejs.org/en/knowledge/advanced/streams/how-to-use-fs-create-read-stream/
+          readable.on("open", () => {
+            res.writeHead(200, {
+              "Content-Length": size,
+              "Content-Type": mimeType
+            });
+  
+            readable.pipe(res);
           });
-
-          readable.pipe(res);
         }
       } catch (e) {
         const response: APIResponse = {
@@ -761,6 +762,36 @@ const startApp = async ({
         };
         res.json(response);
       }
+    },
+  );
+
+
+  app.get(
+    config.GRAPH_ENDPOINT + "file-info/:fileId",
+    sessionMiddleware,
+    verifyUser,
+    express.json(),
+    handleJSONParseErrors,
+    async function(req, res) {
+      const graphId = req.params.graphId;
+      const fileId = req.params.fileId;
+      try {
+        const file = await Notes.getFileInfo(graphId, fileId);
+
+        const response: APIResponse = {
+          payload: file,
+          success: true,
+        };
+        res.json(response);
+      } catch (e) {
+        const response: APIResponse = {
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
+          success: false,
+        };
+        res.json(response);
+      }
+
     },
   );
 
@@ -827,34 +858,6 @@ const startApp = async ({
         success: true,
       };
       res.json(response);
-    },
-  );
-
-
-  app.get(
-    config.GRAPH_ENDPOINT + "url-metadata",
-    sessionMiddleware,
-    verifyUser,
-    async (req, res) => {
-      const url = req.query.url;
-
-      try {
-        const metadata = await Notes.getUrlMetadata(url as string);
-        const response: APIResponse = {
-          success: true,
-          payload: metadata,
-        };
-        res.json(response);
-      } catch (e) {
-        logger.verbose("Error while getting URL metadata");
-        logger.verbose(JSON.stringify(e));
-        const response: APIResponse = {
-          "success": false,
-          error: APIError.NOTES_APPLICATION_ERROR,
-          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
-        };
-        res.json(response);
-      }
     },
   );
 
@@ -950,6 +953,44 @@ const startApp = async ({
           sessionCookieName,
         )
         .json(response);
+    },
+  );
+
+
+  app.get(
+    config.API_PATH + "document-title",
+    sessionMiddleware,
+    verifyUser,
+    async (req, res) => {
+      const url = req.query.url;
+
+      if (!url) {
+        const response: APIResponse = {
+          "success": false,
+          error: APIError.INVALID_REQUEST,
+          errorMessage: "URL not provided",
+        };
+        res.json(response);
+        return;
+      }
+
+      try {
+        const documentTitle = await getDocumentTitle(url as string);
+        const response: APIResponse = {
+          success: true,
+          payload: documentTitle,
+        };
+        res.json(response);
+      } catch (e) {
+        logger.verbose("Error getting document title");
+        logger.verbose(JSON.stringify(e));
+        const response: APIResponse = {
+          "success": false,
+          error: APIError.DOCUMENT_TITLE_NOT_AVAILABLE,
+          errorMessage: e instanceof Error ? e.message : "Unknown error",
+        };
+        res.json(response);
+      }
     },
   );
 

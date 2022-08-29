@@ -1,10 +1,10 @@
 import React from "react";
-import { emojis } from "../config.js";
+import { emojis } from "../config";
 import {
   FrontendNoteListItem,
   MainNoteListItem,
-} from "../interfaces/NoteListItem.js";
-import { l } from "../lib/intl.js";
+} from "../interfaces/NoteListItem";
+import { l } from "../lib/intl";
 import NoteListItemFeatures from "./NoteListItemFeatures";
 
 

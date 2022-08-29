@@ -1,3 +1,4 @@
+import { FileInfo } from "./FileInfo.js";
 import LinkedNote from "./LinkedNote.js";
 import NodePosition from "./NodePosition.js";
 import Note from "./Note.js";
@@ -11,4 +12,5 @@ export default interface NoteToTransmit extends Note {
   readonly linkedNotes: LinkedNote[],
   readonly position: NodePosition,
   readonly numberOfCharacters: number,
+  readonly files: FileInfo[],
 }

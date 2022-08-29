@@ -3,7 +3,6 @@ import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
 import User from "./interfaces/User.js";
 import Users from "./users.js";
-import getUrlMetadata from "./lib/getUrlMetadata.js";
 import { REPO_PATH, SERVER_TIMEOUT } from "./config.js";
 import * as logger from "./lib/logger.js";
 import startServer from "./server.js";
@@ -15,17 +14,6 @@ const programArguments = getProgramArguments();
 
 logger.verbose("Program arguments:");
 logger.verbose(JSON.stringify(programArguments, null, "  "));
-
-if (programArguments["url-metadata"].length > 0) {
-  logger.info("Grabbing url metadata for " + programArguments["url-metadata"]);
-  try {
-    await getUrlMetadata(programArguments["url-metadata"]);
-  } catch (e) {
-    logger.error(e);
-  }
-  process.exit(0);
-}
-
 logger.info("💡 Checking data directory...");
 
 await checkDataDirectory(programArguments["data-folder-path"]);

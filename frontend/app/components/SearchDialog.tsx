@@ -38,25 +38,25 @@ const SearchDialog = ({
     <h2>Types</h2>
     <p>
       <button
-        onClick={() => setSearchValueAndClose("has:audio")}
+        onClick={() => setSearchValueAndClose("has-media:audio")}
         className="default-button dialog-box-button"
       >{l("list.search.presets.notes-with-audio")}</button>
     </p>
     <p>
       <button
-        onClick={() => setSearchValueAndClose("has:video")}
+        onClick={() => setSearchValueAndClose("has-media:video")}
         className="default-button dialog-box-button"
       >{l("list.search.presets.notes-with-video")}</button>
     </p>
     <p>
       <button
-        onClick={() => setSearchValueAndClose("has:document")}
+        onClick={() => setSearchValueAndClose("has-media:document")}
         className="default-button dialog-box-button"
       >{l("list.search.presets.notes-with-documents")}</button>
     </p>
     <p>
       <button
-        onClick={() => setSearchValueAndClose("has:image")}
+        onClick={() => setSearchValueAndClose("has-media:image")}
         className="default-button dialog-box-button"
       >{l("list.search.presets.notes-with-images")}</button>
     </p>

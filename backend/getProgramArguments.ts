@@ -50,11 +50,6 @@ export default (): ProgramArguments => {
       "description": "secret for session authentication",
       "default": randomUUID(),
     },
-    "url-metadata": {
-      "type": "string",
-      "description": "don't start server, only grab url metadata for given url",
-      "default": "",
-    },
     "session-ttl": {
       "type": "integer",
       "description": "time to live for a session in days",

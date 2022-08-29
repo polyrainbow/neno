@@ -3,6 +3,7 @@ import { Link } from "./Link.js";
 import NodePosition from "./NodePosition.js";
 import { NoteId } from "./NoteId.js";
 import ScreenPosition from "./ScreenPosition.js";
+import { FileInfo } from "./FileInfo.js";
 
 export default interface GraphObject {
   readonly creationTime: number,
@@ -13,4 +14,5 @@ export default interface GraphObject {
   screenPosition: ScreenPosition,
   initialNodePosition: NodePosition,
   pinnedNotes: NoteId[],
+  files: FileInfo[],
 }

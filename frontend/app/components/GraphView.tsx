@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import GraphVisualizer from "../lib/GraphVisualizer.js";
+import GraphVisualizer from "../lib/GraphVisualizer";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {
   useLocation,
@@ -8,12 +8,12 @@ import GraphViewHeader from "./GraphViewHeader";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useGoToNote from "../hooks/useGoToNote";
-import { l } from "../lib/intl.js";
-import DatabaseProvider from "../interfaces/DatabaseProvider.js";
-import { HighlightDetails } from "../interfaces/GraphVisualizerConfig.js";
+import { l } from "../lib/intl";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+import { HighlightDetails } from "../interfaces/GraphVisualizerConfig";
 import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
-import { GraphVisualizationMode } from "../interfaces/GraphVisualization.js";
+import { GraphVisualizationMode } from "../interfaces/GraphVisualization";
 
 interface GraphViewProps {
   databaseProvider: DatabaseProvider | null,

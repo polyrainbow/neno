@@ -5,7 +5,7 @@ import DialogServiceConfiguration
   from "../interfaces/DialogServiceConfiguration";
 import ChangeLanguageDialog from "./ChangeLanguageDialog";
 import ExportDatabaseDialog from "./ExportDatabaseDialog";
-import ImportLinksDialog from "./ImportLinksDialog";
+import ImportLinksDialog from "./CreateOneNotePerLineDialog";
 import SearchDialog from "./SearchDialog";
 import SwitchGraphsDialog from "./SwitchGraphsDialog";
 import * as Localizer from "../lib/intl";
@@ -67,9 +67,9 @@ const DialogServiceProvider = (props) => {
         : null
     }
     {
-      config.openDialog === DialogType.IMPORT_LINKS
+      config.openDialog === DialogType.CREATE_ONE_NOTE_PER_LINE
         ? <ImportLinksDialog
-          importLinksAsNotes={config.callback}
+          createOneNotePerLine={config.callback}
           onClose={resetDialogConfig}
         />
         : null

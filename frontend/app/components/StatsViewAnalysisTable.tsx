@@ -1,11 +1,11 @@
 import React from "react";
-import { emojis } from "../config.js";
+import { emojis } from "../config";
 import {
   getAppPath,
-} from "../lib/utils.js";
+} from "../lib/utils";
 import { Link } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
-import { l, lf } from "../lib/intl.js";
+import { l, lf } from "../lib/intl";
 
 const StatsViewAnalysisTable = ({
   stats,

@@ -19,13 +19,17 @@ crop_free
 delete
 description
 done
+draft
 dynamic_feed
 edit_location
 edit_note
+edit_square
 favorite
 favorite_border
 fiber_manual_record
 fiber_new
+file_download
+file_upload
 filter_center_focus
 grain
 grid_view
@@ -60,6 +64,7 @@ people
 people_outline
 photo_library
 post_add
+preview
 push_pin
 query_stats
 radio_button_unchecked
@@ -86,5 +91,6 @@ videocam
 view_agenda
 view_compact_alt
 view_list
+warning
 workspaces
 zoom_out_map

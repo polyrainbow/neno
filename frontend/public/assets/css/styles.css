@@ -387,25 +387,6 @@ button[disabled]{
   font-weight: bold;
 }
 
-#noteTitle {
-  outline: none;
-  border: none;
-  width: 100%;
-  font-size: var(--h1-font-size);
-  font-weight: bold;
-  padding: 0px;
-  margin-top: 30px;
-  margin-bottom: 0px;
-  background-color: var(--background-color);
-  color: var(--font-color);
-  font-family: var(--main-font);
-  min-height: 33px;
-  height: 33px;
-  resize: none;
-  overflow: hidden;
-}
-
-
 .note-search-disclaimer {
   font-size: var(--default-font-size);
   margin-top: 0;
@@ -418,7 +399,7 @@ button[disabled]{
 }
 
 
-.note-list-status {
+.splash-message {
   font-size: var(--large-font-size);
   text-align: center;
   margin: 30px auto;

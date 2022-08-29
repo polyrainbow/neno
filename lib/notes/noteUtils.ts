@@ -14,14 +14,53 @@ import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import UserNoteChange from "./interfaces/UserNoteChange.js";
 import { UserNoteChangeType } from "./interfaces/UserNoteChangeType.js";
 import * as Utils from "../utils.js";
-import NoteContentBlock, {
-  NoteContentBlockHeading,
-  NoteContentBlockLink,
-  NoteContentBlockParagraph,
-  NoteContentBlockType,
-  NoteContentBlockWithFile,
-  NoteContentBlockWithFileLoaded,
-} from "./interfaces/NoteContentBlock.js";
+import { MediaType } from "./interfaces/MediaType.js";
+import { NoteContent } from "./interfaces/NoteContent.js";
+import { FileInfo } from "./interfaces/FileInfo.js";
+import { GraphId } from "./interfaces/GraphId.js";
+import DatabaseIO from "./DatabaseIO.js";
+import subwaytext from "../subwaytext/index.js";
+import { Block, BlockSlashlink, BlockType } from "../subwaytext/interfaces/Block.js";
+
+
+const getExtensionFromFilename = (filename: string): string | null => {
+  const posOfDot = filename.lastIndexOf(".");
+  if (posOfDot === -1) {
+    return null;
+  }
+
+  const extension = filename.substring(posOfDot + 1);
+  if (extension.length === 0) {
+    return null;
+  }
+
+  return extension;
+};
+
+
+const getMediaTypeFromFilename = (
+  filename: string,
+): MediaType => {
+  const map = new Map<string, MediaType>(Object.entries({
+    "png": MediaType.IMAGE,
+    "jpg": MediaType.IMAGE,
+    "webp": MediaType.IMAGE,
+    "gif": MediaType.IMAGE,
+    "svg": MediaType.IMAGE,
+    "pdf": MediaType.PDF,
+    "mp3": MediaType.AUDIO,
+    "flac": MediaType.AUDIO,
+    "mp4": MediaType.VIDEO,
+    "webm": MediaType.VIDEO,
+  }));
+
+  const extension = getExtensionFromFilename(filename);
+  if (!extension) {
+    return MediaType.OTHER;
+  }
+
+  return map.has(extension) ? map.get(extension) as MediaType : MediaType.OTHER;
+};
 
 
 const shortenText = (text: string, maxLength: number): string => {
@@ -44,29 +83,6 @@ const normalizeNoteTitle = (title: string): string => {
   return title
     .replaceAll(/[\r\n]/g, " ")
     .trim();
-};
-
-
-const removeDefaultTextParagraphs = (note: Note): void => {
-  note.blocks = note.blocks.filter((block) => {
-    const isDefaultTextParagraph = (
-      block.type === "paragraph"
-      && block.data.text === "Note text"
-    );
-
-    return !isDefaultTextParagraph;
-  });
-};
-
-const removeEmptyLinkBlocks = (note: Note): void => {
-  note.blocks = note.blocks.filter((block) => {
-    const isEmptyLinkBlock = (
-      block.type === "link"
-      && block.data.link === ""
-    );
-
-    return !isEmptyLinkBlock;
-  });
 };
 
 
@@ -207,12 +223,33 @@ const removeLinksOfNote = (graph: Graph, noteId: NoteId): void => {
 };
 
 
-const getFilesOfNote = (note: SavedNote): FileId[] => {
-  return note.blocks
-    .filter(blockHasLoadedFile)
-    .map((block: NoteContentBlockWithFileLoaded): FileId => {
-      return block.data.file.fileId;
-    });
+const parseFileIds = (noteContent: NoteContent): FileId[] => {
+  // eslint-disable-next-line max-len
+  const regex = /\/file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{3,4})/g;
+  return [...noteContent.matchAll(regex)].map((match) => match[1]);
+};
+
+
+const getFileId = (input: string): FileId | null => {
+  // eslint-disable-next-line max-len
+  const regex = /file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{3,4})/g;
+  const results = [...input.matchAll(regex)].map((match) => match[1]);
+  if (results.length > 0) {
+    return results[0];
+  } else {
+    return null;
+  }
+};
+
+
+const getFileInfos = (
+  graph: Graph,
+  noteContent: NoteContent,
+): FileInfo[] => {
+  const fileIds = parseFileIds(noteContent);
+  const files = graph.files
+    .filter((file: FileInfo) => fileIds.includes(file.fileId));
+  return files;
 };
 
 
@@ -240,19 +277,20 @@ const incorporateUserChangesIntoNote = (
 };
 
 
-const createNoteToTransmit = (
-  databaseNote: NonNullable<SavedNote>,
-  graph: NonNullable<Graph>,
-): NoteToTransmit => {
+const createNoteToTransmit = async (
+  databaseNote: SavedNote,
+  graph: Graph,
+): Promise<NoteToTransmit> => {
   const noteToTransmit: NoteToTransmit = {
     id: databaseNote.id,
-    blocks: databaseNote.blocks,
+    content: databaseNote.content,
     title: databaseNote.title,
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
     linkedNotes: getLinkedNotes(graph, databaseNote.id),
     position: databaseNote.position,
     numberOfCharacters: getNumberOfCharacters(databaseNote),
+    files: getFileInfos(graph, databaseNote.content),
   };
 
   return noteToTransmit;
@@ -318,39 +356,43 @@ const getNoteFeatures = (note: SavedNote): NoteListItemFeatures => {
   let containsAudio = false;
   let containsVideo = false;
 
-  note.blocks.forEach((block) => {
+  subwaytext(note.content).forEach((block) => {
     if (
       (
-        (block.type === NoteContentBlockType.PARAGRAPH)
+        (block.type === BlockType.PARAGRAPH)
         && block.data.text.trim().length > 0
       )
       || (
-        (block.type === NoteContentBlockType.HEADING)
+        (block.type === BlockType.HEADING)
         && block.data.text.trim().length > 0
       )
       || (
-        (block.type === NoteContentBlockType.LIST)
+        (block.type === BlockType.LIST)
         && block.data.items.length > 0
         && block.data.items[0].trim().length > 0
       )
     ) {
       containsText = true;
     }
-    if (block.type === NoteContentBlockType.LINK) {
+    if (block.type === BlockType.URL) {
       containsWeblink = true;
     }
-    if (block.type === NoteContentBlockType.CODE) {
+    if (block.type === BlockType.CODE) {
       containsCode = true;
     }
-    if (blockHasLoadedFile(block)) {
-      if (block.type === NoteContentBlockType.IMAGE) {
-        containsImages = true;
-      } else if (block.type === NoteContentBlockType.DOCUMENT) {
-        containsDocuments = true;
-      } else if (block.type === NoteContentBlockType.AUDIO) {
-        containsAudio = true;
-      } else if (block.type === NoteContentBlockType.VIDEO) {
-        containsVideo = true;
+    if (block.type === BlockType.SLASHLINK) {
+      const fileId = getFileId(block.data.link);
+      if (fileId) {
+        const mediaType = getMediaTypeFromFilename(fileId);
+        if (mediaType === MediaType.IMAGE) {
+          containsImages = true;
+        } else if (mediaType === MediaType.PDF) {
+          containsDocuments = true;
+        } else if (mediaType === MediaType.AUDIO) {
+          containsAudio = true;
+        } else if (mediaType === MediaType.VIDEO) {
+          containsVideo = true;
+        }
       }
     }
   });
@@ -383,22 +425,17 @@ const getSortKeyForTitle = (title: string): string => {
  * @returns {boolean} true or false
  */
 const blockHasLoadedFile = (
-  block: NoteContentBlock,
-): block is NoteContentBlockWithFileLoaded => {
-  return (
-    [
-      NoteContentBlockType.IMAGE,
-      NoteContentBlockType.DOCUMENT,
-      NoteContentBlockType.AUDIO,
-      NoteContentBlockType.VIDEO,
-    ].includes(block.type)
-    && (typeof (block as NoteContentBlockWithFile).data.file === "object")
-  );
+  block: Block,
+): block is BlockSlashlink => {
+  if (
+    block.type !== BlockType.SLASHLINK) return false;
+
+  return !!getFileId(block.data.link);
 };
 
 
 const getNumberOfFiles = (note: SavedNote): number => {
-  return note.blocks.filter(blockHasLoadedFile).length;
+  return subwaytext(note.content).filter(blockHasLoadedFile).length;
 };
 
 const getSortFunction = (
@@ -454,29 +491,14 @@ const getSortFunction = (
 
 
 const getNumberOfCharacters = (note: SavedNote): number => {
-  return note.blocks.reduce((accumulator, block) => {
-    if ([
-      NoteContentBlockType.PARAGRAPH,
-      NoteContentBlockType.HEADING,
-    ].includes(block.type)) {
-      return accumulator
-        + (block as NoteContentBlockParagraph | NoteContentBlockHeading)
-          .data.text.length;
-    } else {
-      return accumulator;
-    }
-  }, 0);
+  return note.content.length;
 };
 
 
-const getURLsOfNote = (note: SavedNote): string[] => {
-  return note.blocks
-    .filter((block): block is NoteContentBlockLink => {
-      return block.type === NoteContentBlockType.LINK;
-    })
-    .map((block) => {
-      return block.data.link;
-    });
+const getURLsOfNote = (noteContent: NoteContent): string[] => {
+  // eslint-disable-next-line max-len
+  const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
+  return [...noteContent.matchAll(regex)].map((match) => match[0]);
 };
 
 
@@ -545,7 +567,7 @@ const getNotesWithDuplicateUrls = (notes: SavedNote[]): SavedNote[] => {
   const urlIndex = new Map<string, Set<SavedNote>>();
 
   notes.forEach((note: SavedNote): void => {
-    const urls = getURLsOfNote(note);
+    const urls = getURLsOfNote(note.content);
 
     urls.forEach((url) => {
       if (urlIndex.has(url)) {
@@ -617,50 +639,20 @@ const getNotesWithUrl = (
   url: string,
 ): SavedNote[] => {
   return notes.filter((note: SavedNote) => {
-    return note.blocks
-      .filter((block): block is NoteContentBlockLink => {
-        return block.type === NoteContentBlockType.LINK;
-      })
-      .some((linkBlock) => linkBlock.data.link === url);
+    return note.content.includes(url);
   });
 };
 
 
 const getNotesWithFile = (
   notes: SavedNote[],
-  file: FileId,
+  fileId: FileId,
 ): SavedNote[] => {
   return notes.filter((note: SavedNote) => {
-    return note.blocks
+    return subwaytext(note.content)
       .filter(blockHasLoadedFile)
-      .some((block) => block.data.file.fileId === file);
+      .some((block) => getFileId(block.data.link) === fileId);
   });
-};
-
-
-const getConcatenatedTextOfNote = (note: SavedNote): string => {
-  const blockText = note.blocks.reduce((accumulator, block) => {
-    if (block.type === NoteContentBlockType.PARAGRAPH) {
-      return accumulator + " " + block.data.text;
-    } else if (block.type === NoteContentBlockType.HEADING) {
-      return accumulator + " " + block.data.text;
-    } else if (block.type === NoteContentBlockType.CODE) {
-      return accumulator + " " + block.data.code;
-    } else if (block.type === NoteContentBlockType.LIST) {
-      const itemsConcatenated = block.data.items.join(" ");
-      return accumulator + " " + itemsConcatenated;
-    } else if (block.type === NoteContentBlockType.IMAGE) {
-      return accumulator + " " + block.data.caption;
-    } else if (block.type === NoteContentBlockType.LINK) {
-      return accumulator
-        + " " + block.data.meta.title
-        + " " + block.data.meta.description;
-    } else {
-      return accumulator;
-    }
-  }, "");
-
-  return note.title + " " + blockText;
 };
 
 
@@ -702,13 +694,13 @@ const getNotesThatContainTokens = (
 
   return notes
     .filter((note: SavedNote) => {
-      const noteText = getConcatenatedTextOfNote(note);
+      const noteContent = note.content;
 
       // the note text must include every query token to be a positive
       return queryTokens.every((queryToken) => {
         return caseSensitive
-          ? noteText.includes(queryToken)
-          : noteText.toLowerCase().includes(queryToken.toLowerCase());
+          ? noteContent.includes(queryToken)
+          : noteContent.toLowerCase().includes(queryToken.toLowerCase());
       });
     });
 };
@@ -716,7 +708,7 @@ const getNotesThatContainTokens = (
 
 const getNotesWithBlocksOfTypes = (
   notes: SavedNote[],
-  types: NoteContentBlockType[],
+  types: BlockType[],
   notesMustContainAllBlockTypes: boolean,
 ): SavedNote[] => {
   return notesMustContainAllBlockTypes
@@ -724,13 +716,46 @@ const getNotesWithBlocksOfTypes = (
       // every single note must contain blocks from all the types
       .filter((note: SavedNote): boolean => {
         return types.every((type) => {
-          return note.blocks.some((block) => block.type === type);
+          return subwaytext(note.content).some((block) => block.type === type);
         });
       })
     // every note must contain one block with only one type of types:
     : notes
       .filter((note: SavedNote): boolean => {
-        return note.blocks.some((block) => types.includes(block.type));
+        return subwaytext(note.content)
+          .some((block) => types.includes(block.type));
+      });
+};
+
+
+const getNotesWithMediaTypes = (
+  notes: SavedNote[],
+  types: MediaType[],
+  notesMustContainAllMediaTypes: boolean,
+): SavedNote[] => {
+  return notesMustContainAllMediaTypes
+    ? notes
+      // every single note must contain blocks from all the types
+      .filter((note: SavedNote): boolean => {
+        return types.every((type) => {
+          return subwaytext(note.content).some((block) => {
+            if (block.type !== BlockType.SLASHLINK) return false;
+            const fileId = getFileId(block.data.link);
+            if (!fileId) return false;
+            return getMediaTypeFromFilename(fileId) === type;
+          });
+        });
+      })
+    // every note must contain one block with only one type of types:
+    : notes
+      .filter((note: SavedNote): boolean => {
+        return subwaytext(note.content)
+          .some((block) => {
+            if (block.type !== BlockType.SLASHLINK) return false;
+            const fileId = getFileId(block.data.link);
+            if (!fileId) return false;
+            return types.includes(getMediaTypeFromFilename(fileId));
+          });
       });
 };
 
@@ -738,8 +763,6 @@ const getNotesWithBlocksOfTypes = (
 export {
   getNoteTitlePreview,
   normalizeNoteTitle,
-  removeDefaultTextParagraphs,
-  removeEmptyLinkBlocks,
   noteWithSameTitleExists,
   findNote,
   getNewNoteId,
@@ -747,7 +770,7 @@ export {
   getLinkedNotes,
   getNumberOfLinkedNotes,
   removeLinksOfNote,
-  getFilesOfNote,
+  parseFileIds,
   incorporateUserChangesIntoNote,
   createNoteToTransmit,
   getNoteFeatures,
@@ -763,9 +786,9 @@ export {
   getNotesByTitle,
   getNotesWithUrl,
   getNotesWithFile,
-  getConcatenatedTextOfNote,
   blockHasLoadedFile,
   getNotesWithTitleContainingTokens,
   getNotesThatContainTokens,
   getNotesWithBlocksOfTypes,
+  getNotesWithMediaTypes,
 };

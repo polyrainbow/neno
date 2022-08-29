@@ -17,7 +17,7 @@ import DatabaseProvider from "../interfaces/DatabaseProvider";
 
 
 interface AppMenuProps {
-  importLinksAsNotes,
+  createOneNotePerLine: (lines: string[]) => Promise<void>,
   switchGraphs,
   onClose,
   unsavedChanges: boolean,
@@ -26,7 +26,7 @@ interface AppMenuProps {
 }
 
 const AppMenu = ({
-  importLinksAsNotes,
+  createOneNotePerLine,
   switchGraphs,
   onClose,
   unsavedChanges,
@@ -41,9 +41,9 @@ const AppMenu = ({
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
 
-  const openImportLinksDialog = useDialog(
-    DialogType.IMPORT_LINKS,
-    importLinksAsNotes,
+  const openCreateOneNotePerLineDialog = useDialog(
+    DialogType.CREATE_ONE_NOTE_PER_LINE,
+    createOneNotePerLine,
   );
 
 
@@ -152,9 +152,9 @@ const AppMenu = ({
       />
       <AppMenuItem
         disabled={!databaseProvider}
-        label={l("menu.import-links")}
+        label={l("menu.create-one-note-per-line")}
         icon="dynamic_feed"
-        onClick={openImportLinksDialog}
+        onClick={openCreateOneNotePerLineDialog}
       />
       <AppMenuItem
         disabled={

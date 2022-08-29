@@ -15,6 +15,10 @@ const StatusBar = ({ apiKey, hostUrl, setGraphId }) => {
         || (typeof apiKey !== "string")
         || (apiKey.length === 0)
       ) {
+        setStatusMessage(
+          "Invalid credentials: Please check server hostname and API key.",
+        );
+        setStatusColor("#ff4c4c");
         return;
       }
 
@@ -32,7 +36,6 @@ const StatusBar = ({ apiKey, hostUrl, setGraphId }) => {
           + result.error,
         );
         setStatusColor("#ff4c4c");
-        // TODO: pushNoteButton.disabled = true;
       }
     };
 

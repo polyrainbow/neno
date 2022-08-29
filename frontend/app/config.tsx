@@ -1,17 +1,6 @@
-import NoteContentBlock, {
-  NoteContentBlockType,
-} from "../../lib/notes/interfaces/NoteContentBlock";
-
 const DEFAULT_NOTE_TITLE = "";
 
-const DEFAULT_NOTE_BLOCKS: NoteContentBlock[] = [
-  {
-    "type": NoteContentBlockType.PARAGRAPH,
-    "data": {
-      "text": "",
-    },
-  },
-];
+const DEFAULT_NOTE_CONTENT = "";
 
 const API_URL = "/api/";
 
@@ -51,9 +40,28 @@ const DEFAULT_DOCUMENT_TITLE = "NENO";
 // disable this if you want to build a local-only instance
 const SERVER_DATABASE_ENABLED = true;
 
+const FILE_PICKER_ACCEPT_TYPES: FilePickerAcceptType[] = [
+  {
+    description: "Media file",
+    accept: {
+      "audio/mp3": [".mp3"],
+      "audio/mpeg": [".mp3"],
+      "audio/flac": [".flac"],
+      "video/mp4": [".mp4"],
+      "video/webm": [".webm"],
+      "application/pdf": [".pdf"],
+      "image/png": [".png"],
+      "image/jpeg": [".jpg"],
+      "image/webp": [".webp"],
+      "image/gif": [".gif"],
+      "image/svg+xml": [".svg"],
+    },
+  },
+];
+
 export {
   DEFAULT_NOTE_TITLE,
-  DEFAULT_NOTE_BLOCKS,
+  DEFAULT_NOTE_CONTENT,
   API_URL,
   MINIMUM_SEARCH_QUERY_LENGTH,
   emojis,
@@ -64,4 +72,5 @@ export {
   SEARCH_RESULTS_PER_PAGE,
   DEFAULT_DOCUMENT_TITLE,
   SERVER_DATABASE_ENABLED,
+  FILE_PICKER_ACCEPT_TYPES,
 };
