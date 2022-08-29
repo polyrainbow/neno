@@ -11,16 +11,14 @@ export const getDocumentTitleFromHtml = (html: string): string => {
 const getDocumentTitle = async (
   url: string,
 ): Promise<string> => {
-  const requestOpts = {
-    method: "GET",
-    headers: {
-      'User-Agent': "NENO",
-    },
-  };
-
-  const response = await fetch(url, requestOpts);
+  const response = await fetch(url);
   if (response.status !== 200) {
     throw new Error('Response code ' + response.status);
+  }
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.startsWith("text/html")) {
+    throw new Error('Invalid content-type' + contentType);
   }
 
   const bodyText = await response.text();
