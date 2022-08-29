@@ -24,7 +24,7 @@ const NoteContentBlockAudio = ({
       .then((url) => {
         setUrl(url);
       });
-  });
+  }, [file, databaseProvider]);
 
   return <div
     className="preview-block-file-wrapper"
