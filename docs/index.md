@@ -23,8 +23,9 @@ NENO is open-source software which means it is completely free to use.
 ### Some features
 
 * Full data ownership: You decide where your data is stored: On your device, on a cloud storage of your choice, or even on your own NENO server.
-* WYSIWYG editor that allows to paste multiple media types: video, audio, PDF documents, images and code
+* Multiple media types: Paste video, audio, PDF documents, images and code into your note
 * Graph View: Drag and drop nodes and create your custom knowledge graph visualization
+* Super-simple plaintext editor
 * Powerful full-text search
 * Tap-to-link: One click is enough to link two notes
 * File overview: All uploaded files in one view
@@ -84,7 +85,12 @@ contains your first note:
 
 ![My first note](./img/my-first-note.png)
 
-If you create another one, you can link it with the first one by clicking on the
+You can now use subwaytext to fill your note. Toggle view mode by clicking on "finish editing".
+A note in view mode might look like this:
+
+![Example of a rendered note](./img/rendered-note-example.png)
+
+If you create another note, you can link it with the first one by clicking on the
 chain icon of your first note in the note list:
 
 ![Link to another note](./img/link-to-another-note.png)
@@ -108,3 +114,10 @@ One of the best features of NENO is the Graph view.
 Now you should already be familiar with NENO's basic functionality. But there
 are some [tips and tricks for working with NENO](./TipsAndTricks.md) that
 can make your life easier.
+
+## Keyboard Shortcuts
+
+### Editor
+
+- Save note: `CTRL`/`CMD` + `s`
+- Toggle edit mode/viewer mode: `CTRL`/`CMD` + `.`
