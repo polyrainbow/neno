@@ -33,7 +33,7 @@ const NoteContent = ({
   databaseProvider,
   toggleEditMode,
 }: NoteContentProps) => {
-  const blocks = subwaytext(note.content); // TODO adapt to new swt structure
+  const blocks = subwaytext(note.content);
 
   if (blocks.length === 0) {
     return <NoteContentEmptyDisclaimer

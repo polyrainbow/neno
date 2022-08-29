@@ -58,6 +58,8 @@ interface NoteComponentProps {
   openInGraphView,
 }
 
+const DEFAULT_CONTENT_MODE = ContentMode.EDITOR;
+
 
 const Note = ({
   note,
@@ -253,18 +255,26 @@ const Note = ({
   useEffect(() => {
     IDB.get("CONTENT_MODE")
       .then((value) => {
-        value === ContentMode.EDITOR
-          ? setContentMode(value)
-          : setContentMode(ContentMode.VIEWER);
+        let startContentMode;
 
         if (value === ContentMode.EDITOR) {
+          startContentMode = ContentMode.EDITOR;
+        } else if (value === ContentMode.VIEWER) {
+          startContentMode = ContentMode.VIEWER;
+        } else {
+          startContentMode = DEFAULT_CONTENT_MODE;
+        }
+
+        setContentMode(startContentMode);
+
+        if (startContentMode === ContentMode.EDITOR) {
           setTimeout(() => {
             document.getElementById("editor")?.focus();
           });
         }
       })
       .catch(() => {
-        setContentMode(ContentMode.VIEWER);
+        setContentMode(DEFAULT_CONTENT_MODE);
       });
   }, []);
 
