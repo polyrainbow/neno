@@ -104,7 +104,7 @@ const Note = ({
 
     // only add line breaks if they're not already there
     let separator;
-    if (note.content.endsWith("\n\n")) {
+    if (note.content.endsWith("\n\n") || note.content.length === 0) {
       separator = "";
     } else if (note.content.endsWith("\n")) {
       separator = "\n";
