@@ -27,7 +27,7 @@ const NoteContentBlockUrl = ({
             <span className="url-block-title">{blockData.text}</span>
             <span className="url-block-hostname">{hostname}</span>
           </>
-          : blockData.url
+          : <span className="url-block-url">{blockData.url}</span>
       }
     </div>
   </a>;

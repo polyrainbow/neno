@@ -167,6 +167,7 @@ FILE PREVIEW
   margin: var(--block-title-margin);
   color: var(--main-content-color);
   text-decoration: none;
+  word-break: break-word;
 }
 
 .url-block-hostname {
@@ -178,4 +179,8 @@ FILE PREVIEW
   border: 0;
   padding: 0;
   text-decoration: none;
+}
+
+.url-block-url {
+  word-break: break-all;
 }
