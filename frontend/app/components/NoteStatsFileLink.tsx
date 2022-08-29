@@ -5,28 +5,28 @@ import {
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 
 interface NoteStatsFileLinkProps {
-  fileMetadata: FileInfo,
+  file: FileInfo,
   databaseProvider: DatabaseProvider
 }
 
 const NoteStatsFileLink = ({
-  fileMetadata,
+  file,
   databaseProvider,
 }: NoteStatsFileLinkProps) => {
   return <a
-    key={"note-stats-link-" + fileMetadata.fileId}
+    key={"note-stats-link-" + file.fileId}
     style={{
       "cursor": "pointer",
     }}
     onClick={async () => {
       const url = await databaseProvider.getUrlForFileId(
-        fileMetadata.fileId,
-        fileMetadata.name,
+        file.fileId,
+        file.name,
       );
       window.open(url, "_blank");
     }}
   >
-    {fileMetadata.name ?? fileMetadata.fileId}
+    {file.name ?? file.fileId}
   </a>;
 };
 

@@ -1,6 +1,6 @@
 import React from "react";
-import Tooltip from "./Tooltip.js";
-import Icon from "./Icon.js";
+import Tooltip from "./Tooltip";
+import Icon from "./Icon";
 
 interface IconButtonProps {
   id?: string,

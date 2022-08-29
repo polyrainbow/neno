@@ -18,6 +18,9 @@ export default {
   resolve: {
     // Add .ts and .tsx as a resolvable extension.
     extensions: [".ts", ".tsx"],
+    extensionAlias: {
+      '.js': ['.ts', '.js'],
+    },
   },
   module: {
     rules: [
@@ -25,7 +28,6 @@ export default {
         test: /\.tsx?$/,
         use: [
           "ts-loader",
-          path.resolve(__dirname, "ts-loader-preparation.cjs"),
         ],
       },
       {

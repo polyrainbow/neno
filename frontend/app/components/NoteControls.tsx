@@ -1,15 +1,18 @@
 import React from "react";
-import IconButton from "./IconButton.js";
-import UnsavedChangesIndicator from "./UnsavedChangesIndicator.js";
+import IconButton from "./IconButton";
+import UnsavedChangesIndicator from "./UnsavedChangesIndicator";
 import { useNavigate } from "react-router-dom";
-import useIsSmallScreen from "../hooks/useIsSmallScreen.js";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import ConfirmationServiceContext
-  from "../contexts/ConfirmationServiceContext.js";
-import { getAppPath } from "../lib/utils.js";
-import { PathTemplate } from "../enum/PathTemplate.js";
-import { l } from "../lib/intl.js";
+  from "../contexts/ConfirmationServiceContext";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
+import { l } from "../lib/intl";
+import { ContentMode } from "../interfaces/ContentMode";
+import Tooltip from "./Tooltip";
+import Icon from "./Icon";
 
 const NoteControls = ({
   activeNote,
@@ -22,6 +25,10 @@ const NoteControls = ({
   pinOrUnpinNote,
   duplicateNote,
   openInGraphView,
+  uploadFile,
+  contentMode,
+  toggleEditMode,
+  uploadInProgress,
 }) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -54,18 +61,24 @@ const NoteControls = ({
               id="button_new"
               title={l("editor.new-note")}
               icon="add"
-              onClick={createNewNote}
+              onClick={() => createNewNote()}
             />
             <IconButton
               id="button_create-linked-note"
               disabled={activeNote.isUnsaved}
               title={l("editor.create-linked-note")}
               icon="add_circle"
-              onClick={createNewLinkedNote}
+              onClick={() => createNewLinkedNote()}
             />
           </>
           : null
       }
+      <IconButton
+        id="button_upload"
+        title={l(contentMode === ContentMode.EDITOR ? "editor.finish-editing" : "editor.edit-note")}
+        icon={contentMode === ContentMode.EDITOR ? "preview" : "create"}
+        onClick={toggleEditMode}
+      />
       <IconButton
         id="button_upload"
         title={l("editor.save-note")}
@@ -109,8 +122,28 @@ const NoteControls = ({
         icon="center_focus_strong"
         onClick={openInGraphView}
       />
+      <IconButton
+        id="button_upload-file"
+        disabled={false}
+        title={l("editor.upload-file")}
+        icon="file_upload"
+        onClick={uploadFile}
+      />
     </div>
     <div id="note-controls-right">
+      {
+        uploadInProgress
+          ? <Tooltip
+            title={l("editor.note-has-not-been-saved-yet")}
+          >
+            <Icon
+              icon={"file_upload"}
+              title={l("editor.upload-in-progress")}
+              size={24}
+            />
+          </Tooltip>
+          : ""
+      }
       <UnsavedChangesIndicator
         isUnsaved={activeNote.isUnsaved}
         unsavedChanges={unsavedChanges}

@@ -1,7 +1,7 @@
 import React from "react";
-import { l } from "../lib/intl.js";
-import GraphStats from "../../../lib/notes/interfaces/GraphStats.js";
-import AppHeaderStatsItem from "./AppHeaderStatsItem.js";
+import { l } from "../lib/intl";
+import GraphStats from "../../../lib/notes/interfaces/GraphStats";
+import AppHeaderStatsItem from "./AppHeaderStatsItem";
 
 interface AppHeaderStatsProps {
   stats: GraphStats,

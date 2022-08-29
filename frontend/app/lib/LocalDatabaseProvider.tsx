@@ -1,23 +1,22 @@
 import * as IDB from "idb-keyval";
-import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery.js";
-import { FileId } from "../../../lib/notes/interfaces/FileId.js";
-import { GraphId } from "../../../lib/notes/interfaces/GraphId.js";
-import GraphStats from "../../../lib/notes/interfaces/GraphStats.js";
+import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery";
+import { FileId } from "../../../lib/notes/interfaces/FileId";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import GraphStatsRetrievalOptions
-  from "../../../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
-import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser.js";
-import { NoteId } from "../../../lib/notes/interfaces/NoteId.js";
-import NoteListPage from "../../../lib/notes/interfaces/NoteListPage.js";
-import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions.js";
-import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit.js";
-import UrlMetadataResponse
-  from "../../../lib/notes/interfaces/UrlMetadataResponse.js";
-import DatabaseProvider from "../interfaces/DatabaseProvider.js";
+  from "../../../lib/notes/interfaces/GraphStatsRetrievalOptions";
+import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
+import { NoteId } from "../../../lib/notes/interfaces/NoteId";
+import NoteListPage from "../../../lib/notes/interfaces/NoteListPage";
+import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
+import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
 import FileSystemAccessAPIStorageProvider
-  from "./FileSystemAccessAPIStorageProvider.js";
-import { streamToBlob } from "./utils.js";
+  from "./FileSystemAccessAPIStorageProvider";
+import { streamToBlob } from "./utils";
 import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 
 
 async function verifyPermission(
@@ -239,17 +238,6 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     );
   }
 
-  importLinksAsNotes(links) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
-      throw new Error(
-        "Database Provider has not been properly initialized yet.",
-      );
-    }
-    return this.#notesModule.importLinksAsNotes(
-      this.#activeGraphId,
-      links,
-    );
-  }
 
   saveGraphVisualization(graphVisualization) {
     if (!(this.#notesModule && this.#activeGraphId)) {
@@ -295,7 +283,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  uploadFile(file: File) {
+  uploadFile(file: File): Promise<FileInfo> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
@@ -305,6 +293,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
       this.#activeGraphId,
       file.stream(),
       file.type,
+      file.name,
     );
   }
 
@@ -322,16 +311,6 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  getUrlMetadata(url: string): Promise<UrlMetadataResponse> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
-      throw new Error(
-        "Database Provider has not been properly initialized yet.",
-      );
-    }
-    return this.#notesModule.getUrlMetadata(url);
-  }
-
-
   getFiles() {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
@@ -339,6 +318,16 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
       );
     }
     return this.#notesModule.getFiles(this.#activeGraphId);
+  }
+
+
+  getFileInfo(fileId: FileId): Promise<FileInfo> {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
+    return this.#notesModule.getFileInfo(this.#activeGraphId, fileId);
   }
 
 

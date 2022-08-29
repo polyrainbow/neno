@@ -73,6 +73,7 @@ export default class DatabaseIO {
         y: 0,
       },
       pinnedNotes: [],
+      files: [],
     };
 
     return newGraph;
@@ -113,7 +114,10 @@ export default class DatabaseIO {
     if (graphFromFile) {
       // when we open a graph from file for the first time, let's make sure
       // it has the up-to-date data structure and is cleaned up.
-      updateGraphDataStructure(graphFromFile);
+      await updateGraphDataStructure(
+        graphFromFile,
+        (fileId) => this.getFileSize(graphId, fileId),
+      );
       cleanUpGraph(graphFromFile);
 
       // flushing these changes will also save the graph in memory for

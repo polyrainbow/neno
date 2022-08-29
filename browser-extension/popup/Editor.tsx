@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import NoteContentBlock from "../../lib/notes/interfaces/NoteContentBlock";
 import NoteFromUser from "../../lib/notes/interfaces/NoteFromUser";
 import {
-  getNoteBlocks,
+  getNoteContent,
   putNote,
 } from "../utils";
 import ExistingNotes from "./ExistingNotes";
@@ -33,7 +32,7 @@ const Editor = ({ apiKey, hostUrl, activeTab, graphId }) => {
   const pushNote = async () => {
     if (typeof graphId !== "string") return;
 
-    const blocks:NoteContentBlock[] = getNoteBlocks({
+    const content = getNoteContent({
       url: activeTab.url,
       pageTitle: activeTab.title,
       noteText,
@@ -42,7 +41,7 @@ const Editor = ({ apiKey, hostUrl, activeTab, graphId }) => {
     const note:NoteFromUser = {
       // eslint-disable-next-line no-undefined
       id: activeNoteId || undefined,
-      blocks,
+      content,
       title: noteTitle,
     };
 
@@ -83,12 +82,16 @@ const Editor = ({ apiKey, hostUrl, activeTab, graphId }) => {
       onInput={(e) => setNoteText((e.target as HTMLTextAreaElement).value)}
       value={noteText}
     />
-    <div id="div_controls">
-      <button
-        id="button_pushNote"
-        onClick={pushNote}
-      >{pushNoteButtonValue}</button>
-    </div>
+    {
+      graphId
+        ? <div id="div_controls">
+          <button
+            id="button_pushNote"
+            onClick={pushNote}
+          >{pushNoteButtonValue}</button>
+        </div>
+        : ""
+    }
     <div>
       <p id="note-status">{statusMessage} {link}</p>
     </div>

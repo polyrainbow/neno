@@ -36,7 +36,6 @@ export interface ProgramArgumentsDescription {
 }
 
 export interface ProgramArguments {
-  "url-metadata": string,
   "data-folder-path": string,
   "session-secret": string,
   "session-ttl": number,

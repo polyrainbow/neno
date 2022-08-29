@@ -17,10 +17,10 @@ changed.
 (sudo) npm i typescript-json-schema tslib -g
 
 # In project directory
-typescript-json-schema tsconfig.json GraphObject --required --strictNullChecks --id GraphObject --noExtraProps -o lib/notes/schemas/GraphObject.schema.json
-typescript-json-schema tsconfig.json GraphVisualizationFromUser --required --strictNullChecks --id GraphVisualizationFromUser --noExtraProps -o lib/notes/schemas/GraphVisualizationFromUser.schema.json
-typescript-json-schema tsconfig.json NoteFromUser --required --strictNullChecks --id NoteFromUser --noExtraProps -o lib/notes/schemas/NoteFromUser.schema.json
-typescript-json-schema tsconfig.json SavedNote --required --strictNullChecks --id SavedNote --noExtraProps -o lib/notes/schemas/SavedNote.schema.json
+typescript-json-schema "lib/notes/interfaces/Graph.ts" GraphObject --required --strictNullChecks --id GraphObject --noExtraProps -o lib/notes/schemas/GraphObject.schema.json
+typescript-json-schema "lib/notes/interfaces/GraphVisualizationFromUser.ts" GraphVisualizationFromUser --required --strictNullChecks --id GraphVisualizationFromUser --noExtraProps -o lib/notes/schemas/GraphVisualizationFromUser.schema.json
+typescript-json-schema "lib/notes/interfaces/NoteFromUser.ts" NoteFromUser --required --strictNullChecks --id NoteFromUser --noExtraProps -o lib/notes/schemas/NoteFromUser.schema.json
+typescript-json-schema "lib/notes/interfaces/SavedNote.ts" SavedNote --required --strictNullChecks --id SavedNote --noExtraProps -o lib/notes/schemas/SavedNote.schema.json
 ```
 
 ## Publishing a release

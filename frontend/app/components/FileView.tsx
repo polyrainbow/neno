@@ -4,10 +4,12 @@ import {
   useParams, Link,
 } from "react-router-dom";
 import { MainNoteListItem } from "../interfaces/NoteListItem";
-import { getAppPath, getFileTypeFromFilename } from "../lib/utils";
+import { getAppPath, getMediaTypeFromFilename } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
+import { MediaType } from "../../../lib/notes/interfaces/MediaType";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 
 
 const FileView = ({
@@ -17,6 +19,7 @@ const FileView = ({
   databaseProvider: DatabaseProvider,
   toggleAppMenu: () => void,
 }) => {
+  const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [src, setSrc] = useState<string>("");
   // status can be READY, BUSY
   const [notes, setNotes] = useState<MainNoteListItem[]>([]);
@@ -25,6 +28,11 @@ const FileView = ({
 
   useEffect(() => {
     if (typeof fileId !== "string") return;
+
+    const getFileInfo = async () => {
+      const fileInfo = await databaseProvider.getFileInfo(fileId);
+      setFileInfo(fileInfo);
+    }
 
     const updateSrc = async () => {
       const src = await databaseProvider.getUrlForFileId(fileId);
@@ -38,11 +46,12 @@ const FileView = ({
       setNotes(response.results);
     };
 
+    getFileInfo();
     updateSrc();
     getNotes();
   }, [databaseProvider, fileId]);
 
-  const type = fileId && getFileTypeFromFilename(fileId);
+  const type = fileId && getMediaTypeFromFilename(fileId);
 
   return <>
     <HeaderContainer
@@ -50,7 +59,7 @@ const FileView = ({
     />
     <section className="content-section-wide">
       <p><Link to="/files">{l("files.show-all-files")}</Link></p>
-      <h1>{fileId}</h1>
+      <h1>{fileInfo?.name}</h1>
       <div
         style={{
           display: "flex",
@@ -58,7 +67,7 @@ const FileView = ({
         }}
       >
         {
-          type === "image"
+          type === MediaType.IMAGE
             ? <img
               style={{
                 marginRight: "15px auto",
@@ -70,7 +79,7 @@ const FileView = ({
             : ""
         }
         {
-          type === "audio"
+          type === MediaType.AUDIO
             ? <audio
               style={{
                 marginRight: "15px auto",
@@ -82,11 +91,11 @@ const FileView = ({
             : ""
         }
         {
-          type === "video"
+          type === MediaType.VIDEO
             ? <video
               style={{
                 marginRight: "15px auto",
-                height: "80vh",
+                maxHeight: "80vh",
               }}
               src={src}
               controls
@@ -94,7 +103,7 @@ const FileView = ({
             : ""
         }
         {
-          type === "document"
+          type === MediaType.PDF
             ? <iframe
               style={{
                 marginRight: "15px auto",
@@ -103,6 +112,14 @@ const FileView = ({
               }}
               src={src}
             />
+            : ""
+        }
+        {
+          type === MediaType.OTHER
+            ? <a
+              download
+              href={src}
+            >Download</a>
             : ""
         }
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import NoteListItem from "./NoteListItem";
-import * as Editor from "../lib/editor";
+import Editor from "./Editor";
 import NoteStats from "./NoteStats";
 import NoteControls from "./NoteControls";
 import useGoToNote from "../hooks/useGoToNote";
@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import { getAppPath } from "../lib/utils";
+import { getAppPath, getFileFromUserSelection, insertDocumentTitles } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import ActiveNote from "../interfaces/ActiveNote";
@@ -27,12 +27,21 @@ import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery";
 import {
   NoteListSortMode,
 } from "../../../lib/notes/interfaces/NoteListSortMode";
-import { DEFAULT_NOTE_BLOCKS } from "../config";
+import { FILE_PICKER_ACCEPT_TYPES } from "../config";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import NoteContent from "./NoteContent";
+import * as IDB from "idb-keyval";
+import { ContentMode } from "../interfaces/ContentMode";
+import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
+import subwaytext from "../../../lib/subwaytext";
+import { Block, BlockType, BlockUrl } from "../../../lib/subwaytext/interfaces/Block";
 
 interface NoteComponentProps {
   note: ActiveNote,
   setNoteTitle: (title: string) => void,
+  setNoteContent: (title: string) => void,
   displayedLinkedNotes: (LinkedNote | FrontendUserNoteChangeNote)[],
+  addFileToNoteObject,
   onLinkAddition: (note: MainNoteListItem) => void,
   onLinkRemoval: (noteId: NoteId) => void,
   setUnsavedChanges,
@@ -47,9 +56,12 @@ interface NoteComponentProps {
   openInGraphView,
 }
 
+
 const Note = ({
   note,
   setNoteTitle,
+  setNoteContent,
+  addFileToNoteObject,
   displayedLinkedNotes,
   onLinkAddition,
   onLinkRemoval,
@@ -65,7 +77,9 @@ const Note = ({
   openInGraphView,
 }: NoteComponentProps) => {
   const goToNote = useGoToNote();
-  const [searchString, setSearchString] = useState("");
+  const [searchString, setSearchString] = useState<string>("");
+  const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
+  const [contentMode, setContentMode] = useState<ContentMode>(ContentMode.LOADING);
   const [searchResults, setSearchResults] = useState<MainNoteListItem[]>([]);
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
@@ -77,6 +91,42 @@ const Note = ({
     // setDatabaseMode(DatabaseMode.NONE);
     navigate(getAppPath(PathTemplate.LOGIN));
   };
+
+
+  const insertFileToNote = (response: FileInfo) => {
+    addFileToNoteObject(response);
+
+    // only add line breaks if they're not already there
+    let separator;
+    if (note.content.endsWith("\n\n")) {
+      separator = "";
+    } else if (note.content.endsWith("\n")) {
+      separator = "\n";
+    } else {
+      separator = "\n\n";
+    }
+  
+    setNoteContent(
+      `${note.content}${separator}/file:${response.fileId}`,
+    );
+  };
+
+
+  const uploadFile = async () => {
+    const file = await getFileFromUserSelection(
+      FILE_PICKER_ACCEPT_TYPES,
+    );
+
+    setUploadInProgress(true);
+
+    const response: FileInfo
+      = await databaseProvider.uploadFile(file);
+
+    insertFileToNote(response);
+
+    setUploadInProgress(false);
+  };
+
 
   const refreshNotesList = async () => {
     const options: DatabaseQuery = {
@@ -114,6 +164,34 @@ const Note = ({
     }
   };
 
+
+  const toggleEditMode = async () => {
+    if (contentMode === ContentMode.LOADING) return;
+
+    const newContentMode = contentMode === ContentMode.EDITOR ? ContentMode.VIEWER : ContentMode.EDITOR;
+    setContentMode(newContentMode);
+    await IDB.set("CONTENT_MODE", newContentMode);
+
+    if (newContentMode === ContentMode.EDITOR) {
+      document.getElementById("editor")?.focus();
+    }
+
+    if (
+      newContentMode === ContentMode.VIEWER
+      // @ts-ignore calling constructor via instance
+      && databaseProvider.constructor.features.includes("GET_DOCUMENT_TITLE")
+    ) {
+      insertDocumentTitles(note.content, databaseProvider)
+        .then((newNoteContent) => {
+          if (newNoteContent !== note.content) {
+            setNoteContent(newNoteContent);
+            setUnsavedChanges(true);
+          }
+        });
+    }
+  };
+
+
   useEffect(() => {
     if (
       searchString.length === 0
@@ -125,30 +203,69 @@ const Note = ({
   }, [searchString]);
 
 
-  useEffect(() => {
-    const parent = document.getElementById("editor");
-    if (!parent) return;
+  const handleFileDrop = (e) => {
+    e.preventDefault();
 
-    Editor.scheduleInit({
-      data: DEFAULT_NOTE_BLOCKS,
-      parent,
-      onChange: () => setUnsavedChanges(true),
-      databaseProvider,
-    });
+    if (e.dataTransfer.items) {
+      // Use DataTransferItemList interface to access the file(s)
+      [...e.dataTransfer.items].forEach((item) => {
+        // If dropped items aren't files, reject them
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          setUploadInProgress(true);
+          databaseProvider.uploadFile(file)
+            .then((response) => {
+              insertFileToNote(response);
+              setUploadInProgress(false);
+            });
+        }
+      });
+    } else {
+      // Use DataTransfer interface to access the file(s)
+      [...e.dataTransfer.files].forEach((file) => {
+        databaseProvider.uploadFile(file)
+          .then((response) => {
+            insertFileToNote(response);
+            setUploadInProgress(false);
+          });
+      });
+    }
+  }
 
-    Editor.scheduleFocus();
-
-    return () => {
-      Editor.scheduleDestroy();
-    };
-  }, []);
 
   useEffect(() => {
     if (noteTitleElementRef.current === null) return;
+    const TOTAL_VERTICAL_PADDING = 10;
+
     noteTitleElementRef.current.style.height = "0px";
     noteTitleElementRef.current.style.height
-      = (noteTitleElementRef.current.scrollHeight) + "px";
-  }, [note.title]);
+      = (noteTitleElementRef.current.scrollHeight - TOTAL_VERTICAL_PADDING) + "px";
+  }, [note.title, contentMode]);
+
+
+  useEffect(() => {
+    IDB.get("CONTENT_MODE")
+      .then((value) => {
+        value === ContentMode.EDITOR
+          ? setContentMode(value)
+          : setContentMode(ContentMode.VIEWER);
+
+        if (value === ContentMode.EDITOR) {
+          setTimeout(() => {
+            document.getElementById("editor")?.focus();
+          });
+        }
+      })
+      .catch(() => {
+        setContentMode(ContentMode.VIEWER);
+      })
+  }, []);
+
+
+  useKeyboardShortcuts({
+    onCmdDot: () => toggleEditMode(),
+  });
+
 
   return <>
     <NoteControls
@@ -162,28 +279,67 @@ const Note = ({
       pinOrUnpinNote={pinOrUnpinNote}
       duplicateNote={duplicateNote}
       openInGraphView={openInGraphView}
+      uploadFile={uploadFile}
+      contentMode={contentMode}
+      toggleEditMode={toggleEditMode}
+      uploadInProgress={uploadInProgress}
     />
-    <section id="note">
-      <div id="note-content">
-        <textarea
-          ref={noteTitleElementRef}
-          id="noteTitle"
-          onInput={(e) => {
-            const element = e.currentTarget;
-            setNoteTitle(element.value);
-            setUnsavedChanges(true);
-          }}
-          value={note.title}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              Editor.scheduleFocus();
-            }
-          }}
-        />
-        <hr/>
-        <div id="editor"></div>
-        <hr/>
+    <section id="note"
+      onDrop={handleFileDrop}
+      onDragOver={(e) => {
+        // https://stackoverflow.com/a/50233827/3890888
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+    >
+      <div id="note-content"
+        className={
+          "note-content "
+          + (contentMode === ContentMode.EDITOR ? "edit-mode" : "view-mode")
+        }
+      >
+        {
+          contentMode === ContentMode.EDITOR
+            ? <textarea
+              ref={noteTitleElementRef}
+              id="note-title-textarea"
+              onInput={(e) => {
+                const element = e.currentTarget;
+                setNoteTitle(element.value);
+                setUnsavedChanges(true);
+              }}
+              value={note.title}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  document.getElementById("editor")?.focus();
+                }
+              }}
+            />
+            : <h1 id="note-title">{note.title}</h1>
+        }
+        {
+          contentMode === ContentMode.EDITOR
+            ? <Editor
+              content={note.content}
+              onChange={(val) => setNoteContent(val)}
+            />
+            : ""
+        }
+        {
+          contentMode === ContentMode.VIEWER
+            ? <NoteContent
+              note={note}
+              databaseProvider={databaseProvider}
+              toggleEditMode={toggleEditMode}
+            />
+            : ""
+        }
+        {
+          contentMode === ContentMode.VIEWER
+            ? <hr/>
+            : ""
+        }
         <div id="links">
           <h2>{l(
             "editor.linked-notes",

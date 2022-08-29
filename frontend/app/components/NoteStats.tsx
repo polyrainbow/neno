@@ -1,16 +1,13 @@
 import React from "react";
-import {
-  FileInfo,
-} from "../../../lib/notes/interfaces/FileInfo.js";
-import { SavedActiveNote } from "../interfaces/ActiveNote.js";
-import DatabaseProvider from "../interfaces/DatabaseProvider.js";
-import { l } from "../lib/intl.js";
+import subwaytext from "../../../lib/subwaytext/index";
+import { SavedActiveNote } from "../interfaces/ActiveNote";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+import { l } from "../lib/intl";
 import {
   makeTimestampHumanReadable,
-  getMetadataOfFilesInNote,
   humanFileSize,
-  getFileTypeFromFilename,
-} from "../lib/utils.js";
+  getMediaTypeFromFilename,
+} from "../lib/utils";
 import NoteStatsFileLink from "./NoteStatsFileLink";
 
 interface NoteStatsProps {
@@ -22,9 +19,6 @@ const NoteStats = ({
   note,
   databaseProvider,
 }: NoteStatsProps) => {
-  const fileMetadataObjects: FileInfo[]
-    = getMetadataOfFilesInNote(note);
-
   return <div
     id="stats"
   >
@@ -45,7 +39,7 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-blocks")}</td>
-          <td>{note.blocks.length}</td>
+          <td>{subwaytext(note.content).length}</td>
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-links")}</td>
@@ -58,18 +52,18 @@ const NoteStats = ({
         <tr>
           <td>{l("editor.stats.files")}</td>
           <td>{
-            fileMetadataObjects.length > 0
-              ? fileMetadataObjects
-                .map((fileMetadata, i, array) => {
-                  const fileType = getFileTypeFromFilename(fileMetadata.fileId);
+            note.files.length > 0
+              ? note.files
+                .map((file, i, array) => {
+                  const fileType = getMediaTypeFromFilename(file.fileId);
 
                   return <React.Fragment
-                    key={"nsfwt_" + fileMetadata.fileId + note.id}
+                    key={"nsfwt_" + file.fileId + note.id}
                   >
                     <NoteStatsFileLink
-                      fileMetadata={fileMetadata}
+                      file={file}
                       databaseProvider={databaseProvider}
-                    /> ({fileType}, {humanFileSize(fileMetadata.size)})
+                    /> ({fileType}, {humanFileSize(file.size)})
                     {
                       i < array.length - 1
                         ? <br />

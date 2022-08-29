@@ -1,50 +1,52 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
-import { getAppPath } from "../lib/utils";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import {
   useNavigate,
 } from "react-router-dom";
-import { PathTemplate } from "../enum/PathTemplate";
-import { FileId } from "../../../lib/notes/interfaces/FileId";
-import FileIdAndSrc from "../interfaces/FileIdAndSrc";
+import FileInfoAndSrc from "../interfaces/FileInfoAndSrc";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 
 interface FilesViewProps {
   databaseProvider: DatabaseProvider,
   toggleAppMenu,
+  createNewNote,
 }
 
 const FilesView = ({
   databaseProvider,
   toggleAppMenu,
+  createNewNote,
 }: FilesViewProps) => {
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
   const navigate = useNavigate();
 
-  const [files, setFiles] = useState<FileIdAndSrc[]>([]);
-  const [danglingFiles, setDanglingFiles] = useState<FileIdAndSrc[]>([]);
+  const [files, setFiles] = useState<FileInfoAndSrc[]>([]);
+  const [danglingFiles, setDanglingFiles] = useState<FileInfoAndSrc[]>([]);
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
 
   const updateDanglingFiles = async () => {
-    const danglingFileIds: FileId[] = await databaseProvider.getDanglingFiles();
+    const danglingFiles: FileInfo[]
+      = await databaseProvider.getDanglingFiles();
     const danglingFileSrcs: string[]
       = await Promise.all(
-        danglingFileIds.map(
-          (fileId) => databaseProvider.getUrlForFileId(fileId),
+        danglingFiles.map(
+          (file) => databaseProvider.getUrlForFileId(file.fileId),
         ),
       );
 
-    const danglingFiles: FileIdAndSrc[] = danglingFileIds.map((fileId, i) => {
-      return {
-        id: fileId,
-        src: danglingFileSrcs[i],
-      };
-    });
-    setDanglingFiles(danglingFiles);
+    const danglingFilesIdSrc: FileInfoAndSrc[]
+      = danglingFiles.map((file, i) => {
+        return {
+          ...file,
+          src: danglingFileSrcs[i],
+        };
+      });
+    setDanglingFiles(danglingFilesIdSrc);
   };
 
 
@@ -52,19 +54,19 @@ const FilesView = ({
     if (!databaseProvider) return;
 
     const updateFiles = async () => {
-      const fileIds: FileId[] = await databaseProvider.getFiles();
+      const files: FileInfo[] = await databaseProvider.getFiles();
       const fileSrcs: string[]
         = await Promise.all(
-          fileIds.map((fileId) => databaseProvider.getUrlForFileId(fileId)),
+          files.map((file) => databaseProvider.getUrlForFileId(file.fileId)),
         );
 
-      const files: FileIdAndSrc[] = fileIds.map((fileId, i) => {
+      const filesSrc: FileInfoAndSrc[] = files.map((file, i) => {
         return {
-          id: fileId,
+          ...file,
           src: fileSrcs[i],
         };
       });
-      setFiles(files);
+      setFiles(filesSrc);
 
       await updateDanglingFiles();
       setStatus("READY");
@@ -94,7 +96,7 @@ const FilesView = ({
               {files.map((file) => {
                 return <FilesViewPreviewBox
                   file={file}
-                  key={"img_" + file.id}
+                  key={"img_" + file.fileId}
                 />;
               })}
             </div>
@@ -106,20 +108,16 @@ const FilesView = ({
             <div>
               {danglingFiles.map((danglingFile) => {
                 return <div
-                  key={"danglingFile_" + danglingFile.id}
+                  key={"danglingFile_" + danglingFile.fileId}
                 >
                   <p>
                     <a
                       href={danglingFile.src}
-                    >{danglingFile.id}</a>
+                    >{danglingFile.name}</a>
                   </p>
                   <button
                     onClick={async () => {
-                      navigate(getAppPath(
-                        PathTemplate.EDITOR_WITH_NEW_NOTE,
-                        undefined,
-                        new URLSearchParams([["attach-file", danglingFile.id]]),
-                      ));
+                      createNewNote([], [danglingFile]);
                     }}
                     className="small-button default-action"
                   >{l("files.create-note-with-file")}</button>
@@ -132,7 +130,7 @@ const FilesView = ({
                         encourageConfirmation: false,
                       });
 
-                      await databaseProvider.deleteFile(danglingFile.id);
+                      await databaseProvider.deleteFile(danglingFile.fileId);
                       await updateDanglingFiles();
                     }}
                     className="small-button dangerous-action"

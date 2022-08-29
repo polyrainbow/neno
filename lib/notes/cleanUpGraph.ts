@@ -11,8 +11,6 @@ import {
   findNote,
   getNewNoteId,
   normalizeNoteTitle,
-  removeDefaultTextParagraphs,
-  removeEmptyLinkBlocks,
 } from "./noteUtils.js";
 
 
@@ -82,8 +80,6 @@ const cleanUpNotes = (graph) => {
     }
     existingNoteIds.push(note.id);
 
-    removeDefaultTextParagraphs(note);
-    removeEmptyLinkBlocks(note);
     note.title = normalizeNoteTitle(note.title);
   });
 

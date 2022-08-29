@@ -5,7 +5,7 @@
 import {
   BrowserRouter as Router,
 } from "react-router-dom";
-import LocalDatabaseProvider from "./lib/LocalDatabaseProvider.js";
+import LocalDatabaseProvider from "./lib/LocalDatabaseProvider";
 import { API_URL } from "./config";
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

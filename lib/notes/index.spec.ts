@@ -18,12 +18,12 @@ describe("Notes module", () => {
 
   it("should create and output notes", async () => {
     const noteFromUser1: NoteFromUser = {
-      blocks: [],
+      content: "",
       title: "Note 1",
     };
     await Notes.put(noteFromUser1, TEST_GRAPH_ID);
     const noteFromUser2: NoteFromUser = {
-      blocks: [],
+      content: "",
       title: "Note 2",
     };
     await Notes.put(noteFromUser2, TEST_GRAPH_ID);
@@ -45,7 +45,7 @@ describe("Notes module", () => {
 
   it("should correctly create links", async () => {
     const noteFromUser: NoteFromUser = {
-      blocks: [],
+      content: "",
       title: "Note 3",
       changes: [
         {

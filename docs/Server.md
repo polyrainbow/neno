@@ -87,9 +87,6 @@ When running NENO server for the first time, follow the instructions on the term
 * secret for signing JSON web tokens for authentication
 * Default value: A random uuid automatically created at server startup
 
-### --url-metadata \<url>
-* don't start server, only grab url metadata for given url"
-
 ## Docker demo
 
 The repository also contains a Dockerfile to set up a NENO server for demo

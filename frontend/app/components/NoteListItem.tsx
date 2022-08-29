@@ -1,7 +1,7 @@
 import React from "react";
 import NoteListItemLinkedNotesIndicator
   from "./NoteListItemLinkedNotesIndicator";
-import NoteListItemInfo from "./NoteListItemInfo.js";
+import NoteListItemInfo from "./NoteListItemInfo";
 import {
   FrontendNoteListItem,
   MainNoteListItem,

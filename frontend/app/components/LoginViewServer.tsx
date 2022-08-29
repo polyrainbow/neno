@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import {
   useNavigate,
 } from "react-router-dom";
-import { DatabaseMode } from "../enum/DatabaseMode.js";
-import { PathTemplate } from "../enum/PathTemplate.js";
-import { l, lf } from "../lib/intl.js";
-import { getAppPath } from "../lib/utils.js";
-import { SERVER_DATABASE_ENABLED } from "../config.js";
+import { DatabaseMode } from "../enum/DatabaseMode";
+import { PathTemplate } from "../enum/PathTemplate";
+import { l, lf } from "../lib/intl";
+import { getAppPath } from "../lib/utils";
+import { SERVER_DATABASE_ENABLED } from "../config";
 
 const LoginViewServer = ({
   serverDatabaseProvider,

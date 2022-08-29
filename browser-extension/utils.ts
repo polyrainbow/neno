@@ -1,16 +1,10 @@
-import NoteContentBlock, {
-  NoteContentBlockLink,
-  NoteContentBlockParagraph,
-  NoteContentBlockType,
-} from "../lib/notes/interfaces/NoteContentBlock";
-
-export const fetchJSON = (url, options) => {
+export const fetchJSON = (url: string, options: RequestInit): Promise<any> => {
   // eslint-disable-next-line no-undef
   return fetch(url, options).then((response) => response.json());
 };
 
 
-export const trimHostUrl = (hostUrl) => {
+export const trimHostUrl = (hostUrl: string): string => {
   let hostUrlTrimmed = hostUrl;
 
   while (hostUrlTrimmed[hostUrlTrimmed.length - 1] === "/") {
@@ -21,52 +15,24 @@ export const trimHostUrl = (hostUrl) => {
 };
 
 
-interface GetNoteBlocksParams {
+interface GetNoteContentParams {
   url: string,
   pageTitle: string,
   noteText: string,
 }
 
-export const getNoteBlocks = ({
+export const getNoteContent = ({
   url,
   pageTitle,
   noteText,
-}:GetNoteBlocksParams):NoteContentBlock[] => {
-  const linkBlock:NoteContentBlockLink = {
-    type: NoteContentBlockType.LINK,
-    data: {
-      link: url,
-      meta: {
-        title: pageTitle,
-        description: "",
-        image: {
-          url: "",
-        },
-      },
-    },
-  };
-
-  const blocks:NoteContentBlock[] = [
-    linkBlock,
-  ];
+}: GetNoteContentParams): string => {
+  let content = url + " " + pageTitle + "\n";
 
   if (noteText.trim().length > 0) {
-    const paragraphs = noteText.split("\n\n");
-    const paragraphBlocks:NoteContentBlockParagraph[] = paragraphs.map(
-      (paragraph) => {
-        return {
-          type: NoteContentBlockType.PARAGRAPH,
-          data: {
-            text: paragraph,
-          },
-        };
-      },
-    );
-
-    blocks.push(...paragraphBlocks);
+    content += "\n" + noteText.trim() + "\n";
   }
 
-  return blocks;
+  return content;
 };
 
 
@@ -75,7 +41,7 @@ export const putNote = ({
   hostUrl,
   apiKey,
   graphId,
-}) => {
+}): Promise<any> => {
   const requestBody = {
     note,
     options: {
@@ -99,7 +65,12 @@ export const putNote = ({
 };
 
 
-export const getExistingNotesWithThisUrl = (url, graphId, hostUrl, apiKey) => {
+export const getExistingNotesWithThisUrl = (
+  url: string,
+  graphId: string,
+  hostUrl: string,
+  apiKey: string,
+): Promise<any> => {
   const searchString = encodeURIComponent("has-url:" + url);
   const requestUrl
     = `${hostUrl}/api/graph/${graphId}/notes?searchString=${searchString}`;

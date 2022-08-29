@@ -4,7 +4,7 @@
   any unneccessary DOM queries.
 */
 
-import * as ScreenSize from "../lib/ScreenSize.js";
+import * as ScreenSize from "../lib/ScreenSize";
 import { useEffect, useState } from "react";
 
 const useIsSmallScreen = () => {

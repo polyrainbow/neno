@@ -1,6 +1,6 @@
-import NoteContentBlock from "./NoteContentBlock.js";
+import { NoteContent } from "./NoteContent";
 
 export default interface Note {
-  blocks: NoteContentBlock[],
+  content: NoteContent,
   title: string,
 }

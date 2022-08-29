@@ -1,5 +1,6 @@
 import { GraphId } from "../../../../backend/interfaces/GraphId.js";
 import { FileId } from "../../../../lib/notes/interfaces/FileId.js";
+import { FileInfo } from "../../../../lib/notes/interfaces/FileInfo.js";
 import GraphStatsRetrievalOptions
   from "../../../../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
 import NoteFromUser from "../../../../lib/notes/interfaces/NoteFromUser.js";
@@ -12,7 +13,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
   static features = [
     "EXPORT_DATABASE",
     "AUTHENTICATION",
-    "GET_URL_METADATA",
+    "GET_DOCUMENT_TITLE",
     "MULTIPLE_GRAPHS",
   ];
 
@@ -92,6 +93,12 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getFiles();
   }
 
+
+  getFileInfo(fileId: FileId): Promise<FileInfo> {
+    return API.getFileInfo(fileId);
+  }
+
+
   getDanglingFiles() {
     return API.getDanglingFiles();
   }
@@ -102,10 +109,6 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
 
   putNote(noteFromUser: NoteFromUser, options) {
     return API.putNote(noteFromUser, options);
-  }
-
-  importLinksAsNotes(links) {
-    return API.importLinksAsNotes(links);
   }
 
   saveGraphVisualization(graphVisualization) {
@@ -120,7 +123,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getReadableGraphStream(withFiles);
   }
 
-  uploadFile(file) {
+  uploadFile(file: File): Promise<FileInfo> {
     return API.uploadFile(file);
   }
 
@@ -130,10 +133,6 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
 
   deleteFile(fileId: FileId) {
     return API.deleteFile(fileId);
-  }
-
-  getUrlMetadata(url: string) {
-    return API.getUrlMetadata(url);
   }
 
   pinNote(noteId: NoteId) {
@@ -148,8 +147,12 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getPins();
   }
 
+  getDocumentTitle(url: string) {
+    return API.getDocumentTitle(url);
+  }
+
   /**
-   * Obtains a URL for a file.
+   * Obtains a URL for an uploaded file.
    * @param {string} fileId
    * @param {string?} publicName This optional file name is appended at the url
    * so that if the user decides to download the file, it is saved with this

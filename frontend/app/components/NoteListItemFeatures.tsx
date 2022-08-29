@@ -1,9 +1,9 @@
 import React from "react";
-import Tooltip from "./Tooltip.js";
-import { emojis } from "../config.js";
-import { l } from "../lib/intl.js";
+import Tooltip from "./Tooltip";
+import { emojis } from "../config";
+import { l } from "../lib/intl";
 import NoteListItemFeaturesType
-  from "../../../lib/notes/interfaces/NoteListItemFeatures.js";
+  from "../../../lib/notes/interfaces/NoteListItemFeatures";
 
 
 const NoteListItemFeatures = ({

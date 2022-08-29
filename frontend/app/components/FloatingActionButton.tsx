@@ -1,5 +1,5 @@
 import React from "react";
-import Tooltip from "./Tooltip.js";
+import Tooltip from "./Tooltip";
 import { getIconSrc } from "../lib/utils";
 
 const FloatingActionButton = ({
