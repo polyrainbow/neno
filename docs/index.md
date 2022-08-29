@@ -85,10 +85,10 @@ contains your first note:
 
 ![My first note](./img/my-first-note.png)
 
-You can now use subwaytext to fill your note. Toggle view mode by clicking on "finish editing".
+You can now use [subwaytext](./Subwaytext.md) to fill your note. Toggle view mode by clicking on "finish editing".
 A note in view mode might look like this:
 
-![Example of a rendered note](./img/rendered-note-example.png)
+![Example of a rendered note with multiple block types](./img/rendered-note-example.png)
 
 If you create another note, you can link it with the first one by clicking on the
 chain icon of your first note in the note list:
