@@ -27,7 +27,7 @@ const NoteContentBlockImage = ({
       .then((url) => {
         setUrl(url);
       });
-  });
+  }, [file, databaseProvider]);
 
 
   return <div
