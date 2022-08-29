@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import it, { describe } from 'node:test';
 import { Block, BlockType, ListBlockStyle } from './interfaces/Block.js';
 import subwaytext from "./index.js";
+import { SpanType } from './interfaces/SpanType.js';
 
 
 describe("subwaytext", () => {
@@ -34,7 +35,7 @@ const x = [{}];
 \`\`\`
 
 https://example.com Link to example.com
-`;
+A paragraph with a https://link.com and a /slashlink`;
 
     const result: Block[] = [
       {
@@ -52,21 +53,58 @@ https://example.com Link to example.com
       {
         type: BlockType.PARAGRAPH,
         data: {
-          text: "some\nmultiline\ntext",
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "some\nmultiline\ntext",
+            },
+          ],
         }
       },
       {
         type: BlockType.LIST,
         data: {
           type: ListBlockStyle.UNORDERED,
-          items: ["List", "unordered"],
+          items: [
+            [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "List",
+              },
+            ],
+            [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "unordered",
+              },
+            ],
+          ],
         }
       },
       {
         type: BlockType.LIST,
         data: {
           type: ListBlockStyle.ORDERED,
-          items: ["ordered list", "another item", ".item3"],
+          items: [
+            [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "ordered list",
+              }
+            ],
+            [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "another item",
+              }
+            ],
+            [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: ".item3",
+              }
+            ],
+          ],
         }
       },
       {
@@ -86,7 +124,12 @@ https://example.com Link to example.com
       {
         type: BlockType.PARAGRAPH,
         data: {
-          text: "here starts another paragraph"
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "here starts another paragraph",
+            },
+          ],
         }
       },
       {
@@ -102,6 +145,29 @@ https://example.com Link to example.com
         data: {
           url: "https://example.com",
           text: "Link to example.com",
+        }
+      },
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "A paragraph with a ",
+            },
+            {
+              type: SpanType.HYPERLINK,
+              text: "https://link.com",
+            },
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: " and a ",
+            },
+            {
+              type: SpanType.SLASHLINK,
+              text: "/slashlink",
+            },
+          ],
         }
       },
     ];

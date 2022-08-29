@@ -362,7 +362,7 @@ const getNoteFeatures = (note: SavedNote): NoteListItemFeatures => {
     if (
       (
         (block.type === BlockType.PARAGRAPH)
-        && block.data.text.trim().length > 0
+        && block.data.text.length > 0
       )
       || (
         (block.type === BlockType.HEADING)
@@ -371,7 +371,7 @@ const getNoteFeatures = (note: SavedNote): NoteListItemFeatures => {
       || (
         (block.type === BlockType.LIST)
         && block.data.items.length > 0
-        && block.data.items[0].trim().length > 0
+        && block.data.items[0].length > 0
       )
     ) {
       containsText = true;
@@ -430,7 +430,8 @@ const blockHasLoadedFile = (
   block: Block,
 ): block is BlockSlashlink => {
   if (
-    block.type !== BlockType.SLASHLINK) return false;
+    block.type !== BlockType.SLASHLINK
+  ) return false;
 
   return !!getFileId(block.data.link);
 };
