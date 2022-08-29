@@ -128,17 +128,13 @@ FILE PREVIEW
   white-space: break-spaces;
 }
 
-.preview-block-list-unordered li, .preview-block-list-ordered li {
-  padding: 5.5px 0 5.5px 3px;
-}
-
 .preview-block-code {
   padding: 10px;
   border: var(--block-border);
   font-family: "Hack", monospace;
   white-space: break-spaces;
   word-break: break-all;
-  background-color: var(--neno-gray-9);
+  background-color: var(--accent-color-interactible);
 }
 
 .preview-block-image-wrapper {
