@@ -7,7 +7,8 @@ Contributions are always welcome, no matter how large or small! Before contribut
 If you want to contribute, here are some links that offer some basic insights on how NENO works:
 
 * [README](./README.md)
-* [Why I built NENO](./docs/Serendipity.md)
+* [Why I built NENO](./docs/posts/Serendipity.md)
+* [Announcing NENO v2](./docs/posts/v2.md)
 * [How to setup a NENO server](./docs/Server.md)
 * [Developer Notes](./docs/DeveloperNotes.md)
 * [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API) (used in local mode

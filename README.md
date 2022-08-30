@@ -44,7 +44,6 @@ Read the [user manual](./docs/index.md) or just [go to the app](https://sebastia
 ## Further reading
 
 * [NENO user manual](./docs/index.md)
-
-* [Why I built NENO](./docs/Serendipity.md)
-
+* [Why I built NENO](./docs/posts/Serendipity.md)
+* [Announcing NENO v2](./docs/posts/v2.md)
 * [Contributing](./CONTRIBUTING.md)
