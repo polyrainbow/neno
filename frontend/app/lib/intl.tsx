@@ -36,6 +36,7 @@ export function l(key: string, replacements?: Replacements): string {
 
     return output;
   } else {
+    console.warn("Translation not available: " + key);
     return key;
   }
 }
