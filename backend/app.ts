@@ -6,7 +6,6 @@ import * as config from "./config.js";
 import compression from "compression";
 import express, { Response } from "express";
 import * as Notes from "../lib/notes/index.js";
-import bcrypt from "bcryptjs";
 import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
 import cookieParser from "cookie-parser";
@@ -18,7 +17,7 @@ import historyAPIFallback from "./lib/HistoryAPIFallback.js";
 import * as path from "path";
 import session from "express-session";
 import User from "./interfaces/User.js";
-import { randomUUID } from "crypto";
+import { pbkdf2Sync, randomUUID } from "crypto";
 import FileSessionStore from "./lib/FileSessionStore.js";
 import * as logger from "./lib/logger.js";
 import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode.js";
@@ -1080,8 +1079,16 @@ const startApp = async ({
         return handleUnsuccessfulLoginAttempt(req, res);
       }
 
-      const passwordIsValid
-        = bcrypt.compareSync(submittedPassword, user.passwordHash);
+      const submittedPasswordHash = pbkdf2Sync(
+        submittedPassword,
+        user.salt,
+        1000,
+        64,
+        "sha512",
+      )
+        .toString("hex");
+
+      const passwordIsValid = submittedPasswordHash === user.passwordHash;
 
       if (!passwordIsValid) {
         return handleUnsuccessfulLoginAttempt(req, res);

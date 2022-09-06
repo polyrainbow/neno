@@ -6,6 +6,7 @@ export default interface User {
   login: string,
   graphIds: GraphId[],
   passwordHash: string,
+  salt: string,
   mfaSecret: string,
   mfaUri?: string,
   qrCode?: string,

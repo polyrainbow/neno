@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as readline from "node:readline/promises";
 import { stdin } from "process";
-import bcrypt from "bcryptjs";
+import { randomBytes, pbkdf2Sync } from "crypto";
 import fs from "fs/promises";
 import { randomUUID } from "crypto";
 import twofactor from "node-2fa";
@@ -35,8 +35,12 @@ export default async (filepath: string): Promise<void> => {
     muteableStdout.muted = false;
     muteableStdout.write("\n");
 
-    const salt = bcrypt.genSaltSync(12);
-    const passwordHash = bcrypt.hashSync(password, salt);
+
+    const salt = randomBytes(16).toString('hex');
+  
+    // Hashing user's salt and password with 1000 iterations, 64 length and sha512 digest
+    const passwordHash = pbkdf2Sync(password, salt, 1000, 64, "sha512")
+      .toString("hex");
 
     const mfa = twofactor.generateSecret({ name: "NENO", account: username });
     const uri = `otpauth://totp/NENO%3A%20${username}?secret=${mfa.secret}&issuer=NENO`;
@@ -45,6 +49,7 @@ export default async (filepath: string): Promise<void> => {
       id: randomUUID(),
       login: username,
       passwordHash: passwordHash,
+      salt: salt,
       mfaSecret: mfa.secret,
       mfaUri: uri,
       apiKeys: [
