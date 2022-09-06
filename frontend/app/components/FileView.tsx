@@ -10,6 +10,7 @@ import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import BusyIndicator from "./BusyIndicator";
 
 
 const FileView = ({
@@ -22,7 +23,7 @@ const FileView = ({
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [src, setSrc] = useState<string>("");
   // status can be READY, BUSY
-  const [notes, setNotes] = useState<MainNoteListItem[]>([]);
+  const [notes, setNotes] = useState<MainNoteListItem[] | null>(null);
 
   const { fileId } = useParams();
 
@@ -125,23 +126,27 @@ const FileView = ({
       </div>
       <h2>{l("files.used-in")}</h2>
       {
-        notes.map((note) => {
-          return <p key={"notelink-" + note.id}>
-            <Link
-              to={
-                getAppPath(
-                  PathTemplate.EDITOR_WITH_NOTE,
-                  new Map([["NOTE_ID", note.id.toString()]]),
-                )
-              }
-            >{note.title}</Link>
-          </p>;
-        })
-      }
-      {
-        notes.length === 0
-          ? <p>{l("files.used-in.none")}</p>
-          : ""
+        notes
+          ? (
+            notes.length > 0
+              ? notes.map((note) => {
+                return <p key={"notelink-" + note.id}>
+                  <Link
+                    to={
+                      getAppPath(
+                        PathTemplate.EDITOR_WITH_NOTE,
+                        new Map([["NOTE_ID", note.id.toString()]]),
+                      )
+                    }
+                  >{note.title}</Link>
+                </p>;
+              })
+              : <p>{l("files.used-in.none")}</p>
+          )
+          : <BusyIndicator
+            alt={l("app.loading")}
+            height={30}
+          />
       }
     </section>
   </>;

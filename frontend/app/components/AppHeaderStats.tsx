@@ -2,6 +2,7 @@ import React from "react";
 import { l } from "../lib/intl";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import AppHeaderStatsItem from "./AppHeaderStatsItem";
+import BusyIndicator from "./BusyIndicator";
 
 interface AppHeaderStatsProps {
   stats: GraphStats,
@@ -14,7 +15,12 @@ const AppHeaderStats = ({
   const showStats = !!stats;
 
   if (!showStats) {
-    return <div id="app-stats">{l("stats.loading-stats")}</div>;
+    return <div id="app-stats">
+      <BusyIndicator
+        alt={l("stats.loading-stats")}
+        height={20}
+      />
+    </div>;
   }
 
   let percentageOfUnlinkedNotes = NaN;
