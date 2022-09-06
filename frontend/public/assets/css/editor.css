@@ -130,7 +130,6 @@ FILE PREVIEW
 
 .preview-block-code {
   padding: 10px;
-  border: var(--block-border);
   font-family: "Hack", monospace;
   white-space: break-spaces;
   word-break: break-all;
