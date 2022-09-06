@@ -256,7 +256,7 @@ const getStats = async (
   let stats: GraphStats = {
     numberOfAllNotes: graph.notes.length,
     numberOfLinks: graph.links.length,
-    numberOfFiles: await io.getNumberOfFiles(graphId),
+    numberOfFiles: graph.files.length,
     numberOfPins: graph.pinnedNotes.length,
     numberOfUnlinkedNotes,
   };

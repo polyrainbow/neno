@@ -305,22 +305,4 @@ export default class DatabaseIO {
 
     return sizes[0] + sizes[1];
   }
-
-
-  async getNumberOfFiles(
-    graphId: GraphId,
-  ): Promise<number> {
-    // it could be that the directory does not exist yet
-    try {
-      const directoryListing = await this.#storageProvider.listDirectory(
-        graphId,
-        this.#NAME_OF_FILES_SUBDIRECTORY,
-      );
-      // filter out system files
-      const files = directoryListing.filter(stringContainsUUID);
-      return files.length;
-    } catch (e) {
-      return 0;
-    }
-  }
 }

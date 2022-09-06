@@ -307,17 +307,19 @@ const createNoteListItem = (
   // NoteListItem to be created
   numberOfLinkedNotes?: number,
 ): NoteListItem => {
+  const blocks = subwaytext(databaseNote.content);
+
   const noteListItem: NoteListItem = {
     id: databaseNote.id,
     title: getNoteTitlePreview(databaseNote),
     creationTime: databaseNote.creationTime,
     updateTime: databaseNote.updateTime,
-    features: getNoteFeatures(databaseNote),
+    features: getNoteFeatures(blocks),
     numberOfLinkedNotes: typeof numberOfLinkedNotes === "number"
       ? numberOfLinkedNotes
       : getNumberOfLinkedNotes(graph, databaseNote.id),
     numberOfCharacters: getNumberOfCharacters(databaseNote),
-    numberOfFiles: getNumberOfFiles(databaseNote),
+    numberOfFiles: getNumberOfFiles(blocks),
   };
 
   return noteListItem;
@@ -349,7 +351,9 @@ const createNoteListItems = (
 };
 
 
-const getNoteFeatures = (note: SavedNote): NoteListItemFeatures => {
+const getNoteFeatures = (
+  blocks: Block[],
+): NoteListItemFeatures => {
   let containsText = false;
   let containsWeblink = false;
   let containsCode = false;
@@ -358,7 +362,7 @@ const getNoteFeatures = (note: SavedNote): NoteListItemFeatures => {
   let containsAudio = false;
   let containsVideo = false;
 
-  subwaytext(note.content).forEach((block) => {
+  blocks.forEach((block) => {
     if (
       (
         (block.type === BlockType.PARAGRAPH)
@@ -437,9 +441,10 @@ const blockHasLoadedFile = (
 };
 
 
-const getNumberOfFiles = (note: SavedNote): number => {
-  return subwaytext(note.content).filter(blockHasLoadedFile).length;
+const getNumberOfFiles = (blocks: Block[]): number => {
+  return blocks.filter(blockHasLoadedFile).length;
 };
+
 
 const getSortFunction = (
   sortMode: NoteListSortMode,
