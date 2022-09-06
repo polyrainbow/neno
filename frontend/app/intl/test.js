@@ -49,4 +49,26 @@ describe("intl", () => {
         assert.deepStrictEqual(keysAreSortedAlphabetically, true);
       });
   });
+
+  it("horizontal ellipsis should be used in favor of 3 dots", () => {
+    const intlFolder = __dirname;
+
+    fs.readdirSync(intlFolder)
+      .filter((filename) => {
+        return filename.endsWith(".json");
+      })
+      .forEach((filename) => {
+        const string = fs.readFileSync(path.join(intlFolder, filename), "utf8");
+        const langObj = JSON.parse(string);
+
+        const values = Object.values(langObj);
+
+        const someValuesContainThreeDots
+          = values.some((val) => {
+            return val.includes("...");
+          });
+
+        assert.deepStrictEqual(someValuesContainThreeDots, false);
+      });
+  });
 });
