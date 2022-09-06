@@ -57,11 +57,14 @@ export default (input: string): Block[] => {
             withinBlock = false;
           }
         } else if (currentBlock.type === BlockType.PARAGRAPH) {
-          if (line.trim().length === 0) {
+          if (
+            line.trim().length === 0
+            || line === CODE_SIGIL
+          ) {
             withinBlock = false;
             currentBlock.data.text = parseText(multilineTextCollector);
             multilineTextCollector = "";
-            return blocks;
+            //return blocks;
           } else if (lineIndex === lines.length - 1) {
             withinBlock = false;
             multilineTextCollector += "\n" + line;

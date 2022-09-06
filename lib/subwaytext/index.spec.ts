@@ -192,4 +192,47 @@ code
 
     assert.deepEqual(subwaytext(input), result);
   });
+
+  it("should recognize a code block after a paragraph block", () => {
+    const input = `\`\`\`
+code
+\`\`\`
+text
+\`\`\`
+code
+\`\`\``;
+
+    const result = [
+      {
+        type: BlockType.CODE,
+        data: {
+          code: "code",
+          contentType: "",
+        }
+      },
+      {
+        data: {
+          text: [
+            {
+              text: "text",
+              type: "NORMAL_TEXT"
+            }
+          ]
+        },
+        type: "paragraph"
+      },
+      {
+        type: BlockType.CODE,
+        data: {
+          code: "code",
+          contentType: "",
+        }
+      },
+    ];
+
+    assert.deepEqual(subwaytext(input), result);
+  });
+
+
+  
 });
