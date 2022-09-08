@@ -50,7 +50,7 @@ const NoteViewHeader = ({
           pinnedNotes.length > 0
             ? pinnedNotes.map((pinnedNote) => {
               return <NoteViewHeaderPinnedNote
-                key={`pinnedNote_${pinnedNote.id}`}
+                key={`pinnedNote_${pinnedNote.meta.id}`}
                 note={pinnedNote}
                 onClick={async () => {
                   if (unsavedChanges) {
@@ -58,12 +58,12 @@ const NoteViewHeader = ({
                     setUnsavedChanges(false);
                   }
 
-                  goToNote(pinnedNote.id);
+                  goToNote(pinnedNote.meta.id);
                 }}
                 isActive={
                   (!!activeNote)
                   && (!activeNote.isUnsaved)
-                  && (pinnedNote.id === activeNote.id)
+                  && (pinnedNote.meta.id === activeNote.id)
                 }
               />;
             })

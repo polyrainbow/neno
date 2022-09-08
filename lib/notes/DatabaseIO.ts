@@ -10,7 +10,7 @@
 
 import { stringContainsUUID } from "../utils.js";
 import { FileId } from "./interfaces/FileId.js";
-import Graph from "./interfaces/Graph.js";
+import Graph, { SerializedGraphObject } from "./interfaces/Graph.js";
 import ReadableWithMimeType from "./interfaces/ReadableWithMimeType.js";
 import * as config from "./config.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
@@ -19,6 +19,7 @@ import updateGraphDataStructure from "./updateGraphDataStructure.js";
 import cleanUpGraph from "./cleanUpGraph.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
+import { parseSerializedNote, serializeNote } from "./noteUtils.js";
 
 
 export default class DatabaseIO {
@@ -39,8 +40,15 @@ export default class DatabaseIO {
         graphId,
         this.#GRAPH_FILE_NAME,
       );
-      const object: Graph = JSON.parse(json);
-      return object;
+      const object: SerializedGraphObject = JSON.parse(json);
+      // when we open a graph from file for the first time, let's make sure
+      // it has the up-to-date data structure and is cleaned up.
+      await updateGraphDataStructure(object);
+      const parsedGraphObject = {
+        ...object,
+        notes: object.notes.map(parseSerializedNote),
+      };
+      return parsedGraphObject;
     } catch (e) {
       return null;
     }
@@ -48,18 +56,22 @@ export default class DatabaseIO {
 
 
   private async writeGraphFile (graphId: GraphId, graph: Graph) {
+    const serializedGraph = {
+      ...graph,
+      notes: graph.notes.map(serializeNote),
+    };
     await this.#storageProvider.writeObject(
       graphId,
       this.#GRAPH_FILE_NAME,
-      JSON.stringify(graph),
+      JSON.stringify(serializedGraph),
     );
   }
 
 
   private createGraph (): Graph {
     const newGraph: Graph = {
-      creationTime: Date.now(),
-      updateTime: Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       notes: [],
       links: [],
       idCounter: 0,
@@ -112,12 +124,6 @@ export default class DatabaseIO {
     const graphFromFile: Graph | null
       = await this.readGraphFile(graphId);
     if (graphFromFile) {
-      // when we open a graph from file for the first time, let's make sure
-      // it has the up-to-date data structure and is cleaned up.
-      await updateGraphDataStructure(
-        graphFromFile,
-        (fileId) => this.getFileSize(graphId, fileId),
-      );
       cleanUpGraph(graphFromFile);
 
       // flushing these changes will also save the graph in memory for
@@ -141,7 +147,7 @@ export default class DatabaseIO {
   // written to the disk and thus are persistent. it should always be called
   // after any operation on the main data object has been performed.
   async flushChanges (graphId: GraphId, graph: Graph): Promise<void> {
-    graph.updateTime = Date.now();
+    graph.updatedAt = Date.now();
     this.#loadedGraphs.set(graphId, graph);
     await this.writeGraphFile(graphId, graph);
   }

@@ -989,7 +989,7 @@ export default class GraphVisualization {
       .classed(consts.nodeClassName, true)
       .classed("new", (d: GraphVisualizationNode) => {
         const MAX_NEW_AGE = 1000 * 60 * 60 * 24 * 10; // 10 days
-        return Date.now() - d.creationTime < MAX_NEW_AGE;
+        return Date.now() - d.createdAt < MAX_NEW_AGE;
       })
       .classed("hub", GraphVisualization.#isHub)
       .classed("unconnected", (d) => {

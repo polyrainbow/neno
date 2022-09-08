@@ -7,5 +7,5 @@ export default interface GraphVisualizationNode {
   title: string,
   position: NodePosition,
   linkedNotes: LinkedNote[],
-  creationTime: number,
+  createdAt: number,
 }

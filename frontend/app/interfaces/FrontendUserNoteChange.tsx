@@ -5,7 +5,7 @@ import {
 
 export interface FrontendUserNoteChangeNote {
   readonly id: number,
-  readonly updateTime: number,
+  readonly updatedAt: number,
   readonly title: string,
 }
 
