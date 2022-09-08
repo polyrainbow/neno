@@ -3,8 +3,9 @@ import { FileId } from "../../../../lib/notes/interfaces/FileId.js";
 import { FileInfo } from "../../../../lib/notes/interfaces/FileInfo.js";
 import GraphStatsRetrievalOptions
   from "../../../../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
-import NoteFromUser from "../../../../lib/notes/interfaces/NoteFromUser.js";
 import { NoteId } from "../../../../lib/notes/interfaces/NoteId.js";
+import { NoteSaveRequest }
+  from "../../../../lib/notes/interfaces/NoteSaveRequest.js";
 import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit.js";
 import DatabaseProvider from "../../interfaces/DatabaseProvider.js";
 import * as API from "./api.js";
@@ -107,8 +108,8 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.deleteNote(noteId);
   }
 
-  putNote(noteFromUser: NoteFromUser, options) {
-    return API.putNote(noteFromUser, options);
+  putNote(noteSaveRequest: NoteSaveRequest) {
+    return API.putNote(noteSaveRequest);
   }
 
   saveGraphVisualization(graphVisualization) {

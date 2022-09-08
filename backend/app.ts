@@ -26,13 +26,13 @@ import { GraphId } from "./interfaces/GraphId.js";
 import BruteForcePreventer from "./BruteForcePreventer.js";
 import GraphStatsRetrievalOptions from "../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
 import Ajv from "ajv";
-import noteFromUserSchema from "../lib/notes/schemas/NoteFromUser.schema.json" assert { type: 'json' };
+import noteSaveRequestSchema from "../lib/notes/schemas/NoteSaveRequest.schema.json" assert { type: 'json' };
 import graphObjectSchema from "../lib/notes/schemas/GraphObject.schema.json" assert { type: 'json' };
-import NoteFromUser from "../lib/notes/interfaces/NoteFromUser.js";
 import graphVisualizationFromUserSchema from "../lib/notes/schemas/GraphVisualizationFromUser.schema.json" assert { type: 'json' };
 import GraphVisualizationFromUser from "../lib/notes/interfaces/GraphVisualizationFromUser.js";
 import GraphObject from "../lib/notes/interfaces/Graph.js";
 import getDocumentTitle from "./lib/getDocumentTitle.js";
+import { NoteSaveRequest } from "../lib/notes/interfaces/NoteSaveRequest.js";
 
 const startApp = async ({
   users,
@@ -80,7 +80,7 @@ const startApp = async ({
 
   const ajv = new Ajv();
 
-  const validateNoteFromUser = ajv.compile(noteFromUserSchema);
+  const validateNoteSaveRequest = ajv.compile(noteSaveRequestSchema);
   const validateGraphVisualizationFromUser = ajv.compile(graphVisualizationFromUserSchema);
   const validateGraphObject = ajv.compile(graphObjectSchema);
 
@@ -468,10 +468,9 @@ const startApp = async ({
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
+      const noteSaveRequest = reqBody;
 
-      const noteFromUser = reqBody.note;
-
-      const isValid = validateNoteFromUser(noteFromUser);
+      const isValid = validateNoteSaveRequest(noteSaveRequest);
 
       if (!isValid) {
         const response: APIResponse = {
@@ -484,9 +483,8 @@ const startApp = async ({
 
       try {
         const noteToTransmit: NoteToTransmit = await Notes.put(
-          noteFromUser as unknown as NoteFromUser,
+          noteSaveRequest as unknown as NoteSaveRequest,
           graphId,
-          reqBody.options,
         );
 
         const response: APIResponse = {

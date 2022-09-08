@@ -33,7 +33,12 @@ const NoteViewHeaderPinnedNote = ({
       style={{
         whiteSpace: "pre",
       }}
-    >{note.title ? shortenText(note.title, 35) : l("list.untitled-note")}</p>
+    >{
+        note.meta.title
+          ? shortenText(note.meta.title, 35)
+          : l("list.untitled-note")
+      }
+    </p>
   </div>;
 };
 

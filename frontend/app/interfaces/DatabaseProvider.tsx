@@ -7,15 +7,14 @@ import GraphStatsRetrievalOptions
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import NoteListPage from "../../../lib/notes/interfaces/NoteListPage";
 import { FileId } from "../../../lib/notes/interfaces/FileId";
-import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
 import GraphVisualizationFromUser
   from "../../../lib/notes/interfaces/GraphVisualizationFromUser";
 import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
-import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import {
   FileInfo,
 } from "../../../lib/notes/interfaces/FileInfo";
+import { NoteSaveRequest } from "../../../lib/notes/interfaces/NoteSaveRequest";
 
 interface DatabaseProvider {
   isAuthenticated?: () => Promise<boolean>,
@@ -33,8 +32,7 @@ interface DatabaseProvider {
   getDanglingFiles: () => Promise<FileInfo[]>;
   deleteNote: (noteId: NoteId) => Promise<void>;
   putNote: (
-    noteToTransmit: NoteFromUser,
-    options: NotePutOptions,
+    noteSaveRequest: NoteSaveRequest,
   ) => Promise<NoteToTransmit>;
   saveGraphVisualization: (
     graphVisualization: GraphVisualizationFromUser,

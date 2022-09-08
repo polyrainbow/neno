@@ -8,6 +8,7 @@ export const getDocumentTitleFromHtml = (html: string): string => {
   return result[1];
 };
 
+
 const getDocumentTitle = async (
   url: string,
 ): Promise<string> => {

@@ -1,6 +1,4 @@
-import { NoteContent } from "./NoteContent";
+import ExistingNote from "./ExistingNote";
+import NewNote from "./NewNote";
 
-export default interface Note {
-  content: NoteContent,
-  title: string,
-}
+export type Note = ExistingNote | NewNote;

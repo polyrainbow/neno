@@ -2,8 +2,9 @@ import { APIError } from "../../../../backend/interfaces/APIError";
 import APIResponse from "../../../../backend/interfaces/APIResponse";
 import { FileId } from "../../../../lib/notes/interfaces/FileId";
 import { FileInfo } from "../../../../lib/notes/interfaces/FileInfo";
-import NoteFromUser from "../../../../lib/notes/interfaces/NoteFromUser";
 import { NoteId } from "../../../../lib/notes/interfaces/NoteId";
+import { NoteSaveRequest }
+  from "../../../../lib/notes/interfaces/NoteSaveRequest";
 import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit";
 import { base64Encode } from "../utils";
 
@@ -171,14 +172,11 @@ const getNotes = (options) => {
 };
 
 
-const putNote = (note: NoteFromUser, options) => {
+const putNote = (noteSaveRequest: NoteSaveRequest) => {
   return callGraphAPIAndGetJSONPayload({
     method: "PUT",
     endpoint: "note",
-    payload: {
-      note,
-      options,
-    },
+    payload: noteSaveRequest,
   });
 };
 

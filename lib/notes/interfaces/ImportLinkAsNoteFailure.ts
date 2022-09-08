@@ -1,6 +1,6 @@
-import NoteFromUser from "./NoteFromUser.js";
+import { NoteSaveRequest } from "./NoteSaveRequest";
 
 export default interface ImportLinkAsNoteFailure {
-  readonly note: NoteFromUser,
+  readonly note: NoteSaveRequest,
   readonly error: string,
 }

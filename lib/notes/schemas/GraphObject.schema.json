@@ -9,7 +9,7 @@
                 "content": {
                     "type": "string"
                 },
-                "creationTime": {
+                "createdAt": {
                     "type": "number"
                 },
                 "id": {
@@ -21,17 +21,17 @@
                 "title": {
                     "type": "string"
                 },
-                "updateTime": {
+                "updatedAt": {
                     "type": "number"
                 }
             },
             "required": [
                 "content",
-                "creationTime",
+                "createdAt",
                 "id",
                 "position",
                 "title",
-                "updateTime"
+                "updatedAt"
             ],
             "type": "object"
         },
@@ -73,7 +73,7 @@
         }
     },
     "properties": {
-        "creationTime": {
+        "createdAt": {
             "type": "number"
         },
         "idCounter": {
@@ -113,19 +113,19 @@
         "screenPosition": {
             "$ref": "GraphObject#/definitions/default_3"
         },
-        "updateTime": {
+        "updatedAt": {
             "type": "number"
         }
     },
     "required": [
-        "creationTime",
+        "createdAt",
         "idCounter",
         "initialNodePosition",
         "links",
         "notes",
         "pinnedNotes",
         "screenPosition",
-        "updateTime"
+        "updatedAt"
     ],
     "type": "object"
 }

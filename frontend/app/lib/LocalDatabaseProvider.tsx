@@ -5,10 +5,8 @@ import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import GraphStatsRetrievalOptions
   from "../../../lib/notes/interfaces/GraphStatsRetrievalOptions";
-import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import NoteListPage from "../../../lib/notes/interfaces/NoteListPage";
-import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import FileSystemAccessAPIStorageProvider
@@ -17,6 +15,7 @@ import { streamToBlob } from "./utils";
 import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import { NoteSaveRequest } from "../../../lib/notes/interfaces/NoteSaveRequest";
 
 
 async function verifyPermission(
@@ -225,16 +224,15 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     return this.#notesModule.remove(noteId, this.#activeGraphId);
   }
 
-  putNote(noteToTransmit: NoteFromUser, options: NotePutOptions) {
+  putNote(noteSaveRequest: NoteSaveRequest) {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.put(
-      noteToTransmit,
+      noteSaveRequest,
       this.#activeGraphId,
-      options,
     );
   }
 

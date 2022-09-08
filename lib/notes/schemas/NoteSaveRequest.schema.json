@@ -1,0 +1,184 @@
+{
+    "$id": "NoteSaveRequest",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "anyOf": [
+        {
+            "$ref": "NoteSaveRequest#/definitions/NewNoteSaveRequest"
+        },
+        {
+            "$ref": "NoteSaveRequest#/definitions/ExistingNoteSaveRequest"
+        }
+    ],
+    "definitions": {
+        "BaseNoteMetadata": {
+            "additionalProperties": false,
+            "properties": {
+                "custom": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "custom",
+                "title"
+            ],
+            "type": "object"
+        },
+        "ExistingNoteMetadata": {
+            "additionalProperties": false,
+            "properties": {
+                "createdAt": {
+                    "type": "number"
+                },
+                "custom": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "position": {
+                    "$ref": "NoteSaveRequest#/definitions/default_3"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "createdAt",
+                "custom",
+                "id",
+                "position",
+                "title",
+                "updatedAt"
+            ],
+            "type": "object"
+        },
+        "ExistingNoteSaveRequest": {
+            "additionalProperties": false,
+            "properties": {
+                "changes": {
+                    "items": {
+                        "$ref": "NoteSaveRequest#/definitions/default_1"
+                    },
+                    "type": "array"
+                },
+                "ignoreDuplicateTitles": {
+                    "type": "boolean"
+                },
+                "note": {
+                    "$ref": "NoteSaveRequest#/definitions/default_2"
+                }
+            },
+            "required": [
+                "ignoreDuplicateTitles",
+                "note"
+            ],
+            "type": "object"
+        },
+        "NewNoteSaveRequest": {
+            "additionalProperties": false,
+            "properties": {
+                "changes": {
+                    "items": {
+                        "$ref": "NoteSaveRequest#/definitions/default_1"
+                    },
+                    "type": "array"
+                },
+                "ignoreDuplicateTitles": {
+                    "type": "boolean"
+                },
+                "note": {
+                    "$ref": "NoteSaveRequest#/definitions/default"
+                }
+            },
+            "required": [
+                "ignoreDuplicateTitles",
+                "note"
+            ],
+            "type": "object"
+        },
+        "UserNoteChangeType": {
+            "enum": [
+                "LINKED_NOTE_ADDED",
+                "LINKED_NOTE_DELETED"
+            ],
+            "type": "string"
+        },
+        "default": {
+            "additionalProperties": false,
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "meta": {
+                    "$ref": "NoteSaveRequest#/definitions/BaseNoteMetadata"
+                }
+            },
+            "required": [
+                "content",
+                "meta"
+            ],
+            "type": "object"
+        },
+        "default_1": {
+            "additionalProperties": false,
+            "properties": {
+                "noteId": {
+                    "type": "number"
+                },
+                "type": {
+                    "$ref": "NoteSaveRequest#/definitions/UserNoteChangeType"
+                }
+            },
+            "required": [
+                "noteId",
+                "type"
+            ],
+            "type": "object"
+        },
+        "default_2": {
+            "additionalProperties": false,
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "meta": {
+                    "$ref": "NoteSaveRequest#/definitions/ExistingNoteMetadata"
+                }
+            },
+            "required": [
+                "content",
+                "meta"
+            ],
+            "type": "object"
+        },
+        "default_3": {
+            "additionalProperties": false,
+            "properties": {
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "x",
+                "y"
+            ],
+            "type": "object"
+        }
+    }
+}
+

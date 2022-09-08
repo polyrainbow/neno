@@ -60,11 +60,11 @@ const StatsView = ({
                 </tr>
                 <tr>
                   <td>{l("stats.metadata.creation-time")}</td>
-                  <td>{makeTimestampHumanReadable(stats.creationTime)}</td>
+                  <td>{makeTimestampHumanReadable(stats.createdAt)}</td>
                 </tr>
                 <tr>
                   <td>{l("stats.metadata.update-time")}</td>
-                  <td>{makeTimestampHumanReadable(stats.updateTime)}</td>
+                  <td>{makeTimestampHumanReadable(stats.updatedAt)}</td>
                 </tr>
                 <tr>
                   <td>{l("stats.metadata.graph-size-without-files")}</td>

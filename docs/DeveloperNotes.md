@@ -19,8 +19,8 @@ changed.
 # In project directory
 typescript-json-schema "lib/notes/interfaces/Graph.ts" GraphObject --required --strictNullChecks --id GraphObject --noExtraProps -o lib/notes/schemas/GraphObject.schema.json
 typescript-json-schema "lib/notes/interfaces/GraphVisualizationFromUser.ts" GraphVisualizationFromUser --required --strictNullChecks --id GraphVisualizationFromUser --noExtraProps -o lib/notes/schemas/GraphVisualizationFromUser.schema.json
-typescript-json-schema "lib/notes/interfaces/NoteFromUser.ts" NoteFromUser --required --strictNullChecks --id NoteFromUser --noExtraProps -o lib/notes/schemas/NoteFromUser.schema.json
-typescript-json-schema "lib/notes/interfaces/SavedNote.ts" SavedNote --required --strictNullChecks --id SavedNote --noExtraProps -o lib/notes/schemas/SavedNote.schema.json
+typescript-json-schema "lib/notes/interfaces/NoteSaveRequest.ts" NoteSaveRequest --required --strictNullChecks --id NoteSaveRequest --noExtraProps -o lib/notes/schemas/NoteSaveRequest.schema.json
+typescript-json-schema "lib/notes/interfaces/ExistingNote.ts" ExistingNote --required --strictNullChecks --id ExistingNote --noExtraProps -o lib/notes/schemas/ExistingNote.schema.json
 ```
 
 ## Publishing a release

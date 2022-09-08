@@ -31,7 +31,6 @@ import useWarnBeforeUnload from "../hooks/useWarnBeforeUnload";
 import useHeaderStats from "../hooks/useHeaderStats";
 import useNoteList from "../hooks/useNoteList";
 import { GraphId } from "../../../lib/notes/interfaces/GraphId";
-import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import ActiveNote, { UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Utils from "../lib/utils";
@@ -43,10 +42,10 @@ import FrontendUserNoteChange, { FrontendUserNoteChangeNote }
   from "../interfaces/FrontendUserNoteChange";
 import UserNoteChange from "../../../lib/notes/interfaces/UserNoteChange";
 import * as Config from "../config";
-import NotePutOptions from "../../../lib/notes/interfaces/NotePutOptions";
 import {
   UserNoteChangeType,
 } from "../../../lib/notes/interfaces/UserNoteChangeType";
+import { NoteSaveRequest } from "../../../lib/notes/interfaces/NoteSaveRequest";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -144,7 +143,13 @@ const AppWithConfirmationServiceProvider = ({
       const noteFromServer = await databaseProvider.getNote(noteId);
       if (noteFromServer) {
         setActiveNote({
-          ...noteFromServer,
+          id: noteFromServer.meta.id,
+          title: noteFromServer.meta.title,
+          createdAt: noteFromServer.meta.createdAt,
+          updatedAt: noteFromServer.meta.updatedAt,
+          position: noteFromServer.meta.position,
+          linkedNotes: noteFromServer.linkedNotes,
+          numberOfCharacters: noteFromServer.numberOfCharacters,
           isUnsaved: false,
           changes: [],
           content: noteFromServer.content,
@@ -216,13 +221,19 @@ const AppWithConfirmationServiceProvider = ({
 
   const createOneNotePerLine = async (lines: string[]): Promise<void> => {
     const promises = lines.map((line) => {
-      const note: NoteFromUser = {
-        title: getNoteTitleFromContent(line),
-        content: line,
-      };
-      return databaseProvider?.putNote(note, {
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          meta: {
+            title: getNoteTitleFromContent(line),
+            custom: {
+              "-neno-flags": "CREATED_VIA_ONE_NOTE_PER_LINE",
+            },
+          },
+          content: line,
+        },
         ignoreDuplicateTitles: true,
-      });
+      };
+      return databaseProvider?.putNote(noteSaveRequest);
     });
     await Promise.all(promises);
     refreshContentViews();
@@ -289,7 +300,7 @@ const AppWithConfirmationServiceProvider = ({
 
     const linkedNote: FrontendUserNoteChangeNote = {
       id: activeNote.id,
-      updateTime: activeNote.updateTime,
+      updatedAt: activeNote.updatedAt,
       title: activeNote.title,
     };
 
@@ -308,10 +319,19 @@ const AppWithConfirmationServiceProvider = ({
   };
 
 
-  const prepareNoteToTransmit = async (): Promise<NoteFromUser> => {
-    const noteToTransmit: NoteFromUser = {
-      title: activeNote.title,
-      content: activeNote.content,
+  const prepareNoteSaveRequest = async (
+    ignoreDuplicateTitles: boolean,
+  ): Promise<NoteSaveRequest> => {
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        content: activeNote.content,
+        meta: {
+          // eslint-disable-next-line no-undefined
+          id: (!activeNote.isUnsaved) ? activeNote.id : undefined,
+          title: activeNote.title,
+          custom: {},
+        },
+      },
       changes: activeNote.changes.map(
         (change: FrontendUserNoteChange): UserNoteChange => {
           return {
@@ -319,36 +339,37 @@ const AppWithConfirmationServiceProvider = ({
             noteId: change.noteId,
           };
         }),
-      // eslint-disable-next-line no-undefined
-      id: (!activeNote.isUnsaved) ? activeNote.id : undefined,
+      ignoreDuplicateTitles,
     };
 
     Utils.setNoteTitleByContentIfUnset(
-      noteToTransmit,
+      noteSaveRequest.note,
       Config.DEFAULT_NOTE_TITLE,
     );
 
-    return noteToTransmit;
+    return noteSaveRequest;
   };
 
 
-  const saveActiveNote = async (options: NotePutOptions): Promise<void> => {
+  const saveActiveNote = async (
+    ignoreDuplicateTitles: boolean,
+  ): Promise<void> => {
     if (!databaseProvider) {
       throw new Error("saveActiveNote: No database provider loaded");
     }
-    const noteToTransmit = await prepareNoteToTransmit();
+    const noteSaveRequest = await prepareNoteSaveRequest(ignoreDuplicateTitles);
     const noteFromDatabase = await databaseProvider.putNote(
-      noteToTransmit, options,
+      noteSaveRequest,
     );
     setActiveNote({
       isUnsaved: false,
-      id: noteFromDatabase.id,
-      title: noteFromDatabase.title,
+      id: noteFromDatabase.meta.id,
+      title: noteFromDatabase.meta.title,
       content: noteFromDatabase.content,
-      creationTime: noteFromDatabase.creationTime,
-      updateTime: noteFromDatabase.updateTime,
+      createdAt: noteFromDatabase.meta.createdAt,
+      updatedAt: noteFromDatabase.meta.updatedAt,
       linkedNotes: noteFromDatabase.linkedNotes,
-      position: noteFromDatabase.position,
+      position: noteFromDatabase.meta.position,
       numberOfCharacters: noteFromDatabase.numberOfCharacters,
       files: noteFromDatabase.files,
       changes: [],
@@ -359,7 +380,7 @@ const AppWithConfirmationServiceProvider = ({
       when saving the new note for the first time, we get its id from the
       databaseProvider. then we update the address bar to include the new id
     */
-    goToNote(noteFromDatabase.id, true);
+    goToNote(noteFromDatabase.meta.id, true);
   };
 
 
@@ -374,21 +395,25 @@ const AppWithConfirmationServiceProvider = ({
       setUnsavedChanges(false);
     }
 
-    const noteToTransmit: NoteFromUser = {
-      title: activeNote.title,
-      content: activeNote.content,
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        meta: {
+          title: activeNote.title,
+          custom: {},
+        },
+        content: activeNote.content,
+      },
       changes: activeNote.linkedNotes.map((linkedNote) => {
         return {
           type: UserNoteChangeType.LINKED_NOTE_ADDED,
           noteId: linkedNote.id,
         };
       }),
+      ignoreDuplicateTitles: true,
     };
-    const noteFromServer = await databaseProvider.putNote(
-      noteToTransmit, { ignoreDuplicateTitles: true },
-    );
+    const noteFromServer = await databaseProvider.putNote(noteSaveRequest);
     refreshContentViews();
-    goToNote(noteFromServer.id);
+    goToNote(noteFromServer.meta.id);
   };
 
   useEffect(() => {

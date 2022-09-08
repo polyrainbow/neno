@@ -2,7 +2,6 @@ import { FileId } from "../../../lib/notes/interfaces/FileId";
 import { PathTemplate } from "../enum/PathTemplate";
 import { UnsavedActiveNote } from "../interfaces/ActiveNote";
 import * as Config from "../config";
-import NoteFromUser from "../../../lib/notes/interfaces/NoteFromUser";
 import FrontendUserNoteChange, { FrontendUserNoteChangeNote }
   from "../interfaces/FrontendUserNoteChange";
 import { UserNoteChangeType }
@@ -17,6 +16,7 @@ import {
   BlockUrl,
 } from "../../../lib/subwaytext/interfaces/Block";
 import subwaytext from "../../../lib/subwaytext";
+import { Note } from "../../../lib/notes/interfaces/Note";
 
 
 const shortenText = (text: string, maxLength: number): string => {
@@ -146,19 +146,19 @@ const getNoteTitleFromContent = (content: string): string => {
 
 // if the note has no title yet, take the title of the link metadata
 const setNoteTitleByContentIfUnset = (
-  note: NoteFromUser,
+  note: Note,
   defaultNoteTitle: string,
 ): void => {
   if (note.content.length === 0) return;
 
   const noteHasNoTitle = (
-    note.title === defaultNoteTitle
-    || note.title === ""
+    note.meta.title === defaultNoteTitle
+    || note.meta.title === ""
   );
 
   if (noteHasNoTitle) {
     const newNoteTitle = getNoteTitleFromContent(note.content);
-    note.title = newNoteTitle;
+    note.meta.title = newNoteTitle;
   }
 };
 

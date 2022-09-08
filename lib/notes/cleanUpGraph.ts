@@ -4,6 +4,7 @@
   legacy schemas.
 */
 
+import GraphObject from "./interfaces/Graph.js";
 import DatabaseMainData from "./interfaces/Graph.js";
 import { Link } from "./interfaces/Link.js";
 import { NoteId } from "./interfaces/NoteId.js";
@@ -70,17 +71,20 @@ const cleanUpLinks = (graph) => {
 };
 
 
-const cleanUpNotes = (graph) => {
+const cleanUpNotes = (graph: GraphObject) => {
   const existingNoteIds: NoteId[] = [];
 
   graph.notes.forEach((note) => {
     // assign id to id-less notes
-    if (typeof note.id !== "number" || existingNoteIds.includes(note.id)) {
-      note.id = getNewNoteId(graph);
+    if (
+      typeof note.meta.id !== "number"
+      || existingNoteIds.includes(note.meta.id)
+    ) {
+      note.meta.id = getNewNoteId(graph);
     }
-    existingNoteIds.push(note.id);
+    existingNoteIds.push(note.meta.id);
 
-    note.title = normalizeNoteTitle(note.title);
+    note.meta.title = normalizeNoteTitle(note.meta.title);
   });
 
   // remove invalid note ids from pins
@@ -88,6 +92,7 @@ const cleanUpNotes = (graph) => {
     return existingNoteIds.includes(pinnedNoteId);
   });
 };
+
 
 
 // this function must be indempotent, since there is only one

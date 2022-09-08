@@ -133,7 +133,7 @@ const NoteView = ({
           note: {
             id: note.id,
             title: note.title,
-            updateTime: note.updateTime,
+            updatedAt: note.updatedAt,
           },
         },
       );
@@ -182,7 +182,7 @@ const NoteView = ({
 
   const handleNoteSaveRequest = async (): Promise<void> => {
     try {
-      await saveActiveNote({ ignoreDuplicateTitles: false });
+      await saveActiveNote(false);
     } catch (e) {
       if (
         e instanceof Error
@@ -195,7 +195,7 @@ const NoteView = ({
           encourageConfirmation: false,
         });
 
-        saveActiveNote({ ignoreDuplicateTitles: true }).catch((e) => {
+        saveActiveNote(true).catch((e) => {
           alert(e);
         });
       } else {
@@ -223,7 +223,7 @@ const NoteView = ({
 
   const pinOrUnpinNote = async (noteId: NoteId) => {
     let newPinnedNotes: NoteToTransmit[];
-    if (pinnedNotes.find((pinnedNote) => pinnedNote.id === noteId)) {
+    if (pinnedNotes.find((pinnedNote) => pinnedNote.meta.id === noteId)) {
       newPinnedNotes = await databaseProvider.unpinNote(noteId);
     } else {
       newPinnedNotes = await databaseProvider.pinNote(noteId);

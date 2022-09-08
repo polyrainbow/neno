@@ -1,10 +1,13 @@
 import assert from 'node:assert';
 import it, { describe } from 'node:test';
 import * as Notes from "./index.js";
-import NoteFromUser from './interfaces/NoteFromUser';
 import MockStorageProvider from './test/MockStorageProvider.js';
 import { randomUUID } from 'node:crypto';
 import { UserNoteChangeType } from './interfaces/UserNoteChangeType.js';
+import {
+  NewNoteSaveRequest,
+  NoteSaveRequest,
+} from './interfaces/NoteSaveRequest.js';
 
 
 
@@ -17,16 +20,26 @@ describe("Notes module", () => {
   const TEST_GRAPH_ID = randomUUID();
 
   it("should create and output notes", async () => {
-    const noteFromUser1: NoteFromUser = {
-      content: "",
-      title: "Note 1",
+    const noteSaveRequest1: NewNoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          title: "Note 1",
+          custom: {},
+        },
+      },
     };
-    await Notes.put(noteFromUser1, TEST_GRAPH_ID);
-    const noteFromUser2: NoteFromUser = {
-      content: "",
-      title: "Note 2",
+    await Notes.put(noteSaveRequest1, TEST_GRAPH_ID);
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          title: "Note 2",
+          custom: {},
+        },
+      },
     };
-    await Notes.put(noteFromUser2, TEST_GRAPH_ID);
+    await Notes.put(noteSaveRequest2, TEST_GRAPH_ID);
     const page = await Notes.getNotesList(TEST_GRAPH_ID, {});
     assert.strictEqual(page.numberOfResults, 2);
   });
@@ -44,9 +57,14 @@ describe("Notes module", () => {
   });
 
   it("should correctly create links", async () => {
-    const noteFromUser: NoteFromUser = {
-      content: "",
-      title: "Note 3",
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          title: "Note 3",
+          custom: {},
+        },
+      },
       changes: [
         {
           type: UserNoteChangeType.LINKED_NOTE_ADDED,
@@ -54,7 +72,7 @@ describe("Notes module", () => {
         }
       ]
     };
-    await Notes.put(noteFromUser, TEST_GRAPH_ID);
+    await Notes.put(noteSaveRequest, TEST_GRAPH_ID);
     const stats = await Notes.getStats(TEST_GRAPH_ID, {
       includeMetadata: false,
       includeAnalysis: false,

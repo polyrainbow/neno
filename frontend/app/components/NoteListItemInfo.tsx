@@ -30,7 +30,7 @@ const NoteListItemInfo = ({
   return <div
     className="info"
   >
-    {(new Date(note.updateTime)).toLocaleDateString()}
+    {(new Date(note.updatedAt)).toLocaleDateString()}
     {
       isMainNoteListItem(note) && (note.numberOfFiles > 0)
         ? SPAN_SEPARATOR + l(

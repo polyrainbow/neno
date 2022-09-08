@@ -16,46 +16,6 @@ const getKeySortFunction = function(
 };
 
 
-/*
-  @function binaryArrayFind:
-    This function performs a binary search in an array of objects that is
-    sorted by a specific key in the objects.
-
-  @param sortedArray:
-    An array of objects that is sorted by a specific key in the objects.
-  @param sortKeyKey:
-    They key of the object whose corresponding value is the sort key for
-    that object.
-  @param sortKeyToFind:
-    The sort key we want to find.
-*/
-function binaryArrayFind<T> (
-  sortedArray: T[],
-  sortKeyKey: string | number,
-  sortKeyToFind: number | string,
-): T | null {
-  let start = 0;
-  let end = sortedArray.length - 1;
-
-  while (start <= end) {
-    // Find the mid index
-    const mid = Math.floor((start + end) / 2);
-
-    // If element is present at mid, return it
-    if (sortedArray[mid][sortKeyKey] === sortKeyToFind) {
-      return sortedArray[mid];
-    // Else look in left or right half accordingly
-    } else if (sortedArray[mid][sortKeyKey] < sortKeyToFind) {
-      start = mid + 1;
-    } else {
-      end = mid - 1;
-    }
-  }
-
-  return null;
-}
-
-
 function binaryArrayFindIndex(
   sortedArray: any[],
   sortKeyKey: string | number,
@@ -188,7 +148,6 @@ const stringContainsUUID = (string: string): boolean => {
 
 export {
   getKeySortFunction,
-  binaryArrayFind,
   binaryArrayFindIndex,
   binaryArrayIncludes,
   yyyymmdd,

@@ -1,0 +1,72 @@
+{
+    "$id": "ExistingNote",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "definitions": {
+        "ExistingNoteMetadata": {
+            "additionalProperties": false,
+            "properties": {
+                "createdAt": {
+                    "type": "number"
+                },
+                "custom": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "id": {
+                    "type": "number"
+                },
+                "position": {
+                    "$ref": "ExistingNote#/definitions/default_1"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "createdAt",
+                "custom",
+                "id",
+                "position",
+                "title",
+                "updatedAt"
+            ],
+            "type": "object"
+        },
+        "default_1": {
+            "additionalProperties": false,
+            "properties": {
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "x",
+                "y"
+            ],
+            "type": "object"
+        }
+    },
+    "properties": {
+        "content": {
+            "type": "string"
+        },
+        "meta": {
+            "$ref": "ExistingNote#/definitions/ExistingNoteMetadata"
+        }
+    },
+    "required": [
+        "content",
+        "meta"
+    ],
+    "type": "object"
+}
+

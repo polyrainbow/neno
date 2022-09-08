@@ -31,11 +31,11 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>{l("editor.stats.creation-time")}</td>
-          <td>{makeTimestampHumanReadable(note.creationTime)}</td>
+          <td>{makeTimestampHumanReadable(note.createdAt)}</td>
         </tr>
         <tr>
           <td>{l("editor.stats.last-update-time")}</td>
-          <td>{makeTimestampHumanReadable(note.updateTime)}</td>
+          <td>{makeTimestampHumanReadable(note.updatedAt)}</td>
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-blocks")}</td>

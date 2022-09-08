@@ -16,8 +16,8 @@ export default interface GraphStats {
   readonly numberOfComponentsWithMoreThanOneNode?: number,
   readonly numberOfHubs?: number,
   readonly nodesWithHighestNumberOfLinks?: NoteListItem[],
-  readonly creationTime?: number,
-  readonly updateTime?: number,
+  readonly createdAt?: number,
+  readonly updatedAt?: number,
   readonly id?: string,
   readonly size?: GraphSize,
 }

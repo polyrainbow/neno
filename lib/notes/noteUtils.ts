@@ -1,11 +1,9 @@
 import Graph from "./interfaces/Graph.js";
-import SavedNote from "./interfaces/SavedNote.js";
 import { FileId } from "./interfaces/FileId.js";
 import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import { Link } from "./interfaces/Link.js";
 import LinkedNote from "./interfaces/LinkedNote.js";
-import Note from "./interfaces/Note.js";
-import NoteFromUser from "./interfaces/NoteFromUser.js";
+import ExistingNote from "./interfaces/ExistingNote.js";
 import { NoteId } from "./interfaces/NoteId.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
 import NoteListItemFeatures from "./interfaces/NoteListItemFeatures.js";
@@ -23,6 +21,8 @@ import {
   BlockSlashlink,
   BlockType,
 } from "../subwaytext/interfaces/Block.js";
+import { Note } from "./interfaces/Note.js";
+import { ExistingNoteMetadata } from "./interfaces/NoteMetadata.js";
 
 
 const getExtensionFromFilename = (filename: string): string | null => {
@@ -75,7 +75,7 @@ const shortenText = (text: string, maxLength: number): string => {
 
 
 const getNoteTitlePreview = (note: Note, maxLength = 800): string => {
-  const titleTrimmed = note.title.trim();
+  const titleTrimmed = note.meta.title.trim();
   const titleShortened = shortenText(titleTrimmed, maxLength);
   return titleShortened;
 };
@@ -89,20 +89,46 @@ const normalizeNoteTitle = (title: string): string => {
 
 
 const noteWithSameTitleExists = (
-  userNote: NoteFromUser,
+  userNote: Note,
   graph: Graph,
 ): boolean => {
-  return graph.notes.some((noteFromDB: SavedNote): boolean => {
+  return graph.notes.some((noteFromDB: ExistingNote): boolean => {
     return (
-      (noteFromDB.title === userNote.title)
-      && (noteFromDB.id !== userNote.id)
+      (noteFromDB.meta.title === userNote.meta.title)
+      && (
+        "id" in userNote.meta
+        && (noteFromDB.meta.id !== userNote.meta.id)
+      )
     );
   });
 };
 
+/*
+  This function performs a binary search in an array of notes that are
+  sorted by id.
+*/
+const findNote = (graph: Graph, noteId: NoteId): ExistingNote | null => {
+  const notesSorted = graph.notes;
+  let start = 0;
+  let end = notesSorted.length - 1;
 
-const findNote = (graph: Graph, noteId: NoteId): SavedNote | null => {
-  return Utils.binaryArrayFind(graph.notes, "id", noteId);
+  while (start <= end) {
+    // Find the mid index
+    const mid = Math.floor((start + end) / 2);
+    const note = notesSorted[mid];
+
+    // If element is present at mid, return it
+    if (note.meta.id === noteId) {
+      return note;
+    // Else look in left or right half accordingly
+    } else if (note.meta.id < noteId) {
+      start = mid + 1;
+    } else {
+      end = mid - 1;
+    }
+  }
+
+  return null;
 };
 
 
@@ -116,11 +142,11 @@ const updateNotePosition = (
   graph: Graph,
   nodePositionUpdate: GraphNodePositionUpdate,
 ): boolean => {
-  const note: SavedNote | null = findNote(graph, nodePositionUpdate.id);
+  const note: ExistingNote | null = findNote(graph, nodePositionUpdate.id);
   if (note === null) {
     return false;
   }
-  note.position = nodePositionUpdate.position;
+  note.meta.position = nodePositionUpdate.position;
   return true;
 };
 
@@ -136,22 +162,22 @@ const getLinksOfNote = (graph: Graph, noteId: NoteId): Link[] => {
 
 
 const getLinkedNotes = (graph: Graph, noteId: NoteId): LinkedNote[] => {
-  const notes: SavedNote[] = getLinksOfNote(graph, noteId)
-    .map((link: Link): SavedNote => {
+  const notes: ExistingNote[] = getLinksOfNote(graph, noteId)
+    .map((link: Link): ExistingNote => {
       const linkedNoteId = (link[0] === noteId) ? link[1] : link[0];
       // we are sure that the notes we are retrieving from noteIds in links
       // really exist. that's why we cast the result of findNote as
-      // SavedNote
-      return findNote(graph, linkedNoteId) as SavedNote;
+      // ExistingNote
+      return findNote(graph, linkedNoteId) as ExistingNote;
     });
 
   const linkedNotes: LinkedNote[] = notes
-    .map((note: SavedNote) => {
+    .map((note: ExistingNote) => {
       const linkedNote: LinkedNote = {
-        id: note.id,
+        id: note.meta.id,
         title: getNoteTitlePreview(note),
-        creationTime: note.creationTime,
-        updateTime: note.updateTime,
+        createdAt: note.meta.createdAt,
+        updatedAt: note.meta.updatedAt,
       };
       return linkedNote;
     });
@@ -257,20 +283,20 @@ const getFileInfos = (
 
 const incorporateUserChangesIntoNote = (
   changes: UserNoteChange[] | undefined,
-  note: SavedNote,
+  note: ExistingNote,
   graph: Graph,
 ): void => {
   if (Array.isArray(changes)) {
     changes.forEach((change) => {
       if (change.type === UserNoteChangeType.LINKED_NOTE_ADDED) {
-        const link: Link = [note.id, change.noteId];
+        const link: Link = [note.meta.id, change.noteId];
         graph.links.push(link);
       }
 
       if (change.type === UserNoteChangeType.LINKED_NOTE_DELETED) {
         graph.links = graph.links.filter((link) => {
           return !(
-            link.includes(note.id) && link.includes(change.noteId)
+            link.includes(note.meta.id) && link.includes(change.noteId)
           );
         });
       }
@@ -280,17 +306,13 @@ const incorporateUserChangesIntoNote = (
 
 
 const createNoteToTransmit = async (
-  databaseNote: SavedNote,
+  databaseNote: ExistingNote,
   graph: Graph,
 ): Promise<NoteToTransmit> => {
   const noteToTransmit: NoteToTransmit = {
-    id: databaseNote.id,
     content: databaseNote.content,
-    title: databaseNote.title,
-    creationTime: databaseNote.creationTime,
-    updateTime: databaseNote.updateTime,
-    linkedNotes: getLinkedNotes(graph, databaseNote.id),
-    position: databaseNote.position,
+    meta: databaseNote.meta,
+    linkedNotes: getLinkedNotes(graph, databaseNote.meta.id),
     numberOfCharacters: getNumberOfCharacters(databaseNote),
     files: getFileInfos(graph, databaseNote.content),
   };
@@ -300,7 +322,7 @@ const createNoteToTransmit = async (
 
 
 const createNoteListItem = (
-  databaseNote: SavedNote,
+  databaseNote: ExistingNote,
   graph: Graph,
   // for performance reasons, numberOfLinkedNotes can be given as argument,
   // so that this function does not have to find it out by itself for each
@@ -310,14 +332,14 @@ const createNoteListItem = (
   const blocks = subwaytext(databaseNote.content);
 
   const noteListItem: NoteListItem = {
-    id: databaseNote.id,
+    id: databaseNote.meta.id,
     title: getNoteTitlePreview(databaseNote),
-    creationTime: databaseNote.creationTime,
-    updateTime: databaseNote.updateTime,
+    createdAt: databaseNote.meta.createdAt,
+    updatedAt: databaseNote.meta.updatedAt,
     features: getNoteFeatures(blocks),
     numberOfLinkedNotes: typeof numberOfLinkedNotes === "number"
       ? numberOfLinkedNotes
-      : getNumberOfLinkedNotes(graph, databaseNote.id),
+      : getNumberOfLinkedNotes(graph, databaseNote.meta.id),
     numberOfCharacters: getNumberOfCharacters(databaseNote),
     numberOfFiles: getNumberOfFiles(blocks),
   };
@@ -327,15 +349,15 @@ const createNoteListItem = (
 
 
 const createNoteListItems = (
-  databaseNotes: SavedNote[],
+  databaseNotes: ExistingNote[],
   graph: Graph,
 ): NoteListItem[] => {
   /*
-    Before we transform every SavedNote to a NoteListItem, we get the
+    Before we transform every ExistingNote to a NoteListItem, we get the
     number of linked notes for every note in one batch. This is more performant
     than traversing all links again and again for every single note.
   */
-  const noteIds = databaseNotes.map((note) => note.id);
+  const noteIds = databaseNotes.map((note) => note.meta.id);
   const numbersOfLinkedNotes
     = getNumberOfLinkedNotesForSeveralNotes(graph, noteIds);
 
@@ -343,7 +365,7 @@ const createNoteListItems = (
     return createNoteListItem(
       databaseNote,
       graph,
-      numbersOfLinkedNotes.get(databaseNote.id),
+      numbersOfLinkedNotes.get(databaseNote.meta.id),
     );
   });
 
@@ -451,16 +473,16 @@ const getSortFunction = (
 ):((a: NoteListItem, b: NoteListItem) => number) => {
   const sortFunctions = {
     [NoteListSortMode.CREATION_DATE_ASCENDING]: (a, b) => {
-      return a.creationTime - b.creationTime;
+      return a.createdAt - b.createdAt;
     },
     [NoteListSortMode.CREATION_DATE_DESCENDING]: (a, b) => {
-      return b.creationTime - a.creationTime;
+      return b.createdAt - a.createdAt;
     },
     [NoteListSortMode.UPDATE_DATE_ASCENDING]: (a, b) => {
-      return a.updateTime - b.updateTime;
+      return a.updatedAt - b.updatedAt;
     },
     [NoteListSortMode.UPDATE_DATE_DESCENDING]: (a, b) => {
-      return b.updateTime - a.updateTime;
+      return b.updatedAt - a.updatedAt;
     },
     [NoteListSortMode.TITLE_ASCENDING]: (a, b) => {
       const aNormalized = getSortKeyForTitle(a.title);
@@ -498,7 +520,7 @@ const getSortFunction = (
 };
 
 
-const getNumberOfCharacters = (note: SavedNote): number => {
+const getNumberOfCharacters = (note: ExistingNote): number => {
   return note.content.length;
 };
 
@@ -512,27 +534,27 @@ const getURLsOfNote = (noteContent: NoteContent): string[] => {
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
 const breadthFirstSearch = (
-  nodes: SavedNote[],
+  nodes: ExistingNote[],
   links,
-  root: SavedNote
-): SavedNote[] => {
-  const queue: SavedNote[] = [];
-  const discovered: SavedNote[] = [];
+  root: ExistingNote
+): ExistingNote[] => {
+  const queue: ExistingNote[] = [];
+  const discovered: ExistingNote[] = [];
   discovered.push(root);
   queue.push(root);
 
   while (queue.length > 0) {
-    const v = queue.shift() as SavedNote;
+    const v = queue.shift() as ExistingNote;
     const connectedNodes = links
       .filter((link: Link): boolean => {
-        return (link[0] === v.id) || (link[1] === v.id);
+        return (link[0] === v.meta.id) || (link[1] === v.meta.id);
       })
-      .map((link: Link): SavedNote => {
-        const linkedNoteId = (link[0] === v.id) ? link[1] : link[0];
+      .map((link: Link): ExistingNote => {
+        const linkedNoteId = (link[0] === v.meta.id) ? link[1] : link[0];
         // we are sure that the notes we are retrieving from noteIds in links
         // really exist. that's why we cast the result of findNote as
-        // SavedNote
-        return nodes.find((n) => (n.id === linkedNoteId)) as SavedNote;
+        // ExistingNote
+        return nodes.find((n) => (n.meta.id === linkedNoteId)) as ExistingNote;
       });
     for (let i = 0; i < connectedNodes.length; i++){
       const w = connectedNodes[i];
@@ -548,8 +570,11 @@ const breadthFirstSearch = (
 
 
 // https://en.wikipedia.org/wiki/Component_(graph_theory)#Algorithms
-const getNumberOfComponents = (nodes: SavedNote[], links: Link[]): number => {
-  let totallyDiscovered: SavedNote[] = [];
+const getNumberOfComponents = (
+  nodes: ExistingNote[],
+  links: Link[],
+): number => {
+  let totallyDiscovered: ExistingNote[] = [];
   let numberOfComponents = 0;
 
   let i = 0;
@@ -561,7 +586,10 @@ const getNumberOfComponents = (nodes: SavedNote[], links: Link[]): number => {
       root = nodes[i];
     }
     const inComponent = breadthFirstSearch(nodes, links, root);
-    totallyDiscovered = [...totallyDiscovered, ...inComponent] as SavedNote[];
+    totallyDiscovered = [
+      ...totallyDiscovered,
+      ...inComponent,
+    ] as ExistingNote[];
     numberOfComponents++;
     i++;
   }
@@ -571,22 +599,22 @@ const getNumberOfComponents = (nodes: SavedNote[], links: Link[]): number => {
 
 
 // this returns all notes that contain a url that is used in another note too
-const getNotesWithDuplicateUrls = (notes: SavedNote[]): SavedNote[] => {
-  const urlIndex = new Map<string, Set<SavedNote>>();
+const getNotesWithDuplicateUrls = (notes: ExistingNote[]): ExistingNote[] => {
+  const urlIndex = new Map<string, Set<ExistingNote>>();
 
-  notes.forEach((note: SavedNote): void => {
+  notes.forEach((note: ExistingNote): void => {
     const urls = getURLsOfNote(note.content);
 
     urls.forEach((url) => {
       if (urlIndex.has(url)) {
-        (urlIndex.get(url) as Set<SavedNote>).add(note);
+        (urlIndex.get(url) as Set<ExistingNote>).add(note);
       } else {
         urlIndex.set(url, new Set([note]));
       }
     });
   });
 
-  const duplicates: Set<SavedNote> = new Set();
+  const duplicates: Set<ExistingNote> = new Set();
 
   for (const notesWithUrl of urlIndex.values()) {
     if (notesWithUrl.size > 1) {
@@ -600,20 +628,20 @@ const getNotesWithDuplicateUrls = (notes: SavedNote[]): SavedNote[] => {
 };
 
 
-const getNotesWithDuplicateTitles = (notes: SavedNote[]): SavedNote[] => {
-  const titleIndex = new Map<string, Set<SavedNote>>();
+const getNotesWithDuplicateTitles = (notes: ExistingNote[]): ExistingNote[] => {
+  const titleIndex = new Map<string, Set<ExistingNote>>();
 
-  notes.forEach((note: SavedNote): void => {
-    const noteTitle = note.title;
+  notes.forEach((note: ExistingNote): void => {
+    const noteTitle = note.meta.title;
 
     if (titleIndex.has(noteTitle)) {
-      (titleIndex.get(noteTitle) as Set<SavedNote>).add(note);
+      (titleIndex.get(noteTitle) as Set<ExistingNote>).add(note);
     } else {
       titleIndex.set(noteTitle, new Set([note]));
     }
   });
 
-  const duplicates: Set<SavedNote> = new Set();
+  const duplicates: Set<ExistingNote> = new Set();
 
   for (const notesWithOneTitle of titleIndex.values()) {
     if (notesWithOneTitle.size > 1) {
@@ -628,12 +656,12 @@ const getNotesWithDuplicateTitles = (notes: SavedNote[]): SavedNote[] => {
 
 
 const getNotesByTitle = (
-  notes: SavedNote[],
+  notes: ExistingNote[],
   query: string,
   caseSensitive: boolean,
-): SavedNote[] => {
-  return notes.filter((note: SavedNote) => {
-    const title = note.title;
+): ExistingNote[] => {
+  return notes.filter((note: ExistingNote) => {
+    const title = note.meta.title;
 
     return caseSensitive
       ? title === query
@@ -643,20 +671,20 @@ const getNotesByTitle = (
 
 
 const getNotesWithUrl = (
-  notes: SavedNote[],
+  notes: ExistingNote[],
   url: string,
-): SavedNote[] => {
-  return notes.filter((note: SavedNote) => {
+): ExistingNote[] => {
+  return notes.filter((note: ExistingNote) => {
     return note.content.includes(url);
   });
 };
 
 
 const getNotesWithFile = (
-  notes: SavedNote[],
+  notes: ExistingNote[],
   fileId: FileId,
-): SavedNote[] => {
-  return notes.filter((note: SavedNote) => {
+): ExistingNote[] => {
+  return notes.filter((note: ExistingNote) => {
     return subwaytext(note.content)
       .filter(blockHasLoadedFile)
       .some((block) => getFileId(block.data.link) === fileId);
@@ -665,11 +693,11 @@ const getNotesWithFile = (
 
 
 const getNotesWithTitleContainingTokens = (
-  notes: SavedNote[],
+  notes: ExistingNote[],
   query: string,
   caseSensitive: boolean
-): SavedNote[] => {
-  return notes.filter((note: SavedNote) => {
+): ExistingNote[] => {
+  return notes.filter((note: ExistingNote) => {
     if (query.length === 0) {
       return true;
     }
@@ -682,11 +710,11 @@ const getNotesWithTitleContainingTokens = (
 
     if (caseSensitive) {
       return queryTokens.every((queryToken) => {
-        return note.title.includes(queryToken);
+        return note.meta.title.includes(queryToken);
       });
     } else {
       return queryTokens.every((queryToken) => {
-        return note.title.toLowerCase().includes(queryToken.toLowerCase());
+        return note.meta.title.toLowerCase().includes(queryToken.toLowerCase());
       });
     }
   });
@@ -694,14 +722,14 @@ const getNotesWithTitleContainingTokens = (
 
 
 const getNotesThatContainTokens = (
-  notes: SavedNote[],
+  notes: ExistingNote[],
   query: string,
   caseSensitive: boolean,
-): SavedNote[] => {
+): ExistingNote[] => {
   const queryTokens = query.split(" ");
 
   return notes
-    .filter((note: SavedNote) => {
+    .filter((note: ExistingNote) => {
       const noteContent = note.content;
 
       // the note text must include every query token to be a positive
@@ -715,21 +743,21 @@ const getNotesThatContainTokens = (
 
 
 const getNotesWithBlocksOfTypes = (
-  notes: SavedNote[],
+  notes: ExistingNote[],
   types: BlockType[],
   notesMustContainAllBlockTypes: boolean,
-): SavedNote[] => {
+): ExistingNote[] => {
   return notesMustContainAllBlockTypes
     ? notes
       // every single note must contain blocks from all the types
-      .filter((note: SavedNote): boolean => {
+      .filter((note: ExistingNote): boolean => {
         return types.every((type) => {
           return subwaytext(note.content).some((block) => block.type === type);
         });
       })
     // every note must contain one block with only one type of types:
     : notes
-      .filter((note: SavedNote): boolean => {
+      .filter((note: ExistingNote): boolean => {
         return subwaytext(note.content)
           .some((block) => types.includes(block.type));
       });
@@ -737,14 +765,14 @@ const getNotesWithBlocksOfTypes = (
 
 
 const getNotesWithMediaTypes = (
-  notes: SavedNote[],
+  notes: ExistingNote[],
   types: MediaType[],
   notesMustContainAllMediaTypes: boolean,
-): SavedNote[] => {
+): ExistingNote[] => {
   return notesMustContainAllMediaTypes
     ? notes
       // every single note must contain blocks from all the types
-      .filter((note: SavedNote): boolean => {
+      .filter((note: ExistingNote): boolean => {
         return types.every((type) => {
           return subwaytext(note.content).some((block) => {
             if (block.type !== BlockType.SLASHLINK) return false;
@@ -756,7 +784,7 @@ const getNotesWithMediaTypes = (
       })
     // every note must contain one block with only one type of types:
     : notes
-      .filter((note: SavedNote): boolean => {
+      .filter((note: ExistingNote): boolean => {
         return subwaytext(note.content)
           .some((block) => {
             if (block.type !== BlockType.SLASHLINK) return false;
@@ -765,6 +793,109 @@ const getNotesWithMediaTypes = (
             return types.includes(getMediaTypeFromFilename(fileId));
           });
       });
+};
+
+
+type NoteHeaders = Map<string, string>;
+type MetaModifier = (meta: Partial<ExistingNoteMetadata>, val: string) => void;
+
+const parseNoteHeaders = (note: string): NoteHeaders => {
+  const headerSection = note.substring(0, note.indexOf("\n\n"));
+  const regex = /^:([^:]*):(.*)$/gm;
+  const headers = new Map<string, string>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  for (const [_match, key, value] of headerSection.matchAll(regex)) {
+    headers.set(key, value);
+  }
+  return headers;
+};
+
+
+const serializeNoteHeaders = (headers: NoteHeaders): string => {
+  return Array.from(headers.entries()).map(([key, value]) => {
+    return ":" + key + ":" + value + "\n";
+  }).join("");
+};
+
+
+const parseSerializedNote = (serializedNote: string): ExistingNote => {
+  const canonicalHeaderKeys
+    = new Map<string, MetaModifier>([
+      ["-neno-id", (meta, val) => meta.id = parseInt(val)],
+      ["-neno-default-graph-position", (meta, val) => {
+        const [x, y] = val.split(",").map((string) => parseFloat(string));
+        meta.position = {
+          x,
+          y,
+        };
+      }],
+      ["title", (meta, val) => meta.title = val],
+      ["created-at", (meta, val) => meta.createdAt = parseInt(val)],
+      ["updated-at", (meta, val) => meta.updatedAt = parseInt(val)],
+    ]);
+
+  const headers = parseNoteHeaders(serializedNote);
+  const partialMeta: Partial<ExistingNoteMetadata> = {};
+  const custom = {};
+  for (const [key, value] of headers.entries()) {
+    if (canonicalHeaderKeys.has(key)) {
+      (canonicalHeaderKeys.get(key) as MetaModifier)(partialMeta, value);
+    } else {
+      custom[key] = value;
+    }
+  }
+
+  partialMeta.custom = custom;
+
+  const requiredFields = [
+    "title",
+    "id",
+    "position",
+    "createdAt",
+    "updatedAt",
+    "custom",
+  ];
+
+  for (const requiredField of requiredFields) {
+    if (!(requiredField in partialMeta)) {
+      throw new Error(
+        "Could not parse note. Missing canonical header: "
+        + requiredField,
+      );
+    }
+  }
+
+  // https://stackoverflow.com/a/58986422/3890888
+  const meta = partialMeta as ExistingNoteMetadata;
+
+  const note: ExistingNote = {
+    content: serializedNote.substring(serializedNote.indexOf("\n\n") + 2),
+    meta,
+  };
+  return note;
+};
+
+
+const serializeNote = (note: ExistingNote): string => {
+  let string
+    = ":-neno-id:" + note.meta.id.toString()
+    + "\n"
+    + ":title:" + note.meta.title
+    + "\n"
+    + ":created-at:" + note.meta.createdAt.toString()
+    + "\n"
+    + ":updated-at:" + note.meta.updatedAt.toString()
+    + "\n"
+    + ":-neno-default-graph-position:" + note.meta.position.x.toString()
+    + "," + note.meta.position.y.toString();
+
+  for (const key in note.meta.custom) {
+    string += "\n" + ":" + key + ":" + note.meta.custom[key];
+  }
+
+  string += "\n\n" + note.content;
+
+  return string;
 };
 
 
@@ -799,4 +930,8 @@ export {
   getNotesThatContainTokens,
   getNotesWithBlocksOfTypes,
   getNotesWithMediaTypes,
+  parseNoteHeaders,
+  serializeNoteHeaders,
+  parseSerializedNote,
+  serializeNote,
 };

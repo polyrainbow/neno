@@ -34,8 +34,6 @@ import { GraphId } from "./interfaces/GraphId.js";
 import { NoteId } from "./interfaces/NoteId.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import GraphNode from "./interfaces/GraphVisualizationNode.js";
-import SavedNote from "./interfaces/SavedNote.js";
-import NoteFromUser from "./interfaces/NoteFromUser.js";
 import GraphStats from "./interfaces/GraphStats.js";
 import GraphVisualizationFromUser
   from "./interfaces/GraphVisualizationFromUser.js";
@@ -48,7 +46,6 @@ import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
 import GraphObject from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import DatabaseQuery from "./interfaces/DatabaseQuery.js";
-import NotePutOptions from "./interfaces/NotePutOptions.js";
 import GraphStatsRetrievalOptions
   from "./interfaces/GraphStatsRetrievalOptions.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
@@ -56,6 +53,8 @@ import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 import { FileInfo } from "./interfaces/FileInfo.js";
 import { BlockType } from "../subwaytext/interfaces/Block.js";
 import { MediaType } from "./interfaces/MediaType.js";
+import ExistingNote from "./interfaces/ExistingNote.js";
+import { NoteSaveRequest } from "./interfaces/NoteSaveRequest.js";
 
 let io: DatabaseIO;
 let randomUUID: () => string;
@@ -80,7 +79,7 @@ const get = async (
   graphId: GraphId,
 ): Promise<NoteToTransmit> => {
   const graph = await io.getGraph(graphId);
-  const noteFromDB: SavedNote | null = findNote(graph, noteId);
+  const noteFromDB: ExistingNote | null = findNote(graph, noteId);
   if (!noteFromDB) {
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
@@ -225,11 +224,11 @@ const getGraphVisualization = async (
 
   const graphNodes: GraphNode[] = graph.notes.map((note) => {
     const graphNode: GraphNode = {
-      id: note.id,
+      id: note.meta.id,
       title: getNoteTitlePreview(note),
-      position: note.position,
-      linkedNotes: getLinkedNotes(graph, note.id),
-      creationTime: note.creationTime,
+      position: note.meta.position,
+      linkedNotes: getLinkedNotes(graph, note.meta.id),
+      createdAt: note.meta.createdAt,
     };
     return graphNode;
   });
@@ -264,8 +263,8 @@ const getStats = async (
   if (options.includeMetadata) {
     stats = {
       ...stats,
-      creationTime: graph.creationTime,
-      updateTime: graph.updateTime,
+      createdAt: graph.createdAt,
+      updatedAt: graph.updatedAt,
       id: graphId,
       size: {
         graph: await io.getSizeOfGraph(graphId),
@@ -288,7 +287,10 @@ const getStats = async (
         numberOfComponents - numberOfUnlinkedNotes,
       numberOfHubs: graph.notes
         .filter((note) => {
-          const numberOfLinkedNotes = getNumberOfLinkedNotes(graph, note.id);
+          const numberOfLinkedNotes = getNumberOfLinkedNotes(
+            graph,
+            note.meta.id,
+          );
           return numberOfLinkedNotes >= config.MIN_NUMBER_OF_LINKS_FOR_HUB;
         })
         .length,
@@ -320,73 +322,73 @@ const setGraphVisualization = async (
 
 
 const put = async (
-  noteFromUser: NoteFromUser,
+  noteSaveRequest: NoteSaveRequest,
   graphId: GraphId,
-  options?: NotePutOptions,
 ): Promise<NoteToTransmit> => {
+  const noteFromUser = noteSaveRequest.note;
+
   if (
     (!noteFromUser)
     || (typeof noteFromUser.content !== "string")
-    || (typeof noteFromUser.title !== "string")
+    || (typeof noteFromUser.meta.title !== "string")
   ) {
     throw new Error(ErrorMessage.INVALID_NOTE_STRUCTURE);
   }
 
-  let ignoreDuplicateTitles = true;
-  if (
-    (typeof options === "object")
-    && (options.ignoreDuplicateTitles === false)
-  ) {
-    ignoreDuplicateTitles = false;
-  }
-
   const graph: Graph = await io.getGraph(graphId);
 
-  if (!ignoreDuplicateTitles && noteWithSameTitleExists(noteFromUser, graph)) {
+  if (
+    !noteSaveRequest.ignoreDuplicateTitles
+    && noteWithSameTitleExists(noteFromUser, graph)
+  ) {
     throw new Error(ErrorMessage.NOTE_WITH_SAME_TITLE_EXISTS);
   }
 
-  let savedNote: SavedNote | null = null;
+  let existingNote: ExistingNote | null = null;
 
   if (
-    typeof noteFromUser.id === "number"
+    "id" in noteFromUser.meta
   ) {
-    savedNote = await findNote(graph, noteFromUser.id);
+    existingNote = await findNote(graph, noteFromUser.meta.id);
   }
 
-  if (savedNote === null) {
+  if (existingNote === null) {
     const noteId: NoteId = getNewNoteId(graph);
-    savedNote = {
-      id: noteId,
-      // Let's make sure that when manipulating the position object at some
-      // point, we don't accidentally manipulate the initialNodePosition object.
-      // So let's copy the primitive values one by one. This actually
-      // prevents bugs from occuring in local mode, where API output from this
-      // module is not consistently serialized and re-parsed. It could also be
-      // cloned (e. g. via structuredClone()) without destroying references,
-      // which would just defer the issue outside of this module.
-      position: {
-        x: graph.initialNodePosition.x,
-        y: graph.initialNodePosition.y,
+    existingNote = {
+      meta: {
+        id: noteId,
+        // Let's make sure that when manipulating the position object at some
+        // point, we don't accidentally manipulate the initialNodePosition
+        // object.
+        // So let's copy the primitive values one by one. This actually
+        // prevents bugs from occuring in local mode, where API output from this
+        // module is not consistently serialized and re-parsed. It could also be
+        // cloned (e. g. via structuredClone()) without destroying references,
+        // which would just defer the issue outside of this module.
+        position: {
+          x: graph.initialNodePosition.x,
+          y: graph.initialNodePosition.y,
+        },
+        title: normalizeNoteTitle(noteFromUser.meta.title),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        custom: noteFromUser.meta.custom,
       },
-      title: normalizeNoteTitle(noteFromUser.title),
       content: noteFromUser.content,
-      creationTime: Date.now(),
-      updateTime: Date.now(),
     };
-    graph.notes.push(savedNote);
+    graph.notes.push(existingNote);
   } else {
-    savedNote.content = noteFromUser.content;
-    savedNote.title = normalizeNoteTitle(noteFromUser.title);
-    savedNote.updateTime = Date.now();
+    existingNote.content = noteFromUser.content;
+    existingNote.meta.title = normalizeNoteTitle(noteFromUser.meta.title);
+    existingNote.meta.updatedAt = Date.now();
   }
 
-  incorporateUserChangesIntoNote(noteFromUser.changes, savedNote, graph);
+  incorporateUserChangesIntoNote(noteSaveRequest.changes, existingNote, graph);
 
   await io.flushChanges(graphId, graph);
 
   const noteToTransmit: NoteToTransmit
-    = await createNoteToTransmit(savedNote, graph);
+    = await createNoteToTransmit(existingNote, graph);
   return noteToTransmit;
 };
 
@@ -446,7 +448,7 @@ const addFile = async (
     fileId,
     name: filename,
     size,
-    creationTime: Date.now(),
+    createdAt: Date.now(),
   };
   graph.files.push(fileInfo);
   await io.flushChanges(graphId, graph);
