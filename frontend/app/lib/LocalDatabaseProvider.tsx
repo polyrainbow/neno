@@ -21,21 +21,21 @@ import { NoteSaveRequest } from "../../../lib/notes/interfaces/NoteSaveRequest";
 async function verifyPermission(
   fileSystemHandle: FileSystemHandle,
   readWrite: boolean,
-): Promise<boolean> {
+): Promise<void> {
   const options: FileSystemHandlePermissionDescriptor = {};
   if (readWrite) {
     options.mode = "readwrite";
   }
   // Check if permission was already granted. If so, return true.
   if ((await fileSystemHandle.queryPermission(options)) === "granted") {
-    return true;
+    return;
   }
   // Request permission. If the user grants permission, return true.
   if ((await fileSystemHandle.requestPermission(options)) === "granted") {
-    return true;
+    return;
   }
-  // The user didn't grant permission, so return false.
-  return false;
+  // The user didn't grant permission
+  throw new Error("User did not grant permission to " + fileSystemHandle.name);
 }
 
 
@@ -131,11 +131,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
       );
     }
 
-    const readWriteAllowed = await verifyPermission(this.#folderHandle, true);
-
-    if (!readWriteAllowed) {
-      return false;
-    }
+    await verifyPermission(this.#folderHandle, true);
 
     this.#notesModule = await import("../../../lib/notes/index");
 
