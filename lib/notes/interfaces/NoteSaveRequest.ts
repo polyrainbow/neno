@@ -9,7 +9,6 @@ interface BaseNoteSaveRequest {
 
 export interface NewNoteSaveRequest extends BaseNoteSaveRequest {
   note: NewNote,
-
 }
 
 export interface ExistingNoteSaveRequest extends BaseNoteSaveRequest {

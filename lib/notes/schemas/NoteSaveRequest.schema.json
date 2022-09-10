@@ -10,25 +10,6 @@
         }
     ],
     "definitions": {
-        "BaseNoteMetadata": {
-            "additionalProperties": false,
-            "properties": {
-                "custom": {
-                    "additionalProperties": {
-                        "type": "string"
-                    },
-                    "type": "object"
-                },
-                "title": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "custom",
-                "title"
-            ],
-            "type": "object"
-        },
         "ExistingNoteMetadata": {
             "additionalProperties": false,
             "properties": {
@@ -45,7 +26,7 @@
                     "type": "number"
                 },
                 "position": {
-                    "$ref": "NoteSaveRequest#/definitions/default_3"
+                    "$ref": "NoteSaveRequest#/definitions/default_1"
                 },
                 "title": {
                     "type": "string"
@@ -69,7 +50,7 @@
             "properties": {
                 "changes": {
                     "items": {
-                        "$ref": "NoteSaveRequest#/definitions/default_1"
+                        "$ref": "NoteSaveRequest#/definitions/default_2"
                     },
                     "type": "array"
                 },
@@ -77,7 +58,7 @@
                     "type": "boolean"
                 },
                 "note": {
-                    "$ref": "NoteSaveRequest#/definitions/default_2"
+                    "$ref": "NoteSaveRequest#/definitions/default_3"
                 }
             },
             "required": [
@@ -86,12 +67,34 @@
             ],
             "type": "object"
         },
+        "NewNoteMetadata": {
+            "additionalProperties": false,
+            "properties": {
+                "custom": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "position": {
+                    "$ref": "NoteSaveRequest#/definitions/default_1"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "custom",
+                "title"
+            ],
+            "type": "object"
+        },
         "NewNoteSaveRequest": {
             "additionalProperties": false,
             "properties": {
                 "changes": {
                     "items": {
-                        "$ref": "NoteSaveRequest#/definitions/default_1"
+                        "$ref": "NoteSaveRequest#/definitions/default_2"
                     },
                     "type": "array"
                 },
@@ -122,7 +125,7 @@
                     "type": "string"
                 },
                 "meta": {
-                    "$ref": "NoteSaveRequest#/definitions/BaseNoteMetadata"
+                    "$ref": "NoteSaveRequest#/definitions/NewNoteMetadata"
                 }
             },
             "required": [
@@ -132,6 +135,22 @@
             "type": "object"
         },
         "default_1": {
+            "additionalProperties": false,
+            "properties": {
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "x",
+                "y"
+            ],
+            "type": "object"
+        },
+        "default_2": {
             "additionalProperties": false,
             "properties": {
                 "noteId": {
@@ -147,7 +166,7 @@
             ],
             "type": "object"
         },
-        "default_2": {
+        "default_3": {
             "additionalProperties": false,
             "properties": {
                 "content": {
@@ -160,22 +179,6 @@
             "required": [
                 "content",
                 "meta"
-            ],
-            "type": "object"
-        },
-        "default_3": {
-            "additionalProperties": false,
-            "properties": {
-                "x": {
-                    "type": "number"
-                },
-                "y": {
-                    "type": "number"
-                }
-            },
-            "required": [
-                "x",
-                "y"
             ],
             "type": "object"
         }

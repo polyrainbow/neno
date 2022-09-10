@@ -45,7 +45,10 @@ import * as Config from "../config";
 import {
   UserNoteChangeType,
 } from "../../../lib/notes/interfaces/UserNoteChangeType";
-import { NoteSaveRequest } from "../../../lib/notes/interfaces/NoteSaveRequest";
+import {
+  NewNoteSaveRequest,
+  NoteSaveRequest,
+} from "../../../lib/notes/interfaces/NoteSaveRequest";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -154,6 +157,7 @@ const AppWithConfirmationServiceProvider = ({
           changes: [],
           content: noteFromServer.content,
           files: noteFromServer.files,
+          keyValues: Object.entries(noteFromServer.meta.custom),
         });
       } else {
         throw new Error("No note received");
@@ -322,15 +326,22 @@ const AppWithConfirmationServiceProvider = ({
   const prepareNoteSaveRequest = async (
     ignoreDuplicateTitles: boolean,
   ): Promise<NoteSaveRequest> => {
-    const noteSaveRequest: NoteSaveRequest = {
+    const noteSaveRequest = {
       note: {
         content: activeNote.content,
-        meta: {
-          // eslint-disable-next-line no-undefined
-          id: (!activeNote.isUnsaved) ? activeNote.id : undefined,
-          title: activeNote.title,
-          custom: {},
-        },
+        meta: activeNote.isUnsaved
+          ? {
+            title: activeNote.title,
+            custom: Object.fromEntries(activeNote.keyValues),
+          }
+          : {
+            title: activeNote.title,
+            custom: Object.fromEntries(activeNote.keyValues),
+            id: activeNote.id,
+            position: activeNote.position,
+            createdAt: activeNote.createdAt,
+            updatedAt: activeNote.updatedAt,
+          },
       },
       changes: activeNote.changes.map(
         (change: FrontendUserNoteChange): UserNoteChange => {
@@ -373,6 +384,7 @@ const AppWithConfirmationServiceProvider = ({
       numberOfCharacters: noteFromDatabase.numberOfCharacters,
       files: noteFromDatabase.files,
       changes: [],
+      keyValues: Object.entries(noteFromDatabase.meta.custom),
     });
     setUnsavedChanges(false);
     refreshContentViews();
@@ -395,11 +407,15 @@ const AppWithConfirmationServiceProvider = ({
       setUnsavedChanges(false);
     }
 
-    const noteSaveRequest: NoteSaveRequest = {
+    const noteSaveRequest: NewNoteSaveRequest = {
       note: {
         meta: {
           title: activeNote.title,
-          custom: {},
+          custom: Object.fromEntries(activeNote.keyValues),
+          position: {
+            x: activeNote.position.x + 20,
+            y: activeNote.position.y + 20,
+          },
         },
         content: activeNote.content,
       },

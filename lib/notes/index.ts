@@ -26,6 +26,7 @@ import {
   getNotesWithDuplicateTitles,
   parseFileIds,
   getNotesWithMediaTypes,
+  findNoteIndex,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -365,7 +366,7 @@ const put = async (
         // module is not consistently serialized and re-parsed. It could also be
         // cloned (e. g. via structuredClone()) without destroying references,
         // which would just defer the issue outside of this module.
-        position: {
+        position: noteFromUser.meta.position ?? {
           x: graph.initialNodePosition.x,
           y: graph.initialNodePosition.y,
         },
@@ -398,7 +399,7 @@ const remove = async (
   graphId: GraphId,
 ): Promise<void> => {
   const graph = await io.getGraph(graphId);
-  const noteIndex = Utils.binaryArrayFindIndex(graph.notes, "id", noteId);
+  const noteIndex = findNoteIndex(graph, noteId);
   if ((noteIndex === -1) || (noteIndex === null)) {
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }
@@ -534,7 +535,7 @@ const pin = async (
   noteId: NoteId,
 ): Promise<NoteToTransmit[]> => {
   const graph = await io.getGraph(graphId);
-  const noteIndex = Utils.binaryArrayFindIndex(graph.notes, "id", noteId);
+  const noteIndex = findNoteIndex(graph, noteId);
   if (noteIndex === -1) {
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }

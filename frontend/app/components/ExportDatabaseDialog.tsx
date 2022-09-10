@@ -70,7 +70,7 @@ const ExportDatabaseDialog = ({
     onClickOnOverlay={() => {
       if (status !== "BUSY") onClose();
     }}
-    className="import-link-dialog"
+    className="export-database-dialog"
   >
     <h1>{l("export-database.heading")}</h1>
     {

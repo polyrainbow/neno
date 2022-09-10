@@ -12,13 +12,12 @@ const SwitchGraphsDialog = ({
 
   return <Dialog
     onClickOnOverlay={onClose}
-    className="import-link-dialog"
+    className="switch-graphs-dialog"
   >
     <h1>{l("switch-graphs.heading")}</h1>
     <select
       value={selectedGraphId}
       onChange={(e) => setSelectedGraphId(e.target.value)}
-      style={{ width: "100%" }}
     >
       {
         graphIds.map((graphId) => {

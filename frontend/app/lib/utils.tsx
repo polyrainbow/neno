@@ -132,6 +132,7 @@ const getNewNoteObject = (
     title: Config.DEFAULT_NOTE_TITLE,
     content: getNewNoteContent(fileInfos?.map((fileInfo) => fileInfo.fileId)),
     files: fileInfos || [],
+    keyValues: [],
   };
 
   Object.seal(note);
