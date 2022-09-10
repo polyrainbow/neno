@@ -11,7 +11,6 @@ import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import UserNoteChange from "./interfaces/UserNoteChange.js";
 import { UserNoteChangeType } from "./interfaces/UserNoteChangeType.js";
-import * as Utils from "../utils.js";
 import { MediaType } from "./interfaces/MediaType.js";
 import { NoteContent } from "./interfaces/NoteContent.js";
 import { FileInfo } from "./interfaces/FileInfo.js";
@@ -107,7 +106,10 @@ const noteWithSameTitleExists = (
   This function performs a binary search in an array of notes that are
   sorted by id.
 */
-const findNote = (graph: Graph, noteId: NoteId): ExistingNote | null => {
+const findNote = (
+  graph: Graph,
+  noteId: NoteId,
+): ExistingNote | null => {
   const notesSorted = graph.notes;
   let start = 0;
   let end = notesSorted.length - 1;
@@ -129,6 +131,34 @@ const findNote = (graph: Graph, noteId: NoteId): ExistingNote | null => {
   }
 
   return null;
+};
+
+
+const findNoteIndex = (
+  graph: Graph,
+  noteId: NoteId,
+): number => {
+  const notesSorted = graph.notes;
+  let start = 0;
+  let end = notesSorted.length - 1;
+
+  while (start <= end) {
+    // Find the mid index
+    const mid = Math.floor((start + end) / 2);
+    const note = notesSorted[mid];
+
+    // If element is present at mid, return index
+    if (note.meta.id === noteId) {
+      return mid;
+    // Else look in left or right half accordingly
+    } else if (note.meta.id < noteId) {
+      start = mid + 1;
+    } else {
+      end = mid - 1;
+    }
+  }
+
+  return -1;
 };
 
 
@@ -934,4 +964,5 @@ export {
   serializeNoteHeaders,
   parseSerializedNote,
   serializeNote,
+  findNoteIndex,
 };

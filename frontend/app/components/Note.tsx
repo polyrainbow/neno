@@ -23,9 +23,11 @@ import * as IDB from "idb-keyval";
 import { ContentMode } from "../interfaces/ContentMode";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import NoteLinks from "./NoteLinks";
+import NoteKeyValues from "./NoteKeyValues";
 
 interface NoteComponentProps {
   note: ActiveNote,
+  setNote,
   setNoteTitle: (title: string) => void,
   setNoteContent: (title: string) => void,
   displayedLinkedNotes: (LinkedNote | FrontendUserNoteChangeNote)[],
@@ -49,6 +51,7 @@ const DEFAULT_CONTENT_MODE = ContentMode.EDITOR;
 
 const Note = ({
   note,
+  setNote,
   setNoteTitle,
   setNoteContent,
   addFileToNoteObject,
@@ -290,6 +293,10 @@ const Note = ({
           setUnsavedChanges={setUnsavedChanges}
           databaseProvider={databaseProvider}
           unsavedChanges={unsavedChanges}
+        />
+        <NoteKeyValues
+          note={note}
+          setNote={setNote}
         />
         {
           (!note.isUnsaved)

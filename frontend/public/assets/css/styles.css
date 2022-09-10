@@ -505,16 +505,22 @@ button[disabled]{
 }
 
 .dialog-box h1 {
-  margin: 0px;
+  margin-top: 0px;
+  margin-bottom: var(--default-margin);
 }
 
+
+.dialog-box select {
+  width: 100%;
+  margin-top: 0px;
+}
 
 .dialog-text {
   margin-top: 0px;
   font-size: var(--large-font-size);
 }
 
-.import-link-dialog textarea {
+.create-one-note-per-line-dialog textarea {
   background-color: var(--background-color);
   color: var(--font-color);
   margin-bottom: var(--default-margin);

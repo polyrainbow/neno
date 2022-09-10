@@ -8,6 +8,10 @@ interface BaseNoteMetadata {
   }
 }
 
+export interface NewNoteMetadata extends BaseNoteMetadata {
+  position?: NodePosition,
+}
+
 export interface ExistingNoteMetadata extends BaseNoteMetadata {
   id: NoteId,
   createdAt: number,
@@ -15,4 +19,4 @@ export interface ExistingNoteMetadata extends BaseNoteMetadata {
   position: NodePosition,
 }
 
-export type NewNoteMetadata = BaseNoteMetadata;
+export type NoteMetadata = NewNoteMetadata | ExistingNoteMetadata;

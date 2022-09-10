@@ -17,7 +17,6 @@ const ChangeLanguageDialog = ({
     <select
       value={selectedLanguage}
       onChange={(e) => setSelectedLanguage(e.target.value)}
-      style={{ width: "100%" }}
     >
       {
         languages.map((language) => {

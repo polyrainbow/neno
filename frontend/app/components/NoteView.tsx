@@ -285,6 +285,7 @@ const NoteView = ({
       <div id="right-view">
         <Note
           note={activeNote}
+          setNote={setActiveNote}
           setNoteTitle={
             (newTitle: string): void => {
               setActiveNote({

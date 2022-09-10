@@ -16,33 +16,6 @@ const getKeySortFunction = function(
 };
 
 
-function binaryArrayFindIndex(
-  sortedArray: any[],
-  sortKeyKey: string | number,
-  sortKeyToFind: string | number,
-): number {
-  let start = 0;
-  let end = sortedArray.length - 1;
-
-  while (start <= end) {
-    // Find the mid index
-    const mid = Math.floor((start + end) / 2);
-
-    // If element is present at mid, return index
-    if (sortedArray[mid][sortKeyKey] === sortKeyToFind) {
-      return mid;
-    // Else look in left or right half accordingly
-    } else if (sortedArray[mid][sortKeyKey] < sortKeyToFind) {
-      start = mid + 1;
-    } else {
-      end = mid - 1;
-    }
-  }
-
-  return -1;
-}
-
-
 /*
   @function binaryArrayIncludes:
     This function performs a binary search in the manner of Array.includes()
@@ -148,7 +121,6 @@ const stringContainsUUID = (string: string): boolean => {
 
 export {
   getKeySortFunction,
-  binaryArrayFindIndex,
   binaryArrayIncludes,
   yyyymmdd,
   deepFreeze,
