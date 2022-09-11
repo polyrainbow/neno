@@ -96,7 +96,11 @@ const AppMenu = ({
           }
 
           if (!isSmallScreen) {
-            createNewNote();
+            // we need to use force when calling createNewNote because
+            // otherwise this function will ask again on unsaved changes.
+            // this is because the setUnsavedChanges call above will be
+            // scheduled and not executed immediately.
+            createNewNote([], [], true);
           }
 
           navigate(target);

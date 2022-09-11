@@ -288,8 +288,9 @@ const AppWithConfirmationServiceProvider = ({
   const createNewNote = async (
     linkedNotes?: FrontendUserNoteChangeNote[],
     files?: FileInfo[],
+    useForce?: boolean,
   ) => {
-    if (unsavedChanges) {
+    if (unsavedChanges && (!useForce)) {
       await confirmDiscardingUnsavedChanges();
       setUnsavedChanges(false);
     }
