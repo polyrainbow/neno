@@ -59,7 +59,7 @@ const FILE_PICKER_ACCEPT_TYPES: FilePickerAcceptType[] = [
   },
 ];
 
-const DEFAULT_CONTENT_TYPE = "text/subwaytext";
+const DEFAULT_CONTENT_TYPE = "text/subway";
 
 export {
   DEFAULT_NOTE_TITLE,
