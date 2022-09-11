@@ -158,7 +158,7 @@
   "menu.note-list": "Note List",
   "menu.stats": "Stats",
   "menu.switch-graphs": "Switch graphs",
-  "note.content-empty": "This note has not any content yet. Click here to add some.",
+  "note.content-empty": "This note has no content yet. Click here to add some.",
   "note.download-file": "Download file",
   "stats.analysis": "Analysis",
   "stats.analysis.components": "%EXTERNAL_LINK[Components](https://en.wikipedia.org/wiki/Component_(graph_theory%29)",
