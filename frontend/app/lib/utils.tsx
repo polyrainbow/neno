@@ -133,6 +133,8 @@ const getNewNoteObject = (
     content: getNewNoteContent(fileInfos?.map((fileInfo) => fileInfo.fileId)),
     files: fileInfos || [],
     keyValues: [],
+    flags: [],
+    contentType: Config.DEFAULT_CONTENT_TYPE,
   };
 
   Object.seal(note);

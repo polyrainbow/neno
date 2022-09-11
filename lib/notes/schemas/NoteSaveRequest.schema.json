@@ -13,6 +13,9 @@
         "ExistingNoteMetadata": {
             "additionalProperties": false,
             "properties": {
+                "contentType": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "number"
                 },
@@ -21,6 +24,12 @@
                         "type": "string"
                     },
                     "type": "object"
+                },
+                "flags": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "id": {
                     "type": "number"
@@ -36,8 +45,10 @@
                 }
             },
             "required": [
+                "contentType",
                 "createdAt",
                 "custom",
+                "flags",
                 "id",
                 "position",
                 "title",
@@ -70,11 +81,20 @@
         "NewNoteMetadata": {
             "additionalProperties": false,
             "properties": {
+                "contentType": {
+                    "type": "string"
+                },
                 "custom": {
                     "additionalProperties": {
                         "type": "string"
                     },
                     "type": "object"
+                },
+                "flags": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "position": {
                     "$ref": "NoteSaveRequest#/definitions/default_1"
@@ -84,7 +104,9 @@
                 }
             },
             "required": [
+                "contentType",
                 "custom",
+                "flags",
                 "title"
             ],
             "type": "object"

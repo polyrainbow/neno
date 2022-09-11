@@ -1,8 +1,11 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   FileInfo,
 } from "../../../lib/notes/interfaces/FileInfo";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
 
 interface NoteStatsFileLinkProps {
   file: FileInfo,
@@ -11,23 +14,13 @@ interface NoteStatsFileLinkProps {
 
 const NoteStatsFileLink = ({
   file,
-  databaseProvider,
 }: NoteStatsFileLinkProps) => {
-  return <a
+  return <Link
     key={"note-stats-link-" + file.fileId}
-    style={{
-      "cursor": "pointer",
-    }}
-    onClick={async () => {
-      const url = await databaseProvider.getUrlForFileId(
-        file.fileId,
-        file.name,
-      );
-      window.open(url, "_blank");
-    }}
+    to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))}
   >
     {file.name ?? file.fileId}
-  </a>;
+  </Link>;
 };
 
 export default NoteStatsFileLink;

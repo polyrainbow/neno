@@ -158,6 +158,8 @@ const AppWithConfirmationServiceProvider = ({
           content: noteFromServer.content,
           files: noteFromServer.files,
           keyValues: Object.entries(noteFromServer.meta.custom),
+          flags: noteFromServer.meta.flags,
+          contentType: noteFromServer.meta.contentType,
         });
       } else {
         throw new Error("No note received");
@@ -229,9 +231,9 @@ const AppWithConfirmationServiceProvider = ({
         note: {
           meta: {
             title: getNoteTitleFromContent(line),
-            custom: {
-              "-neno-flags": "CREATED_VIA_ONE_NOTE_PER_LINE",
-            },
+            contentType: Config.DEFAULT_CONTENT_TYPE,
+            flags: ["CREATED_VIA_ONE_NOTE_PER_LINE"],
+            custom: {},
           },
           content: line,
         },
@@ -333,6 +335,8 @@ const AppWithConfirmationServiceProvider = ({
           ? {
             title: activeNote.title,
             custom: Object.fromEntries(activeNote.keyValues),
+            flags: activeNote.flags,
+            contentType: activeNote.contentType,
           }
           : {
             title: activeNote.title,
@@ -341,6 +345,8 @@ const AppWithConfirmationServiceProvider = ({
             position: activeNote.position,
             createdAt: activeNote.createdAt,
             updatedAt: activeNote.updatedAt,
+            flags: activeNote.flags,
+            contentType: activeNote.contentType,
           },
       },
       changes: activeNote.changes.map(
@@ -385,6 +391,8 @@ const AppWithConfirmationServiceProvider = ({
       files: noteFromDatabase.files,
       changes: [],
       keyValues: Object.entries(noteFromDatabase.meta.custom),
+      flags: noteFromDatabase.meta.flags,
+      contentType: noteFromDatabase.meta.contentType,
     });
     setUnsavedChanges(false);
     refreshContentViews();
@@ -416,6 +424,8 @@ const AppWithConfirmationServiceProvider = ({
             x: activeNote.position.x + 20,
             y: activeNote.position.y + 20,
           },
+          flags: [...activeNote.flags, `DUPLICATE_OF(${activeNote.id})`],
+          contentType: activeNote.contentType,
         },
         content: activeNote.content,
       },

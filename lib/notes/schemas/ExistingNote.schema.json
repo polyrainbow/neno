@@ -6,6 +6,9 @@
         "ExistingNoteMetadata": {
             "additionalProperties": false,
             "properties": {
+                "contentType": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "number"
                 },
@@ -14,6 +17,12 @@
                         "type": "string"
                     },
                     "type": "object"
+                },
+                "flags": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
                 },
                 "id": {
                     "type": "number"
@@ -29,8 +38,10 @@
                 }
             },
             "required": [
+                "contentType",
                 "createdAt",
                 "custom",
+                "flags",
                 "id",
                 "position",
                 "title",
