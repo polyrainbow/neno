@@ -24,6 +24,7 @@ import { ContentMode } from "../interfaces/ContentMode";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import NoteLinks from "./NoteLinks";
 import NoteKeyValues from "./NoteKeyValues";
+import { l } from "../lib/intl";
 
 interface NoteComponentProps {
   note: ActiveNote,
@@ -261,7 +262,11 @@ const Note = ({
                 }
               }}
             />
-            : <h1 id="note-title">{note.title}</h1>
+            : <h1 id="note-title">{
+              note.title.trim().length > 0
+                ? note.title
+                : l("list.untitled-note")
+            }</h1>
         }
         {
           contentMode === ContentMode.EDITOR
