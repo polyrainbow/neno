@@ -219,7 +219,9 @@ const NoteView = ({
   useEffect(() => {
     document.title = activeNote.title.length > 0
       ? activeNote.title
-      : Config.DEFAULT_DOCUMENT_TITLE;
+      : activeNote.isUnsaved
+        ? l("editor.new-note")
+        : l("list.untitled-note");
 
     return () => {
       document.title = Config.DEFAULT_DOCUMENT_TITLE;
