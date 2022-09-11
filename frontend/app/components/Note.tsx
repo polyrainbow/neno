@@ -272,7 +272,10 @@ const Note = ({
           contentMode === ContentMode.EDITOR
             ? <Editor
               content={note.content}
-              onChange={(val) => setNoteContent(val)}
+              onChange={(val) => {
+                setNoteContent(val);
+                setUnsavedChanges(true);
+              }}
             />
             : ""
         }
