@@ -3,13 +3,11 @@ import { Link } from "react-router-dom";
 import {
   FileInfo,
 } from "../../../lib/notes/interfaces/FileInfo";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 
 interface NoteStatsFileLinkProps {
   file: FileInfo,
-  databaseProvider: DatabaseProvider
 }
 
 const NoteStatsFileLink = ({

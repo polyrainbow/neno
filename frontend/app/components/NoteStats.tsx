@@ -1,7 +1,6 @@
 import React from "react";
 import subwaytext from "../../../lib/subwaytext/index";
 import { SavedActiveNote } from "../interfaces/ActiveNote";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { l } from "../lib/intl";
 import {
   makeTimestampHumanReadable,
@@ -12,12 +11,10 @@ import NoteStatsFileLink from "./NoteStatsFileLink";
 
 interface NoteStatsProps {
   note: SavedActiveNote,
-  databaseProvider: DatabaseProvider
 }
 
 const NoteStats = ({
   note,
-  databaseProvider,
 }: NoteStatsProps) => {
   return <div
     id="stats"
@@ -62,7 +59,6 @@ const NoteStats = ({
                   >
                     <NoteStatsFileLink
                       file={file}
-                      databaseProvider={databaseProvider}
                     /> ({fileType}, {humanFileSize(file.size)})
                     {
                       i < array.length - 1

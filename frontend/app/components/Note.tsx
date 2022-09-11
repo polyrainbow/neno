@@ -300,7 +300,7 @@ const Note = ({
         />
         {
           (!note.isUnsaved)
-            ? <NoteStats note={note} databaseProvider={databaseProvider} />
+            ? <NoteStats note={note} />
             : null
         }
       </div>
