@@ -5,7 +5,7 @@
   sense to type-check this file.
 */
 
-import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader";
+import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
 
 const formatHeader = (key, value: string) => {
   return ":" + key + ":" + value + "\n";
