@@ -862,6 +862,11 @@ const parseSerializedNote = (serializedNote: string): ExistingNote => {
       ["title", (meta, val) => meta.title = val],
       ["created-at", (meta, val) => meta.createdAt = parseInt(val)],
       ["updated-at", (meta, val) => meta.updatedAt = parseInt(val)],
+      ["-neno-flags", (meta, val) => {
+        meta.flags = val.trim().length > 0
+          ? val.trim().split(",")
+          : [];
+      }],
     ]);
 
   const headers = parseNoteHeaders(serializedNote);
@@ -883,6 +888,7 @@ const parseSerializedNote = (serializedNote: string): ExistingNote => {
     "position",
     "createdAt",
     "updatedAt",
+    "contentType",
     "custom",
   ];
 
@@ -907,25 +913,23 @@ const parseSerializedNote = (serializedNote: string): ExistingNote => {
 
 
 const serializeNote = (note: ExistingNote): string => {
-  let string
-    = ":-neno-id:" + note.meta.id.toString()
-    + "\n"
-    + ":title:" + note.meta.title
-    + "\n"
-    + ":created-at:" + note.meta.createdAt.toString()
-    + "\n"
-    + ":updated-at:" + note.meta.updatedAt.toString()
-    + "\n"
-    + ":-neno-default-graph-position:" + note.meta.position.x.toString()
-    + "," + note.meta.position.y.toString();
+  const headers: NoteHeaders = new Map([
+    ["-neno-id", note.meta.id.toString()],
+    ["title", note.meta.title],
+    ["created-at", note.meta.createdAt.toString()],
+    ["updated-at", note.meta.updatedAt.toString()],
+    [
+      "-neno-default-graph-position",
+      Object.values(note.meta.position).join(","),
+    ],
+    ["-neno-flags", note.meta.flags.join(",")],
+  ]);
 
   for (const key in note.meta.custom) {
-    string += "\n" + ":" + key + ":" + note.meta.custom[key];
+    headers.set(key, note.meta.custom[key]);
   }
 
-  string += "\n\n" + note.content;
-
-  return string;
+  return serializeNoteHeaders(headers) + "\n\n" + note.content;
 };
 
 

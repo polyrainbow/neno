@@ -10,6 +10,8 @@ interface BaseActiveNote {
   content: string,
   files: FileInfo[],
   keyValues: [string, string][],
+  flags: string[],
+  contentType: string,
 }
 
 export interface UnsavedActiveNote extends BaseActiveNote {

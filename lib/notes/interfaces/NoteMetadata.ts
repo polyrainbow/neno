@@ -3,6 +3,8 @@ import { NoteId } from "./NoteId";
 
 interface BaseNoteMetadata {
   title: string,
+  flags: string[],
+  contentType: string,
   custom: {
     [key: string]: string,
   }
