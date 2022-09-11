@@ -61,6 +61,9 @@ interface NoteViewProps {
   removeActiveNote,
   duplicateNote,
   saveActiveNote,
+  contentMode,
+  setNoteContent,
+  toggleEditMode,
 }
 
 const NoteView = ({
@@ -91,6 +94,9 @@ const NoteView = ({
   removeActiveNote,
   duplicateNote,
   saveActiveNote,
+  contentMode,
+  setNoteContent,
+  toggleEditMode,
 }: NoteViewProps) => {
   const isSmallScreen = useIsSmallScreen();
   const navigate = useNavigate();
@@ -294,16 +300,7 @@ const NoteView = ({
               });
             }
           }
-          setNoteContent={
-            (newContent: string): void => {
-              setActiveNote((previousState) => {
-                return {
-                  ...previousState,
-                  content: newContent,
-                };
-              });
-            }
-          }
+          setNoteContent={setNoteContent}
           addFileToNoteObject={(file: FileInfo): void => {
             setActiveNote((previousState) => {
               return {
@@ -336,6 +333,8 @@ const NoteView = ({
               ),
             );
           }}
+          contentMode={contentMode}
+          toggleEditMode={toggleEditMode}
         />
       </div>
     </main>

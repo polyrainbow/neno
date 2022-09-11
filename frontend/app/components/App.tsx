@@ -49,6 +49,8 @@ import {
   NewNoteSaveRequest,
   NoteSaveRequest,
 } from "../../../lib/notes/interfaces/NoteSaveRequest";
+import { ContentMode } from "../interfaces/ContentMode";
+import * as IDB from "idb-keyval";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -98,6 +100,10 @@ const AppWithConfirmationServiceProvider = ({
   const isSmallScreen = useIsSmallScreen();
   const [headerStats, refreshHeaderStats] = useHeaderStats(databaseProvider);
   const [page, setPage] = useState<number>(1);
+
+  const [contentMode, setContentMode] = useState<ContentMode>(
+    ContentMode.LOADING,
+  );
 
   const handleSearchInputChange = (value) => {
     setSearchValue(value);
@@ -447,6 +453,73 @@ const AppWithConfirmationServiceProvider = ({
   }, []);
 
 
+  useEffect(() => {
+    IDB.get("CONTENT_MODE")
+      .then((value) => {
+        let startContentMode;
+
+        if (value === ContentMode.EDITOR) {
+          startContentMode = ContentMode.EDITOR;
+        } else if (value === ContentMode.VIEWER) {
+          startContentMode = ContentMode.VIEWER;
+        } else {
+          startContentMode = Config.DEFAULT_CONTENT_MODE;
+        }
+
+        setContentMode(startContentMode);
+
+        if (startContentMode === ContentMode.EDITOR) {
+          setTimeout(() => {
+            document.getElementById("editor")?.focus();
+          });
+        }
+      })
+      .catch(() => {
+        setContentMode(Config.DEFAULT_CONTENT_MODE);
+      });
+  }, []);
+
+
+  const setNoteContent = (newContent: string): void => {
+    setActiveNote((previousState) => {
+      return {
+        ...previousState,
+        content: newContent,
+      };
+    });
+  };
+
+
+  const toggleEditMode = async () => {
+    if (contentMode === ContentMode.LOADING) return;
+
+    const newContentMode = contentMode === ContentMode.EDITOR
+      ? ContentMode.VIEWER
+      : ContentMode.EDITOR;
+    setContentMode(newContentMode);
+    await IDB.set("CONTENT_MODE", newContentMode);
+
+    if (newContentMode === ContentMode.EDITOR) {
+      document.getElementById("editor")?.focus();
+    }
+
+    if (
+      databaseProvider
+      && newContentMode === ContentMode.VIEWER
+      // @ts-ignore calling constructor via instance
+      && databaseProvider.constructor.features.includes("GET_DOCUMENT_TITLE")
+    ) {
+      Utils.insertDocumentTitles(activeNote.content, databaseProvider)
+        .then((newNoteContent) => {
+          if (newNoteContent !== activeNote.content) {
+            setNoteContent(newNoteContent);
+            setUnsavedChanges(true);
+          }
+        });
+    }
+  };
+
+
   return <DialogServiceProvider databaseProvider={databaseProvider}>
     <Routes>
       {/*
@@ -515,6 +588,9 @@ const AppWithConfirmationServiceProvider = ({
               createNewLinkedNote={createNewLinkedNote}
               removeActiveNote={removeActiveNote}
               duplicateNote={duplicateNote}
+              contentMode={contentMode}
+              setNoteContent={setNoteContent}
+              toggleEditMode={toggleEditMode}
             />
             : null
         }
@@ -614,6 +690,7 @@ const AppWithConfirmationServiceProvider = ({
           databaseProvider={databaseProvider}
           createOneNotePerLine={createOneNotePerLine}
           switchGraphs={switchGraphs}
+          createNewNote={createNewNote}
         />
         : null
     }

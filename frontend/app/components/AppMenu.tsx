@@ -23,6 +23,7 @@ interface AppMenuProps {
   unsavedChanges: boolean,
   setUnsavedChanges: (boolean) => void,
   databaseProvider: DatabaseProvider | null,
+  createNewNote,
 }
 
 const AppMenu = ({
@@ -32,6 +33,7 @@ const AppMenu = ({
   unsavedChanges,
   setUnsavedChanges,
   databaseProvider,
+  createNewNote,
 }: AppMenuProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -91,6 +93,10 @@ const AppMenu = ({
           if (unsavedChanges) {
             await confirmDiscardingUnsavedChanges();
             setUnsavedChanges(false);
+          }
+
+          if (!isSmallScreen) {
+            createNewNote();
           }
 
           navigate(target);

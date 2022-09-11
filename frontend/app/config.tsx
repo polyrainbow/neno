@@ -1,3 +1,5 @@
+import { ContentMode } from "./interfaces/ContentMode";
+
 const DEFAULT_NOTE_TITLE = "";
 
 const DEFAULT_NOTE_CONTENT = "";
@@ -61,6 +63,8 @@ const FILE_PICKER_ACCEPT_TYPES: FilePickerAcceptType[] = [
 
 const DEFAULT_CONTENT_TYPE = "text/subway";
 
+const DEFAULT_CONTENT_MODE = ContentMode.EDITOR;
+
 export {
   DEFAULT_NOTE_TITLE,
   DEFAULT_NOTE_CONTENT,
@@ -76,4 +80,5 @@ export {
   SERVER_DATABASE_ENABLED,
   FILE_PICKER_ACCEPT_TYPES,
   DEFAULT_CONTENT_TYPE,
+  DEFAULT_CONTENT_MODE,
 };
