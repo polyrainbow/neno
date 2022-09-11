@@ -4,7 +4,6 @@ import NoteStats from "./NoteStats";
 import NoteControls from "./NoteControls";
 import {
   getFileFromUserSelection,
-  insertDocumentTitles,
 } from "../lib/utils";
 import ActiveNote from "../interfaces/ActiveNote";
 import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
@@ -19,7 +18,6 @@ import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { FILE_PICKER_ACCEPT_TYPES } from "../config";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import NoteContent from "./NoteContent";
-import * as IDB from "idb-keyval";
 import { ContentMode } from "../interfaces/ContentMode";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import NoteLinks from "./NoteLinks";
@@ -45,9 +43,9 @@ interface NoteComponentProps {
   pinOrUnpinNote,
   duplicateNote,
   openInGraphView,
+  contentMode,
+  toggleEditMode,
 }
-
-const DEFAULT_CONTENT_MODE = ContentMode.EDITOR;
 
 
 const Note = ({
@@ -69,11 +67,10 @@ const Note = ({
   pinOrUnpinNote,
   duplicateNote,
   openInGraphView,
+  contentMode,
+  toggleEditMode,
 }: NoteComponentProps) => {
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
-  const [contentMode, setContentMode] = useState<ContentMode>(
-    ContentMode.LOADING,
-  );
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
 
   const insertFileToNote = (response: FileInfo) => {
@@ -108,35 +105,6 @@ const Note = ({
     insertFileToNote(response);
 
     setUploadInProgress(false);
-  };
-
-
-  const toggleEditMode = async () => {
-    if (contentMode === ContentMode.LOADING) return;
-
-    const newContentMode = contentMode === ContentMode.EDITOR
-      ? ContentMode.VIEWER
-      : ContentMode.EDITOR;
-    setContentMode(newContentMode);
-    await IDB.set("CONTENT_MODE", newContentMode);
-
-    if (newContentMode === ContentMode.EDITOR) {
-      document.getElementById("editor")?.focus();
-    }
-
-    if (
-      newContentMode === ContentMode.VIEWER
-      // @ts-ignore calling constructor via instance
-      && databaseProvider.constructor.features.includes("GET_DOCUMENT_TITLE")
-    ) {
-      insertDocumentTitles(note.content, databaseProvider)
-        .then((newNoteContent) => {
-          if (newNoteContent !== note.content) {
-            setNoteContent(newNoteContent);
-            setUnsavedChanges(true);
-          }
-        });
-    }
   };
 
 
@@ -179,33 +147,6 @@ const Note = ({
       = (noteTitleElementRef.current.scrollHeight - TOTAL_VERTICAL_PADDING)
       + "px";
   }, [note.title, contentMode]);
-
-
-  useEffect(() => {
-    IDB.get("CONTENT_MODE")
-      .then((value) => {
-        let startContentMode;
-
-        if (value === ContentMode.EDITOR) {
-          startContentMode = ContentMode.EDITOR;
-        } else if (value === ContentMode.VIEWER) {
-          startContentMode = ContentMode.VIEWER;
-        } else {
-          startContentMode = DEFAULT_CONTENT_MODE;
-        }
-
-        setContentMode(startContentMode);
-
-        if (startContentMode === ContentMode.EDITOR) {
-          setTimeout(() => {
-            document.getElementById("editor")?.focus();
-          });
-        }
-      })
-      .catch(() => {
-        setContentMode(DEFAULT_CONTENT_MODE);
-      });
-  }, []);
 
 
   useKeyboardShortcuts({
