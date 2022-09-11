@@ -26,8 +26,11 @@ describe("Notes module", () => {
         meta: {
           title: "Note 1",
           custom: {},
+          flags: [],
+          contentType: "",
         },
       },
+      ignoreDuplicateTitles: false,
     };
     await Notes.put(noteSaveRequest1, TEST_GRAPH_ID);
     const noteSaveRequest2: NoteSaveRequest = {
@@ -36,8 +39,11 @@ describe("Notes module", () => {
         meta: {
           title: "Note 2",
           custom: {},
+          flags: [],
+          contentType: "",
         },
       },
+      ignoreDuplicateTitles: false,
     };
     await Notes.put(noteSaveRequest2, TEST_GRAPH_ID);
     const page = await Notes.getNotesList(TEST_GRAPH_ID, {});
@@ -63,6 +69,8 @@ describe("Notes module", () => {
         meta: {
           title: "Note 3",
           custom: {},
+          flags: [],
+          contentType: "",
         },
       },
       changes: [
@@ -70,7 +78,8 @@ describe("Notes module", () => {
           type: UserNoteChangeType.LINKED_NOTE_ADDED,
           noteId: 1,
         }
-      ]
+      ],
+      ignoreDuplicateTitles: false,
     };
     await Notes.put(noteSaveRequest, TEST_GRAPH_ID);
     const stats = await Notes.getStats(TEST_GRAPH_ID, {
