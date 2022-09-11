@@ -22,6 +22,7 @@ import {
 } from "../subwaytext/interfaces/Block.js";
 import { Note } from "./interfaces/Note.js";
 import { ExistingNoteMetadata } from "./interfaces/NoteMetadata.js";
+import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
 
 
 const getExtensionFromFilename = (filename: string): string | null => {
@@ -826,7 +827,7 @@ const getNotesWithMediaTypes = (
 };
 
 
-type NoteHeaders = Map<string, string>;
+type NoteHeaders = Map<CanonicalNoteHeader | string, string>;
 type MetaModifier = (meta: Partial<ExistingNoteMetadata>, val: string) => void;
 
 const parseNoteHeaders = (note: string): NoteHeaders => {
@@ -850,31 +851,51 @@ const serializeNoteHeaders = (headers: NoteHeaders): string => {
 
 const parseSerializedNote = (serializedNote: string): ExistingNote => {
   const canonicalHeaderKeys
-    = new Map<string, MetaModifier>([
-      ["-neno-id", (meta, val) => meta.id = parseInt(val)],
-      ["-neno-default-graph-position", (meta, val) => {
-        const [x, y] = val.split(",").map((string) => parseFloat(string));
-        meta.position = {
-          x,
-          y,
-        };
-      }],
-      ["title", (meta, val) => meta.title = val],
-      ["created-at", (meta, val) => meta.createdAt = parseInt(val)],
-      ["updated-at", (meta, val) => meta.updatedAt = parseInt(val)],
-      ["-neno-flags", (meta, val) => {
-        meta.flags = val.trim().length > 0
-          ? val.trim().split(",")
-          : [];
-      }],
+    = new Map<CanonicalNoteHeader, MetaModifier>([
+      [
+        CanonicalNoteHeader.ID,
+        (meta, val) => meta.id = parseInt(val)],
+      [
+        CanonicalNoteHeader.GRAPH_POSITION,
+        (meta, val) => {
+          const [x, y] = val.split(",").map((string) => parseFloat(string));
+          meta.position = {
+            x,
+            y,
+          };
+        },
+      ],
+      [
+        CanonicalNoteHeader.TITLE,
+        (meta, val) => meta.title = val,
+      ],
+      [
+        CanonicalNoteHeader.CREATED_AT,
+        (meta, val) => meta.createdAt = parseInt(val),
+      ],
+      [
+        CanonicalNoteHeader.UPDATED_AT,
+        (meta, val) => meta.updatedAt = parseInt(val),
+      ],
+      [
+        CanonicalNoteHeader.FLAGS,
+        (meta, val) => {
+          meta.flags = val.trim().length > 0
+            ? val.trim().split(",")
+            : [];
+        },
+      ],
     ]);
 
   const headers = parseNoteHeaders(serializedNote);
   const partialMeta: Partial<ExistingNoteMetadata> = {};
   const custom = {};
   for (const [key, value] of headers.entries()) {
-    if (canonicalHeaderKeys.has(key)) {
-      (canonicalHeaderKeys.get(key) as MetaModifier)(partialMeta, value);
+    if (canonicalHeaderKeys.has(key as CanonicalNoteHeader)) {
+      (canonicalHeaderKeys.get(key as CanonicalNoteHeader) as MetaModifier)(
+        partialMeta,
+        value,
+      );
     } else {
       custom[key] = value;
     }
@@ -914,15 +935,30 @@ const parseSerializedNote = (serializedNote: string): ExistingNote => {
 
 const serializeNote = (note: ExistingNote): string => {
   const headers: NoteHeaders = new Map([
-    ["-neno-id", note.meta.id.toString()],
-    ["title", note.meta.title],
-    ["created-at", note.meta.createdAt.toString()],
-    ["updated-at", note.meta.updatedAt.toString()],
     [
-      "-neno-default-graph-position",
+      CanonicalNoteHeader.ID,
+      note.meta.id.toString(),
+    ],
+    [
+      CanonicalNoteHeader.TITLE,
+      note.meta.title,
+    ],
+    [
+      CanonicalNoteHeader.CREATED_AT,
+      note.meta.createdAt.toString(),
+    ],
+    [
+      CanonicalNoteHeader.UPDATED_AT,
+      note.meta.updatedAt.toString(),
+    ],
+    [
+      CanonicalNoteHeader.GRAPH_POSITION,
       Object.values(note.meta.position).join(","),
     ],
-    ["-neno-flags", note.meta.flags.join(",")],
+    [
+      CanonicalNoteHeader.FLAGS,
+      note.meta.flags.join(","),
+    ],
   ]);
 
   for (const key in note.meta.custom) {
