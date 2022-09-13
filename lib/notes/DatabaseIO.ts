@@ -16,7 +16,6 @@ import * as config from "./config.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import { GraphId } from "../../backend/interfaces/GraphId.js";
 import updateGraphDataStructure from "./updateGraphDataStructure.js";
-import cleanUpGraph from "./cleanUpGraph.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 import { parseSerializedNote, serializeNote } from "./noteUtils.js";
@@ -35,23 +34,41 @@ export default class DatabaseIO {
   private async readGraphFile(
     graphId: GraphId,
   ): Promise<Graph | null> {
+    let json;
     try {
-      const json = await this.#storageProvider.readObjectAsString(
+      json = await this.#storageProvider.readObjectAsString(
         graphId,
         this.#GRAPH_FILE_NAME,
       );
-      const object: SerializedGraphObject = JSON.parse(json);
-      // when we open a graph from file for the first time, let's make sure
-      // it has the up-to-date data structure and is cleaned up.
-      await updateGraphDataStructure(object);
-      const parsedGraphObject = {
-        ...object,
-        notes: object.notes.map(parseSerializedNote),
-      };
-      return parsedGraphObject;
     } catch (e) {
       return null;
     }
+
+    const object: SerializedGraphObject = JSON.parse(json);
+    // when we open a graph from file for the first time, let's make sure
+    // it has the up-to-date data structure and is cleaned up.
+    await updateGraphDataStructure(object);
+
+    const nonParseableNote = Symbol("NOT_PARSEABLE");
+
+    const parsedNotes = object.notes
+      .map((serializedNote) => {
+        let parsedNote;
+        try {
+          parsedNote = parseSerializedNote(serializedNote);
+        } catch (e) {
+          parsedNote = nonParseableNote;
+        }
+
+        return parsedNote;
+      })
+      .filter(parsedNote => parsedNote !== nonParseableNote);
+
+    const parsedGraphObject = {
+      ...object,
+      notes: parsedNotes,
+    };
+    return parsedGraphObject;
   }
 
 
@@ -124,8 +141,6 @@ export default class DatabaseIO {
     const graphFromFile: Graph | null
       = await this.readGraphFile(graphId);
     if (graphFromFile) {
-      cleanUpGraph(graphFromFile);
-
       // flushing these changes will also save the graph in memory for
       // faster access the next time
       await this.flushChanges(graphId, graphFromFile);

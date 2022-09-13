@@ -888,6 +888,12 @@ const parseSerializedNote = (serializedNote: string): ExistingNote => {
             : [];
         },
       ],
+      [
+        CanonicalNoteHeader.CONTENT_TYPE,
+        (meta, val) => {
+          meta.contentType = val.trim();
+        },
+      ],
     ]);
 
   const headers = parseNoteHeaders(serializedNote);
@@ -961,6 +967,10 @@ const serializeNote = (note: ExistingNote): string => {
     [
       CanonicalNoteHeader.FLAGS,
       note.meta.flags.join(","),
+    ],
+    [
+      CanonicalNoteHeader.CONTENT_TYPE,
+      note.meta.contentType,
     ],
   ]);
 
