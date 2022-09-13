@@ -582,9 +582,9 @@ const startApp = async ({
         return;
       }
 
-      const mimeType = req.headers["content-type"];
+      const contentType = req.headers["content-type"];
 
-      if (!mimeType) {
+      if (!contentType) {
         const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
@@ -592,6 +592,10 @@ const startApp = async ({
         res.status(406).json(response);
         return;
       }
+
+      const mimeType = contentType.includes(";")
+        ? contentType.substring(0, contentType.indexOf(";"))
+        : contentType;
 
       const filenameBase64 = req.headers["filename"];
 
