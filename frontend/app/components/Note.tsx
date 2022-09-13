@@ -3,7 +3,7 @@ import Editor from "./Editor";
 import NoteStats from "./NoteStats";
 import NoteControls from "./NoteControls";
 import {
-  getFileFromUserSelection,
+  getFilesFromUserSelection,
 } from "../lib/utils";
 import ActiveNote from "../interfaces/ActiveNote";
 import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
@@ -30,7 +30,7 @@ interface NoteComponentProps {
   setNoteTitle: (title: string) => void,
   setNoteContent: (title: string) => void,
   displayedLinkedNotes: (LinkedNote | FrontendUserNoteChangeNote)[],
-  addFileToNoteObject,
+  addFilesToNoteObject,
   onLinkAddition: (note: MainNoteListItem) => void,
   onLinkRemoval: (noteId: NoteId) => void,
   setUnsavedChanges,
@@ -53,7 +53,7 @@ const Note = ({
   setNote,
   setNoteTitle,
   setNoteContent,
-  addFileToNoteObject,
+  addFilesToNoteObject,
   displayedLinkedNotes,
   onLinkAddition,
   onLinkRemoval,
@@ -73,8 +73,11 @@ const Note = ({
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
 
-  const insertFileToNote = (response: FileInfo) => {
-    addFileToNoteObject(response);
+  const insertFilesToNote = (responses: FileInfo[]) => {
+    addFilesToNoteObject(responses);
+
+    const fileIds = responses.map((response) => response.fileId);
+    const fileBlocks = fileIds.map((fileId) => `/file:${fileId}`);
 
     // only add line breaks if they're not already there
     let separator;
@@ -87,22 +90,28 @@ const Note = ({
     }
 
     setNoteContent(
-      `${note.content}${separator}/file:${response.fileId}`,
+      `${note.content}${separator}${fileBlocks.join("\n\n")}`,
     );
   };
 
 
-  const uploadFile = async () => {
-    const file = await getFileFromUserSelection(
+  const uploadFiles = async () => {
+    const files = await getFilesFromUserSelection(
       FILE_PICKER_ACCEPT_TYPES,
     );
 
     setUploadInProgress(true);
 
-    const response: FileInfo
-      = await databaseProvider.uploadFile(file);
+    const responses: FileInfo[]
+      = await Promise.all(
+        files.map(
+          (file) => {
+            return databaseProvider.uploadFile(file);
+          },
+        ),
+      );
 
-    insertFileToNote(response);
+    insertFilesToNote(responses);
 
     setUploadInProgress(false);
   };
@@ -120,7 +129,7 @@ const Note = ({
           setUploadInProgress(true);
           databaseProvider.uploadFile(file)
             .then((response) => {
-              insertFileToNote(response);
+              insertFilesToNote([response]);
               setUploadInProgress(false);
             });
         }
@@ -130,7 +139,7 @@ const Note = ({
       [...e.dataTransfer.files].forEach((file) => {
         databaseProvider.uploadFile(file)
           .then((response) => {
-            insertFileToNote(response);
+            insertFilesToNote([response]);
             setUploadInProgress(false);
           });
       });
@@ -166,7 +175,7 @@ const Note = ({
       pinOrUnpinNote={pinOrUnpinNote}
       duplicateNote={duplicateNote}
       openInGraphView={openInGraphView}
-      uploadFile={uploadFile}
+      uploadFiles={uploadFiles}
       contentMode={contentMode}
       toggleEditMode={toggleEditMode}
       uploadInProgress={uploadInProgress}

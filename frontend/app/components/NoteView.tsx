@@ -303,11 +303,11 @@ const NoteView = ({
             }
           }
           setNoteContent={setNoteContent}
-          addFileToNoteObject={(file: FileInfo): void => {
+          addFilesToNoteObject={(files: FileInfo[]): void => {
             setActiveNote((previousState) => {
               return {
                 ...previousState,
-                files: [...previousState.files, file],
+                files: [...previousState.files, ...files],
               };
             });
           }}

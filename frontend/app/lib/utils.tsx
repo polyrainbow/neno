@@ -345,16 +345,18 @@ const getIconSrc = (iconName: string): string => {
 const stringContainsOnlyDigits = (val: string): boolean => /^\d+$/.test(val);
 
 
-const getFileFromUserSelection = async (
+const getFilesFromUserSelection = async (
   types: FilePickerAcceptType[],
-): Promise<File> => {
-  const [fileHandle] = await window.showOpenFilePicker({
-    multiple: false,
+): Promise<File[]> => {
+  const fileHandles = await window.showOpenFilePicker({
+    multiple: true,
     types,
   });
 
-  const file = await fileHandle.getFile();
-  return file;
+  const files = await Promise.all(
+    fileHandles.map((fileHandle) => fileHandle.getFile()),
+  );
+  return files;
 };
 
 
@@ -449,7 +451,7 @@ export {
   getExtensionFromFilename,
   getMediaTypeFromFilename,
   getNoteTitleFromContent,
-  getFileFromUserSelection,
+  getFilesFromUserSelection,
   base64Encode,
   parseFileIds,
   getFileId,
