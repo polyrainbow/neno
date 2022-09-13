@@ -12,7 +12,7 @@ const NoteContentBlockEmptyFile = () => {
         title={l("note.file-not-available")}
         size={70}
       />
-      File not available
+      {l("note.file-not-available")}
     </div>
   </div>;
 };
