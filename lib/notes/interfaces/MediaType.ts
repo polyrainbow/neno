@@ -3,5 +3,6 @@ export enum MediaType {
   PDF = "pdf",
   AUDIO = "audio",
   VIDEO = "video",
+  TEXT = "text",
   OTHER = "other",
 }

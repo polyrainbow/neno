@@ -26,6 +26,22 @@ const ALLOWED_FILE_TYPES: FileType[] = [
     extension: "pdf",
   },
   {
+    mimeType: "application/javascript",
+    extension: "js",
+  },
+  {
+    mimeType: "text/javascript",
+    extension: "js",
+  },
+  {
+    mimeType: "application/json",
+    extension: "js",
+  },
+  {
+    mimeType: "application/json",
+    extension: "json",
+  },
+  {
     mimeType: "audio/mp3",
     extension: "mp3",
   },

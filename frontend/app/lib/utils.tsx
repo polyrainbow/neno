@@ -83,6 +83,9 @@ const getMediaTypeFromFilename = (
     "flac": MediaType.AUDIO,
     "mp4": MediaType.VIDEO,
     "webm": MediaType.VIDEO,
+    "js": MediaType.TEXT,
+    "json": MediaType.TEXT,
+    "txt": MediaType.TEXT,
   }));
 
   const extension = getExtensionFromFilename(filename);
@@ -294,14 +297,14 @@ const getWindowDimensions = (): {width: number, height: number} => {
 
 const parseFileIds = (noteContent: string): FileId[] => {
   // eslint-disable-next-line max-len
-  const regex = /\/file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{3,4})/g;
+  const regex = /\/file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
   return [...noteContent.matchAll(regex)].map((match) => match[1]);
 };
 
 
 const getFileId = (noteContent: string): FileId | null => {
   // eslint-disable-next-line max-len
-  const regex = /file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{3,4})/g;
+  const regex = /file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
   const results = [...noteContent.matchAll(regex)].map((match) => match[1]);
   if (results.length > 0) {
     return results[0];

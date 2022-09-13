@@ -54,6 +54,9 @@ const getMediaTypeFromFilename = (
     "flac": MediaType.AUDIO,
     "mp4": MediaType.VIDEO,
     "webm": MediaType.VIDEO,
+    "js": MediaType.TEXT,
+    "json": MediaType.TEXT,
+    "txt": MediaType.TEXT,
   }));
 
   const extension = getExtensionFromFilename(filename);
@@ -284,14 +287,14 @@ const removeLinksOfNote = (graph: Graph, noteId: NoteId): void => {
 
 const parseFileIds = (noteContent: NoteContent): FileId[] => {
   // eslint-disable-next-line max-len
-  const regex = /\/file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{3,4})/g;
+  const regex = /\/file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
   return [...noteContent.matchAll(regex)].map((match) => match[1]);
 };
 
 
 const getFileId = (input: string): FileId | null => {
   // eslint-disable-next-line max-len
-  const regex = /file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{3,4})/g;
+  const regex = /file:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
   const results = [...input.matchAll(regex)].map((match) => match[1]);
   if (results.length > 0) {
     return results[0];
@@ -844,8 +847,8 @@ const parseNoteHeaders = (note: string): NoteHeaders => {
 
 const serializeNoteHeaders = (headers: NoteHeaders): string => {
   return Array.from(headers.entries()).map(([key, value]) => {
-    return ":" + key + ":" + value + "\n";
-  }).join("");
+    return ":" + key + ":" + value;
+  }).join("\n");
 };
 
 

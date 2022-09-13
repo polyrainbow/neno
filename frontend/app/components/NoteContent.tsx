@@ -20,6 +20,7 @@ import NoteContentBlockImage from "./NoteContentBlockImage";
 import NoteContentEmptyDisclaimer from "./NoteContentEmptyDisclaimer";
 import NoteContentBlockUrl from "./NoteContentBlockUrl";
 import NoteContentRunningText from "./NoteContentRunningText";
+import NoteContentBlockTextFile from "./NoteContentBlockTextFile";
 
 interface NoteContentProps {
   note: ActiveNote,
@@ -51,6 +52,7 @@ const NoteContent = ({
               key={Math.random()}
             />;
           }
+
           const mediaType = getMediaTypeFromFilename(fileId);
           const file
             = note.files.find((file) => file.fileId === fileId);
@@ -77,6 +79,12 @@ const NoteContent = ({
               databaseProvider={databaseProvider}
               key={file.fileId}
               description={block.data.text}
+            />;
+          } else if (mediaType === MediaType.TEXT) {
+            return <NoteContentBlockTextFile
+              file={file}
+              databaseProvider={databaseProvider}
+              key={file.fileId}
             />;
           } else {
             return <NoteContentBlockDocument
