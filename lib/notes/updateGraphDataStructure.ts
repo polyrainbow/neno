@@ -15,7 +15,9 @@ const formatHeader = (key, value: string) => {
 // canonical data structure
 const updateGraphDataStructure = async (graph: any) => {
   graph.notes = graph.notes.map((note) => {
-    if (typeof note === "string") return note;
+    if (typeof note === "string") {
+      return note;
+    }
 
     let string
       = formatHeader(CanonicalNoteHeader.ID, note.id.toString())
@@ -30,7 +32,6 @@ const updateGraphDataStructure = async (graph: any) => {
       );
 
     string += "\n" + note.content;
-
     return string;
   });
 };
