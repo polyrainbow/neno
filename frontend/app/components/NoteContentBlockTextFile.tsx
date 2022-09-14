@@ -70,7 +70,7 @@ const NoteContentBlockTextFile = ({
     <div className="preview-block-audio-second-line">
       <pre
         key={Math.random()}
-        className="preview-block-code"
+        className="preview-block-file-text"
       >
         {text}
       </pre>

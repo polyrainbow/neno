@@ -128,12 +128,16 @@ FILE PREVIEW
   white-space: break-spaces;
 }
 
-.preview-block-code {
+.preview-block-code, .preview-block-file-text {
   padding: 10px;
   font-family: "Hack", monospace;
   white-space: break-spaces;
   word-break: break-all;
   background-color: var(--accent-color-interactible);
+}
+
+.preview-block-file-text {
+  margin-bottom: 0;
 }
 
 .preview-block-image-wrapper {
