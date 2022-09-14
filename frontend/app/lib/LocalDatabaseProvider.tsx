@@ -286,7 +286,6 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     return this.#notesModule.addFile(
       this.#activeGraphId,
       file.stream(),
-      file.type,
       file.name,
     );
   }

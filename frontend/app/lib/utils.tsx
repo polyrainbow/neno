@@ -78,22 +78,38 @@ const getMediaTypeFromFilename = (
     "webp": MediaType.IMAGE,
     "gif": MediaType.IMAGE,
     "svg": MediaType.IMAGE,
+
     "pdf": MediaType.PDF,
+
+    "wav": MediaType.AUDIO,
     "mp3": MediaType.AUDIO,
+    "ogg": MediaType.AUDIO,
     "flac": MediaType.AUDIO,
+
     "mp4": MediaType.VIDEO,
     "webm": MediaType.VIDEO,
+
+    "html": MediaType.TEXT,
+    "css": MediaType.TEXT,
     "js": MediaType.TEXT,
     "json": MediaType.TEXT,
+    "c": MediaType.TEXT,
+    "cpp": MediaType.TEXT,
+    "rs": MediaType.TEXT,
     "txt": MediaType.TEXT,
+    "md": MediaType.TEXT,
+    "xq": MediaType.TEXT,
+    "xql": MediaType.TEXT,
   }));
 
   const extension = getExtensionFromFilename(filename);
   if (!extension) {
-    return MediaType.OTHER;
+    return MediaType.TEXT;
   }
 
-  return map.has(extension) ? map.get(extension) as MediaType : MediaType.OTHER;
+  return map.has(extension)
+    ? map.get(extension) as MediaType
+    : MediaType.OTHER;
 };
 
 
@@ -354,11 +370,13 @@ const getFilesFromUserSelection = async (
   const fileHandles = await window.showOpenFilePicker({
     multiple: true,
     types,
+    excludeAcceptAllOption: false,
   });
 
   const files = await Promise.all(
     fileHandles.map((fileHandle) => fileHandle.getFile()),
   );
+
   return files;
 };
 

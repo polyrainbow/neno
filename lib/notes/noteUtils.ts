@@ -983,6 +983,7 @@ const serializeNote = (note: ExistingNote): string => {
 
 
 export {
+  getExtensionFromFilename,
   getNoteTitlePreview,
   normalizeNoteTitle,
   noteWithSameTitleExists,

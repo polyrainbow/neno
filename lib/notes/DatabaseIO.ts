@@ -11,14 +11,13 @@
 import { stringContainsUUID } from "../utils.js";
 import { FileId } from "./interfaces/FileId.js";
 import Graph, { SerializedGraphObject } from "./interfaces/Graph.js";
-import ReadableWithMimeType from "./interfaces/ReadableWithMimeType.js";
-import * as config from "./config.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import { GraphId } from "../../backend/interfaces/GraphId.js";
 import updateGraphDataStructure from "./updateGraphDataStructure.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 import { parseSerializedNote, serializeNote } from "./noteUtils.js";
+import { Readable } from "./interfaces/Readable.js";
 
 
 export default class DatabaseIO {
@@ -224,7 +223,7 @@ export default class DatabaseIO {
     graphId: GraphId,
     fileId: FileId,
     range,
-  ): Promise<ReadableWithMimeType> {
+  ): Promise<Readable> {
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
       fileId,
@@ -236,24 +235,7 @@ export default class DatabaseIO {
       range,
     );
 
-    const extension = fileId.substring(fileId.lastIndexOf(".") + 1)
-      .toLocaleLowerCase();
-
-    const fileType = config.ALLOWED_FILE_TYPES
-      .find((ft) => {
-        return ft.extension === extension;
-      });
-
-    if (!fileType) {
-      throw Error(ErrorMessage.INVALID_FILENAME_EXTENSION);
-    }
-
-    const mimeType = fileType.mimeType;
-
-    return {
-      readable: stream,
-      mimeType,
-    };
+    return stream;
   }
 
 

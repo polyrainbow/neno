@@ -584,7 +584,7 @@ const startApp = async ({
 
       const contentType = req.headers["content-type"];
 
-      if (!contentType) {
+      if (contentType !== "application/neno-filestream") {
         const response: APIResponse = {
           success: false,
           error: APIError.INVALID_REQUEST,
@@ -592,10 +592,6 @@ const startApp = async ({
         res.status(406).json(response);
         return;
       }
-
-      const mimeType = contentType.includes(";")
-        ? contentType.substring(0, contentType.indexOf(";"))
-        : contentType;
 
       const filenameBase64 = req.headers["filename"];
 
@@ -611,7 +607,7 @@ const startApp = async ({
       const filename = Buffer.from(filenameBase64, "base64").toString();
 
       try {
-        logger.verbose("Starting file upload. Type: " + mimeType);
+        logger.verbose("Starting file upload. Name: " + filename);
 
         const {
           name,
@@ -620,7 +616,6 @@ const startApp = async ({
         } = await Notes.addFile(
           graphId,
           req,
-          mimeType,
           filename,
         );
 
@@ -706,7 +701,7 @@ const startApp = async ({
             return res.end();
           }
 
-          const { readable, mimeType }
+          const readable
             = await Notes.getReadableFileStream(
               graphId,
               req.params.fileId,
@@ -728,13 +723,13 @@ const startApp = async ({
               "Content-Range": `bytes ${start}-${end}/${size}`,
               "Accept-Ranges": "bytes",
               "Content-Length": end - start + 1,
-              "Content-Type": mimeType,
+              "Content-Type": "application/neno-filestream",
             });
 
             readable.pipe(res);
           });
         } else { // no range request
-          const { readable, mimeType }
+          const readable
             = await Notes.getReadableFileStream(graphId, req.params.fileId);
 
           readable.on("error", () => {
@@ -749,7 +744,7 @@ const startApp = async ({
           readable.on("open", () => {
             res.writeHead(200, {
               "Content-Length": size,
-              "Content-Type": mimeType
+              "Content-Type": "application/neno-filestream",
             });
   
             readable.pipe(res);

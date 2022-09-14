@@ -264,9 +264,9 @@ const uploadFile = async (file: File): Promise<FileInfo> => {
     method: "POST",
     endpoint: "file",
     payload: file,
-    payloadType: file.type,
+    payloadType: "application/neno-filestream",
     additionalHeaders: {
-      filename: await base64Encode(file.name),
+      "filename": await base64Encode(file.name),
     },
   });
 

@@ -94,11 +94,9 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getFiles();
   }
 
-
   getFileInfo(fileId: FileId): Promise<FileInfo> {
     return API.getFileInfo(fileId);
   }
-
 
   getDanglingFiles() {
     return API.getDanglingFiles();
@@ -160,7 +158,10 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
    * public name instead of the more technical fileId.
    * @return {string} url
   */
-  async getUrlForFileId(fileId: FileId, publicName?: string): Promise<string> {
+  async getUrlForFileId(
+    fileId: FileId,
+    publicName?: string,
+  ): Promise<string> {
     let url = this.#apiUrl + "graph/" + this.#activeGraphId + "/file/" + fileId;
 
     if (typeof publicName === "string") {

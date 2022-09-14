@@ -144,8 +144,10 @@ export default class FileSystemStorageProvider implements StorageProvider {
     const finalPath = this.joinPath(
       this.#graphsDirectoryPath, graphId, requestPath,
     );
-    try {
+    try { console.log(finalPath)
       const readableStream = fsClassic.createReadStream(finalPath, range);
+      console.log("readable stream");
+      console.log(readableStream);
       return readableStream;
     } catch (e) {
       return handleNodeJsFsApiError(e);

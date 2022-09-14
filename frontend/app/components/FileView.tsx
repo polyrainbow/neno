@@ -4,7 +4,7 @@ import {
   useParams, Link,
 } from "react-router-dom";
 import { MainNoteListItem } from "../interfaces/NoteListItem";
-import { getAppPath, getMediaTypeFromFilename } from "../lib/utils";
+import { getAppPath, getMediaTypeFromFilename, getUrl } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
@@ -33,10 +33,7 @@ const FileView = ({
     const getFileInfo = async () => {
       const fileInfo = await databaseProvider.getFileInfo(fileId);
       setFileInfo(fileInfo);
-    };
-
-    const updateSrc = async () => {
-      const src = await databaseProvider.getUrlForFileId(fileId);
+      const src = await getUrl(fileInfo, databaseProvider);
       setSrc(src);
     };
 
@@ -48,7 +45,6 @@ const FileView = ({
     };
 
     getFileInfo();
-    updateSrc();
     getNotes();
   }, [databaseProvider, fileId]);
 

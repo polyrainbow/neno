@@ -27,6 +27,7 @@ import {
   parseFileIds,
   getNotesWithMediaTypes,
   findNoteIndex,
+  getExtensionFromFilename,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -43,7 +44,6 @@ import { FileId } from "./interfaces/FileId.js";
 import * as config from "./config.js";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
-import ReadableWithType from "./interfaces/ReadableWithMimeType.js";
 import GraphObject from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import DatabaseQuery from "./interfaces/DatabaseQuery.js";
@@ -56,6 +56,7 @@ import { BlockType } from "../subwaytext/interfaces/Block.js";
 import { MediaType } from "./interfaces/MediaType.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
 import { NoteSaveRequest } from "./interfaces/NoteSaveRequest.js";
+import { Readable } from "./interfaces/Readable.js";
 
 let io: DatabaseIO;
 let randomUUID: () => string;
@@ -433,19 +434,10 @@ const importDB = (
 const addFile = async (
   graphId: GraphId,
   readable: SomeReadableStream,
-  mimeType: string,
   filename: string,
 ): Promise<FileInfo> => {
-  const fileType = config.ALLOWED_FILE_TYPES
-    .find((filetype) => {
-      return filetype.mimeType === mimeType;
-    });
-
-  if (!fileType) {
-    throw new Error(ErrorMessage.INVALID_MIME_TYPE);
-  }
-
-  const fileId: FileId = randomUUID() + "." + fileType.extension;
+  const extension = getExtensionFromFilename(filename);
+  const fileId: FileId = randomUUID() + "." + extension;
   const size = await io.addFile(graphId, fileId, readable);
 
   const graph = await io.getGraph(graphId);
@@ -504,12 +496,13 @@ const getReadableFileStream = async (
   graphId: GraphId,
   fileId: FileId,
   range?,
-): Promise<ReadableWithType> => {
+): Promise<Readable> => {
   const graph = await io.getGraph(graphId);
   if (!graph.files.map((file) => file.fileId).includes(fileId)) {
     throw new Error(ErrorMessage.FILE_NOT_FOUND);
   }
-  return io.getReadableFileStream(graphId, fileId, range);
+  const stream = await io.getReadableFileStream(graphId, fileId, range);
+  return stream;
 };
 
 
