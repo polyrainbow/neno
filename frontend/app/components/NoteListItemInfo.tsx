@@ -1,5 +1,5 @@
 import React from "react";
-import { emojis } from "../config";
+import { emojis, SPAN_SEPARATOR } from "../config";
 import {
   FrontendNoteListItem,
   MainNoteListItem,
@@ -13,8 +13,6 @@ const NoteListItemInfo = ({
 }: {
   note: FrontendNoteListItem
 }) => {
-  const SPAN_SEPARATOR = " · ";
-
   const isMainNoteListItem = (
     noteListItem:(FrontendNoteListItem),
   ): noteListItem is MainNoteListItem => {

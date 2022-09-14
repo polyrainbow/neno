@@ -9,6 +9,7 @@ import {
   getMediaTypeFromFilename,
   getUrl,
   humanFileSize,
+  makeTimestampHumanReadable,
 } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
@@ -16,6 +17,7 @@ import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import BusyIndicator from "./BusyIndicator";
+import { SPAN_SEPARATOR } from "../config";
 
 
 const FileView = ({
@@ -69,7 +71,15 @@ const FileView = ({
     <section className="content-section-wide">
       <p><Link to="/files">{l("files.show-all-files")}</Link></p>
       <h1>{fileInfo?.name}</h1>
-      <p>{fileInfo ? humanFileSize(fileInfo.size) : ""}</p>
+      <p>{
+        fileInfo ? humanFileSize(fileInfo.size) : ""
+      }{SPAN_SEPARATOR}{
+        fileInfo
+          ? l("stats.metadata.created-at")
+            + ": "
+            + makeTimestampHumanReadable(fileInfo.createdAt)
+          : ""
+      }</p>
       <div
         style={{
           display: "flex",
