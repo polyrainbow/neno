@@ -45,6 +45,12 @@ const FileView = ({
       setFileInfo(fileInfo);
       const src = await getUrl(fileInfo, databaseProvider);
       setSrc(src);
+
+      if (type === MediaType.TEXT) {
+        fetch(src)
+          .then((response) => response.text())
+          .then((text) => setText(text));
+      }
     };
 
     const getNotes = async () => {
@@ -56,12 +62,6 @@ const FileView = ({
 
     getFileInfo();
     getNotes();
-
-    if (type === MediaType.TEXT) {
-      fetch(src)
-        .then((response) => response.text())
-        .then((text) => setText(text));
-    }
   }, [databaseProvider, fileId]);
 
   return <>
