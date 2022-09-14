@@ -27,11 +27,11 @@ const NoteStats = ({
           <td>{note.id}</td>
         </tr>
         <tr>
-          <td>{l("editor.stats.creation-time")}</td>
+          <td>{l("editor.stats.created-at")}</td>
           <td>{makeTimestampHumanReadable(note.createdAt)}</td>
         </tr>
         <tr>
-          <td>{l("editor.stats.last-update-time")}</td>
+          <td>{l("editor.stats.updated-at")}</td>
           <td>{makeTimestampHumanReadable(note.updatedAt)}</td>
         </tr>
         <tr>

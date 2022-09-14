@@ -59,11 +59,11 @@ const StatsView = ({
                   <td>{databaseType}</td>
                 </tr>
                 <tr>
-                  <td>{l("stats.metadata.creation-time")}</td>
+                  <td>{l("stats.metadata.created-at")}</td>
                   <td>{makeTimestampHumanReadable(stats.createdAt)}</td>
                 </tr>
                 <tr>
-                  <td>{l("stats.metadata.update-time")}</td>
+                  <td>{l("stats.metadata.updated-at")}</td>
                   <td>{makeTimestampHumanReadable(stats.updatedAt)}</td>
                 </tr>
                 <tr>
