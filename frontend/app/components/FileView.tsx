@@ -4,7 +4,12 @@ import {
   useParams, Link,
 } from "react-router-dom";
 import { MainNoteListItem } from "../interfaces/NoteListItem";
-import { getAppPath, getMediaTypeFromFilename, getUrl } from "../lib/utils";
+import {
+  getAppPath,
+  getMediaTypeFromFilename,
+  getUrl,
+  humanFileSize,
+} from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
@@ -24,8 +29,11 @@ const FileView = ({
   const [src, setSrc] = useState<string>("");
   // status can be READY, BUSY
   const [notes, setNotes] = useState<MainNoteListItem[] | null>(null);
+  const [text, setText] = useState<string>("");
 
   const { fileId } = useParams();
+
+  const type = fileId && getMediaTypeFromFilename(fileId);
 
   useEffect(() => {
     if (typeof fileId !== "string") return;
@@ -46,9 +54,13 @@ const FileView = ({
 
     getFileInfo();
     getNotes();
-  }, [databaseProvider, fileId]);
 
-  const type = fileId && getMediaTypeFromFilename(fileId);
+    if (type === MediaType.TEXT) {
+      fetch(src)
+        .then((response) => response.text())
+        .then((text) => setText(text));
+    }
+  }, [databaseProvider, fileId]);
 
   return <>
     <HeaderContainer
@@ -57,6 +69,7 @@ const FileView = ({
     <section className="content-section-wide">
       <p><Link to="/files">{l("files.show-all-files")}</Link></p>
       <h1>{fileInfo?.name}</h1>
+      <p>{fileInfo ? humanFileSize(fileInfo.size) : ""}</p>
       <div
         style={{
           display: "flex",
@@ -109,6 +122,16 @@ const FileView = ({
               }}
               src={src}
             />
+            : ""
+        }
+        {
+          type === MediaType.TEXT
+            ? <pre
+              className="preview-block-file-text"
+              style={{
+                width: "100%",
+              }}
+            >{text}</pre>
             : ""
         }
         {
