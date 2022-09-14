@@ -82,6 +82,7 @@ speaker
 star
 star_border
 stream
+text_snippet
 title
 tour
 trip_origin

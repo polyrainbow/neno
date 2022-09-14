@@ -1,30 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Link,
 } from "react-router-dom";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { PathTemplate } from "../enum/PathTemplate";
-import FileIdAndSrc from "../interfaces/FileInfoAndSrc";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { getAppPath, getMediaTypeFromFilename, getIconSrc } from "../lib/utils";
 
 interface FilesViewPreviewBoxProps{
   key: string,
-  file: FileIdAndSrc,
+  file: FileInfo,
+  databaseProvider: DatabaseProvider,
 }
 
 const FilesViewPreviewBox = ({
   file,
+  databaseProvider,
 }: FilesViewPreviewBoxProps) => {
   const type = getMediaTypeFromFilename(file.fileId) || "unknown";
+  const [thumbnailImageSrc, setThumbnailImageSrc]
+    = useState<string | null>(null);
 
-  const imageSrcMap = {
-    [MediaType.IMAGE]: file.src,
-    [MediaType.AUDIO]: getIconSrc("audiotrack"),
-    [MediaType.VIDEO]: getIconSrc("videocam"),
-    [MediaType.PDF]: getIconSrc("description"),
-  };
 
-  const imageSrc = imageSrcMap[type];
+  useEffect(() => {
+    databaseProvider.getUrlForFileId(file.fileId)
+      .then((src) => {
+        const thumbnailImageSrcMap = {
+          [MediaType.IMAGE]: src,
+          [MediaType.AUDIO]: getIconSrc("audiotrack"),
+          [MediaType.VIDEO]: getIconSrc("videocam"),
+          [MediaType.PDF]: getIconSrc("description"),
+          [MediaType.TEXT]: getIconSrc("text_snippet"),
+        };
+
+        setThumbnailImageSrc(thumbnailImageSrcMap[type]);
+      });
+  }, []);
+
 
   return <Link
     to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))}
@@ -42,7 +55,7 @@ const FilesViewPreviewBox = ({
         cursor: "pointer",
         background: "white",
       }}
-      src={imageSrc}
+      src={thumbnailImageSrc || ""}
       loading="lazy"
     />
   </Link>;

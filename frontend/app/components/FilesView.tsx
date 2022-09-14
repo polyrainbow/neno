@@ -19,7 +19,7 @@ const FilesView = ({
   createNewNote,
 }: FilesViewProps) => {
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
-  const [files, setFiles] = useState<FileInfoAndSrc[]>([]);
+  const [files, setFiles] = useState<FileInfo[]>([]);
   const [danglingFiles, setDanglingFiles] = useState<FileInfoAndSrc[]>([]);
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
@@ -50,19 +50,7 @@ const FilesView = ({
 
     const updateFiles = async () => {
       const files: FileInfo[] = await databaseProvider.getFiles();
-      const fileSrcs: string[]
-        = await Promise.all(
-          files.map((file) => databaseProvider.getUrlForFileId(file.fileId)),
-        );
-
-      const filesSrc: FileInfoAndSrc[] = files.map((file, i) => {
-        return {
-          ...file,
-          src: fileSrcs[i],
-        };
-      });
-      setFiles(filesSrc);
-
+      setFiles(files);
       await updateDanglingFiles();
       setStatus("READY");
     };
@@ -92,6 +80,7 @@ const FilesView = ({
                 return <FilesViewPreviewBox
                   file={file}
                   key={"img_" + file.fileId}
+                  databaseProvider={databaseProvider}
                 />;
               })}
             </div>
