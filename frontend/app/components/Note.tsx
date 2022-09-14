@@ -255,6 +255,7 @@ const Note = ({
         <NoteKeyValues
           note={note}
           setNote={setNote}
+          setUnsavedChanges={setUnsavedChanges}
         />
         {
           (!note.isUnsaved)

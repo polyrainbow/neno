@@ -4,6 +4,7 @@ import ActiveNote from "../interfaces/ActiveNote";
 interface NoteKeyValuesProps {
   note: ActiveNote,
   setNote: (ActiveNote) => void,
+  setUnsavedChanges,
 }
 
 function replaceAt(array, index, value) {
@@ -16,6 +17,7 @@ function replaceAt(array, index, value) {
 const NoteKeyValues = ({
   note,
   setNote,
+  setUnsavedChanges,
 }: NoteKeyValuesProps) => {
   const displayedKeyValuePairs = note.keyValues;
 
@@ -66,18 +68,25 @@ const NoteKeyValues = ({
               value={key}
               onInput={(e) => {
                 changeKey(index, (e.target as HTMLInputElement).value);
+                setUnsavedChanges(true);
               }}
             ></input>
             <input
               value={value}
-              onInput={(e) => changeValue(
-                index,
-                (e.target as HTMLInputElement).value,
-              )}
+              onInput={(e) => {
+                changeValue(
+                  index,
+                  (e.target as HTMLInputElement).value,
+                );
+                setUnsavedChanges(true);
+              }}
             ></input>
             <button
               className="default-button-small"
-              onClick={() => removeKeyValuePair(key)}
+              onClick={() => {
+                removeKeyValuePair(key);
+                setUnsavedChanges(true);
+              }}
             >Remove</button>
           </div>;
         },
@@ -85,7 +94,10 @@ const NoteKeyValues = ({
     }
     <button
       className="default-button"
-      onClick={() => addKeyValuePair()}
+      onClick={() => {
+        addKeyValuePair();
+        setUnsavedChanges(true);
+      }}
     >Add</button>
   </section>;
 };
