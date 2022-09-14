@@ -34,7 +34,6 @@ import GraphObject from "../lib/notes/interfaces/Graph.js";
 import getDocumentTitle from "./lib/getDocumentTitle.js";
 import { NoteSaveRequest } from "../lib/notes/interfaces/NoteSaveRequest.js";
 import MimeTypes from "../lib/MimeTypes.js";
-import { getExtensionFromFilename } from "../lib/notes/noteUtils.js";
 
 const startApp = async ({
   users,
