@@ -4,7 +4,7 @@ import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { PathTemplate } from "../enum/PathTemplate";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { l } from "../lib/intl";
-import { getAppPath, getUrl, humanFileSize, onDownload } from "../lib/utils";
+import { getAppPath, getUrl, onDownload } from "../lib/utils";
 import Icon from "./Icon";
 
 interface NoteContentBlockTextFileProps {
@@ -37,9 +37,8 @@ const NoteContentBlockTextFile = ({
         <div className="preview-block-file-info-title">
           {file.name}
         </div>
-        <div className="preview-block-file-size">
-          {humanFileSize(file.size)}
-        </div>
+        {/* for text files, we don't show file size because it's not that
+        relevant and only takes space */}
       </div>
       <div
         style={{
