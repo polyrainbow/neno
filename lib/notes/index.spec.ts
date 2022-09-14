@@ -88,4 +88,45 @@ describe("Notes module", () => {
     });
     assert.strictEqual(stats.numberOfLinks, 1);
   });
+
+  it("should correctly update key values pairs", async () => {
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          title: "Note",
+          custom: {
+            "test": "1",
+          },
+          flags: [],
+          contentType: "",
+        },
+      },
+      changes: [],
+      ignoreDuplicateTitles: false,
+    };
+
+    const note = await Notes.put(noteSaveRequest, TEST_GRAPH_ID);
+
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          id: note.meta.id,
+          title: "Note",
+          custom: {
+            "test": "12",
+          },
+          flags: [],
+          contentType: "",
+        },
+      },
+      changes: [],
+      ignoreDuplicateTitles: false,
+    };
+
+    const updatedNote = await Notes.put(noteSaveRequest2, TEST_GRAPH_ID);
+
+    assert.strictEqual(updatedNote.meta.custom.test, "12");
+  });
 });

@@ -387,6 +387,7 @@ const put = async (
     existingNote.meta.updatedAt = Date.now();
     existingNote.meta.flags = noteFromUser.meta.flags;
     existingNote.meta.contentType = noteFromUser.meta.contentType;
+    existingNote.meta.custom = noteFromUser.meta.custom;
   }
 
   incorporateUserChangesIntoNote(noteSaveRequest.changes, existingNote, graph);
