@@ -589,6 +589,11 @@ const getPins = async (graphId: GraphId): Promise<NoteToTransmit[]> => {
 };
 
 
+const utils = {
+  getExtensionFromFilename,
+};
+
+
 export {
   init,
   get,
@@ -609,4 +614,5 @@ export {
   pin,
   unpin,
   getPins,
+  utils,
 };

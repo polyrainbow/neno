@@ -33,6 +33,8 @@ import GraphVisualizationFromUser from "../lib/notes/interfaces/GraphVisualizati
 import GraphObject from "../lib/notes/interfaces/Graph.js";
 import getDocumentTitle from "./lib/getDocumentTitle.js";
 import { NoteSaveRequest } from "../lib/notes/interfaces/NoteSaveRequest.js";
+import MimeTypes from "../lib/MimeTypes.js";
+import { getExtensionFromFilename } from "../lib/notes/noteUtils.js";
 
 const startApp = async ({
   users,
@@ -716,6 +718,8 @@ const startApp = async ({
             res.json(response);
           });
 
+          const extension = Notes.utils.getExtensionFromFilename(req.params.fileId);
+
           // https://nodejs.org/en/knowledge/advanced/streams/how-to-use-fs-create-read-stream/
           readable.on("open", () => {
             /** Sending Partial Content With HTTP Code 206 */
@@ -723,7 +727,9 @@ const startApp = async ({
               "Content-Range": `bytes ${start}-${end}/${size}`,
               "Accept-Ranges": "bytes",
               "Content-Length": end - start + 1,
-              "Content-Type": "application/neno-filestream",
+              "Content-Type": extension && MimeTypes.has(extension)
+                ? MimeTypes.get(extension) as string
+                : "application/neno-filestream",
             });
 
             readable.pipe(res);
@@ -740,11 +746,15 @@ const startApp = async ({
             res.status(404).json(response);
           });
 
+          const extension = Notes.utils.getExtensionFromFilename(req.params.fileId);
+
           // https://nodejs.org/en/knowledge/advanced/streams/how-to-use-fs-create-read-stream/
           readable.on("open", () => {
             res.writeHead(200, {
               "Content-Length": size,
-              "Content-Type": "application/neno-filestream",
+              "Content-Type": extension && MimeTypes.has(extension)
+                ? MimeTypes.get(extension) as string
+                : "application/neno-filestream",
             });
   
             readable.pipe(res);

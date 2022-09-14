@@ -16,6 +16,7 @@ import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { NoteSaveRequest } from "../../../lib/notes/interfaces/NoteSaveRequest";
+import MimeTypes from "../../../lib/MimeTypes";
 
 
 async function verifyPermission(
@@ -383,10 +384,14 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
    * @return {string} url
   */
   async getUrlForFileId(fileId) {
-    const { readable, mimeType }
+    const readable
       = await this.getReadableFileStream(
         fileId,
       );
+    const extension = this.#notesModule?.utils.getExtensionFromFilename(fileId);
+    const mimeType = extension && MimeTypes.has(extension)
+      ? MimeTypes.get(extension) as string
+      : "application/neno-filestream";
     const blob = await streamToBlob(readable, mimeType);
     const url = URL.createObjectURL(blob);
     return url;
