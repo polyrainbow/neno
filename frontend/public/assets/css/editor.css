@@ -135,6 +135,7 @@ FILE PREVIEW
   word-break: break-all;
   background-color: var(--accent-color-interactible);
   tab-size: 4;
+  font-size: var(--small-font-size);
 }
 
 .preview-block-file-text {
