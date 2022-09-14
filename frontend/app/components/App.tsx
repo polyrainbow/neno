@@ -328,7 +328,9 @@ const AppWithConfirmationServiceProvider = ({
 
     await databaseProvider?.deleteNote(activeNote.id);
     refreshContentViews();
-    createNewNote();
+    // using force here because a delete prompt dialog has already been shown
+    createNewNote([], [], true);
+    setUnsavedChanges(false);
   };
 
 
