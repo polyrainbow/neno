@@ -57,7 +57,9 @@ const NoteContent = ({
           const file
             = note.files.find((file) => file.fileId === fileId);
           if (!file) {
-            return <NoteContentBlockEmptyFile />;
+            return <NoteContentBlockEmptyFile
+              key={Math.random()}
+            />;
           }
           if (
             mediaType === MediaType.AUDIO

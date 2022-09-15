@@ -6,6 +6,7 @@ add_location_alt
 add_location
 adjust
 archive
+audio_file
 audiotrack
 cached
 cancel
@@ -88,6 +89,7 @@ tour
 trip_origin
 turned_in
 unarchive
+video_file
 videocam
 view_agenda
 view_compact_alt

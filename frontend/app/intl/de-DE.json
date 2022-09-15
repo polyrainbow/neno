@@ -62,6 +62,7 @@
   "files.confirm-delete": "Möchtest du diese Datei wirklich löschen? Das kann nicht rückgängig gemacht werden.",
   "files.confirm-delete.confirm": "Datei löschen",
   "files.create-note-with-file": "Notiz mit dieser Datei erstellen",
+  "files.dangling": "Nicht eingehangen (in keiner Notiz benutzt)",
   "files.dangling-files.explainer": "Nicht eingehangene Dateien sind Dateien, die in keiner Notiz benutzt werden.",
   "files.dangling-files.heading": "Nicht eingehangene Dateien ({danglingFiles})",
   "files.delete": "Löschen",

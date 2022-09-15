@@ -62,6 +62,7 @@
   "files.confirm-delete": "Do you really want to delete this file? This action cannot be undone.",
   "files.confirm-delete.confirm": "Delete file",
   "files.create-note-with-file": "Create note with file",
+  "files.dangling": "Dangling (not used in any note)",
   "files.dangling-files.explainer": "Dangling files are files that are not used in any note.",
   "files.dangling-files.heading": "Dangling Files ({danglingFiles})",
   "files.delete": "Delete",

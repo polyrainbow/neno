@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
 import {
-  useParams, Link,
+  useParams, Link, useNavigate,
 } from "react-router-dom";
 import { MainNoteListItem } from "../interfaces/NoteListItem";
 import {
@@ -18,14 +18,17 @@ import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import BusyIndicator from "./BusyIndicator";
 import { SPAN_SEPARATOR } from "../config";
+import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 
 
 const FileView = ({
   databaseProvider,
   toggleAppMenu,
+  createNewNote,
 }: {
   databaseProvider: DatabaseProvider,
   toggleAppMenu: () => void,
+  createNewNote,
 }) => {
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [src, setSrc] = useState<string>("");
@@ -35,7 +38,11 @@ const FileView = ({
 
   const { fileId } = useParams();
 
+  const navigate = useNavigate();
+
   const type = fileId && getMediaTypeFromFilename(fileId);
+
+  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
   useEffect(() => {
     if (typeof fileId !== "string") return;
@@ -177,6 +184,30 @@ const FileView = ({
             height={30}
           />
       }
+      <button
+        disabled={!fileInfo}
+        onClick={async () => {
+          createNewNote([], [fileInfo]);
+        }}
+        className="small-button default-action"
+      >{l("files.create-note-with-file")}</button>
+      <button
+        disabled={!fileInfo}
+        onClick={async () => {
+          if (!fileInfo) return;
+
+          await confirm({
+            text: l("files.confirm-delete"),
+            confirmText: l("files.confirm-delete.confirm"),
+            cancelText: l("dialog.cancel"),
+            encourageConfirmation: false,
+          });
+
+          await databaseProvider.deleteFile(fileInfo.fileId);
+          navigate(getAppPath(PathTemplate.FILES));
+        }}
+        className="small-button dangerous-action"
+      >{l("files.delete")}</button>
     </section>
   </>;
 };

@@ -100,6 +100,7 @@ const getMediaTypeFromFilename = (
     "md": MediaType.TEXT,
     "xq": MediaType.TEXT,
     "xql": MediaType.TEXT,
+    "xqm": MediaType.TEXT,
   }));
 
   const extension = getExtensionFromFilename(filename);

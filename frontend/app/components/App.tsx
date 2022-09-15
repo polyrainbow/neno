@@ -653,7 +653,6 @@ const AppWithConfirmationServiceProvider = ({
             ? <FilesView
               databaseProvider={databaseProvider}
               toggleAppMenu={toggleAppMenu}
-              createNewNote={createNewNote}
             />
             : null
         }
@@ -668,6 +667,7 @@ const AppWithConfirmationServiceProvider = ({
             ? <FileView
               databaseProvider={databaseProvider}
               toggleAppMenu={toggleAppMenu}
+              createNewNote={createNewNote}
             />
             : null
         }

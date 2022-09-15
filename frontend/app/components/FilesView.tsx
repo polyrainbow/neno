@@ -1,47 +1,30 @@
 import React, { useState, useEffect } from "react";
 import HeaderContainer from "./HeaderContainer";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
-import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
-import FileInfoAndSrc from "../interfaces/FileInfoAndSrc";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import { FileId } from "../../../lib/notes/interfaces/FileId";
 
 interface FilesViewProps {
   databaseProvider: DatabaseProvider,
   toggleAppMenu,
-  createNewNote,
 }
 
 const FilesView = ({
   databaseProvider,
   toggleAppMenu,
-  createNewNote,
 }: FilesViewProps) => {
-  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
   const [files, setFiles] = useState<FileInfo[]>([]);
-  const [danglingFiles, setDanglingFiles] = useState<FileInfoAndSrc[]>([]);
+  const [danglingFileIds, setDanglingFileIds] = useState<FileId[]>([]);
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
 
   const updateDanglingFiles = async () => {
     const danglingFiles: FileInfo[]
       = await databaseProvider.getDanglingFiles();
-    const danglingFileSrcs: string[]
-      = await Promise.all(
-        danglingFiles.map(
-          (file) => databaseProvider.getUrlForFileId(file.fileId),
-        ),
-      );
 
-    const danglingFilesIdSrc: FileInfoAndSrc[]
-      = danglingFiles.map((file, i) => {
-        return {
-          ...file,
-          src: danglingFileSrcs[i],
-        };
-      });
-    setDanglingFiles(danglingFilesIdSrc);
+    setDanglingFileIds(danglingFiles.map((file) => file.fileId));
   };
 
 
@@ -50,6 +33,11 @@ const FilesView = ({
 
     const updateFiles = async () => {
       const files: FileInfo[] = await databaseProvider.getFiles();
+      files.sort((a, b) => {
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+        return 0;
+      });
       setFiles(files);
       await updateDanglingFiles();
       setStatus("READY");
@@ -81,45 +69,8 @@ const FilesView = ({
                   file={file}
                   key={"img_" + file.fileId}
                   databaseProvider={databaseProvider}
+                  isDangling={danglingFileIds.includes(file.fileId)}
                 />;
-              })}
-            </div>
-            <h2>{l(
-              "files.dangling-files.heading",
-              { danglingFiles: danglingFiles.length.toString() },
-            )}</h2>
-            <p>{l("files.dangling-files.explainer")}</p>
-            <div>
-              {danglingFiles.map((danglingFile) => {
-                return <div
-                  key={"danglingFile_" + danglingFile.fileId}
-                >
-                  <p>
-                    <a
-                      href={danglingFile.src}
-                    >{danglingFile.name}</a>
-                  </p>
-                  <button
-                    onClick={async () => {
-                      createNewNote([], [danglingFile]);
-                    }}
-                    className="small-button default-action"
-                  >{l("files.create-note-with-file")}</button>
-                  <button
-                    onClick={async () => {
-                      await confirm({
-                        text: l("files.confirm-delete"),
-                        confirmText: l("files.confirm-delete.confirm"),
-                        cancelText: l("dialog.cancel"),
-                        encourageConfirmation: false,
-                      });
-
-                      await databaseProvider.deleteFile(danglingFile.fileId);
-                      await updateDanglingFiles();
-                    }}
-                    className="small-button dangerous-action"
-                  >{l("files.delete")}</button>
-                </div>;
               })}
             </div>
           </>
