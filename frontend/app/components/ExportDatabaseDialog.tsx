@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Dialog from "./Dialog";
 import RadioGroup from "./RadioGroup";
-import { humanFileSize, yyyymmdd } from "../lib/utils";
+import { getWritableStream, humanFileSize, yyyymmdd } from "../lib/utils";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 
@@ -40,14 +40,6 @@ const ExportDatabaseDialog = ({
     }
 
     writer.close();
-  };
-
-
-  const getWritableStream = async (opts) => {
-    const newHandle = await window.showSaveFilePicker(opts);
-    // create a FileSystemWritableFileStream to write to
-    const writableStream = await newHandle.createWritable();
-    return writableStream;
   };
 
 

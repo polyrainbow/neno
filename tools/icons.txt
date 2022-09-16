@@ -89,6 +89,7 @@ tour
 trip_origin
 turned_in
 unarchive
+upload_file
 video_file
 videocam
 view_agenda

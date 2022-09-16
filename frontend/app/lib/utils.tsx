@@ -453,6 +453,14 @@ const insertDocumentTitles = async (
 };
 
 
+const getWritableStream = async (opts) => {
+  const newHandle = await window.showSaveFilePicker(opts);
+  // create a FileSystemWritableFileStream to write to
+  const writableStream = await newHandle.createWritable();
+  return writableStream;
+};
+
+
 export {
   yyyymmdd,
   getParameterByName,
@@ -478,4 +486,5 @@ export {
   parseFileIds,
   getFileId,
   insertDocumentTitles,
+  getWritableStream,
 };

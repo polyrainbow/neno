@@ -78,6 +78,10 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     }
   }
 
+  getRawNote(noteId: NoteId): Promise<string | null> {
+    return API.getRawNote(noteId);
+  }
+
   getNote(noteId: NoteId): Promise<NoteToTransmit | null> {
     return API.getNote(noteId);
   }

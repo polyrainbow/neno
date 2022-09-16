@@ -1,4 +1,4 @@
-import Graph from "./interfaces/Graph.js";
+import Graph, { SerializedGraphObject } from "./interfaces/Graph.js";
 import { FileId } from "./interfaces/FileId.js";
 import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import { Link } from "./interfaces/Link.js";
@@ -133,6 +133,40 @@ const findNote = (
       return note;
     // Else look in left or right half accordingly
     } else if (note.meta.id < noteId) {
+      start = mid + 1;
+    } else {
+      end = mid - 1;
+    }
+  }
+
+  return null;
+};
+
+
+const findRawNote = (
+  graph: SerializedGraphObject,
+  noteId: NoteId,
+): string | null => {
+  const notesSorted = graph.notes;
+  let start = 0;
+  let end = notesSorted.length - 1;
+
+  while (start <= end) {
+    // Find the mid index
+    const mid = Math.floor((start + end) / 2);
+    const note = notesSorted[mid];
+    const noteHeaders = parseNoteHeaders(note);
+    if (!noteHeaders.has(CanonicalNoteHeader.ID)) {
+      throw new Error("Invalid notes in database");
+    }
+    const idString = noteHeaders.get(CanonicalNoteHeader.ID) as string;
+    const id = parseInt(idString);
+
+    // If element is present at mid, return it
+    if (id === noteId) {
+      return note;
+    // Else look in left or right half accordingly
+    } else if (id < noteId) {
       start = mid + 1;
     } else {
       end = mid - 1;
@@ -992,6 +1026,7 @@ export {
   getNoteTitlePreview,
   normalizeNoteTitle,
   noteWithSameTitleExists,
+  findRawNote,
   findNote,
   getNewNoteId,
   updateNotePosition,

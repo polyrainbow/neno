@@ -182,6 +182,16 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
+  getRawNote(noteId: NoteId): Promise<string | null> {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
+    return this.#notesModule.getRawNote(noteId, this.#activeGraphId);
+  }
+
+
   getNote(noteId: NoteId): Promise<NoteToTransmit | null> {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
@@ -190,6 +200,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     }
     return this.#notesModule.get(noteId, this.#activeGraphId);
   }
+
 
   getNotes(options: DatabaseQuery): Promise<NoteListPage> {
     if (!(this.#notesModule && this.#activeGraphId)) {

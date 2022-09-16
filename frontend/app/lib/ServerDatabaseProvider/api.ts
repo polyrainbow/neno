@@ -155,6 +155,13 @@ const isAuthenticated = () => {
 };
 
 
+const getRawNote = (noteId: NoteId): Promise<string | null> => {
+  return callGraphAPIAndGetJSONPayload({
+    endpoint: "note-raw/" + noteId,
+  });
+};
+
+
 const getNote = (noteId: NoteId): Promise<NoteToTransmit | null> => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "note/" + noteId,
@@ -324,6 +331,7 @@ export {
   login,
   logout,
   isAuthenticated,
+  getRawNote,
   getNote,
   getNotes,
   putNote,

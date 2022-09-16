@@ -32,7 +32,8 @@ export default class DatabaseIO {
 
   private async readGraphFile(
     graphId: GraphId,
-  ): Promise<Graph | null> {
+    updateStructure: boolean,
+  ): Promise<SerializedGraphObject | null> {
     let json;
     try {
       json = await this.#storageProvider.readObjectAsString(
@@ -44,13 +45,27 @@ export default class DatabaseIO {
     }
 
     const object: SerializedGraphObject = JSON.parse(json);
-    // when we open a graph from file for the first time, let's make sure
-    // it has the up-to-date data structure and is cleaned up.
-    await updateGraphDataStructure(object);
+
+    if (updateStructure) {
+      // when we open a graph from file for the first time, let's make sure
+      // it has the up-to-date data structure and is cleaned up.
+      await updateGraphDataStructure(object);
+    }
+
+    return object;
+  }
+
+
+  private async readAndParseGraphFile(
+    graphId: GraphId,
+  ): Promise<Graph | null> {
+    const serializedGraphObject = await this.readGraphFile(graphId, true);
+
+    if (!serializedGraphObject) return null;
 
     const nonParseableNote = Symbol("NOT_PARSEABLE");
 
-    const parsedNotes = object.notes
+    const parsedNotes = serializedGraphObject.notes
       .map((serializedNote) => {
         let parsedNote;
         try {
@@ -64,7 +79,7 @@ export default class DatabaseIO {
       .filter(parsedNote => parsedNote !== nonParseableNote);
 
     const parsedGraphObject = {
-      ...object,
+      ...serializedGraphObject,
       notes: parsedNotes,
     };
     return parsedGraphObject;
@@ -117,6 +132,16 @@ export default class DatabaseIO {
   }
 
 
+  async getRawGraph(graphId: GraphId): Promise<SerializedGraphObject> {
+    const rawGraph = await this.readGraphFile(graphId, false);
+    if (!rawGraph) {
+      throw new Error(ErrorMessage.GRAPH_NOT_FOUND);
+    }
+
+    return rawGraph;
+  }
+
+
   async getGraph(graphId: GraphId): Promise<Graph> {
     // We only want to get one graph at a time to reduce unnecessary disk usage
     // that occurs when a consumer performs two or more API calls at the same
@@ -138,7 +163,7 @@ export default class DatabaseIO {
 
     // Way 2: Slow disk access: try to get it from the file on the disk
     const graphFromFile: Graph | null
-      = await this.readGraphFile(graphId);
+      = await this.readAndParseGraphFile(graphId);
     if (graphFromFile) {
       // flushing these changes will also save the graph in memory for
       // faster access the next time

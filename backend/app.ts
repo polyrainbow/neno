@@ -460,6 +460,33 @@ const startApp = async ({
   );
 
 
+  app.get(
+    config.GRAPH_ENDPOINT + "note-raw/:noteId",
+    sessionMiddleware,
+    verifyUser,
+    async function(req, res) {
+      const graphId = req.params.graphId;
+      const noteId: NoteId = parseInt(req.params.noteId);
+
+      try {
+        const note: string = await Notes.getRawNote(noteId, graphId);
+        const response: APIResponse = {
+          success: true,
+          payload: note,
+        };
+        res.json(response);
+      } catch (e) {
+        const response: APIResponse = {
+          success: false,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
+        };
+        res.json(response);
+      }
+    },
+  );
+
+
   app.put(
     config.GRAPH_ENDPOINT + "note",
     sessionMiddleware,

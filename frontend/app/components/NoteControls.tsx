@@ -7,14 +7,35 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import ConfirmationServiceContext
   from "../contexts/ConfirmationServiceContext";
-import { getAppPath } from "../lib/utils";
+import { getAppPath, getWritableStream } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import { ContentMode } from "../interfaces/ContentMode";
 import Tooltip from "./Tooltip";
 import Icon from "./Icon";
+import DatabaseProvider from "../interfaces/DatabaseProvider";
+import ActiveNote from "../interfaces/ActiveNote";
+
+interface NoteControlsProps {
+  databaseProvider: DatabaseProvider,
+  activeNote: ActiveNote,
+  createNewNote,
+  createNewLinkedNote,
+  handleNoteSaveRequest,
+  removeActiveNote,
+  unsavedChanges,
+  setUnsavedChanges,
+  pinOrUnpinNote,
+  duplicateNote,
+  openInGraphView,
+  uploadFiles,
+  contentMode,
+  toggleEditMode,
+  uploadInProgress,
+}
 
 const NoteControls = ({
+  databaseProvider,
   activeNote,
   createNewNote,
   createNewLinkedNote,
@@ -29,12 +50,32 @@ const NoteControls = ({
   contentMode,
   toggleEditMode,
   uploadInProgress,
-}) => {
+}: NoteControlsProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
+
+
+  const exportNote = async (): Promise<void> => {
+    if (activeNote.isUnsaved) return;
+    const rawNote = await databaseProvider.getRawNote(activeNote.id);
+
+    const opts = {
+      suggestedName: activeNote.title + ".neno",
+      types: [{
+        description: "NENO note",
+        accept: { "application/neno-note": [".neno"] },
+      }],
+    };
+
+    const writableStream = await getWritableStream(opts);
+    const writer = writableStream.getWriter();
+    await writer.write(rawNote);
+    writer.close();
+  };
+
 
   return <section id="note-controls">
     <div id="note-controls-left">
@@ -117,7 +158,10 @@ const NoteControls = ({
         disabled={activeNote.isUnsaved}
         title={l("editor.pin-note")}
         icon="push_pin"
-        onClick={() => pinOrUnpinNote(activeNote.id)}
+        onClick={() => {
+          if (activeNote.isUnsaved) return;
+          pinOrUnpinNote(activeNote.id);
+        }}
       />
       <IconButton
         id="button_open-in-graph-view"
@@ -127,10 +171,17 @@ const NoteControls = ({
         onClick={openInGraphView}
       />
       <IconButton
+        id="button_export-note"
+        disabled={activeNote.isUnsaved}
+        title={l("editor.export-note")}
+        icon="file_download"
+        onClick={exportNote}
+      />
+      <IconButton
         id="button_upload-file"
         disabled={false}
         title={l("editor.upload-file")}
-        icon="file_upload"
+        icon="upload_file"
         onClick={uploadFiles}
       />
     </div>

@@ -165,6 +165,7 @@ const Note = ({
 
   return <>
     <NoteControls
+      databaseProvider={databaseProvider}
       activeNote={note}
       createNewNote={createNewNote}
       createNewLinkedNote={createNewLinkedNote}

@@ -25,6 +25,7 @@ interface DatabaseProvider {
   getGraphIds?: () => GraphId[] | null;
   setActiveGraph?: (graphId: GraphId) => void;
   getNote: (noteId: NoteId) => Promise<NoteToTransmit | null>;
+  getRawNote: (noteId: NoteId) => Promise<string | null>;
   getNotes: (options: DatabaseQuery) => Promise<NoteListPage>;
   getStats: (options: GraphStatsRetrievalOptions) => Promise<GraphStats>;
   getFiles: () => Promise<FileInfo[]>;

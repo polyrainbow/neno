@@ -28,6 +28,7 @@ import {
   getNotesWithMediaTypes,
   findNoteIndex,
   getExtensionFromFilename,
+  findRawNote,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -89,6 +90,20 @@ const get = async (
   const noteToTransmit: NoteToTransmit
     = await createNoteToTransmit(noteFromDB, graph);
   return noteToTransmit;
+};
+
+
+const getRawNote = async (
+  noteId: NoteId,
+  graphId: GraphId,
+): Promise<string> => {
+  const graph = await io.getRawGraph(graphId);
+  const rawNote: string | null = findRawNote(graph, noteId);
+  if (!rawNote) {
+    throw new Error(ErrorMessage.NOTE_NOT_FOUND);
+  }
+
+  return rawNote;
 };
 
 
@@ -597,6 +612,7 @@ const utils = {
 
 export {
   init,
+  getRawNote,
   get,
   getNotesList,
   getGraphVisualization,
