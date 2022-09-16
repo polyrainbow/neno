@@ -21,8 +21,12 @@ import {
   BlockType,
 } from "../subwaytext/interfaces/Block.js";
 import { Note } from "./interfaces/Note.js";
-import { ExistingNoteMetadata } from "./interfaces/NoteMetadata.js";
+import {
+  ExistingNoteMetadata,
+  NewNoteMetadata,
+} from "./interfaces/NoteMetadata.js";
 import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
+import NewNote from "./interfaces/NewNote.js";
 
 
 const getExtensionFromFilename = (filename: string): string | null => {
@@ -891,50 +895,51 @@ const serializeNoteHeaders = (headers: NoteHeaders): string => {
 };
 
 
-const parseSerializedNote = (serializedNote: string): ExistingNote => {
-  const canonicalHeaderKeys
-    = new Map<CanonicalNoteHeader, MetaModifier>([
-      [
-        CanonicalNoteHeader.ID,
-        (meta, val) => meta.id = parseInt(val)],
-      [
-        CanonicalNoteHeader.GRAPH_POSITION,
-        (meta, val) => {
-          const [x, y] = val.split(",").map((string) => parseFloat(string));
-          meta.position = {
-            x,
-            y,
-          };
-        },
-      ],
-      [
-        CanonicalNoteHeader.TITLE,
-        (meta, val) => meta.title = val,
-      ],
-      [
-        CanonicalNoteHeader.CREATED_AT,
-        (meta, val) => meta.createdAt = parseInt(val),
-      ],
-      [
-        CanonicalNoteHeader.UPDATED_AT,
-        (meta, val) => meta.updatedAt = parseInt(val),
-      ],
-      [
-        CanonicalNoteHeader.FLAGS,
-        (meta, val) => {
-          meta.flags = val.trim().length > 0
-            ? val.trim().split(",")
-            : [];
-        },
-      ],
-      [
-        CanonicalNoteHeader.CONTENT_TYPE,
-        (meta, val) => {
-          meta.contentType = val.trim();
-        },
-      ],
-    ]);
+const canonicalHeaderKeys = new Map<CanonicalNoteHeader, MetaModifier>([
+  [
+    CanonicalNoteHeader.ID,
+    (meta, val) => meta.id = parseInt(val)],
+  [
+    CanonicalNoteHeader.GRAPH_POSITION,
+    (meta, val) => {
+      const [x, y] = val.split(",").map((string) => parseFloat(string));
+      meta.position = {
+        x,
+        y,
+      };
+    },
+  ],
+  [
+    CanonicalNoteHeader.TITLE,
+    (meta, val) => meta.title = val,
+  ],
+  [
+    CanonicalNoteHeader.CREATED_AT,
+    (meta, val) => meta.createdAt = parseInt(val),
+  ],
+  [
+    CanonicalNoteHeader.UPDATED_AT,
+    (meta, val) => meta.updatedAt = parseInt(val),
+  ],
+  [
+    CanonicalNoteHeader.FLAGS,
+    (meta, val) => {
+      meta.flags = val.trim().length > 0
+        ? val.trim().split(",")
+        : [];
+    },
+  ],
+  [
+    CanonicalNoteHeader.CONTENT_TYPE,
+    (meta, val) => {
+      meta.contentType = val.trim();
+    },
+  ],
+]);
 
+
+
+const parseSerializedExistingNote = (serializedNote: string): ExistingNote => {
   const headers = parseNoteHeaders(serializedNote);
   const partialMeta: Partial<ExistingNoteMetadata> = {};
   const custom = {};
@@ -974,6 +979,52 @@ const parseSerializedNote = (serializedNote: string): ExistingNote => {
   const meta = partialMeta as ExistingNoteMetadata;
 
   const note: ExistingNote = {
+    content: serializedNote.substring(serializedNote.indexOf("\n\n") + 2),
+    meta,
+  };
+  return note;
+};
+
+
+const parseSerializedNewNote = (serializedNote: string): NewNote => {
+  const headers = parseNoteHeaders(serializedNote);
+  const partialMeta: Partial<NewNoteMetadata> = {};
+  const custom = {};
+  for (const [key, value] of headers.entries()) {
+    // we don't want to keep the old id for new notes
+    if (key === CanonicalNoteHeader.ID) continue;
+
+    if (canonicalHeaderKeys.has(key as CanonicalNoteHeader)) {
+      (canonicalHeaderKeys.get(key as CanonicalNoteHeader) as MetaModifier)(
+        partialMeta,
+        value,
+      );
+    } else {
+      custom[key] = value;
+    }
+  }
+
+  partialMeta.custom = custom;
+
+  const requiredFields = [
+    "title",
+    "contentType",
+    "custom",
+  ];
+
+  for (const requiredField of requiredFields) {
+    if (!(requiredField in partialMeta)) {
+      throw new Error(
+        "Could not parse note. Missing canonical header: "
+        + requiredField,
+      );
+    }
+  }
+
+  // https://stackoverflow.com/a/58986422/3890888
+  const meta = partialMeta as NewNoteMetadata;
+
+  const note: NewNote = {
     content: serializedNote.substring(serializedNote.indexOf("\n\n") + 2),
     meta,
   };
@@ -1056,7 +1107,8 @@ export {
   getNotesWithMediaTypes,
   parseNoteHeaders,
   serializeNoteHeaders,
-  parseSerializedNote,
+  parseSerializedExistingNote,
+  parseSerializedNewNote,
   serializeNote,
   findNoteIndex,
 };

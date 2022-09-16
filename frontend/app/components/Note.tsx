@@ -45,6 +45,7 @@ interface NoteComponentProps {
   openInGraphView,
   contentMode,
   toggleEditMode,
+  importNote,
 }
 
 
@@ -69,6 +70,7 @@ const Note = ({
   openInGraphView,
   contentMode,
   toggleEditMode,
+  importNote,
 }: NoteComponentProps) => {
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
@@ -98,6 +100,7 @@ const Note = ({
   const uploadFiles = async () => {
     const files = await getFilesFromUserSelection(
       FILE_PICKER_ACCEPT_TYPES,
+      true,
     );
 
     setUploadInProgress(true);
@@ -180,6 +183,7 @@ const Note = ({
       contentMode={contentMode}
       toggleEditMode={toggleEditMode}
       uploadInProgress={uploadInProgress}
+      importNote={importNote}
     />
     <section id="note"
       onDrop={handleFileDrop}

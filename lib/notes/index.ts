@@ -29,6 +29,7 @@ import {
   findNoteIndex,
   getExtensionFromFilename,
   findRawNote,
+  parseSerializedNewNote,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -338,6 +339,9 @@ const setGraphVisualization = async (
 };
 
 
+
+
+
 const put = async (
   noteSaveRequest: NoteSaveRequest,
   graphId: GraphId,
@@ -412,6 +416,24 @@ const put = async (
   const noteToTransmit: NoteToTransmit
     = await createNoteToTransmit(existingNote, graph);
   return noteToTransmit;
+};
+
+
+const putRawNote = (
+  rawNote: string,
+  graphId: GraphId,
+): Promise<NoteToTransmit> => {
+  const note = parseSerializedNewNote(rawNote);
+
+  const noteSaveRequest = {
+    note,
+    changes: [],
+    ignoreDuplicateTitles: true,
+  };
+
+  note.meta.flags.push("IMPORTED");
+
+  return put(noteSaveRequest, graphId);
 };
 
 
@@ -619,6 +641,7 @@ export {
   setGraphVisualization,
   getStats,
   put,
+  putRawNote,
   remove,
   importDB,
   addFile,

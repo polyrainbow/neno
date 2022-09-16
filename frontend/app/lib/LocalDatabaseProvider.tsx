@@ -232,6 +232,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     return this.#notesModule.remove(noteId, this.#activeGraphId);
   }
 
+
   putNote(noteSaveRequest: NoteSaveRequest) {
     if (!(this.#notesModule && this.#activeGraphId)) {
       throw new Error(
@@ -240,6 +241,19 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     }
     return this.#notesModule.put(
       noteSaveRequest,
+      this.#activeGraphId,
+    );
+  }
+
+
+  putRawNote(rawNote: string) {
+    if (!(this.#notesModule && this.#activeGraphId)) {
+      throw new Error(
+        "Database Provider has not been properly initialized yet.",
+      );
+    }
+    return this.#notesModule.putRawNote(
+      rawNote,
       this.#activeGraphId,
     );
   }

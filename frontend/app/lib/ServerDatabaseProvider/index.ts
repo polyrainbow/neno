@@ -110,8 +110,12 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.deleteNote(noteId);
   }
 
-  putNote(noteSaveRequest: NoteSaveRequest) {
+  putNote(noteSaveRequest: NoteSaveRequest): Promise<NoteToTransmit> {
     return API.putNote(noteSaveRequest);
+  }
+
+  putRawNote(rawNote: string): Promise<NoteToTransmit> {
+    return API.putRawNote(rawNote);
   }
 
   saveGraphVisualization(graphVisualization) {

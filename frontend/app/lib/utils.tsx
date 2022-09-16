@@ -367,9 +367,10 @@ const stringContainsOnlyDigits = (val: string): boolean => /^\d+$/.test(val);
 
 const getFilesFromUserSelection = async (
   types: FilePickerAcceptType[],
+  multiple: boolean,
 ): Promise<File[]> => {
   const fileHandles = await window.showOpenFilePicker({
-    multiple: true,
+    multiple,
     types,
     excludeAcceptAllOption: false,
   });
@@ -379,6 +380,20 @@ const getFilesFromUserSelection = async (
   );
 
   return files;
+};
+
+
+const readFileAsString = async (file: File): Promise<string> => {
+  return new Promise((resolve) => {
+    const fileReader = new FileReader();
+
+    fileReader.onload = function() {
+      const result = fileReader.result as string;
+      resolve(result);
+    };
+
+    fileReader.readAsText(file);
+  });
 };
 
 
@@ -487,4 +502,5 @@ export {
   getFileId,
   insertDocumentTitles,
   getWritableStream,
+  readFileAsString,
 };

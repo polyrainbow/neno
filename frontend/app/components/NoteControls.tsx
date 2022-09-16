@@ -7,7 +7,10 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import ConfirmationServiceContext
   from "../contexts/ConfirmationServiceContext";
-import { getAppPath, getWritableStream } from "../lib/utils";
+import {
+  getAppPath,
+  getWritableStream,
+} from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import { ContentMode } from "../interfaces/ContentMode";
@@ -32,6 +35,7 @@ interface NoteControlsProps {
   contentMode,
   toggleEditMode,
   uploadInProgress,
+  importNote,
 }
 
 const NoteControls = ({
@@ -50,6 +54,7 @@ const NoteControls = ({
   contentMode,
   toggleEditMode,
   uploadInProgress,
+  importNote,
 }: NoteControlsProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -169,6 +174,13 @@ const NoteControls = ({
         title={l("editor.reveal-note-in-graph")}
         icon="center_focus_strong"
         onClick={openInGraphView}
+      />
+      <IconButton
+        id="button_import-note"
+        disabled={false}
+        title={l("editor.import-note")}
+        icon="file_upload"
+        onClick={importNote}
       />
       <IconButton
         id="button_export-note"

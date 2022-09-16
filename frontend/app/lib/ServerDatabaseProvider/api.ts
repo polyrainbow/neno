@@ -188,6 +188,17 @@ const putNote = (noteSaveRequest: NoteSaveRequest) => {
 };
 
 
+const putRawNote = (rawNote: string) => {
+  return callGraphAPIAndGetJSONPayload({
+    method: "PUT",
+    endpoint: "raw-note",
+    payload: {
+      note: rawNote,
+    },
+  });
+};
+
+
 const deleteNote = (noteId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
@@ -335,6 +346,7 @@ export {
   getNote,
   getNotes,
   putNote,
+  putRawNote,
   deleteNote,
   getStats,
   getFiles,

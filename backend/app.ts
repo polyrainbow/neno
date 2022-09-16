@@ -532,6 +532,40 @@ const startApp = async ({
   );
 
 
+  app.put(
+    config.GRAPH_ENDPOINT + "raw-note",
+    sessionMiddleware,
+    verifyUser,
+    express.json(),
+    handleJSONParseErrors,
+    async function(req, res) {
+      const graphId = req.params.graphId;
+      const reqBody = req.body;
+      const rawNote = reqBody.note;
+
+      try {
+        const noteToTransmit: NoteToTransmit = await Notes.putRawNote(
+          rawNote,
+          graphId,
+        );
+
+        const response: APIResponse = {
+          success: true,
+          payload: noteToTransmit,
+        };
+        res.json(response);
+      } catch (e) {
+        const response: APIResponse = {
+          success: false,
+          error: APIError.NOTES_APPLICATION_ERROR,
+          errorMessage: e instanceof Error ? e.message : "Unknown notes module error",
+        };
+        res.json(response);
+      }
+    },
+  );
+
+
   app.delete(
     config.GRAPH_ENDPOINT + "note/:noteId",
     sessionMiddleware,

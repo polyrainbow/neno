@@ -16,7 +16,7 @@ import { GraphId } from "../../backend/interfaces/GraphId.js";
 import updateGraphDataStructure from "./updateGraphDataStructure.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
-import { parseSerializedNote, serializeNote } from "./noteUtils.js";
+import { parseSerializedExistingNote, serializeNote } from "./noteUtils.js";
 import { Readable } from "./interfaces/Readable.js";
 
 
@@ -69,7 +69,7 @@ export default class DatabaseIO {
       .map((serializedNote) => {
         let parsedNote;
         try {
-          parsedNote = parseSerializedNote(serializedNote);
+          parsedNote = parseSerializedExistingNote(serializedNote);
         } catch (e) {
           parsedNote = nonParseableNote;
         }

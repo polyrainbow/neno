@@ -143,6 +143,26 @@ const AppWithConfirmationServiceProvider = ({
   };
 
 
+  const setActiveNoteFromServer = (noteFromServer: NoteToTransmit): void => {
+    setActiveNote({
+      id: noteFromServer.meta.id,
+      title: noteFromServer.meta.title,
+      createdAt: noteFromServer.meta.createdAt,
+      updatedAt: noteFromServer.meta.updatedAt,
+      position: noteFromServer.meta.position,
+      linkedNotes: noteFromServer.linkedNotes,
+      numberOfCharacters: noteFromServer.numberOfCharacters,
+      isUnsaved: false,
+      changes: [],
+      content: noteFromServer.content,
+      files: noteFromServer.files,
+      keyValues: Object.entries(noteFromServer.meta.custom),
+      flags: noteFromServer.meta.flags,
+      contentType: noteFromServer.meta.contentType,
+    });
+  };
+
+
   const loadNote = async (noteId: NoteId): Promise<void> => {
     if (!databaseProvider) {
       throw new Error("loadNote: No database provider loaded");
@@ -151,22 +171,7 @@ const AppWithConfirmationServiceProvider = ({
     try {
       const noteFromServer = await databaseProvider.getNote(noteId);
       if (noteFromServer) {
-        setActiveNote({
-          id: noteFromServer.meta.id,
-          title: noteFromServer.meta.title,
-          createdAt: noteFromServer.meta.createdAt,
-          updatedAt: noteFromServer.meta.updatedAt,
-          position: noteFromServer.meta.position,
-          linkedNotes: noteFromServer.linkedNotes,
-          numberOfCharacters: noteFromServer.numberOfCharacters,
-          isUnsaved: false,
-          changes: [],
-          content: noteFromServer.content,
-          files: noteFromServer.files,
-          keyValues: Object.entries(noteFromServer.meta.custom),
-          flags: noteFromServer.meta.flags,
-          contentType: noteFromServer.meta.contentType,
-        });
+        setActiveNoteFromServer(noteFromServer);
       } else {
         throw new Error("No note received");
       }
@@ -318,6 +323,47 @@ const AppWithConfirmationServiceProvider = ({
     };
 
     createNewNote([linkedNote]);
+  };
+
+
+  const importNote = async (): Promise<void> => {
+    if (!databaseProvider) throw new Error("DatabaseProvider not ready!");
+
+    if (unsavedChanges) {
+      await confirmDiscardingUnsavedChanges();
+      setUnsavedChanges(false);
+    }
+
+    const types = [{
+      description: "NENO note",
+      accept: { "application/neno-note": [".neno"] },
+    }];
+
+    const [rawNoteFile] = await Utils.getFilesFromUserSelection(types, false);
+    const rawNote = await Utils.readFileAsString(rawNoteFile);
+
+    try {
+      const noteFromServer = await databaseProvider.putRawNote(rawNote);
+      if (noteFromServer) {
+        setActiveNoteFromServer(noteFromServer);
+        navigate(
+          Utils.getAppPath(
+            PathTemplate.EDITOR_WITH_NOTE,
+            new Map([["NOTE_ID", noteFromServer.meta.id.toString()]]),
+          ),
+          { replace: true },
+        );
+      } else {
+        throw new Error("No note received");
+      }
+    } catch (e) {
+      // if credentials are invalid, go to LoginView. If not, throw.
+      if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
+        await handleInvalidCredentialsError();
+      } else {
+        throw e;
+      }
+    }
   };
 
 
@@ -594,6 +640,7 @@ const AppWithConfirmationServiceProvider = ({
               contentMode={contentMode}
               setNoteContent={setNoteContent}
               toggleEditMode={toggleEditMode}
+              importNote={importNote}
             />
             : null
         }

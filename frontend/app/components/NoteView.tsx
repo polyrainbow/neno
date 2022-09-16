@@ -64,6 +64,7 @@ interface NoteViewProps {
   contentMode,
   setNoteContent,
   toggleEditMode,
+  importNote,
 }
 
 const NoteView = ({
@@ -97,6 +98,7 @@ const NoteView = ({
   contentMode,
   setNoteContent,
   toggleEditMode,
+  importNote,
 }: NoteViewProps) => {
   const isSmallScreen = useIsSmallScreen();
   const navigate = useNavigate();
@@ -337,6 +339,7 @@ const NoteView = ({
           }}
           contentMode={contentMode}
           toggleEditMode={toggleEditMode}
+          importNote={importNote}
         />
       </div>
     </main>

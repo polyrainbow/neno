@@ -35,6 +35,9 @@ interface DatabaseProvider {
   putNote: (
     noteSaveRequest: NoteSaveRequest,
   ) => Promise<NoteToTransmit>;
+  putRawNote: (
+    rawNote: string,
+  ) => Promise<NoteToTransmit>;
   saveGraphVisualization: (
     graphVisualization: GraphVisualizationFromUser,
   ) => Promise<void>;
