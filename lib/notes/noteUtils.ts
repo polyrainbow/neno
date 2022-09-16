@@ -99,8 +99,13 @@ const noteWithSameTitleExists = (
     return (
       (noteFromDB.meta.title === userNote.meta.title)
       && (
-        "id" in userNote.meta
-        && (noteFromDB.meta.id !== userNote.meta.id)
+        (
+          "id" in userNote.meta
+          && (noteFromDB.meta.id !== userNote.meta.id)
+        )
+        || (
+          !("id" in userNote.meta)
+        )
       )
     );
   });
