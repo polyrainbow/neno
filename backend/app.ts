@@ -17,7 +17,7 @@ import historyAPIFallback from "./lib/HistoryAPIFallback.js";
 import * as path from "path";
 import session from "express-session";
 import User from "./interfaces/User.js";
-import { pbkdf2Sync, randomUUID } from "crypto";
+import { createHash, pbkdf2Sync, randomUUID } from "crypto";
 import FileSessionStore from "./lib/FileSessionStore.js";
 import * as logger from "./lib/logger.js";
 import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode.js";
@@ -85,9 +85,14 @@ const startApp = async ({
   const validateGraphVisualizationFromUser = ajv.compile(graphVisualizationFromUserSchema);
   const validateGraphObject = ajv.compile(graphObjectSchema);
 
-  const getUserByApiKey = (apiKey: string): User | null => {
+  const getUserByApiKey = (submittedApiKey: string): User | null => {
+    const submittedApiKeyHash
+      = createHash('RSA-SHA3-256').update(submittedApiKey).digest('hex');
+
     const user = users.find((user) => {
-      return user.apiKeys?.includes(apiKey);
+      return user.apiKeyHashes.some(apiKeyHash => {  
+        return submittedApiKeyHash === apiKeyHash;
+      });
     });
 
     return user ?? null;

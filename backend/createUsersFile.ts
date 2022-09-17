@@ -1,9 +1,8 @@
 // @ts-ignore
 import * as readline from "node:readline/promises";
 import { stdin } from "process";
-import { randomBytes, pbkdf2Sync } from "crypto";
+import { randomBytes, pbkdf2Sync, createHash, randomUUID } from "crypto";
 import fs from "fs/promises";
-import { randomUUID } from "crypto";
 import twofactor from "node-2fa";
 import qrcode from "qrcode-terminal";
 import User from "./interfaces/User";
@@ -35,7 +34,6 @@ export default async (filepath: string): Promise<void> => {
     muteableStdout.muted = false;
     muteableStdout.write("\n");
 
-
     const salt = randomBytes(16).toString('hex');
   
     // Hashing user's salt and password with 1000 iterations, 64 length and sha512 digest
@@ -45,6 +43,10 @@ export default async (filepath: string): Promise<void> => {
     const mfa = twofactor.generateSecret({ name: "NENO", account: username });
     const uri = `otpauth://totp/NENO%3A%20${username}?secret=${mfa.secret}&issuer=NENO`;
 
+    const apiKey = randomUUID();
+    // https://security.stackexchange.com/a/209940/247396 - no salt for api key
+    const apiKeyHash = createHash('RSA-SHA3-256').update(apiKey).digest('hex');
+
     users.push({
       id: randomUUID(),
       login: username,
@@ -52,9 +54,7 @@ export default async (filepath: string): Promise<void> => {
       salt: salt,
       mfaSecret: mfa.secret,
       mfaUri: uri,
-      apiKeys: [
-        randomUUID(),
-      ],
+      apiKeyHashes: [apiKeyHash],
       // start with one graph per user
       graphIds: [
         randomUUID(),
@@ -64,6 +64,7 @@ export default async (filepath: string): Promise<void> => {
     logger.info("Scan this QR code with your favorite 2FA app");
     logger.info("URL: " + uri);
     qrcode.generate(uri, { small: true });
+    logger.info("Your API key: " + apiKey);
   }
 
   await fs.writeFile(filepath, JSON.stringify(users, null, "  "));
