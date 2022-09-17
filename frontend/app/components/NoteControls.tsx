@@ -177,7 +177,7 @@ const NoteControls = ({
       />
       <IconButton
         id="button_import-note"
-        disabled={false}
+        disabled={!activeNote.isUnsaved}
         title={l("editor.import-note")}
         icon="file_upload"
         onClick={importNote}

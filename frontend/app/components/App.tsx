@@ -51,6 +51,7 @@ import {
 } from "../../../lib/notes/interfaces/NoteSaveRequest";
 import { ContentMode } from "../interfaces/ContentMode";
 import * as IDB from "idb-keyval";
+import { utils } from "../../../lib/notes";
 
 interface AppProps {
   localDatabaseProvider: DatabaseProvider,
@@ -331,7 +332,6 @@ const AppWithConfirmationServiceProvider = ({
 
     if (unsavedChanges) {
       await confirmDiscardingUnsavedChanges();
-      setUnsavedChanges(false);
     }
 
     const types = [{
@@ -343,19 +343,19 @@ const AppWithConfirmationServiceProvider = ({
     const rawNote = await Utils.readFileAsString(rawNoteFile);
 
     try {
-      const noteFromServer = await databaseProvider.putRawNote(rawNote);
-      if (noteFromServer) {
-        setActiveNoteFromServer(noteFromServer);
-        navigate(
-          Utils.getAppPath(
-            PathTemplate.EDITOR_WITH_NOTE,
-            new Map([["NOTE_ID", noteFromServer.meta.id.toString()]]),
-          ),
-          { replace: true },
-        );
-      } else {
-        throw new Error("No note received");
-      }
+      const parsedNote = utils.parseSerializedNewNote(rawNote);
+      const newActiveNote: UnsavedActiveNote = {
+        isUnsaved: true,
+        title: parsedNote.meta.title,
+        changes: [],
+        content: parsedNote.content,
+        keyValues: Object.entries(parsedNote.meta.custom),
+        flags: parsedNote.meta.flags,
+        contentType: parsedNote.meta.contentType,
+        files: [],
+      };
+      setActiveNote(newActiveNote);
+      setUnsavedChanges(true);
     } catch (e) {
       // if credentials are invalid, go to LoginView. If not, throw.
       if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {

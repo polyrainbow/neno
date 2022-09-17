@@ -629,6 +629,7 @@ const getPins = async (graphId: GraphId): Promise<NoteToTransmit[]> => {
 
 const utils = {
   getExtensionFromFilename,
+  parseSerializedNewNote,
 };
 
 
