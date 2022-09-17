@@ -46,6 +46,9 @@ const NoteContentBlockImage = ({
         <img
           src={url}
           alt={description}
+          style={{
+            background: "white",
+          }}
         />
       </Link>
       <figcaption

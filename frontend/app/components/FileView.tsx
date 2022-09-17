@@ -96,6 +96,7 @@ const FileView = ({
         {
           type === MediaType.IMAGE
             ? <img
+              className="checkerboard-background"
               style={{
                 marginRight: "15px auto",
                 maxWidth: "95vw",

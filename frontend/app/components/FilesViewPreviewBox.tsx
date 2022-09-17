@@ -55,6 +55,7 @@ const FilesViewPreviewBox = ({
       <img
         src={thumbnailImageSrc || ""}
         loading="lazy"
+        className={type === MediaType.IMAGE ? "checkerboard-background" : ""}
       />
       <div
         className="file-info"

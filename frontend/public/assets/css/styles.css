@@ -684,6 +684,19 @@ button.dangerous-action {
   gap: 15px;
 }
 
+:root {
+  --checkerbox-0: #CCCCCC;
+  --checkerbox-1: #FFFFFF;
+}
+
+.checkerboard-background {
+  background: repeating-conic-gradient(
+    var(--checkerbox-1) 0% 25%,
+    var(--checkerbox-0) 0% 50%
+  ) 50% / 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
 
 @media only screen and (min-width: 1281px) {
   body, #app{
