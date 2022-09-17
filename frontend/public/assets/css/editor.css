@@ -120,11 +120,22 @@ FILE PREVIEW
   outline: none;
 }
 
-.preview-block-paragraph, .preview-block-list-unordered, .preview-block-list-ordered {
+.preview-block-paragraph,
+.preview-block-quote,
+.preview-block-list-unordered,
+.preview-block-list-ordered {
   line-height: 1.6em;
 }
 
-.preview-block-paragraph span {
+.preview-block-quote {
+  border-left: 6px solid var(--alt-content-color);
+  padding: var(--default-margin);
+  font-style: italic;
+  background: var(--accent-color-interactible);
+  margin-inline: 0;
+}
+
+.preview-block-paragraph span, .preview-block-quote span {
   white-space: break-spaces;
 }
 

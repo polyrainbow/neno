@@ -21,6 +21,7 @@ import NoteContentEmptyDisclaimer from "./NoteContentEmptyDisclaimer";
 import NoteContentBlockUrl from "./NoteContentBlockUrl";
 import NoteContentRunningText from "./NoteContentRunningText";
 import NoteContentBlockTextFile from "./NoteContentBlockTextFile";
+import NoteContentBlockQuote from "./NoteContentBlockQuote";
 
 interface NoteContentProps {
   note: ActiveNote,
@@ -121,6 +122,11 @@ const NoteContent = ({
           }
         } else if (block.type === BlockType.PARAGRAPH) {
           return <NoteContentBlockParagraph
+            runningText={block.data.text}
+            key={Math.random()}
+          />;
+        } else if (block.type === BlockType.QUOTE) {
+          return <NoteContentBlockQuote
             runningText={block.data.text}
             key={Math.random()}
           />;

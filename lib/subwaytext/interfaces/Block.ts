@@ -7,6 +7,7 @@ export enum BlockType {
   HEADING = "heading",
   LIST = "list",
   CODE = "code",
+  QUOTE = "quote",
 }
 
 
@@ -81,6 +82,15 @@ export interface BlockCode {
   data: BlockCodeData,
 }
 
+interface BlockQuoteData {
+  text: RunningText,
+}
+
+export interface BlockQuote {
+  readonly type: BlockType.QUOTE,
+  data: BlockQuoteData,
+}
+
 export type Block = (
   BlockParagraph
   | BlockUrl
@@ -88,11 +98,13 @@ export type Block = (
   | BlockHeading
   | BlockCode
   | BlockSlashlink
+  | BlockQuote
 );
 
 export type MultiLineBlock = (
   BlockParagraph
   | ListBlock
   | BlockCode
+  | BlockQuote
 );
 

@@ -2,21 +2,21 @@ import React from "react";
 import { RunningText } from "../../../lib/subwaytext/interfaces/Block";
 import NoteContentRunningText from "./NoteContentRunningText";
 
-interface NoteContentBlockParagraphProps {
+interface NoteContentBlockQuoteProps {
   runningText: RunningText,
 }
 
 
-const NoteContentBlockParagraph = ({
+const NoteContentBlockQuote = ({
   runningText,
-}: NoteContentBlockParagraphProps) => {
-  return <p
+}: NoteContentBlockQuoteProps) => {
+  return <blockquote
     key={Math.random()}
-    className="preview-block-paragraph"
+    className="preview-block-quote"
   >
     <NoteContentRunningText runningText={runningText} />
-  </p>;
+  </blockquote>;
 };
 
 
-export default NoteContentBlockParagraph;
+export default NoteContentBlockQuote;

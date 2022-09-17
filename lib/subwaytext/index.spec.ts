@@ -219,7 +219,7 @@ code
             }
           ]
         },
-        type: "paragraph"
+        type: BlockType.PARAGRAPH,
       },
       {
         type: BlockType.CODE,
@@ -234,5 +234,58 @@ code
   });
 
 
+  it("should recognize single-line quote blocks", () => {
+    const input = `>   This is a single-line quote block.`;
+
+    const result = [
+      {
+        type: BlockType.QUOTE,
+        data: {
+          text: [
+            {
+              text: "This is a single-line quote block.",
+              type: "NORMAL_TEXT"
+            }
+          ],
+        },
+      },
+    ];
+
+    assert.deepEqual(subwaytext(input), result);
+  });
+
+
+  it("should recognize multiline quote blocks", () => {
+    const input = `>   This is a quote block
+> that goes on for two lines.
+After that, a text block.`;
+
+    const result = [
+      {
+        type: BlockType.QUOTE,
+        data: {
+          text: [
+            {
+              text: "This is a quote block\nthat goes on for two lines.",
+              type: "NORMAL_TEXT"
+            }
+          ],
+        },
+      },
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              text: "After that, a text block.",
+              type: "NORMAL_TEXT"
+            }
+          ],
+        }
+      },
+    ];
+
+    assert.deepEqual(subwaytext(input), result);
+  });
   
 });

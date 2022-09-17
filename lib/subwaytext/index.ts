@@ -3,6 +3,7 @@ import {
   BlockCode,
   BlockHeading,
   BlockParagraph,
+  BlockQuote,
   BlockSlashlink,
   BlockType,
   BlockUrl,
@@ -14,6 +15,7 @@ import { parseText } from "./utils.js";
 export const HEADING_SIGIL = "#";
 export const CODE_SIGIL = "```";
 export const SLASHLINK_SIGIL = "/";
+export const QUOTE_SIGIL = ">";
 
 
 export default (input: string): Block[] => {
@@ -92,6 +94,23 @@ export default (input: string): Block[] => {
             currentBlock.data.code += "\n" + lineValue;
           }
           return blocks;
+        } else if (
+          currentBlock.type === BlockType.QUOTE
+        ) {
+          if (line.startsWith(QUOTE_SIGIL)) {
+            const lineValue = line.substring(1).trim();
+            multilineTextCollector += "\n" + lineValue;
+            if (lineIndex === lines.length - 1) {
+              withinBlock = false;
+              currentBlock.data.text = parseText(multilineTextCollector);
+              multilineTextCollector = "";
+            }
+            return blocks;
+          } else {
+            withinBlock = false;
+            currentBlock.data.text = parseText(multilineTextCollector);
+            multilineTextCollector = "";
+          }
         }
       }
 
@@ -119,6 +138,28 @@ export default (input: string): Block[] => {
 
           blocks.push(newBlock);
 
+          return blocks;
+        } else if (line.startsWith(QUOTE_SIGIL)) {
+          withinBlock = true;
+          const newBlock: BlockQuote = {
+            type: BlockType.QUOTE,
+            data: {
+              text: [],
+            },
+          };
+
+          blocks.push(newBlock);
+          const lineValue = line.substring(1).trim();
+          multilineTextCollector += lineValue;
+
+          if (lineIndex === lines.length - 1) {
+            withinBlock = false;
+            newBlock.data.text
+              = parseText(multilineTextCollector);
+            multilineTextCollector = "";
+            return blocks;
+          }
+  
           return blocks;
         } else if (line.startsWith("1.")) {
           withinBlock = true;
