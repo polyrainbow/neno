@@ -8,7 +8,7 @@ import {
   getUrl,
 } from "../lib/utils";
 
-interface NoteContentBlockAudioProps {
+interface NoteContentBlockImageProps {
   file: FileInfo,
   databaseProvider: DatabaseProvider,
   description: string,
@@ -19,7 +19,7 @@ const NoteContentBlockImage = ({
   file,
   description,
   databaseProvider,
-}: NoteContentBlockAudioProps) => {
+}: NoteContentBlockImageProps) => {
   const [url, setUrl] = useState<string>("");
 
   useEffect(() => {
