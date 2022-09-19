@@ -42,6 +42,13 @@ const updateGraphDataStructure = async (graph: any) => {
     string += "\n" + note.content;
     return string;
   });
+
+  graph.files.forEach((file) => {
+    if (file.creationTime) {
+      file.createdAt = file.creationTime;
+      delete file.creationTime;
+    }
+  });
 };
 
 
