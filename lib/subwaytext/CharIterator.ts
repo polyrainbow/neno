@@ -20,6 +20,6 @@ export default class CharIterator {
   }
 
   peekBack(): string {
-    return this.#chars.slice(this.#index - 1, this.#index).join("");
+    return this.#chars[this.#index - 1];
   }
 }
