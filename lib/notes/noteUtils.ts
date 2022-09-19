@@ -964,6 +964,7 @@ const parseSerializedExistingNote = (serializedNote: string): ExistingNote => {
     "updatedAt",
     "contentType",
     "custom",
+    "flags",
   ];
 
   for (const requiredField of requiredFields) {

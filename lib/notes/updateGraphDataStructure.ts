@@ -29,6 +29,14 @@ const updateGraphDataStructure = async (graph: any) => {
       + formatHeader(
         CanonicalNoteHeader.GRAPH_POSITION,
         note.position.x.toString() + "," + note.position.y.toString()
+      )
+      + formatHeader(
+        CanonicalNoteHeader.CONTENT_TYPE,
+        "text/subway"
+      )
+      + formatHeader(
+        CanonicalNoteHeader.FLAGS,
+        "MIGRATED_FROM_V3"
       );
 
     string += "\n" + note.content;
