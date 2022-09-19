@@ -812,4 +812,5 @@ button.dangerous-action {
   min-height: 31px;
   display: flex;
   justify-content: space-between;
+  word-break: break-word;
 }
