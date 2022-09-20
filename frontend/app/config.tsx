@@ -1,5 +1,7 @@
 import { ContentMode } from "./interfaces/ContentMode";
 
+const VERSION = "v3.0.0";
+
 const DEFAULT_NOTE_TITLE = "";
 
 const DEFAULT_NOTE_CONTENT = "";
@@ -61,6 +63,7 @@ const DEFAULT_CONTENT_MODE = ContentMode.EDITOR;
 const SPAN_SEPARATOR = " · ";
 
 export {
+  VERSION,
   DEFAULT_NOTE_TITLE,
   DEFAULT_NOTE_CONTENT,
   API_URL,

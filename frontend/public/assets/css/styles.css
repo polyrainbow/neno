@@ -644,6 +644,11 @@ button.dangerous-action {
   font-size: var(--large-font-size);
   color: var(--font-color);
   margin: 0;
+  text-align: center;
+}
+
+#section_login footer .version {
+  font-size: var(--small-font-size);
 }
 
 

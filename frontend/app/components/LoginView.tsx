@@ -3,7 +3,7 @@ import HeaderContainer from "./HeaderContainer";
 import LoginViewServer from "./LoginViewServer";
 import LoginViewLocal from "./LoginViewLocal";
 import { DatabaseMode } from "../enum/DatabaseMode";
-import { ASSETS_PATH } from "../config";
+import { ASSETS_PATH, VERSION } from "../config";
 import { l } from "../lib/intl";
 
 const LoginView = ({
@@ -49,6 +49,7 @@ const LoginView = ({
         <a href="https://github.com/SebastianZimmer/neno/blob/main/docs/index.md">
           {l("login.read-the-manual")}
         </a>
+        <p className="version">{VERSION}</p>
       </footer>
     </section>
   </>;
