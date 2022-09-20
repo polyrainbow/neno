@@ -30,6 +30,7 @@ import {
   getExtensionFromFilename,
   findRawNote,
   parseSerializedNewNote,
+  serializeNewNote,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -630,6 +631,7 @@ const getPins = async (graphId: GraphId): Promise<NoteToTransmit[]> => {
 const utils = {
   getExtensionFromFilename,
   parseSerializedNewNote,
+  serializeNewNote,
 };
 
 

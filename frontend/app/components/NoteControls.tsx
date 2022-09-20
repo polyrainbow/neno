@@ -18,6 +18,7 @@ import Tooltip from "./Tooltip";
 import Icon from "./Icon";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import ActiveNote from "../interfaces/ActiveNote";
+import { serializeNewNote } from "../../../lib/notes/noteUtils";
 
 interface NoteControlsProps {
   databaseProvider: DatabaseProvider,
@@ -64,11 +65,30 @@ const NoteControls = ({
 
 
   const exportNote = async (): Promise<void> => {
-    if (activeNote.isUnsaved) return;
-    const rawNote = await databaseProvider.getRawNote(activeNote.id);
+    let rawNote: string;
+
+    if (activeNote.isUnsaved) {
+      const note = {
+        meta: {
+          title: activeNote.title,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          custom: Object.fromEntries(activeNote.keyValues),
+          contentType: "text/subway",
+          flags: ["EXPORT_FROM_DRAFT"],
+        },
+        content: activeNote.content,
+      };
+
+      rawNote = serializeNewNote(note);
+    } else {
+      const rawNoteFromDB = await databaseProvider.getRawNote(activeNote.id);
+      if (!rawNoteFromDB) throw new Error("Raw export from database failed");
+      rawNote = rawNoteFromDB;
+    }
 
     const opts = {
-      suggestedName: activeNote.title + ".neno",
+      suggestedName: (activeNote.title || l("list.untitled-note")) + ".neno",
       types: [{
         description: "NENO note",
         accept: { "application/neno-note": [".neno"] },
@@ -184,7 +204,7 @@ const NoteControls = ({
       />
       <IconButton
         id="button_export-note"
-        disabled={activeNote.isUnsaved}
+        disabled={false}
         title={l("editor.export-note")}
         icon="file_download"
         onClick={exportNote}

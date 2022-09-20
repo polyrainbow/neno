@@ -1073,6 +1073,30 @@ const serializeNote = (note: ExistingNote): string => {
 };
 
 
+const serializeNewNote = (note: NewNote): string => {
+  const headers: NoteHeaders = new Map([
+    [
+      CanonicalNoteHeader.TITLE,
+      note.meta.title,
+    ],
+    [
+      CanonicalNoteHeader.FLAGS,
+      note.meta.flags.join(","),
+    ],
+    [
+      CanonicalNoteHeader.CONTENT_TYPE,
+      note.meta.contentType,
+    ],
+  ]);
+
+  for (const key in note.meta.custom) {
+    headers.set(key, note.meta.custom[key]);
+  }
+
+  return serializeNoteHeaders(headers) + "\n\n" + note.content;
+};
+
+
 export {
   getExtensionFromFilename,
   getNoteTitlePreview,
@@ -1111,5 +1135,6 @@ export {
   parseSerializedExistingNote,
   parseSerializedNewNote,
   serializeNote,
+  serializeNewNote,
   findNoteIndex,
 };
