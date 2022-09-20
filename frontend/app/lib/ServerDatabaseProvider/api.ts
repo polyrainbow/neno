@@ -150,6 +150,7 @@ const logout = () => {
 
 const isAuthenticated = () => {
   return callUserAPIAndGetJSONPayload({
+    method: "POST",
     endpoint: "authenticated",
   });
 };

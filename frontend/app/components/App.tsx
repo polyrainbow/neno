@@ -205,7 +205,12 @@ const AppWithConfirmationServiceProvider = ({
     refreshNoteList()
       .then(() => {
         databaseProvider?.getPins()
-          .then((pinnedNotes) => setPinnedNotes(pinnedNotes));
+          .then((pinnedNotes) => setPinnedNotes(pinnedNotes))
+          .catch((e) => {
+            if (e.message !== "INVALID_CREDENTIALS") {
+              throw new Error(e);
+            }
+          });
       });
   };
 

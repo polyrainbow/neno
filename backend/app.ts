@@ -220,7 +220,7 @@ const startApp = async ({
     Endpoints with authentication required
   *****************/
 
-  app.get(
+  app.post(
     config.USER_ENDOPINT + "authenticated",
     sessionMiddleware,
     verifyUser,
