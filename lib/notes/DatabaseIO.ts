@@ -18,6 +18,8 @@ import StorageProvider from "./interfaces/StorageProvider.js";
 import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 import { parseSerializedExistingNote, serializeNote } from "./noteUtils.js";
 import { Readable } from "./interfaces/Readable.js";
+import UnbalancedBinaryTree from "../UnbalancedBinaryTree.js";
+import { Block } from "../subwaytext/interfaces/Block.js";
 
 
 export default class DatabaseIO {
@@ -81,6 +83,7 @@ export default class DatabaseIO {
     const parsedGraphObject = {
       ...serializedGraphObject,
       notes: parsedNotes,
+      blockIndex: new UnbalancedBinaryTree<Block[]>(),
     };
     return parsedGraphObject;
   }
@@ -88,9 +91,17 @@ export default class DatabaseIO {
 
   private async writeGraphFile (graphId: GraphId, graph: Graph) {
     const serializedGraph = {
-      ...graph,
+      createdAt: graph.createdAt,
+      updatedAt: graph.updatedAt,
+      links: graph.links,
+      idCounter: graph.idCounter,
+      screenPosition: graph.screenPosition,
+      initialNodePosition: graph.initialNodePosition,
+      pinnedNotes: graph.pinnedNotes,
+      files: graph.files,
       notes: graph.notes.map(serializeNote),
     };
+
     await this.#storageProvider.writeObject(
       graphId,
       this.#GRAPH_FILE_NAME,
@@ -117,6 +128,7 @@ export default class DatabaseIO {
       },
       pinnedNotes: [],
       files: [],
+      blockIndex: new UnbalancedBinaryTree<Block[]>(),
     };
 
     return newGraph;

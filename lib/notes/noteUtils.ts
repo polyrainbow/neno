@@ -27,6 +27,7 @@ import {
 } from "./interfaces/NoteMetadata.js";
 import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
 import NewNote from "./interfaces/NewNote.js";
+import UnbalancedBinaryTree from "../UnbalancedBinaryTree.js";
 
 
 const getExtensionFromFilename = (filename: string): string | null => {
@@ -399,25 +400,25 @@ const createNoteToTransmit = async (
 
 
 const createNoteListItem = (
-  databaseNote: ExistingNote,
+  note: ExistingNote,
   graph: Graph,
   // for performance reasons, numberOfLinkedNotes can be given as argument,
   // so that this function does not have to find it out by itself for each
   // NoteListItem to be created
   numberOfLinkedNotes?: number,
 ): NoteListItem => {
-  const blocks = subwaytext(databaseNote.content);
+  const blocks = getBlocks(note, graph.blockIndex);
 
   const noteListItem: NoteListItem = {
-    id: databaseNote.meta.id,
-    title: getNoteTitlePreview(databaseNote),
-    createdAt: databaseNote.meta.createdAt,
-    updatedAt: databaseNote.meta.updatedAt,
+    id: note.meta.id,
+    title: getNoteTitlePreview(note),
+    createdAt: note.meta.createdAt,
+    updatedAt: note.meta.updatedAt,
     features: getNoteFeatures(blocks),
     numberOfLinkedNotes: typeof numberOfLinkedNotes === "number"
       ? numberOfLinkedNotes
-      : getNumberOfLinkedNotes(graph, databaseNote.meta.id),
-    numberOfCharacters: getNumberOfCharacters(databaseNote),
+      : getNumberOfLinkedNotes(graph, note.meta.id),
+    numberOfCharacters: getNumberOfCharacters(note),
     numberOfFiles: getNumberOfFiles(blocks),
   };
 
@@ -757,12 +758,27 @@ const getNotesWithUrl = (
 };
 
 
+const getBlocks = (
+  note: ExistingNote,
+  blockIndex: UnbalancedBinaryTree<Block[]>,
+): Block[] => {
+  const id = note.meta.id;
+  let parsedContent = blockIndex.get(id);
+  if (!parsedContent) {
+    parsedContent = subwaytext(note.content);
+    blockIndex.set(id, parsedContent);
+  }
+
+  return parsedContent;
+};
+
+
 const getNotesWithFile = (
-  notes: ExistingNote[],
+  graph: Graph,
   fileId: FileId,
 ): ExistingNote[] => {
-  return notes.filter((note: ExistingNote) => {
-    return subwaytext(note.content)
+  return graph.notes.filter((note: ExistingNote) => {
+    return getBlocks(note, graph.blockIndex)
       .filter(blockHasLoadedFile)
       .some((block) => getFileId(block.data.link) === fileId);
   });
@@ -820,38 +836,39 @@ const getNotesThatContainTokens = (
 
 
 const getNotesWithBlocksOfTypes = (
-  notes: ExistingNote[],
+  graph: Graph,
   types: BlockType[],
   notesMustContainAllBlockTypes: boolean,
 ): ExistingNote[] => {
   return notesMustContainAllBlockTypes
-    ? notes
+    ? graph.notes
       // every single note must contain blocks from all the types
       .filter((note: ExistingNote): boolean => {
         return types.every((type) => {
-          return subwaytext(note.content).some((block) => block.type === type);
+          return getBlocks(note, graph.blockIndex)
+            .some((block) => block.type === type);
         });
       })
     // every note must contain one block with only one type of types:
-    : notes
+    : graph.notes
       .filter((note: ExistingNote): boolean => {
-        return subwaytext(note.content)
+        return getBlocks(note, graph.blockIndex)
           .some((block) => types.includes(block.type));
       });
 };
 
 
 const getNotesWithMediaTypes = (
-  notes: ExistingNote[],
+  graph: Graph,
   types: MediaType[],
   notesMustContainAllMediaTypes: boolean,
 ): ExistingNote[] => {
   return notesMustContainAllMediaTypes
-    ? notes
+    ? graph.notes
       // every single note must contain blocks from all the types
       .filter((note: ExistingNote): boolean => {
         return types.every((type) => {
-          return subwaytext(note.content).some((block) => {
+          return getBlocks(note, graph.blockIndex).some((block) => {
             if (block.type !== BlockType.SLASHLINK) return false;
             const fileId = getFileId(block.data.link);
             if (!fileId) return false;
@@ -860,9 +877,9 @@ const getNotesWithMediaTypes = (
         });
       })
     // every note must contain one block with only one type of types:
-    : notes
+    : graph.notes
       .filter((note: ExistingNote): boolean => {
-        return subwaytext(note.content)
+        return getBlocks(note, graph.blockIndex)
           .some((block) => {
             if (block.type !== BlockType.SLASHLINK) return false;
             const fileId = getFileId(block.data.link);

@@ -60,9 +60,11 @@ import { MediaType } from "./interfaces/MediaType.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
 import { NoteSaveRequest } from "./interfaces/NoteSaveRequest.js";
 import { Readable } from "./interfaces/Readable.js";
+import subwaytext from "../subwaytext/index.js";
 
 let io: DatabaseIO;
 let randomUUID: () => string;
+
 
 /**
   EXPORTS
@@ -155,7 +157,7 @@ const getNotesList = async (
     const startOfExactQuery
       = searchString.indexOf("has-file:") + "has-file:".length;
     const fileId = searchString.substring(startOfExactQuery);
-    matchingNotes = getNotesWithFile(graph.notes, fileId);
+    matchingNotes = getNotesWithFile(graph, fileId);
 
   // search for notes with specific block types
   } else if (searchString.includes("has:")) {
@@ -167,10 +169,10 @@ const getNotesList = async (
     */
     if (typesString.includes("+")) {
       const types = typesString.split("+") as BlockType[];
-      matchingNotes = getNotesWithBlocksOfTypes(graph.notes, types, true);
+      matchingNotes = getNotesWithBlocksOfTypes(graph, types, true);
     } else {
       const types = typesString.split("|") as BlockType[];
-      matchingNotes = getNotesWithBlocksOfTypes(graph.notes, types, false);
+      matchingNotes = getNotesWithBlocksOfTypes(graph, types, false);
     }
 
     // search for notes with specific media types
@@ -184,10 +186,10 @@ const getNotesList = async (
     */
     if (typesString.includes("+")) {
       const types = typesString.split("+") as MediaType[];
-      matchingNotes = getNotesWithMediaTypes(graph.notes, types, true);
+      matchingNotes = getNotesWithMediaTypes(graph, types, true);
     } else {
       const types = typesString.split("|") as MediaType[];
-      matchingNotes = getNotesWithMediaTypes(graph.notes, types, false);
+      matchingNotes = getNotesWithMediaTypes(graph, types, false);
     }
 
 
@@ -340,9 +342,6 @@ const setGraphVisualization = async (
 };
 
 
-
-
-
 const put = async (
   noteSaveRequest: NoteSaveRequest,
   graphId: GraphId,
@@ -403,6 +402,10 @@ const put = async (
     graph.notes.push(existingNote);
   } else {
     existingNote.content = noteFromUser.content;
+    graph.blockIndex.set(
+      existingNote.meta.id,
+      subwaytext(existingNote.content),
+    );
     existingNote.meta.title = normalizeNoteTitle(noteFromUser.meta.title);
     existingNote.meta.updatedAt = Date.now();
     existingNote.meta.flags = noteFromUser.meta.flags;
