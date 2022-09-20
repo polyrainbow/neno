@@ -432,8 +432,6 @@ const putRawNote = (
     ignoreDuplicateTitles: true,
   };
 
-  note.meta.flags.push("IMPORTED");
-
   return put(noteSaveRequest, graphId);
 };
 

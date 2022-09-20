@@ -350,7 +350,7 @@ const AppWithConfirmationServiceProvider = ({
         changes: [],
         content: parsedNote.content,
         keyValues: Object.entries(parsedNote.meta.custom),
-        flags: parsedNote.meta.flags,
+        flags: [...parsedNote.meta.flags, "IMPORTED"],
         contentType: parsedNote.meta.contentType,
         files: [],
       };
