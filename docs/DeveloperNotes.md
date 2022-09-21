@@ -25,7 +25,7 @@ typescript-json-schema "lib/notes/interfaces/ExistingNote.ts" ExistingNote --req
 
 ## Publishing a release
 
-1. Update the version number in `package.json` and in `frontent/app/config.tsx`
+1. Run `node tools/updateVersion.js {major,minor,patch}`
 2. Commit this with the commit message `release: vX.Y.Z` (replace X.Y.Z with actual version number)
 3. Add a tag to this commit: `git tag vX.Y.Z`
 4. Push commit to remote (if required via PR)
