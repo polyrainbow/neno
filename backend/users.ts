@@ -24,6 +24,7 @@ const isValidUser = (user: User): boolean => {
     && typeof user.passwordHash === "string"
     && typeof user.mfaSecret === "string"
     && Array.isArray(user.graphIds)
+    && Array.isArray(user.apiKeyHashes)
     // a graph id must not include special characters
     && user.graphIds.every(idContainsOnlyValidChars)
   );
