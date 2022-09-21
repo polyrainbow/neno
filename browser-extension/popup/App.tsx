@@ -43,12 +43,16 @@ const App = () => {
     <Header
       hostUrl={hostUrl}
     />
-    <Editor
-      apiKey={apiKey}
-      hostUrl={hostUrl}
-      activeTab={activeTab}
-      graphId={graphId}
-    />
+    {
+      apiKey && hostUrl && activeTab && graphId
+        ? <Editor
+          apiKey={apiKey}
+          hostUrl={hostUrl}
+          activeTab={activeTab}
+          graphId={graphId}
+        />
+        : "Loading..."
+    }
     <StatusBar
       apiKey={apiKey}
       hostUrl={hostUrl}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import NoteFromUser from "../../lib/notes/interfaces/NoteFromUser";
+import ExistingNote from "../../lib/notes/interfaces/ExistingNote";
+import { NoteSaveRequest } from "../../lib/notes/interfaces/NoteSaveRequest";
 import {
   getNoteContent,
   putNote,
@@ -12,11 +13,18 @@ const forbiddenUrlStartStrings = [
   "chrome-extension://",
 ];
 
-const Editor = ({ apiKey, hostUrl, activeTab, graphId }) => {
+interface EditorProps {
+  apiKey: string,
+  hostUrl: string,
+  activeTab: chrome.tabs.Tab,
+  graphId: string,
+}
+
+const Editor = ({ apiKey, hostUrl, activeTab, graphId }: EditorProps) => {
   const [statusMessage, setStatusMessage] = useState("");
   const [noteTitle, setNoteTitle] = useState("");
   const [noteText, setNoteText] = useState("");
-  const [activeNoteId, setActiveNoteId] = useState<number>(NaN);
+  const [activeNote, setActiveNote] = useState<ExistingNote | null>(null);
   const [pushNoteButtonValue, setPushNoteButtonValue] = useState("Add");
 
   useEffect(() => {
@@ -24,13 +32,19 @@ const Editor = ({ apiKey, hostUrl, activeTab, graphId }) => {
   }, [activeTab]);
 
   if (activeTab && forbiddenUrlStartStrings.some(
-    (startString) => activeTab.url.startsWith(startString),
+    (startString) => activeTab.url?.startsWith(startString),
   )) {
     return <main><p>This page cannot be added as a note.</p></main>;
   }
 
   const pushNote = async () => {
-    if (typeof graphId !== "string") return;
+    if (
+      (typeof graphId !== "string")
+      || (typeof activeTab.url !== "string")
+      || (typeof activeTab.title !== "string")
+    ) {
+      throw new Error("pushNote: Missing properties!");
+    }
 
     const content = getNoteContent({
       url: activeTab.url,
@@ -38,15 +52,27 @@ const Editor = ({ apiKey, hostUrl, activeTab, graphId }) => {
       noteText,
     });
 
-    const note:NoteFromUser = {
-      // eslint-disable-next-line no-undefined
-      id: activeNoteId || undefined,
-      content,
-      title: noteTitle,
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        meta: activeNote
+          ? {
+            // eslint-disable-next-line no-undefined
+            ...activeNote.meta,
+            title: noteTitle,
+          }
+          : {
+            title: noteTitle,
+            custom: {},
+            contentType: "text/subway",
+            flags: ["CREATED_WITH_BROWSER_EXTENSION"],
+          },
+        content,
+      },
+      ignoreDuplicateTitles: true,
     };
 
     const result = await putNote({
-      note,
+      noteSaveRequest,
       hostUrl,
       apiKey,
       graphId,
@@ -54,16 +80,16 @@ const Editor = ({ apiKey, hostUrl, activeTab, graphId }) => {
 
     if (result.success) {
       setStatusMessage("Note added. ");
-      setActiveNoteId(result.payload.id);
+      setActiveNote(result.payload);
       setPushNoteButtonValue("Update");
     } else {
       setStatusMessage("Error adding note: " + result.error);
     }
   };
 
-  const link = ((typeof activeNoteId === "number") && (!isNaN(activeNoteId)))
+  const link = activeNote
     ? <a
-      href={hostUrl + "/editor/" + activeNoteId}
+      href={hostUrl + "/editor/" + activeNote.meta.id}
       target="_blank" rel="noreferrer"
     >Click here to open it in NENO.</a>
     : "";

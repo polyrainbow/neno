@@ -37,18 +37,11 @@ export const getNoteContent = ({
 
 
 export const putNote = ({
-  note,
+  noteSaveRequest,
   hostUrl,
   apiKey,
   graphId,
 }): Promise<any> => {
-  const requestBody = {
-    note,
-    options: {
-      ignoreDuplicateTitles: true,
-    },
-  };
-
   const requestUrl = `${hostUrl}/api/graph/${graphId}/note`;
 
   return fetchJSON(requestUrl, {
@@ -57,7 +50,7 @@ export const putNote = ({
       "X-Auth-Token": apiKey,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(requestBody),
+    body: JSON.stringify(noteSaveRequest),
   })
     .then((response) => {
       return response;
@@ -101,7 +94,7 @@ export const isAuthenticated = (
   const url = hostUrl + "/api/user/authenticated";
 
   return fetchJSON(url, {
-    method: "GET",
+    method: "POST",
     headers: {
       "X-Auth-Token": apiKey,
       "Content-Type": "application/json",
