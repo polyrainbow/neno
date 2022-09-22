@@ -1,4 +1,3 @@
-// @ts-ignore
 import * as readline from "node:readline/promises";
 import { stdin } from "process";
 import { randomBytes, pbkdf2Sync, createHash, randomUUID } from "crypto";
@@ -30,7 +29,7 @@ export default async (filepath: string): Promise<void> => {
 
     muteableStdout.write("Password: ");
     muteableStdout.muted = true;
-    const password = await rl.question();
+    const password = await rl.question("");
     muteableStdout.muted = false;
     muteableStdout.write("\n");
 
