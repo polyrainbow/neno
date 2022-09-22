@@ -1,6 +1,6 @@
 import { ContentMode } from "./interfaces/ContentMode";
 
-const VERSION = "v4.0.0";
+const VERSION = "v4.0.1";
 
 const DEFAULT_NOTE_TITLE = "";
 
