@@ -65,6 +65,7 @@
     "unit-test-backend": "npx tsc -p backend && node dist/backend/lib/getDocumentTitle.spec.js",
     "test-intl": "node frontend/app/intl/test.js",
     "unit-test-notes-module": "npx tsc -p lib && node dist/lib/notes/index.spec.js",
+    "unit-test-unbalanced-binary-tree": "npx tsc -p lib && node dist/lib/UnbalancedBinaryTree.spec.js",
     "unit-test-subwaytext": "npx tsc -p lib && node dist/lib/subwaytext/index.spec.js",
     "subwaytext-example": "npx tsc -p lib && node dist/lib/subwaytext/examples/example.js",
     "subwaytext-performance-test": "npx tsc -p lib && node dist/lib/subwaytext/examples/performance-test.js"

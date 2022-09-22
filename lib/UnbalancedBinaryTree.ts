@@ -42,7 +42,10 @@ export default class UnbalancedBinaryTree<T> {
     let x: Node<T> | null = this.#root;
     while (x) {
       y = x;
-      if (key < x.key) {
+      if (key === x.key) {
+        x.value = value;
+        return;
+      } else if (key < x.key) {
         x = x.left;
       } else {
         x = x.right;
