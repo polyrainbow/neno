@@ -800,6 +800,7 @@ button.dangerous-action {
   min-height: 241px;
   background: var(--accent-color-interactible);
   border-radius: var(--border-radius);
+  overflow: hidden;
 }
 
 .files-view-preview-box img {
