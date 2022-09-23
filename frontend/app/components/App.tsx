@@ -678,9 +678,7 @@ const AppWithConfirmationServiceProvider = ({
               <FloatingActionButton
                 title={l("editor.new-note")}
                 icon="add"
-                onClick={() => navigate(
-                  getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE),
-                )}
+                onClick={() => createNewNote()}
               ></FloatingActionButton>
             </>
             : null
