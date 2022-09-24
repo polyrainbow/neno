@@ -477,6 +477,7 @@ button[disabled]{
   border-radius: 100px;
   margin: 0;
   align-self: center;
+  flex-shrink: 0;
 }
 
 .note-list-item .info{
@@ -819,4 +820,5 @@ button.dangerous-action {
   display: flex;
   justify-content: space-between;
   word-break: break-word;
+  height: 46px;
 }
