@@ -78,13 +78,13 @@ export default (input: string): Block[] => {
             return blocks;
           }
         } else if (currentBlock.type === BlockType.CODE) {
-          if (line === CODE_SIGIL) {
+          if (line.trimEnd() === CODE_SIGIL) {
             withinBlock = false;
             return blocks;
           }
 
-          const lineValue = (line === "\\" + CODE_SIGIL)
-            ? CODE_SIGIL
+          const lineValue = (line.trimEnd() === "\\" + CODE_SIGIL)
+            ? line.substring(1)
             : line;
 
           if (codeBlockJustStarted) {

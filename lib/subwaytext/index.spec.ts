@@ -287,5 +287,35 @@ After that, a text block.`;
 
     assert.deepEqual(subwaytext(input), result);
   });
+
+  it("allow end of code block backticks to be followed by whitespace", () => {
+    const input = `\`\`\`
+some code
+\`\`\`      
+normal text`;
+
+    const result = [
+      {
+        type: BlockType.CODE,
+        data: {
+          code: "some code",
+          contentType: ""
+        },
+      },
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              text: "normal text",
+              type: "NORMAL_TEXT"
+            }
+          ],
+        }
+      },
+    ];
+
+    assert.deepEqual(subwaytext(input), result);
+  });
   
 });
