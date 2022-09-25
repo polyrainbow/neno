@@ -192,6 +192,13 @@ const Note = ({
     />
     <section id="note"
       onDrop={handleFileDrop}
+      onPaste={(e) => {
+        const files = Array.from(e.clipboardData.files);
+        if (files.length > 0) {
+          uploadFiles(files);
+          e.preventDefault();
+        }
+      }}
       onDragOver={(e) => {
         // https://stackoverflow.com/a/50233827/3890888
         e.stopPropagation();
