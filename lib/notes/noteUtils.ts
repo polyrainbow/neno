@@ -604,8 +604,19 @@ const getNumberOfCharacters = (note: ExistingNote): number => {
 
 
 const getURLsOfNote = (noteContent: NoteContent): string[] => {
+  /*
+    We use a simple regex for this as we don't want to implement a full
+    URL parser as described in
+    https://url.spec.whatwg.org/#concept-basic-url-parser
+    The regex is from https://stackoverflow.com/a/3809435/3890888 
+    However it does not seem to cover all cases.
+    I've added some valid URL code points to the query string which are
+    listed in https://url.spec.whatwg.org/#url-code-points
+    - comma (,)
+    There might be more to come.
+  */
   // eslint-disable-next-line max-len
-  const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/g;
+  const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=,]*)/g;
   return [...noteContent.matchAll(regex)].map((match) => match[0]);
 };
 
@@ -774,10 +785,11 @@ const getBlocks = (
 
 
 const getNotesWithFile = (
+  notes: ExistingNote[],
   graph: Graph,
   fileId: FileId,
 ): ExistingNote[] => {
-  return graph.notes.filter((note: ExistingNote) => {
+  return notes.filter((note: ExistingNote) => {
     return getBlocks(note, graph.blockIndex)
       .filter(blockHasLoadedFile)
       .some((block) => getFileId(block.data.link) === fileId);
@@ -793,10 +805,6 @@ const getNotesWithTitleContainingTokens = (
   return notes.filter((note: ExistingNote) => {
     if (query.length === 0) {
       return true;
-    }
-
-    if (query.length > 0 && query.length < 3) {
-      return false;
     }
 
     const queryTokens = query.split(" ");
@@ -836,12 +844,13 @@ const getNotesThatContainTokens = (
 
 
 const getNotesWithBlocksOfTypes = (
+  notes: ExistingNote[],
   graph: Graph,
   types: BlockType[],
   notesMustContainAllBlockTypes: boolean,
 ): ExistingNote[] => {
   return notesMustContainAllBlockTypes
-    ? graph.notes
+    ? notes
       // every single note must contain blocks from all the types
       .filter((note: ExistingNote): boolean => {
         return types.every((type) => {
@@ -850,7 +859,7 @@ const getNotesWithBlocksOfTypes = (
         });
       })
     // every note must contain one block with only one type of types:
-    : graph.notes
+    : notes
       .filter((note: ExistingNote): boolean => {
         return getBlocks(note, graph.blockIndex)
           .some((block) => types.includes(block.type));
@@ -859,12 +868,13 @@ const getNotesWithBlocksOfTypes = (
 
 
 const getNotesWithMediaTypes = (
+  notes: ExistingNote[],
   graph: Graph,
   types: MediaType[],
   notesMustContainAllMediaTypes: boolean,
 ): ExistingNote[] => {
   return notesMustContainAllMediaTypes
-    ? graph.notes
+    ? notes
       // every single note must contain blocks from all the types
       .filter((note: ExistingNote): boolean => {
         return types.every((type) => {
@@ -877,7 +887,7 @@ const getNotesWithMediaTypes = (
         });
       })
     // every note must contain one block with only one type of types:
-    : graph.notes
+    : notes
       .filter((note: ExistingNote): boolean => {
         return getBlocks(note, graph.blockIndex)
           .some((block) => {

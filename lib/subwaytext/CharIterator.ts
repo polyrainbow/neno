@@ -1,5 +1,14 @@
+type IteratorStep
+  = {
+    done: false,
+    value: string,
+  } | {
+    done: true,
+    value: null,
+  };
+
 export default class CharIterator {
-  #chars;
+  #chars: string[];
   #index;
 
   constructor(input: string) {
@@ -7,10 +16,14 @@ export default class CharIterator {
     this.#index = -1;
   }
 
-  next() {
+  next(): IteratorStep {
     this.#index++;
-    return {
-      done: this.#index === this.#chars.length,
+    const done = this.#index === this.#chars.length;
+    return done ? {
+      done,
+      value: null,
+    } : {
+      done,
       value: this.#chars[this.#index],
     };
   }

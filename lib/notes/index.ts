@@ -1,5 +1,4 @@
 import DatabaseIO from "./DatabaseIO.js";
-import * as Utils from "../utils.js";
 import {
   getNoteTitlePreview,
   normalizeNoteTitle,
@@ -16,16 +15,7 @@ import {
   createNoteListItems,
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
-  getNotesWithDuplicateUrls,
-  getNotesThatContainTokens,
-  getNotesByTitle,
-  getNotesWithUrl,
-  getNotesWithFile,
-  getNotesWithTitleContainingTokens,
-  getNotesWithBlocksOfTypes,
-  getNotesWithDuplicateTitles,
   parseFileIds,
-  getNotesWithMediaTypes,
   findNoteIndex,
   getExtensionFromFilename,
   findRawNote,
@@ -33,7 +23,6 @@ import {
   serializeNewNote,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
-import NoteListItem from "./interfaces/NoteListItem.js";
 import GraphVisualization from "./interfaces/GraphVisualization.js";
 import { GraphId } from "./interfaces/GraphId.js";
 import { NoteId } from "./interfaces/NoteId.js";
@@ -45,22 +34,21 @@ import GraphVisualizationFromUser
 import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import { FileId } from "./interfaces/FileId.js";
 import * as config from "./config.js";
-import NoteListPage from "./interfaces/NoteListPage.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import GraphObject from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
-import DatabaseQuery from "./interfaces/DatabaseQuery.js";
 import GraphStatsRetrievalOptions
   from "./interfaces/GraphStatsRetrievalOptions.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 import { FileInfo } from "./interfaces/FileInfo.js";
-import { BlockType } from "../subwaytext/interfaces/Block.js";
-import { MediaType } from "./interfaces/MediaType.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
 import { NoteSaveRequest } from "./interfaces/NoteSaveRequest.js";
 import { Readable } from "./interfaces/Readable.js";
 import subwaytext from "../subwaytext/index.js";
+import { search } from "./search.js";
+import DatabaseQuery from "./interfaces/DatabaseQuery.js";
+import NoteListPage from "./interfaces/NoteListPage.js";
 
 let io: DatabaseIO;
 let randomUUID: () => string;
@@ -115,126 +103,8 @@ const getNotesList = async (
   graphId: GraphId,
   query: DatabaseQuery,
 ): Promise<NoteListPage> => {
-  const searchString = query.searchString || "";
-  const caseSensitive = query.caseSensitive || false;
-  const page = query.page ? Math.max(query.page, 1) : 1;
-  const sortMode
-    = query.sortMode || NoteListSortMode.CREATION_DATE_DESCENDING;
-  const limit = query.limit || 0;
-
-  const graph: Graph = await io.getGraph(graphId);
-
-  let matchingNotes;
-
-  // search for note pairs containing identical urls
-  if (searchString.includes("duplicates:")){
-    const startOfDuplicateType
-      = searchString.indexOf("duplicates:") + "duplicates:".length;
-    const duplicateType = searchString.substring(startOfDuplicateType);
-    if (duplicateType === "url") {
-      matchingNotes = getNotesWithDuplicateUrls(graph.notes);
-    } else if (duplicateType === "title"){
-      matchingNotes = getNotesWithDuplicateTitles(graph.notes);
-    } else {
-      matchingNotes = [];
-    }
-
-  // search for exact title
-  } else if (searchString.includes("exact:")) {
-    const startOfExactQuery = searchString.indexOf("exact:") + "exact:".length;
-    const exactQuery = searchString.substring(startOfExactQuery);
-    matchingNotes = getNotesByTitle(graph.notes, exactQuery, false);
-
-  // search for notes with specific urls
-  } else if (searchString.includes("has-url:")) {
-    const startOfExactQuery
-      = searchString.indexOf("has-url:") + "has-url:".length;
-    const url = searchString.substring(startOfExactQuery);
-    matchingNotes = getNotesWithUrl(graph.notes, url);
-
-  // search for notes with specific fileIds
-  } else if (searchString.includes("has-file:")) {
-    const startOfExactQuery
-      = searchString.indexOf("has-file:") + "has-file:".length;
-    const fileId = searchString.substring(startOfExactQuery);
-    matchingNotes = getNotesWithFile(graph, fileId);
-
-  // search for notes with specific block types
-  } else if (searchString.includes("has:")) {
-    const startOfExactQuery = searchString.indexOf("has:") + "has:".length;
-    const typesString = searchString.substring(startOfExactQuery);
-    /*
-      has:list+paragraph - show all notes that contain list as well as paragraph
-      has:list|paragraph - show all notes that contain list or paragraph
-    */
-    if (typesString.includes("+")) {
-      const types = typesString.split("+") as BlockType[];
-      matchingNotes = getNotesWithBlocksOfTypes(graph, types, true);
-    } else {
-      const types = typesString.split("|") as BlockType[];
-      matchingNotes = getNotesWithBlocksOfTypes(graph, types, false);
-    }
-
-    // search for notes with specific media types
-  } else if (searchString.includes("has-media:")) {
-    const startOfExactQuery = searchString.indexOf("has-media:")
-      + "has-media:".length;
-    const typesString = searchString.substring(startOfExactQuery);
-    /*
-      has-media:audio+video - show all notes that contain audio as well as video
-      has-media:audio|video - show all notes that contain audio or video
-    */
-    if (typesString.includes("+")) {
-      const types = typesString.split("+") as MediaType[];
-      matchingNotes = getNotesWithMediaTypes(graph, types, true);
-    } else {
-      const types = typesString.split("|") as MediaType[];
-      matchingNotes = getNotesWithMediaTypes(graph, types, false);
-    }
-
-
-  // full-text search
-  } else if (searchString.includes("ft:")) {
-    const startOfFtQuery = searchString.indexOf("ft:") + "ft:".length;
-    const ftQuery = searchString.substring(startOfFtQuery);
-    matchingNotes = getNotesThatContainTokens(
-      graph.notes,
-      ftQuery,
-      caseSensitive,
-    );
-
-  // default mode: check if all query tokens are included in note title
-  } else {
-    matchingNotes = getNotesWithTitleContainingTokens(
-      graph.notes,
-      searchString,
-      caseSensitive,
-    );
-  }
-
-  // now we need to transform all notes into NoteListItems before we can
-  // sort those
-  let noteListItems: NoteListItem[] = createNoteListItems(matchingNotes, graph)
-    .sort(getSortFunction(sortMode));
-
-  // let's only slice the array if it makes sense to do so
-  if (limit > 0 && limit < noteListItems.length) {
-    noteListItems = noteListItems.slice(0, limit);
-  }
-
-  // let's extract the list items for the requested page
-  const noteListItemsOfPage: NoteListItem[] = Utils.getPagedMatches(
-    noteListItems,
-    page,
-    config.NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE,
-  );
-
-  const noteListPage: NoteListPage = {
-    results: noteListItemsOfPage,
-    numberOfResults: noteListItems.length,
-  };
-
-  return noteListPage;
+  const graph: GraphObject = await io.getGraph(graphId);
+  return search(graph, query);
 };
 
 
