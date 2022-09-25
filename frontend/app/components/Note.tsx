@@ -97,12 +97,7 @@ const Note = ({
   };
 
 
-  const uploadFiles = async () => {
-    const files = await getFilesFromUserSelection(
-      FILE_PICKER_ACCEPT_TYPES,
-      true,
-    );
-
+  const uploadFiles = async (files: File[]) => {
     setUploadInProgress(true);
 
     const responses: FileInfo[]
@@ -117,6 +112,16 @@ const Note = ({
     insertFilesToNote(responses);
 
     setUploadInProgress(false);
+  };
+
+
+  const handleUploadFilesRequest = async () => {
+    const files = await getFilesFromUserSelection(
+      FILE_PICKER_ACCEPT_TYPES,
+      true,
+    );
+
+    return uploadFiles(files);
   };
 
 
@@ -179,7 +184,7 @@ const Note = ({
       pinOrUnpinNote={pinOrUnpinNote}
       duplicateNote={duplicateNote}
       openInGraphView={openInGraphView}
-      uploadFiles={uploadFiles}
+      handleUploadFilesRequest={handleUploadFilesRequest}
       contentMode={contentMode}
       toggleEditMode={toggleEditMode}
       uploadInProgress={uploadInProgress}
@@ -229,7 +234,6 @@ const Note = ({
               content={note.content}
               onChange={(val) => {
                 setNoteContent(val);
-                setUnsavedChanges(true);
               }}
             />
             : ""

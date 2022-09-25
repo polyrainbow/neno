@@ -32,7 +32,7 @@ interface NoteControlsProps {
   pinOrUnpinNote,
   duplicateNote,
   openInGraphView,
-  uploadFiles,
+  handleUploadFilesRequest,
   contentMode,
   toggleEditMode,
   uploadInProgress,
@@ -51,7 +51,7 @@ const NoteControls = ({
   pinOrUnpinNote,
   duplicateNote,
   openInGraphView,
-  uploadFiles,
+  handleUploadFilesRequest,
   contentMode,
   toggleEditMode,
   uploadInProgress,
@@ -214,7 +214,7 @@ const NoteControls = ({
         disabled={false}
         title={l("editor.upload-file")}
         icon="upload_file"
-        onClick={uploadFiles}
+        onClick={handleUploadFilesRequest}
       />
     </div>
     <div id="note-controls-right">

@@ -541,6 +541,7 @@ const AppWithConfirmationServiceProvider = ({
         content: newContent,
       };
     });
+    setUnsavedChanges(true);
   };
 
 
@@ -567,7 +568,6 @@ const AppWithConfirmationServiceProvider = ({
         .then((newNoteContent) => {
           if (newNoteContent !== activeNote.content) {
             setNoteContent(newNoteContent);
-            setUnsavedChanges(true);
           }
         });
     }
