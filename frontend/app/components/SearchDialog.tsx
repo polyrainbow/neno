@@ -50,9 +50,9 @@ const SearchDialog = ({
     </p>
     <p>
       <button
-        onClick={() => setSearchValueAndClose("has-media:document")}
+        onClick={() => setSearchValueAndClose("has-media:pdf")}
         className="default-button dialog-box-button"
-      >{l("list.search.presets.notes-with-documents")}</button>
+      >{l("list.search.presets.notes-with-pdfs")}</button>
     </p>
     <p>
       <button

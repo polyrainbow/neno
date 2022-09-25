@@ -27,7 +27,7 @@
     "concurrently": "^7.4.0",
     "css-loader": "^6.7.1",
     "d3": "^7.6.1",
-    "eslint": "^8.23.1",
+    "eslint": "^8.24.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",

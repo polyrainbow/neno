@@ -1,7 +1,9 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import * as url from "url";
 
-const LOCALES_DIRECTORY = path.join("..", "frontend", "app", "intl");
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const LOCALES_DIRECTORY = path.join(__dirname, "..", "frontend", "app", "intl");
 
 const filenames = await fs.readdir(LOCALES_DIRECTORY);
 
