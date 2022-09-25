@@ -15,6 +15,7 @@ import {
   getNotesWithBlocksOfTypes,
   getNotesWithDuplicateTitles,
   getNotesWithMediaTypes,
+  getNotesWithKeyValue,
 } from "./noteUtils.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import GraphObject from "./interfaces/Graph.js";
@@ -191,6 +192,14 @@ export const search = async (
         matchingNotes,
         value,
         caseSensitive,
+      );
+
+    // custom key-value search
+    } else if (key.startsWith("$")) {
+      matchingNotes = getNotesWithKeyValue(
+        matchingNotes,
+        key.substring(1),
+        value,
       );
 
     // default mode: check if all query tokens are included in note title

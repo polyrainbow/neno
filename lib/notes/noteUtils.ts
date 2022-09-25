@@ -769,6 +769,23 @@ const getNotesWithUrl = (
 };
 
 
+const getNotesWithKeyValue = (
+  notes: ExistingNote[],
+  key: string,
+  value: string,
+) => {
+  return notes.filter((note: ExistingNote) => {
+    return (
+      key in note.meta.custom
+      && (
+        value.length === 0
+        || note.meta.custom[key].includes(value)
+      )
+    );
+  });
+};
+
+
 const getBlocks = (
   note: ExistingNote,
   blockIndex: UnbalancedBinaryTree<Block[]>,
@@ -1157,6 +1174,7 @@ export {
   getNotesThatContainTokens,
   getNotesWithBlocksOfTypes,
   getNotesWithMediaTypes,
+  getNotesWithKeyValue,
   parseNoteHeaders,
   serializeNoteHeaders,
   parseSerializedExistingNote,
