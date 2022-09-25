@@ -204,6 +204,7 @@ export default class GraphVisualization {
     onChange,
     initialFocusNoteId,
     openNote,
+    initialMode,
   }: GraphVisualizerConfig) {
     const graphObjectPrepared: FrontendGraphVisualization
       = GraphVisualization.prepareGraphObject(graphObject);
@@ -420,11 +421,7 @@ export default class GraphVisualization {
     this.#updateConnectedNodeIds();
 
     // by default, text rendering is activated, if the number of nodes is <= 500
-    this.setMode(
-      this.#nodes.length <= 500
-        ? GraphVisualizationMode.DEFAULT
-        : GraphVisualizationMode.NO_LABELS,
-    );
+    this.setMode(initialMode || GraphVisualizationMode.DEFAULT);
   }
 
 

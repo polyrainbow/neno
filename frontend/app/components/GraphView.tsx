@@ -128,6 +128,14 @@ const GraphView = ({
       const graphObject: BackendGraphVisualization
         = await databaseProvider.getGraphVisualization();
 
+      // for performance reasons, we disable labels above a certain
+      // amount of nodes
+      const initialMode = graphObject.nodes.length <= 500
+        ? GraphVisualizationMode.DEFAULT
+        : GraphVisualizationMode.NO_LABELS;
+
+      setMode(initialMode);
+
       graphVisualizerInstance.current
         = new GraphVisualizer({
           parent: mainElement.current as HTMLElement,
@@ -138,6 +146,7 @@ const GraphView = ({
           onChange,
           initialFocusNoteId: focusNoteId,
           openNote: openNoteInEditor,
+          initialMode,
         });
     } catch (e) {
       // if credentials are invalid, go to LoginView. If not, throw.

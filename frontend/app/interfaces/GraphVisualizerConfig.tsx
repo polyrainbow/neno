@@ -1,6 +1,7 @@
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
+import { GraphVisualizationMode } from "./GraphVisualization";
 
 export interface HighlightDetails {
   active: boolean,
@@ -16,6 +17,7 @@ interface GraphVisualizerConfig {
   onChange?: () => void,
   initialFocusNoteId?: NoteId,
   openNote: (noteId: NoteId) => void,
+  initialMode?: GraphVisualizationMode,
 }
 
 export default GraphVisualizerConfig;
