@@ -24,6 +24,7 @@ import { Note } from "./interfaces/Note.js";
 import {
   ExistingNoteMetadata,
   NewNoteMetadata,
+  NoteMetadata,
 } from "./interfaces/NoteMetadata.js";
 import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
 import NewNote from "./interfaces/NewNote.js";
@@ -1150,6 +1151,18 @@ const serializeNewNote = (note: NewNote): string => {
 };
 
 
+const removeCustomMetadataWithEmptyKeys = (
+  meta: NoteMetadata["custom"],
+): NoteMetadata["custom"] => {
+  return Object.fromEntries(
+    Object.entries(meta)
+      .filter((entry) => {
+        return entry[0].trim().length > 0;
+      }),
+  );
+};
+
+
 export {
   getExtensionFromFilename,
   getNoteTitlePreview,
@@ -1192,4 +1205,5 @@ export {
   serializeNewNote,
   findNoteIndex,
   getNotesWithCustomMetadata,
+  removeCustomMetadataWithEmptyKeys,
 };

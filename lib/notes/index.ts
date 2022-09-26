@@ -21,6 +21,7 @@ import {
   findRawNote,
   parseSerializedNewNote,
   serializeNewNote,
+  removeCustomMetadataWithEmptyKeys,
 } from "./noteUtils.js";
 import Graph from "./interfaces/Graph.js";
 import GraphVisualization from "./interfaces/GraphVisualization.js";
@@ -263,7 +264,9 @@ const put = async (
         title: normalizeNoteTitle(noteFromUser.meta.title),
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        custom: noteFromUser.meta.custom,
+        custom: removeCustomMetadataWithEmptyKeys(
+          noteFromUser.meta.custom,
+        ),
         flags: noteFromUser.meta.flags,
         contentType: noteFromUser.meta.contentType,
       },
@@ -280,7 +283,9 @@ const put = async (
     existingNote.meta.updatedAt = Date.now();
     existingNote.meta.flags = noteFromUser.meta.flags;
     existingNote.meta.contentType = noteFromUser.meta.contentType;
-    existingNote.meta.custom = noteFromUser.meta.custom;
+    existingNote.meta.custom = removeCustomMetadataWithEmptyKeys(
+      noteFromUser.meta.custom,
+    );
   }
 
   incorporateUserChangesIntoNote(noteSaveRequest.changes, existingNote, graph);
