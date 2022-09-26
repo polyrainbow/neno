@@ -786,6 +786,15 @@ const getNotesWithKeyValue = (
 };
 
 
+const getNotesWithCustomMetadata = (
+  notes: ExistingNote[],
+) => {
+  return notes.filter((note: ExistingNote) => {
+    return Object.entries(note.meta.custom).length > 0;
+  });
+};
+
+
 const getBlocks = (
   note: ExistingNote,
   blockIndex: UnbalancedBinaryTree<Block[]>,
@@ -1182,4 +1191,5 @@ export {
   serializeNote,
   serializeNewNote,
   findNoteIndex,
+  getNotesWithCustomMetadata,
 };

@@ -16,6 +16,7 @@ import {
   getNotesWithDuplicateTitles,
   getNotesWithMediaTypes,
   getNotesWithKeyValue,
+  getNotesWithCustomMetadata,
 } from "./noteUtils.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import GraphObject from "./interfaces/Graph.js";
@@ -155,6 +156,14 @@ export const search = async (
       matchingNotes = getNotesByTitle(matchingNotes, value, false);
 
     // search for notes with specific urls
+    } else if (key === "has") {
+      if (value === "custom-metadata") {
+        matchingNotes = getNotesWithCustomMetadata(matchingNotes);
+      } else {
+        matchingNotes = [];
+      }
+
+    // search for notes with specific urls
     } else if (key === "has-url") {
       matchingNotes = getNotesWithUrl(matchingNotes, value);
 
@@ -164,7 +173,7 @@ export const search = async (
 
 
     // search for notes with specific block types
-    } else if (key === "has") {
+    } else if (key === "has-block") {
       /*
         has:list|paragraph - show all notes that contain either list
         or paragraph
