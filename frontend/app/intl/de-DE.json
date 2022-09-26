@@ -112,6 +112,8 @@
   "list.search.placeholder": "Notizen durchsuchen …",
   "list.search.presets": "Such-Vorlagen",
   "list.search.presets.duplicates": "Duplikate",
+  "list.search.presets.has-custom-metadata": "Notizen mit benutzerdefinierten Metadaten",
+  "list.search.presets.has-list": "Notizen mit Listen",
   "list.search.presets.notes-with-audio": "Notizen mit Audio",
   "list.search.presets.notes-with-duplicate-titles": "Notizen mit gleichen Titeln",
   "list.search.presets.notes-with-duplicate-urls": "Notizen mit gleichen URLs",

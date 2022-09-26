@@ -112,6 +112,8 @@
   "list.search.placeholder": "Search notes…",
   "list.search.presets": "Search presets",
   "list.search.presets.duplicates": "Duplicates",
+  "list.search.presets.has-custom-metadata": "Notes with custom metadata",
+  "list.search.presets.has-list": "Notes with lists",
   "list.search.presets.notes-with-audio": "Notes with audio",
   "list.search.presets.notes-with-duplicate-titles": "Notes with duplicate titles",
   "list.search.presets.notes-with-duplicate-urls": "Notes with duplicate URLs",

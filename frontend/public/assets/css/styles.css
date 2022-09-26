@@ -539,6 +539,10 @@ button[disabled]{
   height: 200px;
 }
 
+.search-presets-dialog p {
+  margin: 0;
+}
+
 .small-button {
   font-size: var(--default-font-size);
   margin-right: 10px;
