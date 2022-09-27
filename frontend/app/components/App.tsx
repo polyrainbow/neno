@@ -438,22 +438,7 @@ const AppWithConfirmationServiceProvider = ({
     const noteFromDatabase = await databaseProvider.putNote(
       noteSaveRequest,
     );
-    setActiveNote({
-      isUnsaved: false,
-      id: noteFromDatabase.meta.id,
-      title: noteFromDatabase.meta.title,
-      content: noteFromDatabase.content,
-      createdAt: noteFromDatabase.meta.createdAt,
-      updatedAt: noteFromDatabase.meta.updatedAt,
-      linkedNotes: noteFromDatabase.linkedNotes,
-      position: noteFromDatabase.meta.position,
-      numberOfCharacters: noteFromDatabase.numberOfCharacters,
-      files: noteFromDatabase.files,
-      changes: [],
-      keyValues: Object.entries(noteFromDatabase.meta.custom),
-      flags: noteFromDatabase.meta.flags,
-      contentType: noteFromDatabase.meta.contentType,
-    });
+    setActiveNoteFromServer(noteFromDatabase);
     setUnsavedChanges(false);
     refreshContentViews();
     /*
