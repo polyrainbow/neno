@@ -51,7 +51,7 @@ const App = () => {
           activeTab={activeTab}
           graphId={graphId}
         />
-        : "Loading..."
+        : <main><p>Loading...</p></main>
     }
     <StatusBar
       apiKey={apiKey}
