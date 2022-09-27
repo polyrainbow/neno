@@ -14,4 +14,18 @@ describe("getDocumentTitleFromHtml", () => {
 
     assert.strictEqual(getDocumentTitleFromHtml(input), "Title");
   });
+
+  it("should correctly parse title element with line breaks", async () => {
+    const input = `<html lang="en">
+    <head>
+      <title data-attribute="something">
+        Title
+      </title>
+    </head>
+    <body>
+    </body>
+  </html>`;
+
+    assert.strictEqual(getDocumentTitleFromHtml(input), "Title");
+  });
 });

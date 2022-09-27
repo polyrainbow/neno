@@ -448,9 +448,22 @@ const insertDocumentTitles = async (
           && block.data.text.length === 0;
       })
       .map(async (block): Promise<[string, string]> => {
+        const url = block.data.url;
+        let documentTitle: string;
+        if (typeof databaseProvider.getDocumentTitle === "function") {
+          try {
+            documentTitle
+              = (await databaseProvider.getDocumentTitle(url)) as string;
+          } catch (e) {
+            documentTitle = "";
+          }
+        } else {
+          documentTitle = "";
+        }
+
         return [
           block.data.url,
-          (await databaseProvider.getDocumentTitle?.(block.data.url)) as string,
+          documentTitle,
         ];
       }),
   );
