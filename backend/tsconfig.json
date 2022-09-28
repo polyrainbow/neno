@@ -2,8 +2,7 @@
   "extends": "../base.tsconfig",
   "compilerOptions": {
     "types": [
-      "node",
-      "cheerio"
+      "node"
     ],
     "typeRoots": [
       "./custom_typings",
