@@ -1,9 +1,6 @@
 import React from "react";
 import NoteViewHeader from "./NoteViewHeader";
-import NoteList from "./NoteList";
-import NoteListControls from "./NoteListControls";
-import { DialogType } from "../enum/DialogType";
-import useDialog from "../hooks/useDialog";
+import NoteListWithControls from "./NoteListWithControls";
 
 const ListView = ({
   toggleAppMenu,
@@ -21,12 +18,9 @@ const ListView = ({
   setNoteListScrollTop,
   page,
   setPage,
-  setSearchValue,
   unsavedChanges,
   setUnsavedChanges,
 }) => {
-  const openSearchDialog = useDialog(DialogType.SEARCH, setSearchValue);
-
   return <>
     <NoteViewHeader
       stats={stats}
@@ -36,23 +30,18 @@ const ListView = ({
       setUnsavedChanges={setUnsavedChanges}
       unsavedChanges={unsavedChanges}
     />
-    <NoteListControls
-      onChange={handleSearchInputChange}
-      value={searchValue}
+    <NoteListWithControls
+      handleSearchInputChange={handleSearchInputChange}
+      searchValue={searchValue}
       sortMode={sortMode}
-      setSortMode={handleSortModeChange}
-      openSearchDialog={openSearchDialog}
-      refreshNoteList={refreshContentViews}
-    />
-    <NoteList
-      notes={noteListItems}
+      handleSortModeChange={handleSortModeChange}
+      refreshContentViews={refreshContentViews}
+      noteListItems={noteListItems}
       numberOfResults={numberOfResults}
       activeNote={null} /* in list view, no note is active */
-      isBusy={noteListIsBusy}
-      searchValue={searchValue}
-      scrollTop={noteListScrollTop}
-      setScrollTop={setNoteListScrollTop}
-      sortMode={sortMode}
+      noteListIsBusy={noteListIsBusy}
+      noteListScrollTop={noteListScrollTop}
+      setNoteListScrollTop={setNoteListScrollTop}
       page={page}
       setPage={(page) => {
         setPage(page);

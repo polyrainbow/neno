@@ -2,8 +2,6 @@ import React, {
   useEffect, useContext,
 } from "react";
 import NoteViewHeader from "./NoteViewHeader";
-import NoteList from "./NoteList";
-import NoteListControls from "./NoteListControls";
 import Note from "./Note";
 import * as Utils from "../lib/utils";
 import * as Config from "../config";
@@ -15,9 +13,7 @@ import {
   UserNoteChangeType,
 } from "../../../lib/notes/interfaces/UserNoteChangeType";
 import FrontendUserNoteChange from "../interfaces/FrontendUserNoteChange";
-import { DialogType } from "../enum/DialogType";
 import { PathTemplate } from "../enum/PathTemplate";
-import useDialog from "../hooks/useDialog";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { NoteListSortMode }
   from "../../../lib/notes/interfaces/NoteListSortMode";
@@ -31,6 +27,7 @@ import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { ErrorMessage } from "../../../lib/notes/interfaces/ErrorMessage";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import { l } from "../lib/intl";
+import NoteListWithControls from "./NoteListWithControls";
 
 
 interface NoteViewProps {
@@ -89,7 +86,6 @@ const NoteView = ({
   setNoteListScrollTop,
   page,
   setPage,
-  setSearchValue,
   createNewNote,
   createNewLinkedNote,
   removeActiveNote,
@@ -243,9 +239,6 @@ const NoteView = ({
   };
 
 
-  const openSearchDialog = useDialog(DialogType.SEARCH, setSearchValue);
-
-
   return <>
     <NoteViewHeader
       stats={headerStats}
@@ -259,26 +252,18 @@ const NoteView = ({
       {
         !isSmallScreen
           ? <div id="left-view">
-            <NoteListControls
-              onChange={handleSearchInputChange}
-              value={searchValue}
+            <NoteListWithControls
+              handleSearchInputChange={handleSearchInputChange}
+              searchValue={searchValue}
               sortMode={sortMode}
-              setSortMode={handleSortModeChange}
-              openSearchDialog={openSearchDialog}
-              refreshNoteList={refreshContentViews}
-            />
-            <NoteList
-              notes={noteListItems}
+              handleSortModeChange={handleSortModeChange}
+              refreshContentViews={refreshContentViews}
+              noteListItems={noteListItems}
               numberOfResults={numberOfResults}
               activeNote={activeNote}
-              displayedLinkedNotes={displayedLinkedNotes}
-              onLinkAddition={handleLinkAddition}
-              onLinkRemoval={handleLinkRemoval}
-              isBusy={noteListIsBusy}
-              searchValue={searchValue}
-              scrollTop={noteListScrollTop}
-              setScrollTop={setNoteListScrollTop}
-              sortMode={sortMode}
+              noteListIsBusy={noteListIsBusy}
+              noteListScrollTop={noteListScrollTop}
+              setNoteListScrollTop={setNoteListScrollTop}
               page={page}
               setPage={(page) => {
                 setPage(page);
@@ -286,6 +271,9 @@ const NoteView = ({
               }}
               stats={headerStats}
               itemsAreLinkable={true}
+              onLinkAddition={handleLinkAddition}
+              onLinkRemoval={handleLinkRemoval}
+              displayedLinkedNotes={displayedLinkedNotes}
               setUnsavedChanges={setUnsavedChanges}
               unsavedChanges={unsavedChanges}
             />

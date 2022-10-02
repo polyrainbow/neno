@@ -656,7 +656,6 @@ const AppWithConfirmationServiceProvider = ({
                 setNoteListScrollTop={setNoteListScrollTop}
                 page={page}
                 setPage={setPage}
-                setSearchValue={setSearchValue}
                 unsavedChanges={unsavedChanges}
                 setUnsavedChanges={setUnsavedChanges}
               />
