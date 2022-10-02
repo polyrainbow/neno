@@ -689,6 +689,25 @@ button.dangerous-action {
 
 
 #section_list h1 {
+  margin-top: 0;
+}
+
+#section_list input{
+  margin-right: var(--default-margin);
+}
+
+.search-preset {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--default-margin);
+}
+
+.search-preset-buttons {
+  flex-shrink: 0;
+}
+
+.no-margin {
   margin: 0;
 }
 

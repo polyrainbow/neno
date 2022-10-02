@@ -71,4 +71,32 @@ describe("intl", () => {
         assert.deepStrictEqual(someValuesContainThreeDots, false);
       });
   });
+
+
+  it("all files must have same keys as en-US", () => {
+    const intlFolder = __dirname;
+    let enKeys;
+    const keyMap = new Map();
+
+    fs.readdirSync(intlFolder)
+      .filter((filename) => {
+        return filename.endsWith(".json");
+      })
+      .forEach((filename) => {
+        const string = fs.readFileSync(path.join(intlFolder, filename), "utf8");
+        const locale = filename.substring(0, filename.indexOf(".json"));
+        const langObj = JSON.parse(string);
+        const keys = Object.keys(langObj);
+
+        if (locale === "en-US") {
+          enKeys = keys;
+        } else {
+          keyMap.set(locale, keys);
+        }
+      });
+
+    keyMap.forEach((value) => {
+      assert.deepStrictEqual(value, enKeys);
+    });
+  });
 });

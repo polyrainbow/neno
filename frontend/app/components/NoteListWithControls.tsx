@@ -68,6 +68,7 @@ const NoteListWithControls = ({
             handleSearchInputChange(preset);
             setView("note-list");
           }}
+          currentQuery={searchValue}
         />
     }
 
