@@ -1,6 +1,5 @@
 import React from "react";
 import { l } from "../lib/intl";
-import Dialog from "./Dialog";
 
 interface SearchPreset {
   label: string,
@@ -63,37 +62,26 @@ const SearchPresetDialogPreset = ({
 };
 
 
-const SearchDialog = ({
-  setSearchValue,
-  onClose,
+const SearchPresets = ({
+  onSelect,
 }) => {
   const searchPresets = DEFAULT_SEARCH_PRESETS;
 
-  const setSearchValueAndClose = (searchValue) => {
-    setSearchValue(searchValue);
-    onClose();
-  };
-
-  return <Dialog
-    onClickOnOverlay={onClose}
-    className="search-presets-dialog"
+  return <section
+    id="section_list"
   >
     <h1>{l("list.search.presets")}</h1>
     {
       searchPresets.map((preset) => {
         return <SearchPresetDialogPreset
           key={preset.query + "__" + preset.label}
-          onClick={() => setSearchValueAndClose(preset.query)}
+          onClick={() => onSelect(preset.query)}
           label={preset.label}
           query={preset.query}
         />;
       })
     }
-    <button
-      onClick={onClose}
-      className="default-button dialog-box-button default-action"
-    >{l("dialog.close")}</button>
-  </Dialog>;
+  </section>;
 };
 
-export default SearchDialog;
+export default SearchPresets;

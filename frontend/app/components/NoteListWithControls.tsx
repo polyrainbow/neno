@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
-import { DialogType } from "../enum/DialogType";
-import useDialog from "../hooks/useDialog";
+import SearchPresets from "./SearchPresets";
+
+type View = "note-list" | "search-presets";
 
 const NoteListWithControls = ({
   refreshContentViews,
@@ -26,10 +27,7 @@ const NoteListWithControls = ({
   onLinkRemoval,
   displayedLinkedNotes,
 }) => {
-  const openSearchDialog = useDialog(
-    DialogType.SEARCH,
-    handleSearchInputChange,
-  );
+  const [view, setView] = useState<View>("note-list");
 
   return <>
     <NoteListControls
@@ -37,31 +35,42 @@ const NoteListWithControls = ({
       value={searchValue}
       sortMode={sortMode}
       setSortMode={handleSortModeChange}
-      openSearchDialog={openSearchDialog}
+      view={view}
+      setView={setView}
       refreshNoteList={refreshContentViews}
     />
-    <NoteList
-      notes={noteListItems}
-      numberOfResults={numberOfResults}
-      activeNote={activeNote}
-      isBusy={noteListIsBusy}
-      searchValue={searchValue}
-      scrollTop={noteListScrollTop}
-      setScrollTop={setNoteListScrollTop}
-      sortMode={sortMode}
-      page={page}
-      setPage={(page) => {
-        setPage(page);
-        setNoteListScrollTop(0);
-      }}
-      stats={stats}
-      itemsAreLinkable={itemsAreLinkable}
-      onLinkAddition={onLinkAddition}
-      onLinkRemoval={onLinkRemoval}
-      displayedLinkedNotes={displayedLinkedNotes}
-      setUnsavedChanges={setUnsavedChanges}
-      unsavedChanges={unsavedChanges}
-    />
+    {
+      view === "note-list"
+        ? <NoteList
+          notes={noteListItems}
+          numberOfResults={numberOfResults}
+          activeNote={activeNote}
+          isBusy={noteListIsBusy}
+          searchValue={searchValue}
+          scrollTop={noteListScrollTop}
+          setScrollTop={setNoteListScrollTop}
+          sortMode={sortMode}
+          page={page}
+          setPage={(page) => {
+            setPage(page);
+            setNoteListScrollTop(0);
+          }}
+          stats={stats}
+          itemsAreLinkable={itemsAreLinkable}
+          onLinkAddition={onLinkAddition}
+          onLinkRemoval={onLinkRemoval}
+          displayedLinkedNotes={displayedLinkedNotes}
+          setUnsavedChanges={setUnsavedChanges}
+          unsavedChanges={unsavedChanges}
+        />
+        : <SearchPresets
+          onSelect={(preset) => {
+            handleSearchInputChange(preset);
+            setView("note-list");
+          }}
+        />
+    }
+
   </>;
 };
 

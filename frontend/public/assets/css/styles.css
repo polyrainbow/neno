@@ -688,6 +688,11 @@ button.dangerous-action {
 }
 
 
+#section_list h1 {
+  margin: 0;
+}
+
+
 #app-stats {
   white-space: pre;
   display: flex;

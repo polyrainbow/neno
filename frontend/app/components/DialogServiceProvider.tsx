@@ -6,7 +6,6 @@ import DialogServiceConfiguration
 import ChangeLanguageDialog from "./ChangeLanguageDialog";
 import ExportDatabaseDialog from "./ExportDatabaseDialog";
 import ImportLinksDialog from "./CreateOneNotePerLineDialog";
-import SearchDialog from "./SearchDialog";
 import SwitchGraphsDialog from "./SwitchGraphsDialog";
 import * as Localizer from "../lib/intl";
 
@@ -90,14 +89,6 @@ const DialogServiceProvider = (props) => {
           activeLanguage={Localizer.getActiveLanguage()}
           languages={Localizer.supportedLangs}
           changeLanguage={config.callback}
-          onClose={resetDialogConfig}
-        />
-        : null
-    }
-    {
-      config.openDialog === DialogType.SEARCH
-        ? <SearchDialog
-          setSearchValue={config.callback}
           onClose={resetDialogConfig}
         />
         : null

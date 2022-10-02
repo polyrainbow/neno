@@ -8,7 +8,8 @@ const NoteListControls = ({
   onChange,
   sortMode,
   setSortMode,
-  openSearchDialog,
+  view,
+  setView,
   refreshNoteList,
 }) => {
   return <section id="section-search-input">
@@ -30,7 +31,13 @@ const NoteListControls = ({
         id="button_show_search dialog"
         title={l("list.search.presets")}
         icon="saved_search"
-        onClick={openSearchDialog}
+        onClick={() => {
+          setView(
+            view === "search-presets"
+              ? "note-list"
+              : "search-presets",
+          );
+        }}
       />
       <IconButton
         id="button_refresh-note-list"
