@@ -67,6 +67,11 @@ const NoteKeyValues = ({
             <input
               value={key}
               onInput={(e) => {
+                // @ts-ignore
+                if (e.nativeEvent.data === ":") {
+                  e.preventDefault();
+                  return;
+                }
                 changeKey(index, (e.target as HTMLInputElement).value);
                 setUnsavedChanges(true);
               }}
