@@ -102,7 +102,7 @@
   "list.item.hub": "Hub",
   "list.item.links.currently-selected": "Diese Notiz ist momentan ausgewählt. Sie kann nicht mit sich selbst verbunden werden.",
   "list.item.links.link": "Mit ausgewählter Notiz verbinden",
-  "list.item.links.linked-to-x-notes": "Diese Notiz ist mit ${numberOfLinkedNotes} anderen Notiz(en) verbunden.",
+  "list.item.links.linked-to-x-notes": "Diese Notiz ist mit {numberOfLinkedNotes} anderen Notiz(en) verbunden.",
   "list.item.links.not-linked": "Nicht verbunden",
   "list.item.links.unlink": "Verbindung zu ausgewählter Notiz entfernen",
   "list.note-list": "Notiz-Liste",
