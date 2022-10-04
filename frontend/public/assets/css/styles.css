@@ -101,7 +101,7 @@
   --border-radius: 7px;
   --default-margin: 15px;
   --default-padding: 15px;
-  --xl-list-width: 640px;
+  --xl-list-width: 600px;
   --small-font-size: 13px;
   --default-font-size: 16px;
   --large-font-size: 20px;
@@ -308,6 +308,11 @@ main {
 
 #note-controls-left, #note-controls-right {
   display: flex;
+  flex-wrap: wrap;
+}
+
+#note-controls-right img[width="24"][height="24"] {
+  padding: 13px; /* (50px - 24px) / 2 */
 }
 
 #note-content {

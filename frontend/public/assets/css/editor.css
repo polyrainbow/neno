@@ -137,6 +137,7 @@ FILE PREVIEW
 
 .preview-block-paragraph span, .preview-block-quote span {
   white-space: break-spaces;
+  word-break: break-word;
 }
 
 .preview-block-code, .preview-block-file-text {

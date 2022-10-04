@@ -2,6 +2,7 @@ import React from "react";
 import SearchInput from "./SearchInput";
 import IconButton from "./IconButton";
 import { l } from "../lib/intl";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 const NoteListControls = ({
   value,
@@ -12,6 +13,8 @@ const NoteListControls = ({
   setView,
   refreshNoteList,
 }) => {
+  const isSmallScreen = useIsSmallScreen();
+
   return <section id="section-search-input">
     <div
       style={{
@@ -24,11 +27,11 @@ const NoteListControls = ({
         value={value}
         onChange={onChange}
         inputStyle={{
-          width: "250px",
+          width: isSmallScreen ? "auto" : "250px",
         }}
       />
       <IconButton
-        id="button_show_search dialog"
+        id="button_show-search-presets"
         title={l("list.search.presets")}
         icon="saved_search"
         onClick={() => {
@@ -39,12 +42,16 @@ const NoteListControls = ({
           );
         }}
       />
-      <IconButton
-        id="button_refresh-note-list"
-        title={l("list.refresh")}
-        icon="refresh"
-        onClick={refreshNoteList}
-      />
+      {
+        !isSmallScreen
+          ? <IconButton
+            id="button_refresh-note-list"
+            title={l("list.refresh")}
+            icon="refresh"
+            onClick={refreshNoteList}
+          />
+          : ""
+      }
     </div>
     <div
       style={{
@@ -56,6 +63,9 @@ const NoteListControls = ({
         id="sortModeSelect"
         value={sortMode}
         onChange={(e) => setSortMode(e.target.value)}
+        style={{
+          width: isSmallScreen ? "75px" : "230px",
+        }}
       >
         <option
           value="CREATION_DATE_ASCENDING"

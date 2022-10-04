@@ -15,6 +15,7 @@ import ActiveNote from "../interfaces/ActiveNote";
 import {
   NoteListSortMode,
 } from "../../../lib/notes/interfaces/NoteListSortMode";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 
 interface NoteListProps {
@@ -60,6 +61,7 @@ const NoteList = ({
   const goToNote = useGoToNote();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
+  const isSmallScreen = useIsSmallScreen();
 
   let status = "DEFAULT";
 
@@ -111,12 +113,16 @@ const NoteList = ({
   }
 
   return <section ref={containerRef} id="section_list">
-    <Pagination
-      numberOfResults={numberOfResults}
-      page={page}
-      searchResultsPerPage={SEARCH_RESULTS_PER_PAGE}
-      onChange={(newPage) => setPage(newPage)}
-    />
+    {
+      !isSmallScreen
+        ? <Pagination
+          numberOfResults={numberOfResults}
+          page={page}
+          searchResultsPerPage={SEARCH_RESULTS_PER_PAGE}
+          onChange={(newPage) => setPage(newPage)}
+        />
+        : ""
+    }
     <NoteSearchDisclaimer
       searchValue={searchValue}
       numberOfResults={numberOfResults}
