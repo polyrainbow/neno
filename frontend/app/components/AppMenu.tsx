@@ -69,12 +69,7 @@ const AppMenu = ({
     onOutsideClick={onClose}
   >
     <div
-      id="app-menu"
-      style={{
-        "position": "fixed",
-        "top": "50px",
-        "left": "0px",
-      }}
+      className="app-menu"
       onClick={
         onClose
       }

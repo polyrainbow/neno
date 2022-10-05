@@ -25,7 +25,10 @@ const NoteListItemLinkedNotesIndicator = ({
     title={linkControlLabel}
   >
     <div
-      className={"link-control " + (isLinkable ? "linkable" : "not-linkable")}
+      className={
+        "note-list-item-linked-notes-indicator "
+        + (isLinkable ? "linkable" : "not-linkable")
+      }
       onClick={(e) => {
         if (isLinkable && (!isActive)) {
           onLinkChange();
@@ -34,12 +37,9 @@ const NoteListItemLinkedNotesIndicator = ({
       }}
     >
       <div
-        style={{
-          textAlign: "center",
-        }}
+        className="note-list-item-linked-notes-indicator-content"
       >
         <img
-          style={{ "verticalAlign": "bottom", "height": "28px" }}
           src={
             getIconSrc(isLinked ? "link_off" : "link")
           }
@@ -47,7 +47,7 @@ const NoteListItemLinkedNotesIndicator = ({
           className="svg-icon"
         />
         <div
-          className="linkedNotesIndicatorNumber"
+          className="linked-notes-indicator-number"
         >
           {
             (

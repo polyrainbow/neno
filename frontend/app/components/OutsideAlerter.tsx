@@ -58,13 +58,7 @@ function OutsideAlerter(props) {
 
   return <div
     ref={wrapperRef}
-    className="outsideAlerter"
-    style={{
-      "display": "flex",
-      "justifyContent": "inherit",
-      "textTransform": "none",
-      "whiteSpace": "normal",
-    }}
+    className="outside-alerter"
   >{props.children}</div>;
 }
 

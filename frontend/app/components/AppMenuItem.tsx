@@ -16,12 +16,6 @@ const AppMenuItem = ({
   disabled = false,
 }: AppMenuItemProps) => {
   return <div
-    style={{
-      display: "flex",
-      padding: "15px 10px",
-      alignItems: "center",
-      cursor: disabled ? "default" : "pointer",
-    }}
     onClick={disabled ? undefined : onClick}
     className={"app-menu-item" + (disabled ? " disabled" : "")}
   >
@@ -32,11 +26,9 @@ const AppMenuItem = ({
       height="24"
       className="svg-icon"
     />
-    <p style={{
-      margin: "0",
-      marginLeft: "15px",
-      color: disabled ? "#888888" : "inherit",
-    }}>{label}</p>
+    <p
+      className="label"
+    >{label}</p>
   </div>;
 };
 

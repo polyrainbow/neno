@@ -251,7 +251,7 @@ const NoteView = ({
     <main>
       {
         !isSmallScreen
-          ? <div id="left-view">
+          ? <div className="sidebar">
             <NoteListWithControls
               handleSearchInputChange={handleSearchInputChange}
               searchValue={searchValue}
@@ -280,7 +280,7 @@ const NoteView = ({
           </div>
           : null
       }
-      <div id="right-view">
+      <div className="main-content-besides-sidebar">
         <Note
           note={activeNote}
           setNote={setActiveNote}

@@ -112,7 +112,10 @@ const NoteList = ({
     />;
   }
 
-  return <section ref={containerRef} id="section_list">
+  return <section
+    ref={containerRef}
+    className="list-section"
+  >
     {
       !isSmallScreen
         ? <Pagination
@@ -128,7 +131,7 @@ const NoteList = ({
       numberOfResults={numberOfResults}
       stats={stats}
     />
-    <div id="note-list">
+    <div className="note-list">
       {
         notes.map((note) => {
           const isActive

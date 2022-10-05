@@ -17,11 +17,7 @@ const AppHeaderStatsItem = ({
     title={label}
   >
     <div
-      style={{
-        "display": "flex",
-        "alignItems": "center",
-        "gap": "2px",
-      }}
+      className="app-header-stats-item"
     ><Icon icon={icon} size={24} title={label}/> {value}</div>
   </Tooltip>;
 };

@@ -190,7 +190,7 @@ const Note = ({
       uploadInProgress={uploadInProgress}
       importNote={importNote}
     />
-    <section id="note"
+    <section className="note"
       onDrop={handleFileDrop}
       onPaste={(e) => {
         const files = Array.from(e.clipboardData.files);
@@ -205,7 +205,7 @@ const Note = ({
         e.preventDefault();
       }}
     >
-      <div id="note-content"
+      <div
         className={
           "note-content "
           + (contentMode === ContentMode.EDITOR ? "edit-mode" : "view-mode")
@@ -215,7 +215,7 @@ const Note = ({
           contentMode === ContentMode.EDITOR
             ? <textarea
               ref={noteTitleElementRef}
-              id="note-title-textarea"
+              className="note-title"
               onInput={(e) => {
                 const element = e.currentTarget;
                 setNoteTitle(element.value);
@@ -229,7 +229,7 @@ const Note = ({
                 }
               }}
             />
-            : <h1 id="note-title">{
+            : <h1 className="note-title">{
               note.title.trim().length > 0
                 ? note.title
                 : l("list.untitled-note")

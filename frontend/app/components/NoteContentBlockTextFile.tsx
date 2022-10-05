@@ -5,6 +5,7 @@ import { PathTemplate } from "../enum/PathTemplate";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { l } from "../lib/intl";
 import { getAppPath, getUrl, onDownload } from "../lib/utils";
+import FlexContainer from "./FlexContainer";
 import Icon from "./Icon";
 
 interface NoteContentBlockTextFileProps {
@@ -40,11 +41,7 @@ const NoteContentBlockTextFile = ({
         {/* for text files, we don't show file size because it's not that
         relevant and only takes space */}
       </div>
-      <div
-        style={{
-          display: "flex",
-        }}
-      >
+      <FlexContainer>
         <Link to={
           getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))
         }>
@@ -64,7 +61,7 @@ const NoteContentBlockTextFile = ({
             size={24}
           />
         </a>
-      </div>
+      </FlexContainer>
     </div>
     <div className="preview-block-audio-second-line">
       <pre

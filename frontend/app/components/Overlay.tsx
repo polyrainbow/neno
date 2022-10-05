@@ -3,7 +3,7 @@ import React from "react";
 const Overlay = (props) => {
   return <div
     onClick={props.onClick}
-    id="overlay"
+    className="overlay"
   >
     {props.children}
   </div>;

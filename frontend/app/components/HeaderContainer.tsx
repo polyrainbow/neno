@@ -1,28 +1,15 @@
 import React from "react";
-import AppTitle from "./AppTitle";
 
 interface HeaderContainerProps {
-  leftContent?: React.ReactNode,
-  rightContent?: React.ReactNode,
-  toggleAppMenu: any,
+  children?: React.ReactNode,
 }
 
 const HeaderContainer = ({
-  leftContent,
-  rightContent,
-  toggleAppMenu,
+  children,
 }: HeaderContainerProps) => {
   return (
-    <header>
-      <div id="header-left">
-        <AppTitle
-          toggleAppMenu={toggleAppMenu}
-        />
-        {leftContent}
-      </div>
-      <div id="header-right">
-        {rightContent}
-      </div>
+    <header className="app-header">
+      {children}
     </header>
   );
 };

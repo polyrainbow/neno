@@ -48,9 +48,6 @@ const FilesViewPreviewBox = ({
   >
     <Link
       to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))}
-      style={{
-        textDecoration: "none",
-      }}
     >
       <img
         src={thumbnailImageSrc || ""}

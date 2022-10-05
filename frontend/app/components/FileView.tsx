@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import HeaderContainer from "./HeaderContainer";
 import {
   useParams, Link, useNavigate,
 } from "react-router-dom";
@@ -19,6 +18,8 @@ import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import BusyIndicator from "./BusyIndicator";
 import { SPAN_SEPARATOR } from "../config";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
+import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
+import FlexContainer from "./FlexContainer";
 
 
 const FileView = ({
@@ -72,10 +73,10 @@ const FileView = ({
   }, [databaseProvider, fileId]);
 
   return <>
-    <HeaderContainer
+    <HeaderContainerLeftRight
       toggleAppMenu={toggleAppMenu}
     />
-    <section className="content-section-wide">
+    <section className="content-section-wide file-section">
       <p><Link to="/files">{l("files.show-all-files")}</Link></p>
       <h1>{fileInfo?.name}</h1>
       <p>{
@@ -87,20 +88,13 @@ const FileView = ({
             + makeTimestampHumanReadable(fileInfo.createdAt)
           : ""
       }</p>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-        }}
+      <FlexContainer
+        className="file-container"
       >
         {
           type === MediaType.IMAGE
             ? <img
               className="checkerboard-background"
-              style={{
-                marginRight: "15px auto",
-                maxWidth: "95vw",
-              }}
               src={src}
               loading="lazy"
             />
@@ -109,10 +103,6 @@ const FileView = ({
         {
           type === MediaType.AUDIO
             ? <audio
-              style={{
-                marginRight: "15px auto",
-                width: "95vw",
-              }}
               src={src}
               controls
             />
@@ -121,10 +111,6 @@ const FileView = ({
         {
           type === MediaType.VIDEO
             ? <video
-              style={{
-                marginRight: "15px auto",
-                maxHeight: "80vh",
-              }}
               src={src}
               controls
             />
@@ -133,11 +119,6 @@ const FileView = ({
         {
           type === MediaType.PDF
             ? <iframe
-              style={{
-                marginRight: "15px auto",
-                height: "80vh",
-                width: "60vw",
-              }}
               src={src}
             />
             : ""
@@ -146,9 +127,6 @@ const FileView = ({
           type === MediaType.TEXT
             ? <pre
               className="preview-block-file-text"
-              style={{
-                width: "100%",
-              }}
             >{text}</pre>
             : ""
         }
@@ -160,7 +138,7 @@ const FileView = ({
             >Download</a>
             : ""
         }
-      </div>
+      </FlexContainer>
       <h2>{l("files.used-in")}</h2>
       {
         notes

@@ -102,8 +102,8 @@ const NoteControls = ({
   };
 
 
-  return <section id="note-controls">
-    <div id="note-controls-left">
+  return <section className="note-controls">
+    <div className="note-controls-left">
       {
         isSmallScreen
           ? <IconButton
@@ -217,7 +217,7 @@ const NoteControls = ({
         onClick={handleUploadFilesRequest}
       />
     </div>
-    <div id="note-controls-right">
+    <div className="note-controls-right">
       {
         uploadInProgress
           ? <Tooltip

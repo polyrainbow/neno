@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import HeaderContainer from "./HeaderContainer";
 import LoginViewServer from "./LoginViewServer";
 import LoginViewLocal from "./LoginViewLocal";
 import { DatabaseMode } from "../enum/DatabaseMode";
 import { ASSETS_PATH, VERSION } from "../config";
 import { l } from "../lib/intl";
+import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 
 const LoginView = ({
   serverDatabaseProvider,
@@ -18,12 +18,12 @@ const LoginView = ({
   }, []);
 
   return <>
-    <HeaderContainer
+    <HeaderContainerLeftRight
       toggleAppMenu={toggleAppMenu}
     />
-    <section id="section_login">
+    <section className="section_login">
       <div
-        id="login_welcome"
+        className="login_welcome"
       >
         <img
           src={ASSETS_PATH + "app-icon/logo-circle.svg"}

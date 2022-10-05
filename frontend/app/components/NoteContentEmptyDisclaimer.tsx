@@ -6,16 +6,10 @@ const NoteContentEmptyDisclaimer = ({
   toggleEditMode,
 }) => {
   return <div
-    className="splash-message"
-    style={{
-      cursor: "pointer",
-    }}
+    className="splash-message clickable"
     onClick={() => toggleEditMode()}
   >
     <img
-      style={{
-        width: "100px",
-      }}
       src={getIconSrc("edit_square")}
       alt={l("note.content-empty")}
       className="svg-icon"

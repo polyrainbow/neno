@@ -7,7 +7,7 @@ interface HeaderProps {
 const Header = ({
   hostUrl,
 }: HeaderProps) => {
-  return <header>
+  return <header className="app-header">
     <a
       href={hostUrl || ""}
       target="_blank"

@@ -98,9 +98,7 @@ const StatsViewAnalysisTable = ({
                   key={
                     `stats_nodesWithHighesNumberOfLinks_${note.id}`
                   }
-                  style={{
-                    "margin": "0",
-                  }}
+                  className="no-margin"
                 >
                   <Link to={
                     getAppPath(

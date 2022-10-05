@@ -34,30 +34,16 @@ const NoteContentBlockImage = ({
     className="preview-block-image-wrapper"
     key={file.fileId}
   >
-    <figure
-      style={{
-        textAlign: "center",
-        marginTop: "0",
-      }}
-    >
+    <figure>
       <Link
         to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))}
       >
         <img
           src={url}
           alt={description}
-          style={{
-            background: "white",
-          }}
         />
       </Link>
-      <figcaption
-        style={{
-          fontStyle: "italic",
-          marginTop: "5px",
-          whiteSpace: "break-spaces",
-        }}
-      >{description}</figcaption>
+      <figcaption>{description}</figcaption>
     </figure>
   </div>;
 };

@@ -41,17 +41,9 @@ const Pagination = (props) => {
   if (!doRenderPageButtons) return null;
 
   return (
-    <div style={{ "textAlign": "center", "wordBreak": "break-all" }}>
+    <div className="pagination">
       <nav>
-        <ul style={{
-          listStyle: "none",
-          padding: 0,
-          margin: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexWrap: "wrap",
-        }}>
+        <ul>
           {items.map(({ page, type, selected, ...item }, index) => {
             let children: React.ReactNode | null = null;
 

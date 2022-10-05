@@ -1,35 +1,6 @@
-textarea.editor {
-  background: var(--accent-color-interactible);
-  border: none;
-  width: calc(100% - 10px);
-  height: 500px;
-  font-size: 18px;
-  color: var(--main-content-color);
-  outline: none;
-  font-family: "Hack", monospace;
-  padding: 5px;
-  resize: none;
-  border-radius: var(--border-radius);
-}
-
-#note-title-textarea {
-  font-size: var(--h1-font-size);
-  font-weight: bold;
-  margin-top: 30px;
-  margin-bottom: 0px;
-  color: var(--font-color);
-  font-family: var(--main-font);
-  min-height: 33px;
-  height: 33px;
-  resize: none;
-  overflow: hidden;
-  background: var(--accent-color-interactible);
-  border: none;
-  width: calc(100% - 10px);
-  outline: none;
-  padding: 5px;
-  border-radius: var(--border-radius);
-}
+/******************************
+  Blocks
+******************************/
 
 :root {
   --block-border: var(--content-element-border);
@@ -42,82 +13,6 @@ textarea.editor {
   --block-title-line-height: 1.5em;
   --block-title-margin: 0;
   --block-download-icon-fill-color: var(--neno-gray-5);
-}
-
-
-/*
-FILE PREVIEW
-*/
-
-.preview-block-file-wrapper {
-  display: block;
-  padding: var(--block-padding);
-  border: var(--block-border);
-  box-shadow: var(--block-box-shadow);
-  border-radius: var(--block-border-radius);
-  margin: var(--default-margin) 0;
-}
-
-.preview-block-file-first-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.preview-block-file-file-info {
-  flex-grow: 8;
-  max-width: calc(100% - 80px);
-}
-
-.preview-block-file-download-button {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-.preview-block-file-download-button svg {
-  fill: var(--block-download-icon-fill-color);
-}
-
-.cdx-audio--with-file__file-icon {
-  margin-right: 20px;
-  position: relative;
-}
-
-.cdx-audio--with-file__file-icon::before {
-  position: absolute;
-  bottom: 7px;
-  left: 8.5px;
-  font-size: 8px;
-  font-weight: 900;
-  text-transform: uppercase;
-  line-height: 150%;
-  content: attr(data-extension);
-}
-
-.cdx-audio--with-file__file-icon svg {
-  fill: currentColor;
-}
-
-.preview-block-file-size {
-  font-size: var(--block-subtitle-font-size);
-  color: var(--block-filesize-color);
-}
-
-.preview-block-file-size::after {
-  content: attr(data-size);
-  margin-left: 0.2em;
-}
-
-.preview-block-file-info-title {
-  font-size: var(--block-title-font-size);
-  font-weight: var(--block-title-font-weight);
-  line-height: var(--block-title-line-height);
-  margin: var(--block-title-margin);
-  white-space: pre-wrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  outline: none;
 }
 
 .preview-block-paragraph,
@@ -160,9 +55,21 @@ FILE PREVIEW
   margin: var(--default-margin) 0px;
 }
 
+.preview-block-image-wrapper figure {
+  text-align: center;
+  margin-top: 0;
+}
+
+.preview-block-image-wrapper figure figcaption {
+  font-style: italic;
+  margin-top: 5px;
+  white-space: break-spaces;
+}
+
 .preview-block-image-wrapper img {
   max-width: 100%;
   max-height: 700px;
+  background-color: white;
 }
 
 .file-not-available {
@@ -219,4 +126,64 @@ FILE PREVIEW
 .default-button-small {
   padding: 10px 20px;
   margin: 0;
+}
+
+/******************************
+  File preview blocks
+******************************/
+
+.preview-block-file-wrapper {
+  display: block;
+  padding: var(--block-padding);
+  border: var(--block-border);
+  box-shadow: var(--block-box-shadow);
+  border-radius: var(--block-border-radius);
+  margin: var(--default-margin) 0;
+}
+
+.preview-block-file-wrapper audio, .preview-block-file-wrapper video {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.preview-block-file-first-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.preview-block-file-file-info {
+  flex-grow: 8;
+  max-width: calc(100% - 80px);
+}
+
+.preview-block-file-download-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.preview-block-file-download-button svg {
+  fill: var(--block-download-icon-fill-color);
+}
+
+.preview-block-file-size {
+  font-size: var(--block-subtitle-font-size);
+  color: var(--block-filesize-color);
+}
+
+.preview-block-file-size::after {
+  content: attr(data-size);
+  margin-left: 0.2em;
+}
+
+.preview-block-file-info-title {
+  font-size: var(--block-title-font-size);
+  font-weight: var(--block-title-font-weight);
+  line-height: var(--block-title-line-height);
+  margin: var(--block-title-margin);
+  white-space: pre-wrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  outline: none;
 }

@@ -15,7 +15,7 @@ const AppHeaderStats = ({
   const showStats = !!stats;
 
   if (!showStats) {
-    return <div id="app-stats">
+    return <div className="header-stats">
       <BusyIndicator
         alt={l("stats.loading-stats")}
         height={20}
@@ -31,7 +31,7 @@ const AppHeaderStats = ({
   }
 
   return (
-    <div id="app-stats">
+    <div className="header-stats">
       <AppHeaderStatsItem
         icon={"note"}
         label={l("stats.number-of-notes")}

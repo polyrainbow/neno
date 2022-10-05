@@ -1,0 +1,76 @@
+/******************************
+  Files view
+******************************/
+
+.files-view .files {
+  flex-wrap: wrap;
+}
+
+.files-view-preview-box {
+  margin-right: var(--default-margin);
+  margin-bottom: var(--default-margin);
+  width: 200px;
+  min-height: 241px;
+  background: var(--accent-color-interactible);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.files-view-preview-box a {
+  text-decoration: none;
+}
+
+.files-view-preview-box img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.files-view-preview-box .file-info {
+  color: var(--main-content-color);
+  text-decoration: none;
+  padding: 5px;
+  font-size: var(--small-font-size);
+  min-height: 31px;
+  display: flex;
+  justify-content: space-between;
+  word-break: break-word;
+  height: 46px;
+}
+
+/******************************
+  File view
+******************************/
+
+.file-section .file-container {
+  justify-content: center;
+}
+
+.file-section img,
+.file-section audio,
+.file-section video,
+.file-section iframe {
+  margin: 15px auto;
+}
+
+.file-section iframe {
+  height: 80vh;
+  width: 60vw;
+}
+
+.file-section pre {
+  width: 100%;
+}
+
+.file-section video {
+  max-height: 80vh;
+}
+
+.file-section audio {
+  width: 95vw;
+}
+
+.file-section img {
+  max-width: 95vw;
+}

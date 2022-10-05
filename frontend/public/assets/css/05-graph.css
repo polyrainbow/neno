@@ -29,11 +29,9 @@
   }
 }
 
-
 :root {
   --highlighted-link-stroke-width: 12px;
 }
-
 
 .main-graph {
   -webkit-touch-callout: none;
@@ -53,7 +51,6 @@
   right: 0px;
   font-family: sans-serif;
 }
-
 
 .grid-line {
   fill: var(--grid-line-color);
@@ -107,11 +104,9 @@ g.node:hover circle{
   fill: var(--hover-color);
 }
 
-
 g.node-highlighter circle{
   fill: #5598cf;
 }
-
 
 path.link {
   fill: none;

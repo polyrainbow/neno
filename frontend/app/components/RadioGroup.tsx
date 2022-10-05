@@ -20,18 +20,10 @@ const RadioOption = ({
   const radioInputId = groupId + "_" + value;
 
   return <div
-    style={{
-      "display": "flex",
-      "alignItems": "center",
-      "marginBottom": "15px",
-    }}
+    className="radio-option"
   >
     <div
-      style={{
-        "width": "24px",
-        "height": "24px",
-        "marginRight": "10px",
-      }}
+      className="radio-option-input-wrapper"
     >
       <input
         id={radioInputId}

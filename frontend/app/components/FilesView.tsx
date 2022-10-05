@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import HeaderContainer from "./HeaderContainer";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { FileId } from "../../../lib/notes/interfaces/FileId";
+import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
+import FlexContainer from "./FlexContainer";
 
 interface FilesViewProps {
   databaseProvider: DatabaseProvider,
@@ -70,10 +71,10 @@ const FilesView = ({
   }, [databaseProvider]);
 
   return <>
-    <HeaderContainer
+    <HeaderContainerLeftRight
       toggleAppMenu={toggleAppMenu}
     />
-    <section className="content-section-wide">
+    <section className="content-section-wide files-view">
       {
         status === "READY"
           ? <>
@@ -97,11 +98,8 @@ const FilesView = ({
                 value={FileSortMode.NAME_DESCENDING}
               >{l("files.sort-mode.name.descending")}</option>
             </select>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-              }}
+            <FlexContainer
+              className="files"
             >
               {displayedFiles.map((file) => {
                 return <FilesViewPreviewBox
@@ -111,7 +109,7 @@ const FilesView = ({
                   isDangling={danglingFileIds.includes(file.fileId)}
                 />;
               })}
-            </div>
+            </FlexContainer>
           </>
           : <p>{l("files.fetching")}</p>
       }

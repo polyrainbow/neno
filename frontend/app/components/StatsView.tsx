@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import HeaderContainer from "./HeaderContainer";
 import { emojis } from "../config";
 import {
   makeTimestampHumanReadable,
@@ -9,6 +8,7 @@ import StatsViewAnalysisTable from "./StatsViewAnalysisTable";
 import { l } from "../lib/intl";
 import DatabaseProvider from "../interfaces/DatabaseProvider";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
+import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 
 interface StatsViewProps {
   databaseProvider: DatabaseProvider,
@@ -39,7 +39,7 @@ const StatsView = ({
   const databaseType = databaseProvider.constructor.type;
 
   return <>
-    <HeaderContainer
+    <HeaderContainerLeftRight
       toggleAppMenu={toggleAppMenu}
     />
     <section className="content-section">

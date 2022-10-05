@@ -8,12 +8,9 @@ const AppTitle = ({ toggleAppMenu }) => {
     width="40"
     height="40"
     onClick={toggleAppMenu}
-    id="heading"
+    className={"app-title" + (toggleAppMenu ? " clickable" : "")}
     src={ASSETS_PATH + "app-icon/logo-circle.svg"}
     alt={l("app.menu-button.alt")}
-    style={{
-      cursor: toggleAppMenu ? "pointer" : "inherit",
-    }}
   />;
 };
 

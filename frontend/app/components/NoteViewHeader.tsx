@@ -9,6 +9,8 @@ import { l } from "../lib/intl";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import ActiveNote from "../interfaces/ActiveNote";
+import HeaderContainer from "./HeaderContainer";
+import FlexContainer from "./FlexContainer";
 
 interface NoteViewHeaderProps {
   stats: GraphStats | null,
@@ -32,19 +34,12 @@ const NoteViewHeader = ({
   const goToNote = useGoToNote();
 
   return (
-    <header>
+    <HeaderContainer>
       <AppTitle
         toggleAppMenu={toggleAppMenu}
       />
-      <div
-        id="pinned-notes"
-        style={{
-          display: "flex",
-          height: "100%",
-          overflow: "auto",
-          justifyContent: "flex-start",
-          width: "100vw",
-        }}
+      <FlexContainer
+        className="pinned-notes"
       >
         {
           pinnedNotes.length > 0
@@ -68,18 +63,16 @@ const NoteViewHeader = ({
               />;
             })
             : <p
-              style={{
-                padding: "0px 10px",
-              }}
+              className="pinned-notes-placeholder"
             >{l("app.pinned-notes-placeholder")}</p>
         }
-      </div>
+      </FlexContainer>
       {
         stats
           ? <AppHeaderStats stats={stats} />
           : ""
       }
-    </header>
+    </HeaderContainer>
   );
 };
 

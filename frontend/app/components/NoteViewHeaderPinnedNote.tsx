@@ -25,20 +25,12 @@ const NoteViewHeaderPinnedNote = ({
       width="24"
       height="24"
       className="svg-icon"
-      style={{
-        marginRight: "3px",
-      }}
     />
-    <p
-      style={{
-        whiteSpace: "pre",
-      }}
-    >{
-        note.meta.title
-          ? shortenText(note.meta.title, 35)
-          : l("list.untitled-note")
-      }
-    </p>
+    <p>{
+      note.meta.title
+        ? shortenText(note.meta.title, 35)
+        : l("list.untitled-note")
+    }</p>
   </div>;
 };
 

@@ -26,9 +26,6 @@ const NoteListStatus = ({
     className="splash-message"
   >
     <img
-      style={{
-        width: "100px",
-      }}
       src={getIconSrc(activeState.icon)}
       alt={activeState.label}
       className="svg-icon"

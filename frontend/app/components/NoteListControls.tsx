@@ -3,6 +3,7 @@ import SearchInput from "./SearchInput";
 import IconButton from "./IconButton";
 import { l } from "../lib/intl";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import FlexContainer from "./FlexContainer";
 
 const NoteListControls = ({
   value,
@@ -15,13 +16,10 @@ const NoteListControls = ({
 }) => {
   const isSmallScreen = useIsSmallScreen();
 
-  return <section id="section-search-input">
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-      }}
-    >
+  return <section
+    className="note-list-controls"
+  >
+    <FlexContainer centerAlignedItems>
       <SearchInput
         placeholder={l("list.search.placeholder")}
         value={value}
@@ -52,20 +50,12 @@ const NoteListControls = ({
           />
           : ""
       }
-    </div>
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-      }}
-    >
+    </FlexContainer>
+    <FlexContainer centerAlignedItems>
       <select
-        id="sortModeSelect"
+        className="note-list-sort-mode-select"
         value={sortMode}
         onChange={(e) => setSortMode(e.target.value)}
-        style={{
-          width: isSmallScreen ? "75px" : "230px",
-        }}
       >
         <option
           value="CREATION_DATE_ASCENDING"
@@ -104,7 +94,7 @@ const NoteListControls = ({
           value="NUMBER_OF_CHARACTERS_DESCENDING"
         >{l("list.sort-mode.number-of-chars-descending")}</option>
       </select>
-    </div>
+    </FlexContainer>
   </section>;
 };
 

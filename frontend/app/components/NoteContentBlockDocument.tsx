@@ -9,6 +9,7 @@ import {
   humanFileSize,
   onDownload,
 } from "../lib/utils";
+import FlexContainer from "./FlexContainer";
 import Icon from "./Icon";
 
 interface NoteContentBlockAudioProps {
@@ -34,11 +35,7 @@ const NoteContentBlockDocument = ({
           {humanFileSize(file.size)}
         </div>
       </div>
-      <div
-        style={{
-          display: "flex",
-        }}
-      >
+      <FlexContainer>
         <Link to={
           getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))
         }>
@@ -58,7 +55,7 @@ const NoteContentBlockDocument = ({
             size={24}
           />
         </a>
-      </div>
+      </FlexContainer>
     </div>
   </div>;
 };

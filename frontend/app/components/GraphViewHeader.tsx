@@ -1,10 +1,11 @@
 import React from "react";
-import HeaderContainer from "./HeaderContainer";
 import UnsavedChangesIndicator from "./UnsavedChangesIndicator";
 import IconButton from "./IconButton";
 import SearchInput from "./SearchInput";
 import { l } from "../lib/intl";
 import { GraphVisualizationMode } from "../interfaces/GraphVisualization";
+import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
+import FlexContainer from "./FlexContainer";
 
 const GraphViewHeader = ({
   unsavedChanges,
@@ -17,7 +18,7 @@ const GraphViewHeader = ({
   mode,
   setMode,
 }) => {
-  return <HeaderContainer
+  return <HeaderContainerLeftRight
     toggleAppMenu={toggleAppMenu}
     leftContent={
       <>
@@ -39,12 +40,7 @@ const GraphViewHeader = ({
             graphVisualizerInstance.current.inflateGraph(1.1);
           }}
         />
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
+        <FlexContainer centerAlignedItems>
           <select
             id="graphModeSelect"
             value={mode}
@@ -66,7 +62,7 @@ const GraphViewHeader = ({
               value={GraphVisualizationMode.VORONOY_HUBS}
             >{l("graph.mode.voronoy-hubs")}</option>
           </select>
-        </div>
+        </FlexContainer>
       </>
     }
     rightContent={
