@@ -38,6 +38,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.1",
     "style-loader": "^3.3.1",
+    "stylelint": "^14.13.0",
+    "stylelint-config-standard": "^28.0.0",
     "tippy.js": "^6.3.7",
     "ts-loader": "^9.4.1",
     "typescript": "^4.8.3",
@@ -47,6 +49,7 @@
     "webpack-merge": "^5.8.0"
   },
   "scripts": {
+    "stylelint": "npx stylelint \"**/0*.css\"",
     "lint": "npx eslint .",
     "lint-fix": "npx eslint . --fix",
     "dev-be": "npx webpack --config browser-extension/webpack.common.js --watch",

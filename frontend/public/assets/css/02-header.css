@@ -5,14 +5,13 @@
 .app-header {
   background: var(--header-background-color);
   margin: 0;
-  padding: 0px;
+  padding: 0;
   padding-right: 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: var(--header-bar-height);
   user-select: none;
-
   width: 100vw;
   box-sizing: border-box;
   top: 0;
@@ -43,7 +42,7 @@
 }
 
 .app-title {
-  margin: 0px;
+  margin: 0;
   margin-right: 5px;
   padding: 5px 10px;
   font-size: var(--large-font-size);
@@ -66,7 +65,7 @@
   gap: 2px;
 }
 
-@media only screen and (max-width: 1280px){
+@media only screen and (max-width: 1280px) {
   .header-stats {
     display: none;
   }
@@ -81,7 +80,7 @@
   z-index: 1;
   position: fixed;
   top: 50px;
-  left: 0px;
+  left: 0;
 }
 
 .app-menu-item {
@@ -95,7 +94,7 @@
   cursor: default;
 }
 
-.app-menu-item:not(.disabled):hover{
+.app-menu-item:not(.disabled):hover {
   background-color: var(--accent-color-1-light);
 }
 
@@ -131,11 +130,11 @@
 }
 
 .pinned-notes-placeholder {
-  padding: 0px 10px;
+  padding: 0 10px;
 }
 
 .pinned-note {
-  padding: 0px 10px;
+  padding: 0 10px;
   padding-left: 5px; /* because of intrinsic icon padding */
   display: flex;
   align-items: center;

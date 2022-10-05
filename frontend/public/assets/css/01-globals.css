@@ -6,13 +6,12 @@
   --neno-blue-0: #dff4ff;
   --neno-blue-1: #98d8ff;
   --neno-blue-2: #47b7ff;
-  --neno-blue-3: #0099dd;
+  --neno-blue-3: #09d;
   --neno-blue-4: #0077b1;
   --neno-blue-5: #005786;
   --neno-blue-6: #00375f;
   --neno-blue-7: #0f213e;
-  --neno-blue-8: #000000;
-
+  --neno-blue-8: #000;
   --neno-red-0: #ff8697;
   --neno-red-1: #ff4f71;
   --neno-red-2: #ec0050;
@@ -20,8 +19,7 @@
   --neno-red-4: #91002d;
   --neno-red-5: #67001e;
   --neno-red-6: #40000f;
-  --neno-red-7: #000000;
-
+  --neno-red-7: #000;
   --neno-gray-0: #f6f8fa;
   --neno-gray-1: #eaeef2;
   --neno-gray-2: #d0d7de;
@@ -47,7 +45,7 @@
     --main-content-color: black;
     --alt-content-color: var(--neno-gray-5);
     --link-color: var(--neno-blue-5);
-    --overlay-gradient: linear-gradient( 105.5deg,  rgba(31,212,248,0.8) 11%, rgba(218,15,183,0.8) 74.9% );
+    --overlay-gradient: linear-gradient(105.5deg, #1fd4f8cc 11%, #da0fb7cc 74.9%);
     --icon-button-enabled-filter: none;
     --icon-button-disabled-filter: contrast(0) brightness(1.3);
     --default-border: 1px solid var(--neno-gray-2);
@@ -89,7 +87,7 @@
   --button-background-color-active: var(--accent-color-1);
   --table-row-background-color-odd: var(--background-color);
   --table-row-background-color-even: var(--accent-color-interactible);
-  --main-font: 'Rubik', sans-serif;
+  --main-font: "Rubik", sans-serif;
   --input-border-width: 1px;
   --border-radius: 7px;
   --default-margin: 15px;
@@ -102,14 +100,13 @@
   --header-bar-height: 50px;
   --max-content-width: 1000px;
   --default-box-shadow:
-    0 1px 1px hsl(0deg 0% 0% / 0.075),
-    0 2px 2px hsl(0deg 0% 0% / 0.075),
-    0 4px 4px hsl(0deg 0% 0% / 0.075),
-    0 8px 8px hsl(0deg 0% 0% / 0.075),
-    0 16px 16px hsl(0deg 0% 0% / 0.075);
-  --content-element-border:
-    var(--input-border-width) solid var(--main-content-color) !important;
-  --content-element-border-radius: 0px;
+    0 1px 1px hsl(0deg 0% 0% / 7.5%),
+    0 2px 2px hsl(0deg 0% 0% / 7.5%),
+    0 4px 4px hsl(0deg 0% 0% / 7.5%),
+    0 8px 8px hsl(0deg 0% 0% / 7.5%),
+    0 16px 16px hsl(0deg 0% 0% / 7.5%);
+  --content-element-border: var(--input-border-width) solid var(--main-content-color) !important;
+  --content-element-border-radius: 0;
   --input-padding: 8px;
   --focus-outline: var(--font-color) auto 1px;
 }
@@ -119,7 +116,16 @@
 ******************************/
 
 .emoji {
-  font-family: apple color emoji,segoe ui emoji,noto color emoji,android emoji,emojisymbols,emojione mozilla,twemoji mozilla,segoe ui symbol;
+  font-family:
+    "apple color emoji",
+    "segoe ui emoji",
+    "noto color emoji",
+    "android emoji",
+    emojisymbols,
+    "emojione mozilla",
+    "twemoji mozilla",
+    "segoe ui symbol"; /* stylelint-disable-line font-family-no-missing-generic-family-keyword */
+
   font-weight: 400;
 }
 
@@ -137,12 +143,13 @@ h1 {
   font-size: var(--h1-font-size);
 }
 
-input, select {
+input,
+select {
   border: none;
   font-size: var(--default-font-size);
   background: var(--accent-color-interactible);
   color: var(--font-color);
-  margin: 15px 0px;
+  margin: 15px 0;
   padding: var(--input-padding);
   border-radius: var(--border-radius);
 }
@@ -157,14 +164,19 @@ a {
   color: var(--link-color);
 }
 
-body, #app {
+body,
+#app {
   margin: 0;
   padding: 0;
   background-color: var(--background-color);
   color: var(--font-color);
 }
 
-body, #app, input, select, button {
+body,
+#app,
+input,
+select,
+button {
   font-family: var(--main-font);
 }
 
@@ -173,15 +185,16 @@ main {
 }
 
 @media only screen and (min-width: 1281px) {
-  body, #app{
+  body,
+  #app {
     overflow: hidden;
   }
-  
+
   main {
     grid-template-columns: var(--xl-list-width) auto;
     grid-template-rows: 100%;
     position: fixed;
-    bottom: 0px;
+    bottom: 0;
     top: var(--header-bar-height);
     width: 100%;
   }
@@ -191,10 +204,10 @@ main {
   position: fixed;
   width: 100vw;
   height: 100vh;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: var(--overlay-gradient);
   display: grid;
   align-items: center;
@@ -275,17 +288,13 @@ main {
   Checkerbox layout
 ******************************/
 
-:root {
-  --checkerbox-0: #CCCCCC;
-  --checkerbox-1: #FFFFFF;
-}
-
 .checkerboard-background {
-  background: repeating-conic-gradient(
-    var(--checkerbox-1) 0% 25%,
-    var(--checkerbox-0) 0% 50%
-  ) 50% / 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background:
+    repeating-conic-gradient(
+      #fff 0% 25%,
+      #ccc 0% 50%
+    ) 50% / 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
 }
 
 /******************************
@@ -306,17 +315,17 @@ main {
 }
 
 .dialog-box h1 {
-  margin-top: 0px;
+  margin-top: 0;
   margin-bottom: var(--default-margin);
 }
 
 .dialog-box select {
   width: 100%;
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 .dialog-text {
-  margin-top: 0px;
+  margin-top: 0;
   font-size: var(--large-font-size);
 }
 
@@ -377,7 +386,7 @@ button.dangerous-action {
 }
 
 .default-button.dialog-box-button {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 /******************************
@@ -407,17 +416,17 @@ button.dangerous-action {
   text-align: center;
 }
 
-.icon-button[disabled]{
+.icon-button[disabled] {
   cursor: inherit;
   border: none;
 }
 
-.icon-button[disabled] img{
-  filter: var(--icon-button-disabled-filter);
-}
-
 .icon-button img {
   vertical-align: middle;
+}
+
+.icon-button[disabled] img {
+  filter: var(--icon-button-disabled-filter);
 }
 
 .icon-button-floating {
@@ -443,7 +452,7 @@ button.dangerous-action {
 
 .data-table {
   border-collapse: collapse;
-  margin: var(--default-margin) 0px;
+  margin: var(--default-margin) 0;
   width: 100%;
 }
 
@@ -455,7 +464,8 @@ button.dangerous-action {
   background-color: var(--table-row-background-color-even);
 }
 
-.data-table th, .data-table td {
+.data-table th,
+.data-table td {
   text-align: left;
   padding: 5px;
 }

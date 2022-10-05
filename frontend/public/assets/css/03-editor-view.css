@@ -1,6 +1,7 @@
+.note-list-controls input,
+.note-list-controls select {
+  margin: 6.5px 0;
 
-.note-list-controls input, .note-list-controls select {
-  margin: 6.5px 0px;
   /* in the mobile view, we don't set a fixed height of the bar, so the margin
   of these elements must be set that it matches a total height of 50px */
 }
@@ -9,7 +10,7 @@
   width: 230px;
 }
 
-@media only screen and (max-width: 1280px){
+@media only screen and (max-width: 1280px) {
   .note-list-sort-mode-select {
     width: 75px;
   }
@@ -70,7 +71,7 @@
   cursor: pointer;
 }
 
-.note-list-item .title{
+.note-list-item .title {
   font-weight: bold;
 }
 
@@ -102,7 +103,7 @@
   flex-shrink: 0;
 }
 
-.note-list-item .info{
+.note-list-item .info {
   display: inline;
 }
 
@@ -110,7 +111,7 @@
   background-color: var(--nli-color-hover);
 }
 
-.note-list-item[class*="active"]{
+.note-list-item[class*="active"] {
   background-color: var(--nli-color-active) !important;
 }
 
@@ -118,7 +119,7 @@
   background-color: var(--nli-color-active);
 }
 
-.note-list-item[class*="linked"] .note-list-item-linked-notes-indicator{
+.note-list-item[class*="linked"] .note-list-item-linked-notes-indicator {
   background-color: var(--nli-color-linked);
 }
 
@@ -126,8 +127,9 @@
   Note
 ******************************/
 
-.note-controls, .note-list-controls {
-  padding: 0px 10px;
+.note-controls,
+.note-list-controls {
+  padding: 0 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -140,7 +142,8 @@
   user-select: none;
 }
 
-.note-controls-left, .note-controls-right {
+.note-controls-left,
+.note-controls-right {
   display: flex;
   flex-wrap: wrap;
 }
@@ -241,12 +244,14 @@
     z-index: 1;
   }
 
-  .note-controls, .note-list-controls {
+  .note-controls,
+  .note-list-controls {
     height: var(--header-bar-height);
   }
 
-  .list-section{
+  .list-section {
     overflow-y: scroll;
+
     /* height is 100vh minus 2 headers of 50px height and minus top padding of
     this element */
     height: calc(100vh - (2 * var(--header-bar-height)) - var(--default-margin));
@@ -258,14 +263,14 @@
   }
 
   .note {
-    padding: 0px 48px;
+    padding: 0 48px;
     overflow-y: auto;
     margin: 0;
     height: calc(100vh - (2 * var(--header-bar-height)));
   }
 }
 
-@media only screen and (max-width: 1280px){
+@media only screen and (max-width: 1280px) {
   main {
     grid-template-columns: 1fr;
   }
@@ -274,7 +279,8 @@
     grid-area: 2 / 1 / 3 / 2;
   }
 
-  .note-controls, .note-list-controls {
+  .note-controls,
+  .note-list-controls {
     flex-wrap: wrap;
   }
 
@@ -283,7 +289,7 @@
   }
 
   .note-content {
-    padding: 0px var(--default-margin);
+    padding: 0 var(--default-margin);
   }
 }
 
@@ -299,7 +305,7 @@ textarea.editor {
   font-size: 18px;
   color: var(--main-content-color);
   outline: none;
-  font-family: "Hack", monospace;
+  font-family: Hack, monospace;
   padding: 5px;
   resize: none;
   border-radius: var(--border-radius);
@@ -309,7 +315,7 @@ textarea.note-title {
   font-size: var(--h1-font-size);
   font-weight: bold;
   margin-top: 30px;
-  margin-bottom: 0px;
+  margin-bottom: 0;
   color: var(--font-color);
   font-family: var(--main-font);
   min-height: 33px;

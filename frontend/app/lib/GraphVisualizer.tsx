@@ -296,7 +296,7 @@ export default class GraphVisualization {
     // node highlighter circles, so this code is placed after node highlighter g
     // creation code
     this.#newLinkLine = mainSVGGroup.append("svg:path")
-      .attr("class", "link newLinkLine hidden")
+      .attr("class", "link new-link-line hidden")
       .attr("d", "M0,0L0,0");
 
     // svg nodes and links

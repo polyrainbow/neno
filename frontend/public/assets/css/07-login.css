@@ -2,7 +2,7 @@
   Login
 ******************************/
 
-.section_login {
+.section-login {
   display: grid;
   grid-gap: var(--default-margin);
   grid-template-columns: 1fr 1fr;
@@ -15,62 +15,62 @@
   overflow: auto;
 }
 
-.section_login .login_welcome {
+.section-login .login-welcome {
   margin: auto;
 }
 
-.section_login .login_welcome #login_logo {
+.section-login .login-welcome #login-logo {
   margin: auto;
   width: 200px;
   height: 200px;
   display: block;
 }
 
-.section_login .login_welcome div {
+.section-login .login-welcome div {
   margin: auto;
   text-align: center;
   display: block;
 }
 
-.login_welcome_app_title {
+.login-welcome-app-title {
   font-size: var(--h1-font-size);
   font-weight: bold;
 }
 
-.section_login input {
+.section-login input {
   font-size: var(--large-font-size);
   color: var(--font-color);
   margin: 0;
 }
 
-.section_login footer {
+.section-login footer {
   font-size: var(--large-font-size);
   color: var(--font-color);
   margin: 0;
   text-align: center;
 }
 
-.section_login footer .version {
+.section-login footer .version {
   font-size: var(--small-font-size);
 }
 
 @media only screen and (min-width: 1281px) {
-  .section_login .login_welcome {
+  .section-login .login-welcome {
     grid-area: 1 / 1 / 2 / 3;
   }
 
-  .section_login footer {
+  .section-login footer {
     grid-area: 3 / 1 / 4 / 3;
   }
 }
 
-@media only screen and (max-width: 1280px){
-  .section_login {
+@media only screen and (max-width: 1280px) {
+  .section-login {
     grid-template-columns: auto;
     grid-template-rows: auto auto auto;
   }
 
-  .section_login .login_welcome {
+  .section-login .login-welcome {
     grid-area: 1 / 1 / 2 / 2;
   }
 }

@@ -30,14 +30,16 @@
   margin-inline: 0;
 }
 
-.preview-block-paragraph span, .preview-block-quote span {
+.preview-block-paragraph span,
+.preview-block-quote span {
   white-space: break-spaces;
   word-break: break-word;
 }
 
-.preview-block-code, .preview-block-file-text {
+.preview-block-code,
+.preview-block-file-text {
   padding: 10px;
-  font-family: "Hack", monospace;
+  font-family: Hack, monospace;
   white-space: break-spaces;
   word-break: break-all;
   background-color: var(--accent-color-interactible);
@@ -52,7 +54,7 @@
 .preview-block-image-wrapper {
   display: flex;
   justify-content: center;
-  margin: var(--default-margin) 0px;
+  margin: var(--default-margin) 0;
 }
 
 .preview-block-image-wrapper figure {
@@ -115,7 +117,7 @@
   justify-content: center;
   align-content: center;
   gap: 10px;
-  margin: 10px 0px;
+  margin: 10px 0;
 }
 
 .key-value-row input {
@@ -141,7 +143,8 @@
   margin: var(--default-margin) 0;
 }
 
-.preview-block-file-wrapper audio, .preview-block-file-wrapper video {
+.preview-block-file-wrapper audio,
+.preview-block-file-wrapper video {
   width: 100%;
   margin-top: 20px;
 }

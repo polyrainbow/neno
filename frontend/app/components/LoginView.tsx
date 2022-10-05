@@ -21,16 +21,16 @@ const LoginView = ({
     <HeaderContainerLeftRight
       toggleAppMenu={toggleAppMenu}
     />
-    <section className="section_login">
+    <section className="section-login">
       <div
-        className="login_welcome"
+        className="login-welcome"
       >
         <img
           src={ASSETS_PATH + "app-icon/logo-circle.svg"}
           alt={l("login.logo.alt")}
-          id="login_logo"
+          id="login-logo"
         />
-        <div id="login_welcome_app_title">{l("app.title")}</div>
+        <div id="login-welcome-app-title">{l("app.title")}</div>
         <div>{l("login.introduction")}</div>
       </div>
       <div>
