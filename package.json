@@ -58,6 +58,7 @@
     "start-server-dev": "node dist/backend/index.js --http-port 8080 --session-secret 000",
     "start-server-dev-tls": "node dist/backend/index.js --https-port 8080 --use-https --cert-path ~/.neno/server.cert --cert-key-path ~/.neno/server.key",
     "build-frontend-production": "npx webpack --config frontend/webpack.production.js",
+    "build-frontend-production-stats": "npx webpack --config frontend/webpack.production.js --profile --json > stats.json",
     "build-frontend-development": "npx webpack --config frontend/webpack.development.js",
     "build": "npm run compile-typescript-backend && npm run build-frontend-production",
     "start-dev-server-frontend": "npx webpack serve --config frontend/webpack.development.js",

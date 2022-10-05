@@ -9,7 +9,10 @@ import LocalDatabaseProvider from "./lib/LocalDatabaseProvider";
 import { API_URL } from "./config";
 import React, { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./components/App";
+
+// We import App dynamically to enable Webpack code splitting.
+// Otherwise webpack would complain about a bundle size being too big.
+const App = (await import("./components/App")).default;
 
 const localDatabaseProvider = new LocalDatabaseProvider();
 
