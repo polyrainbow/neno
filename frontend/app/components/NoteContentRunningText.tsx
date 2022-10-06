@@ -9,10 +9,10 @@ interface NoteContentRunningTextProps {
 const NoteContentRunningText = ({
   runningText,
 }: NoteContentRunningTextProps) => {
-  const markup = runningText.map((span: Span) => {
+  const markup = runningText.map((span: Span, i: number) => {
     if (span.type === SpanType.HYPERLINK) {
       return <span
-        key={`hyperlink-span-${span.text}`}
+        key={`hyperlink-span-${i}-${span.text}`}
       >
         <a
           href={span.text}
