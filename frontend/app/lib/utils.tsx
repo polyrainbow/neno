@@ -468,16 +468,22 @@ const insertDocumentTitles = async (
       }),
   );
 
-  let newNoteContent = noteContent;
+  const lines = noteContent.split("\n");
+
+  // TODO: This method of replacing might result in incorrect notes when a URL
+  // is at the beginning of a line but not part of a URL block.
+  // We should instead edit the parsed note and re-serialize it again. For this
+  // we need an idempotent parse/serialize mechanism.
   urlsWithDocTitles.forEach(([url, docTitle]) => {
-    newNoteContent = newNoteContent
-      .replace(
-        url,
-        url + " " + docTitle,
-      );
+    for (const [i, line] of lines.entries()) {
+      if (line.trimEnd() === url) {
+        lines[i] = url + " " + docTitle;
+        break;
+      }
+    }
   });
 
-  return newNoteContent;
+  return lines.join("\n");
 };
 
 
