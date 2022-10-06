@@ -327,7 +327,7 @@ const getPins = () => {
 
 
 const getDocumentTitle = async (url: string): Promise<string> => {
-  const requestUrl = "document-title?url=" + url;
+  const requestUrl = "document-title?url=" + encodeURIComponent(url);
   const response = (await callAPI({
     url: API_URL + requestUrl,
     outputType: "json",

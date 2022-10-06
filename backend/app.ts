@@ -1035,7 +1035,7 @@ const startApp = async ({
     async (req, res) => {
       const url = req.query.url;
 
-      if (!url) {
+      if (!url || (typeof url !== "string")) {
         const response: APIResponse = {
           "success": false,
           error: APIError.INVALID_REQUEST,
@@ -1045,8 +1045,10 @@ const startApp = async ({
         return;
       }
 
+      const urlDecoded = decodeURIComponent(url);
+
       try {
-        const documentTitle = await getDocumentTitle(url as string);
+        const documentTitle = await getDocumentTitle(urlDecoded);
         const response: APIResponse = {
           success: true,
           payload: documentTitle,
