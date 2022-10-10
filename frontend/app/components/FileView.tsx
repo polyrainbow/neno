@@ -77,7 +77,9 @@ const FileView = ({
       toggleAppMenu={toggleAppMenu}
     />
     <section className="content-section-wide file-section">
-      <p><Link to="/files">{l("files.show-all-files")}</Link></p>
+      <p><Link
+        to={getAppPath(PathTemplate.FILES)}
+      >{l("files.show-all-files")}</Link></p>
       <h1>{fileInfo?.name}</h1>
       <p>{
         fileInfo ? humanFileSize(fileInfo.size) : ""
