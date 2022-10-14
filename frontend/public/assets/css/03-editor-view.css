@@ -40,6 +40,9 @@
 
 .note-list-item-main .title {
   font-size: var(--default-font-size);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .note-list-item-second-row {
@@ -64,7 +67,10 @@
 
 .note-list-item-linked-notes-indicator-content .svg-icon {
   vertical-align: bottom;
-  height: 28px;
+  height: 20px;
+  width: 28px;
+  object-fit: cover;
+  margin-bottom: 4px;
 }
 
 .note-list-item:not(.active) .note-list-item-linked-notes-indicator.linkable {
@@ -77,6 +83,10 @@
 
 .note-list-item .index {
   width: 56px;
+}
+
+.note-features span {
+  margin: 0 2px;
 }
 
 .note-list-item .linked-notes-indicator-number {
