@@ -1,4 +1,4 @@
-import { GraphId } from "../../../backend/interfaces/GraphId";
+import { GraphId } from "../interfaces/GraphId";
 import { SomeReadableStream } from "../interfaces/SomeReadableStream";
 import StorageProvider from "../interfaces/StorageProvider";
 
