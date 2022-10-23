@@ -31,7 +31,9 @@
 }
 
 .preview-block-paragraph span,
-.preview-block-quote span {
+.preview-block-quote span,
+.preview-block-list-ordered,
+.preview-block-list-unordered {
   white-space: break-spaces;
   word-break: break-word;
 }
