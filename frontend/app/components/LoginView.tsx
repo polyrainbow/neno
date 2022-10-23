@@ -30,7 +30,7 @@ const LoginView = () => {
           alt={l("login.logo.alt")}
           id="login-logo"
         />
-        <div id="login-welcome-app-title">{l("app.title")}</div>
+        <div className="login-welcome-app-title">{l("app.title")}</div>
         <div>{l("login.introduction")}</div>
       </div>
       <div>
