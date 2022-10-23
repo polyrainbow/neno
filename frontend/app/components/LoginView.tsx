@@ -9,14 +9,12 @@ import useDatabaseControl from "../hooks/useDatabaseControl";
 
 const LoginView = () => {
   const {
-    setDatabaseMode,
-    serverDatabaseProvider,
-    localDatabaseProvider,
+    databaseModeRef,
   } = useDatabaseControl();
 
   // reset database mode when opening login view
   useEffect(() => {
-    setDatabaseMode?.(DatabaseMode.NONE);
+    databaseModeRef.current = DatabaseMode.NONE;
   }, []);
 
   return <>
@@ -34,16 +32,10 @@ const LoginView = () => {
         <div>{l("login.introduction")}</div>
       </div>
       <div>
-        <LoginViewServer
-          serverDatabaseProvider={serverDatabaseProvider}
-          setDatabaseMode={setDatabaseMode}
-        />
+        <LoginViewServer />
       </div>
       <div>
-        <LoginViewLocal
-          localDatabaseProvider={localDatabaseProvider}
-          setDatabaseMode={setDatabaseMode}
-        />
+        <LoginViewLocal />
       </div>
       <footer>
         <a href="https://github.com/SebastianZimmer/neno/blob/main/docs/index.md">

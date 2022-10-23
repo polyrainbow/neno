@@ -8,7 +8,7 @@ import GraphStatsRetrievalOptions
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import NoteListPage from "../../../lib/notes/interfaces/NoteListPage";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
-import DatabaseProvider, {
+import {
   SuccessfulAuthenticationResponse,
 } from "../types/DatabaseProvider";
 import FileSystemAccessAPIStorageProvider
@@ -19,6 +19,7 @@ import BackendGraphVisualization
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { NoteSaveRequest } from "../../../lib/notes/interfaces/NoteSaveRequest";
 import MimeTypes from "../../../lib/MimeTypes";
+import LocalDatabaseProviderInterface from "../types/LocalDatabaseProvider";
 
 
 async function verifyPermission(
@@ -42,7 +43,8 @@ async function verifyPermission(
 }
 
 
-export default class LocalDatabaseProvider implements DatabaseProvider {
+export default class LocalDatabaseProvider
+implements LocalDatabaseProviderInterface {
   /* PRIVATE */
 
   static #handleStorageKey = "LOCAL_DB_FOLDER_HANDLE";
@@ -135,7 +137,7 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  async initializeDatabase() {
+  async initializeDatabase(): Promise<void> {
     if (this.#isDatabaseInitialized) {
       return;
     }

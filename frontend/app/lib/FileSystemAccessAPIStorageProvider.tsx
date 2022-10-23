@@ -60,6 +60,7 @@ implements StorageProvider {
   async #getDescendantFileHandle(
     folderHandle: FileSystemDirectoryHandle,
     filePath: string,
+    create: boolean,
   ): Promise<FileSystemFileHandle> {
     const pathSegments = this.splitPath(filePath);
     const folderPathSegments = pathSegments.slice(0, pathSegments.length - 1);
@@ -75,17 +76,21 @@ implements StorageProvider {
     const fileHandle = await destinationFolderHandle.getFileHandle(
       filename,
       {
-        create: true,
+        create,
       },
     );
     return fileHandle;
   }
 
 
-  async #getFileHandle(requestPath: string): Promise<FileSystemFileHandle> {
+  async #getFileHandle(
+    requestPath: string,
+    create: boolean,
+  ): Promise<FileSystemFileHandle> {
     return await this.#getDescendantFileHandle(
       this.#directoryHandle,
       requestPath,
+      create,
     );
   }
 
@@ -103,7 +108,7 @@ implements StorageProvider {
     data,
   ): Promise<void> {
     const finalPath = this.joinPath(graphId, requestPath);
-    const fileHandle = await this.#getFileHandle(finalPath);
+    const fileHandle = await this.#getFileHandle(finalPath, true);
     const writable = await fileHandle.createWritable();
     await writable.write(data);
     await writable.close();
@@ -116,7 +121,7 @@ implements StorageProvider {
     readableStream,
   ): Promise<number> {
     const finalPath = this.joinPath(graphId, requestPath);
-    const fileHandle = await this.#getFileHandle(finalPath);
+    const fileHandle = await this.#getFileHandle(finalPath, true);
     const writable = await fileHandle.createWritable();
     await readableStream.pipeTo(writable);
     const size = await this.getFileSize(graphId, requestPath);
@@ -129,7 +134,7 @@ implements StorageProvider {
     requestPath: string,
   ): Promise<string> {
     const finalPath = this.joinPath(graphId, requestPath);
-    const fileHandle = await this.#getFileHandle(finalPath);
+    const fileHandle = await this.#getFileHandle(finalPath, false);
     const file = await fileHandle.getFile();
     const string = await file.text();
     return string;
@@ -143,7 +148,7 @@ implements StorageProvider {
     _range?: ByteRange, // to be implemented
   ): Promise<ReadableStream<Uint8Array>> {
     const finalPath = this.joinPath(graphId, requestPath);
-    const fileHandle = await this.#getFileHandle(finalPath);
+    const fileHandle = await this.#getFileHandle(finalPath, false);
     const file = await fileHandle.getFile();
     const readable = file.stream();
     return readable;
@@ -227,7 +232,7 @@ implements StorageProvider {
     requestPath: string,
   ): Promise<number> {
     const finalPath = this.joinPath(graphId, requestPath);
-    const fileHandle = await this.#getFileHandle(finalPath);
+    const fileHandle = await this.#getFileHandle(finalPath, false);
     const file = await fileHandle.getFile();
     const size = file.size;
     return size;

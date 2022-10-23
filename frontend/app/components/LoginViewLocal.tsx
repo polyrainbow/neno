@@ -4,25 +4,27 @@ import {
 } from "react-router-dom";
 import { DatabaseMode } from "../enum/DatabaseMode";
 import { PathTemplate } from "../enum/PathTemplate";
+import useDatabaseControl from "../hooks/useDatabaseControl";
 import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
 
-const LoginViewLocal = ({
-  localDatabaseProvider,
-  setDatabaseMode,
-}) => {
+const LoginViewLocal = () => {
+  const {
+    databaseModeRef,
+    localDatabaseProvider,
+  } = useDatabaseControl();
+
   const [localDisclaimer, setLocalDisclaimer]
     = useState<string | null>(null);
   const [
     localDatabaseFolderHandleName,
     setLocalDatabaseFolderHandleName,
-  ] = useState(null);
+  ] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const retrieveLocalDatabaseFolderHandle = async () => {
-      if (!localDatabaseProvider) return;
       const folderHandleName
         = await localDatabaseProvider.getFolderHandleName();
       setLocalDatabaseFolderHandleName(folderHandleName);
@@ -60,12 +62,15 @@ const LoginViewLocal = ({
             className="default-button default-action"
             onClick={async () => {
               try {
-                const response
-                  = await localDatabaseProvider.initializeDatabase();
-                setDatabaseMode(DatabaseMode.LOCAL);
+                await localDatabaseProvider.initializeDatabase();
+                databaseModeRef.current = DatabaseMode.LOCAL;
+                const graphIds = localDatabaseProvider.getGraphIds();
+                if (!graphIds) {
+                  throw new Error("Local database provider has no graph ids");
+                }
                 navigate(getAppPath(
                   PathTemplate.NEW_NOTE,
-                  new Map([["GRAPH_ID", response.graphIds[0]]]),
+                  new Map([["GRAPH_ID", graphIds[0]]]),
                 ));
               } catch (e) {
                 console.error(e);
@@ -96,7 +101,7 @@ const LoginViewLocal = ({
           const folderHandle = await window.showDirectoryPicker();
           const response
             = await localDatabaseProvider.login(folderHandle);
-          setDatabaseMode(DatabaseMode.LOCAL);
+          databaseModeRef.current = DatabaseMode.LOCAL;
           navigate(getAppPath(
             PathTemplate.NEW_NOTE,
             new Map([["GRAPH_ID", response.graphIds[0]]]),

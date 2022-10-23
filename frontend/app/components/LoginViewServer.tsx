@@ -7,17 +7,15 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { l, lf } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
 import { SERVER_DATABASE_ENABLED } from "../config";
-import DatabaseProvider from "../types/DatabaseProvider";
+import useDatabaseControl from "../hooks/useDatabaseControl";
 
-interface LoginViewServerProps {
-  serverDatabaseProvider: DatabaseProvider,
-  setDatabaseMode: (databaseMode: DatabaseMode) => void,
-}
 
-const LoginViewServer = ({
-  serverDatabaseProvider,
-  setDatabaseMode,
-}: LoginViewServerProps) => {
+const LoginViewServer = () => {
+  const {
+    databaseModeRef,
+    serverDatabaseProvider,
+  } = useDatabaseControl();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [mfaToken, setMfaToken] = useState("");
@@ -35,7 +33,7 @@ const LoginViewServer = ({
         if (response.graphIds.length === 0) {
           throw new Error("No graphs available on server database");
         }
-        setDatabaseMode(DatabaseMode.SERVER);
+        databaseModeRef.current = DatabaseMode.SERVER;
         navigate(getAppPath(
           PathTemplate.NEW_NOTE,
           new Map([["GRAPH_ID", response.graphIds[0]]]),

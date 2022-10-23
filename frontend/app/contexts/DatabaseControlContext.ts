@@ -1,13 +1,12 @@
-import { createContext } from "react";
+import React, { createContext } from "react";
 import { DatabaseMode } from "../enum/DatabaseMode";
 import DatabaseProvider from "../types/DatabaseProvider";
+import LocalDatabaseProvider from "../types/LocalDatabaseProvider";
 
 interface DatabaseControl {
-  databaseProvider: DatabaseProvider | null,
-  databaseMode: DatabaseMode,
-  setDatabaseMode: (databaseMode: DatabaseMode) => void,
+  databaseModeRef: React.MutableRefObject<DatabaseMode>,
   serverDatabaseProvider: DatabaseProvider,
-  localDatabaseProvider: DatabaseProvider,
+  localDatabaseProvider: LocalDatabaseProvider,
 }
 
 export default createContext<DatabaseControl | null>(null);

@@ -14,6 +14,7 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import useDatabaseControl from "../hooks/useDatabaseControl";
+import { DatabaseMode } from "../enum/DatabaseMode";
 
 
 const AppMenu = () => {
@@ -32,7 +33,16 @@ const AppMenu = () => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
-  const { databaseProvider } = useDatabaseControl();
+  const databaseControl = useDatabaseControl();
+
+  const databaseProvider
+    = databaseControl.databaseModeRef.current === DatabaseMode.LOCAL
+      ? databaseControl.localDatabaseProvider
+      : (
+        databaseControl.databaseModeRef.current === DatabaseMode.SERVER
+          ? databaseControl.serverDatabaseProvider
+          : null
+      );
 
   const { graphId } = useParams();
 
@@ -211,6 +221,7 @@ const AppMenu = () => {
 
           await databaseProvider?.removeAccess();
           navigate(getAppPath(PathTemplate.LOGIN));
+          window.location.reload();
         }}
       />
     </div>

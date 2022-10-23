@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import ConfirmationServiceProvider from "./ConfirmationServiceProvider";
 import { DatabaseMode } from "../enum/DatabaseMode";
 import DatabaseProvider from "../types/DatabaseProvider";
@@ -8,9 +8,10 @@ import DialogServiceProvider from "./DialogServiceProvider";
 import DatabaseContext from "../contexts/DatabaseControlContext";
 import AppRouter from "./AppRouter";
 import useWarnBeforeUnload from "../hooks/useWarnBeforeUnload";
+import LocalDatabaseProvider from "../types/LocalDatabaseProvider";
 
 interface AppProps {
-  localDatabaseProvider: DatabaseProvider,
+  localDatabaseProvider: LocalDatabaseProvider,
   serverDatabaseProvider: DatabaseProvider,
 }
 
@@ -28,22 +29,19 @@ const App = ({
     toggleAppMenu: () => setIsAppMenuOpen(!isAppMenuOpen),
   };
 
-  const [databaseMode, setDatabaseMode]
-    = useState<DatabaseMode>(DatabaseMode.NONE);
+  const databaseModeRef = useRef<DatabaseMode>(DatabaseMode.NONE);
 
-  const databaseProvider: DatabaseProvider | null
-    = databaseMode === DatabaseMode.LOCAL
+  const databaseProvider
+    = databaseModeRef.current === DatabaseMode.LOCAL
       ? localDatabaseProvider
       : (
-        databaseMode === DatabaseMode.SERVER
+        databaseModeRef.current === DatabaseMode.SERVER
           ? serverDatabaseProvider
           : null
       );
 
   const databaseControl = {
-    databaseProvider,
-    databaseMode,
-    setDatabaseMode,
+    databaseModeRef,
     serverDatabaseProvider,
     localDatabaseProvider,
   };

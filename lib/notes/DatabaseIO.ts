@@ -46,7 +46,13 @@ export default class DatabaseIO {
       return null;
     }
 
-    const object: SerializedGraphObject = JSON.parse(json);
+    let object: SerializedGraphObject;
+
+    try {
+      object = JSON.parse(json);
+    } catch (e) {
+      throw new Error("Invalid graph file for " + graphId);
+    }
 
     if (updateStructure) {
       // when we open a graph from file for the first time, let's make sure

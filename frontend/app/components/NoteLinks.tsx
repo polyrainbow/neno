@@ -60,7 +60,6 @@ const NoteLinks = ({
 
   const handleInvalidCredentialsError = async () => {
     await databaseProvider?.removeAccess();
-    // setDatabaseMode(DatabaseMode.NONE);
     navigate(getAppPath(PathTemplate.LOGIN));
   };
 
