@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import NoteViewHeader from "./NoteViewHeader";
 import NoteListWithControls from "./NoteListWithControls";
 import { useNavigate } from "react-router-dom";
@@ -9,18 +9,11 @@ import { PathTemplate } from "../enum/PathTemplate";
 import useControlledNoteList from "../hooks/useControlledNoteList";
 import useDatabaseProvider from "../hooks/useDatabaseProvider";
 import useGraphId from "../hooks/useGraphId";
+import useHeaderStats from "../hooks/useHeaderStats";
+import usePinnedNotes from "../hooks/usePinnedNotes";
 
-interface ListViewProps {
-  refreshContentViews,
-  stats,
-  pinnedNotes,
-}
 
-const ListView = ({
-  refreshContentViews,
-  stats,
-  pinnedNotes,
-}: ListViewProps) => {
+const ListView = () => {
   const graphId = useGraphId();
   const navigate = useNavigate();
   const databaseProvider = useDatabaseProvider();
@@ -37,9 +30,23 @@ const ListView = ({
     handleInvalidCredentialsError,
   );
 
+  const [headerStats, refreshHeaderStats] = useHeaderStats(
+    databaseProvider,
+    graphId,
+  );
+
+  const {
+    pinnedNotes,
+    refreshPinnedNotes,
+  } = usePinnedNotes(databaseProvider, graphId);
+
+  useEffect(() => {
+    refreshPinnedNotes();
+  }, []);
+
   return <>
     <NoteViewHeader
-      stats={stats}
+      stats={headerStats}
       pinnedNotes={pinnedNotes}
       activeNote={null} /* in list view, no note is active */
       graphId={graphId}
@@ -50,8 +57,9 @@ const ListView = ({
       sortMode={controlledNoteList.sortMode}
       handleSortModeChange={controlledNoteList.setSortMode}
       refreshContentViews={() => {
-        refreshContentViews();
+        refreshHeaderStats();
         controlledNoteList.refresh();
+        refreshPinnedNotes();
       }}
       noteListItems={controlledNoteList.items}
       numberOfResults={controlledNoteList.numberOfResults}
@@ -61,7 +69,7 @@ const ListView = ({
       setNoteListScrollTop={controlledNoteList.setScrollTop}
       page={controlledNoteList.page}
       setPage={controlledNoteList.setPage}
-      stats={stats}
+      stats={headerStats}
       itemsAreLinkable={false}
       onLinkAddition={null}
       onLinkRemoval={null}

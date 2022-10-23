@@ -17,7 +17,7 @@ import AppMenuContext from "../contexts/AppMenuContext";
 
 interface NoteViewHeaderProps {
   stats: GraphStats | null,
-  pinnedNotes: NoteToTransmit[],
+  pinnedNotes: NoteToTransmit[] | null,
   activeNote: ActiveNote | null,
   graphId: GraphId,
 }
@@ -43,29 +43,31 @@ const NoteViewHeader = ({
         className="pinned-notes"
       >
         {
-          pinnedNotes.length > 0
-            ? pinnedNotes.map((pinnedNote) => {
-              return <NoteViewHeaderPinnedNote
-                key={`pinnedNote_${pinnedNote.meta.id}`}
-                note={pinnedNote}
-                onClick={async () => {
-                  if (unsavedChanges) {
-                    await confirmDiscardingUnsavedChanges();
-                    setUnsavedChanges(false);
-                  }
+          Array.isArray(pinnedNotes)
+            ? pinnedNotes.length > 0
+              ? pinnedNotes.map((pinnedNote) => {
+                return <NoteViewHeaderPinnedNote
+                  key={`pinnedNote_${pinnedNote.meta.id}`}
+                  note={pinnedNote}
+                  onClick={async () => {
+                    if (unsavedChanges) {
+                      await confirmDiscardingUnsavedChanges();
+                      setUnsavedChanges(false);
+                    }
 
-                  goToNote(graphId, pinnedNote.meta.id);
-                }}
-                isActive={
-                  (!!activeNote)
-                  && (!activeNote.isUnsaved)
-                  && (pinnedNote.meta.id === activeNote.id)
-                }
-              />;
-            })
-            : <p
-              className="pinned-notes-placeholder"
-            >{l("app.pinned-notes-placeholder")}</p>
+                    goToNote(graphId, pinnedNote.meta.id);
+                  }}
+                  isActive={
+                    (!!activeNote)
+                    && (!activeNote.isUnsaved)
+                    && (pinnedNote.meta.id === activeNote.id)
+                  }
+                />;
+              })
+              : <p
+                className="pinned-notes-placeholder"
+              >{l("app.pinned-notes-placeholder")}</p>
+            : ""
         }
       </FlexContainer>
       {

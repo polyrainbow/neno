@@ -10,8 +10,6 @@ import {
 } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { PathTemplate } from "../enum/PathTemplate";
-import { NoteId } from "../../../lib/notes/interfaces/NoteId";
-import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { ErrorMessage } from "../../../lib/notes/interfaces/ErrorMessage";
@@ -26,10 +24,10 @@ import useControlledNoteList from "../hooks/useControlledNoteList";
 import useGraphId from "../hooks/useGraphId";
 import useHeaderStats from "../hooks/useHeaderStats";
 import useActiveNote from "../hooks/useActiveNote";
+import usePinnedNotes from "../hooks/usePinnedNotes";
 
 
 const NoteView = () => {
-  const [pinnedNotes, setPinnedNotes] = useState<NoteToTransmit[]>([]);
   const databaseProvider = useDatabaseProvider();
   const isSmallScreen = useIsSmallScreen();
   const navigate = useNavigate();
@@ -65,6 +63,13 @@ const NoteView = () => {
     databaseProvider,
     graphId,
   );
+
+  const {
+    pinnedNotes,
+    pinOrUnpinNote,
+    refreshPinnedNotes,
+  } = usePinnedNotes(databaseProvider, graphId);
+
   const [contentMode, setContentMode] = useState<ContentMode>(
     ContentMode.LOADING,
   );
@@ -111,8 +116,7 @@ const NoteView = () => {
     try {
       await refreshHeaderStats();
       await controlledNoteList.refresh(graphId);
-      const pinnedNotes = await databaseProvider.getPins(graphId);
-      setPinnedNotes(pinnedNotes);
+      await refreshPinnedNotes();
     } catch (e) {
       if (e instanceof Error && e.message !== "INVALID_CREDENTIALS") {
         throw new Error(e.message, { cause: e });
@@ -181,20 +185,6 @@ const NoteView = () => {
       document.title = Config.DEFAULT_DOCUMENT_TITLE;
     };
   }, [activeNote]);
-
-
-  const pinOrUnpinNote = async (
-    noteId: NoteId,
-  ) => {
-    let newPinnedNotes: NoteToTransmit[];
-    if (pinnedNotes.find((pinnedNote) => pinnedNote.meta.id === noteId)) {
-      newPinnedNotes = await databaseProvider.unpinNote(graphId, noteId);
-    } else {
-      newPinnedNotes = await databaseProvider.pinNote(graphId, noteId);
-    }
-
-    setPinnedNotes(newPinnedNotes);
-  };
 
 
   useEffect(() => {

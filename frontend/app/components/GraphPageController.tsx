@@ -11,6 +11,7 @@ import BusyIndicator from "./BusyIndicator";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
 import GraphSettingsView from "./GraphSettingsView";
+import ListView from "./ListView";
 import NoteView from "./NoteView";
 import StatsView from "./StatsView";
 import VisualizationView from "./VisualView";
@@ -67,6 +68,7 @@ const GraphPageController = ({
 
   const pageComponentsMap = new Map<GraphSubpage, any>([
     [GraphSubpage.FILE, FileView],
+    [GraphSubpage.LIST, ListView],
     [GraphSubpage.NOTE, NoteView],
     [GraphSubpage.FILES, FilesView],
     [GraphSubpage.SETTINGS, GraphSettingsView],
