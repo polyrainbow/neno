@@ -349,7 +349,9 @@ const getAppPath = (
   params?: Map<string, string>,
   urlParams?: URLSearchParams,
 ): string => {
-  let path = `${Config.ROOT_PATH}${pathTemplate}`;
+  // We don't use ROOT_PATH here because it is automatically used by the router
+  // via its `basename` property
+  let path = `/${pathTemplate}`;
   params?.forEach((value, key) => {
     if (value.length === 0) {
       throw new Error(
