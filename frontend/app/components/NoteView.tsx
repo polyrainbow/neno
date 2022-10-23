@@ -1,192 +1,148 @@
 import React, {
-  useEffect, useContext,
+  useEffect, useContext, useState,
 } from "react";
 import NoteViewHeader from "./NoteViewHeader";
 import Note from "./Note";
 import * as Utils from "../lib/utils";
 import * as Config from "../config";
 import {
-  useNavigate,
+  useNavigate, useParams, useSearchParams,
 } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import {
-  UserNoteChangeType,
-} from "../../../lib/notes/interfaces/UserNoteChangeType";
-import FrontendUserNoteChange from "../interfaces/FrontendUserNoteChange";
 import { PathTemplate } from "../enum/PathTemplate";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
-import { NoteListSortMode }
-  from "../../../lib/notes/interfaces/NoteListSortMode";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
-import { MainNoteListItem } from "../interfaces/NoteListItem";
-import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
-import useDisplayedLinkedNotes from "../hooks/useDisplayedLinkedNotes";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { ErrorMessage } from "../../../lib/notes/interfaces/ErrorMessage";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import { l } from "../lib/intl";
 import NoteListWithControls from "./NoteListWithControls";
+import { ContentMode } from "../types/ContentMode";
+import * as IDB from "idb-keyval";
+import useGoToNote from "../hooks/useGoToNote";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
+import useControlledNoteList from "../hooks/useControlledNoteList";
+import useGraphId from "../hooks/useGraphId";
+import useHeaderStats from "../hooks/useHeaderStats";
+import useActiveNote from "../hooks/useActiveNote";
 
 
-interface NoteViewProps {
-  databaseProvider: DatabaseProvider,
-  unsavedChanges: boolean,
-  setUnsavedChanges: (boolean) => any,
-  toggleAppMenu: () => any,
-  refreshContentViews: () => void,
-  headerStats: GraphStats | null,
-  pinnedNotes: NoteToTransmit[],
-  handleSearchInputChange,
-  setPinnedNotes,
-  searchValue,
-  sortMode: NoteListSortMode,
-  handleSortModeChange,
-  noteListItems,
-  numberOfResults,
-  noteListIsBusy,
-  noteListScrollTop,
-  setNoteListScrollTop,
-  page: number,
-  setPage: (number) => any,
-  setSearchValue,
-  activeNote,
-  setActiveNote,
-  createNewNote,
-  createNewLinkedNote,
-  removeActiveNote,
-  duplicateNote,
-  saveActiveNote,
-  contentMode,
-  setNoteContent,
-  toggleEditMode,
-  importNote,
-}
-
-const NoteView = ({
-  databaseProvider,
-  activeNote,
-  setActiveNote,
-  unsavedChanges,
-  setUnsavedChanges,
-  toggleAppMenu,
-  refreshContentViews,
-  headerStats,
-  pinnedNotes,
-  handleSearchInputChange,
-  setPinnedNotes,
-  searchValue,
-  sortMode,
-  handleSortModeChange,
-  noteListItems,
-  numberOfResults,
-  noteListIsBusy,
-  noteListScrollTop,
-  setNoteListScrollTop,
-  page,
-  setPage,
-  createNewNote,
-  createNewLinkedNote,
-  removeActiveNote,
-  duplicateNote,
-  saveActiveNote,
-  contentMode,
-  setNoteContent,
-  toggleEditMode,
-  importNote,
-}: NoteViewProps) => {
+const NoteView = () => {
+  const [pinnedNotes, setPinnedNotes] = useState<NoteToTransmit[]>([]);
+  const databaseProvider = useDatabaseProvider();
   const isSmallScreen = useIsSmallScreen();
   const navigate = useNavigate();
   const confirm = useContext(ConfirmationServiceContext) as (any) => void;
-  const displayedLinkedNotes = useDisplayedLinkedNotes(activeNote);
+  const graphId = useGraphId();
+  const { noteId } = useParams();
+  const [urlSearchParams] = useSearchParams();
 
-  const handleLinkAddition = async (note: MainNoteListItem): Promise<void> => {
-    // return if linked note has already been added
-    if (activeNote.changes.some((change) => {
-      return (
-        change.type === UserNoteChangeType.LINKED_NOTE_ADDED
-        && change.noteId === note.id
-      );
-    })) {
-      return;
+  const handleInvalidCredentialsError = async () => {
+    await databaseProvider?.removeAccess();
+    navigate(Utils.getAppPath(PathTemplate.LOGIN));
+  };
+
+  const {
+    activeNote,
+    saveActiveNote,
+    createNewNote,
+    createNewLinkedNote,
+    removeActiveNote,
+    duplicateNote,
+    loadNote,
+    importNote,
+    handleLinkAddition,
+    handleLinkRemoval,
+    displayedLinkedNotes,
+    setActiveNote,
+    setNoteContent,
+    unsavedChanges,
+    setUnsavedChanges,
+  } = useActiveNote(databaseProvider, graphId, handleInvalidCredentialsError);
+
+  const [headerStats, refreshHeaderStats] = useHeaderStats(
+    databaseProvider,
+    graphId,
+  );
+  const [contentMode, setContentMode] = useState<ContentMode>(
+    ContentMode.LOADING,
+  );
+  const goToNote = useGoToNote();
+
+
+  const toggleEditMode = async () => {
+    if (contentMode === ContentMode.LOADING) return;
+
+    const newContentMode = contentMode === ContentMode.EDITOR
+      ? ContentMode.VIEWER
+      : ContentMode.EDITOR;
+    setContentMode(newContentMode);
+    await IDB.set("CONTENT_MODE", newContentMode);
+
+    if (newContentMode === ContentMode.EDITOR) {
+      document.getElementById("editor")?.focus();
     }
 
-    // remove possible LINKED_NOTE_DELETED changes
-    const newChanges = [
-      ...activeNote.changes.filter((change) => {
-        return !(
-          change.type === UserNoteChangeType.LINKED_NOTE_DELETED
-          && change.noteId === note.id
-        );
-      }),
-    ];
-
-    // if linkedNote is NOT already there and saved,
-    // let's add a LINKED_NOTE_ADDED change
     if (
-      activeNote.isUnsaved
-      || (!activeNote.linkedNotes.find((linkedNote) => {
-        return linkedNote.id === note.id;
-      }))
+      databaseProvider
+      && newContentMode === ContentMode.VIEWER
+      // @ts-ignore calling constructor via instance
+      && databaseProvider.constructor.features.includes("GET_DOCUMENT_TITLE")
     ) {
-      newChanges.push(
-        {
-          type: UserNoteChangeType.LINKED_NOTE_ADDED,
-          noteId: note.id,
-          note: {
-            id: note.id,
-            title: note.title,
-            updatedAt: note.updatedAt,
-          },
-        },
-      );
+      Utils.insertDocumentTitles(activeNote.content, databaseProvider)
+        .then((newNoteContent) => {
+          if (newNoteContent !== activeNote.content) {
+            setNoteContent(newNoteContent);
+          }
+        });
     }
-
-    setActiveNote({
-      ...activeNote,
-      changes: newChanges,
-    });
-
-    setUnsavedChanges(true);
   };
 
 
-  const handleLinkRemoval = async (linkedNoteId: NoteId) => {
-    if (activeNote.changes.some((change) => {
-      return (
-        change.type === UserNoteChangeType.LINKED_NOTE_DELETED
-        && change.noteId === linkedNoteId
-      );
-    })) {
-      return;
+  const controlledNoteList = useControlledNoteList(
+    databaseProvider,
+    graphId,
+    handleInvalidCredentialsError,
+  );
+
+
+  const refreshContentViews = async (): Promise<void> => {
+    try {
+      await refreshHeaderStats();
+      await controlledNoteList.refresh(graphId);
+      const pinnedNotes = await databaseProvider.getPins(graphId);
+      setPinnedNotes(pinnedNotes);
+    } catch (e) {
+      if (e instanceof Error && e.message !== "INVALID_CREDENTIALS") {
+        throw new Error(e.message, { cause: e });
+      }
     }
+  };
 
-    setActiveNote({
-      ...activeNote,
-      changes: [
-        ...activeNote.changes.filter(
-          (change: FrontendUserNoteChange): boolean => {
-            return !(
-              change.type === UserNoteChangeType.LINKED_NOTE_ADDED
-              && change.noteId === linkedNoteId
-            );
-          },
-        ),
-        {
-          type: UserNoteChangeType.LINKED_NOTE_DELETED,
-          noteId: linkedNoteId,
-        },
-      ],
-    });
 
-    setUnsavedChanges(true);
+  const saveActiveNoteAndRefreshViews = async (
+    ignoreDuplicateTitles: boolean,
+  ) => {
+    const noteFromDatabase = await saveActiveNote(ignoreDuplicateTitles);
+    await refreshContentViews();
+    /*
+      when saving the new note for the first time, we get its id from the
+      databaseProvider. then we update the address bar to include the new id
+    */
+    goToNote(
+      graphId,
+      noteFromDatabase.meta.id,
+      true,
+    );
+
+    return noteFromDatabase;
   };
 
 
   const handleNoteSaveRequest = async (): Promise<void> => {
     try {
-      await saveActiveNote(false);
+      await saveActiveNoteAndRefreshViews(false);
     } catch (e) {
       if (
         e instanceof Error
@@ -199,7 +155,7 @@ const NoteView = ({
           encourageConfirmation: false,
         });
 
-        saveActiveNote(true).catch((e) => {
+        saveActiveNoteAndRefreshViews(true).catch((e) => {
           alert(e);
         });
       } else {
@@ -227,55 +183,126 @@ const NoteView = ({
   }, [activeNote]);
 
 
-  const pinOrUnpinNote = async (noteId: NoteId) => {
+  const pinOrUnpinNote = async (
+    noteId: NoteId,
+  ) => {
     let newPinnedNotes: NoteToTransmit[];
     if (pinnedNotes.find((pinnedNote) => pinnedNote.meta.id === noteId)) {
-      newPinnedNotes = await databaseProvider.unpinNote(noteId);
+      newPinnedNotes = await databaseProvider.unpinNote(graphId, noteId);
     } else {
-      newPinnedNotes = await databaseProvider.pinNote(noteId);
+      newPinnedNotes = await databaseProvider.pinNote(graphId, noteId);
     }
 
     setPinnedNotes(newPinnedNotes);
   };
 
 
+  useEffect(() => {
+    IDB.get("CONTENT_MODE")
+      .then((value) => {
+        let startContentMode;
+
+        if (value === ContentMode.EDITOR) {
+          startContentMode = ContentMode.EDITOR;
+        } else if (value === ContentMode.VIEWER) {
+          startContentMode = ContentMode.VIEWER;
+        } else {
+          startContentMode = Config.DEFAULT_CONTENT_MODE;
+        }
+
+        setContentMode(startContentMode);
+
+        if (startContentMode === ContentMode.EDITOR) {
+          setTimeout(() => {
+            document.getElementById("editor")?.focus();
+          });
+        }
+      })
+      .catch(() => {
+        setContentMode(Config.DEFAULT_CONTENT_MODE);
+      });
+  }, []);
+
+
+  const getValidNoteId = (noteIdParam?: string): number | null => {
+    if (
+      noteIdParam
+      && (noteIdParam !== "new")
+      && !isNaN(parseInt(noteIdParam))
+    ) {
+      return parseInt(noteIdParam);
+    } else {
+      return null;
+    }
+  };
+
+
+  const setCanonicalNewNotePath = () => {
+    /* whatever has been written to the address bar, let's replace it with
+    the canonical path for a new note */
+    navigate(
+      Utils.getAppPath(
+        PathTemplate.NEW_NOTE,
+        new Map([["GRAPH_ID", graphId]]),
+        new URLSearchParams(location.search),
+      ),
+      { replace: true },
+    );
+  };
+
+
+  useEffect(() => {
+    refreshContentViews();
+
+    if (typeof getValidNoteId(noteId) !== "number") {
+      const fileIds = urlSearchParams.has("fileIds")
+        ? (urlSearchParams.get("fileIds") as string).split(",")
+        : [];
+
+      createNewNote([], fileIds);
+      setCanonicalNewNotePath();
+    }
+  }, []);
+
+
+  useEffect(() => {
+    const validNoteId = getValidNoteId(noteId);
+    if (typeof validNoteId === "number") {
+      loadNote(graphId, validNoteId);
+    }
+  }, [noteId]);
+
   return <>
     <NoteViewHeader
       stats={headerStats}
-      toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
       activeNote={activeNote}
-      setUnsavedChanges={setUnsavedChanges}
-      unsavedChanges={unsavedChanges}
+      graphId={graphId}
     />
     <main>
       {
         !isSmallScreen
           ? <div className="sidebar">
             <NoteListWithControls
-              handleSearchInputChange={handleSearchInputChange}
-              searchValue={searchValue}
-              sortMode={sortMode}
-              handleSortModeChange={handleSortModeChange}
+              handleSearchInputChange={controlledNoteList.setSearchQuery}
+              searchValue={controlledNoteList.searchQuery}
+              sortMode={controlledNoteList.sortMode}
+              handleSortModeChange={controlledNoteList.setSortMode}
               refreshContentViews={refreshContentViews}
-              noteListItems={noteListItems}
-              numberOfResults={numberOfResults}
+              noteListItems={controlledNoteList.items}
+              numberOfResults={controlledNoteList.numberOfResults}
               activeNote={activeNote}
-              noteListIsBusy={noteListIsBusy}
-              noteListScrollTop={noteListScrollTop}
-              setNoteListScrollTop={setNoteListScrollTop}
-              page={page}
-              setPage={(page) => {
-                setPage(page);
-                setNoteListScrollTop(0);
-              }}
+              noteListIsBusy={controlledNoteList.isBusy}
+              noteListScrollTop={controlledNoteList.scrollTop}
+              setNoteListScrollTop={controlledNoteList.setScrollTop}
+              page={controlledNoteList.page}
+              setPage={controlledNoteList.setPage}
               stats={headerStats}
               itemsAreLinkable={true}
               onLinkAddition={handleLinkAddition}
               onLinkRemoval={handleLinkRemoval}
               displayedLinkedNotes={displayedLinkedNotes}
-              setUnsavedChanges={setUnsavedChanges}
-              unsavedChanges={unsavedChanges}
+              graphId={graphId}
             />
           </div>
           : null
@@ -305,14 +332,26 @@ const NoteView = ({
           onLinkRemoval={handleLinkRemoval}
           displayedLinkedNotes={displayedLinkedNotes}
           setUnsavedChanges={setUnsavedChanges}
-          databaseProvider={databaseProvider}
-          createNewNote={createNewNote}
-          createNewLinkedNote={createNewLinkedNote}
+          createNewNote={() => {
+            createNewNote();
+            setCanonicalNewNotePath();
+          }}
+          createNewLinkedNote={() => {
+            createNewLinkedNote();
+            setCanonicalNewNotePath();
+          }}
           handleNoteSaveRequest={handleNoteSaveRequest}
-          removeActiveNote={removeActiveNote}
+          removeActiveNote={async () => {
+            await removeActiveNote();
+            refreshContentViews();
+          }}
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}
-          duplicateNote={duplicateNote}
+          duplicateNote={async () => {
+            const duplicate = await duplicateNote();
+            refreshContentViews();
+            goToNote(graphId, duplicate.meta.id);
+          }}
           openInGraphView={() => {
             if (activeNote.isUnsaved) {
               throw new Error("Cannot open an unsaved note in graph view");
@@ -321,13 +360,17 @@ const NoteView = ({
             navigate(
               Utils.getAppPath(
                 PathTemplate.GRAPH_WITH_FOCUS_NOTE,
-                new Map([["FOCUS_NOTE_ID", activeNote.id.toString()]]),
+                new Map([
+                  ["GRAPH_ID", graphId],
+                  ["FOCUS_NOTE_ID", activeNote.id.toString()],
+                ]),
               ),
             );
           }}
           contentMode={contentMode}
           toggleEditMode={toggleEditMode}
           importNote={importNote}
+          graphId={graphId}
         />
       </div>
     </main>

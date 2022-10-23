@@ -3,11 +3,11 @@ import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
 import {
   UserNoteChangeType,
 } from "../../../lib/notes/interfaces/UserNoteChangeType";
-import ActiveNote from "../interfaces/ActiveNote";
+import ActiveNote from "../types/ActiveNote";
 import {
   FrontendUserNoteAdditionChange,
   FrontendUserNoteChangeNote,
-} from "../interfaces/FrontendUserNoteChange";
+} from "../types/FrontendUserNoteChange";
 
 export default (
   activeNote: ActiveNote,

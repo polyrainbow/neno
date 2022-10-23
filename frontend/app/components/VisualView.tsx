@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import GraphVisualizer from "../lib/GraphVisualizer";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
 import {
+  useNavigate,
   useLocation,
 } from "react-router-dom";
 import GraphViewHeader from "./GraphViewHeader";
@@ -9,27 +10,18 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useGoToNote from "../hooks/useGoToNote";
 import { l } from "../lib/intl";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
-import { HighlightDetails } from "../interfaces/GraphVisualizerConfig";
+import { HighlightDetails } from "../types/GraphVisualizerConfig";
 import BackendGraphVisualization
   from "../../../lib/notes/interfaces/GraphVisualization";
-import { GraphVisualizationMode } from "../interfaces/GraphVisualization";
+import { GraphVisualizationMode } from "../types/GraphVisualization";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
+import useGraphId from "../hooks/useGraphId";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
+import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 
-interface GraphViewProps {
-  databaseProvider: DatabaseProvider | null,
-  unsavedChanges: boolean,
-  setUnsavedChanges: (boolean) => void,
-  toggleAppMenu: () => void,
-  handleInvalidCredentialsError: () => void,
-}
 
-const GraphView = ({
-  databaseProvider,
-  unsavedChanges,
-  setUnsavedChanges,
-  toggleAppMenu,
-  handleInvalidCredentialsError,
-}: GraphViewProps) => {
+const VisualizationView = () => {
   const DEFAULT_STATUS: HighlightDetails = {
     active: false,
   };
@@ -40,8 +32,12 @@ const GraphView = ({
   const [mode, setMode] = useState<GraphVisualizationMode>(
     GraphVisualizationMode.DEFAULT,
   );
+  const [unsavedChanges, setUnsavedChanges]
+    = useContext(UnsavedChangesContext);
+  const databaseProvider = useDatabaseProvider();
   const [searchValue, setSearchValue] = useState<string>("");
-
+  const graphId = useGraphId();
+  const navigate = useNavigate();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
@@ -51,12 +47,16 @@ const GraphView = ({
   const focusNoteId = parseInt(searchParams.get("focusNote") || "");
 
   const saveGraphObject = async () => {
+    if (!graphId) return;
     if (!graphVisualizerInstance.current) {
       throw new Error("Error saving graph. Graph instance undefined.");
     }
     const graphVisualization = graphVisualizerInstance.current.getSaveData();
     try {
-      await databaseProvider?.saveGraphVisualization(graphVisualization);
+      await databaseProvider?.saveGraphVisualization(
+        graphId,
+        graphVisualization,
+      );
       setUnsavedChanges(false);
     } catch (e) {
       console.error(e);
@@ -66,12 +66,13 @@ const GraphView = ({
 
 
   const openNoteInEditor = async (noteId) => {
+    if (!graphId) return;
     if (unsavedChanges) {
       await confirmDiscardingUnsavedChanges();
       setUnsavedChanges(false);
     }
 
-    goToNote(noteId);
+    goToNote(graphId, noteId);
   };
 
 
@@ -115,9 +116,16 @@ const GraphView = ({
     };
   }, [handleKeydown]);
 
+  const handleInvalidCredentialsError = async () => {
+    await databaseProvider?.removeAccess();
+    // setDatabaseMode(DatabaseMode.NONE);
+    navigate(getAppPath(PathTemplate.LOGIN));
+  };
+
 
   const initializeGraphInstance = async () => {
     if (!databaseProvider) return;
+    if (!graphId) return;
 
     // Effects that should only run once can use a ref
     // https://github.com/reactwg/react-18/discussions/18
@@ -126,7 +134,7 @@ const GraphView = ({
 
     try {
       const graphObject: BackendGraphVisualization
-        = await databaseProvider.getGraphVisualization();
+        = await databaseProvider.getGraphVisualization(graphId);
 
       // for performance reasons, we disable labels above a certain
       // amount of nodes
@@ -170,7 +178,6 @@ const GraphView = ({
   return <>
     <GraphViewHeader
       unsavedChanges={unsavedChanges}
-      toggleAppMenu={toggleAppMenu}
       searchValue={searchValue}
       setSearchValue={setSearchValue}
       openSelectedNoteInEditor={openSelectedNoteInEditor}
@@ -187,4 +194,4 @@ const GraphView = ({
   </>;
 };
 
-export default GraphView;
+export default VisualizationView;

@@ -1,14 +1,14 @@
 import { FileId } from "../../../lib/notes/interfaces/FileId";
 import { PathTemplate } from "../enum/PathTemplate";
-import { UnsavedActiveNote } from "../interfaces/ActiveNote";
+import { UnsavedActiveNote } from "../types/ActiveNote";
 import * as Config from "../config";
 import FrontendUserNoteChange, { FrontendUserNoteChangeNote }
-  from "../interfaces/FrontendUserNoteChange";
+  from "../types/FrontendUserNoteChange";
 import { UserNoteChangeType }
   from "../../../lib/notes/interfaces/UserNoteChangeType";
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+import DatabaseProvider from "../types/DatabaseProvider";
 import {
   Block,
   BlockSlashlink,
@@ -17,6 +17,7 @@ import {
 } from "../../../lib/subwaytext/interfaces/Block";
 import subwaytext from "../../../lib/subwaytext";
 import { Note } from "../../../lib/notes/interfaces/Note";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 
 
 const shortenText = (text: string, maxLength: number): string => {
@@ -136,7 +137,7 @@ const getNewNoteContent = (
 
 const getNewNoteObject = (
   linkedNotes: FrontendUserNoteChangeNote[],
-  fileInfos?: FileInfo[],
+  fileIds?: FileId[],
 ): UnsavedActiveNote => {
   const note: UnsavedActiveNote = {
     isUnsaved: true,
@@ -150,8 +151,10 @@ const getNewNoteObject = (
       },
     ),
     title: Config.DEFAULT_NOTE_TITLE,
-    content: getNewNoteContent(fileInfos?.map((fileInfo) => fileInfo.fileId)),
-    files: fileInfos || [],
+    content: getNewNoteContent(fileIds),
+    // Note may already have files, but the files list will be populated by
+    // databaseProvider
+    files: [],
     keyValues: [],
     flags: [],
     contentType: Config.DEFAULT_CONTENT_TYPE,
@@ -348,11 +351,24 @@ const getAppPath = (
 ): string => {
   let path = `${Config.ROOT_PATH}${pathTemplate}`;
   params?.forEach((value, key) => {
+    if (value.length === 0) {
+      throw new Error(
+        "getAppPath: Empty value for app path param received: " + key,
+      );
+    }
     path = path.replace(`%${key}%`, value);
   });
+
+  if (path.includes("%")) {
+    throw new Error(
+      "getAppPath: Invalid path. Did you forget to set a param? " + path,
+    );
+  }
+
   if (urlParams) {
     path += "?" + urlParams;
   }
+
   return path;
 };
 
@@ -398,23 +414,25 @@ const readFileAsString = async (file: File): Promise<string> => {
 
 
 export const onDownload = async (
+  graphId: GraphId,
   file: FileInfo,
   databaseProvider: DatabaseProvider,
 ): Promise<void> => {
   const fileId = file.fileId;
   const name = file.name;
-  const url = await databaseProvider.getUrlForFileId(fileId, name);
+  const url = await databaseProvider.getUrlForFileId(graphId, fileId, name);
   window.open(url, "_blank");
 };
 
 
 export const getUrl = async (
+  graphId: GraphId,
   file: FileInfo,
   databaseProvider: DatabaseProvider,
 ) => {
   const fileId = file.fileId;
   const name = file.name;
-  const url = await databaseProvider.getUrlForFileId(fileId, name);
+  const url = await databaseProvider.getUrlForFileId(graphId, fileId, name);
   return url;
 };
 

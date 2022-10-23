@@ -1,5 +1,5 @@
 import React from "react";
-import ActiveNote from "../interfaces/ActiveNote";
+import ActiveNote from "../types/ActiveNote";
 
 interface NoteKeyValuesProps {
   note: ActiveNote,

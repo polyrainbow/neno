@@ -1,5 +1,6 @@
 import { APIError } from "../../../../backend/interfaces/APIError";
 import APIResponse from "../../../../backend/interfaces/APIResponse";
+import { GraphId } from "../../../../lib/notes/interfaces/GraphId";
 import { FileId } from "../../../../lib/notes/interfaces/FileId";
 import { FileInfo } from "../../../../lib/notes/interfaces/FileInfo";
 import { NoteId } from "../../../../lib/notes/interfaces/NoteId";
@@ -9,8 +10,6 @@ import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit";
 import { base64Encode } from "../utils";
 
 let API_URL;
-let GRAPH_ID;
-let GRAPH_ENDPOINT;
 let USER_ENDPOINT;
 
 const init = (apiUrl) => {
@@ -19,10 +18,10 @@ const init = (apiUrl) => {
 };
 
 
-const setGraphId = (graphId) => {
-  GRAPH_ID = graphId;
-  GRAPH_ENDPOINT = API_URL + "graph/" + GRAPH_ID + "/";
+const getGraphEndpoint = (graphId: GraphId) => {
+  return API_URL + "graph/" + graphId + "/";
 };
+
 
 interface APICallParams {
   method?: string,
@@ -118,10 +117,11 @@ const callUserAPIAndGetJSONPayload = async (
 
 const callGraphAPIAndGetJSONPayload = async (
   options: EndpointCallParams,
+  graphId: GraphId,
 ): Promise<any> => {
   const response = await callAPI({
     ...options,
-    url: GRAPH_ENDPOINT + options.endpoint,
+    url: getGraphEndpoint(graphId) + options.endpoint,
   }) as APIResponse;
   return getJSONResponsePayloadIfSuccessful(response);
 };
@@ -156,110 +156,110 @@ const isAuthenticated = () => {
 };
 
 
-const getRawNote = (noteId: NoteId): Promise<string | null> => {
+const getRawNote = (graphId, noteId: NoteId): Promise<string | null> => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "note-raw/" + noteId,
-  });
+  }, graphId);
 };
 
 
-const getNote = (noteId: NoteId): Promise<NoteToTransmit | null> => {
+const getNote = (graphId, noteId: NoteId): Promise<NoteToTransmit | null> => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "note/" + noteId,
-  });
+  }, graphId);
 };
 
 
-const getNotes = (options) => {
+const getNotes = (graphId, options) => {
   const params = new URLSearchParams(options);
   const endpoint = `notes?${params.toString()}`;
 
   return callGraphAPIAndGetJSONPayload({
     endpoint,
-  });
+  }, graphId);
 };
 
 
-const putNote = (noteSaveRequest: NoteSaveRequest) => {
+const putNote = (graphId, noteSaveRequest: NoteSaveRequest) => {
   return callGraphAPIAndGetJSONPayload({
     method: "PUT",
     endpoint: "note",
     payload: noteSaveRequest,
-  });
+  }, graphId);
 };
 
 
-const putRawNote = (rawNote: string) => {
+const putRawNote = (graphId, rawNote: string) => {
   return callGraphAPIAndGetJSONPayload({
     method: "PUT",
     endpoint: "raw-note",
     payload: {
       note: rawNote,
     },
-  });
+  }, graphId);
 };
 
 
-const deleteNote = (noteId) => {
+const deleteNote = (graphId, noteId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
     endpoint: "note/" + noteId,
-  });
+  }, graphId);
 };
 
 
-const getStats = (options) => {
+const getStats = (graphId, options) => {
   const searchParams = new URLSearchParams(options);
   const endpoint = "stats?" + searchParams.toString();
 
   return callGraphAPIAndGetJSONPayload({
     endpoint,
-  });
+  }, graphId);
 };
 
 
-const getFiles = () => {
+const getFiles = (graphId) => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "files",
-  });
+  }, graphId);
 };
 
 
-const getFileInfo = (fileId: FileId) => {
+const getFileInfo = (graphId, fileId: FileId) => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "file-info/" + fileId,
-  });
+  }, graphId);
 };
 
 
-const getDanglingFiles = () => {
+const getDanglingFiles = (graphId) => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "dangling-files",
-  });
+  }, graphId);
 };
 
 
-const getGraphVisualization = () => {
+const getGraphVisualization = (graphId) => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "graph-visualization",
-  });
+  }, graphId);
 };
 
 
-const saveGraphVisualization = (graphObject) => {
+const saveGraphVisualization = (graphId, graphObject) => {
   return callGraphAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "graph-visualization",
     payload: graphObject,
-  });
+  }, graphId);
 };
 
 
-const getReadableGraphStream = async (withFiles) => {
+const getReadableGraphStream = async (graphId, withFiles) => {
   const searchParams = new URLSearchParams({
     withFiles,
   });
-  const url = GRAPH_ENDPOINT + "?" + searchParams.toString();
+  const url = getGraphEndpoint(graphId) + "?" + searchParams.toString();
   const response = await callAPI({
     url,
     outputType: "body",
@@ -268,8 +268,8 @@ const getReadableGraphStream = async (withFiles) => {
 };
 
 
-const getReadableFileStream = async (fileId) => {
-  const url = GRAPH_ENDPOINT + "file/" + fileId;
+const getReadableFileStream = async (graphId, fileId) => {
+  const url = getGraphEndpoint(graphId) + "file/" + fileId;
   const response = await callAPI({
     url,
     outputType: "body",
@@ -278,7 +278,7 @@ const getReadableFileStream = async (fileId) => {
 };
 
 
-const uploadFile = async (file: File): Promise<FileInfo> => {
+const uploadFile = async (graphId, file: File): Promise<FileInfo> => {
   const response = await callGraphAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "file",
@@ -287,42 +287,42 @@ const uploadFile = async (file: File): Promise<FileInfo> => {
     additionalHeaders: {
       "filename": await base64Encode(file.name),
     },
-  });
+  }, graphId);
 
   return response;
 };
 
 
-const deleteFile = (fileId) => {
+const deleteFile = (graphId, fileId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
     endpoint: "file/" + fileId,
-  });
+  }, graphId);
 };
 
 
-const pinNote = (noteId) => {
+const pinNote = (graphId, noteId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "PUT",
     endpoint: "pins",
     payload: { noteId },
-  });
+  }, graphId);
 };
 
 
-const unpinNote = (noteId) => {
+const unpinNote = (graphId, noteId) => {
   return callGraphAPIAndGetJSONPayload({
     method: "DELETE",
     endpoint: "pins",
     payload: { noteId },
-  });
+  }, graphId);
 };
 
 
-const getPins = () => {
+const getPins = (graphId) => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "pins",
-  });
+  }, graphId);
 };
 
 
@@ -339,7 +339,6 @@ const getDocumentTitle = async (url: string): Promise<string> => {
 
 export {
   init,
-  setGraphId,
   login,
   logout,
   isAuthenticated,

@@ -1,5 +1,5 @@
+import { GraphId } from "../../lib/notes/interfaces/GraphId";
 import { UserId } from "./UserId";
-import { GraphId } from "./GraphId";
 
 export default interface User {
   id: UserId, // unique key

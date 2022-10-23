@@ -3,13 +3,12 @@ import UnsavedChangesIndicator from "./UnsavedChangesIndicator";
 import IconButton from "./IconButton";
 import SearchInput from "./SearchInput";
 import { l } from "../lib/intl";
-import { GraphVisualizationMode } from "../interfaces/GraphVisualization";
+import { GraphVisualizationMode } from "../types/GraphVisualization";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 
 const GraphViewHeader = ({
   unsavedChanges,
-  toggleAppMenu,
   searchValue,
   setSearchValue,
   saveGraphObject,
@@ -19,7 +18,6 @@ const GraphViewHeader = ({
   setMode,
 }) => {
   return <HeaderContainerLeftRight
-    toggleAppMenu={toggleAppMenu}
     leftContent={
       <>
         <IconButton

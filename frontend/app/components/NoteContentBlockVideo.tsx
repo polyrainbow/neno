@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import { PathTemplate } from "../enum/PathTemplate";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+import DatabaseProvider from "../types/DatabaseProvider";
 import { l } from "../lib/intl";
 import { getAppPath, getUrl, humanFileSize, onDownload } from "../lib/utils";
 import FlexContainer from "./FlexContainer";
@@ -11,17 +12,19 @@ import Icon from "./Icon";
 interface NoteContentBlockVideoProps {
   file: FileInfo,
   databaseProvider: DatabaseProvider,
+  graphId: GraphId,
 }
 
 
 const NoteContentBlockVideo = ({
   file,
   databaseProvider,
+  graphId,
 }: NoteContentBlockVideoProps) => {
   const [url, setUrl] = useState<string>("");
 
   useEffect(() => {
-    getUrl(file, databaseProvider)
+    getUrl(graphId, file, databaseProvider)
       .then((url) => {
         setUrl(url);
       });
@@ -42,7 +45,10 @@ const NoteContentBlockVideo = ({
       </div>
       <FlexContainer>
         <Link to={
-          getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))
+          getAppPath(PathTemplate.FILE, new Map([
+            ["GRAPH_ID", graphId],
+            ["FILE_ID", file.fileId],
+          ]))
         }>
           <Icon
             icon="info"
@@ -52,7 +58,7 @@ const NoteContentBlockVideo = ({
         </Link>
         <a
           className="preview-block-file-download-button"
-          onClick={() => onDownload(file, databaseProvider)}
+          onClick={() => onDownload(graphId, file, databaseProvider)}
         >
           <Icon
             icon="file_download"

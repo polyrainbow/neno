@@ -22,7 +22,7 @@ import FileSessionStore from "./lib/FileSessionStore.js";
 import * as logger from "./lib/logger.js";
 import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode.js";
 import { UserId } from "./interfaces/UserId.js";
-import { GraphId } from "./interfaces/GraphId.js";
+import { GraphId } from "../lib/notes/interfaces/GraphId";
 import BruteForcePreventer from "./BruteForcePreventer.js";
 import GraphStatsRetrievalOptions from "../lib/notes/interfaces/GraphStatsRetrievalOptions.js";
 import Ajv from "ajv";

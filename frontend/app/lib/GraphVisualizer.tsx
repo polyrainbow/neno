@@ -46,7 +46,7 @@ import FrontendGraphVisualization, {
   GraphVisualizationLink,
   GraphVisualizationMode,
 }
-  from "../interfaces/GraphVisualization";
+  from "../types/GraphVisualization";
 import GraphVisualizationNode
   from "../../../lib/notes/interfaces/GraphVisualizationNode";
 import { Link } from "../../../lib/notes/interfaces/Link";
@@ -57,7 +57,7 @@ import ScreenPosition from "../../../lib/notes/interfaces/ScreenPosition";
 import NodePosition from "../../../lib/notes/interfaces/NodePosition";
 import GraphVisualizerConfig, {
   HighlightDetails,
-} from "../interfaces/GraphVisualizerConfig";
+} from "../types/GraphVisualizerConfig";
 import { Delaunay } from "d3";
 
 

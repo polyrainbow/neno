@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import { PathTemplate } from "../enum/PathTemplate";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+import DatabaseProvider from "../types/DatabaseProvider";
 import {
   getAppPath,
   getUrl,
@@ -12,6 +13,7 @@ interface NoteContentBlockImageProps {
   file: FileInfo,
   databaseProvider: DatabaseProvider,
   description: string,
+  graphId: GraphId,
 }
 
 
@@ -19,11 +21,12 @@ const NoteContentBlockImage = ({
   file,
   description,
   databaseProvider,
+  graphId,
 }: NoteContentBlockImageProps) => {
   const [url, setUrl] = useState<string>("");
 
   useEffect(() => {
-    getUrl(file, databaseProvider)
+    getUrl(graphId, file, databaseProvider)
       .then((url) => {
         setUrl(url);
       });
@@ -36,7 +39,10 @@ const NoteContentBlockImage = ({
   >
     <figure>
       <Link
-        to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))}
+        to={getAppPath(PathTemplate.FILE, new Map([
+          ["GRAPH_ID", graphId],
+          ["FILE_ID", file.fileId],
+        ]))}
       >
         <img
           src={url}

@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import DialogServiceConfiguration
-  from "../interfaces/DialogServiceConfiguration";
+  from "../types/DialogServiceConfiguration";
 
 const DialogServiceContext
   = React

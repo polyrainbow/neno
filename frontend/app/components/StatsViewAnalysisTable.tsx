@@ -6,10 +6,18 @@ import {
 import { Link } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l, lf } from "../lib/intl";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import GraphStats from "../../../lib/notes/interfaces/GraphStats";
+
+interface StatsViewAnalysisTableProps {
+  stats: Required<GraphStats>,
+  graphId: GraphId,
+}
 
 const StatsViewAnalysisTable = ({
   stats,
-}) => {
+  graphId,
+}: StatsViewAnalysisTableProps) => {
   const {
     numberOfAllNotes,
     numberOfUnlinkedNotes,
@@ -102,8 +110,11 @@ const StatsViewAnalysisTable = ({
                 >
                   <Link to={
                     getAppPath(
-                      PathTemplate.EDITOR_WITH_NOTE,
-                      new Map([["NOTE_ID", note.id]]),
+                      PathTemplate.EXISTING_NOTE,
+                      new Map([
+                        ["GRAPH_ID", graphId],
+                        ["NOTE_ID", note.id.toString()],
+                      ]),
                     )
                   }>
                     {note.title}

@@ -8,7 +8,9 @@ import GraphStatsRetrievalOptions
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import NoteListPage from "../../../lib/notes/interfaces/NoteListPage";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+import DatabaseProvider, {
+  SuccessfulAuthenticationResponse,
+} from "../types/DatabaseProvider";
 import FileSystemAccessAPIStorageProvider
   from "./FileSystemAccessAPIStorageProvider";
 import { streamToBlob } from "./utils";
@@ -51,7 +53,6 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   #folderHandle: FileSystemDirectoryHandle | null = null;
   #notesModule: typeof import("../../../lib/notes/index") | null = null;
   #graphIds: GraphId[] | null = null;
-  #activeGraphId: string | null = null;
   #storageProvider: FileSystemAccessAPIStorageProvider | null = null;
 
   /* PUBLIC */
@@ -63,16 +64,8 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
 
   static type = "LOCAL";
 
-  getActiveGraphId(): GraphId | null {
-    return this.#activeGraphId;
-  }
-
   getGraphIds(): GraphId[] | null {
     return this.#graphIds;
-  }
-
-  setActiveGraph(graphId) {
-    this.#activeGraphId = graphId;
   }
 
 
@@ -94,7 +87,9 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
   }
 
 
-  async login(folderHandle: FileSystemDirectoryHandle): Promise<void> {
+  async login(
+    folderHandle: FileSystemDirectoryHandle,
+  ): Promise<SuccessfulAuthenticationResponse> {
     await IDB.set(
       LocalDatabaseProvider.#handleStorageKey,
       folderHandle,
@@ -103,6 +98,25 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     this.#folderHandle = folderHandle;
 
     await this.initializeDatabase();
+
+    if (!this.#graphIds) {
+      throw new Error("Database initialization failed");
+    }
+
+    return {
+      graphIds: this.#graphIds,
+    };
+  }
+
+
+  async isAuthenticated(): Promise<SuccessfulAuthenticationResponse> {
+    if (!this.#graphIds) {
+      throw new Error("NOT_AUTHENTICATED");
+    }
+
+    return {
+      graphIds: this.#graphIds,
+    };
   }
 
 
@@ -176,109 +190,107 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
       );
     }
 
-    this.#activeGraphId = this.#graphIds[0];
-
     this.#isDatabaseInitialized = true;
   }
 
 
-  getRawNote(noteId: NoteId): Promise<string | null> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getRawNote(graphId, noteId: NoteId): Promise<string | null> {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.getRawNote(noteId, this.#activeGraphId);
+    return this.#notesModule.getRawNote(noteId, graphId);
   }
 
 
-  getNote(noteId: NoteId): Promise<NoteToTransmit | null> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getNote(graphId, noteId: NoteId): Promise<NoteToTransmit | null> {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.get(noteId, this.#activeGraphId);
+    return this.#notesModule.get(noteId, graphId);
   }
 
 
-  getNotes(options: DatabaseQuery): Promise<NoteListPage> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getNotes(graphId, options: DatabaseQuery): Promise<NoteListPage> {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.getNotesList(
-      this.#activeGraphId,
+      graphId,
       options,
     );
   }
 
-  getStats(options: GraphStatsRetrievalOptions): Promise<GraphStats> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getStats(graphId, options: GraphStatsRetrievalOptions): Promise<GraphStats> {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.getStats(this.#activeGraphId, options);
+    return this.#notesModule.getStats(graphId, options);
   }
 
-  deleteNote(noteId: NoteId): Promise<void> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  deleteNote(graphId, noteId: NoteId): Promise<void> {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.remove(noteId, this.#activeGraphId);
+    return this.#notesModule.remove(noteId, graphId);
   }
 
 
-  putNote(noteSaveRequest: NoteSaveRequest) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  putNote(graphId, noteSaveRequest: NoteSaveRequest) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.put(
       noteSaveRequest,
-      this.#activeGraphId,
+      graphId,
     );
   }
 
 
-  putRawNote(rawNote: string) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  putRawNote(graphId, rawNote: string) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.putRawNote(
       rawNote,
-      this.#activeGraphId,
+      graphId,
     );
   }
 
 
-  saveGraphVisualization(graphVisualization) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  saveGraphVisualization(graphId, graphVisualization) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.setGraphVisualization(
       graphVisualization,
-      this.#activeGraphId,
+      graphId,
     );
   }
 
-  async getGraphVisualization(): Promise<BackendGraphVisualization> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  async getGraphVisualization(graphId): Promise<BackendGraphVisualization> {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     const graphVisualization = await this.#notesModule.getGraphVisualization(
-      this.#activeGraphId,
+      graphId,
     );
 
     /*
@@ -290,127 +302,129 @@ export default class LocalDatabaseProvider implements DatabaseProvider {
     return structuredClone(graphVisualization);
   }
 
-  getReadableGraphStream(withFiles) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getReadableGraphStream(graphId, withFiles) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.getReadableGraphStream(
-      this.#activeGraphId,
+      graphId,
       withFiles,
     );
   }
 
 
-  uploadFile(file: File): Promise<FileInfo> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  uploadFile(graphId, file: File): Promise<FileInfo> {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.addFile(
-      this.#activeGraphId,
+      graphId,
       file.stream(),
       file.name,
     );
   }
 
 
-  deleteFile(fileId: FileId) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  deleteFile(graphId, fileId: FileId) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.deleteFile(
-      this.#activeGraphId,
+      graphId,
       fileId,
     );
   }
 
 
-  getFiles() {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getFiles(graphId) {
+    if (!this.#notesModule) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.getFiles(this.#activeGraphId);
+    return this.#notesModule.getFiles(graphId);
   }
 
 
-  getFileInfo(fileId: FileId): Promise<FileInfo> {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getFileInfo(graphId, fileId: FileId): Promise<FileInfo> {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.getFileInfo(this.#activeGraphId, fileId);
+    return this.#notesModule.getFileInfo(graphId, fileId);
   }
 
 
-  getDanglingFiles() {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getDanglingFiles(graphId) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.getDanglingFiles(this.#activeGraphId);
+    return this.#notesModule.getDanglingFiles(graphId);
   }
 
 
-  getReadableFileStream(fileId) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getReadableFileStream(graphId, fileId) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
     return this.#notesModule.getReadableFileStream(
-      this.#activeGraphId,
+      graphId,
       fileId,
     );
   }
 
 
-  pinNote(noteId) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  pinNote(graphId, noteId) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.pin(this.#activeGraphId, noteId);
+    return this.#notesModule.pin(graphId, noteId);
   }
 
-  unpinNote(noteId) {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  unpinNote(graphId, noteId) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.unpin(this.#activeGraphId, noteId);
+    return this.#notesModule.unpin(graphId, noteId);
   }
 
-  getPins() {
-    if (!(this.#notesModule && this.#activeGraphId)) {
+  getPins(graphId) {
+    if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.getPins(this.#activeGraphId);
+    return this.#notesModule.getPins(graphId);
   }
 
   /**
    * Obtains a URL for a file.
-   * @param {string} fileId
+   * @param {GraphId} graphId
+   * @param {FileId} fileId
    * @param {string?} publicName This optional file name is appended at the url
    * so that if the user decides to download the file, it is saved with this
    * public name instead of the more technical fileId.
    * @return {string} url
   */
-  async getUrlForFileId(fileId) {
+  async getUrlForFileId(graphId, fileId) {
     const readable
       = await this.getReadableFileStream(
+        graphId,
         fileId,
       );
     const extension = this.#notesModule?.utils.getExtensionFromFilename(fileId);

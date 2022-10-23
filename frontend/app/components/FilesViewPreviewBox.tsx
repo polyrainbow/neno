@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   Link,
 } from "react-router-dom";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { PathTemplate } from "../enum/PathTemplate";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+import DatabaseProvider from "../types/DatabaseProvider";
 import { l } from "../lib/intl";
 import { getAppPath, getMediaTypeFromFilename, getIconSrc } from "../lib/utils";
 
@@ -13,6 +14,7 @@ interface FilesViewPreviewBoxProps{
   key: string,
   file: FileInfo,
   databaseProvider: DatabaseProvider,
+  graphId: GraphId,
   isDangling: boolean,
 }
 
@@ -20,6 +22,7 @@ const FilesViewPreviewBox = ({
   file,
   databaseProvider,
   isDangling,
+  graphId,
 }: FilesViewPreviewBoxProps) => {
   const type = getMediaTypeFromFilename(file.fileId) || "unknown";
   const [thumbnailImageSrc, setThumbnailImageSrc]
@@ -27,7 +30,7 @@ const FilesViewPreviewBox = ({
 
 
   useEffect(() => {
-    databaseProvider.getUrlForFileId(file.fileId)
+    databaseProvider.getUrlForFileId(graphId, file.fileId)
       .then((src) => {
         const thumbnailImageSrcMap = {
           [MediaType.IMAGE]: src,
@@ -47,7 +50,10 @@ const FilesViewPreviewBox = ({
     className="files-view-preview-box"
   >
     <Link
-      to={getAppPath(PathTemplate.FILE, new Map([["FILE_ID", file.fileId]]))}
+      to={getAppPath(PathTemplate.FILE, new Map([
+        ["GRAPH_ID", graphId],
+        ["FILE_ID", file.fileId],
+      ]))}
     >
       <img
         src={thumbnailImageSrc || ""}

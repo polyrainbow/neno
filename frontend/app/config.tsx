@@ -1,4 +1,4 @@
-import { ContentMode } from "./interfaces/ContentMode";
+import { ContentMode } from "./types/ContentMode";
 
 const VERSION = "v4.1.0";
 

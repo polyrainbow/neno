@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   useParams, Link, useNavigate,
 } from "react-router-dom";
-import { MainNoteListItem } from "../interfaces/NoteListItem";
+import { MainNoteListItem } from "../types/NoteListItem";
 import {
   getAppPath,
   getMediaTypeFromFilename,
@@ -12,7 +12,6 @@ import {
 } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import BusyIndicator from "./BusyIndicator";
@@ -20,23 +19,18 @@ import { SPAN_SEPARATOR } from "../config";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
+import useGraphId from "../hooks/useGraphId";
 
 
-const FileView = ({
-  databaseProvider,
-  toggleAppMenu,
-  createNewNote,
-}: {
-  databaseProvider: DatabaseProvider,
-  toggleAppMenu: () => void,
-  createNewNote,
-}) => {
+const FileView = () => {
+  const databaseProvider = useDatabaseProvider();
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [src, setSrc] = useState<string>("");
   // status can be READY, BUSY
   const [notes, setNotes] = useState<MainNoteListItem[] | null>(null);
   const [text, setText] = useState<string>("");
-
+  const graphId = useGraphId();
   const { fileId } = useParams();
 
   const navigate = useNavigate();
@@ -49,9 +43,9 @@ const FileView = ({
     if (typeof fileId !== "string") return;
 
     const getFileInfo = async () => {
-      const fileInfo = await databaseProvider.getFileInfo(fileId);
+      const fileInfo = await databaseProvider.getFileInfo(graphId, fileId);
       setFileInfo(fileInfo);
-      const src = await getUrl(fileInfo, databaseProvider);
+      const src = await getUrl(graphId, fileInfo, databaseProvider);
       setSrc(src);
 
       if (type === MediaType.TEXT) {
@@ -62,7 +56,7 @@ const FileView = ({
     };
 
     const getNotes = async () => {
-      const response = await databaseProvider.getNotes({
+      const response = await databaseProvider.getNotes(graphId, {
         searchString: "has-file:" + fileId,
       });
       setNotes(response.results);
@@ -73,12 +67,10 @@ const FileView = ({
   }, [databaseProvider, fileId]);
 
   return <>
-    <HeaderContainerLeftRight
-      toggleAppMenu={toggleAppMenu}
-    />
+    <HeaderContainerLeftRight />
     <section className="content-section-wide file-section">
       <p><Link
-        to={getAppPath(PathTemplate.FILES)}
+        to={getAppPath(PathTemplate.FILES, new Map([["GRAPH_ID", graphId]]))}
       >{l("files.show-all-files")}</Link></p>
       <h1>{fileInfo?.name}</h1>
       <p>{
@@ -151,8 +143,11 @@ const FileView = ({
                   <Link
                     to={
                       getAppPath(
-                        PathTemplate.EDITOR_WITH_NOTE,
-                        new Map([["NOTE_ID", note.id.toString()]]),
+                        PathTemplate.EXISTING_NOTE,
+                        new Map([
+                          ["GRAPH_ID", graphId],
+                          ["NOTE_ID", note.id.toString()],
+                        ]),
                       )
                     }
                   >{note.title}</Link>
@@ -168,7 +163,15 @@ const FileView = ({
       <button
         disabled={!fileInfo}
         onClick={async () => {
-          createNewNote([], [fileInfo]);
+          if (!fileInfo) return;
+
+          navigate(getAppPath(
+            PathTemplate.NEW_NOTE,
+            new Map([["GRAPH_ID", graphId]]),
+            new URLSearchParams({
+              fileIds: fileInfo.fileId,
+            }),
+          ));
         }}
         className="small-button default-action"
       >{l("files.create-note-with-file")}</button>
@@ -184,8 +187,11 @@ const FileView = ({
             encourageConfirmation: false,
           });
 
-          await databaseProvider.deleteFile(fileInfo.fileId);
-          navigate(getAppPath(PathTemplate.FILES));
+          await databaseProvider.deleteFile(graphId, fileInfo.fileId);
+          navigate(getAppPath(
+            PathTemplate.FILES,
+            new Map([["GRAPH_ID", graphId]]),
+          ));
         }}
         className="small-button dangerous-action"
       >{l("files.delete")}</button>

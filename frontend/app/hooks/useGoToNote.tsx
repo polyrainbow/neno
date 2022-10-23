@@ -1,6 +1,7 @@
 import {
   useNavigate,
 } from "react-router-dom";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import { PathTemplate } from "../enum/PathTemplate";
 import { getAppPath } from "../lib/utils";
@@ -8,10 +9,17 @@ import { getAppPath } from "../lib/utils";
 const useGoToNote = () => {
   const navigate = useNavigate();
 
-  const goToNote = (noteId: NoteId, replace = false) => {
+  const goToNote = (
+    graphId: GraphId,
+    noteId: NoteId,
+    replace = false,
+  ) => {
     const path = getAppPath(
-      PathTemplate.EDITOR_WITH_NOTE,
-      new Map([["NOTE_ID", noteId.toString()]]),
+      PathTemplate.EXISTING_NOTE,
+      new Map([
+        ["GRAPH_ID", graphId],
+        ["NOTE_ID", noteId.toString()],
+      ]),
     );
 
     return navigate(path, { replace });

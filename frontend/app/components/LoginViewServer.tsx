@@ -7,11 +7,17 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { l, lf } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
 import { SERVER_DATABASE_ENABLED } from "../config";
+import DatabaseProvider from "../types/DatabaseProvider";
+
+interface LoginViewServerProps {
+  serverDatabaseProvider: DatabaseProvider,
+  setDatabaseMode: (databaseMode: DatabaseMode) => void,
+}
 
 const LoginViewServer = ({
   serverDatabaseProvider,
   setDatabaseMode,
-}) => {
+}: LoginViewServerProps) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [mfaToken, setMfaToken] = useState("");
@@ -24,10 +30,16 @@ const LoginViewServer = ({
 
   const startLoginAttempt = () => {
     setIsBusy(true);
-    serverDatabaseProvider.login(username, password, mfaToken)
-      .then(() => {
+    serverDatabaseProvider.login?.(username, password, mfaToken)
+      .then((response) => {
+        if (response.graphIds.length === 0) {
+          throw new Error("No graphs available on server database");
+        }
         setDatabaseMode(DatabaseMode.SERVER);
-        navigate(getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
+        navigate(getAppPath(
+          PathTemplate.NEW_NOTE,
+          new Map([["GRAPH_ID", response.graphIds[0]]]),
+        ));
       })
       .catch((e) => {
         const disclaimer = e.message;

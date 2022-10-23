@@ -1,5 +1,5 @@
 import React from "react";
-import { HighlightDetails } from "../interfaces/GraphVisualizerConfig";
+import { HighlightDetails } from "../types/GraphVisualizerConfig";
 import { emojis } from "../config";
 import { l } from "../lib/intl";
 

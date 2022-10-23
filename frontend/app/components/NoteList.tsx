@@ -10,12 +10,13 @@ import useConfirmDiscardingUnsavedChangesDialog
 import {
   FrontendNoteListItem,
   MainNoteListItem,
-} from "../interfaces/NoteListItem";
-import ActiveNote from "../interfaces/ActiveNote";
+} from "../types/NoteListItem";
+import ActiveNote from "../types/ActiveNote";
 import {
   NoteListSortMode,
 } from "../../../lib/notes/interfaces/NoteListSortMode";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 
 
 interface NoteListProps {
@@ -36,6 +37,7 @@ interface NoteListProps {
   itemsAreLinkable: boolean,
   unsavedChanges: boolean,
   setUnsavedChanges,
+  graphId: GraphId,
 }
 
 const NoteList = ({
@@ -56,6 +58,7 @@ const NoteList = ({
   itemsAreLinkable,
   unsavedChanges,
   setUnsavedChanges,
+  graphId,
 }: NoteListProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const goToNote = useGoToNote();
@@ -157,7 +160,7 @@ const NoteList = ({
                 setUnsavedChanges(false);
               }
 
-              goToNote(note.id);
+              goToNote(graphId, note.id);
             }}
             isLinkable={itemsAreLinkable}
             onLinkChange={() => {

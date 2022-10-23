@@ -5,22 +5,22 @@ import { DatabaseMode } from "../enum/DatabaseMode";
 import { ASSETS_PATH, VERSION } from "../config";
 import { l } from "../lib/intl";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
+import useDatabaseControl from "../hooks/useDatabaseControl";
 
-const LoginView = ({
-  serverDatabaseProvider,
-  localDatabaseProvider,
-  setDatabaseMode,
-  toggleAppMenu,
-}) => {
+const LoginView = () => {
+  const {
+    setDatabaseMode,
+    serverDatabaseProvider,
+    localDatabaseProvider,
+  } = useDatabaseControl();
+
   // reset database mode when opening login view
   useEffect(() => {
-    setDatabaseMode(DatabaseMode.NONE);
+    setDatabaseMode?.(DatabaseMode.NONE);
   }, []);
 
   return <>
-    <HeaderContainerLeftRight
-      toggleAppMenu={toggleAppMenu}
-    />
+    <HeaderContainerLeftRight />
     <section className="section-login">
       <div
         className="login-welcome"

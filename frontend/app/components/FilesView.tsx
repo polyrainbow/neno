@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from "react";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
 import { l } from "../lib/intl";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import { FileId } from "../../../lib/notes/interfaces/FileId";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
-
-interface FilesViewProps {
-  databaseProvider: DatabaseProvider,
-  toggleAppMenu,
-}
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
+import useGraphId from "../hooks/useGraphId";
 
 enum FileSortMode {
   CREATED_AT_DESCENDING = "CREATED_AT_DESCENDING",
@@ -19,10 +15,8 @@ enum FileSortMode {
   NAME_DESCENDING = "NAME_DESCENDING",
 }
 
-const FilesView = ({
-  databaseProvider,
-  toggleAppMenu,
-}: FilesViewProps) => {
+const FilesView = () => {
+  const databaseProvider = useDatabaseProvider();
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [danglingFileIds, setDanglingFileIds] = useState<FileId[]>([]);
   const [sortMode, setSortMode] = useState<FileSortMode>(
@@ -30,10 +24,13 @@ const FilesView = ({
   );
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
+  const graphId = useGraphId();
 
   const updateDanglingFiles = async () => {
+    if (!graphId) return;
+
     const danglingFiles: FileInfo[]
-      = await databaseProvider.getDanglingFiles();
+      = await databaseProvider.getDanglingFiles(graphId);
 
     setDanglingFileIds(danglingFiles.map((file) => file.fileId));
   };
@@ -58,10 +55,10 @@ const FilesView = ({
 
 
   useEffect(() => {
-    if (!databaseProvider) return;
+    if (!databaseProvider || !graphId) return;
 
     const updateFiles = async () => {
-      const files: FileInfo[] = await databaseProvider.getFiles();
+      const files: FileInfo[] = await databaseProvider.getFiles(graphId);
       setFiles(files);
       await updateDanglingFiles();
       setStatus("READY");
@@ -70,10 +67,10 @@ const FilesView = ({
     updateFiles();
   }, [databaseProvider]);
 
+  if (!graphId) return null; // better navigate to fallback
+
   return <>
-    <HeaderContainerLeftRight
-      toggleAppMenu={toggleAppMenu}
-    />
+    <HeaderContainerLeftRight />
     <section className="content-section-wide files-view">
       {
         status === "READY"
@@ -107,6 +104,7 @@ const FilesView = ({
                   key={"img_" + file.fileId}
                   databaseProvider={databaseProvider}
                   isDangling={danglingFileIds.includes(file.fileId)}
+                  graphId={graphId}
                 />;
               })}
             </FlexContainer>

@@ -1,6 +1,7 @@
 import React from "react";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import subwaytext from "../../../lib/subwaytext/index";
-import { SavedActiveNote } from "../interfaces/ActiveNote";
+import { SavedActiveNote } from "../types/ActiveNote";
 import { l } from "../lib/intl";
 import {
   makeTimestampHumanReadable,
@@ -11,10 +12,12 @@ import NoteStatsFileLink from "./NoteStatsFileLink";
 
 interface NoteStatsProps {
   note: SavedActiveNote,
+  graphId: GraphId,
 }
 
 const NoteStats = ({
   note,
+  graphId,
 }: NoteStatsProps) => {
   return <div
     id="stats"
@@ -59,6 +62,7 @@ const NoteStats = ({
                   >
                     <NoteStatsFileLink
                       file={file}
+                      graphId={graphId}
                     /> ({fileType}, {humanFileSize(file.size)})
                     {
                       i < array.length - 1

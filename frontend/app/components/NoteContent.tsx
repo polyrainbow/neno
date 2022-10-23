@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import subwaytext from "../../../lib/subwaytext/index";
 import {
+  BlockSlashlink,
   BlockType,
   ListBlockStyle,
 } from "../../../lib/subwaytext/interfaces/Block";
-import ActiveNote from "../interfaces/ActiveNote";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+import ActiveNote from "../types/ActiveNote";
 import {
   getFileId,
   getMediaTypeFromFilename,
@@ -22,26 +22,86 @@ import NoteContentBlockUrl from "./NoteContentBlockUrl";
 import NoteContentRunningText from "./NoteContentRunningText";
 import NoteContentBlockTextFile from "./NoteContentBlockTextFile";
 import NoteContentBlockQuote from "./NoteContentBlockQuote";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
+import { FileId } from "../../../lib/notes/interfaces/FileId";
+import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 
 interface NoteContentProps {
   note: ActiveNote,
-  databaseProvider: DatabaseProvider,
   toggleEditMode,
+  graphId: GraphId,
 }
 
 
 const NoteContent = ({
   note,
-  databaseProvider,
   toggleEditMode,
+  graphId,
 }: NoteContentProps) => {
+  const databaseProvider = useDatabaseProvider();
   const blocks = subwaytext(note.content);
+  const [resolvedFileInfos, setResolvedFileInfos] = useState<FileInfo[]>([]);
+
+
+  /*
+    When using a slashlink with a fileId in content, it is not guaranteed that
+    we have the accofing FileInfo ready in note.files
+    So here, we gather all unresolved fileInfos from the note's content and
+    try to resolve it against the database. Further down, we combine those
+    resolvedFileInfos with the file infos provided by note.files
+  */
+  useEffect(() => {
+    const fileIdsInContent = blocks
+      .filter((block): block is BlockSlashlink => {
+        if (block.type !== BlockType.SLASHLINK) return false;
+        const fileId = getFileId(block.data.link);
+        if (!fileId) return false;
+        return true;
+      })
+      .map((block): FileId => {
+        return getFileId(block.data.link) as string;
+      });
+
+    const initiallyResolvedFileIds = note.files.map((file) => file.fileId);
+    const unresolvedFileIds = fileIdsInContent.filter((fileId) => {
+      return !initiallyResolvedFileIds.includes(fileId);
+    });
+
+    Promise
+      .allSettled(
+        unresolvedFileIds.map(
+          (fileId) => databaseProvider.getFileInfo(graphId, fileId),
+        ),
+      )
+      .then((results: PromiseSettledResult<FileInfo>[]) => {
+        const resolvedFileInfos = results
+          .filter(
+            (
+              result: PromiseSettledResult<FileInfo>,
+            ): result is PromiseFulfilledResult<FileInfo> => {
+              return result.status === "fulfilled";
+            })
+          .map((result) => {
+            return result.value;
+          });
+
+        setResolvedFileInfos(resolvedFileInfos);
+      });
+  }, []);
+
 
   if (blocks.length === 0) {
     return <NoteContentEmptyDisclaimer
       toggleEditMode={toggleEditMode}
     />;
   }
+
+  const allAvailableFileInfos = [
+    ...note.files,
+    ...resolvedFileInfos,
+  ];
+
 
   return <div>
     {
@@ -56,7 +116,7 @@ const NoteContent = ({
 
           const mediaType = getMediaTypeFromFilename(fileId);
           const file
-            = note.files.find((file) => file.fileId === fileId);
+            = allAvailableFileInfos.find((file) => file.fileId === fileId);
           if (!file) {
             return <NoteContentBlockEmptyFile
               key={Math.random()}
@@ -69,12 +129,14 @@ const NoteContent = ({
               file={file}
               databaseProvider={databaseProvider}
               key={file.fileId}
+              graphId={graphId}
             />;
           } else if (mediaType === MediaType.VIDEO) {
             return <NoteContentBlockVideo
               file={file}
               databaseProvider={databaseProvider}
               key={file.fileId}
+              graphId={graphId}
             />;
           } else if (mediaType === MediaType.IMAGE) {
             return <NoteContentBlockImage
@@ -82,18 +144,21 @@ const NoteContent = ({
               databaseProvider={databaseProvider}
               key={file.fileId}
               description={block.data.text}
+              graphId={graphId}
             />;
           } else if (mediaType === MediaType.TEXT) {
             return <NoteContentBlockTextFile
               file={file}
               databaseProvider={databaseProvider}
               key={file.fileId}
+              graphId={graphId}
             />;
           } else {
             return <NoteContentBlockDocument
               file={file}
               databaseProvider={databaseProvider}
               key={file.fileId}
+              graphId={graphId}
             />;
           }
         } else if (block.type === BlockType.LIST) {

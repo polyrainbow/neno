@@ -12,7 +12,6 @@ import { stringContainsUUID } from "../utils.js";
 import { FileId } from "./interfaces/FileId.js";
 import Graph, { SerializedGraphObject } from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
-import { GraphId } from "../../backend/interfaces/GraphId.js";
 import updateGraphDataStructure from "./updateGraphDataStructure.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
@@ -20,6 +19,7 @@ import { parseSerializedExistingNote, serializeNote } from "./noteUtils.js";
 import { Readable } from "./interfaces/Readable.js";
 import UnbalancedBinaryTree from "../UnbalancedBinaryTree.js";
 import { Block } from "../subwaytext/interfaces/Block.js";
+import { GraphId } from "./interfaces/GraphId.js";
 
 
 export default class DatabaseIO {

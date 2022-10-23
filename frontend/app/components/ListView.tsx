@@ -1,60 +1,78 @@
 import React from "react";
 import NoteViewHeader from "./NoteViewHeader";
 import NoteListWithControls from "./NoteListWithControls";
+import { useNavigate } from "react-router-dom";
+import FloatingActionButton from "./FloatingActionButton";
+import { l } from "../lib/intl";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
+import useControlledNoteList from "../hooks/useControlledNoteList";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
+import useGraphId from "../hooks/useGraphId";
 
-const ListView = ({
-  toggleAppMenu,
+interface ListViewProps {
   refreshContentViews,
   stats,
   pinnedNotes,
-  handleSearchInputChange,
-  searchValue,
-  sortMode,
-  handleSortModeChange,
-  noteListItems,
-  numberOfResults,
-  noteListIsBusy,
-  noteListScrollTop,
-  setNoteListScrollTop,
-  page,
-  setPage,
-  unsavedChanges,
-  setUnsavedChanges,
-}) => {
+}
+
+const ListView = ({
+  refreshContentViews,
+  stats,
+  pinnedNotes,
+}: ListViewProps) => {
+  const graphId = useGraphId();
+  const navigate = useNavigate();
+  const databaseProvider = useDatabaseProvider();
+
+  const handleInvalidCredentialsError = async () => {
+    await databaseProvider?.removeAccess();
+    // setDatabaseMode(DatabaseMode.NONE);
+    navigate(getAppPath(PathTemplate.LOGIN));
+  };
+
+  const controlledNoteList = useControlledNoteList(
+    databaseProvider,
+    graphId,
+    handleInvalidCredentialsError,
+  );
+
   return <>
     <NoteViewHeader
       stats={stats}
-      toggleAppMenu={toggleAppMenu}
       pinnedNotes={pinnedNotes}
       activeNote={null} /* in list view, no note is active */
-      setUnsavedChanges={setUnsavedChanges}
-      unsavedChanges={unsavedChanges}
+      graphId={graphId}
     />
     <NoteListWithControls
-      handleSearchInputChange={handleSearchInputChange}
-      searchValue={searchValue}
-      sortMode={sortMode}
-      handleSortModeChange={handleSortModeChange}
-      refreshContentViews={refreshContentViews}
-      noteListItems={noteListItems}
-      numberOfResults={numberOfResults}
-      activeNote={null} /* in list view, no note is active */
-      noteListIsBusy={noteListIsBusy}
-      noteListScrollTop={noteListScrollTop}
-      setNoteListScrollTop={setNoteListScrollTop}
-      page={page}
-      setPage={(page) => {
-        setPage(page);
-        setNoteListScrollTop(0);
+      handleSearchInputChange={controlledNoteList.setSearchQuery}
+      searchValue={controlledNoteList.searchQuery}
+      sortMode={controlledNoteList.sortMode}
+      handleSortModeChange={controlledNoteList.setSortMode}
+      refreshContentViews={() => {
+        refreshContentViews();
+        controlledNoteList.refresh();
       }}
+      noteListItems={controlledNoteList.items}
+      numberOfResults={controlledNoteList.numberOfResults}
+      activeNote={null} /* in list view, no note is active */
+      noteListIsBusy={controlledNoteList.isBusy}
+      noteListScrollTop={controlledNoteList.scrollTop}
+      setNoteListScrollTop={controlledNoteList.setScrollTop}
+      page={controlledNoteList.page}
+      setPage={controlledNoteList.setPage}
       stats={stats}
       itemsAreLinkable={false}
       onLinkAddition={null}
       onLinkRemoval={null}
       displayedLinkedNotes={[]}
-      setUnsavedChanges={setUnsavedChanges}
-      unsavedChanges={unsavedChanges}
+      graphId={graphId}
     />
+    <FloatingActionButton
+      title={l("editor.new-note")}
+      icon="add"
+      onClick={() => navigate(getAppPath(PathTemplate.NEW_NOTE))}
+    ></FloatingActionButton>
   </>;
 };
 

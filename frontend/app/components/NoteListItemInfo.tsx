@@ -3,7 +3,7 @@ import { emojis, SPAN_SEPARATOR } from "../config";
 import {
   FrontendNoteListItem,
   MainNoteListItem,
-} from "../interfaces/NoteListItem";
+} from "../types/NoteListItem";
 import { l } from "../lib/intl";
 import NoteListItemFeatures from "./NoteListItemFeatures";
 

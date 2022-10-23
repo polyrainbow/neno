@@ -5,24 +5,26 @@ import NoteControls from "./NoteControls";
 import {
   getFilesFromUserSelection,
 } from "../lib/utils";
-import ActiveNote from "../interfaces/ActiveNote";
+import ActiveNote from "../types/ActiveNote";
 import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
 import {
   FrontendUserNoteChangeNote,
-} from "../interfaces/FrontendUserNoteChange";
+} from "../types/FrontendUserNoteChange";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import {
   MainNoteListItem,
-} from "../interfaces/NoteListItem";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+} from "../types/NoteListItem";
+import DatabaseProvider from "../types/DatabaseProvider";
 import { FILE_PICKER_ACCEPT_TYPES } from "../config";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import NoteContent from "./NoteContent";
-import { ContentMode } from "../interfaces/ContentMode";
+import { ContentMode } from "../types/ContentMode";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import NoteLinks from "./NoteLinks";
 import NoteKeyValues from "./NoteKeyValues";
 import { l } from "../lib/intl";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
 
 interface NoteComponentProps {
   note: ActiveNote,
@@ -34,7 +36,6 @@ interface NoteComponentProps {
   onLinkAddition: (note: MainNoteListItem) => void,
   onLinkRemoval: (noteId: NoteId) => void,
   setUnsavedChanges,
-  databaseProvider: DatabaseProvider,
   createNewNote,
   createNewLinkedNote,
   handleNoteSaveRequest,
@@ -46,6 +47,7 @@ interface NoteComponentProps {
   contentMode,
   toggleEditMode,
   importNote,
+  graphId: GraphId,
 }
 
 
@@ -59,7 +61,6 @@ const Note = ({
   onLinkAddition,
   onLinkRemoval,
   setUnsavedChanges,
-  databaseProvider,
   createNewNote,
   createNewLinkedNote,
   handleNoteSaveRequest,
@@ -71,7 +72,9 @@ const Note = ({
   contentMode,
   toggleEditMode,
   importNote,
+  graphId,
 }: NoteComponentProps) => {
+  const databaseProvider = useDatabaseProvider();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
 
@@ -97,14 +100,17 @@ const Note = ({
   };
 
 
-  const uploadFiles = async (files: File[]) => {
+  const uploadFiles = async (
+    databaseProvider: DatabaseProvider,
+    files: File[],
+  ) => {
     setUploadInProgress(true);
 
     const responses: FileInfo[]
       = await Promise.all(
         files.map(
           (file) => {
-            return databaseProvider.uploadFile(file);
+            return databaseProvider.uploadFile(graphId, file);
           },
         ),
       );
@@ -116,12 +122,13 @@ const Note = ({
 
 
   const handleUploadFilesRequest = async () => {
+    if (!databaseProvider) throw new Error("DatabaseProvider not ready");
     const files = await getFilesFromUserSelection(
       FILE_PICKER_ACCEPT_TYPES,
       true,
     );
 
-    return uploadFiles(files);
+    return uploadFiles(databaseProvider, files);
   };
 
 
@@ -135,7 +142,7 @@ const Note = ({
         if (item.kind === "file") {
           const file = item.getAsFile();
           setUploadInProgress(true);
-          databaseProvider.uploadFile(file)
+          databaseProvider?.uploadFile(graphId, file)
             .then((response) => {
               insertFilesToNote([response]);
               setUploadInProgress(false);
@@ -145,7 +152,7 @@ const Note = ({
     } else {
       // Use DataTransfer interface to access the file(s)
       [...e.dataTransfer.files].forEach((file) => {
-        databaseProvider.uploadFile(file)
+        databaseProvider?.uploadFile(graphId, file)
           .then((response) => {
             insertFilesToNote([response]);
             setUploadInProgress(false);
@@ -173,7 +180,6 @@ const Note = ({
 
   return <>
     <NoteControls
-      databaseProvider={databaseProvider}
       activeNote={note}
       createNewNote={createNewNote}
       createNewLinkedNote={createNewLinkedNote}
@@ -189,13 +195,16 @@ const Note = ({
       toggleEditMode={toggleEditMode}
       uploadInProgress={uploadInProgress}
       importNote={importNote}
+      graphId={graphId}
     />
     <section className="note"
       onDrop={handleFileDrop}
       onPaste={(e) => {
+        if (!databaseProvider) return;
+
         const files = Array.from(e.clipboardData.files);
         if (files.length > 0) {
-          uploadFiles(files);
+          uploadFiles(databaseProvider, files);
           e.preventDefault();
         }
       }}
@@ -249,8 +258,8 @@ const Note = ({
           contentMode === ContentMode.VIEWER
             ? <NoteContent
               note={note}
-              databaseProvider={databaseProvider}
               toggleEditMode={toggleEditMode}
+              graphId={graphId}
             />
             : ""
         }
@@ -265,8 +274,8 @@ const Note = ({
           onLinkAddition={onLinkAddition}
           onLinkRemoval={onLinkRemoval}
           setUnsavedChanges={setUnsavedChanges}
-          databaseProvider={databaseProvider}
           unsavedChanges={unsavedChanges}
+          graphId={graphId}
         />
         <NoteKeyValues
           note={note}
@@ -275,7 +284,10 @@ const Note = ({
         />
         {
           (!note.isUnsaved)
-            ? <NoteStats note={note} />
+            ? <NoteStats
+              note={note}
+              graphId={graphId}
+            />
             : null
         }
       </div>

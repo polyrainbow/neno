@@ -2,9 +2,6 @@
   This is the entry point of the React application.
 */
 
-import {
-  BrowserRouter as Router,
-} from "react-router-dom";
 import LocalDatabaseProvider from "./lib/LocalDatabaseProvider";
 import { API_URL } from "./config";
 import React, { StrictMode } from "react";
@@ -28,11 +25,9 @@ const appContainer = document.getElementById("app");
 const root = createRoot(appContainer);
 root.render(
   <StrictMode>
-    <Router>
-      <App
-        serverDatabaseProvider={serverDatabaseProvider}
-        localDatabaseProvider={localDatabaseProvider}
-      />
-    </Router>
+    <App
+      serverDatabaseProvider={serverDatabaseProvider}
+      localDatabaseProvider={localDatabaseProvider}
+    />
   </StrictMode>,
 );

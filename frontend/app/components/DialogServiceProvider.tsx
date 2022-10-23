@@ -2,12 +2,16 @@ import React, { useEffect } from "react";
 import DialogServiceContext from "../contexts/DialogServiceContext";
 import { DialogType } from "../enum/DialogType";
 import DialogServiceConfiguration
-  from "../interfaces/DialogServiceConfiguration";
+  from "../types/DialogServiceConfiguration";
 import ChangeLanguageDialog from "./ChangeLanguageDialog";
-import ExportDatabaseDialog from "./ExportDatabaseDialog";
-import ImportLinksDialog from "./CreateOneNotePerLineDialog";
 import SwitchGraphsDialog from "./SwitchGraphsDialog";
 import * as Localizer from "../lib/intl";
+import DatabaseProvider from "../types/DatabaseProvider";
+
+interface DialogServiceProviderProps {
+  databaseProvider: DatabaseProvider | null,
+  children: React.ReactNode[] | React.ReactNode,
+}
 
 /*
   This component renders a dialog when another component opens it via the
@@ -15,7 +19,7 @@ import * as Localizer from "../lib/intl";
   It must be inserted into the component tree above all components that use
   the useDialog() hook.
 */
-const DialogServiceProvider = (props) => {
+const DialogServiceProvider = (props: DialogServiceProviderProps) => {
   /*
     In this state, we save the currently opened dialog and the callback that
     should be executed when the dialog requests it.
@@ -25,12 +29,14 @@ const DialogServiceProvider = (props) => {
     setConfig,
   ] = React.useState<DialogServiceConfiguration>({
     openDialog: DialogType.NONE,
+    props: null,
     callback: null,
   });
 
   const resetDialogConfig = () => {
     setConfig({
       openDialog: DialogType.NONE,
+      props: null,
       callback: null,
     });
   };
@@ -58,26 +64,10 @@ const DialogServiceProvider = (props) => {
       {props.children}
     </DialogServiceContext.Provider>
     {
-      config.openDialog === DialogType.EXPORT_DATABASE
-        ? <ExportDatabaseDialog
-          databaseProvider={props.databaseProvider}
-          onClose={resetDialogConfig}
-        />
-        : null
-    }
-    {
-      config.openDialog === DialogType.CREATE_ONE_NOTE_PER_LINE
-        ? <ImportLinksDialog
-          createOneNotePerLine={config.callback}
-          onClose={resetDialogConfig}
-        />
-        : null
-    }
-    {
       config.openDialog === DialogType.SWITCH_GRAPHS
         ? <SwitchGraphsDialog
-          activeGraphId={props.databaseProvider.getActiveGraphId()}
-          graphIds={props.databaseProvider.getGraphIds()}
+          activeGraphId={config.props.graphId}
+          graphIds={props.databaseProvider?.getGraphIds()}
           switchGraphs={config.callback}
           onClose={resetDialogConfig}
         />

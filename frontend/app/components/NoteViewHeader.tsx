@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import AppTitle from "./AppTitle";
 import AppHeaderStats from "./AppHeaderStats";
 import NoteViewHeaderPinnedNote from "./NoteViewHeaderPinnedNote";
@@ -8,30 +8,31 @@ import useConfirmDiscardingUnsavedChangesDialog
 import { l } from "../lib/intl";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import NoteToTransmit from "../../../lib/notes/interfaces/NoteToTransmit";
-import ActiveNote from "../interfaces/ActiveNote";
+import ActiveNote from "../types/ActiveNote";
 import HeaderContainer from "./HeaderContainer";
 import FlexContainer from "./FlexContainer";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
+import AppMenuContext from "../contexts/AppMenuContext";
 
 interface NoteViewHeaderProps {
   stats: GraphStats | null,
-  toggleAppMenu,
   pinnedNotes: NoteToTransmit[],
   activeNote: ActiveNote | null,
-  unsavedChanges: boolean,
-  setUnsavedChanges,
+  graphId: GraphId,
 }
 
 const NoteViewHeader = ({
   stats,
-  toggleAppMenu,
   pinnedNotes,
   activeNote,
-  unsavedChanges,
-  setUnsavedChanges,
+  graphId,
 }: NoteViewHeaderProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const goToNote = useGoToNote();
+  const [unsavedChanges, setUnsavedChanges] = useContext(UnsavedChangesContext);
+  const { toggleAppMenu } = useContext(AppMenuContext);
 
   return (
     <HeaderContainer>
@@ -53,7 +54,7 @@ const NoteViewHeader = ({
                     setUnsavedChanges(false);
                   }
 
-                  goToNote(pinnedNote.meta.id);
+                  goToNote(graphId, pinnedNote.meta.id);
                 }}
                 isActive={
                   (!!activeNote)

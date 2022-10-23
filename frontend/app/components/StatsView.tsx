@@ -6,26 +6,20 @@ import {
 } from "../lib/utils";
 import StatsViewAnalysisTable from "./StatsViewAnalysisTable";
 import { l } from "../lib/intl";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
 import GraphStats from "../../../lib/notes/interfaces/GraphStats";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
+// import AppMenu from "./AppMenu";
+import useGraphId from "../hooks/useGraphId";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
 
-interface StatsViewProps {
-  databaseProvider: DatabaseProvider,
-  toggleAppMenu: () => void,
-}
-
-const StatsView = ({
-  databaseProvider,
-  toggleAppMenu,
-}: StatsViewProps) => {
+const StatsView = () => {
+  const databaseProvider = useDatabaseProvider();
   const [stats, setStats] = useState<Required<GraphStats> | null>(null);
+  const graphId = useGraphId();
 
   useEffect(() => {
-    if (!databaseProvider) return;
-
     const updateStats = async () => {
-      const stats = await databaseProvider.getStats({
+      const stats = await databaseProvider.getStats(graphId, {
         includeMetadata: true,
         includeAnalysis: true,
       }) as Required<GraphStats>;
@@ -35,13 +29,13 @@ const StatsView = ({
     updateStats();
   }, [databaseProvider]);
 
+  if (!graphId) return null;
+
   // @ts-ignore calling constructor via instance
   const databaseType = databaseProvider.constructor.type;
 
   return <>
-    <HeaderContainerLeftRight
-      toggleAppMenu={toggleAppMenu}
-    />
+    <HeaderContainerLeftRight />
     <section className="content-section">
       <h1>{l("stats.graph-stats")}</h1>
       {
@@ -88,11 +82,22 @@ const StatsView = ({
               </tbody>
             </table>
             <h2>{l("stats.analysis")}</h2>
-            <StatsViewAnalysisTable stats={stats} />
+            <StatsViewAnalysisTable
+              stats={stats}
+              graphId={graphId}
+            />
           </>
           : <p>{l("stats.fetching")}</p>
       }
     </section>
+    {/* <AppMenu
+      onClose={() => setIsAppMenuOpen(false)}
+      databaseProvider={databaseProvider}
+      createOneNotePerLine={createOneNotePerLine}
+      switchGraphs={switchGraphs}
+      createNewNote={createNewNote}
+      graphId={activeGraphId}
+    /> */}
   </>;
 };
 

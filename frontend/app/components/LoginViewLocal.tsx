@@ -60,9 +60,13 @@ const LoginViewLocal = ({
             className="default-button default-action"
             onClick={async () => {
               try {
-                await localDatabaseProvider.initializeDatabase();
+                const response
+                  = await localDatabaseProvider.initializeDatabase();
                 setDatabaseMode(DatabaseMode.LOCAL);
-                navigate(getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
+                navigate(getAppPath(
+                  PathTemplate.NEW_NOTE,
+                  new Map([["GRAPH_ID", response.graphIds[0]]]),
+                ));
               } catch (e) {
                 console.error(e);
 
@@ -90,9 +94,13 @@ const LoginViewLocal = ({
       onClick={async () => {
         try {
           const folderHandle = await window.showDirectoryPicker();
-          await localDatabaseProvider.login(folderHandle);
+          const response
+            = await localDatabaseProvider.login(folderHandle);
           setDatabaseMode(DatabaseMode.LOCAL);
-          navigate(getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE));
+          navigate(getAppPath(
+            PathTemplate.NEW_NOTE,
+            new Map([["GRAPH_ID", response.graphIds[0]]]),
+          ));
         } catch (e) {
           console.error(e);
         }

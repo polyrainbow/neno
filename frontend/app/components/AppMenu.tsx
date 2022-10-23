@@ -1,87 +1,89 @@
-import React from "react";
+import React, { useContext } from "react";
 import AppMenuItem from "./AppMenuItem";
 import OutsideAlerter from "./OutsideAlerter";
-import {
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import useConfirmDiscardingUnsavedChangesDialog
-  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import { getAppPath } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
 import { DialogType } from "../enum/DialogType";
 import useDialog from "../hooks/useDialog";
 import { l, setLanguage } from "../lib/intl";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+import AppMenuContext from "../contexts/AppMenuContext";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
+import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import useDatabaseControl from "../hooks/useDatabaseControl";
 
 
-interface AppMenuProps {
-  createOneNotePerLine: (lines: string[]) => Promise<void>,
-  switchGraphs,
-  onClose,
-  unsavedChanges: boolean,
-  setUnsavedChanges: (boolean) => void,
-  databaseProvider: DatabaseProvider | null,
-  createNewNote,
-}
+const AppMenu = () => {
+  const {
+    isAppMenuOpen,
+    setIsAppMenuOpen,
+  } = useContext(AppMenuContext);
 
-const AppMenu = ({
-  createOneNotePerLine,
-  switchGraphs,
-  onClose,
-  unsavedChanges,
-  setUnsavedChanges,
-  databaseProvider,
-  createNewNote,
-}: AppMenuProps) => {
-  const confirmDiscardingUnsavedChanges
-    = useConfirmDiscardingUnsavedChangesDialog();
+  const [unsavedChanges, setUnsavedChanges]
+    = useContext(UnsavedChangesContext);
 
   const location = useLocation();
   const pathname = location.pathname;
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
 
-  const openCreateOneNotePerLineDialog = useDialog(
-    DialogType.CREATE_ONE_NOTE_PER_LINE,
-    createOneNotePerLine,
-  );
+  const { databaseProvider } = useDatabaseControl();
 
-
-  const openSwitchGraphsDialog = useDialog(
-    DialogType.SWITCH_GRAPHS,
-    switchGraphs,
-  );
-
-  const openExportDatabaseDialog = useDialog(
-    DialogType.EXPORT_DATABASE,
-    null,
-  );
+  const { graphId } = useParams();
 
   const openChangeLanguageDialog = useDialog(
     DialogType.CHANGE_LANGUAGE,
+    null,
     setLanguage,
   );
 
 
+  const switchGraphs = (graphId: GraphId): void => {
+    navigate(getAppPath(
+      isSmallScreen ? PathTemplate.LIST : PathTemplate.NEW_NOTE,
+      new Map([["GRAPH_ID", graphId]]),
+    ));
+    // we need to do a manual reload via native browser apis here because
+    // navigate() does not work as <DialogServiceProvider /> is
+    // not mounted within <AppRouter />
+    window.location.reload();
+  };
+
+  const openSwitchGraphsDialog = useDialog(
+    DialogType.SWITCH_GRAPHS,
+    { graphId },
+    switchGraphs,
+  );
+
+  if (!isAppMenuOpen) return null;
+
   return <OutsideAlerter
-    onOutsideClick={onClose}
+    onOutsideClick={() => setIsAppMenuOpen(false)}
   >
     <div
       className="app-menu"
       onClick={
-        onClose
+        () => setIsAppMenuOpen(false)
       }
     >
       <AppMenuItem
-        disabled={!databaseProvider}
+        disabled={!(databaseProvider && graphId)}
         label={isSmallScreen ? l("menu.note-list") : l("menu.editor")}
         icon={isSmallScreen ? "list" : "create"}
         onClick={async () => {
-          const target = isSmallScreen
-            ? getAppPath(PathTemplate.LIST)
-            : getAppPath(PathTemplate.EDITOR_WITH_NEW_NOTE);
+          if (!graphId) return;
+
+          const target = getAppPath(
+            isSmallScreen
+              ? PathTemplate.LIST
+              : PathTemplate.NEW_NOTE,
+            new Map([["GRAPH_ID", graphId]]),
+          );
 
           if (pathname === target) return;
 
@@ -90,6 +92,7 @@ const AppMenu = ({
             setUnsavedChanges(false);
           }
 
+          /*
           if (!isSmallScreen) {
             // we need to use force when calling createNewNote because
             // otherwise this function will ask again on unsaved changes.
@@ -97,16 +100,22 @@ const AppMenu = ({
             // scheduled and not executed immediately.
             createNewNote([], [], true);
           }
+          */
 
           navigate(target);
         }}
       />
       <AppMenuItem
-        disabled={!databaseProvider}
+        disabled={!(databaseProvider && graphId)}
         label={l("menu.graph")}
         icon="scatter_plot"
         onClick={async () => {
-          const target = getAppPath(PathTemplate.GRAPH);
+          if (!graphId) return;
+
+          const target = getAppPath(
+            PathTemplate.GRAPH,
+            new Map([["GRAPH_ID", graphId]]),
+          );
           if (pathname === target) return;
 
           if (unsavedChanges) {
@@ -117,11 +126,16 @@ const AppMenu = ({
         }}
       />
       <AppMenuItem
-        disabled={!databaseProvider}
+        disabled={!(databaseProvider && graphId)}
         label={l("menu.files")}
         icon="grid_view"
         onClick={async () => {
-          const target = getAppPath(PathTemplate.FILES);
+          if (!graphId) return;
+
+          const target = getAppPath(
+            PathTemplate.FILES,
+            new Map([["GRAPH_ID", graphId]]),
+          );
           if (pathname === target) return;
 
           if (unsavedChanges) {
@@ -132,11 +146,16 @@ const AppMenu = ({
         }}
       />
       <AppMenuItem
-        disabled={!databaseProvider}
+        disabled={!(databaseProvider && graphId)}
         label={l("menu.stats")}
         icon="query_stats"
         onClick={async () => {
-          const target = getAppPath(PathTemplate.STATS);
+          if (!graphId) return;
+
+          const target = getAppPath(
+            PathTemplate.STATS,
+            new Map([["GRAPH_ID", graphId]]),
+          );
           if (pathname === target) return;
 
           if (unsavedChanges) {
@@ -147,19 +166,24 @@ const AppMenu = ({
         }}
       />
       <AppMenuItem
-        disabled={
-          // @ts-ignore calling static property via class instance
-          !databaseProvider?.constructor.features.includes("EXPORT_DATABASE")
-        }
-        label={l("menu.export-database")}
-        icon="archive"
-        onClick={openExportDatabaseDialog}
-      />
-      <AppMenuItem
-        disabled={!databaseProvider}
-        label={l("menu.create-one-note-per-line")}
-        icon="dynamic_feed"
-        onClick={openCreateOneNotePerLineDialog}
+        disabled={!(databaseProvider && graphId)}
+        label={l("menu.settings")}
+        icon="settings"
+        onClick={async () => {
+          if (!graphId) return;
+
+          const target = getAppPath(
+            PathTemplate.SETTINGS,
+            new Map([["GRAPH_ID", graphId]]),
+          );
+          if (pathname === target) return;
+
+          if (unsavedChanges) {
+            await confirmDiscardingUnsavedChanges();
+            setUnsavedChanges(false);
+          }
+          navigate(target);
+        }}
       />
       <AppMenuItem
         disabled={

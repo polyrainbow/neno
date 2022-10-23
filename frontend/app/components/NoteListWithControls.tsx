@@ -1,9 +1,36 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import {
+  NoteListSortMode,
+} from "../../../lib/notes/interfaces/NoteListSortMode";
+import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import SearchPresets from "./SearchPresets";
 
 type View = "note-list" | "search-presets";
+
+interface NoteListWithControlsProps {
+  refreshContentViews,
+  stats,
+  handleSearchInputChange,
+  searchValue,
+  sortMode: NoteListSortMode,
+  handleSortModeChange,
+  noteListItems,
+  numberOfResults,
+  noteListIsBusy,
+  noteListScrollTop: number,
+  setNoteListScrollTop,
+  page: number,
+  setPage,
+  activeNote,
+  itemsAreLinkable,
+  onLinkAddition,
+  onLinkRemoval,
+  displayedLinkedNotes,
+  graphId: GraphId,
+}
 
 const NoteListWithControls = ({
   refreshContentViews,
@@ -19,15 +46,15 @@ const NoteListWithControls = ({
   setNoteListScrollTop,
   page,
   setPage,
-  unsavedChanges,
-  setUnsavedChanges,
   activeNote,
   itemsAreLinkable,
   onLinkAddition,
   onLinkRemoval,
   displayedLinkedNotes,
-}) => {
+  graphId,
+}: NoteListWithControlsProps) => {
   const [view, setView] = useState<View>("note-list");
+  const [unsavedChanges, setUnsavedChanges] = useContext(UnsavedChangesContext);
 
   return <>
     <NoteListControls
@@ -62,6 +89,7 @@ const NoteListWithControls = ({
           displayedLinkedNotes={displayedLinkedNotes}
           setUnsavedChanges={setUnsavedChanges}
           unsavedChanges={unsavedChanges}
+          graphId={graphId}
         />
         : <SearchPresets
           onSelect={(preset) => {

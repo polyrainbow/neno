@@ -5,7 +5,7 @@ import NoteListItemInfo from "./NoteListItemInfo";
 import {
   FrontendNoteListItem,
   MainNoteListItem,
-} from "../interfaces/NoteListItem";
+} from "../types/NoteListItem";
 import { l } from "../lib/intl";
 
 interface NoteListItemProps {

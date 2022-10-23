@@ -11,12 +11,14 @@ import { DialogType } from "../enum/DialogType";
 */
 const useDialog = (
   dialogType: DialogType,
+  props: any,
   callback: ((...args: any[]) => void) | null,
 ) => {
   const setDialogConfig = useContext(DialogServiceContext);
   return () => {
     setDialogConfig?.({
       openDialog: dialogType,
+      props,
       callback,
     });
   };

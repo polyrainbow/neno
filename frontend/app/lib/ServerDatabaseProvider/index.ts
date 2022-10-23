@@ -1,4 +1,4 @@
-import { GraphId } from "../../../../backend/interfaces/GraphId.js";
+import { GraphId } from "../../../../lib/notes/interfaces/GraphId";
 import { FileId } from "../../../../lib/notes/interfaces/FileId.js";
 import { FileInfo } from "../../../../lib/notes/interfaces/FileInfo.js";
 import GraphStatsRetrievalOptions
@@ -7,7 +7,9 @@ import { NoteId } from "../../../../lib/notes/interfaces/NoteId.js";
 import { NoteSaveRequest }
   from "../../../../lib/notes/interfaces/NoteSaveRequest.js";
 import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit.js";
-import DatabaseProvider from "../../interfaces/DatabaseProvider.js";
+import DatabaseProvider, {
+  SuccessfulAuthenticationResponse,
+} from "../../types/DatabaseProvider.js";
 import * as API from "./api.js";
 
 export default class ServerDatabaseProvider implements DatabaseProvider {
@@ -21,7 +23,6 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
   static type = "SERVER";
 
   #graphIds = null;
-  #activeGraphId;
   #apiUrl = null;
 
   constructor(API_URL) {
@@ -29,43 +30,30 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     API.init(API_URL);
   }
 
-  getActiveGraphId(): GraphId | null {
-    return this.#activeGraphId;
-  }
-
   getGraphIds(): GraphId[] | null {
     return this.#graphIds;
   }
 
-  setActiveGraph(graphId: GraphId): void {
-    this.#activeGraphId = graphId;
-    API.setGraphId(this.#activeGraphId);
-  }
 
-  async login(username, password, mfaToken) {
+  async login(
+    username: string,
+    password: string,
+    mfaToken: string,
+  ): Promise<SuccessfulAuthenticationResponse> {
     const response = await API.login(username, password, mfaToken);
-    this.#graphIds = response.graphIds;
-    this.#activeGraphId = this.#graphIds?.[0] ?? null;
-    API.setGraphId(this.#activeGraphId);
     return response;
   }
 
-  async isAuthenticated(): Promise<boolean> {
-    try {
-      const response = await API.isAuthenticated();
-      this.#graphIds = response.graphIds;
-      this.#activeGraphId = this.#graphIds?.[0] ?? null;
-      API.setGraphId(this.#activeGraphId);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  async isAuthenticated(): Promise<SuccessfulAuthenticationResponse> {
+    const response = await API.isAuthenticated();
+    this.#graphIds = response.graphIds;
+    return {
+      graphIds: response.graphIds,
+    };
   }
 
   async removeAccess() {
     this.#graphIds = null;
-    this.#activeGraphId = null;
-    API.setGraphId(null);
 
     // we try to logout from the server but if the server fails to do this and
     // throws an INVALID_CREDENTIALS error, we assume we are already logged out
@@ -78,80 +66,83 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     }
   }
 
-  getRawNote(noteId: NoteId): Promise<string | null> {
-    return API.getRawNote(noteId);
+  getRawNote(graphId: GraphId, noteId: NoteId): Promise<string | null> {
+    return API.getRawNote(graphId, noteId);
   }
 
-  getNote(noteId: NoteId): Promise<NoteToTransmit | null> {
-    return API.getNote(noteId);
+  getNote(graphId: GraphId, noteId: NoteId): Promise<NoteToTransmit | null> {
+    return API.getNote(graphId, noteId);
   }
 
-  getNotes(options) {
-    return API.getNotes(options);
+  getNotes(graphId: GraphId, options) {
+    return API.getNotes(graphId, options);
   }
 
-  getStats(options: GraphStatsRetrievalOptions) {
-    return API.getStats(options);
+  getStats(graphId: GraphId, options: GraphStatsRetrievalOptions) {
+    return API.getStats(graphId, options);
   }
 
-  getFiles() {
-    return API.getFiles();
+  getFiles(graphId: GraphId) {
+    return API.getFiles(graphId);
   }
 
-  getFileInfo(fileId: FileId): Promise<FileInfo> {
-    return API.getFileInfo(fileId);
+  getFileInfo(graphId: GraphId, fileId: FileId): Promise<FileInfo> {
+    return API.getFileInfo(graphId, fileId);
   }
 
-  getDanglingFiles() {
-    return API.getDanglingFiles();
+  getDanglingFiles(graphId: GraphId) {
+    return API.getDanglingFiles(graphId);
   }
 
-  deleteNote(noteId: NoteId): Promise<void> {
-    return API.deleteNote(noteId);
+  deleteNote(graphId: GraphId, noteId: NoteId): Promise<void> {
+    return API.deleteNote(graphId, noteId);
   }
 
-  putNote(noteSaveRequest: NoteSaveRequest): Promise<NoteToTransmit> {
-    return API.putNote(noteSaveRequest);
+  putNote(
+    graphId: GraphId,
+    noteSaveRequest: NoteSaveRequest,
+  ): Promise<NoteToTransmit> {
+    return API.putNote(graphId, noteSaveRequest);
   }
 
-  putRawNote(rawNote: string): Promise<NoteToTransmit> {
-    return API.putRawNote(rawNote);
+  putRawNote(graphId: GraphId, rawNote: string): Promise<NoteToTransmit> {
+    return API.putRawNote(graphId, rawNote);
   }
 
-  saveGraphVisualization(graphVisualization) {
-    return API.saveGraphVisualization(graphVisualization);
+  saveGraphVisualization(graphId: GraphId, graphVisualization) {
+    return API.saveGraphVisualization(graphId, graphVisualization);
   }
 
-  getGraphVisualization() {
-    return API.getGraphVisualization();
+  getGraphVisualization(graphId: GraphId) {
+    return API.getGraphVisualization(graphId);
   }
 
-  getReadableGraphStream(withFiles: boolean) {
-    return API.getReadableGraphStream(withFiles);
+  getReadableGraphStream(graphId: GraphId, withFiles: boolean) {
+    return API.getReadableGraphStream(graphId, withFiles);
   }
 
-  uploadFile(file: File): Promise<FileInfo> {
-    return API.uploadFile(file);
+  uploadFile(graphId: GraphId, file: File): Promise<FileInfo> {
+    return API.uploadFile(graphId, file);
   }
 
-  getReadableFileStream(fileId: FileId) {
-    return API.getReadableFileStream(fileId);
+  getReadableFileStream(graphId: GraphId, fileId: FileId) {
+    return API.getReadableFileStream(graphId, fileId);
   }
 
-  deleteFile(fileId: FileId) {
-    return API.deleteFile(fileId);
+  deleteFile(graphId: GraphId, fileId: FileId) {
+    return API.deleteFile(graphId, fileId);
   }
 
-  pinNote(noteId: NoteId) {
-    return API.pinNote(noteId);
+  pinNote(graphId: GraphId, noteId: NoteId) {
+    return API.pinNote(graphId, noteId);
   }
 
-  unpinNote(noteId: NoteId) {
-    return API.unpinNote(noteId);
+  unpinNote(graphId: GraphId, noteId: NoteId) {
+    return API.unpinNote(graphId, noteId);
   }
 
-  getPins() {
-    return API.getPins();
+  getPins(graphId: GraphId) {
+    return API.getPins(graphId);
   }
 
   getDocumentTitle(url: string) {
@@ -160,6 +151,7 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
 
   /**
    * Obtains a URL for an uploaded file.
+   * @param {string} graphId
    * @param {string} fileId
    * @param {string?} publicName This optional file name is appended at the url
    * so that if the user decides to download the file, it is saved with this
@@ -167,10 +159,11 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
    * @return {string} url
   */
   async getUrlForFileId(
+    graphId: GraphId,
     fileId: FileId,
     publicName?: string,
   ): Promise<string> {
-    let url = this.#apiUrl + "graph/" + this.#activeGraphId + "/file/" + fileId;
+    let url = this.#apiUrl + "graph/" + graphId + "/file/" + fileId;
 
     if (typeof publicName === "string") {
       url += `/${encodeURIComponent(publicName)}`;

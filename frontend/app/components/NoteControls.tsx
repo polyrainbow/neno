@@ -9,19 +9,18 @@ import ConfirmationServiceContext
   from "../contexts/ConfirmationServiceContext";
 import {
   getAppPath,
-  getWritableStream,
 } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
-import { ContentMode } from "../interfaces/ContentMode";
+import { ContentMode } from "../types/ContentMode";
 import Tooltip from "./Tooltip";
 import Icon from "./Icon";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
-import ActiveNote from "../interfaces/ActiveNote";
-import { serializeNewNote } from "../../../lib/notes/noteUtils";
+import ActiveNote from "../types/ActiveNote";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
+import { exportNote } from "../lib/FrontendFunctions";
 
 interface NoteControlsProps {
-  databaseProvider: DatabaseProvider,
   activeNote: ActiveNote,
   createNewNote,
   createNewLinkedNote,
@@ -37,10 +36,10 @@ interface NoteControlsProps {
   toggleEditMode,
   uploadInProgress,
   importNote,
+  graphId: GraphId,
 }
 
 const NoteControls = ({
-  databaseProvider,
   activeNote,
   createNewNote,
   createNewLinkedNote,
@@ -56,50 +55,14 @@ const NoteControls = ({
   toggleEditMode,
   uploadInProgress,
   importNote,
+  graphId,
 }: NoteControlsProps) => {
+  const databaseProvider = useDatabaseProvider();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
-
-
-  const exportNote = async (): Promise<void> => {
-    let rawNote: string;
-
-    if (activeNote.isUnsaved) {
-      const note = {
-        meta: {
-          title: activeNote.title,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          custom: Object.fromEntries(activeNote.keyValues),
-          contentType: "text/subway",
-          flags: ["EXPORT_FROM_DRAFT"],
-        },
-        content: activeNote.content,
-      };
-
-      rawNote = serializeNewNote(note);
-    } else {
-      const rawNoteFromDB = await databaseProvider.getRawNote(activeNote.id);
-      if (!rawNoteFromDB) throw new Error("Raw export from database failed");
-      rawNote = rawNoteFromDB;
-    }
-
-    const opts = {
-      suggestedName: (activeNote.title || l("list.untitled-note")) + ".neno",
-      types: [{
-        description: "NENO note",
-        accept: { "application/neno-note": [".neno"] },
-      }],
-    };
-
-    const writableStream = await getWritableStream(opts);
-    const writer = writableStream.getWriter();
-    await writer.write(rawNote);
-    writer.close();
-  };
 
 
   return <section className="note-controls">
@@ -115,7 +78,10 @@ const NoteControls = ({
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              navigate(getAppPath(PathTemplate.LIST));
+              navigate(getAppPath(
+                PathTemplate.LIST,
+                new Map([["GRAPH_ID", graphId]]),
+              ));
             }}
           />
           : null
@@ -207,7 +173,10 @@ const NoteControls = ({
         disabled={false}
         title={l("editor.export-note")}
         icon="file_download"
-        onClick={exportNote}
+        onClick={() => {
+          if (!databaseProvider) return;
+          exportNote(activeNote, graphId, databaseProvider);
+        }}
       />
       <IconButton
         id="button_upload-file"

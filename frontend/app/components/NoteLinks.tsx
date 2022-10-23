@@ -12,20 +12,21 @@ import {
 } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
-import ActiveNote from "../interfaces/ActiveNote";
+import ActiveNote from "../types/ActiveNote";
 import LinkedNote from "../../../lib/notes/interfaces/LinkedNote";
 import {
   FrontendUserNoteChangeNote,
-} from "../interfaces/FrontendUserNoteChange";
+} from "../types/FrontendUserNoteChange";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 import {
   MainNoteListItem,
-} from "../interfaces/NoteListItem";
-import DatabaseProvider from "../interfaces/DatabaseProvider";
+} from "../types/NoteListItem";
 import DatabaseQuery from "../../../lib/notes/interfaces/DatabaseQuery";
 import {
   NoteListSortMode,
 } from "../../../lib/notes/interfaces/NoteListSortMode";
+import { GraphId } from "../../../lib/notes/interfaces/GraphId";
+import useDatabaseProvider from "../hooks/useDatabaseProvider";
 
 
 interface NoteLinksProps {
@@ -34,8 +35,8 @@ interface NoteLinksProps {
   onLinkAddition: (note: MainNoteListItem) => void,
   onLinkRemoval: (noteId: NoteId) => void,
   setUnsavedChanges,
-  databaseProvider: DatabaseProvider,
   unsavedChanges: boolean,
+  graphId: GraphId,
 }
 
 
@@ -45,9 +46,11 @@ const NoteLinks = ({
   onLinkAddition,
   onLinkRemoval,
   setUnsavedChanges,
-  databaseProvider,
   unsavedChanges,
+  graphId,
 }: NoteLinksProps) => {
+  const databaseProvider = useDatabaseProvider();
+
   const goToNote = useGoToNote();
   const [searchString, setSearchString] = useState<string>("");
   const [searchResults, setSearchResults] = useState<MainNoteListItem[]>([]);
@@ -56,13 +59,15 @@ const NoteLinks = ({
     = useConfirmDiscardingUnsavedChangesDialog();
 
   const handleInvalidCredentialsError = async () => {
-    await databaseProvider.removeAccess();
+    await databaseProvider?.removeAccess();
     // setDatabaseMode(DatabaseMode.NONE);
     navigate(getAppPath(PathTemplate.LOGIN));
   };
 
 
   const refreshNotesList = async () => {
+    if (!databaseProvider) throw new Error("DatabaseProvider not ready!");
+
     const options: DatabaseQuery = {
       page: 1,
       sortMode: NoteListSortMode.UPDATE_DATE_DESCENDING,
@@ -76,7 +81,7 @@ const NoteLinks = ({
     try {
       const {
         results,
-      } = await databaseProvider.getNotes(options);
+      } = await databaseProvider.getNotes(graphId, options);
 
       /*
       // ... some time later - check if this is the current request
@@ -132,7 +137,7 @@ const NoteLinks = ({
               setUnsavedChanges(false);
             }
 
-            goToNote(displayedLinkedNote.id);
+            goToNote(graphId, displayedLinkedNote.id);
           }}
           isActive={false}
           isLinked={true}
@@ -179,7 +184,7 @@ const NoteLinks = ({
                 setUnsavedChanges(false);
               }
 
-              goToNote(noteListItem.id);
+              goToNote(graphId, noteListItem.id);
             }}
             isActive={false}
             isLinked={false}
