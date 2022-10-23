@@ -54,6 +54,7 @@
     "lint-fix": "npx eslint . --fix",
     "dev-be": "npx webpack --config browser-extension/webpack.common.js --watch",
     "build-browser-extension": "npx webpack --config browser-extension/webpack.common.js",
+    "compile-lib": "npx tsc -p lib --outDir dist/lib/",
     "compile-typescript-backend": "npx tsc -p backend",
     "start-server-dev": "node dist/backend/index.js --http-port 8080 --session-secret 000",
     "start-server-dev-tls": "node dist/backend/index.js --https-port 8080 --use-https --cert-path ~/.neno/server.cert --cert-key-path ~/.neno/server.key",
@@ -67,11 +68,11 @@
     "dev": "concurrently -i --default-input-target 0 --kill-others \"npm run compile-typescript-backend && npm run start-server-dev\" \"npm run build-frontend-development\"",
     "unit-test-backend": "npx tsc -p backend && node dist/backend/lib/getDocumentTitle.spec.js",
     "test-intl": "node frontend/app/intl/test.js",
-    "unit-test-notes-module": "npx tsc -p lib && node dist/lib/notes/index.spec.js && node dist/lib/notes/search.spec.js",
-    "unit-test-unbalanced-binary-tree": "npx tsc -p lib && node dist/lib/UnbalancedBinaryTree.spec.js",
-    "unit-test-subwaytext": "npx tsc -p lib && node dist/lib/subwaytext/index.spec.js",
-    "subwaytext-example": "npx tsc -p lib && node dist/lib/subwaytext/examples/example.js",
-    "subwaytext-performance-test": "npx tsc -p lib && node dist/lib/subwaytext/examples/performance-test.js"
+    "unit-test-notes-module": "npm run compile-lib && node dist/lib/notes/index.spec.js && node dist/lib/notes/search.spec.js",
+    "unit-test-unbalanced-binary-tree": "npm run compile-lib && node dist/lib/UnbalancedBinaryTree.spec.js",
+    "unit-test-subwaytext": "npm run compile-lib && node dist/lib/subwaytext/index.spec.js",
+    "subwaytext-example": "npm run compile-lib && node dist/lib/subwaytext/examples/example.js",
+    "subwaytext-performance-test": "npm run compile-lib && node dist/lib/subwaytext/examples/performance-test.js"
   },
   "author": "Sebastian Zimmer",
   "license": "Apache License 2.0"
