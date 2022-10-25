@@ -78,7 +78,10 @@ const ListView = () => {
     <FloatingActionButton
       title={l("editor.new-note")}
       icon="add"
-      onClick={() => navigate(getAppPath(PathTemplate.NEW_NOTE))}
+      onClick={() => navigate(getAppPath(
+        PathTemplate.NEW_NOTE,
+        new Map([["GRAPH_ID", graphId]]),
+      ))}
     ></FloatingActionButton>
   </>;
 };
