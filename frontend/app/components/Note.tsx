@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Editor from "./Editor";
 import NoteStats from "./NoteStats";
-import NoteControls from "./NoteControls";
 import {
   getFilesFromUserSelection,
 } from "../lib/utils";
@@ -25,6 +24,7 @@ import NoteKeyValues from "./NoteKeyValues";
 import { l } from "../lib/intl";
 import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import useDatabaseProvider from "../hooks/useDatabaseProvider";
+import NoteMenuBar from "./NoteMenuBar";
 
 interface NoteComponentProps {
   note: ActiveNote,
@@ -179,7 +179,7 @@ const Note = ({
 
 
   return <>
-    <NoteControls
+    <NoteMenuBar
       activeNote={note}
       createNewNote={createNewNote}
       createNewLinkedNote={createNewLinkedNote}
