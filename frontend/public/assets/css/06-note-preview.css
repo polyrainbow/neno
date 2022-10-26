@@ -80,7 +80,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 15px;
+  gap: var(--default-gap);
   color: var(--error-and-danger-text-color);
 }
 
@@ -118,8 +118,8 @@
   align-items: center;
   justify-content: center;
   align-content: center;
-  gap: 10px;
-  margin: 10px 0;
+  gap: var(--small-gap);
+  margin: var(--small-gap) 0;
 }
 
 .key-value-row input {
