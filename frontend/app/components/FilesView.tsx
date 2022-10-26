@@ -75,10 +75,10 @@ const FilesView = () => {
       {
         status === "READY"
           ? <>
-            <h2>{l(
+            <h1>{l(
               "files.files-heading",
               { numberOfFiles: files.length.toString() },
-            )}</h2>
+            )}</h1>
             <select
               onChange={(e) => setSortMode(e.target.value as FileSortMode)}
             >

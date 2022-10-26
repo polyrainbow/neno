@@ -4,11 +4,10 @@
 
 .files-view .files {
   flex-wrap: wrap;
+  gap: var(--default-gap);
 }
 
 .files-view-preview-box {
-  margin-right: var(--default-margin);
-  margin-bottom: var(--default-margin);
   width: 200px;
   min-height: 241px;
   background: var(--accent-color-interactible);

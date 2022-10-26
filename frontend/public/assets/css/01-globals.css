@@ -90,7 +90,8 @@
   --main-font: "Rubik", sans-serif;
   --input-border-width: 1px;
   --border-radius: 7px;
-  --default-margin: 15px;
+  --default-gap: 15px;
+  --small-gap: 10px;
   --default-padding: 15px;
   --xl-list-width: 600px;
   --small-font-size: 13px;
@@ -240,16 +241,16 @@ main {
 .content-section {
   max-width: var(--max-content-width);
   margin: 0 auto;
-  padding: var(--default-margin);
+  padding: var(--default-gap);
   overflow: auto;
-  height: calc(100vh - var(--header-bar-height) - (2 * var(--default-margin)));
+  height: calc(100vh - var(--header-bar-height) - (2 * var(--default-gap)));
 }
 
 .content-section-wide {
   margin: 0 auto;
-  padding: var(--default-margin);
+  padding: var(--default-gap);
   overflow: auto;
-  height: calc(100vh - var(--header-bar-height) - (2 * var(--default-margin)));
+  height: calc(100vh - var(--header-bar-height) - (2 * var(--default-gap)));
 }
 
 .splash-message {
@@ -269,7 +270,7 @@ main {
 .radio-option {
   display: flex;
   align-items: center;
-  margin-bottom: var(--default-margin);
+  margin-bottom: var(--default-gap);
 }
 
 .radio-option-input-wrapper {
@@ -306,17 +307,17 @@ main {
   color: var(--font-color);
   max-width: min(450px, 100%);
   display: block;
-  padding: var(--default-margin);
+  padding: var(--default-gap);
   margin: auto;
   border-radius: var(--border-radius);
   box-shadow: var(--default-box-shadow);
-  max-height: calc(100vh - (2 * var(--default-margin)));
+  max-height: calc(100vh - (2 * var(--default-gap)));
   overflow: auto;
 }
 
 .dialog-box h1 {
   margin-top: 0;
-  margin-bottom: var(--default-margin);
+  margin-bottom: var(--default-gap);
 }
 
 .dialog-box select {
@@ -332,13 +333,13 @@ main {
 .dialog-action-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--default-margin);
+  gap: var(--default-gap);
 }
 
 .create-one-note-per-line-dialog textarea {
   background-color: var(--background-color);
   color: var(--font-color);
-  margin-bottom: var(--default-margin);
+  margin-bottom: var(--default-gap);
   width: calc(100% - 6px);
   display: block;
   height: 200px;
@@ -404,9 +405,7 @@ button.dangerous-action {
 
 .small-button {
   font-size: var(--default-font-size);
-  margin-right: 10px;
   padding: 10px;
-  margin-bottom: var(--default-margin);
 }
 
 .default-button-small {
@@ -466,7 +465,7 @@ button.dangerous-action {
 
 .data-table {
   border-collapse: collapse;
-  margin: var(--default-margin) 0;
+  margin: var(--default-gap) 0;
   width: 100%;
 }
 

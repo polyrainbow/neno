@@ -24,7 +24,7 @@
 
 .preview-block-quote {
   border-left: 6px solid var(--alt-content-color);
-  padding: var(--default-margin);
+  padding: var(--default-gap);
   font-style: italic;
   background: var(--accent-color-interactible);
   margin-inline: 0;
@@ -56,7 +56,7 @@
 .preview-block-image-wrapper {
   display: flex;
   justify-content: center;
-  margin: var(--default-margin) 0;
+  margin: var(--default-gap) 0;
 }
 
 .preview-block-image-wrapper figure {
@@ -137,7 +137,7 @@
   border: var(--block-border);
   box-shadow: var(--block-box-shadow);
   border-radius: var(--block-border-radius);
-  margin: var(--default-margin) 0;
+  margin: var(--default-gap) 0;
 }
 
 .preview-block-file-wrapper audio,

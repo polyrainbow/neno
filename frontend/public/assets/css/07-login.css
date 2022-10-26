@@ -4,7 +4,7 @@
 
 .section-login {
   display: grid;
-  grid-gap: var(--default-margin);
+  grid-gap: var(--default-gap);
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto auto;
   padding: 20px;
