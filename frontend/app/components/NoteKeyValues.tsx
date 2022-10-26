@@ -93,7 +93,7 @@ const NoteKeyValues = ({
                 removeKeyValuePair(key);
                 setUnsavedChanges(true);
               }}
-            >Remove</button>
+            >{l("note.custom-metadata.remove")}</button>
           </div>;
         },
       )
@@ -104,7 +104,7 @@ const NoteKeyValues = ({
         addKeyValuePair();
         setUnsavedChanges(true);
       }}
-    >Add</button>
+    >{l("note.custom-metadata.add")}</button>
   </section>;
 };
 

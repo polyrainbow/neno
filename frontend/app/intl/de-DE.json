@@ -178,6 +178,8 @@
   "note.actions": "Aktionen",
   "note.content-empty": "Diese Notiz hat noch keinen Inhalt. Klicke hier, um welchen hinzuzufügen",
   "note.custom-metadata": "Benutzerdefinierte Metadaten",
+  "note.custom-metadata.add": "Hinzufügen",
+  "note.custom-metadata.remove": "Entfernen",
   "note.download-file": "Datei herunterladen",
   "note.file-not-available": "Datei nicht verfügbar",
   "stats.analysis": "Analyse",

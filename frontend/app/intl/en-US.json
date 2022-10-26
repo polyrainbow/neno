@@ -178,6 +178,8 @@
   "note.actions": "Actions",
   "note.content-empty": "This note has no content yet. Click here to add some.",
   "note.custom-metadata": "Custom metadata",
+  "note.custom-metadata.add": "Add",
+  "note.custom-metadata.remove": "Remove",
   "note.download-file": "Download file",
   "note.file-not-available": "File not available",
   "stats.analysis": "Analysis",
