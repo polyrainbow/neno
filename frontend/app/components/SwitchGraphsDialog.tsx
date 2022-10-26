@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { l } from "../lib/intl";
 import Dialog from "./Dialog";
+import DialogActionBar from "./DialogActionBar";
 
 const SwitchGraphsDialog = ({
   activeGraphId,
@@ -28,18 +29,19 @@ const SwitchGraphsDialog = ({
         })
       }
     </select>
-    <br/>
-    <button
-      onClick={() => {
-        switchGraphs(selectedGraphId);
-        onClose();
-      }}
-      className="default-button dialog-box-button default-action"
-    >{l("switch-graphs.switch")}</button>
-    <button
-      onClick={onClose}
-      className="default-button dialog-box-button"
-    >{l("dialog.cancel")}</button>
+    <DialogActionBar>
+      <button
+        onClick={() => {
+          switchGraphs(selectedGraphId);
+          onClose();
+        }}
+        className="default-button dialog-box-button default-action"
+      >{l("switch-graphs.switch")}</button>
+      <button
+        onClick={onClose}
+        className="default-button dialog-box-button"
+      >{l("dialog.cancel")}</button>
+    </DialogActionBar>
   </Dialog>;
 };
 

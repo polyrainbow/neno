@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { l } from "../lib/intl";
 import Dialog from "./Dialog";
+import DialogActionBar from "./DialogActionBar";
 
 const ChangeLanguageDialog = ({
   activeLanguage,
@@ -27,18 +28,19 @@ const ChangeLanguageDialog = ({
         })
       }
     </select>
-    <br/>
-    <button
-      onClick={() => {
-        changeLanguage(selectedLanguage);
-        onClose();
-      }}
-      className="default-button dialog-box-button default-action"
-    >{l("change-language.change")}</button>
-    <button
-      onClick={onClose}
-      className="default-button dialog-box-button"
-    >{l("dialog.cancel")}</button>
+    <DialogActionBar>
+      <button
+        onClick={() => {
+          changeLanguage(selectedLanguage);
+          onClose();
+        }}
+        className="default-button dialog-box-button default-action"
+      >{l("change-language.change")}</button>
+      <button
+        onClick={onClose}
+        className="default-button dialog-box-button"
+      >{l("dialog.cancel")}</button>
+    </DialogActionBar>
   </Dialog>;
 };
 

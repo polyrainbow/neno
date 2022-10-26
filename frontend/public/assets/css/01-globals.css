@@ -329,6 +329,12 @@ main {
   font-size: var(--large-font-size);
 }
 
+.dialog-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--default-margin);
+}
+
 .create-one-note-per-line-dialog textarea {
   background-color: var(--background-color);
   color: var(--font-color);
@@ -375,9 +381,7 @@ button.dangerous-action {
 
 .default-button {
   font-size: var(--large-font-size);
-  margin-right: 10px;
   padding: 10px 20px;
-  margin-bottom: var(--default-margin);
   user-select: none;
 }
 
@@ -403,6 +407,11 @@ button.dangerous-action {
   margin-right: 10px;
   padding: 10px;
   margin-bottom: var(--default-margin);
+}
+
+.default-button-small {
+  padding: 10px 20px;
+  margin: 0;
 }
 
 /******************************

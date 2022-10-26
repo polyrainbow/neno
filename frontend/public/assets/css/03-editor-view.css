@@ -171,6 +171,12 @@
   margin: auto;
 }
 
+.note-actions {
+  gap: var(--default-margin);
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .note-meta-paragraph {
   font-size: var(--default-font-size);
 }
