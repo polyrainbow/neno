@@ -175,6 +175,7 @@
   gap: var(--default-margin);
   display: flex;
   flex-wrap: wrap;
+  margin-bottom: var(--default-margin);
 }
 
 .note-meta-paragraph {
