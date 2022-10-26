@@ -162,6 +162,10 @@
   padding: 13px; /* (50px - 24px) / 2 */
 }
 
+.note {
+  max-width: 100vw;
+}
+
 .note-content {
   max-width: var(--max-content-width);
   margin: auto;
