@@ -1,4 +1,5 @@
 import React from "react";
+import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
 
 interface NoteKeyValuesProps {
@@ -56,7 +57,7 @@ const NoteKeyValues = ({
   return <section
     className="key-values"
   >
-    <h2>Custom metadata</h2>
+    <h2>{l("note.custom-metadata")}</h2>
     {
       displayedKeyValuePairs.map(
         ([key, value], index) => {

@@ -389,6 +389,11 @@ button.dangerous-action {
   margin-bottom: 0;
 }
 
+.default-button-with-icon {
+  display: inline-flex;
+  gap: 5px;
+}
+
 /******************************
   Small button
 ******************************/

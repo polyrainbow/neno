@@ -25,6 +25,7 @@ import { l } from "../lib/intl";
 import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import useDatabaseProvider from "../hooks/useDatabaseProvider";
 import NoteMenuBar from "./NoteMenuBar";
+import NoteActions from "./NoteActions";
 
 interface NoteComponentProps {
   note: ActiveNote,
@@ -290,6 +291,23 @@ const Note = ({
             />
             : null
         }
+        <NoteActions
+          activeNote={note}
+          createNewNote={createNewNote}
+          createNewLinkedNote={createNewLinkedNote}
+          handleNoteSaveRequest={handleNoteSaveRequest}
+          removeActiveNote={removeActiveNote}
+          unsavedChanges={unsavedChanges}
+          setUnsavedChanges={setUnsavedChanges}
+          pinOrUnpinNote={pinOrUnpinNote}
+          duplicateNote={duplicateNote}
+          openInGraphView={openInGraphView}
+          handleUploadFilesRequest={handleUploadFilesRequest}
+          contentMode={contentMode}
+          toggleEditMode={toggleEditMode}
+          importNote={importNote}
+          graphId={graphId}
+        />
       </div>
     </section>
   </>;
