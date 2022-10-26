@@ -54,7 +54,7 @@ const Pagination = (props) => {
                 <button
                   type="button"
                   className={
-                    "small-button"
+                    "default-button-small"
                     + (selected ? " pagination-button-selected" : "")
                   }
                   {...item}
@@ -66,7 +66,7 @@ const Pagination = (props) => {
               children = (
                 <button
                   type="button"
-                  className="small-button pagination-button-special"
+                  className="default-button-small pagination-button-special"
                   title={
                     type === "previous"
                       ? l("list.pagination.previous-page")

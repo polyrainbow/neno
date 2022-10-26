@@ -65,11 +65,11 @@ const SearchPresetItem = ({
     >
       <button
         onClick={onClick}
-        className="small-button dialog-box-button"
+        className="default-button-small dialog-box-button"
       >{l("list.search.presets.query")}</button>
       <button
         onClick={onDelete}
-        className="small-button dialog-box-button"
+        className="default-button-small dialog-box-button"
       >{l("list.search.presets.remove")}</button>
     </div>
   </div>;

@@ -403,13 +403,9 @@ button.dangerous-action {
   Small button
 ******************************/
 
-.small-button {
+.default-button-small {
   font-size: var(--default-font-size);
   padding: 10px;
-}
-
-.default-button-small {
-  padding: 10px 20px;
 }
 
 /******************************
