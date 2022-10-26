@@ -21,6 +21,7 @@ import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 import useDatabaseProvider from "../hooks/useDatabaseProvider";
 import useGraphId from "../hooks/useGraphId";
+import DialogActionBar from "./DialogActionBar";
 
 
 const FileView = () => {
@@ -160,41 +161,43 @@ const FileView = () => {
             height={30}
           />
       }
-      <button
-        disabled={!fileInfo}
-        onClick={async () => {
-          if (!fileInfo) return;
+      <DialogActionBar>
+        <button
+          disabled={!fileInfo}
+          onClick={async () => {
+            if (!fileInfo) return;
 
-          navigate(getAppPath(
-            PathTemplate.NEW_NOTE,
-            new Map([["GRAPH_ID", graphId]]),
-            new URLSearchParams({
-              fileIds: fileInfo.fileId,
-            }),
-          ));
-        }}
-        className="small-button default-action"
-      >{l("files.create-note-with-file")}</button>
-      <button
-        disabled={!fileInfo}
-        onClick={async () => {
-          if (!fileInfo) return;
+            navigate(getAppPath(
+              PathTemplate.NEW_NOTE,
+              new Map([["GRAPH_ID", graphId]]),
+              new URLSearchParams({
+                fileIds: fileInfo.fileId,
+              }),
+            ));
+          }}
+          className="default-button default-action"
+        >{l("files.create-note-with-file")}</button>
+        <button
+          disabled={!fileInfo}
+          onClick={async () => {
+            if (!fileInfo) return;
 
-          await confirm({
-            text: l("files.confirm-delete"),
-            confirmText: l("files.confirm-delete.confirm"),
-            cancelText: l("dialog.cancel"),
-            encourageConfirmation: false,
-          });
+            await confirm({
+              text: l("files.confirm-delete"),
+              confirmText: l("files.confirm-delete.confirm"),
+              cancelText: l("dialog.cancel"),
+              encourageConfirmation: false,
+            });
 
-          await databaseProvider.deleteFile(graphId, fileInfo.fileId);
-          navigate(getAppPath(
-            PathTemplate.FILES,
-            new Map([["GRAPH_ID", graphId]]),
-          ));
-        }}
-        className="small-button dangerous-action"
-      >{l("files.delete")}</button>
+            await databaseProvider.deleteFile(graphId, fileInfo.fileId);
+            navigate(getAppPath(
+              PathTemplate.FILES,
+              new Map([["GRAPH_ID", graphId]]),
+            ));
+          }}
+          className="default-button dangerous-action"
+        >{l("files.delete")}</button>
+      </DialogActionBar>
     </section>
   </>;
 };
