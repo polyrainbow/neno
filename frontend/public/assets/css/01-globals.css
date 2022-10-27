@@ -339,7 +339,7 @@ main {
 .create-one-note-per-line-dialog textarea {
   background-color: var(--background-color);
   color: var(--font-color);
-  margin-bottom: var(--default-gap);
+  margin: var(--default-gap) 0;
   width: calc(100% - 6px);
   display: block;
   height: 200px;
@@ -388,10 +388,6 @@ button.dangerous-action {
 
 .default-button:focus {
   outline: var(--focus-outline);
-}
-
-.default-button.dialog-box-button {
-  margin-bottom: 0;
 }
 
 .default-button-with-icon {
