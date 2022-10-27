@@ -25,10 +25,10 @@
   display: flex;
   background-color: var(--nli-color);
   margin: auto;
-  margin-bottom: var(--default-gap);
   border-radius: var(--border-radius);
   overflow: hidden;
   user-select: none;
+  width: 100%;
   max-width: var(--max-content-width);
 }
 
@@ -171,6 +171,12 @@
   margin: auto;
 }
 
+.note-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--default-gap);
+}
+
 .note-actions {
   gap: var(--default-gap);
   display: flex;
@@ -217,7 +223,6 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: var(--small-gap);
-  margin-bottom: var(--default-gap);
 }
 
 .pagination-button-selected {
@@ -230,8 +235,10 @@
 ******************************/
 
 .list-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--default-gap);
   padding: var(--default-gap);
-  padding-bottom: 0;
 }
 
 .list-section h1 {
@@ -255,6 +262,9 @@
 .note-list {
   border-collapse: collapse;
   width: 100%;
+  gap: var(--default-gap);
+  display: flex;
+  flex-direction: column;
 }
 
 @media only screen and (min-width: 1281px) {
@@ -275,7 +285,7 @@
 
     /* height is 100vh minus 2 headers of 50px height and minus top padding of
     this element */
-    height: calc(100vh - (2 * var(--header-bar-height)) - var(--default-gap));
+    height: calc(100vh - (2 * var(--header-bar-height)) - (2 * var(--default-gap)));
   }
 
   .main-content-besides-sidebar {

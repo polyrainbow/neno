@@ -114,7 +114,7 @@ const NoteLinks = ({
   }, [searchString]);
 
 
-  return <div id="links">
+  return <div className="note-links-section">
     <h2>{l(
       "editor.linked-notes",
       { linkedNotes: displayedLinkedNotes.length.toString() },
@@ -125,7 +125,7 @@ const NoteLinks = ({
         >{l("editor.no-notes-linked-yet")}</p>
         : null
     }
-    <div id="links">
+    <div className="note-links">
       {
         displayedLinkedNotes.map((displayedLinkedNote) => <NoteListItem
           key={"note-link-list-item-" + displayedLinkedNote.id}
