@@ -5,7 +5,6 @@ import {
 import { MainNoteListItem } from "../types/NoteListItem";
 import {
   getAppPath,
-  getMediaTypeFromFilename,
   getUrl,
   humanFileSize,
   makeTimestampHumanReadable,
@@ -22,6 +21,7 @@ import FlexContainer from "./FlexContainer";
 import useDatabaseProvider from "../hooks/useDatabaseProvider";
 import useGraphId from "../hooks/useGraphId";
 import DialogActionBar from "./DialogActionBar";
+import { getMediaTypeFromFilename } from "../../../lib/notes/noteUtils";
 
 
 const FileView = () => {

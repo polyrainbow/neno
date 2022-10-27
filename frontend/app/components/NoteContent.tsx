@@ -9,7 +9,6 @@ import {
 import ActiveNote from "../types/ActiveNote";
 import {
   getFileId,
-  getMediaTypeFromFilename,
 } from "../lib/utils";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
 import NoteContentBlockDocument from "./NoteContentBlockDocument";
@@ -26,6 +25,7 @@ import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import useDatabaseProvider from "../hooks/useDatabaseProvider";
 import { FileId } from "../../../lib/notes/interfaces/FileId";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
+import { getMediaTypeFromFilename } from "../../../lib/notes/noteUtils";
 
 interface NoteContentProps {
   note: ActiveNote,

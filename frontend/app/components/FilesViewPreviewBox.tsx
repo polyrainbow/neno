@@ -8,7 +8,8 @@ import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { PathTemplate } from "../enum/PathTemplate";
 import DatabaseProvider from "../types/DatabaseProvider";
 import { l } from "../lib/intl";
-import { getAppPath, getMediaTypeFromFilename, getIconSrc } from "../lib/utils";
+import { getAppPath, getIconSrc } from "../lib/utils";
+import { getMediaTypeFromFilename } from "../../../lib/notes/noteUtils";
 
 interface FilesViewPreviewBoxProps{
   key: string,

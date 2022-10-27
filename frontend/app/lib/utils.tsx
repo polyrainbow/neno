@@ -6,7 +6,6 @@ import FrontendUserNoteChange, { FrontendUserNoteChangeNote }
   from "../types/FrontendUserNoteChange";
 import { UserNoteChangeType }
   from "../../../lib/notes/interfaces/UserNoteChangeType";
-import { MediaType } from "../../../lib/notes/interfaces/MediaType";
 import { FileInfo } from "../../../lib/notes/interfaces/FileInfo";
 import DatabaseProvider from "../types/DatabaseProvider";
 import {
@@ -52,66 +51,6 @@ const getParameterByName = (name: string, url: string): string | null => {
 
 const makeTimestampHumanReadable = (timestamp: number): string => {
   return (new Date(timestamp)).toLocaleString();
-};
-
-
-const getExtensionFromFilename = (filename: string): string | null => {
-  const posOfDot = filename.lastIndexOf(".");
-  if (posOfDot === -1) {
-    return null;
-  }
-
-  const extension = filename.substring(posOfDot + 1);
-  if (extension.length === 0) {
-    return null;
-  }
-
-  return extension;
-};
-
-
-const getMediaTypeFromFilename = (
-  filename: string,
-): MediaType | null => {
-  const map = new Map<string, MediaType>(Object.entries({
-    "png": MediaType.IMAGE,
-    "jpg": MediaType.IMAGE,
-    "webp": MediaType.IMAGE,
-    "gif": MediaType.IMAGE,
-    "svg": MediaType.IMAGE,
-
-    "pdf": MediaType.PDF,
-
-    "wav": MediaType.AUDIO,
-    "mp3": MediaType.AUDIO,
-    "ogg": MediaType.AUDIO,
-    "flac": MediaType.AUDIO,
-
-    "mp4": MediaType.VIDEO,
-    "webm": MediaType.VIDEO,
-
-    "html": MediaType.TEXT,
-    "css": MediaType.TEXT,
-    "js": MediaType.TEXT,
-    "json": MediaType.TEXT,
-    "c": MediaType.TEXT,
-    "cpp": MediaType.TEXT,
-    "rs": MediaType.TEXT,
-    "txt": MediaType.TEXT,
-    "md": MediaType.TEXT,
-    "xq": MediaType.TEXT,
-    "xql": MediaType.TEXT,
-    "xqm": MediaType.TEXT,
-  }));
-
-  const extension = getExtensionFromFilename(filename);
-  if (!extension) {
-    return MediaType.TEXT;
-  }
-
-  return map.has(extension)
-    ? map.get(extension) as MediaType
-    : MediaType.OTHER;
 };
 
 
@@ -532,8 +471,6 @@ export {
   getIconSrc,
   getNewNoteContent,
   stringContainsOnlyDigits,
-  getExtensionFromFilename,
-  getMediaTypeFromFilename,
   getNoteTitleFromContent,
   getFilesFromUserSelection,
   base64Encode,

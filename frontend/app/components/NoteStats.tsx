@@ -6,9 +6,9 @@ import { l } from "../lib/intl";
 import {
   makeTimestampHumanReadable,
   humanFileSize,
-  getMediaTypeFromFilename,
 } from "../lib/utils";
 import NoteStatsFileLink from "./NoteStatsFileLink";
+import { getMediaTypeFromFilename } from "../../../lib/notes/noteUtils";
 
 interface NoteStatsProps {
   note: SavedActiveNote,
