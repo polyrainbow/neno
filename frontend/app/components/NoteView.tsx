@@ -334,6 +334,7 @@ const NoteView = () => {
           removeActiveNote={async () => {
             await removeActiveNote();
             refreshContentViews();
+            setCanonicalNewNotePath();
           }}
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}
