@@ -89,8 +89,9 @@ const Editor = ({ apiKey, hostUrl, activeTab, graphId }: EditorProps) => {
 
   const link = activeNote
     ? <a
-      href={hostUrl + "/editor/" + activeNote.meta.id}
-      target="_blank" rel="noreferrer"
+      href={`${hostUrl}/graph/${graphId}/note/${activeNote.meta.id}`}
+      target="_blank"
+      rel="noreferrer"
     >Click here to open it in NENO.</a>
     : "";
 
