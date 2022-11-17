@@ -45,7 +45,7 @@ device. If you want, you could also select a cloud storage folder so that your n
 In local mode, no note data is sent to a web server.
 
 To use NENO in local mode, you do not need technical knowledge, just go to this link to start:
-[NENO App](https://sebastianzimmer.github.io/neno/login)
+[NENO App](https://sebastianzimmer.github.io/neno)
 
 Beware that yor web browser has to support a feature called
 "File System Access API". At the time of writing, the desktop versions
