@@ -9,7 +9,7 @@
   --block-title-font-size: var(--default-font-size);
   --block-subtitle-font-size: var(--small-font-size);
   --block-filesize-color: var(--alt-content-color);
-  --block-title-font-weight: 600;
+  --block-title-font-weight: var(--bold);
   --block-title-line-height: 1.5em;
   --block-title-margin: 0;
   --block-download-icon-fill-color: var(--neno-gray-5);

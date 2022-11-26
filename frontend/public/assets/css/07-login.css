@@ -34,7 +34,7 @@
 
 .login-welcome-app-title {
   font-size: var(--h1-font-size);
-  font-weight: bold;
+  font-weight: var(--bold);
 }
 
 .section-login input {

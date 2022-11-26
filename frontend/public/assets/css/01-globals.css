@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'Mona Sans';
+  src:
+    url('../fonts/Mona-Sans.woff2') format('woff2 supports variations'),
+    url('../fonts/Mona-Sans.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+}
+
 /******************************
   Variable definitions
 ******************************/
@@ -87,7 +96,7 @@
   --button-background-color-active: var(--accent-color-1);
   --table-row-background-color-odd: var(--background-color);
   --table-row-background-color-even: var(--accent-color-interactible);
-  --main-font: "Rubik", sans-serif;
+  --main-font: "Mona Sans", sans-serif;
   --input-border-width: 1px;
   --border-radius: 7px;
   --default-gap: 15px;
@@ -110,6 +119,7 @@
   --content-element-border-radius: 0;
   --input-padding: 8px;
   --focus-outline: var(--font-color) auto 1px;
+  --bold: 765;
 }
 
 /******************************
@@ -393,6 +403,7 @@ button.dangerous-action {
 .default-button-with-icon {
   display: inline-flex;
   gap: 5px;
+  align-items: center;
 }
 
 /******************************

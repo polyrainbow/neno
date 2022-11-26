@@ -78,7 +78,7 @@
 }
 
 .note-list-item .title {
-  font-weight: bold;
+  font-weight: var(--bold);
 }
 
 .note-list-item .index {
@@ -92,7 +92,7 @@
 .note-list-item .linked-notes-indicator-number {
   text-align: center;
   display: block;
-  font-weight: bold;
+  font-weight: var(--bold);
 }
 
 .note-list-item .unlinked-note-indicator {
@@ -227,7 +227,7 @@
 
 .pagination-button-selected {
   background-color: var(--button-background-color-active);
-  font-weight: bold;
+  font-weight: var(--bold);
 }
 
 /******************************
@@ -340,7 +340,7 @@ textarea.editor {
 
 textarea.note-title {
   font-size: var(--h1-font-size);
-  font-weight: bold;
+  font-weight: var(--bold);
   margin-top: 30px;
   margin-bottom: 0;
   color: var(--font-color);
