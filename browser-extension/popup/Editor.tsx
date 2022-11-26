@@ -100,12 +100,12 @@ const Editor = ({ apiKey, hostUrl, activeTab, graphId }: EditorProps) => {
     <h2>Add this page as a note</h2>
     <input
       type="text"
-      id="input_note-title"
+      id="note-title"
       value={noteTitle}
       onInput={(e) => setNoteTitle((e.target as HTMLInputElement).value)}
     />
     <textarea
-      id="textarea_note-text"
+      id="note-text"
       onInput={(e) => setNoteText((e.target as HTMLTextAreaElement).value)}
       value={noteText}
     />

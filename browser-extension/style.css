@@ -1,35 +1,35 @@
 @font-face {
-  font-family: 'Mona Sans';
+  font-family: "Mona Sans";
   src:
-    url('assets/Mona-Sans.woff2') format('woff2 supports variations'),
-    url('assets/Mona-Sans.woff2') format('woff2-variations');
+    url("assets/Mona-Sans.woff2") format("woff2 supports variations"),
+    url("assets/Mona-Sans.woff2") format("woff2-variations");
   font-weight: 200 900;
   font-stretch: 75% 125%;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --accent-color-1: rgb(70, 184, 255);
-    --accent-color-1-light: rgb(168, 222, 255);
-    --accent-color-2: rgb(255, 133, 152);
+    --accent-color-1: #46b8ff;
+    --accent-color-1-light: #a8deff;
+    --accent-color-2: #ff8598;
     --accent-color-interactible: #e0e0e0;
     --background-color: white;
     --main-content-color: black;
-    --link-color: rgb(0, 40, 216);
-    --overlay-gradient: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(9,9,121,0.5) 35%, rgba(0,212,255,1) 100%);
+    --link-color: #0028d8;
+    --overlay-gradient: linear-gradient(45deg, #020024 0%, #09097980 35%, #00d4ff 100%);
   }
 }
-  
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --accent-color-1: rgb(11, 73, 92);
-    --accent-color-1-light: rgb(4, 53, 65);
+    --accent-color-1: #0b495c;
+    --accent-color-1-light: #043541;
     --accent-color-2: #6d2433;
     --accent-color-interactible: #303030;
     --background-color: black;
-    --main-content-color: rgb(255, 255, 255);
-    --link-color: rgb(122, 146, 255);
-    --overlay-gradient: linear-gradient(45deg, rgb(17 10 146) 0%, rgba(9, 9, 121, 0.5) 35%, rgb(0 125 151) 100%);
+    --main-content-color: #fff;
+    --link-color: #7a92ff;
+    --overlay-gradient: linear-gradient(45deg, #110a92 0%, #09097980 35%, #007d97 100%);
   }
 
   img.svg-icon {
@@ -52,28 +52,31 @@
   --button-background-color-active: var(--accent-color-1);
   --table-row-background-color-odd: var(--background-color);
   --table-row-background-color-even: var(--accent-color-interactible);
-  --main-font: 'Mona Sans', sans-serif;
+  --main-font: "Mona Sans", sans-serif;
   --input-border-width: 2px;
   --border-radius: 10px;
   --default-margin: 15px;
   --xl-list-width: 720px;
   --main-ui-font-size: 24px;
   --default-box-shadow:
-    0 1px 1px hsl(0deg 0% 0% / 0.075),
-    0 2px 2px hsl(0deg 0% 0% / 0.075),
-    0 4px 4px hsl(0deg 0% 0% / 0.075),
-    0 8px 8px hsl(0deg 0% 0% / 0.075),
-    0 16px 16px hsl(0deg 0% 0% / 0.075);
+    0 1px 1px hsl(0deg 0% 0% / 7.5%),
+    0 2px 2px hsl(0deg 0% 0% / 7.5%),
+    0 4px 4px hsl(0deg 0% 0% / 7.5%),
+    0 8px 8px hsl(0deg 0% 0% / 7.5%),
+    0 16px 16px hsl(0deg 0% 0% / 7.5%);
 }
 
-
-body, button, #input_note-title, #textarea_note-text {
+body,
+button,
+#note-title,
+#note-text {
   font-family: var(--main-font);
   color: var(--main-content-color);
   background-color: var(--background-color);
 }
 
-input, select {
+input,
+select {
   border: var(--input-border-width) solid var(--main-content-color) !important;
   font-size: var(--main-ui-font-size);
   background: var(--background-color);
@@ -86,12 +89,17 @@ input[type="radio"] {
   margin: 0;
 }
 
-body, #app {
+body,
+#app {
   background-color: var(--background-color);
   color: var(--font-color);
 }
 
-body, #app, input, select, button {
+body,
+#app,
+input,
+select,
+button {
   font-family: var(--main-font);
 }
 
@@ -104,7 +112,7 @@ button {
   padding: 10px;
 }
 
-button[disabled]{
+button[disabled] {
   color: grey;
   fill: grey;
   cursor: inherit;

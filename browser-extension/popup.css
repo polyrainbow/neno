@@ -1,6 +1,6 @@
 body {
   width: 320px;
-  margin: 0px;
+  margin: 0;
 }
 
 main {
@@ -16,38 +16,33 @@ header {
 }
 
 #heading {
-  margin: 0px;
+  margin: 0;
 }
 
 h2 {
-  margin-top: 0px;
+  margin-top: 0;
 }
-
 
 footer {
   background-color: grey;
   padding: 5px 10px;
 }
 
-
 a {
   color: var(--link-color);
 }
 
-#textarea_note-text{
+#note-text {
   height: 100px;
   border: var(--input-border-width) solid var(--main-content-color) !important;
 }
 
-#input_note-title, #textarea_note-text {
+#note-title,
+#note-text {
   width: 290px;
   margin-bottom: 10px;
 }
 
-#button_addPage {
-  font-size: 20px;
-}
-
-#input_note-title {
+#note-title {
   font-size: 20px;
 }
