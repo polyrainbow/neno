@@ -1,5 +1,10 @@
-:root {
-  --main-font: 'Rubik', sans-serif;
+@font-face {
+  font-family: 'Mona Sans';
+  src:
+    url('assets/Mona-Sans.woff2') format('woff2 supports variations'),
+    url('assets/Mona-Sans.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
 }
 
 @media (prefers-color-scheme: light) {
@@ -47,7 +52,7 @@
   --button-background-color-active: var(--accent-color-1);
   --table-row-background-color-odd: var(--background-color);
   --table-row-background-color-even: var(--accent-color-interactible);
-  --main-font: 'Rubik', sans-serif;
+  --main-font: 'Mona Sans', sans-serif;
   --input-border-width: 2px;
   --border-radius: 10px;
   --default-margin: 15px;

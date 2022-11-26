@@ -55,7 +55,7 @@ const ExistingNotes = ({ apiKey, hostUrl, activeTab, graphId }) => {
               >{note.title}</a>
             </p>;
           })
-          : "None found."
+          : "None"
       }
     </div>
   </section>;
