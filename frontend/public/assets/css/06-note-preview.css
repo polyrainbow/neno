@@ -33,7 +33,8 @@
 .preview-block-paragraph span,
 .preview-block-quote span,
 .preview-block-list-ordered,
-.preview-block-list-unordered {
+.preview-block-list-unordered,
+.preview-block-image-wrapper figure figcaption {
   white-space: break-spaces;
   word-break: break-word;
 }
@@ -67,7 +68,6 @@
 .preview-block-image-wrapper figure figcaption {
   font-style: italic;
   margin-top: 5px;
-  white-space: break-spaces;
 }
 
 .preview-block-image-wrapper img {
