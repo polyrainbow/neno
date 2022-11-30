@@ -26,8 +26,10 @@ import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import useDatabaseProvider from "../hooks/useDatabaseProvider";
 import NoteMenuBar from "./NoteMenuBar";
 import NoteActions from "./NoteActions";
+import BusyIndicator from "./BusyIndicator";
 
 interface NoteComponentProps {
+  isBusy: boolean,
   note: ActiveNote,
   setNote,
   setNoteTitle: (title: string) => void,
@@ -53,6 +55,7 @@ interface NoteComponentProps {
 
 
 const Note = ({
+  isBusy,
   note,
   setNote,
   setNoteTitle,
@@ -198,118 +201,124 @@ const Note = ({
       importNote={importNote}
       graphId={graphId}
     />
-    <section className="note"
-      onDrop={handleFileDrop}
-      onPaste={(e) => {
-        if (!databaseProvider) return;
+    {
+      isBusy
+        ? <div className="note-busy-container">
+          <BusyIndicator alt={l("app.loading")} height={64} />
+        </div>
+        : <section className="note"
+          onDrop={handleFileDrop}
+          onPaste={(e) => {
+            if (!databaseProvider) return;
 
-        const files = Array.from(e.clipboardData.files);
-        if (files.length > 0) {
-          uploadFiles(databaseProvider, files);
-          e.preventDefault();
-        }
-      }}
-      onDragOver={(e) => {
-        // https://stackoverflow.com/a/50233827/3890888
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-    >
-      <div
-        className={
-          "note-content "
-          + (contentMode === ContentMode.EDITOR ? "edit-mode" : "view-mode")
-        }
-      >
-        {
-          contentMode === ContentMode.EDITOR
-            ? <textarea
-              ref={noteTitleElementRef}
-              className="note-title"
-              onInput={(e) => {
-                const element = e.currentTarget;
-                setNoteTitle(element.value);
-                setUnsavedChanges(true);
-              }}
-              value={note.title}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  document.getElementById("editor")?.focus();
-                }
-              }}
-            />
-            : <h1 className="note-title">{
-              note.title.trim().length > 0
-                ? note.title
-                : l("list.untitled-note")
-            }</h1>
-        }
-        {
-          contentMode === ContentMode.EDITOR
-            ? <Editor
-              content={note.content}
-              onChange={(val) => {
-                setNoteContent(val);
-              }}
-            />
-            : ""
-        }
-        {
-          contentMode === ContentMode.VIEWER
-            ? <NoteContent
+            const files = Array.from(e.clipboardData.files);
+            if (files.length > 0) {
+              uploadFiles(databaseProvider, files);
+              e.preventDefault();
+            }
+          }}
+          onDragOver={(e) => {
+            // https://stackoverflow.com/a/50233827/3890888
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
+          <div
+            className={
+              "note-content "
+              + (contentMode === ContentMode.EDITOR ? "edit-mode" : "view-mode")
+            }
+          >
+            {
+              contentMode === ContentMode.EDITOR
+                ? <textarea
+                  ref={noteTitleElementRef}
+                  className="note-title"
+                  onInput={(e) => {
+                    const element = e.currentTarget;
+                    setNoteTitle(element.value);
+                    setUnsavedChanges(true);
+                  }}
+                  value={note.title}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      document.getElementById("editor")?.focus();
+                    }
+                  }}
+                />
+                : <h1 className="note-title">{
+                  note.title.trim().length > 0
+                    ? note.title
+                    : l("list.untitled-note")
+                }</h1>
+            }
+            {
+              contentMode === ContentMode.EDITOR
+                ? <Editor
+                  content={note.content}
+                  onChange={(val) => {
+                    setNoteContent(val);
+                  }}
+                />
+                : ""
+            }
+            {
+              contentMode === ContentMode.VIEWER
+                ? <NoteContent
+                  note={note}
+                  toggleEditMode={toggleEditMode}
+                  graphId={graphId}
+                />
+                : ""
+            }
+            {
+              contentMode === ContentMode.VIEWER
+                ? <hr/>
+                : ""
+            }
+            <NoteLinks
               note={note}
+              displayedLinkedNotes={displayedLinkedNotes}
+              onLinkAddition={onLinkAddition}
+              onLinkRemoval={onLinkRemoval}
+              setUnsavedChanges={setUnsavedChanges}
+              unsavedChanges={unsavedChanges}
+              graphId={graphId}
+            />
+            <NoteKeyValues
+              note={note}
+              setNote={setNote}
+              setUnsavedChanges={setUnsavedChanges}
+            />
+            {
+              (!note.isUnsaved)
+                ? <NoteStats
+                  note={note}
+                  graphId={graphId}
+                />
+                : null
+            }
+            <NoteActions
+              activeNote={note}
+              createNewNote={createNewNote}
+              createNewLinkedNote={createNewLinkedNote}
+              handleNoteSaveRequest={handleNoteSaveRequest}
+              removeActiveNote={removeActiveNote}
+              unsavedChanges={unsavedChanges}
+              setUnsavedChanges={setUnsavedChanges}
+              pinOrUnpinNote={pinOrUnpinNote}
+              duplicateNote={duplicateNote}
+              openInGraphView={openInGraphView}
+              handleUploadFilesRequest={handleUploadFilesRequest}
+              contentMode={contentMode}
               toggleEditMode={toggleEditMode}
+              importNote={importNote}
               graphId={graphId}
             />
-            : ""
-        }
-        {
-          contentMode === ContentMode.VIEWER
-            ? <hr/>
-            : ""
-        }
-        <NoteLinks
-          note={note}
-          displayedLinkedNotes={displayedLinkedNotes}
-          onLinkAddition={onLinkAddition}
-          onLinkRemoval={onLinkRemoval}
-          setUnsavedChanges={setUnsavedChanges}
-          unsavedChanges={unsavedChanges}
-          graphId={graphId}
-        />
-        <NoteKeyValues
-          note={note}
-          setNote={setNote}
-          setUnsavedChanges={setUnsavedChanges}
-        />
-        {
-          (!note.isUnsaved)
-            ? <NoteStats
-              note={note}
-              graphId={graphId}
-            />
-            : null
-        }
-        <NoteActions
-          activeNote={note}
-          createNewNote={createNewNote}
-          createNewLinkedNote={createNewLinkedNote}
-          handleNoteSaveRequest={handleNoteSaveRequest}
-          removeActiveNote={removeActiveNote}
-          unsavedChanges={unsavedChanges}
-          setUnsavedChanges={setUnsavedChanges}
-          pinOrUnpinNote={pinOrUnpinNote}
-          duplicateNote={duplicateNote}
-          openInGraphView={openInGraphView}
-          handleUploadFilesRequest={handleUploadFilesRequest}
-          contentMode={contentMode}
-          toggleEditMode={toggleEditMode}
-          importNote={importNote}
-          graphId={graphId}
-        />
-      </div>
-    </section>
+          </div>
+        </section>
+    }
   </>;
 };
 

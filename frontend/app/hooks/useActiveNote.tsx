@@ -39,6 +39,7 @@ export default (
     = useContext(UnsavedChangesContext);
   const newNoteObject: UnsavedActiveNote = getNewNoteObject([]);
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
+  const [isBusy, setIsBusy] = useState<boolean>(false);
   const displayedLinkedNotes = useDisplayedLinkedNotes(activeNote);
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -349,6 +350,7 @@ export default (
 
 
   const loadNote = async (graphId: GraphId, noteId: NoteId): Promise<void> => {
+    setIsBusy(true);
     try {
       const noteFromServer
         = await databaseProvider.getNote(graphId, noteId);
@@ -365,10 +367,12 @@ export default (
         throw e;
       }
     }
+    setIsBusy(false);
   };
 
 
   return {
+    isBusy,
     activeNote,
     displayedLinkedNotes,
     handleLinkAddition,

@@ -42,6 +42,7 @@ const NoteView = () => {
   };
 
   const {
+    isBusy,
     activeNote,
     saveActiveNote,
     createNewNote,
@@ -299,6 +300,7 @@ const NoteView = () => {
       }
       <div className="main-content-besides-sidebar">
         <Note
+          isBusy={isBusy}
           note={activeNote}
           setNote={setActiveNote}
           setNoteTitle={

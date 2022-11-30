@@ -162,6 +162,11 @@
   padding: 13px; /* (50px - 24px) / 2 */
 }
 
+.note-busy-container {
+  text-align: center;
+  margin: 15px;
+}
+
 .note {
   max-width: 100vw;
 }
