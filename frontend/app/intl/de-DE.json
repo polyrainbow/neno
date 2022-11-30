@@ -79,6 +79,7 @@
   "files.used-in.none": "Diese Datei wird von keiner Notiz benutzt.",
   "graph-settings.for": "Graph-Einstellungen für {graphId}",
   "graph.inflate-10%": "Graph um 10% aufblähen",
+  "graph.inflate-selection-10%": "Auswahl um 10% aufblähen",
   "graph.initial-position-explainer": "Anfängliche Position für neue Notizen (kann woanders hin bewegt werden)",
   "graph.mode.default": "Standard",
   "graph.mode.hubs-only": "Nur Hubs",

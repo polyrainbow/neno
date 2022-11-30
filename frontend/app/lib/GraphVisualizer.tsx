@@ -1230,5 +1230,60 @@ export default class GraphVisualization {
     this.#updateGraph({ type: "INFLATION" });
     this.#onChange?.();
   }
+
+
+  inflateSelection(factor: number): void {
+    const selectedNodes
+      = Array.from(this.#selection).filter(GraphVisualization.#isNode);
+
+    if (selectedNodes.length < 2) {
+      throw new Error("Not enough nodes selected");
+    }
+
+    const boundaries = {
+      xmin: selectedNodes[0].position.x,
+      xmax: selectedNodes[0].position.x,
+      ymin: selectedNodes[0].position.y,
+      ymax: selectedNodes[0].position.y,
+    };
+
+    selectedNodes.slice(1)
+      .forEach((node) => {
+        (node.position.x < boundaries.xmin)
+          && (boundaries.xmin = node.position.x);
+        (node.position.x > boundaries.xmax)
+          && (boundaries.xmax = node.position.x);
+        (node.position.y < boundaries.ymin)
+          && (boundaries.ymin = node.position.y);
+        (node.position.y > boundaries.ymax)
+          && (boundaries.ymax = node.position.y);
+      });
+
+    const center = {
+      x: (boundaries.xmax + boundaries.xmin) / 2,
+      y: (boundaries.ymax + boundaries.ymin) / 2,
+    };
+
+    selectedNodes
+      .forEach((node) => {
+        const originalVectorFromCenter = {
+          x: node.position.x - center.x,
+          y: node.position.y - center.y,
+        };
+
+        const newVectorFromCenter = {
+          x: originalVectorFromCenter.x * factor,
+          y: originalVectorFromCenter.y * factor,
+        };
+
+        node.position.x = center.x + newVectorFromCenter.x;
+        node.position.y = center.y + newVectorFromCenter.y;
+
+        this.#updatedNodes.add(node);
+      });
+
+    this.#updateGraph({ type: "INFLATION" });
+    this.#onChange?.();
+  }
 }
 
