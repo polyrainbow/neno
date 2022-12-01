@@ -269,7 +269,7 @@ main {
   margin: 30px auto;
 }
 
-.splash-message img {
+.splash-message .svg-icon {
   width: 100px;
 }
 
