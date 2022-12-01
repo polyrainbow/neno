@@ -156,40 +156,42 @@ const NoteLinks = ({
         marginTop: 0,
       }}
     />
-    {
-      searchResults
-        .filter((noteListItem) => {
-          // only display search result if it is not the same as the active note
-          // and if the result has not already been added as linked note
-          return (
-            (
-              note.isUnsaved
-              || (noteListItem.id !== note.id)
-            )
-            && !displayedLinkedNotes
-              .map((note) => note.id)
-              .includes(noteListItem.id)
-          );
-        })
-        .map((noteListItem) => {
-          return <NoteListItem
-            key={"noteLinkAdditionSearchResult-" + noteListItem.id}
-            note={noteListItem}
-            onSelect={async () => {
-              if (unsavedChanges) {
-                await confirmDiscardingUnsavedChanges();
-                setUnsavedChanges(false);
-              }
+    <div className="note-links">
+      {
+        searchResults
+          .filter((noteListItem) => {
+            // only display search result if it is not the same as the active
+            // note and if the result has not already been added as linked note
+            return (
+              (
+                note.isUnsaved
+                || (noteListItem.id !== note.id)
+              )
+              && !displayedLinkedNotes
+                .map((note) => note.id)
+                .includes(noteListItem.id)
+            );
+          })
+          .map((noteListItem) => {
+            return <NoteListItem
+              key={"noteLinkAdditionSearchResult-" + noteListItem.id}
+              note={noteListItem}
+              onSelect={async () => {
+                if (unsavedChanges) {
+                  await confirmDiscardingUnsavedChanges();
+                  setUnsavedChanges(false);
+                }
 
-              goToNote(graphId, noteListItem.id);
-            }}
-            isActive={false}
-            isLinked={false}
-            onLinkChange={() => onLinkAddition(noteListItem)}
-            isLinkable={true}
-          />;
-        })
-    }
+                goToNote(graphId, noteListItem.id);
+              }}
+              isActive={false}
+              isLinked={false}
+              onLinkChange={() => onLinkAddition(noteListItem)}
+              isLinkable={true}
+            />;
+          })
+      }
+    </div>
   </div>;
 };
 
