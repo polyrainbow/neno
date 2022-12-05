@@ -75,6 +75,8 @@
   "files.sort-mode.created-at.descending": "Neuere zuerst",
   "files.sort-mode.name.ascending": "Dateiname (A-Z)",
   "files.sort-mode.name.descending": "Dateiname (Z-A)",
+  "files.sort-mode.size.ascending": "Kleine Dateien zuerst",
+  "files.sort-mode.size.descending": "Große Dateien zuerst",
   "files.used-in": "Benutzt in",
   "files.used-in.none": "Diese Datei wird von keiner Notiz benutzt.",
   "graph-settings.for": "Graph-Einstellungen für {graphId}",

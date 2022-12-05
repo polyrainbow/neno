@@ -13,6 +13,8 @@ enum FileSortMode {
   CREATED_AT_ASCENDING = "CREATED_AT_ASCENDING",
   NAME_ASCENDING = "NAME_ASCENDING",
   NAME_DESCENDING = "NAME_DESCENDING",
+  SIZE_ASCENDING = "SIZE_ASCENDING",
+  SIZE_DESCENDING = "SIZE_DESCENDING",
 }
 
 const FilesView = () => {
@@ -48,6 +50,10 @@ const FilesView = () => {
       if (a.name.toLowerCase() < b.name.toLowerCase()) return 1;
       if (a.name.toLowerCase() > b.name.toLowerCase()) return -1;
       return 0;
+    } else if (sortMode === FileSortMode.SIZE_DESCENDING) {
+      return b.size - a.size;
+    } else if (sortMode === FileSortMode.SIZE_ASCENDING) {
+      return a.size - b.size;
     } else {
       return 0;
     }
@@ -94,6 +100,12 @@ const FilesView = () => {
               <option
                 value={FileSortMode.NAME_DESCENDING}
               >{l("files.sort-mode.name.descending")}</option>
+              <option
+                value={FileSortMode.SIZE_ASCENDING}
+              >{l("files.sort-mode.size.ascending")}</option>
+              <option
+                value={FileSortMode.SIZE_DESCENDING}
+              >{l("files.sort-mode.size.descending")}</option>
             </select>
             <FlexContainer
               className="files"
