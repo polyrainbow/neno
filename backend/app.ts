@@ -444,7 +444,10 @@ const startApp = async ({
     verifyUser,
     async function(req, res) {
       const graphId = req.params.graphId;
-      const noteId: NoteId = parseInt(req.params.noteId);
+      const noteIdParam = req.params.noteId;
+      const noteId: NoteId | "random" = noteIdParam === "random"
+        ? "random"
+        : parseInt(noteIdParam);
 
       try {
         const note: NoteToTransmit = await Notes.get(noteId, graphId);

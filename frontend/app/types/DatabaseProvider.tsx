@@ -24,7 +24,10 @@ interface DatabaseProvider {
   isAuthenticated: () => Promise<SuccessfulAuthenticationResponse>,
   removeAccess: () => Promise<void>;
   getGraphIds: () => GraphId[] | null;
-  getNote: (graphId: GraphId, noteId: NoteId) => Promise<NoteToTransmit | null>;
+  getNote: (
+    graphId: GraphId,
+    noteId: NoteId | "random",
+  ) => Promise<NoteToTransmit | null>;
   getRawNote: (graphId: GraphId, noteId: NoteId) => Promise<string | null>;
   getNotes: (graphId: GraphId, options: DatabaseQuery) => Promise<NoteListPage>;
   getStats: (

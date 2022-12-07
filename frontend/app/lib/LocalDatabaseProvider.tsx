@@ -206,7 +206,10 @@ implements LocalDatabaseProviderInterface {
   }
 
 
-  getNote(graphId, noteId: NoteId): Promise<NoteToTransmit | null> {
+  getNote(
+    graphId: GraphId,
+    noteId: NoteId | "random",
+  ): Promise<NoteToTransmit | null> {
     if (!(this.#notesModule)) {
       throw new Error(
         "Database Provider has not been properly initialized yet.",

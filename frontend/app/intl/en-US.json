@@ -28,6 +28,7 @@
   "editor.no-unsaved-changes": "No unsaved changes",
   "editor.note-has-not-been-saved-yet": "This note has not been saved yet",
   "editor.note-search-placeholder": "Search notes…",
+  "editor.open-random-note": "Open random note",
   "editor.pin-note": "Pin note",
   "editor.remove-note": "Remove note",
   "editor.remove-note.confirm.confirm": "Remove note",

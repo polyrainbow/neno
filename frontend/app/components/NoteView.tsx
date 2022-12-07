@@ -25,6 +25,7 @@ import useGraphId from "../hooks/useGraphId";
 import useHeaderStats from "../hooks/useHeaderStats";
 import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
+import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 
 
 const NoteView = () => {
@@ -215,11 +216,18 @@ const NoteView = () => {
   }, []);
 
 
-  const getValidNoteId = (noteIdParam?: string): number | null => {
+  const getValidNoteId = (
+    noteIdParam?: string,
+  ): NoteId | "random" | null => {
+    if (noteIdParam === "random") {
+      return "random";
+    }
+
     if (
       noteIdParam
       && (noteIdParam !== "new")
       && !isNaN(parseInt(noteIdParam))
+      && Utils.stringContainsOnlyDigits(noteIdParam)
     ) {
       return parseInt(noteIdParam);
     } else {
@@ -245,7 +253,7 @@ const NoteView = () => {
   useEffect(() => {
     refreshContentViews();
 
-    if (typeof getValidNoteId(noteId) !== "number") {
+    if (getValidNoteId(noteId) === null) {
       const fileIds = urlSearchParams.has("fileIds")
         ? (urlSearchParams.get("fileIds") as string).split(",")
         : [];
@@ -257,10 +265,30 @@ const NoteView = () => {
 
 
   useEffect(() => {
-    const validNoteId = getValidNoteId(noteId);
-    if (typeof validNoteId === "number") {
-      loadNote(graphId, validNoteId);
-    }
+    const loadNoteAndRefreshURL = async () => {
+      const validNoteId = getValidNoteId(noteId);
+      if (validNoteId !== null) {
+        const receivedNoteId = await loadNote(graphId, validNoteId);
+        if (
+          typeof receivedNoteId === "number"
+          && validNoteId !== receivedNoteId
+        ) {
+          navigate(
+            Utils.getAppPath(
+              PathTemplate.EXISTING_NOTE,
+              new Map([
+                ["GRAPH_ID", graphId],
+                ["NOTE_ID", receivedNoteId.toString()],
+              ]),
+              new URLSearchParams(location.search),
+            ),
+            { replace: true },
+          );
+        }
+      }
+    };
+
+    loadNoteAndRefreshURL();
   }, [noteId]);
 
   return <>

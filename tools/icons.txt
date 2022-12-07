@@ -68,6 +68,7 @@ post_add
 preview
 push_pin
 query_stats
+question_mark
 radio_button_unchecked
 refresh
 save_alt

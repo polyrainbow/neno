@@ -163,7 +163,10 @@ const getRawNote = (graphId, noteId: NoteId): Promise<string | null> => {
 };
 
 
-const getNote = (graphId, noteId: NoteId): Promise<NoteToTransmit | null> => {
+const getNote = (
+  graphId: GraphId,
+  noteId: NoteId | "random",
+): Promise<NoteToTransmit | null> => {
   return callGraphAPIAndGetJSONPayload({
     endpoint: "note/" + noteId,
   }, graphId);

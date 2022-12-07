@@ -71,11 +71,19 @@ const init = async (
 
 
 const get = async (
-  noteId: NoteId,
+  noteId: NoteId | "random",
   graphId: GraphId,
 ): Promise<NoteToTransmit> => {
   const graph = await io.getGraph(graphId);
-  const noteFromDB: ExistingNote | null = findNote(graph, noteId);
+
+  const noteFromDB: ExistingNote | null = (noteId === "random")
+    ? (
+      graph.notes.length > 0
+        ? graph.notes[Math.floor(Math.random() * graph.notes.length)]
+        : null
+    )
+    : findNote(graph, noteId);
+
   if (!noteFromDB) {
     throw new Error(ErrorMessage.NOTE_NOT_FOUND);
   }

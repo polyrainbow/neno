@@ -28,6 +28,7 @@
   "editor.no-unsaved-changes": "Keine ungespeicherten Änderungen",
   "editor.note-has-not-been-saved-yet": "Diese Notiz wurde noch nicht gespeichert",
   "editor.note-search-placeholder": "Notizen durchsuchen …",
+  "editor.open-random-note": "Zufällige Notiz öffnen",
   "editor.pin-note": "Anpinnen",
   "editor.remove-note": "Notiz löschen",
   "editor.remove-note.confirm.confirm": "Notiz löschen",

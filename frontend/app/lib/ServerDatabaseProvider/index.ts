@@ -70,7 +70,10 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
     return API.getRawNote(graphId, noteId);
   }
 
-  getNote(graphId: GraphId, noteId: NoteId): Promise<NoteToTransmit | null> {
+  getNote(
+    graphId: GraphId,
+    noteId: NoteId | "random",
+  ): Promise<NoteToTransmit | null> {
     return API.getNote(graphId, noteId);
   }
 

@@ -349,13 +349,18 @@ export default (
   };
 
 
-  const loadNote = async (graphId: GraphId, noteId: NoteId): Promise<void> => {
+  const loadNote = async (
+    graphId: GraphId,
+    noteId: NoteId | "random",
+  ): Promise<NoteId | null> => {
+    let receivedNoteId: NoteId | null = null;
     setIsBusy(true);
     try {
       const noteFromServer
         = await databaseProvider.getNote(graphId, noteId);
       if (noteFromServer) {
         setActiveNoteFromServer(noteFromServer);
+        receivedNoteId = noteFromServer.meta.id;
       } else {
         throw new Error("No note received");
       }
@@ -368,6 +373,7 @@ export default (
       }
     }
     setIsBusy(false);
+    return receivedNoteId;
   };
 
 
