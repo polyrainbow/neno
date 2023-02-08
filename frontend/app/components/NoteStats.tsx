@@ -42,6 +42,10 @@ const NoteStats = ({
           <td>{subwaytext(note.content).length}</td>
         </tr>
         <tr>
+          <td>{l("editor.stats.number-of-lines")}</td>
+          <td>{note.content.split("\n").length}</td>
+        </tr>
+        <tr>
           <td>{l("editor.stats.number-of-links")}</td>
           <td>{note.linkedNotes?.length || 0}</td>
         </tr>

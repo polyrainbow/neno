@@ -46,6 +46,7 @@
   "editor.stats.heading": "Metadaten",
   "editor.stats.id": "ID",
   "editor.stats.number-of-blocks": "Blöcke",
+  "editor.stats.number-of-lines": "Zeilen",
   "editor.stats.number-of-characters": "Zeichen",
   "editor.stats.number-of-links": "Verbundene Notizen",
   "editor.stats.updated-at": "Letzte Aktualisierung",

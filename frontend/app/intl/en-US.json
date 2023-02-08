@@ -46,6 +46,7 @@
   "editor.stats.heading": "Stats",
   "editor.stats.id": "ID",
   "editor.stats.number-of-blocks": "Number of blocks",
+  "editor.stats.number-of-lines": "Number of lines",
   "editor.stats.number-of-characters": "Number of characters",
   "editor.stats.number-of-links": "Number of links",
   "editor.stats.updated-at": "Updated at",
