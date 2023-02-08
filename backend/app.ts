@@ -33,7 +33,7 @@ import GraphObject from "../lib/notes/interfaces/Graph.js";
 import getDocumentTitle from "./lib/getDocumentTitle.js";
 import { NoteSaveRequest } from "../lib/notes/interfaces/NoteSaveRequest.js";
 import MimeTypes from "../lib/MimeTypes.js";
-import * as Users from "./Users.js";
+import * as Users from "./users.js";
 import { ExpectedAssertionResult, ExpectedAttestationResult, Fido2Lib } from "fido2-lib";
 import { toArrayBuffer } from "./lib/utils.js";
 
