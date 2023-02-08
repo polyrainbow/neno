@@ -1,8 +1,7 @@
 import * as path from "path";
 import startApp from "./app.js";
 import getProgramArguments from "./getProgramArguments.js";
-import User from "./interfaces/User.js";
-import Users from "./users.js";
+import * as Users from "./users.js";
 import { REPO_PATH, SERVER_TIMEOUT } from "./config.js";
 import * as logger from "./lib/logger.js";
 import startServer from "./server.js";
@@ -21,12 +20,10 @@ await checkDataDirectory(programArguments["data-folder-path"]);
 logger.info("💡 Getting users...");
 
 await Users.init(programArguments["data-folder-path"]);
-const users: User[] = Users.getAll();
 
 logger.info("💡 Starting app...");
 
 const app = await startApp({
-  users,
   dataPath: programArguments["data-folder-path"],
   frontendPath: path.join(REPO_PATH, "frontend", "public"),
   sessionSecret: programArguments["session-secret"],

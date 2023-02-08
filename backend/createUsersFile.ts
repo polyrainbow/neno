@@ -1,20 +1,15 @@
 import * as readline from "node:readline/promises";
-import { stdin } from "process";
-import { randomBytes, pbkdf2Sync, createHash, randomUUID } from "crypto";
+import { stdin, stdout } from "process";
+import { createHash, randomUUID } from "crypto";
 import fs from "fs/promises";
-import twofactor from "node-2fa";
-import qrcode from "qrcode-terminal";
 import User from "./interfaces/User";
 import * as logger from "./lib/logger.js";
-import MuteableStdout from "./lib/MuteableStdout.js";
 
 
 export default async (filepath: string): Promise<void> => {
-  const muteableStdout = new MuteableStdout();
-
   const rl = readline.createInterface({
     input: stdin,
-    output: muteableStdout,
+    output: stdout,
     terminal: true,
   });
 
@@ -25,44 +20,31 @@ export default async (filepath: string): Promise<void> => {
 
   for (let i = 0; i < numberOfUsers; i++) {
     logger.info(`Gathering info for user ${(i + 1)}/${numberOfUsers}`);
-    const username = await rl.question("User name: ");
+    const name = await rl.question("User name: ");
 
-    muteableStdout.write("Password: ");
-    muteableStdout.muted = true;
-    const password = await rl.question("");
-    muteableStdout.muted = false;
-    muteableStdout.write("\n");
-
-    const salt = randomBytes(16).toString('hex');
-  
-    // Hashing user's salt and password with 1000 iterations, 64 length and sha512 digest
-    const passwordHash = pbkdf2Sync(password, salt, 1000, 64, "sha512")
-      .toString("hex");
-
-    const mfa = twofactor.generateSecret({ name: "NENO", account: username });
-    const uri = `otpauth://totp/NENO%3A%20${username}?secret=${mfa.secret}&issuer=NENO`;
+    logger.info("\n");
 
     const apiKey = randomUUID();
     // https://security.stackexchange.com/a/209940/247396 - no salt for api key
     const apiKeyHash = createHash('RSA-SHA3-256').update(apiKey).digest('hex');
 
+    const signUpToken = randomUUID();
+
     users.push({
       id: randomUUID(),
-      login: username,
-      passwordHash: passwordHash,
-      salt: salt,
-      mfaSecret: mfa.secret,
-      mfaUri: uri,
+      name,
       apiKeyHashes: [apiKeyHash],
       // start with one graph per user
       graphIds: [
         randomUUID(),
-      ]
+      ],
+      signUpTokens: [
+        signUpToken,
+      ],
+      credentials: [],
     });
 
     logger.info("Scan this QR code with your favorite 2FA app");
-    logger.info("URL: " + uri);
-    qrcode.generate(uri, { small: true });
     logger.info("Your API key: " + apiKey);
   }
 

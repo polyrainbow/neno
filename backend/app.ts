@@ -12,12 +12,11 @@ import cookieParser from "cookie-parser";
 import AppStartOptions from "./interfaces/AppStartOptions.js";
 import NoteListPage from "../lib/notes/interfaces/NoteListPage.js";
 import FileSystemStorageProvider from "./lib/FileSystemStorageProvider.js";
-import twofactor from "node-2fa";
 import historyAPIFallback from "./lib/HistoryAPIFallback.js";
 import * as path from "path";
 import session from "express-session";
 import User from "./interfaces/User.js";
-import { createHash, pbkdf2Sync, randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import FileSessionStore from "./lib/FileSessionStore.js";
 import * as logger from "./lib/logger.js";
 import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode.js";
@@ -34,9 +33,11 @@ import GraphObject from "../lib/notes/interfaces/Graph.js";
 import getDocumentTitle from "./lib/getDocumentTitle.js";
 import { NoteSaveRequest } from "../lib/notes/interfaces/NoteSaveRequest.js";
 import MimeTypes from "../lib/MimeTypes.js";
+import * as Users from "./Users.js";
+import { ExpectedAssertionResult, ExpectedAttestationResult, Fido2Lib } from "fido2-lib";
+import { toArrayBuffer } from "./lib/utils.js";
 
 const startApp = async ({
-  users,
   dataPath,
   frontendPath,
   sessionSecret,
@@ -45,6 +46,7 @@ const startApp = async ({
   sessionCookieName,
   maxGraphSize,
 }: AppStartOptions): Promise<Express.Application> => {
+  Users.init(dataPath);
   const graphsDirectoryPath = path.join(dataPath, config.GRAPHS_DIRECTORY_NAME);
   const storageProvider = new FileSystemStorageProvider(graphsDirectoryPath);
   logger.info("File system storage ready at " + graphsDirectoryPath);
@@ -54,6 +56,20 @@ const startApp = async ({
   );
   logger.info("Initializing notes module...");
   await Notes.init(storageProvider, randomUUID);
+
+  const f2l = new Fido2Lib({
+    timeout: 60,
+    rpId: "localhost",
+    rpName: "NENO",
+    rpIcon: "http://localhost:8080/assets/app-icon/logo.svg",
+    challengeSize: 128,
+    attestation: "none",
+    cryptoParams: [-7, -257],
+    authenticatorAttachment: "platform",
+    authenticatorRequireResidentKey: false,
+    authenticatorUserVerification: "required"
+  });
+
   logger.info("Initializing routes...");
   const app = express();
 
@@ -85,11 +101,13 @@ const startApp = async ({
   const validateGraphVisualizationFromUser = ajv.compile(graphVisualizationFromUserSchema);
   const validateGraphObject = ajv.compile(graphObjectSchema);
 
-  const getUserByApiKey = (submittedApiKey: string): User | null => {
+  const getUserByApiKey = async (
+    submittedApiKey: string,
+  ): Promise<User | null> => {
     const submittedApiKeyHash
       = createHash('RSA-SHA3-256').update(submittedApiKey).digest('hex');
 
-    const user = users.find((user) => {
+    const user = await Users.find((user) => {
       return user.apiKeyHashes.some(apiKeyHash => {  
         return submittedApiKeyHash === apiKeyHash;
       });
@@ -99,8 +117,8 @@ const startApp = async ({
   };
 
 
-  const getGraphIdsForUser = (userId: UserId): GraphId[] => {
-    const user = users.find((user) => user.id === userId);
+  const getGraphIdsForUser = async (userId: UserId): Promise<GraphId[]> => {
+    const user = await Users.find((user) => user.id === userId);
   
     if (!user) {
       throw new Error("Unknown user id");
@@ -110,7 +128,7 @@ const startApp = async ({
   };
 
 
-  const verifyUser = (req, res, next) => {
+  const verifyUser = async (req, res, next) => {
     if (req.session.userId) {
       // make the user id available in the req object for easier access
       req.userId = req.session.userId;
@@ -118,7 +136,7 @@ const startApp = async ({
       // if the user passed a graph id as param, they must have the rights to
       // access it
       if (req.params.graphId) {
-        const graphIds = getGraphIdsForUser(req.userId);
+        const graphIds = await getGraphIdsForUser(req.userId);
         if (!graphIds.includes(req.params.graphId)){
           const response: APIResponse = {
             success: false,
@@ -132,7 +150,7 @@ const startApp = async ({
     // if userId has not been set via session, check if api key is present
     } else if (typeof req.headers["x-auth-token"] === "string") {
       const apiKey = req.headers["x-auth-token"];
-      const user = getUserByApiKey(apiKey);
+      const user = await getUserByApiKey(apiKey);
 
       if (user) {
         req.userId = user.id;
@@ -140,7 +158,7 @@ const startApp = async ({
         // if the user passed a graph id as param, they must have the rights to
         // access it
         if (req.params.graphId) {
-          const graphIds = getGraphIdsForUser(req.userId);
+          const graphIds = await getGraphIdsForUser(req.userId);
           if (!graphIds.includes(req.params.graphId)){
             const response: APIResponse = {
               success: false,
@@ -228,7 +246,7 @@ const startApp = async ({
       const response: APIResponse = {
         success: true,
         payload: {
-          graphIds: getGraphIdsForUser(req.userId),
+          graphIds: await getGraphIdsForUser(req.userId),
         },
       };
       res.json(response);
@@ -1087,8 +1105,6 @@ const startApp = async ({
   const handleUnsuccessfulLoginAttempt = (req, res) => {
     logger.verbose("Unsuccessful login attempt");
     logger.verbose(`User: ${req.body.username}`);
-    logger.verbose(`Password: ${req.body.password}`);
-    logger.verbose(`MFA Token: ${req.body.mfaToken}`);
     logger.verbose(`IP: ${req.socket.remoteAddress}`);
 
     bruteForcePreventer.unsuccessfulLogin(req.socket.remoteAddress);
@@ -1101,12 +1117,154 @@ const startApp = async ({
   };
 
 
+  enum LoginRequestType {
+    REQUEST_CHALLENGE = "REQUEST_CHALLENGE",
+    SUBMIT_ASSERTION = "SUBMIT_ASSERTION",
+  }
+
+
   app.post(
     config.USER_ENDOPINT + 'login',
     sessionMiddleware,
     express.json(),
     handleJSONParseErrors,
-    (req, res) => {
+    async (req, res) => {
+      const remoteAddress = req.socket.remoteAddress;
+      // remote address may be undefined if the client has disconnected
+      if (typeof remoteAddress !== "string") {
+        return;
+      }
+
+      const type = req.body.type as LoginRequestType;
+
+      if (!bruteForcePreventer.isLoginAttemptLegit(remoteAddress)) {
+        logger.verbose(
+          `Login request denied due to brute force prevention. IP: ${remoteAddress}`
+        );
+
+        const response: APIResponse = {
+          success: false,
+          error: APIError.TOO_EARLY,
+        };
+        return res.status(425).json(response);
+      }
+
+      if (type === LoginRequestType.REQUEST_CHALLENGE) {
+        const authnOptions = await f2l.assertionOptions();
+
+        // this modification of the session object initializes the session and
+        // makes express-session set the cookie
+        req.session.userAgent = req.headers["user-agent"];
+        req.session.userPlatform = req.headers["sec-ch-ua-platform"];
+        req.session.challenge = Buffer.from(authnOptions.challenge).toString("base64url");
+
+        const response: APIResponse = {
+          success: true,
+          payload: {
+            authnOptions: {
+              ...authnOptions,
+              challenge: Buffer.from(authnOptions.challenge).toString("base64url"),
+            },
+          },
+        };
+  
+        return res.status(200).json(response);
+      } else if (type === LoginRequestType.SUBMIT_ASSERTION) {
+        const clientResponse = req.body.response;
+
+        const userId = Buffer.from(clientResponse.userHandle, "base64url")
+          .toString();
+
+        const user = await Users.find((user) => {
+          return user.id === userId;
+        });
+
+        if (!user) {
+          return handleUnsuccessfulLoginAttempt(req, res);
+        }
+
+        const clientAssertionResponse = {
+          rawId: toArrayBuffer(Buffer.from(req.body.rawId, "base64url")),
+          response: {
+            signature: clientResponse.signature,
+            clientDataJSON: clientResponse.clientDataJSON,
+            authenticatorData: clientResponse.authenticatorData,
+          },
+        };
+
+        for (let i = 0; i < user.credentials.length; i++) {
+          const assertionExpectations: ExpectedAssertionResult = {
+            challenge: req.session.challenge,
+            origin: "http://localhost:8080",
+            factor: "either",
+            publicKey: user.credentials[i].pubKey,
+            prevCounter: user.credentials[i].prevCounter,
+            userHandle: null,
+          };
+        
+          try {
+            await f2l.assertionResult(
+              clientAssertionResponse,
+              assertionExpectations,
+            );
+
+            req.session.userId = user.id;
+            req.session.challenge = null;
+            req.session.loggedIn = true;
+        
+            bruteForcePreventer.successfulLogin(remoteAddress);
+
+            const response: APIResponse = {
+              success: true,
+              payload: {
+                graphIds: user.graphIds,
+              },
+            };
+      
+            return res.status(200).json(response);
+          } catch (e) {
+            continue;
+          }
+        }
+
+        const response: APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+
+        return res.status(406).json(response);
+      }
+    },
+  );
+
+
+  enum RegisterRequestType {
+    REQUEST_CHALLENGE = "REQUEST_CHALLENGE",
+    SUBMIT_PUBLIC_KEY = "SUBMIT_PUBLIC_KEY",
+  }
+
+  /*
+    this register handler handles WebAuthn registration requests.
+    this is a 4-step process:
+
+    1. client calls this endpoint with a registration request and a
+    sign-up token (type="request-challenge")
+    2. server recognizes that the sign-up token is associated with a certain
+    user and sends a webauthn challenge to the client:
+    "You want to register your device for user Alice, so please create a public
+    key with this challenge."
+    3. client creates credentials and sends public key to server
+      (type="submit-public-key")
+    4. server saves public key.
+  */
+  app.post(
+    config.USER_ENDOPINT + 'register',
+    sessionMiddleware,
+    express.json(),
+    handleJSONParseErrors,
+    async (req, res) => {
+      const type = req.body.type as RegisterRequestType;
+
       const remoteAddress = req.socket.remoteAddress;
       // remote address may be undefined if the client has disconnected
       if (typeof remoteAddress !== "string") {
@@ -1125,71 +1283,168 @@ const startApp = async ({
         return res.status(425).json(response);
       }
 
-      // read username and password from request body
-      const submittedUsername = req.body.username;
-      const submittedPassword = req.body.password;
-      const submittedMfaToken = req.body.mfaToken;
+      if (type === RegisterRequestType.REQUEST_CHALLENGE) {
+        const signUpToken = req.body.signUpToken;
 
-      if (
-        (!submittedUsername)
-        || (!submittedPassword)
-        || (!submittedMfaToken)
-      ) {
-        return handleUnsuccessfulLoginAttempt(req, res);
+        if (!signUpToken) {
+          bruteForcePreventer.unsuccessfulLogin(req.socket.remoteAddress);
+
+          const response: APIResponse = {
+            success: false,
+            error: APIError.INVALID_CREDENTIALS,
+          };
+
+          return res.status(401).json(response);
+        }
+
+        const user = await Users.find((user) => {
+          return user.signUpTokens.includes(signUpToken);
+        });
+
+        if (!user) {
+          bruteForcePreventer.unsuccessfulLogin(req.socket.remoteAddress);
+
+          const response: APIResponse = {
+            success: false,
+            error: APIError.INVALID_CREDENTIALS,
+          };
+
+          return res.status(401).json(response);
+        }
+
+        const registrationOptions = await f2l.attestationOptions();
+        registrationOptions.user.id = user.id;
+        registrationOptions.user.name = user.name;
+        registrationOptions.user.displayName = user.name;
+
+        // this modification of the session object initializes the session and
+        // makes express-session set the cookie
+        req.session.userId = user.id;
+        req.session.userAgent = req.headers["user-agent"];
+        req.session.userPlatform = req.headers["sec-ch-ua-platform"];
+        req.session.challenge = Buffer.from(registrationOptions.challenge).toString("base64url");
+        req.session.loggedIn = false;
+
+        const response: APIResponse = {
+          success: true,
+          payload: {
+            registrationOptions: {
+              ...registrationOptions,
+              challenge: Buffer.from(registrationOptions.challenge).toString("base64url"),
+            },
+          },
+        };
+
+        return res.status(200).json(response);
+      } else if (type === RegisterRequestType.SUBMIT_PUBLIC_KEY) {
+        if (typeof req.body.clientDataJSON !== "string") return;
+        if (typeof req.body.attestationObject !== "string") return;
+  
+        const challenge = req.session.challenge;
+
+        const attestationExpectations: ExpectedAttestationResult = {
+          challenge,
+          origin: "http://localhost:8080",
+          factor: "either"
+        };
+
+        const attestationResult = {
+          rawId: toArrayBuffer(Buffer.from(req.body.rawId, "base64url")),
+          response: {
+            clientDataJSON: req.body.clientDataJSON as string,
+            attestationObject: req.body.attestationObject as string,
+          },
+        };
+
+        try {
+          const regResult = await f2l.attestationResult(
+            attestationResult,
+            attestationExpectations,
+          );
+
+          req.session.challenge = null;
+          req.session.loggedIn = true;
+
+          logger.verbose(
+            `Successful login: ${req.session.userId} IP: ${remoteAddress}`,
+          );
+          bruteForcePreventer.successfulLogin(remoteAddress);
+
+          const user = await Users.find((user) => {
+            return user.id === req.session.userId;
+          });
+
+          if (!user) {
+            bruteForcePreventer.unsuccessfulLogin(req.socket.remoteAddress);
+  
+            const response: APIResponse = {
+              success: false,
+              error: APIError.INVALID_CREDENTIALS,
+            };
+  
+            return res.status(401).json(response);
+          }
+
+          Users.addCredentials(
+            user.id,
+            {
+              pubKey: regResult.authnrData.get("credentialPublicKeyPem"),
+              prevCounter: 0,
+            },
+          );
+
+          const response: APIResponse = {
+            success: true,
+            payload: {
+              graphIds: user.graphIds,
+            },
+          };
+  
+          return res.status(200).json(response);
+        } catch (e) {
+          const response: APIResponse = {
+            success: false,
+            error: APIError.INVALID_REQUEST,
+          };
+
+          await new Promise((resolve, reject) => {
+            req.session.destroy(function(err) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(null);
+              }
+            });
+          });
+    
+          return res.status(406)
+            .clearCookie(
+              sessionCookieName,
+            )
+            .json(response);
+        }
+      } else {
+        const response: APIResponse = {
+          success: false,
+          error: APIError.INVALID_REQUEST,
+        };
+
+        await new Promise((resolve, reject) => {
+          req.session.destroy(function(err) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(null);
+            }
+          });
+        });
+  
+        return res.status(406)
+          .clearCookie(
+            sessionCookieName,
+          )
+          .json(response);
       }
-
-      const user = users.find((user) => {
-        return user.login === submittedUsername;
-      });
-
-      if (!user) {
-        return handleUnsuccessfulLoginAttempt(req, res);
-      }
-
-      const mfaTokenIsValid
-        = twofactor.verifyToken(
-          user.mfaSecret,
-          submittedMfaToken,
-        )?.delta === 0;
-
-      if (!mfaTokenIsValid) {
-        return handleUnsuccessfulLoginAttempt(req, res);
-      }
-
-      const submittedPasswordHash = pbkdf2Sync(
-        submittedPassword,
-        user.salt,
-        1000,
-        64,
-        "sha512",
-      )
-        .toString("hex");
-
-      const passwordIsValid = submittedPasswordHash === user.passwordHash;
-
-      if (!passwordIsValid) {
-        return handleUnsuccessfulLoginAttempt(req, res);
-      }
-
-      // this modification of the session object initializes the session and
-      // makes express-session set the cookie
-      req.session.userId = user.id;
-      req.session.userAgent = req.headers["user-agent"];
-      req.session.userPlatform = req.headers["sec-ch-ua-platform"];
-
-      logger.verbose(
-        `Successful login: ${req.session.userId} IP: ${remoteAddress}`,
-      );
-      bruteForcePreventer.successfulLogin(remoteAddress);
-
-      const response: APIResponse = {
-        success: true,
-        payload: {
-          graphIds: user.graphIds,
-        },
-      };
-
-      return res.status(200).json(response);
     },
   );
 

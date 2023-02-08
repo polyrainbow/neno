@@ -19,8 +19,24 @@ import { NoteSaveRequest } from "../../../lib/notes/interfaces/NoteSaveRequest";
 export type SuccessfulAuthenticationResponse
   = { graphIds: GraphId[] };
 
+export type RegisterRequestOptions = {
+  type: "REQUEST_CHALLENGE",
+  signUpToken: string,
+} | {
+  type: "SUBMIT_PUBLIC_KEY",
+  attestationObject: string,
+  clientDataJSON: string,
+  rawId: string,
+};
+
+export type RegisterResponse = {
+  challenge: string,
+  graphIds?: GraphId[],
+};
+
 interface DatabaseProvider {
   login: (...args) => Promise<SuccessfulAuthenticationResponse>,
+  register?: (options: RegisterRequestOptions) => Promise<RegisterResponse>,
   isAuthenticated: () => Promise<SuccessfulAuthenticationResponse>,
   removeAccess: () => Promise<void>;
   getGraphIds: () => GraphId[] | null;

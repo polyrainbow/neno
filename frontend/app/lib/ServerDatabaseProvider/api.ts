@@ -8,6 +8,7 @@ import { NoteSaveRequest }
   from "../../../../lib/notes/interfaces/NoteSaveRequest";
 import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit";
 import { base64Encode } from "../utils";
+import { RegisterRequestOptions } from "../../types/DatabaseProvider";
 
 let API_URL;
 let USER_ENDPOINT;
@@ -128,14 +129,23 @@ const callGraphAPIAndGetJSONPayload = async (
 
 
 const login = (
-  username: string,
-  password: string,
-  mfaToken: string,
+  options,
 ): Promise<any> => {
   return callUserAPIAndGetJSONPayload({
     method: "POST",
     endpoint: "login",
-    payload: { username, password, mfaToken },
+    payload: options,
+  });
+};
+
+
+const register = (
+  options: RegisterRequestOptions,
+): Promise<any> => {
+  return callUserAPIAndGetJSONPayload({
+    method: "POST",
+    endpoint: "register",
+    payload: options,
   });
 };
 
@@ -343,6 +353,7 @@ const getDocumentTitle = async (url: string): Promise<string> => {
 export {
   init,
   login,
+  register,
   logout,
   isAuthenticated,
   getRawNote,

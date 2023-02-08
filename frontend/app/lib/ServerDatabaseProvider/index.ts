@@ -8,6 +8,8 @@ import { NoteSaveRequest }
   from "../../../../lib/notes/interfaces/NoteSaveRequest.js";
 import NoteToTransmit from "../../../../lib/notes/interfaces/NoteToTransmit.js";
 import DatabaseProvider, {
+  RegisterRequestOptions,
+  RegisterResponse,
   SuccessfulAuthenticationResponse,
 } from "../../types/DatabaseProvider.js";
 import * as API from "./api.js";
@@ -35,12 +37,15 @@ export default class ServerDatabaseProvider implements DatabaseProvider {
   }
 
 
-  async login(
-    username: string,
-    password: string,
-    mfaToken: string,
-  ): Promise<SuccessfulAuthenticationResponse> {
-    const response = await API.login(username, password, mfaToken);
+  async login(options): Promise<SuccessfulAuthenticationResponse> {
+    const response = await API.login(options);
+    return response;
+  }
+
+  async register(
+    options: RegisterRequestOptions,
+  ): Promise<RegisterResponse> {
+    const response = await API.register(options);
     return response;
   }
 

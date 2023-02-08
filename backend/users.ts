@@ -6,13 +6,12 @@
 import * as path from "path";
 import fs from "fs/promises";
 import { constants } from 'fs';
-import User from "./interfaces/User.js";
+import User, { StoredCredentials } from "./interfaces/User.js";
 import createUsersFile from "./createUsersFile.js";
 import * as logger from "./lib/logger.js";
 
 const USERS_FILENAME = "users.json";
 let dataFolderPath: string | null = null;
-let users: User[] | null = null;
 
 const isValidUser = (user: User): boolean => {
   const idContainsOnlyValidChars = (id) => /^[A-Za-z0-9-]+$/.test(id);
@@ -20,9 +19,6 @@ const isValidUser = (user: User): boolean => {
   return (
     typeof user.id === "string"
     && idContainsOnlyValidChars(user.id)
-    && typeof user.login === "string"
-    && typeof user.passwordHash === "string"
-    && typeof user.mfaSecret === "string"
     && Array.isArray(user.graphIds)
     && Array.isArray(user.apiKeyHashes)
     // a graph id must not include special characters
@@ -30,8 +26,11 @@ const isValidUser = (user: User): boolean => {
   );
 };
 
-const init = async (_dataFolderPath: string): Promise<void> => {
-  dataFolderPath = _dataFolderPath;
+const getFromFile = async () => {
+  if (!dataFolderPath) throw new Error(
+    "Users module has not been initialized yet.",
+  );
+
   const usersFile = path.join(dataFolderPath, USERS_FILENAME);
 
   try {
@@ -43,7 +42,7 @@ const init = async (_dataFolderPath: string): Promise<void> => {
     await createUsersFile(usersFile);
   }
 
-  logger.info("Loading users file...");
+  logger.debug("Loading users file...");
   const json = (await fs.readFile(usersFile)).toString();
   const usersFromFile: User[] = JSON.parse(json);
 
@@ -51,19 +50,49 @@ const init = async (_dataFolderPath: string): Promise<void> => {
     throw new Error("Invalid users file.");
   }
 
-  users = usersFromFile;
+  return usersFromFile;
 };
 
-const getAll = (): User[] => {
-  if (users === null) {
-    throw new Error("Users module not correctly initialized.");
-  }
+const init = (_dataFolderPath: string): void => {
+  dataFolderPath = _dataFolderPath;
+};
 
+
+const addCredentials = async (
+  userId: string,
+  credentials: StoredCredentials,
+): Promise<void> => {
+  if (!dataFolderPath) throw new Error(
+    "Users module has not been initialized yet.",
+  );
+
+  const users = await getFromFile();
+  const user = users.find((user) => user.id === userId);
+  if (!user) throw new Error("User not found");
+  user.credentials.push(credentials);
+  const usersFile = path.join(dataFolderPath, USERS_FILENAME);
+  await fs.writeFile(usersFile, JSON.stringify(users, null, "  "));
+};
+
+const getAll = async (): Promise<User[]> => {
+  if (!dataFolderPath) throw new Error(
+    "Users module has not been initialized yet.",
+  );
+
+  const users = await getFromFile();
   return users;
 };
 
 
-export default {
+const find = async (fn: (user: User) => boolean): Promise<User | undefined> => {
+  const users = await getAll();
+  return users.find(fn);
+};
+
+
+export {
   init,
   getAll,
+  find,
+  addCredentials,
 };

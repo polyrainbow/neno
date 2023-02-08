@@ -379,7 +379,9 @@ export const getUrl = async (
 
 
 // also works with utf-8/16 strings in constrast to btoa()
-const base64Encode = async (string: string): Promise<string> => {
+const base64Encode = async (
+  input: string | Blob | ArrayBuffer,
+): Promise<string> => {
   return new Promise((resolve) => {
     const fileReader = new FileReader();
 
@@ -391,8 +393,73 @@ const base64Encode = async (string: string): Promise<string> => {
       resolve(base64String);
     };
 
-    fileReader.readAsDataURL(new Blob(Array.from(string)));
+    const blob = typeof input === "string"
+      ? new Blob(Array.from(input))
+      : ("size" in input)
+        ? input
+        : new Blob([new Uint8Array(input, 0, input.byteLength)]);
+
+    fileReader.readAsDataURL(blob);
   });
+};
+
+
+const base64UrlEncode = async (
+  input: string | Blob | ArrayBuffer,
+) => {
+  const base64 = await base64Encode(input);
+  let base64Url = base64;
+  while (base64Url[base64Url.length - 1] === "=") {
+    base64Url = base64Url.substring(0, base64Url.length - 1);
+  }
+  base64Url = base64Url
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+
+  return base64Url;
+};
+
+
+const base64UrlDecode = function(input) {
+  // Replace non-url compatible chars with base64 standard chars
+  input = input
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  // Pad out with standard base64 required padding characters
+  const pad = input.length % 4;
+  if (pad) {
+    if (pad === 1) {
+      throw new Error(
+        "InvalidLengthError: Input base64url string is the wrong length to "
+        + "determine padding",
+      );
+    }
+    input += new Array(5 - pad).join("=");
+  }
+
+  return input;
+};
+
+
+const base64ToArrayBuffer = (base64) => {
+  const binaryString = window.atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
+};
+
+const base64UrlToArrayBuffer = (input) => {
+  return base64ToArrayBuffer(base64UrlDecode(input));
+};
+
+
+const stringToUTF8ByteArray = (input) => {
+  const enc = new TextEncoder(); // always utf-8
+  return enc.encode(input);
 };
 
 
@@ -474,9 +541,12 @@ export {
   getNoteTitleFromContent,
   getFilesFromUserSelection,
   base64Encode,
+  base64UrlEncode,
+  base64UrlToArrayBuffer,
   parseFileIds,
   getFileId,
   insertDocumentTitles,
   getWritableStream,
   readFileAsString,
+  stringToUTF8ByteArray,
 };

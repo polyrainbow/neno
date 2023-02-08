@@ -48,14 +48,20 @@ export default function (session) {
     async set(sid, sess, cb) {
       const sessions = await this.#getSessions();
 
-      while (sessions.length > this.#maxNumberOfSessions) {
-        sessions.shift();
-      }
+      const existingSession = sessions.find((s) => s.id === sid);
 
-      sessions.push({
-        id: sid,
-        data: sess,
-      });
+      if (existingSession) {
+        existingSession.data = sess;
+      } else {
+        while (sessions.length > this.#maxNumberOfSessions) {
+          sessions.shift();
+        }
+
+        sessions.push({
+          id: sid,
+          data: sess,
+        });
+      }
 
       await this.#writeSessions(sessions);
       cb(null);
