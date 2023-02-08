@@ -33,15 +33,6 @@ const getFromFile = async () => {
 
   const usersFile = path.join(dataFolderPath, USERS_FILENAME);
 
-  try {
-    await fs.access(usersFile, constants.R_OK | constants.W_OK);
-  } catch {
-    logger.warn(
-      "No users file found. We must create one.",
-    );
-    await createUsersFile(usersFile);
-  }
-
   logger.debug("Loading users file...");
   const json = (await fs.readFile(usersFile)).toString();
   const usersFromFile: User[] = JSON.parse(json);
@@ -53,8 +44,19 @@ const getFromFile = async () => {
   return usersFromFile;
 };
 
-const init = (_dataFolderPath: string): void => {
+const init = async (_dataFolderPath: string): Promise<void> => {
   dataFolderPath = _dataFolderPath;
+
+  const usersFile = path.join(dataFolderPath, USERS_FILENAME);
+
+  try {
+    await fs.access(usersFile, constants.R_OK | constants.W_OK);
+  } catch {
+    logger.warn(
+      "No users file found. We must create one.",
+    );
+    await createUsersFile(usersFile);
+  }
 };
 
 

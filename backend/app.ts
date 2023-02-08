@@ -46,7 +46,7 @@ const startApp = async ({
   sessionCookieName,
   maxGraphSize,
 }: AppStartOptions): Promise<Express.Application> => {
-  Users.init(dataPath);
+  await Users.init(dataPath);
   const graphsDirectoryPath = path.join(dataPath, config.GRAPHS_DIRECTORY_NAME);
   const storageProvider = new FileSystemStorageProvider(graphsDirectoryPath);
   logger.info("File system storage ready at " + graphsDirectoryPath);
