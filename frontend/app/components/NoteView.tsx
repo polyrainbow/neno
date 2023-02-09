@@ -153,14 +153,19 @@ const NoteView = () => {
     const noteFromDatabase = await saveActiveNote(ignoreDuplicateTitles);
 
     /*
-      when saving the new note for the first time, we get its id from the
-      databaseProvider. then we update the address bar to include the new id
+      When saving a new note for the first time, we get its id from the
+      databaseProvider. Then we update the address bar to include the new id.
+      We're using requestIdleCallback because we first want to let React
+      update all the states, so that when this goToNote function triggers an
+      effect, we then can work with the updated changes.
     */
-    goToNote(
-      graphId,
-      noteFromDatabase.meta.id,
-      true,
-    );
+    requestIdleCallback(() => {
+      goToNote(
+        graphId,
+        noteFromDatabase.meta.id,
+        true,
+      );
+    });
 
     /*
       Order matters here: We want to goToNote before refreshing content views
@@ -280,13 +285,14 @@ const NoteView = () => {
           We don't want to react on a note id change in the url if that
           note is already loaded. This might happen when saving a new note for
           the first time:
-          the note id changes from "new" to "123", which triggers this effect.
+          The note id changes from "new" to "123", which triggers this effect.
           But we got the content already from the call to saveActiveNote().
+          So if we already have a noteId and it is the same one, don't reload!
         */
-        && (
+        && (!(
           "id" in activeNote
-          && validNoteId !== activeNote.id
-        )
+          && validNoteId === activeNote.id
+        ))
       ) {
         const receivedNoteId = await loadNote(graphId, validNoteId);
         if (
