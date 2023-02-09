@@ -37,7 +37,7 @@ const getExtensionFromFilename = (filename: string): string | null => {
     return null;
   }
 
-  const extension = filename.substring(posOfDot + 1);
+  const extension = filename.substring(posOfDot + 1).toLowerCase();
   if (extension.length === 0) {
     return null;
   }
