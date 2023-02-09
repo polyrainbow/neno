@@ -28,6 +28,26 @@ import usePinnedNotes from "../hooks/usePinnedNotes";
 import { NoteId } from "../../../lib/notes/interfaces/NoteId";
 
 
+const getValidNoteId = (
+  noteIdParam?: string,
+): NoteId | "random" | null => {
+  if (noteIdParam === "random") {
+    return "random";
+  }
+
+  if (
+    noteIdParam
+    && (noteIdParam !== "new")
+    && !isNaN(parseInt(noteIdParam))
+    && Utils.stringContainsOnlyDigits(noteIdParam)
+  ) {
+    return parseInt(noteIdParam);
+  } else {
+    return null;
+  }
+};
+
+
 const NoteView = () => {
   const databaseProvider = useDatabaseProvider();
   const isSmallScreen = useIsSmallScreen();
@@ -131,7 +151,7 @@ const NoteView = () => {
     ignoreDuplicateTitles: boolean,
   ) => {
     const noteFromDatabase = await saveActiveNote(ignoreDuplicateTitles);
-    await refreshContentViews();
+
     /*
       when saving the new note for the first time, we get its id from the
       databaseProvider. then we update the address bar to include the new id
@@ -142,6 +162,13 @@ const NoteView = () => {
       true,
     );
 
+    /*
+      Order matters here: We want to goToNote before refreshing content views
+      for higher perceived performance. refreshContentViews is nice to have
+      but not necessary to continue editing the active note.
+    */
+
+    await refreshContentViews();
     return noteFromDatabase;
   };
 
@@ -216,26 +243,6 @@ const NoteView = () => {
   }, []);
 
 
-  const getValidNoteId = (
-    noteIdParam?: string,
-  ): NoteId | "random" | null => {
-    if (noteIdParam === "random") {
-      return "random";
-    }
-
-    if (
-      noteIdParam
-      && (noteIdParam !== "new")
-      && !isNaN(parseInt(noteIdParam))
-      && Utils.stringContainsOnlyDigits(noteIdParam)
-    ) {
-      return parseInt(noteIdParam);
-    } else {
-      return null;
-    }
-  };
-
-
   const setCanonicalNewNotePath = () => {
     /* whatever has been written to the address bar, let's replace it with
     the canonical path for a new note */
@@ -267,7 +274,20 @@ const NoteView = () => {
   useEffect(() => {
     const loadNoteAndRefreshURL = async () => {
       const validNoteId = getValidNoteId(noteId);
-      if (validNoteId !== null) {
+      if (
+        validNoteId !== null
+        /*
+          We don't want to react on a note id change in the url if that
+          note is already loaded. This might happen when saving a new note for
+          the first time:
+          the note id changes from "new" to "123", which triggers this effect.
+          But we got the content already from the call to saveActiveNote().
+        */
+        && (
+          "id" in activeNote
+          && validNoteId !== activeNote.id
+        )
+      ) {
         const receivedNoteId = await loadNote(graphId, validNoteId);
         if (
           typeof receivedNoteId === "number"
