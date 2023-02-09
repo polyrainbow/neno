@@ -5,5 +5,6 @@
       "wicg-file-system-access",
       "d3"
     ],
+    "noImplicitAny": false
   }
 }
