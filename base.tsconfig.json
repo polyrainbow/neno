@@ -10,7 +10,7 @@
     ],
     "module": "esnext",
     "moduleResolution": "node",
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noUnusedLocals": false,
     "outDir": "dist",
     "preserveConstEnums": true,

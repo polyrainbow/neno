@@ -24,7 +24,7 @@ import { getPagedMatches } from "../utils.js";
 import * as config from "./config.js";
 import CharIterator from "../subwaytext/CharIterator.js";
 
-export const isWhiteSpace = (string) => {
+export const isWhiteSpace = (string: string): boolean => {
   return string.trim().length === 0;
 };
 

@@ -569,48 +569,60 @@ const getSortFunction = (
   sortMode: NoteListSortMode,
 ):((a: NoteListItem, b: NoteListItem) => number) => {
   const sortFunctions = {
-    [NoteListSortMode.CREATION_DATE_ASCENDING]: (a, b) => {
-      return a.createdAt - b.createdAt;
-    },
-    [NoteListSortMode.CREATION_DATE_DESCENDING]: (a, b) => {
-      return b.createdAt - a.createdAt;
-    },
-    [NoteListSortMode.UPDATE_DATE_ASCENDING]: (a, b) => {
-      return a.updatedAt - b.updatedAt;
-    },
-    [NoteListSortMode.UPDATE_DATE_DESCENDING]: (a, b) => {
-      return b.updatedAt - a.updatedAt;
-    },
-    [NoteListSortMode.TITLE_ASCENDING]: (a, b) => {
-      const aNormalized = getSortKeyForTitle(a.title);
-      const bNormalized = getSortKeyForTitle(b.title);
+    [NoteListSortMode.CREATION_DATE_ASCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return a.createdAt - b.createdAt;
+      },
+    [NoteListSortMode.CREATION_DATE_DESCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return b.createdAt - a.createdAt;
+      },
+    [NoteListSortMode.UPDATE_DATE_ASCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return a.updatedAt - b.updatedAt;
+      },
+    [NoteListSortMode.UPDATE_DATE_DESCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return b.updatedAt - a.updatedAt;
+      },
+    [NoteListSortMode.TITLE_ASCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        const aNormalized = getSortKeyForTitle(a.title);
+        const bNormalized = getSortKeyForTitle(b.title);
 
-      return aNormalized.localeCompare(bNormalized);
-    },
-    [NoteListSortMode.TITLE_DESCENDING]: (a, b) => {
-      const aNormalized = getSortKeyForTitle(a.title);
-      const bNormalized = getSortKeyForTitle(b.title);
+        return aNormalized.localeCompare(bNormalized);
+      },
+    [NoteListSortMode.TITLE_DESCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        const aNormalized = getSortKeyForTitle(a.title);
+        const bNormalized = getSortKeyForTitle(b.title);
 
-      return bNormalized.localeCompare(aNormalized);
-    },
-    [NoteListSortMode.NUMBER_OF_LINKS_ASCENDING]: (a, b) => {
-      return a.numberOfLinkedNotes - b.numberOfLinkedNotes;
-    },
-    [NoteListSortMode.NUMBER_OF_LINKS_DESCENDING]: (a, b) => {
-      return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
-    },
-    [NoteListSortMode.NUMBER_OF_FILES_ASCENDING]: (a, b) => {
-      return a.numberOfFiles - b.numberOfFiles;
-    },
-    [NoteListSortMode.NUMBER_OF_FILES_DESCENDING]: (a, b) => {
-      return b.numberOfFiles - a.numberOfFiles;
-    },
-    [NoteListSortMode.NUMBER_OF_CHARACTERS_ASCENDING]: (a, b) => {
-      return a.numberOfCharacters - b.numberOfCharacters;
-    },
-    [NoteListSortMode.NUMBER_OF_CHARACTERS_DESCENDING]: (a, b) => {
-      return b.numberOfCharacters - a.numberOfCharacters;
-    },
+        return bNormalized.localeCompare(aNormalized);
+      },
+    [NoteListSortMode.NUMBER_OF_LINKS_ASCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return a.numberOfLinkedNotes - b.numberOfLinkedNotes;
+      },
+    [NoteListSortMode.NUMBER_OF_LINKS_DESCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return b.numberOfLinkedNotes - a.numberOfLinkedNotes;
+      },
+    [NoteListSortMode.NUMBER_OF_FILES_ASCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return a.numberOfFiles - b.numberOfFiles;
+      },
+    [NoteListSortMode.NUMBER_OF_FILES_DESCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return b.numberOfFiles - a.numberOfFiles;
+      },
+    [NoteListSortMode.NUMBER_OF_CHARACTERS_ASCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return a.numberOfCharacters - b.numberOfCharacters;
+      },
+    [NoteListSortMode.NUMBER_OF_CHARACTERS_DESCENDING]:
+      (a: NoteListItem, b: NoteListItem) => {
+        return b.numberOfCharacters - a.numberOfCharacters;
+      },
   };
 
   return sortFunctions[sortMode] ?? sortFunctions.UPDATE_DATE_ASCENDING;
@@ -643,7 +655,7 @@ const getURLsOfNote = (noteContent: NoteContent): string[] => {
 // https://en.wikipedia.org/wiki/Breadth-first_search
 const breadthFirstSearch = (
   nodes: ExistingNote[],
-  links,
+  links: Link[],
   root: ExistingNote
 ): ExistingNote[] => {
   const queue: ExistingNote[] = [];
@@ -1014,7 +1026,7 @@ const canonicalHeaderKeys = new Map<CanonicalNoteHeader, MetaModifier>([
 const parseSerializedExistingNote = (serializedNote: string): ExistingNote => {
   const headers = parseNoteHeaders(serializedNote);
   const partialMeta: Partial<ExistingNoteMetadata> = {};
-  const custom = {};
+  const custom: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
     if (canonicalHeaderKeys.has(key as CanonicalNoteHeader)) {
       (canonicalHeaderKeys.get(key as CanonicalNoteHeader) as MetaModifier)(
@@ -1062,7 +1074,7 @@ const parseSerializedExistingNote = (serializedNote: string): ExistingNote => {
 const parseSerializedNewNote = (serializedNote: string): NewNote => {
   const headers = parseNoteHeaders(serializedNote);
   const partialMeta: Partial<NewNoteMetadata> = {};
-  const custom = {};
+  const custom: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
     // we don't want to keep the old id for new notes
     if (key === CanonicalNoteHeader.ID) continue;

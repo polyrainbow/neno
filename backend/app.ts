@@ -4,7 +4,7 @@ import Stats, { GraphSize } from "../lib/notes/interfaces/GraphStats.js";
 import { yyyymmdd } from "../lib/utils.js";
 import * as config from "./config.js";
 import compression from "compression";
-import express, { Response } from "express";
+import express, { NextFunction, Response } from "express";
 import * as Notes from "../lib/notes/index.js";
 import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
@@ -87,6 +87,7 @@ const startApp = async ({
     resave: false,
     name: sessionCookieName,
     unset: "keep",
+    // @ts-ignore
     store: new (FileSessionStore(session))({
       checkPeriod: 86400000, // prune expired entries every 24h,
       maxNumberOfSessions: 1000,
@@ -128,7 +129,11 @@ const startApp = async ({
   };
 
 
-  const verifyUser = async (req, res, next) => {
+  const verifyUser = async (
+    req: any,
+    res: any,
+    next: NextFunction,
+  ) => {
     if (req.session.userId) {
       // make the user id available in the req object for easier access
       req.userId = req.session.userId;
@@ -186,7 +191,11 @@ const startApp = async ({
   };
 
   //CORS middleware
-  const allowCORS = (req, res, next) => {
+  const allowCORS = async (
+    req: any,
+    res: any,
+    next: NextFunction,
+  ): Promise<void> => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header(
       'Access-Control-Allow-Methods',
@@ -198,10 +207,10 @@ const startApp = async ({
     );
 
     if (req.method === "OPTIONS") {
-      return res.status(200).end();
+      res.status(200).end();
+    } else {
+      next();
     }
-
-    next();
   };
 
   app.use("/", express.static(frontendPath));

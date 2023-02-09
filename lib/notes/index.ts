@@ -50,6 +50,7 @@ import subwaytext from "../subwaytext/index.js";
 import { search } from "./search.js";
 import DatabaseQuery from "./interfaces/DatabaseQuery.js";
 import NoteListPage from "./interfaces/NoteListPage.js";
+import ByteRange from "./interfaces/ByteRange.js";
 
 let io: DatabaseIO;
 let randomUUID: () => string;
@@ -418,7 +419,7 @@ const getDanglingFiles = async (
 const getReadableFileStream = async (
   graphId: GraphId,
   fileId: FileId,
-  range?,
+  range?: ByteRange,
 ): Promise<Readable> => {
   const graph = await io.getGraph(graphId);
   if (!graph.files.map((file) => file.fileId).includes(fileId)) {

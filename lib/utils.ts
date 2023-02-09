@@ -62,7 +62,7 @@ const yyyymmdd = (date: Date): string => {
 };
 
 
-const deepFreeze = (o) => {
+const deepFreeze = (o: any) => {
   Object.freeze(o);
   if (o === undefined) {
     return o;

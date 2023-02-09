@@ -2,7 +2,7 @@ import CharIterator from "./CharIterator.js";
 import { RunningText, Span } from "./interfaces/Block.js";
 import { SpanType } from "./interfaces/SpanType.js";
 
-export const isWhiteSpace = (string) => {
+export const isWhiteSpace = (string: string): boolean => {
   return string.trim().length === 0;
 };
 
@@ -10,7 +10,7 @@ export const isWhiteSpace = (string) => {
 export const parseText = (text: string): RunningText => {
   const spans: Span[] = [];
   const iterator = new CharIterator(text);
-  let currentSpanType;
+  let currentSpanType: SpanType = SpanType.NORMAL_TEXT;
   let currentSpanText = "";
 
   // eslint-disable-next-line no-constant-condition

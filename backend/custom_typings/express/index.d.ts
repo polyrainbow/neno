@@ -1,6 +1,8 @@
 declare namespace Express {
   interface Request {
     userId: string;
-    session: any;
+    params: any;
+    body: any;
+    method: string;
   }
 }

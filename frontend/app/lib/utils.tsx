@@ -141,7 +141,7 @@ const setNoteTitleByContentIfUnset = (
   @param sortKeyKey:
     The sort key we want to find.
 */
-const binaryArrayFind = function<T>(
+const binaryArrayFind = function<T extends Record<string, string>>(
   sortedArray: T[],
   sortKeyKey: string,
   sortKeyToFind: string,
@@ -234,7 +234,10 @@ function humanFileSize(bytes: number, si = false, dp = 1): string {
 }
 
 
-const streamToBlob = async (stream, mimeType: string): Promise<Blob> => {
+const streamToBlob = async (
+  stream: ReadableStream,
+  mimeType: string,
+): Promise<Blob> => {
   const response = new Response(
     stream,
     {
@@ -420,7 +423,7 @@ const base64UrlEncode = async (
 };
 
 
-const base64UrlDecode = function(input) {
+const base64UrlDecode = function(input: string): string {
   // Replace non-url compatible chars with base64 standard chars
   input = input
     .replace(/-/g, "+")
@@ -442,7 +445,7 @@ const base64UrlDecode = function(input) {
 };
 
 
-const base64ToArrayBuffer = (base64) => {
+const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
   const binaryString = window.atob(base64);
   const len = binaryString.length;
   const bytes = new Uint8Array(len);
@@ -452,12 +455,12 @@ const base64ToArrayBuffer = (base64) => {
   return bytes.buffer;
 };
 
-const base64UrlToArrayBuffer = (input) => {
+const base64UrlToArrayBuffer = (input: string): ArrayBuffer => {
   return base64ToArrayBuffer(base64UrlDecode(input));
 };
 
 
-const stringToUTF8ByteArray = (input) => {
+const stringToUTF8ByteArray = (input: string): Uint8Array => {
   const enc = new TextEncoder(); // always utf-8
   return enc.encode(input);
 };
@@ -513,7 +516,7 @@ const insertDocumentTitles = async (
 };
 
 
-const getWritableStream = async (opts) => {
+const getWritableStream = async (opts: SaveFilePickerOptions) => {
   const newHandle = await window.showSaveFilePicker(opts);
   // create a FileSystemWritableFileStream to write to
   const writableStream = await newHandle.createWritable();

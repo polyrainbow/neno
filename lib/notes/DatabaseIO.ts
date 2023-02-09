@@ -20,6 +20,8 @@ import { Readable } from "./interfaces/Readable.js";
 import UnbalancedBinaryTree from "../UnbalancedBinaryTree.js";
 import { Block } from "../subwaytext/interfaces/Block.js";
 import { GraphId } from "./interfaces/GraphId.js";
+import ByteRange from "./interfaces/ByteRange.js";
+import ExistingNote from "./interfaces/ExistingNote.js";
 
 
 export default class DatabaseIO {
@@ -74,7 +76,7 @@ export default class DatabaseIO {
     const nonParseableNote = Symbol("NOT_PARSEABLE");
 
     const parsedNotes = serializedGraphObject.notes
-      .map((serializedNote) => {
+      .map((serializedNote: string) => {
         let parsedNote;
         try {
           parsedNote = parseSerializedExistingNote(serializedNote);
@@ -84,7 +86,11 @@ export default class DatabaseIO {
 
         return parsedNote;
       })
-      .filter(parsedNote => parsedNote !== nonParseableNote);
+      .filter(
+        (parsedNote: ExistingNote | symbol): parsedNote is ExistingNote => {
+          return parsedNote !== nonParseableNote;
+        }
+      );
 
     const parsedGraphObject = {
       ...serializedGraphObject,
@@ -145,7 +151,9 @@ export default class DatabaseIO {
     PUBLIC
   **/
 
-  constructor(config) {
+  constructor(config: {
+    storageProvider: StorageProvider,
+  }) {
     this.#storageProvider = config.storageProvider;
   }
 
@@ -265,7 +273,7 @@ export default class DatabaseIO {
   async getReadableFileStream(
     graphId: GraphId,
     fileId: FileId,
-    range,
+    range?: ByteRange,
   ): Promise<Readable> {
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,

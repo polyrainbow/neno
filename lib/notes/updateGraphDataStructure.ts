@@ -7,14 +7,14 @@
 
 import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
 
-const formatHeader = (key, value: string) => {
+const formatHeader = (key: string, value: string) => {
   return ":" + key + ":" + value + "\n";
 };
 
 // this function must be indempotent, so that it always results in one
 // canonical data structure
 const updateGraphDataStructure = async (graph: any) => {
-  graph.notes = graph.notes.map((note) => {
+  graph.notes = graph.notes.map((note: any) => {
     if (typeof note === "string") {
       return note;
     }
@@ -43,7 +43,7 @@ const updateGraphDataStructure = async (graph: any) => {
     return string;
   });
 
-  graph.files.forEach((file) => {
+  graph.files.forEach((file: any) => {
     if (file.creationTime) {
       file.createdAt = file.creationTime;
       delete file.creationTime;
