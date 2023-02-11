@@ -39,8 +39,9 @@ const LoginViewServer = () => {
     // @ts-ignore
     const registrationOptions = response.registrationOptions;
 
-    const publicKeyCredentialOptions = {
+    const publicKeyCredentialOptions: PublicKeyCredentialCreationOptions = {
       ...registrationOptions,
+      timeout: 60,
       challenge: base64UrlToArrayBuffer(registrationOptions.challenge),
       user: {
         ...registrationOptions.user,

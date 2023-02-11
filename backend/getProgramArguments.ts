@@ -63,7 +63,7 @@ export default (): ProgramArguments => {
     "session-cookie-name": {
       "type": "string",
       "description": "the name of the session cookie in which the auth token is stored",
-      "default": "NENO_token", // 500 MB
+      "default": "NENO_token",
     },
     "ipv6-only": {
       "type": "boolean",

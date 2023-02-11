@@ -20,9 +20,9 @@ export default (
 
   const f2l = new Fido2Lib({
     timeout: 60,
-    rpId: "localhost",
+    rpId: config.RELYING_PARTY,
     rpName: "NENO",
-    rpIcon: "http://localhost:8080/assets/app-icon/logo.svg",
+    rpIcon: `${config.ORIGIN}/assets/app-icon/logo.svg`,
     challengeSize: 128,
     attestation: "none",
     cryptoParams: [-7, -257],
@@ -172,7 +172,7 @@ export default (
         for (let i = 0; i < user.credentials.length; i++) {
           const assertionExpectations: ExpectedAssertionResult = {
             challenge: req.session.challenge,
-            origin: "http://localhost:8080",
+            origin: config.ORIGIN,
             factor: "either",
             publicKey: user.credentials[i].pubKey,
             prevCounter: user.credentials[i].prevCounter,
@@ -321,7 +321,7 @@ export default (
 
         const attestationExpectations: ExpectedAttestationResult = {
           challenge,
-          origin: "http://localhost:8080",
+          origin: config.ORIGIN,
           factor: "either"
         };
 
