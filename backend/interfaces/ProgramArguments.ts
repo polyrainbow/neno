@@ -48,5 +48,7 @@ export interface ProgramArguments {
   "http-port": number,
   "https-port": number,
   "ipv6-only": boolean,
+  "origin": string,
+  "rpid": string,
 }
 

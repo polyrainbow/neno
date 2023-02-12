@@ -29,6 +29,8 @@ const startApp = async ({
   maxUploadFileSize,
   sessionCookieName,
   maxGraphSize,
+  origin,
+  rpid,
 }: AppStartOptions): Promise<Express.Application> => {
   await Users.init(dataPath);
   const graphsDirectoryPath = path.join(dataPath, config.GRAPHS_DIRECTORY_NAME);
@@ -217,6 +219,8 @@ const startApp = async ({
     handleJSONParseErrors,
     sessionCookieName,
     getGraphIdsForUser,
+    origin,
+    rpid,
   );
 
   app.get(

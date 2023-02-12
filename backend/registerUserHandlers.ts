@@ -15,20 +15,22 @@ export default (
   handleJSONParseErrors,
   sessionCookieName,
   getGraphIdsForUser,
+  origin,
+  rpid,
 ) => {
   const bruteForcePreventer = new BruteForcePreventer();
 
   const f2l = new Fido2Lib({
     timeout: 60,
-    rpId: config.RELYING_PARTY,
+    rpId: rpid,
     rpName: "NENO",
-    rpIcon: `${config.ORIGIN}/assets/app-icon/logo.svg`,
+    rpIcon: `${origin}/assets/app-icon/logo.svg`,
     challengeSize: 128,
     attestation: "none",
     cryptoParams: [-7, -257],
     authenticatorAttachment: "platform",
     authenticatorRequireResidentKey: false,
-    authenticatorUserVerification: "required"
+    authenticatorUserVerification: "required",
   });
 
   const handleUnsuccessfulLoginAttempt = (req, res) => {
@@ -172,7 +174,7 @@ export default (
         for (let i = 0; i < user.credentials.length; i++) {
           const assertionExpectations: ExpectedAssertionResult = {
             challenge: req.session.challenge,
-            origin: config.ORIGIN,
+            origin: origin,
             factor: "either",
             publicKey: user.credentials[i].pubKey,
             prevCounter: user.credentials[i].prevCounter,
@@ -190,6 +192,8 @@ export default (
             req.session.loggedIn = true;
         
             bruteForcePreventer.successfulLogin(remoteAddress);
+
+            logger.debug(`Successful login for user ${user.name}`);
 
             const response: APIResponse = {
               success: true,
@@ -294,6 +298,8 @@ export default (
         registrationOptions.user.name = user.name;
         registrationOptions.user.displayName = user.name;
 
+        logger.debug(`Successful register for user ${user.name}`);
+
         // this modification of the session object initializes the session and
         // makes express-session set the cookie
         req.session.userId = user.id;
@@ -321,7 +327,7 @@ export default (
 
         const attestationExpectations: ExpectedAttestationResult = {
           challenge,
-          origin: config.ORIGIN,
+          origin: origin,
           factor: "either"
         };
 

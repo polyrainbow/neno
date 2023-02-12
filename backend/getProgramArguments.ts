@@ -75,6 +75,16 @@ export default (): ProgramArguments => {
       "description": "The maximum size of one graph in bytes",
       "default": 107374182400, // 100 GB
     },
+    "origin": {
+      "type": "string",
+      "description": "The origin of this server",
+      "default": "http://localhost:8080",
+    },
+    "rpid": {
+      "type": "string",
+      "description": "The relying party id for WebAuthn",
+      "default": "localhost",
+    },
   };
 
   // format options for util.parseArgs()

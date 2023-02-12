@@ -12,9 +12,6 @@ const REPO_PATH = path.join(__dirname, "..", "..");
 const SERVER_TIMEOUT = 30_000; // ms
 const GRAPHS_DIRECTORY_NAME = "graphs";
 
-const ORIGIN = "http://localhost:8080";
-const RELYING_PARTY = "localhost";
-
 export {
   API_PATH,
   USER_ENDOPINT,
@@ -22,6 +19,4 @@ export {
   REPO_PATH,
   SERVER_TIMEOUT,
   GRAPHS_DIRECTORY_NAME,
-  ORIGIN,
-  RELYING_PARTY,
 };
