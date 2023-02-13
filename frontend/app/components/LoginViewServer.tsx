@@ -27,10 +27,16 @@ const LoginViewServer = () => {
   const navigate = useNavigate();
 
   const addCredentials = async () => {
-    const response = await serverDatabaseProvider.register?.({
-      type: "REQUEST_CHALLENGE",
-      signUpToken,
-    });
+    let response;
+    try {
+      response = await serverDatabaseProvider.register?.({
+        type: "REQUEST_CHALLENGE",
+        signUpToken,
+      });
+    } catch (e) {
+      setDisclaimer((e as Error).message);
+      return;
+    }
 
     if (!response) {
       throw new Error("No response received");
@@ -49,9 +55,15 @@ const LoginViewServer = () => {
       },
     };
 
-    const credential = await navigator.credentials.create({
-      publicKey: publicKeyCredentialOptions,
-    });
+    let credential;
+    try {
+      credential = await navigator.credentials.create({
+        publicKey: publicKeyCredentialOptions,
+      });
+    } catch (e) {
+      setDisclaimer((e as Error).message);
+      return;
+    }
 
     if (!credential) throw new Error("No credential");
 
@@ -74,6 +86,7 @@ const LoginViewServer = () => {
           throw new Error("No graphs available on server database");
         }
         databaseModeRef.current = DatabaseMode.SERVER;
+        setDisclaimer(null);
         navigate(getAppPath(
           PathTemplate.NEW_NOTE,
           new Map([["GRAPH_ID", response.graphIds[0]]]),
@@ -87,9 +100,15 @@ const LoginViewServer = () => {
 
 
   const startLoginAttempt = async () => {
-    const response = await serverDatabaseProvider.login?.({
-      type: "REQUEST_CHALLENGE",
-    });
+    let response;
+    try {
+      response = await serverDatabaseProvider.login?.({
+        type: "REQUEST_CHALLENGE",
+      });
+    } catch (e) {
+      setDisclaimer((e as Error).message);
+      return;
+    }
 
     if (!response) {
       throw new Error("No response received");
@@ -103,9 +122,15 @@ const LoginViewServer = () => {
       challenge: base64UrlToArrayBuffer(authnOptions.challenge),
     };
 
-    const assertion = await navigator.credentials.get({
-      publicKey: publicKeyGetRequestOptions,
-    });
+    let assertion;
+    try {
+      assertion = await navigator.credentials.get({
+        publicKey: publicKeyGetRequestOptions,
+      });
+    } catch (e) {
+      setDisclaimer("INVALID_CREDENTIALS");
+      return;
+    }
 
     // @ts-ignore
     const assertionResponse = assertion.response;
@@ -131,6 +156,7 @@ const LoginViewServer = () => {
           throw new Error("No graphs available on server database");
         }
         databaseModeRef.current = DatabaseMode.SERVER;
+        setDisclaimer(null);
         navigate(getAppPath(
           PathTemplate.NEW_NOTE,
           new Map([["GRAPH_ID", response.graphIds[0]]]),
