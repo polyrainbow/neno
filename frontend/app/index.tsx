@@ -22,7 +22,7 @@ const serverDatabaseProvider = new ServerDatabaseProvider(
 );
 
 const appContainer = document.getElementById("app");
-const root = createRoot(appContainer);
+const root = createRoot(appContainer as HTMLDivElement);
 root.render(
   <StrictMode>
     <App
