@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { GraphId } from "../../lib/notes/interfaces/GraphId";
 import { getExistingNotesWithThisUrl } from "../utils";
 
 interface Note {
@@ -6,24 +7,33 @@ interface Note {
   id: number,
 }
 
-const ExistingNotes = ({ apiKey, hostUrl, activeTab, graphId }) => {
+interface ExistingNotesProps {
+  apiKey: string,
+  hostUrl: string,
+  activeTab: chrome.tabs.Tab,
+  graphId: GraphId
+}
+
+const ExistingNotes = ({
+  apiKey,
+  hostUrl,
+  activeTab,
+  graphId,
+}: ExistingNotesProps) => {
   const [existingNotes, setExistingNotes] = useState<Note[]>([]);
 
   useEffect(() => {
     const updateExistingNotes = async () => {
       if (
-        typeof hostUrl !== "string"
-        || hostUrl.length === 0
-        || typeof apiKey !== "string"
+        hostUrl.length === 0
         || apiKey.length === 0
-        || typeof graphId !== "string"
       ) {
         return;
       }
 
       try {
         const response = await getExistingNotesWithThisUrl(
-          activeTab.url,
+          activeTab.url as string,
           graphId,
           hostUrl,
           apiKey,

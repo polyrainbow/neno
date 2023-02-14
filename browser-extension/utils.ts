@@ -1,3 +1,6 @@
+import { GraphId } from "../lib/notes/interfaces/GraphId";
+import { NoteSaveRequest } from "../lib/notes/interfaces/NoteSaveRequest";
+
 export const fetchJSON = (url: string, options: RequestInit): Promise<any> => {
   // eslint-disable-next-line no-undef
   return fetch(url, options).then((response) => response.json());
@@ -41,6 +44,11 @@ export const putNote = ({
   hostUrl,
   apiKey,
   graphId,
+}: {
+  noteSaveRequest: NoteSaveRequest,
+  hostUrl: string,
+  apiKey: string,
+  graphId: GraphId,
 }): Promise<any> => {
   const requestUrl = `${hostUrl}/api/graph/${graphId}/note`;
 

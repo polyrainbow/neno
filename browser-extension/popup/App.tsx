@@ -5,6 +5,7 @@ import StatusBar from "./StatusBar";
 import {
   trimHostUrl,
 } from "../utils";
+import { GraphId } from "../../lib/notes/interfaces/GraphId";
 
 let didInit = false;
 
@@ -12,7 +13,7 @@ const App = () => {
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [hostUrl, setHostUrl] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<chrome.tabs.Tab | null>(null);
-  const [graphId, setGraphId] = useState(null);
+  const [graphId, setGraphId] = useState<GraphId | null>(null);
 
   useEffect(() => {
     // https://beta.reactjs.org/learn/you-might-not-need-an-effect#initializing-the-application

@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from "react";
+import { GraphId } from "../../lib/notes/interfaces/GraphId";
 import {
   isAuthenticated,
 } from "../utils";
 
-const StatusBar = ({ apiKey, hostUrl, setGraphId }) => {
+interface StatusBarProps {
+  apiKey: string | null,
+  hostUrl: string | null,
+  setGraphId: (graphId: GraphId) => void,
+}
+
+const StatusBar = ({
+  apiKey,
+  hostUrl,
+  setGraphId,
+}: StatusBarProps) => {
   const [statusMessage, setStatusMessage] = useState("Verifying server ...");
   const [statusColor, setStatusColor] = useState("");
 
