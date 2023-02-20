@@ -141,27 +141,20 @@ const Note = ({
 
     if (e.dataTransfer.items) {
       // Use DataTransferItemList interface to access the file(s)
-      [...e.dataTransfer.items].forEach((item) => {
-        // If dropped items aren't files, reject them
-        if (item.kind === "file") {
-          const file = item.getAsFile();
-          setUploadInProgress(true);
-          databaseProvider?.uploadFile(graphId, file)
-            .then((response) => {
-              insertFilesToNote([response]);
-              setUploadInProgress(false);
-            });
-        }
-      });
+      const files = [...e.dataTransfer.items]
+        .filter((item) => {
+          // If dropped items aren't files, reject them
+          return item.kind === "file";
+        })
+        .map((item) => {
+          return item.getAsFile();
+        });
+
+      uploadFiles(databaseProvider, files);
     } else {
       // Use DataTransfer interface to access the file(s)
-      [...e.dataTransfer.files].forEach((file) => {
-        databaseProvider?.uploadFile(graphId, file)
-          .then((response) => {
-            insertFilesToNote([response]);
-            setUploadInProgress(false);
-          });
-      });
+      const files = [...e.dataTransfer.files];
+      uploadFiles(databaseProvider, files);
     }
   };
 
