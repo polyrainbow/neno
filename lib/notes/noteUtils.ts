@@ -795,7 +795,10 @@ const getNotesWithUrl = (
   url: string,
 ): ExistingNote[] => {
   return notes.filter((note: ExistingNote) => {
-    return note.content.includes(url);
+    return note.content.includes(url)
+      // there should be no char after url string or it should be a
+      // whitespace char
+      && !(note.content[note.content.indexOf(url) + url.length]?.trim());
   });
 };
 
