@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import it, { describe } from 'node:test';
+import test from 'node:test';
 import ExistingNote from './interfaces/ExistingNote.js';
 import {
   getExtensionFromFilename,
@@ -7,8 +7,8 @@ import {
 } from './noteUtils.js';
 
 
-describe("getExtensionFromFilename", () => {
-  it(
+test("getExtensionFromFilename", (t) => {
+  t.test(
     "should correctly normalize filenames",
     async () => {
       assert.strictEqual(getExtensionFromFilename("AUDIO.mp3"), "mp3");
@@ -20,8 +20,8 @@ describe("getExtensionFromFilename", () => {
 });
 
 
-describe("getNotesWithUrl", () => {
-  it(
+test("getNotesWithUrl", (t) => {
+  t.test(
     "should find correct notes",
     async () => {
       const notes: ExistingNote[] = [

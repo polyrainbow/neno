@@ -1,12 +1,12 @@
 import assert from 'node:assert';
-import it, { describe } from 'node:test';
+import test from 'node:test';
 import { Block, BlockType, ListBlockStyle } from './interfaces/Block.js';
 import subwaytext from "./index.js";
 import { SpanType } from './interfaces/SpanType.js';
 
 
-describe("subwaytext", () => {
-  it("should parse basic documents correctly", async () => {
+test("subwaytext", async (t) => {
+  await t.test("should parse basic documents correctly", () => {
     const input = `#Heading
 
 
@@ -175,25 +175,28 @@ A paragraph with a https://link.com and a /slashlink`;
     assert.deepEqual(subwaytext(input), result);
   });
 
-  it("should unescape escaped code block signals within a code block", () => {
-    const input = `\`\`\`
+  await t.test(
+    "should unescape escaped code block signals within a code block",
+    () => {
+      const input = `\`\`\`
 \\\`\`\`
 code
 \\\`\`\`
 \`\`\``;
 
-    const result = [{
-      type: BlockType.CODE,
-      data: {
-        code: "```\ncode\n```",
-        contentType: "",
-      }
-    }];
+      const result = [{
+        type: BlockType.CODE,
+        data: {
+          code: "```\ncode\n```",
+          contentType: "",
+        }
+      }];
 
-    assert.deepEqual(subwaytext(input), result);
-  });
+      assert.deepEqual(subwaytext(input), result);
+    },
+  );
 
-  it("should recognize a code block after a paragraph block", () => {
+  await t.test("should recognize a code block after a paragraph block", () => {
     const input = `\`\`\`
 code
 \`\`\`
@@ -234,7 +237,7 @@ code
   });
 
 
-  it("should recognize single-line quote blocks", () => {
+  await t.test("should recognize single-line quote blocks", () => {
     const input = `>   This is a single-line quote block.`;
 
     const result = [
@@ -255,7 +258,7 @@ code
   });
 
 
-  it("should recognize multiline quote blocks", () => {
+  await t.test("should recognize multiline quote blocks", () => {
     const input = `>   This is a quote block
 > that goes on for two lines.
 After that, a text block.`;
@@ -288,34 +291,37 @@ After that, a text block.`;
     assert.deepEqual(subwaytext(input), result);
   });
 
-  it("allow end of code block backticks to be followed by whitespace", () => {
-    const input = `\`\`\`
+  await t.test(
+    "allow end of code block backticks to be followed by whitespace",
+    () => {
+      const input = `\`\`\`
 some code
 \`\`\`      
 normal text`;
 
-    const result = [
-      {
-        type: BlockType.CODE,
-        data: {
-          code: "some code",
-          contentType: ""
+      const result = [
+        {
+          type: BlockType.CODE,
+          data: {
+            code: "some code",
+            contentType: ""
+          },
         },
-      },
-      {
-        type: BlockType.PARAGRAPH,
-        data: {
-          text: [
-            {
-              text: "normal text",
-              type: "NORMAL_TEXT"
-            }
-          ],
-        }
-      },
-    ];
+        {
+          type: BlockType.PARAGRAPH,
+          data: {
+            text: [
+              {
+                text: "normal text",
+                type: "NORMAL_TEXT"
+              }
+            ],
+          }
+        },
+      ];
 
-    assert.deepEqual(subwaytext(input), result);
-  });
+      assert.deepEqual(subwaytext(input), result);
+    },
+  );
   
 });

@@ -1,13 +1,13 @@
 import assert from 'node:assert';
-import it, { describe } from 'node:test';
+import test from 'node:test';
 import {
   parseQueryString,
   getRawTokensFromQueryString,
 } from './search.js';
 
 
-describe("search", () => {
-  it(
+test("search", async (t) => {
+  await t.test(
     "should correctly parse all search tokens",
     async () => {
       // eslint-disable-next-line max-len
@@ -26,7 +26,7 @@ describe("search", () => {
     },
   );
 
-  it(
+  await t.test(
     "should correctly parse all query string",
     async () => {
       // eslint-disable-next-line max-len
@@ -53,7 +53,7 @@ describe("search", () => {
     },
   );
 
-  it(
+  await t.test(
     "should correctly parse tokens with colons in quotation marks",
     async () => {
       // eslint-disable-next-line max-len

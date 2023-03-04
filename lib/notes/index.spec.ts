@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import it, { describe } from 'node:test';
+import test from 'node:test';
 import * as Notes from "./index.js";
 import MockStorageProvider from './test/MockStorageProvider.js';
 import { randomUUID } from 'node:crypto';
@@ -16,10 +16,10 @@ Notes.init(
   () => randomUUID(),
 );
 
-describe("Notes module", () => {
+await test("Notes module", async (t) => {
   const TEST_GRAPH_ID = randomUUID();
 
-  it("should create and output notes", async () => {
+  await t.test("should create and output notes", async () => {
     const noteSaveRequest1: NewNoteSaveRequest = {
       note: {
         content: "",
@@ -50,7 +50,7 @@ describe("Notes module", () => {
     assert.strictEqual(page.numberOfResults, 2);
   });
 
-  it("should output correct graph stats", async () => {
+  await t.test("should output correct graph stats", async () => {
     const stats = await Notes.getStats(TEST_GRAPH_ID, {
       includeMetadata: true,
       includeAnalysis: false,
@@ -62,7 +62,7 @@ describe("Notes module", () => {
     assert.strictEqual(stats.numberOfUnlinkedNotes, 2);
   });
 
-  it("should correctly create links", async () => {
+  await t.test("should correctly create links", async () => {
     const noteSaveRequest: NoteSaveRequest = {
       note: {
         content: "",
@@ -89,7 +89,7 @@ describe("Notes module", () => {
     assert.strictEqual(stats.numberOfLinks, 1);
   });
 
-  it("should correctly update key values pairs", async () => {
+  await t.test("should correctly update key values pairs", async () => {
     const noteSaveRequest: NoteSaveRequest = {
       note: {
         content: "",

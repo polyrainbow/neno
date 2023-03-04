@@ -6,7 +6,7 @@
 
 Make sure that these are installed:
 
-* Node.js (>=18)
+* Node.js (>=19.7.0)
 * npm (>=8)
 
 The NENO app must be executed in a

@@ -1,10 +1,10 @@
 import assert from 'node:assert';
-import it, { describe } from 'node:test';
+import test from 'node:test';
 import UnbalancedBinaryTree from './UnbalancedBinaryTree.js';
 
 
-describe("UnbalancedBinaryTree", () => {
-  it("should correctly set and retrieve nodes", async () => {
+test("UnbalancedBinaryTree", async (t) => {
+  await t.test("should correctly set and retrieve nodes", () => {
     const tree = new UnbalancedBinaryTree();
     tree.set(100, "100");
     tree.set(50, "50");
@@ -16,12 +16,12 @@ describe("UnbalancedBinaryTree", () => {
     assert.strictEqual(tree.get(150), "150");
   });
 
-  it("should return null if node not found", async () => {
+  await t.test("should return null if node not found", () => {
     const tree = new UnbalancedBinaryTree();
     assert.strictEqual(tree.get(1), null);
   });
 
-  it("should correctly overwrite existing nodes", async () => {
+  await t.test("should correctly overwrite existing nodes", () => {
     const tree = new UnbalancedBinaryTree();
     tree.set(1, 1);
     tree.set(1, 2);

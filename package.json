@@ -69,9 +69,9 @@
     "dev": "concurrently -i --default-input-target 0 --kill-others \"npm run compile-typescript-backend && npm run start-server-dev\" \"npm run build-frontend-development\"",
     "unit-test-backend": "npx tsc -p backend && node dist/backend/lib/getDocumentTitle.spec.js",
     "test-intl": "node frontend/app/intl/test.js",
-    "unit-test-notes-module": "npm run compile-lib && node dist/lib/notes/index.spec.js && node dist/lib/notes/search.spec.js && node dist/lib/notes/noteUtils.spec.js",
-    "unit-test-unbalanced-binary-tree": "npm run compile-lib && node dist/lib/UnbalancedBinaryTree.spec.js",
-    "unit-test-subwaytext": "npm run compile-lib && node dist/lib/subwaytext/index.spec.js",
+    "unit-test-notes-module": "npm run compile-lib && node --test-reporter=spec dist/lib/notes/index.spec.js && node --test-reporter=spec dist/lib/notes/search.spec.js && node --test-reporter=spec dist/lib/notes/noteUtils.spec.js",
+    "unit-test-unbalanced-binary-tree": "npm run compile-lib && node --test-reporter=spec dist/lib/UnbalancedBinaryTree.spec.js",
+    "unit-test-subwaytext": "npm run compile-lib && node --test-reporter=spec dist/lib/subwaytext/index.spec.js",
     "subwaytext-example": "npm run compile-lib && node dist/lib/subwaytext/examples/example.js",
     "subwaytext-performance-test": "npm run compile-lib && node dist/lib/subwaytext/examples/performance-test.js"
   },
