@@ -16,7 +16,8 @@ export default async (filepath: string): Promise<void> => {
   const users: User[] = [];
 
   const numberOfUsers
-    = (await rl.question("How many users do you wish to create? (1) ")) || 1;
+    = parseInt(await rl.question("How many users do you wish to create? (1) "))
+    || 1;
 
   for (let i = 0; i < numberOfUsers; i++) {
     logger.info(`Gathering info for user ${(i + 1)}/${numberOfUsers}`);
