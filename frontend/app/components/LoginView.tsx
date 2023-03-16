@@ -38,9 +38,14 @@ const LoginView = () => {
         <LoginViewLocal />
       </div>
       <footer>
-        <a href="https://github.com/SebastianZimmer/neno/blob/main/docs/index.md">
-          {l("login.read-the-manual")}
-        </a>
+        <div className="links">
+          <a href="https://github.com/SebastianZimmer/neno/blob/main/docs/index.md">
+            {l("login.links.user-manual")}
+          </a>
+          <a href="https://github.com/SebastianZimmer/neno/">
+            {l("login.links.source-code")}
+          </a>
+        </div>
         <p className="version">{VERSION}</p>
       </footer>
     </section>

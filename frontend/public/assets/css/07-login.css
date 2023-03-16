@@ -44,10 +44,15 @@
 }
 
 .section-login footer {
-  font-size: var(--large-font-size);
   color: var(--font-color);
   margin: 0;
   text-align: center;
+}
+
+.section-login footer .links {
+  display: flex;
+  justify-content: center;
+  gap: var(--default-gap);
 }
 
 .section-login footer .version {
