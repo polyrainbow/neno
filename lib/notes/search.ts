@@ -17,6 +17,7 @@ import {
   getNotesWithMediaTypes,
   getNotesWithKeyValue,
   getNotesWithCustomMetadata,
+  getNotesWithFlag,
 } from "./noteUtils.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import GraphObject from "./interfaces/Graph.js";
@@ -171,6 +172,8 @@ export const search = async (
     } else if (key === "has-file") {
       matchingNotes = getNotesWithFile(matchingNotes, graph, value);
 
+    } else if (key === "has-flag") {
+      matchingNotes = getNotesWithFlag(matchingNotes, value);
 
     // search for notes with specific block types
     } else if (key === "has-block") {

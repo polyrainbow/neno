@@ -857,6 +857,16 @@ const getNotesWithFile = (
 };
 
 
+const getNotesWithFlag = (
+  notes: ExistingNote[],
+  flag: string,
+): ExistingNote[] => {
+  return notes.filter((note: ExistingNote) => {
+    return note.meta.flags.includes(flag);
+  });
+};
+
+
 const getNotesWithTitleContainingTokens = (
   notes: ExistingNote[],
   query: string,
@@ -1240,4 +1250,5 @@ export {
   findNoteIndex,
   getNotesWithCustomMetadata,
   removeCustomMetadataWithEmptyKeys,
+  getNotesWithFlag,
 };
