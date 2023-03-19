@@ -1,8 +1,7 @@
 import { GraphId } from "../interfaces/GraphId";
-import { SomeReadableStream } from "../interfaces/SomeReadableStream";
 import StorageProvider from "../interfaces/StorageProvider";
 
-export default class MockStorageProvider implements StorageProvider {
+export default class MockStorageProvider implements StorageProvider<string> {
   #files = new Map<string, string>;
 
   readObjectAsString(
@@ -22,7 +21,7 @@ export default class MockStorageProvider implements StorageProvider {
   getReadableStream(
     graphId: GraphId,
     requestPath: string,
-  ): Promise<SomeReadableStream> {
+  ): Promise<string> {
     const finalPath = this.joinPath(graphId, requestPath);
     if (this.#files.has(finalPath)) {
       return Promise.resolve(this.#files.get(finalPath) as string);
@@ -52,7 +51,7 @@ export default class MockStorageProvider implements StorageProvider {
   writeObjectFromReadable(
     graphId: GraphId,
     requestPath: string,
-    readableStream: SomeReadableStream,
+    readableStream: string,
   ): Promise<number> {
     const finalPath = this.joinPath(graphId, requestPath);
     this.#files.set(finalPath, readableStream);

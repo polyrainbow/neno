@@ -8,7 +8,7 @@ import ByteRange from "../../../lib/notes/interfaces/ByteRange";
 import StorageProvider from "../../../lib/notes/interfaces/StorageProvider";
 
 export default class FileSystemAccessAPIStorageProvider
-implements StorageProvider {
+implements StorageProvider<ReadableStream> {
   constructor(directoryHandle: FileSystemDirectoryHandle) {
     this.#directoryHandle = directoryHandle;
   }
@@ -105,7 +105,7 @@ implements StorageProvider {
   async writeObject(
     graphId: string,
     requestPath: string,
-    data,
+    data: FileSystemWriteChunkType,
   ): Promise<void> {
     const finalPath = this.joinPath(graphId, requestPath);
     const fileHandle = await this.#getFileHandle(finalPath, true);
@@ -118,7 +118,7 @@ implements StorageProvider {
   async writeObjectFromReadable(
     graphId: string,
     requestPath: string,
-    readableStream,
+    readableStream: ReadableStream,
   ): Promise<number> {
     const finalPath = this.joinPath(graphId, requestPath);
     const fileHandle = await this.#getFileHandle(finalPath, true);

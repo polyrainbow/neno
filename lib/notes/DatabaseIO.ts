@@ -14,7 +14,6 @@ import Graph, { SerializedGraphObject } from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import updateGraphDataStructure from "./updateGraphDataStructure.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
-import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 import { parseSerializedExistingNote, serializeNote } from "./noteUtils.js";
 import { Readable } from "./interfaces/Readable.js";
 import UnbalancedBinaryTree from "../UnbalancedBinaryTree.js";
@@ -24,8 +23,8 @@ import ByteRange from "./interfaces/ByteRange.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
 
 
-export default class DatabaseIO {
-  #storageProvider: StorageProvider;
+export default class DatabaseIO<ReadableStreamImplementation> {
+  #storageProvider: StorageProvider<ReadableStreamImplementation>;
   #loadedGraphs: Map<GraphId, Graph> = new Map();
   #graphRetrievalInProgress: Promise<void> = Promise.resolve();
   #finishedObtainingGraph: (() => void) = () => {return;};
@@ -152,7 +151,7 @@ export default class DatabaseIO {
   **/
 
   constructor(config: {
-    storageProvider: StorageProvider,
+    storageProvider: StorageProvider<ReadableStreamImplementation>,
   }) {
     this.#storageProvider = config.storageProvider;
   }
@@ -221,7 +220,7 @@ export default class DatabaseIO {
   async addFile(
     graphId: GraphId,
     fileId: FileId,
-    source: SomeReadableStream,
+    source: ReadableStreamImplementation,
   ): Promise<number> {
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
@@ -253,7 +252,7 @@ export default class DatabaseIO {
   async getReadableGraphStream(
     graphId: GraphId,
     withFiles: boolean,
-  ): Promise<SomeReadableStream> {
+  ): Promise<ReadableStreamImplementation> {
     if (!this.#storageProvider.getArchiveStreamOfFolder) {
       throw new Error(ErrorMessage.NOT_SUPPORTED_BY_STORAGE_PROVIDER);
     }

@@ -336,7 +336,7 @@ implements LocalDatabaseProviderInterface {
         "Database Provider has not been properly initialized yet.",
       );
     }
-    return this.#notesModule.addFile(
+    return this.#notesModule.addFile<ReadableStream<Uint8Array>>(
       graphId,
       file.stream(),
       file.name,

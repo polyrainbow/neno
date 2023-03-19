@@ -1,8 +1,7 @@
 import { GraphId } from "./GraphId";
 import ByteRange from "./ByteRange";
-import { SomeReadableStream } from "./SomeReadableStream";
 
-export default interface StorageProvider {
+export default interface StorageProvider<ReadableStreamImplementation> {
   readObjectAsString: (
     graphId: GraphId,
     requestPath: string,
@@ -11,7 +10,7 @@ export default interface StorageProvider {
     graphId: GraphId,
     requestPath: string,
     range?: ByteRange,
-  ) => Promise<SomeReadableStream>,
+  ) => Promise<ReadableStreamImplementation>,
   removeObject: (graphId: GraphId, requestPath: string) => Promise<void>,
   writeObject: (
     graphId: GraphId,
@@ -21,7 +20,7 @@ export default interface StorageProvider {
   writeObjectFromReadable: (
     graphId: GraphId,
     requestPath: string,
-    readableStream: SomeReadableStream,
+    readableStream: ReadableStreamImplementation,
   ) => Promise<number>,
   joinPath: (...segments: string[]) => string,
   getFileSize(graphId: GraphId, requestPath: string): Promise<number>,
@@ -32,5 +31,5 @@ export default interface StorageProvider {
   getArchiveStreamOfFolder?: (
     graphId: GraphId,
     requestPath: string,
-  ) => Promise<SomeReadableStream>,
+  ) => Promise<ReadableStreamImplementation>,
 }

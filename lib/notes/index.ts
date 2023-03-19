@@ -41,7 +41,6 @@ import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import GraphStatsRetrievalOptions
   from "./interfaces/GraphStatsRetrievalOptions.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
-import { SomeReadableStream } from "./interfaces/SomeReadableStream.js";
 import { FileInfo } from "./interfaces/FileInfo.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
 import { NoteSaveRequest } from "./interfaces/NoteSaveRequest.js";
@@ -52,7 +51,7 @@ import DatabaseQuery from "./interfaces/DatabaseQuery.js";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import ByteRange from "./interfaces/ByteRange.js";
 
-let io: DatabaseIO;
+let io: DatabaseIO<any>;
 let randomUUID: () => string;
 
 
@@ -61,13 +60,13 @@ let randomUUID: () => string;
 **/
 
 
-const init = async (
-  storageProvider: StorageProvider,
+const init = async <ReadableStreamImplementation>(
+  storageProvider: StorageProvider<ReadableStreamImplementation>,
   _randomUUID: () => string,
 ): Promise<void> => {
   randomUUID = _randomUUID;
 
-  io = new DatabaseIO({storageProvider});
+  io = new DatabaseIO<ReadableStreamImplementation>({storageProvider});
 };
 
 
@@ -355,9 +354,9 @@ const importDB = (
 };
 
 
-const addFile = async (
+const addFile = async <ReadableStreamImplementation>(
   graphId: GraphId,
-  readable: SomeReadableStream,
+  readable: ReadableStreamImplementation,
   filename: string,
 ): Promise<FileInfo> => {
   const extension = getExtensionFromFilename(filename);

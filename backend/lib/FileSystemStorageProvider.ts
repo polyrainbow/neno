@@ -64,7 +64,8 @@ const handleNodeJsFsApiError = (e: unknown): never => {
 };
 
 
-export default class FileSystemStorageProvider implements StorageProvider {
+export default class FileSystemStorageProvider
+implements StorageProvider<fsClassic.ReadStream> {
   #graphsDirectoryPath;
 
   constructor(graphsDirectoryPath: string) {
