@@ -485,6 +485,7 @@ button.dangerous-action {
   padding: 5px;
 }
 
-.stats-table tr td:nth-of-type(2) {
+.data-table tr td:nth-of-type(2) {
+  word-break: break-word;
   text-align: right;
 }

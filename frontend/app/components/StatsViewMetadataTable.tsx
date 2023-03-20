@@ -6,7 +6,7 @@ import {
 } from "../lib/utils";
 
 const StatsViewMetadataTable = ({ stats, databaseType }) => {
-  return <table className="data-table stats-table">
+  return <table className="data-table">
     <tbody>
       <tr>
         <td>{l("stats.metadata.id")}</td>

@@ -46,7 +46,7 @@ const StatsViewAnalysisTable = ({
 
   const meshednessPercentage = meshedness * 100;
 
-  return <table className="data-table stats-table">
+  return <table className="data-table">
     <tbody>
       <tr>
         <td>{emojis.note} {l("stats.analysis.nodes-notes")}</td>
