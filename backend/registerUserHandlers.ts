@@ -1,5 +1,4 @@
 import * as config from "./config.js";
-import express from "express";
 import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
 import * as logger from "./lib/logger.js";
@@ -8,16 +7,16 @@ import { ExpectedAssertionResult, ExpectedAttestationResult, Fido2Lib } from "fi
 import { toArrayBuffer } from "./lib/utils.js";
 import BruteForcePreventer from "./BruteForcePreventer.js";
 
-export default (
+export default ({
   app,
   sessionMiddleware,
   verifyUser,
-  handleJSONParseErrors,
   sessionCookieName,
   getGraphIdsForUser,
   origin,
   rpid,
-) => {
+  parseJSONBody,
+}) => {
   const bruteForcePreventer = new BruteForcePreventer();
 
   const f2l = new Fido2Lib({
@@ -67,8 +66,7 @@ export default (
     config.USER_ENDOPINT + "logout",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const response: APIResponse = {
         success: true,
@@ -105,8 +103,7 @@ export default (
   app.post(
     config.USER_ENDOPINT + 'login',
     sessionMiddleware,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async (req, res) => {
       const remoteAddress = req.socket.remoteAddress;
       // remote address may be undefined if the client has disconnected
@@ -241,8 +238,7 @@ export default (
   app.post(
     config.USER_ENDOPINT + 'register',
     sessionMiddleware,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async (req, res) => {
       const type = req.body.type as RegisterRequestType;
 

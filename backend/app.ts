@@ -203,25 +203,30 @@ const startApp = async ({
     }
   };
 
-  registerGraphHandlers(
+  const parseJSONBody = [
+    express.json({limit: "5mb"}),
+    handleJSONParseErrors,
+  ];
+
+  registerGraphHandlers({
     app,
     sessionMiddleware,
     verifyUser,
-    handleJSONParseErrors,
     maxUploadFileSize,
     maxGraphSize,
-  );
+    parseJSONBody,
+  });
 
-  registerUserHandlers(
+  registerUserHandlers({
     app,
     sessionMiddleware,
     verifyUser,
-    handleJSONParseErrors,
     sessionCookieName,
     getGraphIdsForUser,
     origin,
     rpid,
-  );
+    parseJSONBody,
+  });
 
   app.get(
     config.API_PATH + "document-title",

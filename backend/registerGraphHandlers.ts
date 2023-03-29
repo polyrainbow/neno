@@ -14,21 +14,20 @@ import noteSaveRequestSchema from "../lib/notes/schemas/NoteSaveRequest.schema.j
 import graphObjectSchema from "../lib/notes/schemas/GraphObject.schema.json" assert { type: 'json' };
 import graphVisualizationFromUserSchema from "../lib/notes/schemas/GraphVisualizationFromUser.schema.json" assert { type: 'json' };
 import * as config from "./config.js";
-import express from "express";
 import * as Notes from "../lib/notes/index.js";
 import APIResponse from "./interfaces/APIResponse.js";
 import { APIError } from "./interfaces/APIError.js";
 import * as logger from "./lib/logger.js";
 
 
-export default (
+export default ({
   app,
   sessionMiddleware,
   verifyUser,
-  handleJSONParseErrors,
   maxUploadFileSize,
   maxGraphSize,
-) => {
+  parseJSONBody,
+}) => {
   const ajv = new Ajv();
 
   const validateNoteSaveRequest = ajv.compile(noteSaveRequestSchema);
@@ -84,8 +83,7 @@ export default (
     config.GRAPH_ENDPOINT,
     sessionMiddleware,
     verifyUser,
-    express.json(), // returns {} on non-JSON request bodies
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const graphObject = req.body;
@@ -160,10 +158,7 @@ export default (
     config.GRAPH_ENDPOINT + "graph-visualization",
     sessionMiddleware,
     verifyUser,
-    // posting a graph can be somewhat larger, so let's increase upload limit
-    // from 100kb to 1mb
-    express.json({ limit: "1mb" }),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const graphVisualizationFromUser = req.body;
@@ -298,8 +293,7 @@ export default (
     config.GRAPH_ENDPOINT + "note",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -343,8 +337,7 @@ export default (
     config.GRAPH_ENDPOINT + "raw-note",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -643,8 +636,7 @@ export default (
     config.GRAPH_ENDPOINT + "file-info/:fileId",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const fileId = req.params.fileId;
@@ -673,8 +665,7 @@ export default (
     config.GRAPH_ENDPOINT + "files",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const files = await Notes.getFiles(graphId);
@@ -692,8 +683,7 @@ export default (
     config.GRAPH_ENDPOINT + "file/:fileId",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const fileId = req.params.fileId;
@@ -720,8 +710,7 @@ export default (
     config.GRAPH_ENDPOINT + "dangling-files",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const files = await Notes.getDanglingFiles(graphId);
@@ -739,8 +728,7 @@ export default (
     config.GRAPH_ENDPOINT + "pins",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -761,8 +749,7 @@ export default (
     config.GRAPH_ENDPOINT + "pins",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const reqBody = req.body;
@@ -783,8 +770,7 @@ export default (
     config.GRAPH_ENDPOINT + "pins",
     sessionMiddleware,
     verifyUser,
-    express.json(),
-    handleJSONParseErrors,
+    parseJSONBody,
     async function(req, res) {
       const graphId = req.params.graphId;
       const pinnedNotes = await Notes.getPins(graphId);
