@@ -17,9 +17,5 @@ jobs:
     - run: npm i
     - run: npm run lint
     - run: npm run stylelint
-    - run: npm run unit-test-notes-module
-    - run: npm run unit-test-subwaytext
-    - run: npm run unit-test-unbalanced-binary-tree
-    - run: npm run unit-test-backend
-    - run: npm run test-intl
+    - run: npm run test
     - run: npm run build
