@@ -2,7 +2,7 @@ import * as logger from "./logger.js";
 
 
 export const getDocumentTitleFromHtml = (html: string): string => {
-  const REGEX = /<title.*>(.*)<\/title>/gs;
+  const REGEX = /<title[^<>]*>([^<>]*)<\/title>/gs;
   const result = REGEX.exec(html);
   if (!result) throw new Error("Document contains no title element");
   return result[1].trim();
