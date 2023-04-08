@@ -56,6 +56,7 @@ const NoteView = () => {
   const graphId = useGraphId();
   const { noteId } = useParams();
   const [urlSearchParams] = useSearchParams();
+  const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
 
   const handleInvalidCredentialsError = async () => {
     await databaseProvider?.removeAccess();
@@ -179,6 +180,7 @@ const NoteView = () => {
 
 
   const handleNoteSaveRequest = async (): Promise<void> => {
+    setUploadInProgress(true);
     try {
       await saveActiveNoteAndRefreshViews(false);
     } catch (e) {
@@ -200,6 +202,7 @@ const NoteView = () => {
         alert(e);
       }
     }
+    setUploadInProgress(false);
   };
 
 
@@ -422,6 +425,8 @@ const NoteView = () => {
           toggleEditMode={toggleEditMode}
           importNote={importNote}
           graphId={graphId}
+          uploadInProgress={uploadInProgress}
+          setUploadInProgress={setUploadInProgress}
         />
       </div>
     </main>

@@ -1,11 +1,8 @@
 import React from "react";
-import UnsavedChangesIndicator from "./UnsavedChangesIndicator";
-import { l } from "../lib/intl";
-import Tooltip from "./Tooltip";
-import Icon from "./Icon";
 import ActiveNote from "../types/ActiveNote";
 import { GraphId } from "../../../lib/notes/interfaces/GraphId";
 import NoteControls from "./NoteControls";
+import StatusIndicator from "./StatusIndicator";
 
 interface NoteMenuBarProps {
   activeNote: ActiveNote,
@@ -65,22 +62,11 @@ const NoteMenuBar = ({
       />
     </div>
     <div className="note-controls-right">
-      {
-        uploadInProgress
-          ? <Tooltip
-            title={l("editor.note-has-not-been-saved-yet")}
-          >
-            <Icon
-              icon={"file_upload"}
-              title={l("editor.upload-in-progress")}
-              size={24}
-            />
-          </Tooltip>
-          : ""
-      }
-      <UnsavedChangesIndicator
-        isUnsaved={activeNote.isUnsaved}
-        unsavedChanges={unsavedChanges}
+      <StatusIndicator
+        isNew={activeNote.isUnsaved}
+        hasUnsavedChanges={unsavedChanges}
+        isEverythingSaved={!unsavedChanges}
+        isUploading={uploadInProgress}
       />
     </div>
   </section>;

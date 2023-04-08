@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Editor from "./Editor";
 import NoteStats from "./NoteStats";
 import {
@@ -51,6 +51,8 @@ interface NoteComponentProps {
   toggleEditMode,
   importNote,
   graphId: GraphId,
+  uploadInProgress: boolean,
+  setUploadInProgress: (val: boolean) => void,
 }
 
 
@@ -77,9 +79,10 @@ const Note = ({
   toggleEditMode,
   importNote,
   graphId,
+  uploadInProgress,
+  setUploadInProgress,
 }: NoteComponentProps) => {
   const databaseProvider = useDatabaseProvider();
-  const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
   const noteTitleElementRef = useRef<HTMLTextAreaElement>(null);
 
   const insertFilesToNote = (responses: FileInfo[]) => {

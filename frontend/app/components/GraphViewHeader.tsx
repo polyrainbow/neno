@@ -1,5 +1,5 @@
 import React from "react";
-import UnsavedChangesIndicator from "./UnsavedChangesIndicator";
+import StatusIndicator from "./StatusIndicator";
 import IconButton from "./IconButton";
 import SearchInput from "./SearchInput";
 import { l } from "../lib/intl";
@@ -95,7 +95,12 @@ const GraphViewHeader = ({
             marginRight: "10px",
           }}
         />
-        <UnsavedChangesIndicator unsavedChanges={unsavedChanges} />
+        <StatusIndicator
+          isNew={false}
+          hasUnsavedChanges={unsavedChanges}
+          isEverythingSaved={!unsavedChanges}
+          isUploading={false}
+        />
       </>
     }
   />;
