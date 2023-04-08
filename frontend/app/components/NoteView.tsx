@@ -203,8 +203,26 @@ const NoteView = () => {
   };
 
 
+  const setCanonicalNewNotePath = () => {
+    /* whatever has been written to the address bar, let's replace it with
+    the canonical path for a new note */
+    navigate(
+      Utils.getAppPath(
+        PathTemplate.NEW_NOTE,
+        new Map([["GRAPH_ID", graphId]]),
+        new URLSearchParams(location.search),
+      ),
+      { replace: true },
+    );
+  };
+
+
   useKeyboardShortcuts({
     onSave: handleNoteSaveRequest,
+    onCmdB: () => {
+      createNewNote();
+      setCanonicalNewNotePath();
+    },
   });
 
 
@@ -246,20 +264,6 @@ const NoteView = () => {
         setContentMode(Config.DEFAULT_CONTENT_MODE);
       });
   }, []);
-
-
-  const setCanonicalNewNotePath = () => {
-    /* whatever has been written to the address bar, let's replace it with
-    the canonical path for a new note */
-    navigate(
-      Utils.getAppPath(
-        PathTemplate.NEW_NOTE,
-        new Map([["GRAPH_ID", graphId]]),
-        new URLSearchParams(location.search),
-      ),
-      { replace: true },
-    );
-  };
 
 
   useEffect(() => {

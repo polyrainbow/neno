@@ -3,15 +3,15 @@ import { useEffect } from "react";
 interface KeyboardShortCutHandlers {
   onSave?: () => void,
   onCmdDot?: () => void,
+  onCmdB?: () => void,
 }
 
 export default (handlers: KeyboardShortCutHandlers): void => {
   const handleKeydown = (e) => {
     if (
       handlers.onSave
-      // navigator.platform is deprecated and should be replaced with
-      // navigator.userAgentData.platform at some point
-      && (window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
+      // @ts-ignore
+      && (navigator.userAgentData.platform === "macOS" ? e.metaKey : e.ctrlKey)
       && e.key === "s"
     ) {
       handlers.onSave();
@@ -20,12 +20,21 @@ export default (handlers: KeyboardShortCutHandlers): void => {
 
     if (
       handlers.onCmdDot
-      // navigator.platform is deprecated and should be replaced with
-      // navigator.userAgentData.platform at some point
-      && (window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)
+      // @ts-ignore
+      && (navigator.userAgentData.platform === "macOS" ? e.metaKey : e.ctrlKey)
       && e.key === "."
     ) {
       handlers.onCmdDot();
+      e.preventDefault();
+    }
+
+    if (
+      handlers.onCmdB
+      // @ts-ignore
+      && (navigator.userAgentData.platform === "macOS" ? e.metaKey : e.ctrlKey)
+      && e.key === "b"
+    ) {
+      handlers.onCmdB();
       e.preventDefault();
     }
   };
