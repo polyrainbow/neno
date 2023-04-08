@@ -45,8 +45,10 @@
   margin: 0;
   margin-right: 5px;
   padding: 5px 10px;
-  font-size: var(--large-font-size);
   white-space: pre;
+  background: none;
+  height: 50px;
+  border-radius: 0;
 }
 
 .app-title:hover {
@@ -142,6 +144,7 @@
   height: 35px;
   background: var(--accent-color-1);
   border-radius: var(--border-radius);
+  font-size: initial;
 }
 
 .pinned-note:hover {

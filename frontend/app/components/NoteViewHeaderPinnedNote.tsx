@@ -15,7 +15,7 @@ const NoteViewHeaderPinnedNote = ({
   isActive,
   onClick,
 }: NoteViewHeaderPinnedNoteProps) => {
-  return <div
+  return <button
     className={"pinned-note " + (isActive ? "active" : "")}
     onClick={onClick}
   >
@@ -31,7 +31,7 @@ const NoteViewHeaderPinnedNote = ({
         ? shortenText(note.meta.title, 35)
         : l("list.untitled-note")
     }</p>
-  </div>;
+  </button>;
 };
 
 
