@@ -17,6 +17,7 @@ const ChangeLanguageDialog = ({
     <h1>{l("change-language.heading")}</h1>
     <select
       value={selectedLanguage}
+      autoFocus={true}
       onChange={(e) => setSelectedLanguage(e.target.value)}
     >
       {

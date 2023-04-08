@@ -18,6 +18,7 @@ const SwitchGraphsDialog = ({
     <h1>{l("switch-graphs.heading")}</h1>
     <select
       value={selectedGraphId}
+      autoFocus={true}
       onChange={(e) => setSelectedGraphId(e.target.value)}
     >
       {

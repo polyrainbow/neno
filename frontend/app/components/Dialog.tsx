@@ -11,12 +11,12 @@ const Dialog = (props) => {
   return <Overlay
     onClick={onClickOnOverlay}
   >
-    <div
+    <dialog
       className={"dialog-box " + className}
       onClick={(e) => e.stopPropagation()}
     >
       {children}
-    </div>
+    </dialog>
   </Overlay>;
 };
 

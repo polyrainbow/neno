@@ -23,7 +23,6 @@ const ConfirmationDialog = ({
       <button
         onClick={onConfirm}
         autoFocus={encourageConfirmation}
-        tabIndex={0}
         className={
           "default-button dialog-box-button "
           + (encourageConfirmation ? "default-action" : "dangerous-action")
@@ -32,7 +31,6 @@ const ConfirmationDialog = ({
       <button
         onClick={onCancel}
         autoFocus={!encourageConfirmation}
-        tabIndex={1}
         className={
           "default-button dialog-box-button "
           + (!encourageConfirmation ? "default-action" : "")
