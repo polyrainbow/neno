@@ -1,6 +1,8 @@
-import { readFile, writeFile } from "fs/promises";
-import * as path from "path";
+import { readFile, writeFile } from "node:fs/promises";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const iconIds = process.argv[2]
   ? process.argv[2].split(",")
@@ -20,7 +22,7 @@ for (let i = 0; i < iconIds.length; i++) {
   const buffer = Buffer.from(arrayBuffer, "binary");
   const targetFilename = `${iconId}.svg`;
   const targetPath = path.join(
-    "..", "frontend", "public", "assets", "icons",
+    __dirname, "..", "frontend", "public", "assets", "icons",
     targetFilename,
   );
   console.log("Writing " + targetFilename);
