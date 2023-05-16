@@ -60,7 +60,7 @@ const ExistingNotes = ({
               key={"existing-note-" + note.id}
             >
               <a
-                href={hostUrl + "/editor/" + note.id}
+                href={`${hostUrl}/graph/${graphId}/note/${note.id}`}
                 target="_blank" rel="noreferrer"
               >{note.title}</a>
             </p>;
