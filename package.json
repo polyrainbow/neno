@@ -39,7 +39,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
-    "stylelint": "^15.2.0",
+    "stylelint": "^15.10.1",
     "stylelint-config-standard": "^30.0.1",
     "tippy.js": "^6.3.7",
     "ts-loader": "^9.4.1",
