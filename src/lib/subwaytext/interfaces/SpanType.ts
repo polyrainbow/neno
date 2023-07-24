@@ -1,0 +1,6 @@
+export enum SpanType {
+  NORMAL_TEXT = "NORMAL_TEXT",
+  HYPERLINK = "HYPERLINK",
+  SLASHLINK = "SLASHLINK",
+  WIKILINK = "WIKILINK",
+}

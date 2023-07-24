@@ -1,6 +1,0 @@
-export enum DialogType {
-  CHANGE_LANGUAGE = "CHANGE_LANGUAGE",
-  SWITCH_GRAPHS = "SWITCH_GRAPHS",
-  SEARCH = "SEARCH",
-  NONE = "NONE",
-}

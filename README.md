@@ -11,7 +11,7 @@
 
 ## What is NENO?
 
-NENO is a powerful note-taking app that helps you create your personal knowledge graph. With NENO, you retain full control over your data because you decide where it is stored: On your device, on a cloud storage of your choice, or even on a server under your control.
+NENO is a powerful note-taking app that helps you create your personal knowledge graph. With NENO, you retain full control over your data because you decide where it is stored: On your device or on a cloud storage of your choice.
 
 ## Screenshots
 
@@ -26,14 +26,14 @@ NENO is a powerful note-taking app that helps you create your personal knowledge
 
 ## Features
 
-* Full data ownership: You decide where your data is stored: On your device, on a cloud storage of your choice, or even on your own NENO server.
+* Full data ownership: You decide where your data is stored: On your device or on a cloud storage of your choice.
 * Multiple media types: Paste video, audio, PDF documents, images and code into your note
 * Graph View: Drag and drop nodes and create your custom knowledge graph visualization
-* Super-simple plaintext editor
+* Simple plaintext editor
 * Powerful full-text search
 * Tap-to-link: One click is enough to link two notes
 * File overview: All uploaded files in one view
-* Lossless export: Export your data losslessly to create backups or to migrate to another NENO instance
+* Lossless export: Export your data losslessly to create backups
 * Dark mode: Eye-friendly note-taking at night time
 
 ## Getting started

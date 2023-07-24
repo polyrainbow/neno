@@ -3,7 +3,7 @@ import * as path from "node:path";
 import * as url from "url";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const LOCALES_DIRECTORY = path.join(__dirname, "..", "frontend", "app", "intl");
+const LOCALES_DIRECTORY = path.join(__dirname, "..", "src", "intl");
 
 const filenames = await fs.readdir(LOCALES_DIRECTORY);
 
@@ -19,8 +19,12 @@ for (const filename of localeFilenames) {
   const pairs = Object.entries(obj);
   pairs.sort(
     function(a, b) {
-      if (a[0].toLowerCase() < b[0].toLowerCase()) {return -1;}
-      if (a[0].toLowerCase() > b[0].toLowerCase()) {return 1;}
+      if (a[0].toLowerCase() < b[0].toLowerCase()) {
+        return -1;
+      }
+      if (a[0].toLowerCase() > b[0].toLowerCase()) {
+        return 1;
+      }
       return 0;
     },
   );

@@ -1,35 +1,47 @@
 {
-  "overrides": [
-    {
-      "files": [".js", "*.ts", "*.tsx"]
-    }
-  ],
   "env": {
+    "browser": true,
+    "commonjs": true,
     "es6": true,
     "jest": true
   },
+  "parser": "@typescript-eslint/parser",
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
   "parserOptions": {
-    "ecmaVersion": 2022,
+    "ecmaVersion": 2021,
     "sourceType": "module"
   },
-  "ignorePatterns": [
-    "node_modules",
-    "dist"
-  ],
+  "ignorePatterns": ["assets", "js"],
   "extends": [
-    "standard",
     "eslint:recommended",
-    "google"
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:react/recommended",
+    "google",
+    "plugin:@typescript-eslint/recommended"
   ],
+  "plugins": [
+    "react-hooks",
+    "@typescript-eslint"
+  ],
+  "settings": {
+    "react": {
+      "version": "17.1"
+    }
+  },
   "rules": {
-    "indent": [
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "indent": "off",
+    "@typescript-eslint/indent": [
       "error",
       2
     ],
+    "@typescript-eslint/semi": ["error", "always"],
     "linebreak-style": [
       "error",
       "unix"
@@ -38,17 +50,7 @@
       "error",
       "double"
     ],
-    "semi": [
-      "error",
-      "always"
-    ],
-    "no-unused-vars": [
-      "error", {
-        "vars": "all",
-        "args": "after-used",
-        "ignoreRestSiblings": false
-      }
-    ],
+    "semi": [0],
     "eqeqeq": ["error"],
     "no-redeclare": ["error"],
     "no-empty": ["error"],
@@ -56,8 +58,7 @@
     "no-eq-null": ["error"],
     "no-extra-boolean-cast": ["error"],
     "no-label-var": ["error"],
-    "no-undefined": ["error"],
-    "no-use-before-define": ["error"],
+    "no-undefined": [0],
     "no-mixed-requires": ["error"],
     "camelcase": ["error"],
     "no-mixed-spaces-and-tabs": ["error"],
@@ -66,7 +67,42 @@
     "no-var": ["error"],
     "prefer-const": ["error"],
     "operator-linebreak": ["error", "before"],
-    "no-console": [0],
-    "require-jsdoc": [0]
+    "no-console": [
+      "error",
+      { 
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
+    "require-jsdoc": [0],
+
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": [0],
+
+    "jsx-quotes": ["error", "prefer-double"],
+
+    "react/jsx-pascal-case": "error",
+    "react/prop-types": [0],
+    "react/jsx-closing-bracket-location": [0],
+    "react/jsx-closing-tag-location": [0],
+    "react/jsx-handler-names": [0],
+    "react/jsx-indent": [0],
+    "react/jsx-uses-vars": ["error"],
+    "react/react-in-jsx-scope": [0],
+    "@typescript-eslint/explicit-module-boundary-types": [0],
+    "@typescript-eslint/no-explicit-any": [0],
+    "@typescript-eslint/ban-ts-comment": [0],
+    "@typescript-eslint/type-annotation-spacing": "error",
+
+    "max-len": ["error", { "code": 80 }],
+
+    "react-refresh/only-export-components": [0],
+
+    "func-call-spacing": [0],
+    "object-curly-spacing": [0],
+    "@typescript-eslint/object-curly-spacing": [2, "always"],
+    "no-constant-condition": [0]
   }
 }

@@ -10,7 +10,7 @@ Run `npm i`
 
 ## 3. Build the frontend from the source
 
-Set the constant `ROOT_PATH` in `frontend/app/config.tsx` to the correct basepath
+Set the constant `ROOT_PATH` in `src/config.tsx` to the correct basepath
 of your hosting environment. Then go to the `tools` directory and open the script
 `./buildLocalInstance.sh`. Set the target directory to which the built is saved.
 Now run this script.

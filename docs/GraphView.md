@@ -45,16 +45,6 @@ you want it to be. All selected nodes will follow the drag.
 Please note that the node you drag is always included in the movement,
 regardless of whether it is selected or not.
 
-## Creating new edges
-To create a new edge, press and hold the `SHIFT` key, then click and hold the
-mouse button on one of the nodes of the link to be created and move your cursor
-to the other node of the link to be created. Let go of the mouse button. The
-new edge is shown now.
-
-## Removing edges
-
-Select the edge by pressing and holding `S` and a clicking on the edge. Press `Del` or `Backspace` to remove it.
-
 ## Inflating the graph
 
 When you have a graph with a lot of nodes but do not have enough real estate to put more notes in between, you can inflate the graph by 10% by clicking on the button in the title bar.

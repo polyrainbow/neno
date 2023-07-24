@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { readFile, writeFile } from "fs/promises";
 import * as path from "path";
 import * as url from "url";
@@ -55,7 +56,7 @@ const replaceVersionInFile = async (
 
 const updateConfigFile = async (oldVersionString, newVersionString) => {
   const configFilePath = path.join(
-    __dirname, "..", "frontend", "app", "config.tsx",
+    __dirname, "..", "src", "config.tsx",
   );
 
   await replaceVersionInFile(
@@ -80,6 +81,7 @@ const readCurrentVersion = async () => {
 const currentVersionString = await readCurrentVersion();
 console.log("Current version: " + currentVersionString);
 const currentVersion = parseVersion(currentVersionString);
+// eslint-disable-next-line no-undef
 const versionType = process.argv[2];
 const newVersion = increaseVersion(currentVersion, versionType);
 const newVersionString = serializeVersion(newVersion);
