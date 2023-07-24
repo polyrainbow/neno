@@ -53,10 +53,6 @@ For example `has-url:https://google.com`
 You can save every search query as a preset by opening the `Search presets` view by clicking the button next to the search input field. 
 You can also quickly query saved presets.
 
-## Create one note per line
-
-When you want to create several notes at once, e. g. you have several URLs and want to create a note for every one of those, use the `Create one note per line` feature in the graph settings & tools view. Just paste the URLs separated by line breaks, and click on `Create notes`.
-
 ## Stats and number of components
 
 It might be interesting to you to see some stats on your graph or see how many [components](https://en.wikipedia.org/wiki/Component_(graph_theory)) it has. Use the `Stats` view for this, which you can find in the app menu.
