@@ -38,6 +38,7 @@ const assignCorrectElementNodes = (
   let currentSection = ElementNodeType.PARAGRAPH;
   while (elementNodes[i]) {
     if (currentSection === ElementNodeType.PARAGRAPH) {
+      // TODO: we should allow a language specification after backticks
       if (elementNodes[i].getTextContent() === "```") {
         nodesMap.set(elementNodes[i], ElementNodeType.CODE);
         currentSection = ElementNodeType.CODE;
@@ -45,7 +46,8 @@ const assignCorrectElementNodes = (
         nodesMap.set(elementNodes[i], ElementNodeType.PARAGRAPH);
       }
     } else {
-      if (elementNodes[i].getTextContent() === "```") {
+      // let's allow trailing whitespace with trimEnd()
+      if (elementNodes[i].getTextContent().trimEnd() === "```") {
         nodesMap.set(elementNodes[i], ElementNodeType.CODE);
         currentSection = ElementNodeType.PARAGRAPH;
       } else {
