@@ -276,7 +276,8 @@ export default class DatabaseIO {
   private async writeGraphMetadataFile(graph: Graph) {
     await this.#storageProvider.writeObject(
       this.#GRAPH_METADATA_FILENAME,
-      JSON.stringify(graph.metadata),
+      // we pretty print the JSON for Git to be able to show better diffs
+      JSON.stringify(graph.metadata, null, 2),
     );
   }
 
