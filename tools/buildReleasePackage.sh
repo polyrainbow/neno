@@ -11,12 +11,11 @@ OUTPUT_FILENAME=neno-$VERSION.tar.gz
 cd ..
 
 echo "Removing old builds ..."
-rm frontend/public/js/*
+rm public/js/*
 rm -R dist
 
 echo "Creating build ..."
 npm run build
-npm run build-browser-extension
 
 echo "Creating archive ..."
 # works with Mac tar, not sure about GNU tar

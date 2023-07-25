@@ -4,11 +4,6 @@ import {
   BaseGraphVisualization,
 } from "../lib/notes/interfaces/GraphVisualization";
 
-/*
-  In the frontend, we resolve the note ids inside the links to actual note
-  objects.
-*/
-
 export enum GraphVisualizationMode {
   DEFAULT = "DEFAULT",
   NO_LABELS = "NO_LABELS",

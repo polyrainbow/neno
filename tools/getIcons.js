@@ -22,7 +22,7 @@ for (let i = 0; i < iconIds.length; i++) {
   const buffer = Buffer.from(arrayBuffer, "binary");
   const targetFilename = `${iconId}.svg`;
   const targetPath = path.join(
-    __dirname, "..", "frontend", "public", "assets", "icons",
+    __dirname, "..", "public", "assets", "icons",
     targetFilename,
   );
   console.log("Writing " + targetFilename);

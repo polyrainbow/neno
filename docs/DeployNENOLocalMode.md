@@ -8,7 +8,7 @@ static files via HTTPS.
 ## 2. Install dependencies
 Run `npm i`
 
-## 3. Build the frontend from the source
+## 3. Build the app from the source
 
 Set the constant `ROOT_PATH` in `src/config.tsx` to the correct basepath
 of your hosting environment. Then go to the `tools` directory and open the script
