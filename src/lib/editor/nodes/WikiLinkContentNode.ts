@@ -21,22 +21,50 @@ export class WikiLinkContentNode extends TextNode {
   }
 
   static clone(node: WikiLinkContentNode): WikiLinkContentNode {
-    return new WikiLinkContentNode(node.__text);
+    return new WikiLinkContentNode(node.__text, node.getLinkAvailability);
   }
 
-  constructor(text: string) {
+  constructor(
+    text: string,
+    private readonly getLinkAvailability: (link: string) => Promise<boolean>,
+  ) {
     super(text);
   }
 
   createDOM(config: EditorConfig): HTMLElement {
     const element = super.createDOM(config);
     addClassNamesToElement(element, config.theme.wikiLinkContent);
+
+    this.getLinkAvailability(this.__text).then((isAvailable) => {
+      if (isAvailable) {
+        element?.classList.add("available");
+      } else {
+        element?.classList.add("unavailable");
+      }
+    });
+
     return element;
   }
 
+  updateDOM(_prevNode: TextNode, element: HTMLElement): boolean {
+    this.getLinkAvailability(this.__text).then((isAvailable) => {
+      if (isAvailable) {
+        element?.classList.add("available");
+      } else {
+        element?.classList.add("unavailable");
+      }
+    });
+
+    return true;
+  }
+
+  // Dummy function. This will never happen.
   static importJSON(serializedNode: SerializedTextNode): WikiLinkContentNode {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    const node = $createWikiLinkContentNode(serializedNode.text);
+    const node = $createWikiLinkContentNode(
+      serializedNode.text,
+      () => Promise.resolve(true),
+    );
     node.setFormat(serializedNode.format);
     node.setDetail(serializedNode.detail);
     node.setMode(serializedNode.mode);
@@ -72,8 +100,13 @@ export class WikiLinkContentNode extends TextNode {
 }
 
 
-export function $createWikiLinkContentNode(text = ""): WikiLinkContentNode {
-  return $applyNodeReplacement(new WikiLinkContentNode(text));
+export function $createWikiLinkContentNode(
+  text = "",
+  getLinkAvailability: (link: string) => Promise<boolean>,
+): WikiLinkContentNode {
+  return $applyNodeReplacement(
+    new WikiLinkContentNode(text, getLinkAvailability),
+  );
 }
 
 export function $isWikiLinkContentNode(

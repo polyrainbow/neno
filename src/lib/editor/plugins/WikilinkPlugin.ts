@@ -51,6 +51,7 @@ const getWikiLinkMatch = (text: string): EntityMatch | null => {
 
 function registerWikilinkTransforms(
   editor: LexicalEditor,
+  getLinkAvailability: (link: string) => Promise<boolean>,
 ): Array<() => void> {
   const replaceWithSimpleText = (node: TextNode): void => {
     const textNode = $createTextNode(node.getTextContent());
@@ -110,7 +111,10 @@ function registerWikilinkTransforms(
         nodeToReplace.getTextContent().length - 2,
       );
       const replacementNode1 = $createWikiLinkPunctuationNode(false);
-      const replacementNode2 = $createWikiLinkContentNode(wikilinkTextContent);
+      const replacementNode2 = $createWikiLinkContentNode(
+        wikilinkTextContent,
+        getLinkAvailability,
+      );
       const replacementNode3 = $createWikiLinkPunctuationNode(true);
 
       nodeToReplace.insertAfter(replacementNode1);
@@ -222,7 +226,11 @@ function registerWikilinkTransforms(
   ];
 }
 
-export function WikiLinkPlugin(): JSX.Element | null {
+export function WikiLinkPlugin(
+  {
+    getLinkAvailability,
+  }: { getLinkAvailability: (link: string) => Promise<boolean> },
+): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -233,6 +241,7 @@ export function WikiLinkPlugin(): JSX.Element | null {
     return mergeRegister(
       ...registerWikilinkTransforms(
         editor,
+        getLinkAvailability,
       ),
     );
   }, [editor]);

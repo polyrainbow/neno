@@ -112,6 +112,7 @@ interface EditorProps {
   onChange: (text: string) => void,
   onUserRequest: (type: UserRequestType, value: string) => void,
   getTransclusionContent: (id: string) => Promise<ReactElement>,
+  getLinkAvailability: (link: string) => Promise<boolean>,
 }
 
 
@@ -120,6 +121,7 @@ export const Editor = ({
   onChange,
   onUserRequest,
   getTransclusionContent,
+  getLinkAvailability,
 }: EditorProps) => {
   const initialConfig = {
     namespace: "MyEditor",
@@ -162,7 +164,7 @@ export const Editor = ({
       <HeadingPlugin />
       <InlineCodePlugin />
       <LinkPlugin />
-      <WikiLinkPlugin />
+      <WikiLinkPlugin getLinkAvailability={getLinkAvailability} />
       <TransclusionPlugin
         getTransclusionContent={getTransclusionContent}
       />

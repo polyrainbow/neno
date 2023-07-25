@@ -400,8 +400,15 @@ div[data-lexical-editor] > p {
 }
 
 .wikilink-content {
-  color: var(--link-color);
   cursor: pointer;
+}
+
+.wikilink-content.available {
+  color: var(--link-color);
+}
+
+.wikilink-content.unavailable {
+  color: var(--error-and-danger-text-color);
 }
 
 .wikilink-punctuation {

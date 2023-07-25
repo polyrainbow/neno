@@ -294,6 +294,32 @@ const Note = ({
   };
 
 
+  const getLinkAvailability = async (linkText: string): Promise<boolean> => {
+    const slug = sluggifyLink(linkText);
+
+    if (linkText.startsWith(FILE_SLUG_PREFIX)) {
+      const fileId = getFileId(slug);
+
+      if (!fileId) {
+        return false;
+      }
+
+      try {
+        await databaseProvider.getFileInfo(fileId);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    try {
+      await databaseProvider.get(slug);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (noteElement.current) {
       noteElement.current.scrollTop = 0;
@@ -424,6 +450,7 @@ const Note = ({
                   }
                 }
                 getTransclusionContent={getTransclusionContent}
+                getLinkAvailability={getLinkAvailability}
               />
               : ""
           }
