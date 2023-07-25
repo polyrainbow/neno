@@ -1,15 +1,17 @@
-import * as Notes from "./index.js";
+import NotesProvider from "./index.js";
 import MockStorageProvider from "./test/MockStorageProvider.js";
 import {
   NewNoteSaveRequest,
   NoteSaveRequest,
 } from "./interfaces/NoteSaveRequest.js";
+// @ts-ignore
+import { TextEncoder, TextDecoder } from "util";
+// @ts-ignore
+Object.assign(global, { TextDecoder, TextEncoder });
 
-Notes.init(new MockStorageProvider());
+const notesProvider = new NotesProvider(new MockStorageProvider());
 
 describe("Notes module", () => {
-  const TEST_GRAPH_ID = "random";
-
   it("should create and output notes", async () => {
     const noteSaveRequest1: NewNoteSaveRequest = {
       note: {
@@ -22,7 +24,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
     };
-    await Notes.put(noteSaveRequest1, TEST_GRAPH_ID);
+    await notesProvider.put(noteSaveRequest1);
     const noteSaveRequest2: NoteSaveRequest = {
       note: {
         content: "",
@@ -34,13 +36,13 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
     };
-    await Notes.put(noteSaveRequest2, TEST_GRAPH_ID);
-    const page = await Notes.getNotesList(TEST_GRAPH_ID, {});
+    await notesProvider.put(noteSaveRequest2);
+    const page = await notesProvider.getNotesList({});
     expect(page.numberOfResults).toBe(2);
   });
 
   it("should output correct graph stats", async () => {
-    const stats = await Notes.getStats(TEST_GRAPH_ID, {
+    const stats = await notesProvider.getStats({
       includeMetadata: true,
       includeAnalysis: false,
     });
@@ -63,8 +65,8 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
     };
-    await Notes.put(noteSaveRequest, TEST_GRAPH_ID);
-    const stats = await Notes.getStats(TEST_GRAPH_ID, {
+    await notesProvider.put(noteSaveRequest);
+    const stats = await notesProvider.getStats({
       includeMetadata: false,
       includeAnalysis: false,
     });
@@ -86,7 +88,7 @@ describe("Notes module", () => {
       ignoreDuplicateTitles: false,
     };
 
-    const note = await Notes.put(noteSaveRequest, TEST_GRAPH_ID);
+    const note = await notesProvider.put(noteSaveRequest);
 
     const noteSaveRequest2: NoteSaveRequest = {
       note: {
@@ -103,7 +105,7 @@ describe("Notes module", () => {
       ignoreDuplicateTitles: false,
     };
 
-    const updatedNote = await Notes.put(noteSaveRequest2, TEST_GRAPH_ID);
+    const updatedNote = await notesProvider.put(noteSaveRequest2);
 
     expect(updatedNote.meta.custom.test).toBe("12");
   });
