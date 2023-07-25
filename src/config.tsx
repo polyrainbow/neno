@@ -4,8 +4,6 @@ const VERSION = "v6.0.0";
 
 const DEFAULT_NOTE_CONTENT = "";
 
-const API_URL = "/api/";
-
 const MINIMUM_SEARCH_QUERY_LENGTH = 3;
 
 const LOCAL_GRAPH_ID = "local";
