@@ -107,7 +107,7 @@ const NoteActions = ({
         id="button_upload"
         title={l(
           contentMode === ContentMode.EDITOR
-            ? "editor.finish-editing"
+            ? "editor.read-mode"
             : "editor.edit-note",
         )}
         icon={contentMode === ContentMode.EDITOR ? "preview" : "create"}
