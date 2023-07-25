@@ -1,8 +1,8 @@
-import { FileId } from "../lib/notes/interfaces/FileId";
+import { FileId } from "./notes/interfaces/FileId";
 import { PathTemplate } from "../enum/PathTemplate";
 import { UnsavedActiveNote } from "../types/ActiveNote";
 import * as Config from "../config";
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
+import { FileInfo } from "./notes/interfaces/FileInfo";
 import {
   Block,
   BlockSlashlink,
@@ -426,6 +426,12 @@ const stringContainsUUID = (string: string): boolean => {
 };
 
 
+const getFirstLines = (text: string, numberOfLines: number): string => {
+  const lines = text.split("\n");
+  return lines.slice(0, numberOfLines).join("\n");
+};
+
+
 export {
   getKeySortFunction,
   yyyymmdd,
@@ -456,4 +462,5 @@ export {
   readFileAsString,
   stringToUTF8ByteArray,
   createContentFromFileIds,
+  getFirstLines,
 };

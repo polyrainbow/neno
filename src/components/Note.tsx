@@ -11,6 +11,7 @@ import {
   getAppPath,
   getFileId,
   getFilesFromUserSelection,
+  getFirstLines,
 } from "../lib/utils";
 import ActiveNote from "../types/ActiveNote";
 import { FILE_PICKER_ACCEPT_TYPES, LOCAL_GRAPH_ID } from "../config";
@@ -66,6 +67,26 @@ interface NoteComponentProps {
   uploadInProgress: boolean,
   setUploadInProgress: (val: boolean) => void,
 }
+
+
+const getTransclusionContentFromNoteContent = async (
+  noteContent: string,
+): Promise<ReactElement> => {
+  const MAX_LINES = 6;
+
+  const lines = noteContent.split("\n");
+  let transclusionContent;
+
+  if (lines.length <= MAX_LINES) {
+    transclusionContent = noteContent;
+  } else {
+    transclusionContent = getFirstLines(noteContent, MAX_LINES) + "\n…";
+  }
+
+  return <p className="transclusion-note-content">
+    {transclusionContent}
+  </p>;
+};
 
 
 const Note = ({
@@ -260,13 +281,13 @@ const Note = ({
       );
 
       if (linkedNote) {
-        return <p>{linkedNote.content}</p>;
+        return getTransclusionContentFromNoteContent(linkedNote.content);
       }
     }
 
     try {
       const linkedNote = await databaseProvider.get(slug);
-      return <p>{linkedNote.content}</p>;
+      return getTransclusionContentFromNoteContent(linkedNote.content);
     } catch (e) {
       return <p>Transclusion not available.</p>;
     }
