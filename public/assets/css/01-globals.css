@@ -218,7 +218,6 @@ main {
   top: 0;
   bottom: 0;
   left: 0;
-  right: 0;
   background: var(--overlay-gradient);
   display: grid;
   align-items: center;

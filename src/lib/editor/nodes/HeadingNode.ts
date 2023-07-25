@@ -34,7 +34,7 @@ export class HeadingNode extends TextNode {
 
   createDOM(config: EditorConfig): HTMLElement {
     const element = super.createDOM(config);
-    addClassNamesToElement(element, config.theme.s_heading);
+    addClassNamesToElement(element, config.theme.sHeading);
     return element;
   }
 

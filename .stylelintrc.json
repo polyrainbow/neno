@@ -1,6 +1,7 @@
 {
   "extends": "stylelint-config-standard",
   "rules": {
-    "no-duplicate-selectors": null
+    "no-duplicate-selectors": null,
+    "media-feature-range-notation": "prefix"
   }
 }

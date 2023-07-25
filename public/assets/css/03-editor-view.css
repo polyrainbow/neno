@@ -395,7 +395,7 @@ div[data-lexical-editor] > p {
   color: var(--link-color);
 }
 
-.s_heading {
+.s-heading {
   font-weight: bold;
 }
 
@@ -412,7 +412,7 @@ div[data-lexical-editor] > p {
   font-weight: bold;
 }
 
-.transclusion {
+div[data-lexical-editor] .transclusion {
   background: var(--accent-color-interactible);
   border-radius: 7px;
   padding: 10px;
@@ -420,17 +420,17 @@ div[data-lexical-editor] > p {
   cursor: pointer;
 }
 
-.transclusion p {
+div[data-lexical-editor] .transclusion p {
   margin: 0;
 }
 
-.transclusion p.slug {
+div[data-lexical-editor] .transclusion p.slug {
   color: var(--alt-content-color);
   font-size: var(--default-font-size);
   margin-top: var(--default-padding);
 }
 
 .inline-code, .code-block {
-  font-family: 'IBM Plex Mono';
+  font-family: 'IBM Plex Mono', monospace;
   background-color: var(--background-color);
 }
