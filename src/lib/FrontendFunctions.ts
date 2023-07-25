@@ -3,6 +3,11 @@ import { getWritableStream } from "./utils";
 import { serializeNewNote } from "../lib/notes/noteUtils";
 import { l } from "./intl";
 import NotesProvider from "./notes";
+import {
+  NOTE_FILE_DESCRIPTION,
+  NOTE_FILE_EXTENSION,
+  NOTE_MIME_TYPE,
+} from "../config";
 
 export const exportNote = async (
   activeNote: ActiveNote,
@@ -31,14 +36,13 @@ export const exportNote = async (
     rawNote = rawNoteFromDB;
   }
 
-  // TODO: use correct file ending and MIME type
   const opts = {
     suggestedName: (
       "slug" in activeNote ? activeNote.slug : l("list.untitled-note")
-    ) + ".neno",
+    ) + NOTE_FILE_EXTENSION,
     types: [{
-      description: "NENO note",
-      accept: { "application/neno-note": [".neno"] },
+      description: NOTE_FILE_DESCRIPTION,
+      accept: { [NOTE_MIME_TYPE]: [NOTE_FILE_EXTENSION] },
     }],
   };
 

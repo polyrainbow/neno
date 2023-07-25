@@ -17,6 +17,11 @@ import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import { Slug } from "../lib/notes/interfaces/Slug";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import NotesProvider from "../lib/notes";
+import {
+  NOTE_FILE_DESCRIPTION,
+  NOTE_FILE_EXTENSION,
+  NOTE_MIME_TYPE,
+} from "../config";
 
 export default (
   databaseProvider: NotesProvider,
@@ -172,8 +177,8 @@ export default (
     }
 
     const types = [{
-      description: "NENO note",
-      accept: { "application/neno-note": [".neno"] },
+      description: NOTE_FILE_DESCRIPTION,
+      accept: { [NOTE_MIME_TYPE]: [NOTE_FILE_EXTENSION] },
     }];
 
     const [rawNoteFile] = await getFilesFromUserSelection(types, false);

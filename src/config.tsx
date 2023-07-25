@@ -61,10 +61,15 @@ const DEFAULT_CONTENT_MODE = ContentMode.EDITOR;
 
 const SPAN_SEPARATOR = " · ";
 
+const NOTE_FILE_EXTENSION = ".subtext";
+
+const NOTE_MIME_TYPE = "text/subtext";
+
+const NOTE_FILE_DESCRIPTION = "NENO subtext note";
+
 export {
   VERSION,
   DEFAULT_NOTE_CONTENT,
-  API_URL,
   MINIMUM_SEARCH_QUERY_LENGTH,
   emojis,
   ROOT_PATH,
@@ -79,4 +84,7 @@ export {
   DEFAULT_CONTENT_MODE,
   SPAN_SEPARATOR,
   LOCAL_GRAPH_ID,
+  NOTE_FILE_EXTENSION,
+  NOTE_MIME_TYPE,
+  NOTE_FILE_DESCRIPTION,
 };
