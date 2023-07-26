@@ -77,11 +77,6 @@ const getNewNoteObject = (params: CreateNewNoteParams): UnsavedActiveNote => {
 };
 
 
-const getNoteTitleFromContent = (content: string): string => {
-  return shortenText(content, 100);
-};
-
-
 function humanFileSize(bytes: number, si = false, dp = 1): string {
   const thresh = si ? 1000 : 1024;
 
@@ -451,7 +446,6 @@ export {
   getAppPath,
   getIconSrc,
   stringContainsOnlyDigits,
-  getNoteTitleFromContent,
   getFilesFromUserSelection,
   base64Encode,
   base64UrlEncode,
