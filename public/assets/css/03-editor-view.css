@@ -397,6 +397,10 @@ div[data-lexical-editor] > p {
 
 .s-heading {
   font-weight: bold;
+  font-size: 1.5em;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  display: block;
 }
 
 .wikilink-content {
@@ -439,5 +443,5 @@ div[data-lexical-editor] .transclusion p.slug {
 
 .inline-code, .code-block {
   font-family: 'IBM Plex Mono', monospace;
-  background-color: var(--background-color);
+  background-color: var(--accent-color-interactible);
 }
