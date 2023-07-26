@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import {
   $getRoot,
   CLEAR_HISTORY_COMMAND,
@@ -14,9 +16,7 @@ import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import { HashtagNode } from "./nodes/HashtagNode";
 import { HeadingNode } from "./nodes/HeadingNode";
-import { HashtagPlugin } from "./plugins/HashtagPlugin";
 import { HeadingPlugin } from "./plugins/HeadingPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
 import { AutoLinkNode } from "@lexical/link";
@@ -128,7 +128,7 @@ export const Editor = ({
     theme,
     onError,
     nodes: [
-      HashtagNode,
+      // HashtagNode,
       AutoLinkNode,
       HeadingNode,
       WikiLinkContentNode,
@@ -139,6 +139,13 @@ export const Editor = ({
       CodeBlockNode,
     ],
   };
+
+  /*
+    HashtagPlugin is disabled for now, since not part of spec yet and
+    collisions with HeadingPlugin.
+    See also
+    https://github.com/subconsciousnetwork/subtext/issues/21#issuecomment-1651543966
+  */
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
@@ -159,7 +166,7 @@ export const Editor = ({
       } />
       <HistoryPlugin />
       <MyCustomAutoFocusPlugin />
-      <HashtagPlugin />
+      {/* <HashtagPlugin /> */}
       <BoldPlugin />
       <HeadingPlugin />
       <InlineCodePlugin />
