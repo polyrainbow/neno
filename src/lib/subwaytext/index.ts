@@ -269,16 +269,30 @@ interface ParsedDocument {
 }
 
 onmessage = (event) => {
-  const notes = event.data;
-  const notesParsed: ParsedDocument[]
-    = (notes as UnparsedDocument[])
-      .map((note: UnparsedDocument) => {
-        return {
-          id: note.id,
-          parsedContent: parse(note.content),
-        };
-      });
-  postMessage(notesParsed);
+  const eventData = event.data;
+
+  if (eventData.action === "PARSE_NOTES") {
+    const notes = eventData.notes;
+
+    if (!Array.isArray(notes)) {
+      throw new Error(
+        "Subwaytext worker: Expected an array of notes, received "
+        + typeof notes
+        + " instead.",
+      );
+    }
+
+    const notesParsed: ParsedDocument[]
+      = (notes as UnparsedDocument[])
+        .map((note: UnparsedDocument) => {
+          return {
+            id: note.id,
+            parsedContent: parse(note.content),
+          };
+        });
+
+    postMessage(notesParsed);
+  }
 };
 
 export default parse;

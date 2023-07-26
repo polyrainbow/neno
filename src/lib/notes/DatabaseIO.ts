@@ -254,7 +254,10 @@ export default class DatabaseIO {
             };
           });
         const worker = DatabaseIO.#workerPool[t];
-        worker.postMessage(notesForThread);
+        worker.postMessage({
+          "action": "PARSE_NOTES",
+          "notes": notesForThread,
+        });
         worker.onmessage = (event: MessageEvent<ParsedDocument[]>) => {
           const notesParsed = event.data;
           for (const noteParsed of notesParsed) {
