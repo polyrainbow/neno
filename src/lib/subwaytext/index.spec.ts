@@ -54,7 +54,29 @@ A paragraph with a https://link.com and a /slashlink`;
           text: [
             {
               type: SpanType.NORMAL_TEXT,
-              text: "some\nmultiline\ntext",
+              text: "some",
+            },
+          ],
+        },
+      },
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "multiline",
+            },
+          ],
+        },
+      },
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "text",
             },
           ],
         },
