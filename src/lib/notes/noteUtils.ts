@@ -370,7 +370,10 @@ const inferNoteTitle = (noteContent: string, maxLength = 800): string => {
   if (!firstContentLine) {
     return "";
   }
-  const titleShortened = shortenText(firstContentLine, maxLength);
+  const titleShortened = shortenText(firstContentLine, maxLength)
+    .trim()
+    // remove wikilink punctuation
+    .replace(/(\[\[)|(]])/g, "");
   return titleShortened;
 };
 

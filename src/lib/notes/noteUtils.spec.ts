@@ -3,6 +3,7 @@ import {
   getExtensionFromFilename,
   getNotesWithFlag,
   getNotesWithUrl,
+  inferNoteTitle,
   sluggifyLink,
 } from "./noteUtils.js";
 
@@ -178,6 +179,17 @@ describe("sluggifyLink", () => {
       ).toBe(
         "slashes/are/allowed",
       );
+    },
+  );
+});
+
+describe("infer note title", () => {
+  it(
+    "should remove wikilink punctuation",
+    async () => {
+      expect(inferNoteTitle(
+        "a title with a [[wikilink]] and some brackets []",
+      )).toBe("a title with a wikilink and some brackets []");
     },
   );
 });
