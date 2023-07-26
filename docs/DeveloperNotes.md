@@ -10,3 +10,7 @@
 
 The release package will now be built remotely with the script 
 `tools/buildReleasePackage.sh`
+
+## Known issues
+
+- Dots in the URL (e.g. in a slug) stop Vite from using History API fallback https://github.com/vitejs/vite/issues/2415
