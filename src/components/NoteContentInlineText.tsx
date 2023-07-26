@@ -1,5 +1,10 @@
+import { Link } from "react-router-dom";
 import { InlineText, Span } from "../lib/subwaytext/interfaces/Block";
 import { SpanType } from "../lib/subwaytext/interfaces/SpanType";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../enum/PathTemplate";
+import { LOCAL_GRAPH_ID } from "../config";
+import { sluggifyLink } from "../lib/notes/noteUtils";
 
 interface NoteContentInlineTextProps {
   runningText: InlineText,
@@ -18,6 +23,23 @@ const NoteContentInlineText = ({
           target="_blank"
           rel="noreferrer noopener"
         >{span.text}</a>
+      </span>;
+    } else if (span.type === SpanType.WIKILINK) {
+      const linkText = span.text.substring(2, span.text.length - 2);
+      const slug = sluggifyLink(linkText);
+
+      return <span
+        key={`wikilink-span-${i}-${span.text}`}
+      >
+        <Link
+          to={getAppPath(
+            PathTemplate.EXISTING_NOTE,
+            new Map([
+              ["GRAPH_ID", LOCAL_GRAPH_ID],
+              ["SLUG", slug],
+            ]),
+          )}
+        >{linkText}</Link>
       </span>;
     } else {
       // normal text or slashlink.

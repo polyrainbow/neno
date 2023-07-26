@@ -4,7 +4,7 @@ const input = `# My subwaytext document
 
 https://example.com Link to example.com
 
-A paragraph with a https://link.com and a /slashlink
+A paragraph with a https://link.com and a /slashlink and a [[wikilink]].
 
 1. A list with
 2. a /slashlink again`;

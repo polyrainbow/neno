@@ -268,31 +268,38 @@ interface ParsedDocument {
   parsedContent: Block[];
 }
 
-onmessage = (event) => {
-  const eventData = event.data;
+if (
+  // @ts-ignore
+  typeof WorkerGlobalScope !== "undefined"
+  // @ts-ignore
+  && self instanceof WorkerGlobalScope
+) {
+  onmessage = (event) => {
+    const eventData = event.data;
 
-  if (eventData.action === "PARSE_NOTES") {
-    const notes = eventData.notes;
+    if (eventData.action === "PARSE_NOTES") {
+      const notes = eventData.notes;
 
-    if (!Array.isArray(notes)) {
-      throw new Error(
-        "Subwaytext worker: Expected an array of notes, received "
-        + typeof notes
-        + " instead.",
-      );
+      if (!Array.isArray(notes)) {
+        throw new Error(
+          "Subwaytext worker: Expected an array of notes, received "
+          + typeof notes
+          + " instead.",
+        );
+      }
+
+      const notesParsed: ParsedDocument[]
+        = (notes as UnparsedDocument[])
+          .map((note: UnparsedDocument) => {
+            return {
+              id: note.id,
+              parsedContent: parse(note.content),
+            };
+          });
+
+      postMessage(notesParsed);
     }
-
-    const notesParsed: ParsedDocument[]
-      = (notes as UnparsedDocument[])
-        .map((note: UnparsedDocument) => {
-          return {
-            id: note.id,
-            parsedContent: parse(note.content),
-          };
-        });
-
-    postMessage(notesParsed);
-  }
-};
+  };
+}
 
 export default parse;
