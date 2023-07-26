@@ -58,25 +58,6 @@ const parse = (input: string): Block[] => {
           } else {
             withinBlock = false;
           }
-        } else if (currentBlock.type === BlockType.PARAGRAPH) {
-          if (
-            line.trim().length === 0
-            || line === CODE_SIGIL
-          ) {
-            withinBlock = false;
-            currentBlock.data.text = parseText(multilineTextCollector);
-            multilineTextCollector = "";
-            // return blocks;
-          } else if (lineIndex === lines.length - 1) {
-            withinBlock = false;
-            multilineTextCollector += "\n" + line;
-            currentBlock.data.text = parseText(multilineTextCollector);
-            multilineTextCollector = "";
-            return blocks;
-          } else {
-            multilineTextCollector += "\n" + line;
-            return blocks;
-          }
         } else if (currentBlock.type === BlockType.CODE) {
           if (line.trimEnd() === CODE_SIGIL) {
             withinBlock = false;
@@ -226,25 +207,14 @@ const parse = (input: string): Block[] => {
         } else if (line.trim().length === 0) {
           return blocks;
         } else {
-          withinBlock = true;
-          multilineTextCollector = line;
           const newBlock: BlockParagraph = {
             type: BlockType.PARAGRAPH,
             data: {
-              text: [],
+              text: parseText(line),
             },
           };
 
           blocks.push(newBlock);
-
-          if (lineIndex === lines.length - 1) {
-            withinBlock = false;
-            newBlock.data.text
-              = parseText(multilineTextCollector);
-            multilineTextCollector = "";
-            return blocks;
-          }
-
           return blocks;
         }
       }

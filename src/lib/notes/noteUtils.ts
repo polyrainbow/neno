@@ -1015,7 +1015,7 @@ const sluggifyNoteText = (text: string): string => {
 
 
 /*
-  sluggifyLink is used to turn a linked entity like a Wikilink into a slug.
+  sluggifyLink is used to turn a linking entity like a Wikilink into a slug.
   Here we do not want to replace slashes with dashes, as slashes are valid
   slug chars for links.
 
