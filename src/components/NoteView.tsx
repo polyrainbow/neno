@@ -79,6 +79,8 @@ const NoteView = () => {
     setUnsavedChanges,
     slugInput,
     setSlugInput,
+    editorInstanceId,
+    updateEditorInstance,
   } = useActiveNote(databaseProvider, handleInvalidCredentialsError);
 
   const [headerStats, refreshHeaderStats] = useHeaderStats(databaseProvider);
@@ -366,6 +368,7 @@ const NoteView = () => {
         <Note
           isBusy={isBusy}
           note={activeNote}
+          editorInstanceId={editorInstanceId}
           setNote={setActiveNote}
           setSlugInput={setSlugInput}
           slugInput={slugInput}
@@ -399,6 +402,7 @@ const NoteView = () => {
             const duplicate = await duplicateNote();
             refreshContentViews();
             goToNote(duplicate.meta.slug);
+            updateEditorInstance();
           }}
           openInGraphView={() => {
             if (activeNote.isUnsaved) {

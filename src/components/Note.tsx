@@ -46,6 +46,7 @@ import { getTransclusionContentFromNoteContent } from "../lib/Transclusion";
 interface NoteComponentProps {
   isBusy: boolean,
   note: ActiveNote,
+  editorInstanceId: number,
   slugInput: string,
   setSlugInput: (val: string) => void,
   setNote: (note: ActiveNote) => void,
@@ -71,6 +72,7 @@ interface NoteComponentProps {
 const Note = ({
   isBusy,
   note,
+  editorInstanceId,
   setNote,
   slugInput,
   setSlugInput,
@@ -389,6 +391,7 @@ const Note = ({
             contentMode === ContentMode.EDITOR
               ? <Editor
                 initialText={note.initialContent}
+                instanceId={editorInstanceId}
                 onChange={(val) => {
                   setNoteContent(val);
                 }}

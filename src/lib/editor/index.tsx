@@ -5,7 +5,7 @@ import {
   CLEAR_HISTORY_COMMAND,
   EditorState,
 } from "lexical";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -86,38 +86,50 @@ works differently.
 
 const PlainTextStateExchangePlugin = ({
   initialText,
-}: { initialText: string }) => {
+  instanceId,
+}: {
+  initialText: string,
+  instanceId: number,
+}) => {
   const [editor] = useLexicalComposerContext();
+  const currentInstanceIdRef = useRef<number>(instanceId);
 
   useEffect(() => {
     editor.update(() => {
       const root = $getRoot();
       const currentText = getSubtextFromEditor(root);
-      // If the new initial text is not different from the current text, we do
-      // not need to perform the update as it would just move the cursor from
-      // the current position. The user probably just has saved their note with
-      // CTRL/CMD+S.
-      // This is just an issue if there are two notes with the same
-      // non-empty content, because then, the cursor would not reset.
-      if (initialText !== currentText) {
+      /*
+        If the new initial text is not different from the current text, we do
+        not need to perform the update as it would just move the cursor from
+        the current position. The user probably just has saved their note with
+        CTRL/CMD+S.
+        This is just an issue if there are two notes with the same
+        non-empty content, e.g. when creating a duplicate.
+        In that case, the cursor would not reset.
+        That's why we also check if the instanceId has changed.
+      */
+      if (
+        currentInstanceIdRef.current !== instanceId
+        || initialText !== currentText
+      ) {
         setSubtext(root, initialText);
         editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
         /*
-          When we open a new note, the cursor should be at the beginning of the
-          note and the view should be scrolled to the top.
-          We detect that with the heuristic that the current text is not a
-          prefix of the new initial text.
-          When it is a prefix, we assume that the user is editing an existing
+          When we open a new note, the instanceId changes and the cursor should
+          be at the beginning of the note and the view should be scrolled to the
+          top.
+          When the instanceId has not changed, the user is editing an existing
           note from outside the editor (e.g. appending a link). In this case,
           we should move the cursor to the end.
-          This is not perfect, but it's good enough for now.
         */
-        if (currentText.length > 0 && initialText.startsWith(currentText)) {
+        if (currentInstanceIdRef.current === instanceId) {
           root.getLastChild()?.selectEnd();
         }
       }
+
+      currentInstanceIdRef.current = instanceId;
     });
-  }, [editor, initialText]);
+  }, [editor, initialText, instanceId]);
 
   return null;
 };
@@ -132,6 +144,7 @@ export enum UserRequestType {
 
 interface EditorProps {
   initialText: string,
+  instanceId: number,
   onChange: (text: string) => void,
   onUserRequest: (type: UserRequestType, value: string) => void,
   getTransclusionContent: (id: string) => Promise<ReactElement>,
@@ -141,6 +154,7 @@ interface EditorProps {
 
 export const Editor = ({
   initialText,
+  instanceId,
   onChange,
   onUserRequest,
   getTransclusionContent,
@@ -178,7 +192,10 @@ export const Editor = ({
         contentEditable={<ContentEditable />}
         ErrorBoundary={LexicalErrorBoundary}
       />
-      <PlainTextStateExchangePlugin initialText={initialText}/>
+      <PlainTextStateExchangePlugin
+        initialText={initialText}
+        instanceId={instanceId}
+      />
       <OnChangePlugin onChange={
         (editorState: EditorState) => {
           editorState.read(() => {

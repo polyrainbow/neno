@@ -35,6 +35,14 @@ export default (
   const [slugInput, setSlugInput] = useState<string>("");
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
+  const [editorInstanceId, setEditorInstanceId] = useState<number>(
+    Math.random(),
+  );
+
+
+  const updateEditorInstance = () => {
+    setEditorInstanceId(Math.random());
+  };
 
 
   const setNoteContent = (
@@ -78,6 +86,8 @@ export default (
     if (params.content) {
       setUnsavedChanges(true);
     }
+
+    updateEditorInstance();
   };
 
 
@@ -265,6 +275,7 @@ export default (
         = await databaseProvider.get(slug);
       setActiveNoteFromServer(noteFromServer);
       receivedNoteSlug = noteFromServer.meta.slug;
+      updateEditorInstance();
     } catch (e) {
       if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
         await handleInvalidCredentialsError();
@@ -298,5 +309,7 @@ export default (
     setUnsavedChanges,
     slugInput,
     setSlugInput,
+    editorInstanceId,
+    updateEditorInstance,
   };
 };
