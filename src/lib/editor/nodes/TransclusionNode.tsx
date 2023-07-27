@@ -49,7 +49,7 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
         : <div>Loading...</div>;
     };
 
-    return <div data-transclusion-id={transclusionId}>
+    return <div className="transclusion" data-transclusion-id={transclusionId}>
       <TransclusionContent />
       <p className="slug">{this.__link}</p>
     </div>;
@@ -57,7 +57,7 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
 
   createDOM(): HTMLDivElement {
     const div = document.createElement("div");
-    div.classList.add("transclusion");
+    div.classList.add("transclusion-wrapper");
     return div;
   }
 
