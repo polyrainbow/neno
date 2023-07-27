@@ -51,6 +51,8 @@ function onCopyForPlainText(
   event: CommandPayloadType<typeof COPY_COMMAND>,
   editor: LexicalEditor,
 ): void {
+  if (!event) return;
+
   editor.update(() => {
     const clipboardData
       = event instanceof KeyboardEvent ? null : event.clipboardData;

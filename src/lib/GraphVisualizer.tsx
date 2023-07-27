@@ -1101,7 +1101,7 @@ export default class GraphVisualization {
         ? this.#nodes.filter(this.#isHub)
         : this.#nodes;
       const points = nodes.map(
-        (node) => [node.position.x, node.position.y],
+        (node): [number, number] => [node.position.x, node.position.y],
       );
       const delaunay = Delaunay.from(points);
       const boundaries = this.#getBoundaries();
