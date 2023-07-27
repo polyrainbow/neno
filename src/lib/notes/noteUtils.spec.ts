@@ -193,6 +193,15 @@ describe("infer note title", () => {
       )).toBe("a title with a wikilink and some brackets []");
     },
   );
+
+  it(
+    "should remove heading sigil",
+    async () => {
+      expect(inferNoteTitle(
+        "#   A heading with # and ##",
+      )).toBe("A heading with # and ##");
+    },
+  );
 });
 
 

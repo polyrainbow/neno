@@ -368,6 +368,10 @@ const removeWikilinkPunctuation = (text: string): string => {
   return text.replace(/(\[\[)|(]])/g, "");
 };
 
+const removeHeadingSigil = (text: string): string => {
+  return text.replace(/^#+\s*/, "");
+};
+
 
 const inferNoteTitle = (noteContent: string, maxLength = 800): string => {
   const lines = noteContent.split("\n");
@@ -375,9 +379,12 @@ const inferNoteTitle = (noteContent: string, maxLength = 800): string => {
   if (!firstContentLine) {
     return "";
   }
-  const titleShortened = removeWikilinkPunctuation(
-    shortenText(firstContentLine, maxLength).trim(),
+
+  const textNormalized = removeWikilinkPunctuation(
+    removeHeadingSigil(firstContentLine),
   );
+
+  const titleShortened = shortenText(textNormalized, maxLength).trim();
   return titleShortened;
 };
 
