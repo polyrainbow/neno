@@ -32,7 +32,6 @@ import useConfirmDiscardingUnsavedChangesDialog
 import { useNavigate } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
-import NoteContentBlockEmptyFile from "./NoteContentBlockEmptyFile";
 import { getMediaTypeFromFilename, sluggifyLink } from "../lib/notes/noteUtils";
 import { MediaType } from "../lib/notes/interfaces/MediaType";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
@@ -202,22 +201,14 @@ const Note = ({
 
       const fileId = getFileId(slug);
       if (!fileId) {
-        return <NoteContentBlockEmptyFile
-          key={Math.random()}
-        />;
+        throw new Error("INVALID_FILE_SLUG");
       }
 
       const mediaType = getMediaTypeFromFilename(fileId);
       let file = availableFileInfos.find((file) => file.fileId === fileId);
 
       if (!file) {
-        try {
-          file = await databaseProvider.getFileInfo(fileId);
-        } catch (e) {
-          return <NoteContentBlockEmptyFile
-            key={Math.random()}
-          />;
-        }
+        file = await databaseProvider.getFileInfo(fileId);
       }
 
       if (
@@ -265,12 +256,8 @@ const Note = ({
       }
     }
 
-    try {
-      const linkedNote = await databaseProvider.get(slug);
-      return getTransclusionContentFromNoteContent(linkedNote.content);
-    } catch (e) {
-      return <p>Transclusion not available.</p>;
-    }
+    const linkedNote = await databaseProvider.get(slug);
+    return getTransclusionContentFromNoteContent(linkedNote.content);
   };
 
 

@@ -57,6 +57,7 @@
   "editor.stats.x-coordinate": "X-Koordinate",
   "editor.stats.y-coordinate": "Y-Koordinate",
   "editor.title-already-exists-confirmation": "Eine Notiz mit diesem Titel existiert bereits. Möchtest du diese Notiz mit dem gleichen Titel speichern?",
+  "editor.transclusion.not-available": "Inhalt nicht verfügbar",
   "editor.unsaved-changes": "Ungespeicherte Änderungen",
   "editor.upload-file": "Datei hochladen",
   "editor.upload-in-progress": "Dateien werden hochgeladen",

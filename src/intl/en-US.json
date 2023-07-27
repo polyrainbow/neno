@@ -57,6 +57,7 @@
   "editor.stats.x-coordinate": "X coordinate",
   "editor.stats.y-coordinate": "Y coordinate",
   "editor.title-already-exists-confirmation": "A note with this title already exists. Do you want to save this note with the same title?",
+  "editor.transclusion.not-available": "Not available",
   "editor.unsaved-changes": "Unsaved changes",
   "editor.upload-file": "Upload file",
   "editor.upload-in-progress": "Upload in progress",

@@ -5,6 +5,8 @@ import {
   SerializedLexicalNode,
 } from "lexical";
 import { ReactElement, ReactNode, useEffect, useState } from "react";
+import Icon from "../../../components/Icon";
+import { l } from "../../intl";
 
 
 export class TransclusionNode extends DecoratorNode<ReactNode> {
@@ -33,26 +35,43 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
-    const transclusionId = this.__link.substring(1);
-    const TransclusionContent = () => {
+    const Transclusion = ({ slug }) => {
       const [content, setContent] = useState<ReactElement | null>(null);
+      const [isError, setIsError] = useState(false);
 
       useEffect(() => {
-        this.__getTransclusionContent(transclusionId)
+        this.__getTransclusionContent(slug)
           .then((content) => {
             setContent(content);
+            setIsError(false);
+          })
+          .catch(() => {
+            setContent(<p>Not available.</p>);
+            setIsError(true);
           });
-      }, [transclusionId]);
+      }, [slug]);
 
-      return content
-        ? content
-        : <div>Loading...</div>;
+      return <div
+        className={"transclusion " + (isError ? "unavailable" : "")}
+        data-transclusion-id={slug}
+      >
+        {
+          isError
+            ? <div className="not-available-disclaimer">
+              <Icon
+                icon="warning"
+                title={l("editor.transclusion.not-available")}
+                size={70}
+              />
+              {l("editor.transclusion.not-available")}
+            </div>
+            : (content ?? <div>Loading...</div>)
+        }
+        <p className="slug">{this.__link}</p>
+      </div>;
     };
 
-    return <div className="transclusion" data-transclusion-id={transclusionId}>
-      <TransclusionContent />
-      <p className="slug">{this.__link}</p>
-    </div>;
+    return <Transclusion slug={this.__link.substring(1)}/>;
   }
 
   createDOM(): HTMLDivElement {

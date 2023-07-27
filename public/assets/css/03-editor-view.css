@@ -431,6 +431,17 @@ div[data-lexical-editor] .transclusion {
   cursor: pointer;
 }
 
+div[data-lexical-editor] .transclusion.unavailable {
+  background: var(--error-and-danger-background-color);
+}
+
+div[data-lexical-editor] .transclusion.unavailable .not-available-disclaimer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--default-gap);
+}
+
 div[data-lexical-editor] .transclusion p {
   margin: 0;
 }
