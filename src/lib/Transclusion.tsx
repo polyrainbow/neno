@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import { getFirstLines } from "./utils";
+import { removeWikilinkPunctuation } from "./notes/noteUtils";
 
 export const getTransclusionContentFromNoteContent = (
   noteContent: string,
@@ -16,6 +17,6 @@ export const getTransclusionContentFromNoteContent = (
   }
 
   return <p className="transclusion-note-content">
-    {transclusionContent}
+    {removeWikilinkPunctuation(transclusionContent)}
   </p>;
 };

@@ -364,16 +364,20 @@ const shortenText = (text: string, maxLength: number): string => {
 };
 
 
+const removeWikilinkPunctuation = (text: string): string => {
+  return text.replace(/(\[\[)|(]])/g, "");
+};
+
+
 const inferNoteTitle = (noteContent: string, maxLength = 800): string => {
   const lines = noteContent.split("\n");
   const firstContentLine = lines.find((line) => line.trim().length > 0);
   if (!firstContentLine) {
     return "";
   }
-  const titleShortened = shortenText(firstContentLine, maxLength)
-    .trim()
-    // remove wikilink punctuation
-    .replace(/(\[\[)|(]])/g, "");
+  const titleShortened = removeWikilinkPunctuation(
+    shortenText(firstContentLine, maxLength).trim(),
+  );
   return titleShortened;
 };
 
@@ -1214,4 +1218,5 @@ export {
   createSlug,
   getNoteTitle,
   getRandomKey,
+  removeWikilinkPunctuation,
 };
