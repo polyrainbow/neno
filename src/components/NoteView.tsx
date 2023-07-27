@@ -218,11 +218,15 @@ const NoteView = () => {
     const title = activeNote.keyValues.find((kv) => kv[0] === "title")?.[1]
       ?? inferNoteTitle(activeNote.content);
 
-    document.title = title.length > 0
+    const documentTitle = title.length > 0
       ? title
       : activeNote.isUnsaved
         ? l("editor.new-note")
         : l("list.untitled-note");
+
+    if (document.title !== documentTitle) {
+      document.title = documentTitle;
+    }
 
     return () => {
       document.title = Config.DEFAULT_DOCUMENT_TITLE;
