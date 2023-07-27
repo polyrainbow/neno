@@ -1,5 +1,6 @@
 import ExistingNote from "./interfaces/ExistingNote.js";
 import {
+  createSlug,
   getExtensionFromFilename,
   getNotesWithFlag,
   getNotesWithUrl,
@@ -190,6 +191,28 @@ describe("infer note title", () => {
       expect(inferNoteTitle(
         "a title with a [[wikilink]] and some brackets []",
       )).toBe("a title with a wikilink and some brackets []");
+    },
+  );
+});
+
+
+describe("createSlug", () => {
+  it(
+    "should use the first meaningful line for slug creation",
+    async () => {
+      const noteContent = "\n\n\n\n# This is a heading\n\nThis is a paragraph";
+      expect(createSlug(noteContent, [])).toBe("this-is-a-heading");
+    },
+  );
+
+  it(
+    "should use add a number if the slug already exists",
+    async () => {
+      const noteContent = "content";
+      expect(createSlug(noteContent, ["content"])).toBe("content-2");
+
+      const noteContent2 = "content-2";
+      expect(createSlug(noteContent2, ["content-2"])).toBe("content-2-2");
     },
   );
 });

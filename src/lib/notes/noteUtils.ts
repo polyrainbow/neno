@@ -1052,7 +1052,8 @@ const isValidSlug = (slug: Slug): boolean => {
 };
 
 
-const createSlug = (title: string, existingSlugs: Slug[]): Slug => {
+const createSlug = (noteContent: string, existingSlugs: Slug[]): Slug => {
+  const title = inferNoteTitle(noteContent);
   let slugStem = sluggifyNoteText(title);
 
   let n = 1;
