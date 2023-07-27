@@ -33,7 +33,8 @@ import getSubtextFromEditor from "./utils/getSubtextFromEditor";
 import { InlineCodeNode } from "./nodes/InlineCodeNode";
 import { InlineCodePlugin } from "./plugins/InlineCodePlugin";
 import { CodeBlockNode } from "./nodes/CodeBlockNode";
-import { CodeBlockPlugin } from "./plugins/CodeBlockPlugin";
+import { BlockTransformPlugin } from "./plugins/BlockTransformPlugin";
+import { QuoteBlockNode } from "./nodes/QuoteBlockNode";
 
 const theme = {
   ltr: "ltr",
@@ -49,6 +50,7 @@ const theme = {
   subtext: "subtext",
   inlineCode: "inline-code",
   codeBlock: "code-block",
+  quoteBlock: "quote-block",
 };
 
 
@@ -137,6 +139,7 @@ export const Editor = ({
       TransclusionNode,
       InlineCodeNode,
       CodeBlockNode,
+      QuoteBlockNode,
     ],
   };
 
@@ -175,7 +178,7 @@ export const Editor = ({
       <TransclusionPlugin
         getTransclusionContent={getTransclusionContent}
       />
-      <CodeBlockPlugin />
+      <BlockTransformPlugin />
       <NodeEventPlugin
         nodeType={AutoLinkNode}
         eventType="click"

@@ -445,3 +445,11 @@ div[data-lexical-editor] .transclusion p.slug {
   font-family: 'IBM Plex Mono', monospace;
   background-color: var(--accent-color-interactible);
 }
+
+.quote-block {
+  border-left: 6px solid var(--alt-content-color);
+  padding: 3px var(--default-gap);
+  font-style: italic;
+  background: var(--accent-color-interactible);
+  margin-inline: 0;
+}

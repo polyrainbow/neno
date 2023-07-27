@@ -17,22 +17,22 @@ import { $applyNodeReplacement, ParagraphNode } from "lexical";
 import { ElementNodeType } from "../types/ElementNodeType";
 
 /** @noInheritDoc */
-export class CodeBlockNode extends ParagraphNode {
+export class QuoteBlockNode extends ParagraphNode {
   static getType(): string {
-    return ElementNodeType.CODE;
+    return ElementNodeType.QUOTE;
   }
 
   constructor() {
     super();
   }
 
-  static clone(): CodeBlockNode {
-    return new CodeBlockNode();
+  static clone(): QuoteBlockNode {
+    return new QuoteBlockNode();
   }
 
   createDOM(config: EditorConfig): HTMLElement {
     const element = super.createDOM(config);
-    addClassNamesToElement(element, config.theme.codeBlock);
+    addClassNamesToElement(element, config.theme.quoteBlock);
     return element;
   }
 
@@ -45,19 +45,19 @@ export class CodeBlockNode extends ParagraphNode {
   exportJSON(): SerializedElementNode {
     return {
       ...super.exportJSON(),
-      type: ElementNodeType.CODE,
+      type: ElementNodeType.QUOTE,
     };
   }
 }
 
 
-export function $createCodeBlockNode(): CodeBlockNode {
-  return $applyNodeReplacement(new CodeBlockNode());
+export function $createQuoteBlockNode(): QuoteBlockNode {
+  return $applyNodeReplacement(new QuoteBlockNode());
 }
 
 
-export function $isCodeBlockNode(
+export function $isQuoteBlockNode(
   node: LexicalNode | null | undefined,
-): node is CodeBlockNode {
-  return node instanceof CodeBlockNode;
+): node is QuoteBlockNode {
+  return node instanceof QuoteBlockNode;
 }
