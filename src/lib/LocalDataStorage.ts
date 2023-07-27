@@ -5,6 +5,7 @@ import { streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { FileId } from "./notes/interfaces/FileId";
+import { createDemoGraph, folderHasGraph } from "./DemoGraph";
 
 /*
   Notes:
@@ -86,6 +87,10 @@ export const initializeNotesProvider = async (
   );
 
   folderHandle = newFolderHandle;
+
+  if (!(await folderHasGraph(folderHandle))) {
+    await createDemoGraph(folderHandle);
+  }
 
   const storageProvider = new FileSystemAccessAPIStorageProvider(folderHandle);
   notesProvider = new NotesProvider(storageProvider);

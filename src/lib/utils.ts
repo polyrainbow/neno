@@ -3,11 +3,6 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { UnsavedActiveNote } from "../types/ActiveNote";
 import * as Config from "../config";
 import { FileInfo } from "./notes/interfaces/FileInfo";
-import {
-  Block,
-  BlockSlashlink,
-  BlockType,
-} from "./subwaytext/interfaces/Block.js";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { FILE_SLUG_PREFIX } from "./notes/config.js";
 import { getUrlForFileId } from "./LocalDataStorage";
@@ -127,35 +122,6 @@ const getWindowDimensions = (): { width: number, height: number } => {
   const width = window.innerWidth || docEl.clientWidth;
   const height = window.innerHeight || docEl.clientHeight;
   return { width, height };
-};
-
-
-const parseFileIds = (noteContent: string): FileId[] => {
-  // eslint-disable-next-line max-len
-  const regex = /\/files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
-  return [...noteContent.matchAll(regex)].map((match) => match[1]);
-};
-
-
-const getFileId = (noteContent: string): FileId | null => {
-  // eslint-disable-next-line max-len
-  const regex = /files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
-  const results = [...noteContent.matchAll(regex)].map((match) => match[1]);
-  if (results.length > 0) {
-    return results[0];
-  } else {
-    return null;
-  }
-};
-
-
-const blockHasLoadedFile = (
-  block: Block,
-): block is BlockSlashlink => {
-  if (
-    block.type !== BlockType.SLASHLINK) return false;
-
-  return !!parseFileIds(block.data.link)[0];
 };
 
 
@@ -357,13 +323,10 @@ export {
   shortenText,
   streamToBlob,
   getWindowDimensions,
-  blockHasLoadedFile,
   getAppPath,
   getIconSrc,
   stringContainsOnlyDigits,
   getFilesFromUserSelection,
-  parseFileIds,
-  getFileId,
   getWritableStream,
   readFileAsString,
   createContentFromFileIds,

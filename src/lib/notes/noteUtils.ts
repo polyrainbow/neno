@@ -13,7 +13,6 @@ import { FileInfo } from "./interfaces/FileInfo.js";
 import subwaytext from "../subwaytext/index.js";
 import {
   Block,
-  BlockSlashlink,
   BlockType,
 } from "../subwaytext/interfaces/Block.js";
 import {
@@ -266,7 +265,7 @@ const removeCustomMetadataWithEmptyKeys = (
 };
 
 
-const getFileId = (input: string): FileId | null => {
+const extractFirstFileId = (input: string): FileId | null => {
   // eslint-disable-next-line max-len
   const regex = /files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
   const results = [...input.matchAll(regex)].map((match) => match[1]);
@@ -278,19 +277,16 @@ const getFileId = (input: string): FileId | null => {
 };
 
 
-const blockHasLoadedFile = (
-  block: Block,
-): block is BlockSlashlink => {
-  if (
-    block.type !== BlockType.SLASHLINK
-  ) return false;
-
-  return !!getFileId(block.data.link);
+const parseFileIds = (noteContent: NoteContent): FileId[] => {
+  // eslint-disable-next-line max-len
+  const regex = /(^|\s)\/files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})($|\s)/g;
+  const matches = [...noteContent.matchAll(regex)];
+  return matches.map((match) => match[2]);
 };
 
 
-const getNumberOfFiles = (blocks: Block[]): number => {
-  return blocks.filter(blockHasLoadedFile).length;
+const getNumberOfFiles = (noteContent: string): number => {
+  return parseFileIds(noteContent).length;
 };
 
 
@@ -488,13 +484,6 @@ const getNumberOfUnlinkedNotes = (graph: Graph): number => {
 };
 
 
-const parseFileIds = (noteContent: NoteContent): FileId[] => {
-  // eslint-disable-next-line max-len
-  const regex = /\/files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
-  return [...noteContent.matchAll(regex)].map((match) => match[1]);
-};
-
-
 const getFileInfos = (
   graph: Graph,
   noteContent: NoteContent,
@@ -579,7 +568,7 @@ const getNoteFeatures = (
       containsCode = true;
     }
     if (block.type === BlockType.SLASHLINK) {
-      const fileId = getFileId(block.data.link);
+      const fileId = extractFirstFileId(block.data.link);
       if (fileId) {
         const mediaType = getMediaTypeFromFilename(fileId);
         if (mediaType === MediaType.IMAGE) {
@@ -623,7 +612,7 @@ const createNoteListItem = (
     features: getNoteFeatures(blocks),
     linkCount: getNumberOfLinkedNotes(graph, note.meta.slug),
     numberOfCharacters: getNumberOfCharacters(note),
-    numberOfFiles: getNumberOfFiles(blocks),
+    numberOfFiles: getNumberOfFiles(note.content),
   };
 
   return noteListItem;
@@ -939,13 +928,10 @@ const getNotesWithCustomMetadata = (
 
 const getNotesWithFile = (
   notes: ExistingNote[],
-  graph: Graph,
   fileId: FileId,
 ): ExistingNote[] => {
   return notes.filter((note: ExistingNote) => {
-    return getBlocks(note, graph.indexes.blocks)
-      .filter(blockHasLoadedFile)
-      .some((block) => getFileId(block.data.link) === fileId);
+    return parseFileIds(note.content).includes(fileId);
   });
 };
 
@@ -1147,7 +1133,7 @@ const getNotesWithMediaTypes = (
         return types.every((type) => {
           return getBlocks(note, graph.indexes.blocks).some((block) => {
             if (block.type !== BlockType.SLASHLINK) return false;
-            const fileId = getFileId(block.data.link);
+            const fileId = extractFirstFileId(block.data.link);
             if (!fileId) return false;
             return getMediaTypeFromFilename(fileId) === type;
           });
@@ -1159,7 +1145,7 @@ const getNotesWithMediaTypes = (
         return getBlocks(note, graph.indexes.blocks)
           .some((block) => {
             if (block.type !== BlockType.SLASHLINK) return false;
-            const fileId = getFileId(block.data.link);
+            const fileId = extractFirstFileId(block.data.link);
             if (!fileId) return false;
             return types.includes(getMediaTypeFromFilename(fileId));
           });
@@ -1201,7 +1187,6 @@ export {
   getNotesByTitle,
   getNotesWithUrl,
   getNotesWithFile,
-  blockHasLoadedFile,
   getNotesWithTitleContainingToken,
   getNotesWithTitleOrSlugContainingToken,
   getNotesThatContainTokens,
@@ -1226,4 +1211,5 @@ export {
   getNoteTitle,
   getRandomKey,
   removeWikilinkPunctuation,
+  extractFirstFileId,
 };

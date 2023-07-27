@@ -7,9 +7,6 @@ import {
   ListBlockStyle,
 } from "../lib/subwaytext/interfaces/Block";
 import ActiveNote from "../types/ActiveNote";
-import {
-  getFileId,
-} from "../lib/utils";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
 import NoteContentBlockDocument from "./NoteContentBlockDocument";
 import NoteContentBlockEmptyFile from "./NoteContentBlockEmptyFile";
@@ -24,7 +21,10 @@ import NoteContentBlockQuote from "./NoteContentBlockQuote";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { FileId } from "../lib/notes/interfaces/FileId";
 import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import { getMediaTypeFromFilename } from "../lib/notes/noteUtils";
+import {
+  extractFirstFileId,
+  getMediaTypeFromFilename,
+} from "../lib/notes/noteUtils";
 
 interface NoteContentProps {
   note: ActiveNote,
@@ -52,12 +52,12 @@ const NoteContent = ({
     const fileIdsInContent = blocks
       .filter((block): block is BlockSlashlink => {
         if (block.type !== BlockType.SLASHLINK) return false;
-        const fileId = getFileId(block.data.link);
+        const fileId = extractFirstFileId(block.data.link);
         if (!fileId) return false;
         return true;
       })
       .map((block): FileId => {
-        return getFileId(block.data.link) as string;
+        return extractFirstFileId(block.data.link) as string;
       });
 
     const initiallyResolvedFileIds = note.files.map((file) => file.fileId);
@@ -104,7 +104,7 @@ const NoteContent = ({
     {
       blocks.map((block) => {
         if (block.type === BlockType.SLASHLINK) {
-          const fileId = getFileId(block.data.link);
+          const fileId = extractFirstFileId(block.data.link);
           if (!fileId) {
             return <NoteContentBlockEmptyFile
               key={Math.random()}

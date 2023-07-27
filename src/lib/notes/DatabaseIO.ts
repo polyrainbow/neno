@@ -61,7 +61,7 @@ export default class DatabaseIO {
   }
 
 
-  private async getSlugsFromGraphDirectory(): Promise<string[]> {
+  private async getNoteFilenamesFromGraphDirectory(): Promise<string[]> {
     return (await this.#storageProvider.listDirectory())
       .filter((entry: string): boolean => {
         return entry.endsWith(DatabaseIO.#NOTE_FILE_EXTENSION);
@@ -69,39 +69,23 @@ export default class DatabaseIO {
   }
 
 
-  private async readAndParseGraphFromDisk(): Promise<Graph> {
-    const filenames = await this.getSlugsFromGraphDirectory();
-    const slugs = DatabaseIO.getSlugsFromFilenames(filenames);
-    const nonParseableNote = Symbol("NOT_PARSEABLE");
+  private async parseGraph(
+    notes: string[],
+    metadataSerialized: string,
+  ): Promise<Graph> {
+    const parsedNotes: ExistingNote[] = [];
 
-    const parsedNotes = (await Promise.all(
-      slugs.map(async (slug: string): Promise<ExistingNote | symbol> => {
-        const serializedNote = await this.#storageProvider.readObjectAsString(
-          this.#storageProvider.joinPath(
-            DatabaseIO.getFilenameForSlug(slug),
-          ),
-        );
-        let parsedNote: ExistingNote | symbol;
-        try {
-          parsedNote = parseSerializedExistingNote(serializedNote);
-        } catch (e) {
-          parsedNote = nonParseableNote;
-        }
+    for (const serializedNote of notes) {
+      let parsedNote: ExistingNote;
+      try {
+        parsedNote = parseSerializedExistingNote(serializedNote);
+        parsedNotes.push(parsedNote);
+      } catch (e) {
+        continue;
+      }
+    }
 
-        return parsedNote;
-      }),
-    ))
-      .filter(
-        (parsedNote: ExistingNote | symbol): parsedNote is ExistingNote => {
-          return parsedNote !== nonParseableNote;
-        },
-      );
-
-    const graphMetadata = JSON.parse(
-      await this.#storageProvider.readObjectAsString(
-        this.#GRAPH_METADATA_FILENAME,
-      ),
-    );
+    const graphMetadata = JSON.parse(metadataSerialized);
 
     const blockIndex = await DatabaseIO.createBlockIndex(parsedNotes);
     const outgoingLinkIndex = DatabaseIO.createOutgoingLinkIndex(blockIndex);
@@ -122,6 +106,24 @@ export default class DatabaseIO {
     };
 
     return parsedGraphObject;
+  }
+
+
+  private async readAndParseGraphFromDisk(): Promise<Graph> {
+    const noteFilenames = await this.getNoteFilenamesFromGraphDirectory();
+
+    const graphMetadataSerialized
+      = await this.#storageProvider.readObjectAsString(
+        this.#GRAPH_METADATA_FILENAME,
+      );
+
+    const serializedNotes = await Promise.all(
+      noteFilenames.map(async (filename: string): Promise<string> => {
+        return await this.#storageProvider.readObjectAsString(filename);
+      }),
+    );
+
+    return this.parseGraph(serializedNotes, graphMetadataSerialized);
   }
 
 
@@ -285,7 +287,7 @@ export default class DatabaseIO {
   }
 
 
-  private createGraph(): Graph {
+  private createEmptyGraph(): Graph {
     const newGraph: Graph = {
       metadata: {
         createdAt: Date.now(),
@@ -312,7 +314,6 @@ export default class DatabaseIO {
 
     return newGraph;
   }
-
 
   /**
     PUBLIC
@@ -375,7 +376,7 @@ export default class DatabaseIO {
     } catch (error) {
       // Way 3: If there is no graph object in memory or on the disk,
       // create a new graph object
-      const newGraph: Graph = this.createGraph();
+      const newGraph: Graph = this.createEmptyGraph();
       // write it to memory and disk
       await this.flushChanges(newGraph);
       this.#finishedObtainingGraph();

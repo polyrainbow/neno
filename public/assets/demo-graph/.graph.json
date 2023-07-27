@@ -1,0 +1,24 @@
+{
+  "createdAt": 1690400000000,
+  "updatedAt": 1690400000000,
+  "screenPosition": {
+    "translateX": 0,
+    "translateY": 0,
+    "scale": 0
+  },
+  "initialNodePosition": {
+    "x": 0,
+    "y": 0
+  },
+  "pinnedNotes": [
+    "welcome-to-neno"
+  ],
+  "files": [
+    {
+      "fileId": "9f6917da-9396-4e6f-b683-d117505ee5a7.jpg",
+      "size": 301495,
+      "name": "beach.jpg",
+      "createdAt": 1690400000000
+    }
+  ]
+}

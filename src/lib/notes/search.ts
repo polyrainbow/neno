@@ -170,7 +170,7 @@ export const search = async (
 
     // search for notes with specific fileIds
     } else if (key === "has-file") {
-      matchingNotes = getNotesWithFile(matchingNotes, graph, value);
+      matchingNotes = getNotesWithFile(matchingNotes, value);
     } else if (key === "has-flag") {
       matchingNotes = getNotesWithFlag(matchingNotes, value);
 

@@ -9,7 +9,6 @@ import { Editor, UserRequestType } from "../lib/editor";
 import NoteStats from "./NoteStats";
 import {
   getAppPath,
-  getFileId,
   getFilesFromUserSelection,
 } from "../lib/utils";
 import ActiveNote from "../types/ActiveNote";
@@ -32,7 +31,11 @@ import useConfirmDiscardingUnsavedChangesDialog
 import { useNavigate } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
-import { getMediaTypeFromFilename, sluggifyLink } from "../lib/notes/noteUtils";
+import {
+  extractFirstFileId,
+  getMediaTypeFromFilename,
+  sluggifyLink,
+} from "../lib/notes/noteUtils";
 import { MediaType } from "../lib/notes/interfaces/MediaType";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
 import NoteContentBlockVideo from "./NoteContentBlockVideo";
@@ -201,7 +204,7 @@ const Note = ({
         ...note.files,
       ];
 
-      const fileId = getFileId(slug);
+      const fileId = extractFirstFileId(slug);
       if (!fileId) {
         throw new Error("INVALID_FILE_SLUG");
       }
@@ -267,7 +270,7 @@ const Note = ({
     const slug = sluggifyLink(linkText);
 
     if (linkText.startsWith(FILE_SLUG_PREFIX)) {
-      const fileId = getFileId(slug);
+      const fileId = extractFirstFileId(slug);
 
       if (!fileId) {
         return false;
@@ -406,7 +409,7 @@ const Note = ({
                       const slug = sluggifyLink(value);
 
                       if (slug.startsWith(FILE_SLUG_PREFIX)) {
-                        const fileId = getFileId(slug);
+                        const fileId = extractFirstFileId(slug);
 
                         if (!fileId) {
                           return;
