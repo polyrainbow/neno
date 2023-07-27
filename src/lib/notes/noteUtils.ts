@@ -386,7 +386,6 @@ const getNoteTitle = (note: ExistingNote): string => {
   }
 };
 
-// TODO: make non-existing notes red instead of blue?
 
 const updateNotePosition = (
   graph: Graph,
@@ -430,13 +429,13 @@ const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
 
 
 const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
-  const backlinks = graph.indexes.backlinks.get(slug);
+  const backlinkSlugs = graph.indexes.backlinks.get(slug);
 
-  if (!backlinks) {
+  if (!backlinkSlugs) {
     throw new Error("Could not determine backlinks for slug " + slug);
   }
 
-  const notes: ExistingNote[] = Array.from(backlinks)
+  const notes: ExistingNote[] = Array.from(backlinkSlugs)
     .map((slug: Slug): ExistingNote => {
       // we are sure that the notes we are retrieving from slugs in links
       // really exist. that's why we cast the result of findNote as
@@ -444,18 +443,18 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
       return graph.notes.get(slug) as ExistingNote;
     });
 
-  const linkedNotes: SparseNoteInfo[] = notes
+  const backlinks: SparseNoteInfo[] = notes
     .map((note: ExistingNote) => {
-      const linkedNote: SparseNoteInfo = {
+      const backlink: SparseNoteInfo = {
         slug: note.meta.slug,
         title: getNoteTitle(note),
         createdAt: note.meta.createdAt,
         updatedAt: note.meta.updatedAt,
       };
-      return linkedNote;
+      return backlink;
     });
 
-  return linkedNotes;
+  return backlinks;
 };
 
 

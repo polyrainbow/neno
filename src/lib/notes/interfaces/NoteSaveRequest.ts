@@ -1,8 +1,10 @@
 import ExistingNote from "./ExistingNote.js";
 import NewNote from "./NewNote.js";
+import { Slug } from "./Slug.js";
 
 interface BaseNoteSaveRequest {
   ignoreDuplicateTitles: boolean,
+  changeSlugTo?: Slug,
 }
 
 export interface NewNoteSaveRequest extends BaseNoteSaveRequest {
@@ -11,7 +13,6 @@ export interface NewNoteSaveRequest extends BaseNoteSaveRequest {
 
 export interface ExistingNoteSaveRequest extends BaseNoteSaveRequest {
   note: ExistingNote,
-  changeSlugTo?: string,
 }
 
 export type NoteSaveRequest = NewNoteSaveRequest | ExistingNoteSaveRequest;

@@ -53,7 +53,7 @@ describe("Notes module", () => {
     expect(stats.numberOfUnlinkedNotes).toBe(2);
   });
 
-  it("should correctly create links", async () => {
+  it("should correctly output number of links", async () => {
     const noteSaveRequest: NoteSaveRequest = {
       note: {
         content: "Note with a link to [[another existing note]]",
@@ -73,7 +73,7 @@ describe("Notes module", () => {
     expect(stats.numberOfLinks).toBe(1);
   });
 
-  it("should correctly update key values pairs", async () => {
+  it("should correctly update key-value pairs", async () => {
     const noteSaveRequest: NoteSaveRequest = {
       note: {
         content: "",
@@ -108,5 +108,42 @@ describe("Notes module", () => {
     const updatedNote = await notesProvider.put(noteSaveRequest2);
 
     expect(updatedNote.meta.custom.test).toBe("12");
+  });
+
+  it("should show correct backlinks for new created notes", async () => {
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        content: "Note 1 with a link to [[Note 2]] that does not exist yet.",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "note-1",
+    };
+
+    await notesProvider.put(noteSaveRequest);
+
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "This is Note 2",
+        meta: {
+          custom: {
+            "test": "12",
+          },
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "note-2",
+    };
+
+    const note2 = await notesProvider.put(noteSaveRequest2);
+
+    expect(note2.backlinks.length).toBe(1);
+    expect(note2.backlinks[0].slug).toBe("note-1");
   });
 });

@@ -89,8 +89,10 @@ export default class NotesProvider {
     graph.indexes.outgoingLinks.set(ourSlug, new Set(ourOutgoingLinks));
 
     // Backlinks index
+    const ourBacklinks = new Set<Slug>();
+
     if (!graph.indexes.backlinks.has(ourSlug)) {
-      graph.indexes.backlinks.set(ourSlug, new Set<Slug>());
+      graph.indexes.backlinks.set(ourSlug, ourBacklinks);
     }
 
     for (const someExistingSlug of graph.notes.keys()) {
@@ -100,6 +102,14 @@ export default class NotesProvider {
       } else {
         (graph.indexes.backlinks.get(someExistingSlug) as Set<Slug>)
           .delete(ourSlug);
+      }
+
+      const theirOutgoingLinks = graph.indexes.outgoingLinks.get(
+        someExistingSlug,
+      ) as Set<Slug>;
+
+      if (theirOutgoingLinks.has(ourSlug)) {
+        ourBacklinks.add(someExistingSlug);
       }
     }
   };
