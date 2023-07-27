@@ -353,7 +353,14 @@ const Note = ({
               }
               onInput={(e) => {
                 const element = e.currentTarget;
-                const newValue = element.value.replace(/[^\w\d-/._]/g, "");
+                const newValue = element.value.replace(
+                  // In the input field, we also allow \p{SK} modifiers, as
+                  // they are used to create a full letter with modifier in a
+                  // second step. They are not valid slug characters on its own,
+                  // though.
+                  /[^\p{L}\p{Sk}\d\-/._]/gu,
+                  "",
+                ).toLowerCase();
                 setSlugInput(newValue);
                 setUnsavedChanges(true);
               }}
