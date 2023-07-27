@@ -13,6 +13,7 @@ import {
 } from "lexical";
 import { $isAutoLinkNode, AutoLinkNode } from "@lexical/link";
 import { ReactElement } from "react";
+import { ElementNodeType } from "../types/ElementNodeType";
 
 const transclusionsMatchSlashlinks = (
   slashlinks: AutoLinkNode[],
@@ -68,12 +69,15 @@ export default (
   getTransclusionContent: (id: string) => Promise<ReactElement>,
 ) => {
   // this usually happens after a paste event, so let's fix the structure first
-  if (node.getType() === "paragraph" && node.getTextContent().includes("\n")) {
+  if (
+    node.getType() === ElementNodeType.PARAGRAPH
+    && node.getTextContent().includes("\n")
+  ) {
     splitParagraphAtLineBreaks(node);
     return;
   }
 
-  const slashlinks = node.getType() === "paragraph"
+  const slashlinks = node.getType() === ElementNodeType.PARAGRAPH
     ? node.getChildren()
       .filter((child): child is AutoLinkNode => {
         return $isAutoLinkNode(child)
@@ -82,7 +86,7 @@ export default (
             || child.getTextContent().startsWith("@")
           );
       })
-    : []; // don't create slashlinks on code blocks
+    : []; // don't create slashlinks on code or quote blocks
 
   const transclusions: TransclusionNode[] = node.getChildren()
     .filter(

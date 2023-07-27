@@ -423,6 +423,10 @@ div[data-lexical-editor] > p {
   font-weight: bold;
 }
 
+div[data-lexical-editor] .transclusion-wrapper {
+  user-select: none;
+}
+
 div[data-lexical-editor] .transclusion {
   background: var(--accent-color-interactible);
   border-radius: 7px;
