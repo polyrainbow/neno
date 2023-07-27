@@ -92,9 +92,30 @@ const PlainTextStateExchangePlugin = ({
   useEffect(() => {
     editor.update(() => {
       const root = $getRoot();
-      setSubtext(root, initialText);
-      editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
-      root.getLastChild()?.selectEnd();
+      const currentText = getSubtextFromEditor(root);
+      // If the new initial text is not different from the current text, we do
+      // not need to perform the update as it would just move the cursor from
+      // the current position. The user probably just has saved their note with
+      // CTRL/CMD+S.
+      // This is just an issue if there are two notes with the same
+      // non-empty content, because then, the cursor would not reset.
+      if (initialText !== currentText) {
+        setSubtext(root, initialText);
+        editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
+        /*
+          When we open a new note, the cursor should be at the beginning of the
+          note and the view should be scrolled to the top.
+          We detect that with the heuristic that the current text is not a
+          prefix of the new initial text.
+          When it is a prefix, we assume that the user is editing an existing
+          note from outside the editor (e.g. appending a link). In this case,
+          we should move the cursor to the end.
+          This is not perfect, but it's good enough for now.
+        */
+        if (currentText.length > 0 && initialText.startsWith(currentText)) {
+          root.getLastChild()?.selectEnd();
+        }
+      }
     });
   }, [editor, initialText]);
 
