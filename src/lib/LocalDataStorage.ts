@@ -6,6 +6,18 @@ import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { FileId } from "./notes/interfaces/FileId";
 
+/*
+  Notes:
+  FileSystemHandle.requestPermission currently requires to be called
+  from a user gesture: https://stackoverflow.com/a/69897694/3890888
+
+  Persistent file handle permissions not yet implemented:
+  https://bugs.chromium.org/p/chromium/issues/detail?id=1354695
+  https://bugs.chromium.org/p/chromium/issues/detail?id=1373962
+  https://bugs.chromium.org/p/chromium/issues/detail?id=1011533
+  https://bugs.chromium.org/p/chromium/issues/detail?id=1467574
+ */
+
 async function verifyPermission(
   fileSystemHandle: FileSystemHandle,
   readWrite: boolean,

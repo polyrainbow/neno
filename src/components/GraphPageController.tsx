@@ -12,7 +12,11 @@ import ListView from "./ListView";
 import NoteView from "./NoteView";
 import StatsView from "./StatsView";
 import VisualizationView from "./VisualView";
-import { getNotesProvider, isInitialized } from "../lib/LocalDataStorage";
+import {
+  getNotesProvider,
+  initializeNotesProviderWithExistingFolderHandle,
+  isInitialized,
+} from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
 interface GraphPageControllerProps {
@@ -33,7 +37,17 @@ const GraphPageController = ({
         ]),
       ));
     } else {
-      navigate(getAppPath(PathTemplate.LOGIN));
+      try {
+        await initializeNotesProviderWithExistingFolderHandle();
+        navigate(getAppPath(
+          PathTemplate.NEW_NOTE,
+          new Map([
+            ["GRAPH_ID", LOCAL_GRAPH_ID],
+          ]),
+        ));
+      } catch (e) {
+        navigate(getAppPath(PathTemplate.LOGIN));
+      }
     }
   };
 
