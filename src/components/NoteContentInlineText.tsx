@@ -41,6 +41,23 @@ const NoteContentInlineText = ({
           )}
         >{linkText}</Link>
       </span>;
+    } else if (span.type === SpanType.SLASHLINK) {
+      const linkText = span.text;
+      const slug = sluggifyLink(linkText.substring(1));
+
+      return <span
+        key={`slashlink-span-${i}-${span.text}`}
+      >
+        <Link
+          to={getAppPath(
+            PathTemplate.EXISTING_NOTE,
+            new Map([
+              ["GRAPH_ID", LOCAL_GRAPH_ID],
+              ["SLUG", slug],
+            ]),
+          )}
+        >{linkText}</Link>
+      </span>;
     } else {
       // normal text or slashlink.
       // inline slashlinks are currently rendered as normal text
