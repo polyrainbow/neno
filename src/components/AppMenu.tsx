@@ -161,8 +161,8 @@ const AppMenu = () => {
       />
       <AppMenuItem
         disabled={!isInitialized()}
-        label={l("menu.logout")}
-        icon="lock"
+        label={l("menu.close-graph")}
+        icon="logout"
         onClick={async () => {
           if (unsavedChanges) {
             await confirmDiscardingUnsavedChanges();
