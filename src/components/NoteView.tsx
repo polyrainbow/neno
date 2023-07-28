@@ -415,7 +415,7 @@ const NoteView = () => {
 
             navigate(
               Utils.getAppPath(
-                PathTemplate.GRAPH_WITH_FOCUS_NOTE,
+                PathTemplate.VISUAL_WITH_FOCUS_NOTE,
                 new Map([
                   ["GRAPH_ID", Config.LOCAL_GRAPH_ID],
                   ["FOCUS_NOTE_SLUG", activeNote.slug],

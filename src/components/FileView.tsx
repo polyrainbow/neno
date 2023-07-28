@@ -21,6 +21,8 @@ import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
 import DialogActionBar from "./DialogActionBar";
 import { getMediaTypeFromFilename } from "../lib/notes/noteUtils";
+import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
+import { isInitialized } from "../lib/LocalDataStorage";
 
 
 const FileView = () => {
@@ -37,6 +39,8 @@ const FileView = () => {
   const type = fileId && getMediaTypeFromFilename(fileId);
 
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
+
+  useGraphAccessCheck();
 
   useEffect(() => {
     if (typeof fileId !== "string") return;
@@ -64,6 +68,10 @@ const FileView = () => {
     getFileInfo();
     getNotes();
   }, [notesProvider, fileId]);
+
+  if (!isInitialized()) {
+    return <BusyIndicator height={80} alt={l("app.loading")} />;
+  }
 
   return <>
     <HeaderContainerLeftRight />

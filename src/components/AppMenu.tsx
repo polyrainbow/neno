@@ -79,7 +79,7 @@ const AppMenu = () => {
         icon="scatter_plot"
         onClick={async () => {
           const target = getAppPath(
-            PathTemplate.GRAPH,
+            PathTemplate.VISUAL,
             new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
           );
           if (pathname === target) return;

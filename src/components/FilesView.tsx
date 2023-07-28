@@ -6,6 +6,9 @@ import { FileId } from "../lib/notes/interfaces/FileId";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
+import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
+import { isInitialized } from "../lib/LocalDataStorage";
+import BusyIndicator from "./BusyIndicator";
 
 enum FileSortMode {
   CREATED_AT_DESCENDING = "CREATED_AT_DESCENDING",
@@ -17,6 +20,8 @@ enum FileSortMode {
 }
 
 const FilesView = () => {
+  useGraphAccessCheck();
+
   const notesProvider = useNotesProvider();
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [danglingFileIds, setDanglingFileIds] = useState<FileId[]>([]);
@@ -68,6 +73,10 @@ const FilesView = () => {
 
     updateFiles();
   }, [notesProvider]);
+
+  if (!isInitialized()) {
+    return <BusyIndicator height={80} alt={l("app.loading")} />;
+  }
 
   return <>
     <HeaderContainerLeftRight />

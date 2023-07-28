@@ -6,10 +6,15 @@ import {
 } from "react-router-dom";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
-import GraphPageController from "./GraphPageController";
-import { GraphSubpage } from "../types/GraphSubpage";
 import { ROOT_PATH } from "../config";
-
+import NoteView from "./NoteView";
+import ListView from "./ListView";
+import VisualizationView from "./VisualView";
+import FilesView from "./FilesView";
+import FileView from "./FileView";
+import StatsView from "./StatsView";
+import GraphSettingsView from "./GraphSettingsView";
+import NoteAccessProvider from "./NoteAccessProvider";
 
 const AppRouter = () => {
   const router = createBrowserRouter(
@@ -47,28 +52,36 @@ const AppRouter = () => {
             ["GRAPH_ID", ":graphId"],
           ]),
         ),
-        element: <GraphPageController page={GraphSubpage.NOTE} />,
+        element: <NoteAccessProvider>
+          <NoteView />
+        </NoteAccessProvider>,
       },
       {
         path: getAppPath(
           PathTemplate.LIST,
           new Map([["GRAPH_ID", ":graphId"]]),
         ),
-        element: <GraphPageController page={GraphSubpage.LIST} />,
+        element: <NoteAccessProvider>
+          <ListView />
+        </NoteAccessProvider>,
       },
       {
         path: getAppPath(
-          PathTemplate.GRAPH,
+          PathTemplate.VISUAL,
           new Map([["GRAPH_ID", ":graphId"]]),
         ),
-        element: <GraphPageController page={GraphSubpage.VISUAL} />,
+        element: <NoteAccessProvider>
+          <VisualizationView />
+        </NoteAccessProvider>,
       },
       {
         path: getAppPath(
           PathTemplate.FILES,
           new Map([["GRAPH_ID", ":graphId"]]),
         ),
-        element: <GraphPageController page={GraphSubpage.FILES} />,
+        element: <NoteAccessProvider>
+          <FilesView />
+        </NoteAccessProvider>,
       },
       {
         path: getAppPath(
@@ -78,28 +91,33 @@ const AppRouter = () => {
             ["FILE_ID", ":fileId"],
           ]),
         ),
-        element: <GraphPageController page={GraphSubpage.FILE} />,
+        element: <NoteAccessProvider>
+          <FileView />
+        </NoteAccessProvider>,
       },
       {
         path: getAppPath(
           PathTemplate.STATS,
           new Map([["GRAPH_ID", ":graphId"]]),
         ),
-        element: <GraphPageController page={GraphSubpage.STATS} />,
+        element: <NoteAccessProvider>
+          <StatsView />
+        </NoteAccessProvider>,
       },
       {
         path: getAppPath(
           PathTemplate.SETTINGS,
           new Map([["GRAPH_ID", ":graphId"]]),
         ),
-        element: <GraphPageController page={GraphSubpage.SETTINGS} />,
+        element: <NoteAccessProvider>
+          <GraphSettingsView />
+        </NoteAccessProvider>,
       },
     ],
     {
       basename: ROOT_PATH,
     },
   );
-
 
   return <RouterProvider router={router} />;
 };
