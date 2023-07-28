@@ -3,8 +3,6 @@ import DialogServiceContext from "../contexts/DialogServiceContext";
 import { DialogType } from "../enum/DialogType";
 import DialogServiceConfiguration
   from "../types/DialogServiceConfiguration";
-import ChangeLanguageDialog from "./ChangeLanguageDialog";
-import * as Localizer from "../lib/intl";
 import NotesProvider from "../lib/notes";
 
 interface DialogServiceProviderProps {
@@ -62,16 +60,6 @@ const DialogServiceProvider = (props: DialogServiceProviderProps) => {
     >
       {props.children}
     </DialogServiceContext.Provider>
-    {
-      config.openDialog === DialogType.CHANGE_LANGUAGE
-        ? <ChangeLanguageDialog
-          activeLanguage={Localizer.getActiveLanguage()}
-          languages={Localizer.supportedLangs}
-          changeLanguage={config.callback}
-          onClose={resetDialogConfig}
-        />
-        : null
-    }
   </>;
 };
 

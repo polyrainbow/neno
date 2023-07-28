@@ -1,9 +1,7 @@
 import { useContext } from "react";
 import AppMenuItem from "./AppMenuItem";
 import OutsideAlerter from "./OutsideAlerter";
-import { DialogType } from "../enum/DialogType";
-import useDialog from "../hooks/useDialog";
-import { l, setLanguage } from "../lib/intl";
+import { l } from "../lib/intl";
 import AppMenuContext from "../contexts/AppMenuContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
@@ -31,13 +29,6 @@ const AppMenu = () => {
   const isSmallScreen = useIsSmallScreen();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
-
-  const openChangeLanguageDialog = useDialog(
-    DialogType.CHANGE_LANGUAGE,
-    null,
-    setLanguage,
-  );
-
 
   if (!isAppMenuOpen) return null;
 
@@ -153,11 +144,6 @@ const AppMenu = () => {
           }
           navigate(target);
         }}
-      />
-      <AppMenuItem
-        label={l("menu.change-language")}
-        icon="language"
-        onClick={openChangeLanguageDialog}
       />
       <AppMenuItem
         disabled={!isInitialized()}

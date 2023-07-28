@@ -1,20 +1,14 @@
 import { useState } from "react";
-import { l } from "../lib/intl";
-import Dialog from "./Dialog";
-import DialogActionBar from "./DialogActionBar";
+import { getActiveLanguage, l, setLanguage, supportedLangs } from "../lib/intl";
 
-const ChangeLanguageDialog = ({
-  activeLanguage,
-  languages,
-  changeLanguage,
-  onClose,
-}) => {
+const ChangeLanguageSetting = () => {
+  const activeLanguage = getActiveLanguage();
+  const languages = supportedLangs;
+
   const [selectedLanguage, setSelectedLanguage] = useState(activeLanguage);
 
-  return <Dialog
-    onClickOnOverlay={onClose}
-  >
-    <h1>{l("change-language.heading")}</h1>
+  return <section>
+    <h2>{l("change-language.heading")}</h2>
     <select
       value={selectedLanguage}
       autoFocus={true}
@@ -29,20 +23,15 @@ const ChangeLanguageDialog = ({
         })
       }
     </select>
-    <DialogActionBar>
+    <div>
       <button
         onClick={() => {
-          changeLanguage(selectedLanguage);
-          onClose();
+          setLanguage(selectedLanguage);
         }}
         className="default-button dialog-box-button default-action"
       >{l("change-language.change")}</button>
-      <button
-        onClick={onClose}
-        className="default-button dialog-box-button"
-      >{l("dialog.cancel")}</button>
-    </DialogActionBar>
-  </Dialog>;
+    </div>
+  </section>;
 };
 
-export default ChangeLanguageDialog;
+export default ChangeLanguageSetting;
