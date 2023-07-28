@@ -13,6 +13,12 @@ import useConfirmDiscardingUnsavedChangesDialog
 import { isInitialized, removeAccess } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
+/*
+  Closing the app menu after calling navigate() is essential.
+  Before, we had the close app menu handler on the div.app-menu,
+  but this led to the navigate() call not having any effect, as it was not
+  followed by a state change.
+*/
 
 const AppMenu = () => {
   const {
@@ -35,12 +41,7 @@ const AppMenu = () => {
   return <OutsideAlerter
     onOutsideClick={() => setIsAppMenuOpen(false)}
   >
-    <div
-      className="app-menu"
-      onClick={
-        () => setIsAppMenuOpen(false)
-      }
-    >
+    <div className="app-menu">
       <AppMenuItem
         disabled={!isInitialized()}
         label={isSmallScreen ? l("menu.note-list") : l("menu.editor")}
@@ -60,17 +61,8 @@ const AppMenu = () => {
             setUnsavedChanges(false);
           }
 
-          /*
-          if (!isSmallScreen) {
-            // we need to use force when calling createNewNote because
-            // otherwise this function will ask again on unsaved changes.
-            // this is because the setUnsavedChanges call above will be
-            // scheduled and not executed immediately.
-            createNewNote([], [], true);
-          }
-          */
-
           navigate(target);
+          setIsAppMenuOpen(false);
         }}
       />
       <AppMenuItem
@@ -88,7 +80,9 @@ const AppMenu = () => {
             await confirmDiscardingUnsavedChanges();
             setUnsavedChanges(false);
           }
+
           navigate(target);
+          setIsAppMenuOpen(false);
         }}
       />
       <AppMenuItem
@@ -106,7 +100,9 @@ const AppMenu = () => {
             await confirmDiscardingUnsavedChanges();
             setUnsavedChanges(false);
           }
+
           navigate(target);
+          setIsAppMenuOpen(false);
         }}
       />
       <AppMenuItem
@@ -124,7 +120,9 @@ const AppMenu = () => {
             await confirmDiscardingUnsavedChanges();
             setUnsavedChanges(false);
           }
+
           navigate(target);
+          setIsAppMenuOpen(false);
         }}
       />
       <AppMenuItem
@@ -142,7 +140,9 @@ const AppMenu = () => {
             await confirmDiscardingUnsavedChanges();
             setUnsavedChanges(false);
           }
+
           navigate(target);
+          setIsAppMenuOpen(false);
         }}
       />
       <AppMenuItem
@@ -157,6 +157,7 @@ const AppMenu = () => {
 
           await removeAccess();
           navigate(getAppPath(PathTemplate.LOGIN));
+          setIsAppMenuOpen(false);
           window.location.reload();
         }}
       />
