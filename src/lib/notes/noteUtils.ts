@@ -409,12 +409,22 @@ const updateNotePosition = (
 };
 
 
-const getOutgoingLinks = (graph: Graph, slug: Slug): Set<Slug> => {
+const getOutgoingLinksToOtherNotes = (
+  graph: Graph,
+  slug: Slug,
+): Set<Slug> => {
   if (!graph.indexes.outgoingLinks.has(slug)) {
     throw new Error("Could not determine outgoing links of " + slug);
   }
 
-  return graph.indexes.outgoingLinks.get(slug) as Set<Slug>;
+  const slugs = graph.indexes.outgoingLinks.get(slug) as Set<Slug>;
+
+  const validNoteSlugs = Array.from(slugs)
+    .filter((theirSlug: Slug) => {
+      return graph.notes.has(theirSlug) && theirSlug !== slug;
+    });
+
+  return new Set<Slug>(validNoteSlugs);
 };
 
 
@@ -466,7 +476,7 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
 
 
 const getNumberOfLinkedNotes = (graph: Graph, slug: Slug): LinkCount => {
-  const outgoingLinks = getOutgoingLinks(graph, slug);
+  const outgoingLinks = getOutgoingLinksToOtherNotes(graph, slug);
   const backlinks = getBacklinks(graph, slug);
   return {
     outgoing: outgoingLinks.size,
@@ -502,8 +512,9 @@ const createNoteToTransmit = async (
   const noteToTransmit: NoteToTransmit = {
     content: databaseNote.content,
     meta: databaseNote.meta,
-    outgoingLinks: Array.from(getOutgoingLinks(graph, databaseNote.meta.slug))
-      .filter((slug: Slug) => graph.notes.has(slug))
+    outgoingLinks: Array.from(
+      getOutgoingLinksToOtherNotes(graph, databaseNote.meta.slug),
+    )
       .map((slug: Slug) => {
         const notePreview = getNotePreview(graph, slug);
         return notePreview;

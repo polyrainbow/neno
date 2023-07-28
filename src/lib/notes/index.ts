@@ -96,6 +96,10 @@ export default class NotesProvider {
     }
 
     for (const someExistingSlug of graph.notes.keys()) {
+      if (someExistingSlug === ourSlug) {
+        continue;
+      }
+
       if (ourOutgoingLinks.includes(someExistingSlug)) {
         (graph.indexes.backlinks.get(someExistingSlug) as Set<Slug>)
           .add(ourSlug);

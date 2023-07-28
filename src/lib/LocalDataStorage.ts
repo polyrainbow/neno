@@ -17,7 +17,7 @@ import { createDemoGraph, folderHasGraph } from "./DemoGraph";
   https://bugs.chromium.org/p/chromium/issues/detail?id=1373962
   https://bugs.chromium.org/p/chromium/issues/detail?id=1011533
   https://bugs.chromium.org/p/chromium/issues/detail?id=1467574
- */
+*/
 
 async function verifyPermission(
   fileSystemHandle: FileSystemHandle,

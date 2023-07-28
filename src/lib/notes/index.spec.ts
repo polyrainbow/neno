@@ -9,10 +9,10 @@ import { TextEncoder, TextDecoder } from "util";
 // @ts-ignore
 Object.assign(global, { TextDecoder, TextEncoder });
 
-const notesProvider = new NotesProvider(new MockStorageProvider());
-
 describe("Notes module", () => {
   it("should create and output notes", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
     const noteSaveRequest1: NewNoteSaveRequest = {
       note: {
         content: "",
@@ -42,6 +42,33 @@ describe("Notes module", () => {
   });
 
   it("should output correct graph stats", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
+    const noteSaveRequest1: NewNoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+    };
+    await notesProvider.put(noteSaveRequest1);
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+    };
+    await notesProvider.put(noteSaveRequest2);
+
     const stats = await notesProvider.getStats({
       includeMetadata: true,
       includeAnalysis: false,
@@ -54,6 +81,8 @@ describe("Notes module", () => {
   });
 
   it("should correctly output number of links", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
     const noteSaveRequest: NoteSaveRequest = {
       note: {
         content: "Note with a link to [[another existing note]]",
@@ -73,7 +102,73 @@ describe("Notes module", () => {
     expect(stats.numberOfLinks).toBe(1);
   });
 
+
+  it(
+    "search result only consider links to really existing notes",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: `Note with a links to some non-existing notes and one
+          existing note and to itself.
+          [[1]] [[2]] [[3]] [[4]] [[5]] [[6]]
+          /7 /8 /9 /10 /test
+          `,
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "1",
+      };
+      await notesProvider.put(noteSaveRequest);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 2",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "2",
+      };
+      await notesProvider.put(noteSaveRequest2);
+
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "Note 3 with link to [[1]]",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "test",
+      };
+      await notesProvider.put(noteSaveRequest3);
+
+      const list = await notesProvider.getNotesList({});
+
+      const result = list.results.find((note) => note.slug === "1");
+
+      expect(result?.linkCount).toStrictEqual({
+        outgoing: 2,
+        back: 1,
+        sum: 3,
+      });
+    },
+  );
+
   it("should correctly update key-value pairs", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
     const noteSaveRequest: NoteSaveRequest = {
       note: {
         content: "",
@@ -111,6 +206,8 @@ describe("Notes module", () => {
   });
 
   it("should show correct backlinks for new created notes", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
     const noteSaveRequest: NoteSaveRequest = {
       note: {
         content: "Note 1 with a link to [[Note 2]] that does not exist yet.",
