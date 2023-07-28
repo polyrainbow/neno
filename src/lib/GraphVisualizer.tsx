@@ -59,6 +59,9 @@ import GraphVisualizerConfig, {
 import { Delaunay } from "d3";
 import { Slug } from "./notes/interfaces/Slug";
 
+const clamp = (value, min, max) => {
+  return Math.min(Math.max(value, min), max);
+};
 
 export default class GraphVisualization {
   /** ********************
@@ -107,6 +110,12 @@ export default class GraphVisualization {
         )
         .filter((link) => link[0] && link[1]),
     };
+
+    frontendGraph.screenPosition.scale = clamp(
+      frontendGraph.screenPosition.scale,
+      GraphVisualization.#consts.SCALE_EXTENT[0],
+      GraphVisualization.#consts.SCALE_EXTENT[1],
+    );
 
     return frontendGraph;
   };
@@ -176,7 +185,6 @@ export default class GraphVisualization {
   // eslint-disable-next-line max-len
   #initialNodePositionIndicator: d3.Selection<SVGRectElement, unknown, null, undefined> | null = null;
   #nodeHighlighterContainer;
-  #newLinkLine;
   #linksContainer;
   #nodesContainer;
   #nodeDrag;
@@ -228,7 +236,8 @@ export default class GraphVisualization {
     // ... we'll overwrite it if a valid note to focus is given
     if (
       typeof initialFocusNoteSlug === "string"
-      && initialFocusNoteSlug.length > 0) {
+      && initialFocusNoteSlug.length > 0
+    ) {
       // set initial node in the center of the screen
       const node = this.#nodes.find(
         (node) => node.slug === initialFocusNoteSlug,
@@ -290,13 +299,6 @@ export default class GraphVisualization {
     this.#nodeHighlighterContainer = mainSVGGroup.append("g")
       .classed("note-highlighters", true);
 
-    // displayed when dragging between nodes - should be rendered in front of
-    // node highlighter circles, so this code is placed after node highlighter g
-    // creation code
-    this.#newLinkLine = mainSVGGroup.append("svg:path")
-      .attr("class", "link new-link-line hidden")
-      .attr("d", "M0,0L0,0");
-
     // svg nodes and links
     this.#linksContainer = mainSVGGroup.append("g")
       .classed("links", true);
@@ -352,9 +354,6 @@ export default class GraphVisualization {
       });
     svg.on("mouseup", () => {
       this.#svgMouseUp();
-    });
-    svg.on("mousemove", (e) => {
-      this.#newPathMove(e, this.#mouseDownNode);
     });
 
     // listen for dragging and zooming
@@ -446,24 +445,6 @@ export default class GraphVisualization {
           },
           [],
         ),
-    );
-  }
-
-
-  #newPathMove(e, originNode): void {
-    if (!this.#newLinkCreationInProgress) {
-      return;
-    }
-
-    const newLinkEnd = {
-      x: d3.pointer(e, this.#mainSVGGroup.node())[0] - 1,
-      y: d3.pointer(e, this.#mainSVGGroup.node())[1] - 1,
-    };
-
-    this.#newLinkLine.attr(
-      "d",
-      "M" + originNode.position.x + "," + originNode.position.y
-      + "L" + newLinkEnd.x + "," + newLinkEnd.y,
     );
   }
 
@@ -620,17 +601,7 @@ export default class GraphVisualization {
   #handleMouseDownOnNode(e, d: GraphVisualizationNode) {
     e.stopPropagation();
     this.#mouseDownNode = d;
-    if (e.shiftKey) {
-      this.#newLinkCreationInProgress = true;
-      // reposition dragged directed edge
-      this.#newLinkLine
-        .classed("hidden", false)
-        .attr(
-          "d",
-          "M" + d.position.x + "," + d.position.y
-          + "L" + d.position.x + "," + d.position.y,
-        );
-    } else if (this.#sKeyIsPressed) {
+    if (this.#sKeyIsPressed) {
       this.#toggleSelection([d]);
     }
   }
@@ -646,8 +617,6 @@ export default class GraphVisualization {
     const mouseDownNode = this.#mouseDownNode;
 
     if (!mouseDownNode) return;
-
-    this.#newLinkLine.classed("hidden", true);
 
     if (mouseDownNode !== mouseUpNode) {
       // we're in a different node:
@@ -695,7 +664,6 @@ export default class GraphVisualization {
 
     // on mouse up, new link creation process is always over
     this.#newLinkCreationInProgress = false;
-    this.#newLinkLine.classed("hidden", true);
   }
 
 

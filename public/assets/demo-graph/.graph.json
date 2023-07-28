@@ -2,9 +2,9 @@
   "createdAt": 1690400000000,
   "updatedAt": 1690400000000,
   "screenPosition": {
-    "translateX": 0,
-    "translateY": 0,
-    "scale": 0
+    "translateX": 200,
+    "translateY": 200,
+    "scale": 1
   },
   "initialNodePosition": {
     "x": 0,
