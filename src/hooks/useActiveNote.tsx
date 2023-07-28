@@ -272,7 +272,9 @@ export default (
     setIsBusy(true);
     try {
       const noteFromServer
-        = await notesProvider.get(slug);
+        = slug === "random"
+          ? await notesProvider.getRandom()
+          : await notesProvider.get(slug);
       setActiveNoteFromServer(noteFromServer);
       receivedNoteSlug = noteFromServer.meta.slug;
       updateEditorInstance();
