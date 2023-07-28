@@ -744,7 +744,7 @@ export default class GraphVisualization {
           if (this.#searchValue.length < 3) return false;
           return node.title.toLowerCase().includes(this.#searchValue);
         }),
-        (d) => d.id,
+        (d) => d.slug,
       )
       .attr(
         "transform",
@@ -860,7 +860,7 @@ export default class GraphVisualization {
     this.#nodeElements = this.#nodeElements
       .data(
         nodesData,
-        (d) => d.id,
+        (d) => d.slug,
       );
 
     // update node positions of moved/dragged nodes
@@ -870,11 +870,10 @@ export default class GraphVisualization {
 
         const draggedNode = event?.type === "NODE_DRAG" && event.node;
 
-        const selectedNodeIds = Array.from(this.#selection)
-          .filter(GraphVisualization.#isNode)
+        const selectedNodeSlugs = Array.from(this.#selection)
           .map((node) => node.slug);
 
-        return draggedNode || selectedNodeIds.includes(d.id);
+        return draggedNode || selectedNodeSlugs.includes(d.slug);
       })
       .attr(
         "transform",
@@ -886,7 +885,7 @@ export default class GraphVisualization {
     // update existing nodes
     this.#nodeElements
       .classed("unconnected", (d) => {
-        return this.#slugsOfAllNodesWithAtLeast1LinkedNote.has(d.id);
+        return !this.#slugsOfAllNodesWithAtLeast1LinkedNote.has(d.slug);
       })
       .classed("selected", (node) => {
         return this.#selection.has(node);
@@ -913,7 +912,7 @@ export default class GraphVisualization {
       })
       .classed("hub", (d) => this.#isHub(d))
       .classed("unconnected", (d) => {
-        return this.#slugsOfAllNodesWithAtLeast1LinkedNote.has(d.id);
+        return this.#slugsOfAllNodesWithAtLeast1LinkedNote.has(d.slug);
       })
       .attr(
         "transform",
@@ -945,7 +944,7 @@ export default class GraphVisualization {
       })
       .on("click", (e, d) => {
         if (e.ctrlKey) {
-          this.#openNote(d.id);
+          this.#openNote(d.slug);
         }
       })
       .call(this.#nodeDrag)
