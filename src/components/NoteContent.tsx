@@ -43,7 +43,7 @@ const NoteContent = ({
 
   /*
     When using a slashlink with a fileId in content, it is not guaranteed that
-    we have the accofing FileInfo ready in note.files
+    we have the associated FileInfo ready in note.files
     So here, we gather all unresolved fileInfos from the note's content and
     try to resolve them with the notesProvider. Further down, we combine those
     resolvedFileInfos with the file infos provided by note.files
