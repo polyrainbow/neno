@@ -377,6 +377,7 @@ div[data-lexical-editor] {
   color: var(--main-content-color);
   outline: none;
   text-align: start;
+  max-width: var(--max-content-width);
 }
 
 
