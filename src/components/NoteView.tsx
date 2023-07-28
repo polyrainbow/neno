@@ -107,7 +107,9 @@ const NoteView = () => {
     await IDB.set("CONTENT_MODE", newContentMode);
 
     if (newContentMode === ContentMode.EDITOR) {
-      document.getElementById("editor")?.focus();
+      document.querySelector<HTMLDivElement>(
+        "div[data-lexical-editor]",
+      )?.focus();
     }
   };
 
@@ -253,7 +255,9 @@ const NoteView = () => {
 
         if (startContentMode === ContentMode.EDITOR) {
           setTimeout(() => {
-            document.getElementById("editor")?.focus();
+            document.querySelector<HTMLDivElement>(
+              "div[data-lexical-editor]",
+            )?.focus();
           });
         }
       })

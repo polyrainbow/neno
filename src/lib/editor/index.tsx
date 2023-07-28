@@ -92,7 +92,7 @@ const PlainTextStateExchangePlugin = ({
   instanceId: number,
 }) => {
   const [editor] = useLexicalComposerContext();
-  const currentInstanceIdRef = useRef<number>(instanceId);
+  const currentInstanceIdRef = useRef<number>(0);
 
   useEffect(() => {
     editor.update(() => {
@@ -125,6 +125,8 @@ const PlainTextStateExchangePlugin = ({
         if (currentInstanceIdRef.current === instanceId) {
           root.getLastChild()?.selectEnd();
         }
+
+        editor.focus();
       }
 
       currentInstanceIdRef.current = instanceId;

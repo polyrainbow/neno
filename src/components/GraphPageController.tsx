@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import NotesProviderContext from "../contexts/NotesProviderContext";
 import { PathTemplate } from "../enum/PathTemplate";
@@ -18,6 +17,8 @@ import {
   isInitialized,
 } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
+import useRunOnce from "../hooks/useRunOnce";
+import { l } from "../lib/intl";
 
 interface GraphPageControllerProps {
   page: GraphSubpage,
@@ -28,15 +29,9 @@ const GraphPageController = ({
 }: GraphPageControllerProps) => {
   const navigate = useNavigate();
 
+
   const checkAuthentication = async () => {
-    if (isInitialized()) {
-      navigate(getAppPath(
-        PathTemplate.NEW_NOTE,
-        new Map([
-          ["GRAPH_ID", LOCAL_GRAPH_ID],
-        ]),
-      ));
-    } else {
+    if (!isInitialized()) {
       try {
         await initializeNotesProviderWithExistingFolderHandle();
         navigate(getAppPath(
@@ -46,17 +41,19 @@ const GraphPageController = ({
           ]),
         ));
       } catch (e) {
-        navigate(getAppPath(PathTemplate.LOGIN));
+        const urlParams = new URLSearchParams();
+        urlParams.set("redirect", window.location.pathname);
+        navigate(getAppPath(PathTemplate.LOGIN, new Map(), urlParams));
       }
     }
   };
 
-  useEffect(() => {
+  useRunOnce(() => {
     checkAuthentication();
-  }, []);
+  });
 
   if (!isInitialized()) {
-    return <BusyIndicator height={80} alt="please wait" />;
+    return <BusyIndicator height={80} alt={l("app.loading")} />;
   }
 
 

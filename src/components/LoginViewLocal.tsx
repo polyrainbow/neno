@@ -63,10 +63,16 @@ const LoginViewLocal = () => {
             onClick={async () => {
               try {
                 await initializeNotesProviderWithExistingFolderHandle();
-                navigate(getAppPath(
-                  PathTemplate.NEW_NOTE,
-                  new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-                ));
+                const urlSearchParams
+                  = new URLSearchParams(window.location.search);
+                if (urlSearchParams.has("redirect")) {
+                  navigate(urlSearchParams.get("redirect") ?? "/");
+                } else {
+                  navigate(getAppPath(
+                    PathTemplate.NEW_NOTE,
+                    new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+                  ));
+                }
               } catch (e) {
                 console.error(e);
 

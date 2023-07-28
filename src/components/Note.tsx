@@ -373,7 +373,9 @@ const Note = ({
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
-                  document.getElementById("editor")?.focus();
+                  document.querySelector<HTMLDivElement>(
+                    "div[data-lexical-editor]",
+                  )?.focus();
                 }
 
                 if (e.key === "Escape") {
