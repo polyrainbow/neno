@@ -24,7 +24,7 @@ import {
 } from "../config";
 
 export default (
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
   handleInvalidCredentialsError: () => void,
 ) => {
   const [unsavedChanges, setUnsavedChanges]
@@ -163,7 +163,7 @@ export default (
     }
 
     const noteSaveRequest = await prepareNoteSaveRequest(ignoreDuplicateTitles);
-    const noteFromDatabase = await databaseProvider.put(noteSaveRequest);
+    const noteFromDatabase = await notesProvider.put(noteSaveRequest);
     setActiveNoteFromServer(noteFromDatabase);
     setUnsavedChanges(false);
     return noteFromDatabase;
@@ -226,7 +226,7 @@ export default (
       return;
     }
 
-    await databaseProvider.remove(activeNote.slug);
+    await notesProvider.remove(activeNote.slug);
 
     // using force here because a delete prompt dialog has already been shown
     createNewNote({
@@ -261,7 +261,7 @@ export default (
       },
       ignoreDuplicateTitles: true,
     };
-    const noteFromServer = await databaseProvider.put(noteSaveRequest);
+    const noteFromServer = await notesProvider.put(noteSaveRequest);
 
     return noteFromServer;
   };
@@ -272,7 +272,7 @@ export default (
     setIsBusy(true);
     try {
       const noteFromServer
-        = await databaseProvider.get(slug);
+        = await notesProvider.get(slug);
       setActiveNoteFromServer(noteFromServer);
       receivedNoteSlug = noteFromServer.meta.slug;
       updateEditorInstance();

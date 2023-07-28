@@ -11,13 +11,13 @@ import { LOCAL_GRAPH_ID } from "../config";
 
 interface NoteContentBlockTextFileProps {
   file: FileInfo,
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
 }
 
 
 const NoteContentBlockTextFile = ({
   file,
-  databaseProvider,
+  notesProvider,
 }: NoteContentBlockTextFileProps) => {
   const [text, setText] = useState<string>("");
 
@@ -28,7 +28,7 @@ const NoteContentBlockTextFile = ({
       })
       .then((response) => response.text())
       .then((text) => setText(text));
-  }, [file, databaseProvider]);
+  }, [file, notesProvider]);
 
   return <div
     className="preview-block-file-wrapper"

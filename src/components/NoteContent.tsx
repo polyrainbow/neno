@@ -36,7 +36,7 @@ const NoteContent = ({
   note,
   toggleEditMode,
 }: NoteContentProps) => {
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
   const blocks = subwaytext(note.content);
   const [resolvedFileInfos, setResolvedFileInfos] = useState<FileInfo[]>([]);
 
@@ -45,7 +45,7 @@ const NoteContent = ({
     When using a slashlink with a fileId in content, it is not guaranteed that
     we have the accofing FileInfo ready in note.files
     So here, we gather all unresolved fileInfos from the note's content and
-    try to resolve it against the database. Further down, we combine those
+    try to resolve them with the notesProvider. Further down, we combine those
     resolvedFileInfos with the file infos provided by note.files
   */
   useEffect(() => {
@@ -68,7 +68,7 @@ const NoteContent = ({
     Promise
       .allSettled(
         unresolvedFileIds.map(
-          (fileId) => databaseProvider.getFileInfo(fileId),
+          (fileId) => notesProvider.getFileInfo(fileId),
         ),
       )
       .then((results: PromiseSettledResult<FileInfo>[]) => {
@@ -124,26 +124,26 @@ const NoteContent = ({
           ) {
             return <NoteContentBlockAudio
               file={file}
-              databaseProvider={databaseProvider}
+              notesProvider={notesProvider}
               key={file.fileId}
             />;
           } else if (mediaType === MediaType.VIDEO) {
             return <NoteContentBlockVideo
               file={file}
-              databaseProvider={databaseProvider}
+              notesProvider={notesProvider}
               key={file.fileId}
             />;
           } else if (mediaType === MediaType.IMAGE) {
             return <NoteContentBlockImage
               file={file}
-              databaseProvider={databaseProvider}
+              notesProvider={notesProvider}
               key={file.fileId}
               description={block.data.text}
             />;
           } else if (mediaType === MediaType.TEXT) {
             return <NoteContentBlockTextFile
               file={file}
-              databaseProvider={databaseProvider}
+              notesProvider={notesProvider}
               key={file.fileId}
             />;
           } else {

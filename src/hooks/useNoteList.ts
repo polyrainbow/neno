@@ -14,7 +14,7 @@ type NoteList = [
 // hook for retrieving graph stats for the application header
 // refreshes only when manually invoked
 export default (
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
   {
     searchQuery,
     sortMode,
@@ -63,7 +63,7 @@ export default (
         const {
           results,
           numberOfResults,
-        } = await databaseProvider.getNotesList(options);
+        } = await notesProvider.getNotesList(options);
 
         // ... some time later - check if this is the current request
         if (currentRequestId.current === requestId) {
@@ -80,7 +80,7 @@ export default (
         }
       }
     },
-    [searchQuery, page, sortMode, databaseProvider],
+    [searchQuery, page, sortMode, notesProvider],
   );
 
   useEffect(() => {

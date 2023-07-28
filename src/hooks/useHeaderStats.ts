@@ -5,13 +5,13 @@ import NotesProvider from "../lib/notes";
 // hook for retrieving graph stats for the application header
 // refreshes only when manually invoked
 export default (
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
 ): [GraphStats | null, () => Promise<void>] => {
   const [headerStats, setHeaderStats] = useState<GraphStats | null>(null);
 
   const refreshHeaderStats = async (): Promise<void> => {
     try {
-      const stats = await databaseProvider.getStats(
+      const stats = await notesProvider.getStats(
         {
           includeMetadata: false,
           includeAnalysis: false,

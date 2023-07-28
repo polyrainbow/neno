@@ -8,12 +8,12 @@ import BusyIndicator from "./BusyIndicator";
 import StatsViewMetadataTable from "./StatsViewMetadataTable";
 
 const StatsView = () => {
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
   const [stats, setStats] = useState<Required<GraphStats> | null>(null);
 
   useEffect(() => {
     const updateStats = async () => {
-      const stats = await databaseProvider.getStats({
+      const stats = await notesProvider.getStats({
         includeMetadata: true,
         includeAnalysis: true,
       }) as Required<GraphStats>;
@@ -21,10 +21,10 @@ const StatsView = () => {
     };
 
     updateStats();
-  }, [databaseProvider]);
+  }, [notesProvider]);
 
   // @ts-ignore calling constructor via instance
-  const databaseType = databaseProvider.constructor.type;
+  const databaseType = notesProvider.constructor.type;
 
   return <>
     <HeaderContainerLeftRight />

@@ -11,7 +11,7 @@ import { LOCAL_GRAPH_ID } from "../config";
 
 interface NoteContentBlockImageProps {
   file: FileInfo,
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
   description: string,
 }
 
@@ -19,7 +19,7 @@ interface NoteContentBlockImageProps {
 const NoteContentBlockImage = ({
   file,
   description,
-  databaseProvider,
+  notesProvider,
 }: NoteContentBlockImageProps) => {
   const [url, setUrl] = useState<string>("");
 
@@ -28,7 +28,7 @@ const NoteContentBlockImage = ({
       .then((url) => {
         setUrl(url);
       });
-  }, [file, databaseProvider]);
+  }, [file, notesProvider]);
 
 
   return <div

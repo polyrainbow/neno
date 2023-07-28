@@ -55,7 +55,7 @@ const LoginViewLocal = () => {
       typeof localDatabaseFolderHandleName === "string"
         ? <>
           <p>
-            {l("login.local.already-created-database")}
+            {l("login.local.already-created-folder")}
           </p>
           <button
             type="button"
@@ -78,7 +78,7 @@ const LoginViewLocal = () => {
             }}
           >
             {l(
-              "login.local.open-database-x",
+              "login.local.open-folder-x",
               { dbName: localDatabaseFolderHandleName },
             )}
           </button>

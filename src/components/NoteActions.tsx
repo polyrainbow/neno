@@ -52,7 +52,7 @@ const NoteActions = ({
   toggleEditMode,
   importNote,
 }: NoteActionsProps) => {
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const navigate = useNavigate();
@@ -172,8 +172,8 @@ const NoteActions = ({
         title={l("editor.export-note")}
         icon="file_download"
         onClick={() => {
-          if (!databaseProvider) return;
-          exportNote(activeNote, databaseProvider);
+          if (!notesProvider) return;
+          exportNote(activeNote, notesProvider);
         }}
       />
       <IconButtonWithLabel

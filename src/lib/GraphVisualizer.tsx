@@ -137,9 +137,9 @@ export default class GraphVisualization {
     sees the same content in the middle of the screen when using multiple
     devices with different screen sizes or simply resizes the browser window.
     That means we want to save the center position of the graph visualization
-    in the database graph object.
-    So every time we get a screen position object from the database or
-    save one to the database, we need to transform it first with this function.
+    in the graph object.
+    So every time we get a screen position object from the notesProvider or
+    save one to it, we need to transform it first with this function.
   */
   static #transformScreenPosition = (
     center: ScreenPosition,
@@ -251,14 +251,14 @@ export default class GraphVisualization {
           scale: SCALE,
         };
       } else {
-        // by default, we're using the screenPosition from the database ...
+        // by default, we're using the screenPosition from the graph ...
         this.#screenPosition = GraphVisualization.#transformScreenPosition(
           graphObjectPrepared.screenPosition,
           svgRect,
         );
       }
     } else {
-      // by default, we're using the screenPosition from the database ...
+      // by default, we're using the screenPosition from the graph ...
       this.#screenPosition = GraphVisualization.#transformScreenPosition(
         graphObjectPrepared.screenPosition,
         svgRect,

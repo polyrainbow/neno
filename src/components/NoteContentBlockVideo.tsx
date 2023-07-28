@@ -11,13 +11,13 @@ import { LOCAL_GRAPH_ID } from "../config";
 
 interface NoteContentBlockVideoProps {
   file: FileInfo,
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
 }
 
 
 const NoteContentBlockVideo = ({
   file,
-  databaseProvider,
+  notesProvider,
 }: NoteContentBlockVideoProps) => {
   const [url, setUrl] = useState<string>("");
 
@@ -26,7 +26,7 @@ const NoteContentBlockVideo = ({
       .then((url) => {
         setUrl(url);
       });
-  }, [file, databaseProvider]);
+  }, [file, notesProvider]);
 
   return <div
     className="preview-block-file-wrapper"

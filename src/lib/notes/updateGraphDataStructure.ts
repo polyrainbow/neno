@@ -1,10 +1,3 @@
-
-/*
-  This module is to modify the data structure/the database schema from
-  legacy schemas. As those do not match our types, it does not really make
-  sense to type-check this file.
-*/
-
 import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
 
 const formatHeader = (key: string, value: string) => {

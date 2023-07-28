@@ -97,7 +97,7 @@ const Note = ({
   setUploadInProgress,
 }: NoteComponentProps) => {
   const noteElement = useRef<HTMLElement>(null);
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
   const goToNote = useGoToNote();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -127,7 +127,7 @@ const Note = ({
 
 
   const uploadFiles = async (
-    databaseProvider: NotesProvider,
+    notesProvider: NotesProvider,
     files: File[],
   ) => {
     setUploadInProgress(true);
@@ -136,7 +136,7 @@ const Note = ({
       = await Promise.all(
         files.map(
           (file) => {
-            return databaseProvider.addFile(
+            return notesProvider.addFile(
               file.stream(),
               file.name,
             );
@@ -151,13 +151,13 @@ const Note = ({
 
 
   const handleUploadFilesRequest = async () => {
-    if (!databaseProvider) throw new Error("NotesProvider not ready");
+    if (!notesProvider) throw new Error("NotesProvider not ready");
     const files = await getFilesFromUserSelection(
       FILE_PICKER_ACCEPT_TYPES,
       true,
     );
 
-    return uploadFiles(databaseProvider, files);
+    return uploadFiles(notesProvider, files);
   };
 
 
@@ -178,11 +178,11 @@ const Note = ({
         })
         .filter((file: File | null): file is File => file !== null);
 
-      uploadFiles(databaseProvider, files);
+      uploadFiles(notesProvider, files);
     } else {
       // Use DataTransfer interface to access the file(s)
       const files = [...e.dataTransfer.files];
-      uploadFiles(databaseProvider, files);
+      uploadFiles(notesProvider, files);
     }
   };
 
@@ -213,7 +213,7 @@ const Note = ({
       let file = availableFileInfos.find((file) => file.fileId === fileId);
 
       if (!file) {
-        file = await databaseProvider.getFileInfo(fileId);
+        file = await notesProvider.getFileInfo(fileId);
       }
 
       if (
@@ -221,26 +221,26 @@ const Note = ({
       ) {
         return <NoteContentBlockAudio
           file={file}
-          databaseProvider={databaseProvider}
+          notesProvider={notesProvider}
           key={file.fileId}
         />;
       } else if (mediaType === MediaType.VIDEO) {
         return <NoteContentBlockVideo
           file={file}
-          databaseProvider={databaseProvider}
+          notesProvider={notesProvider}
           key={file.fileId}
         />;
       } else if (mediaType === MediaType.IMAGE) {
         return <NoteContentBlockImage
           file={file}
-          databaseProvider={databaseProvider}
+          notesProvider={notesProvider}
           key={file.fileId}
           description={""}
         />;
       } else if (mediaType === MediaType.TEXT) {
         return <NoteContentBlockTextFile
           file={file}
-          databaseProvider={databaseProvider}
+          notesProvider={notesProvider}
           key={file.fileId}
         />;
       } else {
@@ -261,7 +261,7 @@ const Note = ({
       }
     }
 
-    const linkedNote = await databaseProvider.get(slug);
+    const linkedNote = await notesProvider.get(slug);
     return getTransclusionContentFromNoteContent(linkedNote.content);
   };
 
@@ -277,7 +277,7 @@ const Note = ({
       }
 
       try {
-        await databaseProvider.getFileInfo(fileId);
+        await notesProvider.getFileInfo(fileId);
         return true;
       } catch (e) {
         return false;
@@ -285,7 +285,7 @@ const Note = ({
     }
 
     try {
-      await databaseProvider.get(slug);
+      await notesProvider.get(slug);
       return true;
     } catch (e) {
       return false;
@@ -330,11 +330,11 @@ const Note = ({
           ref={noteElement}
           onDrop={handleFileDrop}
           onPaste={(e) => {
-            if (!databaseProvider) return;
+            if (!notesProvider) return;
 
             const files = Array.from(e.clipboardData.files);
             if (files.length > 0) {
-              uploadFiles(databaseProvider, files);
+              uploadFiles(notesProvider, files);
               e.preventDefault();
             }
           }}

@@ -11,7 +11,7 @@ import {
 
 export const exportNote = async (
   activeNote: ActiveNote,
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
 ): Promise<void> => {
   let rawNote: string;
 
@@ -29,10 +29,10 @@ export const exportNote = async (
 
     rawNote = serializeNewNote(note);
   } else {
-    const rawNoteFromDB = await databaseProvider.getRawNote(
+    const rawNoteFromDB = await notesProvider.getRawNote(
       activeNote.slug,
     );
-    if (!rawNoteFromDB) throw new Error("Raw export from database failed");
+    if (!rawNoteFromDB) throw new Error("Raw export failed");
     rawNote = rawNoteFromDB;
   }
 

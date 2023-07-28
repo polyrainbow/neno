@@ -506,22 +506,22 @@ const getFileInfos = (
 
 
 const createNoteToTransmit = async (
-  databaseNote: ExistingNote,
+  existingNote: ExistingNote,
   graph: Graph,
 ): Promise<NoteToTransmit> => {
   const noteToTransmit: NoteToTransmit = {
-    content: databaseNote.content,
-    meta: databaseNote.meta,
+    content: existingNote.content,
+    meta: existingNote.meta,
     outgoingLinks: Array.from(
-      getOutgoingLinksToOtherNotes(graph, databaseNote.meta.slug),
+      getOutgoingLinksToOtherNotes(graph, existingNote.meta.slug),
     )
       .map((slug: Slug) => {
         const notePreview = getNotePreview(graph, slug);
         return notePreview;
       }),
-    backlinks: getBacklinks(graph, databaseNote.meta.slug),
-    numberOfCharacters: getNumberOfCharacters(databaseNote),
-    files: getFileInfos(graph, databaseNote.content),
+    backlinks: getBacklinks(graph, existingNote.meta.slug),
+    numberOfCharacters: getNumberOfCharacters(existingNote),
+    files: getFileInfos(graph, existingNote.content),
   };
 
   return noteToTransmit;
@@ -631,12 +631,12 @@ const createNoteListItem = (
 
 
 const createNoteListItems = (
-  databaseNotes: ExistingNote[],
+  existingNotes: ExistingNote[],
   graph: Graph,
 ): NoteListItem[] => {
-  const noteListItems = databaseNotes.map((databaseNote) => {
+  const noteListItems = existingNotes.map((existingNote) => {
     return createNoteListItem(
-      databaseNote,
+      existingNote,
       graph,
     );
   });

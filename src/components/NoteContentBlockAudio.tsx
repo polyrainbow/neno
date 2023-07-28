@@ -11,13 +11,13 @@ import { LOCAL_GRAPH_ID } from "../config";
 
 interface NoteContentBlockAudioProps {
   file: FileInfo,
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
 }
 
 
 const NoteContentBlockAudio = ({
   file,
-  databaseProvider,
+  notesProvider,
 }: NoteContentBlockAudioProps) => {
   const [url, setUrl] = useState<string>("");
 
@@ -26,7 +26,7 @@ const NoteContentBlockAudio = ({
       .then((url) => {
         setUrl(url);
       });
-  }, [file, databaseProvider]);
+  }, [file, notesProvider]);
 
   return <div
     className="preview-block-file-wrapper"

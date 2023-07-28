@@ -24,7 +24,7 @@ interface ControlledNoteList {
 // hook for retrieving graph stats for the application header
 // refreshes only when manually invoked
 export default (
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
   handleInvalidCredentialsError,
 ): ControlledNoteList => {
   const [searchQuery, setSearchQueryState] = useState<string>("");
@@ -51,7 +51,7 @@ export default (
     isBusy,
     refresh,
   ] = useNoteList(
-    databaseProvider,
+    notesProvider,
     {
       searchQuery,
       sortMode,

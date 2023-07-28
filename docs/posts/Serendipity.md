@@ -29,7 +29,7 @@ In a way, the note box was always meant to be used in a digital environment whic
 
 The whole idea of ordering information in a rhizomatic instead of a tree-like way or even linear way creates new opportunities. A lot of nonfiction books contain concepts that are interdependent of each other, yet they are linearized to text. This linearization is a lossy process and implies an order where there is none.
 
-Tree-like information structures, on the other hand, do not allow for connecting distant notes from distant branches to one another. This is how OneNote works. Your database is divided into notebooks, which are divided into sections, which are divided into pages. You cannot just link two distant pages to each other (to be fair, it is technically possible but it is not that straight-forward and linking pages is definitely not that encouraged by the user interface).
+Tree-like information structures, on the other hand, do not allow for connecting distant notes from distant branches to one another. This is how OneNote works. Your notes are divided into notebooks, which are divided into sections, which are divided into pages. You cannot just link two distant pages to each other (to be fair, it is technically possible but it is not that straight-forward and linking pages is definitely not that encouraged by the user interface).
 
 Without going into more detail here on why the rhizome is cool, here is one of my favorite videos on this by Three Minute Theory which I recommend you to watch:
 

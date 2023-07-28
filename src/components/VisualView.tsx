@@ -34,7 +34,7 @@ const VisualizationView = () => {
   );
   const [unsavedChanges, setUnsavedChanges]
     = useContext(UnsavedChangesContext);
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
   const [searchValue, setSearchValue] = useState<string>("");
   const navigate = useNavigate();
   const confirmDiscardingUnsavedChanges
@@ -51,7 +51,7 @@ const VisualizationView = () => {
     }
     const graphVisualization = graphVisualizerInstance.current.getSaveData();
     try {
-      await databaseProvider?.setGraphVisualization(
+      await notesProvider?.setGraphVisualization(
         graphVisualization,
       );
       setUnsavedChanges(false);
@@ -119,7 +119,7 @@ const VisualizationView = () => {
 
 
   const initializeGraphInstance = async () => {
-    if (!databaseProvider) return;
+    if (!notesProvider) return;
 
     // Effects that should only run once can use a ref
     // https://github.com/reactwg/react-18/discussions/18
@@ -128,7 +128,7 @@ const VisualizationView = () => {
 
     try {
       const graphObject: BackendGraphVisualization
-        = await databaseProvider.getGraphVisualization();
+        = await notesProvider.getGraphVisualization();
 
       // for performance reasons, we disable labels above a certain
       // amount of nodes
@@ -162,7 +162,7 @@ const VisualizationView = () => {
 
   useEffect(() => {
     initializeGraphInstance();
-  }, [databaseProvider]);
+  }, [notesProvider]);
 
   useEffect(() => {
     if (!graphVisualizerInstance.current) return;

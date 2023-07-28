@@ -24,7 +24,7 @@ import { getMediaTypeFromFilename } from "../lib/notes/noteUtils";
 
 
 const FileView = () => {
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [src, setSrc] = useState<string>("");
   // status can be READY, BUSY
@@ -42,7 +42,7 @@ const FileView = () => {
     if (typeof fileId !== "string") return;
 
     const getFileInfo = async () => {
-      const fileInfo = await databaseProvider.getFileInfo(fileId);
+      const fileInfo = await notesProvider.getFileInfo(fileId);
       setFileInfo(fileInfo);
       const src = await getUrl(fileInfo);
       setSrc(src);
@@ -55,7 +55,7 @@ const FileView = () => {
     };
 
     const getNotes = async () => {
-      const response = await databaseProvider.getNotesList({
+      const response = await notesProvider.getNotesList({
         searchString: "has-file:" + fileId,
       });
       setNotes(response.results);
@@ -63,7 +63,7 @@ const FileView = () => {
 
     getFileInfo();
     getNotes();
-  }, [databaseProvider, fileId]);
+  }, [notesProvider, fileId]);
 
   return <>
     <HeaderContainerLeftRight />
@@ -189,7 +189,7 @@ const FileView = () => {
               encourageConfirmation: false,
             });
 
-            await databaseProvider.deleteFile(fileInfo.fileId);
+            await notesProvider.deleteFile(fileInfo.fileId);
             navigate(getAppPath(
               PathTemplate.FILES,
               new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),

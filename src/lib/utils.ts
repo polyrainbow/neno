@@ -60,7 +60,7 @@ const getNewNoteObject = (params: CreateNewNoteParams): UnsavedActiveNote => {
     content: params.content ?? Config.DEFAULT_NOTE_CONTENT,
     initialContent: params.content ?? "",
     // Note may already have files, but the files list will be populated by
-    // databaseProvider
+    // notesProvider
     files: [],
     keyValues: [],
     flags: [],

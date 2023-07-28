@@ -3,11 +3,11 @@ import NotesProviderContext from "../contexts/NotesProviderContext";
 import NotesProvider from "../lib/notes";
 
 export const useNotesProvider = (): NotesProvider => {
-  const databaseProviderContext = useContext(NotesProviderContext);
-  if (!databaseProviderContext) {
+  const notesProviderContext = useContext(NotesProviderContext);
+  if (!notesProviderContext) {
     throw new Error("NotesProviderContext is not initialized");
   }
-  return databaseProviderContext;
+  return notesProviderContext;
 };
 
 export default useNotesProvider;

@@ -16,7 +16,7 @@ import { LOCAL_GRAPH_ID } from "../config";
 
 const ListView = () => {
   const navigate = useNavigate();
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
 
   const handleInvalidCredentialsError = async () => {
     await removeAccess();
@@ -24,18 +24,18 @@ const ListView = () => {
   };
 
   const controlledNoteList = useControlledNoteList(
-    databaseProvider,
+    notesProvider,
     handleInvalidCredentialsError,
   );
 
   const [headerStats, refreshHeaderStats] = useHeaderStats(
-    databaseProvider,
+    notesProvider,
   );
 
   const {
     pinnedNotes,
     refreshPinnedNotes,
-  } = usePinnedNotes(databaseProvider);
+  } = usePinnedNotes(notesProvider);
 
   useEffect(() => {
     refreshPinnedNotes();

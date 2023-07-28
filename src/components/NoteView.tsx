@@ -50,7 +50,7 @@ const getValidNoteSlug = (
 
 
 const NoteView = () => {
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
   const isSmallScreen = useIsSmallScreen();
   const navigate = useNavigate();
   const confirm = useContext(ConfirmationServiceContext) as (val: any) => void;
@@ -81,15 +81,15 @@ const NoteView = () => {
     setSlugInput,
     editorInstanceId,
     updateEditorInstance,
-  } = useActiveNote(databaseProvider, handleInvalidCredentialsError);
+  } = useActiveNote(notesProvider, handleInvalidCredentialsError);
 
-  const [headerStats, refreshHeaderStats] = useHeaderStats(databaseProvider);
+  const [headerStats, refreshHeaderStats] = useHeaderStats(notesProvider);
 
   const {
     pinnedNotes,
     pinOrUnpinNote,
     refreshPinnedNotes,
-  } = usePinnedNotes(databaseProvider);
+  } = usePinnedNotes(notesProvider);
 
   const [contentMode, setContentMode] = useState<ContentMode>(
     ContentMode.LOADING,
@@ -113,7 +113,7 @@ const NoteView = () => {
 
 
   const controlledNoteList = useControlledNoteList(
-    databaseProvider,
+    notesProvider,
     handleInvalidCredentialsError,
   );
 
@@ -138,7 +138,7 @@ const NoteView = () => {
 
     /*
       When saving a new note for the first time, we get its id from the
-      databaseProvider. Then we update the address bar to include the new id.
+      notesProvider. Then we update the address bar to include the new id.
       We're using requestIdleCallback because we first want to let React
       update all the states, so that when this goToNote function triggers an
       effect, we then can work with the updated changes.

@@ -4,7 +4,7 @@ import { Slug } from "../lib/notes/interfaces/Slug";
 import NotesProvider from "../lib/notes";
 
 export default (
-  databaseProvider: NotesProvider,
+  notesProvider: NotesProvider,
 ) => {
   const [pinnedNotes, setPinnedNotes] = useState<NoteToTransmit[] | null>(null);
 
@@ -17,16 +17,16 @@ export default (
     }
 
     if (pinnedNotes.find((pinnedNote) => pinnedNote.meta.slug === slug)) {
-      newPinnedNotes = await databaseProvider.unpin(slug);
+      newPinnedNotes = await notesProvider.unpin(slug);
     } else {
-      newPinnedNotes = await databaseProvider.pin(slug);
+      newPinnedNotes = await notesProvider.pin(slug);
     }
 
     setPinnedNotes(newPinnedNotes);
   };
 
   const refreshPinnedNotes = async () => {
-    const pinnedNotes = await databaseProvider.getPins();
+    const pinnedNotes = await notesProvider.getPins();
     setPinnedNotes(pinnedNotes);
   };
 

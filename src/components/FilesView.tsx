@@ -17,7 +17,7 @@ enum FileSortMode {
 }
 
 const FilesView = () => {
-  const databaseProvider = useNotesProvider();
+  const notesProvider = useNotesProvider();
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [danglingFileIds, setDanglingFileIds] = useState<FileId[]>([]);
   const [sortMode, setSortMode] = useState<FileSortMode>(
@@ -28,7 +28,7 @@ const FilesView = () => {
 
   const updateDanglingFiles = async () => {
     const danglingFiles: FileInfo[]
-      = await databaseProvider.getDanglingFiles();
+      = await notesProvider.getDanglingFiles();
 
     setDanglingFileIds(danglingFiles.map((file) => file.fileId));
   };
@@ -57,17 +57,17 @@ const FilesView = () => {
 
 
   useEffect(() => {
-    if (!databaseProvider) return;
+    if (!notesProvider) return;
 
     const updateFiles = async () => {
-      const files: FileInfo[] = await databaseProvider.getFiles();
+      const files: FileInfo[] = await notesProvider.getFiles();
       setFiles(files);
       await updateDanglingFiles();
       setStatus("READY");
     };
 
     updateFiles();
-  }, [databaseProvider]);
+  }, [notesProvider]);
 
   return <>
     <HeaderContainerLeftRight />

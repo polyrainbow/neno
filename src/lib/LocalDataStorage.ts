@@ -48,9 +48,6 @@ let folderHandle: FileSystemDirectoryHandle | null = null;
 let notesProvider: NotesProvider | null = null;
 
 
-// when we return that we have an access token, the app switches to editor
-// mode and the editor will start fetching data, so we need to be prepared
-// and initialize the database
 export const getFolderHandleName = async (): Promise<string | null> => {
   if (folderHandle) {
     return folderHandle.name;
