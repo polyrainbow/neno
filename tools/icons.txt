@@ -51,6 +51,7 @@ link_off
 list_alt
 list
 lock
+logout
 looks_3
 loyalty
 menu

@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const iconIds = process.argv[2]
   ? process.argv[2].split(",")
-  : (await readFile("icons.txt", "utf8")).split("\n");
+  : (await readFile(path.join(__dirname, "icons.txt"), "utf8")).split("\n");
 
 for (let i = 0; i < iconIds.length; i++) {
   const iconId = iconIds[i];
