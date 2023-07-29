@@ -32,7 +32,7 @@ NENO is a powerful note-taking app that helps you create your personal knowledge
 * Simple plaintext editor
 * Powerful full-text search
 * Tap-to-link: One click is enough to link two notes
-* File overview: All uploaded files in one view
+* File overview: All files in one view
 * Lossless export: Export your data losslessly to create backups
 * Dark mode: Eye-friendly note-taking at night time
 
