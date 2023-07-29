@@ -11,7 +11,6 @@ OUTPUT_FILENAME=neno-$VERSION.tar.gz
 cd ..
 
 echo "Removing old builds ..."
-rm public/js/*
 rm -R dist
 
 echo "Creating build ..."
@@ -19,6 +18,6 @@ npm run build
 
 echo "Creating archive ..."
 # works with Mac tar, not sure about GNU tar
-tar --exclude node_modules --exclude="*.tar.gz" -zcv -f $OUTPUT_FILENAME ./*
+tar -zcv -f $OUTPUT_FILENAME ./dist/*
 
 echo "Done."
