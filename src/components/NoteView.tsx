@@ -107,6 +107,9 @@ const NoteView = () => {
     await IDB.set("CONTENT_MODE", newContentMode);
 
     if (newContentMode === ContentMode.EDITOR) {
+      // To make sure that the editor shows the current note content and not the
+      // initial one, let's refresh it.
+      setNoteContent(activeNote.content, true);
       document.querySelector<HTMLDivElement>(
         "div[data-lexical-editor]",
       )?.focus();
