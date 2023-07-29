@@ -17,7 +17,6 @@ import {
 } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode } from "./nodes/HeadingNode";
-import { HeadingPlugin } from "./plugins/HeadingPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
 import { AutoLinkNode } from "@lexical/link";
 import { WikiLinkContentNode } from "./nodes/WikiLinkContentNode";
@@ -36,6 +35,7 @@ import { CodeBlockNode } from "./nodes/CodeBlockNode";
 import { BlockTransformPlugin } from "./plugins/BlockTransformPlugin";
 import { QuoteBlockNode } from "./nodes/QuoteBlockNode";
 import { LinkType } from "../../types/LinkType";
+import { UserRequestType } from "./types/UserRequestType";
 
 const theme = {
   ltr: "ltr",
@@ -44,7 +44,7 @@ const theme = {
   paragraph: "editor-paragraph",
   hashtag: "hashtag",
   link: "link",
-  sHeading: "s-heading", // heading seems to be a reserved word
+  sHeading: "s-heading", // "heading" seems to be a reserved word
   wikiLinkPunctuation: "wikilink-punctuation",
   wikiLinkContent: "wikilink-content",
   bold: "bold",
@@ -138,13 +138,6 @@ const PlainTextStateExchangePlugin = ({
 };
 
 
-export enum UserRequestType {
-  HYPERLINK = "HYPERLINK",
-  WIKILINK = "WIKILINK",
-  SLASHLINK = "SLASHLINK",
-  TRANSCLUSION_TARGET = "TRANSCLUSION_TARGET"
-}
-
 interface EditorProps {
   initialText: string,
   instanceId: number,
@@ -168,7 +161,6 @@ export const Editor = ({
     theme,
     onError,
     nodes: [
-      // HashtagNode,
       AutoLinkNode,
       HeadingNode,
       WikiLinkContentNode,
@@ -210,9 +202,7 @@ export const Editor = ({
       } />
       <HistoryPlugin />
       <MyCustomAutoFocusPlugin />
-      {/* <HashtagPlugin /> */}
       <BoldPlugin />
-      <HeadingPlugin />
       <InlineCodePlugin />
       <LinkPlugin />
       <WikiLinkPlugin getLinkAvailability={(linkText: string) => {

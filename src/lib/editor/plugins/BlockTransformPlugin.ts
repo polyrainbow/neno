@@ -22,8 +22,9 @@ import {
 } from "@lexical/react/LexicalComposerContext";
 import { $createQuoteBlockNode, QuoteBlockNode } from "../nodes/QuoteBlockNode";
 import { ElementNodeType } from "../types/ElementNodeType";
+import { $createHeadingNode, HeadingNode } from "../nodes/HeadingNode";
 
-type BlockNode = ParagraphNode | CodeBlockNode | QuoteBlockNode;
+type BlockNode = ParagraphNode | CodeBlockNode | QuoteBlockNode | HeadingNode;
 
 const assignCorrectElementNodes = (
   elementNodes: BlockNode[],
@@ -42,6 +43,8 @@ const assignCorrectElementNodes = (
         insideCodeBlock = true;
       } else if (nodeText.startsWith(">")) {
         typeNodeShouldHaveMap.set(node, ElementNodeType.QUOTE);
+      } else if (nodeText.startsWith("#")) {
+        typeNodeShouldHaveMap.set(node, ElementNodeType.HEADING);
       } else {
         typeNodeShouldHaveMap.set(node, ElementNodeType.PARAGRAPH);
       }
@@ -67,6 +70,8 @@ const assignCorrectElementNodes = (
         elementNode.replace($createCodeBlockNode(), true);
       } else if (typeNodeShouldHave === ElementNodeType.QUOTE) {
         elementNode.replace($createQuoteBlockNode(), true);
+      } else if (typeNodeShouldHave === ElementNodeType.HEADING) {
+        elementNode.replace($createHeadingNode(), true);
       } else {
         throw new Error("Unknown node type: " + typeNodeShouldHave);
       }

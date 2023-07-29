@@ -11,25 +11,25 @@
 import type {
   EditorConfig,
   LexicalNode,
-  NodeKey,
-  SerializedTextNode,
+  SerializedElementNode,
 } from "lexical";
 
 import { addClassNamesToElement } from "@lexical/utils";
-import { $applyNodeReplacement, TextNode } from "lexical";
+import { $applyNodeReplacement, ParagraphNode } from "lexical";
+import { ElementNodeType } from "../types/ElementNodeType";
 
 /** @noInheritDoc */
-export class HeadingNode extends TextNode {
+export class HeadingNode extends ParagraphNode {
   static getType(): string {
-    return "heading";
+    return ElementNodeType.HEADING;
   }
 
-  static clone(node: HeadingNode): HeadingNode {
-    return new HeadingNode(node.__text, node.__key);
+  static clone(): HeadingNode {
+    return new HeadingNode();
   }
 
-  constructor(text: string, key?: NodeKey) {
-    super(text, key);
+  constructor() {
+    super();
   }
 
   createDOM(config: EditorConfig): HTMLElement {
@@ -38,34 +38,21 @@ export class HeadingNode extends TextNode {
     return element;
   }
 
-  static importJSON(serializedNode: SerializedTextNode): HeadingNode {
-    const node = $createHeadingNode(serializedNode.text);
-    node.setFormat(serializedNode.format);
-    node.setDetail(serializedNode.detail);
-    node.setMode(serializedNode.mode);
-    node.setStyle(serializedNode.style);
-    return node;
+  static importJSON(): ParagraphNode {
+    throw new Error("Method not implemented.");
   }
 
-  exportJSON(): SerializedTextNode {
+  exportJSON(): SerializedElementNode {
     return {
       ...super.exportJSON(),
-      type: "heading",
+      type: ElementNodeType.HEADING,
     };
-  }
-
-  canInsertTextBefore(): boolean {
-    return false;
-  }
-
-  isTextEntity(): true {
-    return true;
   }
 }
 
 
-export function $createHeadingNode(text = ""): HeadingNode {
-  return $applyNodeReplacement(new HeadingNode(text));
+export function $createHeadingNode(): HeadingNode {
+  return $applyNodeReplacement(new HeadingNode());
 }
 
 

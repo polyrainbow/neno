@@ -5,7 +5,7 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { Editor, UserRequestType } from "../lib/editor";
+import { Editor } from "../lib/editor";
 import NoteStats from "./NoteStats";
 import {
   getAppPath,
@@ -46,6 +46,7 @@ import { FILE_SLUG_PREFIX } from "../lib/notes/config";
 import NotesProvider from "../lib/notes";
 import { getTransclusionContentFromNoteContent } from "../lib/Transclusion";
 import { LinkType } from "../types/LinkType";
+import { UserRequestType } from "../lib/editor/types/UserRequestType";
 
 interface NoteComponentProps {
   isBusy: boolean,
