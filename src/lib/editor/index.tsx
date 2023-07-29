@@ -125,6 +125,11 @@ const PlainTextStateExchangePlugin = ({
         */
         if (currentInstanceIdRef.current === instanceId) {
           root.getLastChild()?.selectEnd();
+        } else {
+          // We need to get the selection inside the first block, because
+          // otherwise, the selection is at the beginning of the root node and
+          // typing would create a new block before the first one.
+          root.getFirstChild()?.selectStart();
         }
 
         editor.focus();
