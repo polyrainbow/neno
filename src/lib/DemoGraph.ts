@@ -1,6 +1,10 @@
+import { ROOT_PATH } from "../config";
+
 export const createDemoGraph = async (
   folderHandle: FileSystemDirectoryHandle,
 ): Promise<void> => {
+  const DEMO_GRAPH_PATH = `${ROOT_PATH}assets/demo-graph/`;
+
   const demoNoteSlugs = [
     "welcome-to-neno",
     "i-like-pizza",
@@ -13,7 +17,7 @@ export const createDemoGraph = async (
 
   for (const demoNoteSlug of demoNoteSlugs) {
     const response = await fetch(
-      `/assets/demo-graph/${demoNoteSlug}.subtext`,
+      `${DEMO_GRAPH_PATH}${demoNoteSlug}.subtext`,
     );
 
     const readable = response.body;
@@ -37,7 +41,7 @@ export const createDemoGraph = async (
 
   for (const demoFile of demoFiles) {
     const response = await fetch(
-      `/assets/demo-graph/files/${demoFile}`,
+      `${DEMO_GRAPH_PATH}files/${demoFile}`,
     );
 
     const readable = response.body;
@@ -57,7 +61,7 @@ export const createDemoGraph = async (
   }
 
   const response = await fetch(
-    "/assets/demo-graph/.graph.json",
+    `${DEMO_GRAPH_PATH}.graph.json`,
   );
 
   const readable = response.body;

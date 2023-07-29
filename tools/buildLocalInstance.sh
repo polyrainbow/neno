@@ -16,6 +16,9 @@ rm -R $TARGET_DIRECTORY/assets
 echo "Copying files to target directory"
 cp -R ../dist/* $TARGET_DIRECTORY/
 
+echo "Replacing assets path in index.html"
+sed -i '' -E "s/\/assets/\/neno\/assets/" $TARGET_DIRECTORY/index.html
+
 echo "Creating 404.html for GitHub pages"
 cp $TARGET_DIRECTORY/index.html $TARGET_DIRECTORY/404.html
 # https://stackoverflow.com/a/59677657/3890888
