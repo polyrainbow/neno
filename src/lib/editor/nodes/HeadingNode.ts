@@ -6,8 +6,6 @@
  *
  */
 
-/* eslint-disable @typescript-eslint/no-use-before-define */
-
 import type {
   EditorConfig,
   LexicalNode,
