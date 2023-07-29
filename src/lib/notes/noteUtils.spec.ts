@@ -188,6 +188,11 @@ describe("sluggify", () => {
       ).toBe(
         "apostrophes-wont-be-used-but-will-be-removed",
       );
+      expect(
+        sluggify("Underscores are VALID_CHARS"),
+      ).toBe(
+        "underscores-are-valid_chars",
+      );
     },
   );
 });
