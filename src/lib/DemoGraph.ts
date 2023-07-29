@@ -60,8 +60,10 @@ export const createDemoGraph = async (
     await readable.pipeTo(writable);
   }
 
+  // Graph metadata file is just called graph.json instead of .graph.json, as
+  // the latter is problematic to some file servers.
   const response = await fetch(
-    `${DEMO_GRAPH_PATH}.graph.json`,
+    `${DEMO_GRAPH_PATH}graph.json`,
   );
 
   const readable = response.body;
