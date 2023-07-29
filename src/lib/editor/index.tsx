@@ -35,6 +35,7 @@ import { InlineCodePlugin } from "./plugins/InlineCodePlugin";
 import { CodeBlockNode } from "./nodes/CodeBlockNode";
 import { BlockTransformPlugin } from "./plugins/BlockTransformPlugin";
 import { QuoteBlockNode } from "./nodes/QuoteBlockNode";
+import { LinkType } from "../../types/LinkType";
 
 const theme = {
   ltr: "ltr",
@@ -150,7 +151,7 @@ interface EditorProps {
   onChange: (text: string) => void,
   onUserRequest: (type: UserRequestType, value: string) => void,
   getTransclusionContent: (id: string) => Promise<ReactElement>,
-  getLinkAvailability: (link: string) => Promise<boolean>,
+  getLinkAvailability: (link: string, linkType: LinkType) => Promise<boolean>,
 }
 
 
@@ -214,7 +215,9 @@ export const Editor = ({
       <HeadingPlugin />
       <InlineCodePlugin />
       <LinkPlugin />
-      <WikiLinkPlugin getLinkAvailability={getLinkAvailability} />
+      <WikiLinkPlugin getLinkAvailability={(linkText: string) => {
+        return getLinkAvailability(linkText, LinkType.WIKILINK);
+      }} />
       <TransclusionPlugin
         getTransclusionContent={getTransclusionContent}
       />

@@ -8,7 +8,7 @@ import {
   getNotesWithUrl,
   inferNoteTitle,
   parseFileIds,
-  sluggifyLink,
+  sluggify,
 } from "./noteUtils.js";
 
 
@@ -161,27 +161,32 @@ describe("getNotesWithFlag", () => {
   );
 });
 
-describe("sluggifyLink", () => {
+describe("sluggify", () => {
   it(
     "should create correct slugs",
     async () => {
-      expect(sluggifyLink("AUDIO.mp3")).toBe("audio.mp3");
-      expect(sluggifyLink("Der Äther")).toBe("der-äther");
-      expect(sluggifyLink("--hey there")).toBe("hey-there");
+      expect(sluggify("AUDIO.mp3")).toBe("audio-mp3");
+      expect(sluggify("Der Äther")).toBe("der-äther");
+      expect(sluggify("--hey there")).toBe("hey-there");
       expect(
-        sluggifyLink("#   This is a heading"),
+        sluggify("#   This is a heading"),
       ).toBe(
         "this-is-a-heading",
       );
       expect(
-        sluggifyLink("#   This is a heading\n\nThis is a paragraph"),
+        sluggify("#   This is a heading\n\nThis is a paragraph"),
       ).toBe(
         "this-is-a-heading-this-is-a-paragraph",
       );
       expect(
-        sluggifyLink("#slashes/are/allowed"),
+        sluggify("slashes/and.dots.are/transformed"),
       ).toBe(
-        "slashes/are/allowed",
+        "slashes-and-dots-are-transformed",
+      );
+      expect(
+        sluggify("Apostrophes won't be used, but will be removed"),
+      ).toBe(
+        "apostrophes-wont-be-used-but-will-be-removed",
       );
     },
   );

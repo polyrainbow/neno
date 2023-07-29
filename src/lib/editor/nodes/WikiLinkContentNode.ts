@@ -26,7 +26,9 @@ export class WikiLinkContentNode extends TextNode {
 
   constructor(
     text: string,
-    private readonly getLinkAvailability: (link: string) => Promise<boolean>,
+    private readonly getLinkAvailability: (
+      link: string,
+    ) => Promise<boolean>,
   ) {
     super(text);
   }
@@ -35,25 +37,27 @@ export class WikiLinkContentNode extends TextNode {
     const element = super.createDOM(config);
     addClassNamesToElement(element, config.theme.wikiLinkContent);
 
-    this.getLinkAvailability(this.__text).then((isAvailable) => {
-      if (isAvailable) {
-        element?.classList.add("available");
-      } else {
-        element?.classList.add("unavailable");
-      }
-    });
+    this.getLinkAvailability(this.__text)
+      .then((isAvailable) => {
+        if (isAvailable) {
+          element?.classList.add("available");
+        } else {
+          element?.classList.add("unavailable");
+        }
+      });
 
     return element;
   }
 
   updateDOM(_prevNode: TextNode, element: HTMLElement): boolean {
-    this.getLinkAvailability(this.__text).then((isAvailable) => {
-      if (isAvailable) {
-        element?.classList.add("available");
-      } else {
-        element?.classList.add("unavailable");
-      }
-    });
+    this.getLinkAvailability(this.__text)
+      .then((isAvailable) => {
+        if (isAvailable) {
+          element?.classList.add("available");
+        } else {
+          element?.classList.add("unavailable");
+        }
+      });
 
     return true;
   }

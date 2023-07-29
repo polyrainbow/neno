@@ -129,24 +129,23 @@ const getAppPath = (
   pathTemplate: PathTemplate,
   params?: Map<string, string>,
   urlParams?: URLSearchParams,
+  doNotEncode?: boolean,
 ): string => {
   // We don't use ROOT_PATH here because it is automatically used by the router
   // via its `basename` property
   let path = `/${pathTemplate}`;
+
   params?.forEach((value, key) => {
     if (value.length === 0) {
       throw new Error(
         "getAppPath: Empty value for app path param received: " + key,
       );
     }
-    path = path.replace(`%${key}%`, value);
-  });
-
-  if (path.includes("%")) {
-    throw new Error(
-      "getAppPath: Invalid path. Did you forget to set a param? " + path,
+    path = path.replace(
+      `%${key}%`,
+      doNotEncode ? value : encodeURIComponent(value),
     );
-  }
+  });
 
   if (urlParams) {
     path += "?" + urlParams;

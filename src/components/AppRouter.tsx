@@ -25,6 +25,8 @@ const AppRouter = () => {
           getAppPath(
             PathTemplate.NEW_NOTE,
             new Map([["GRAPH_ID", ":graphId"]]),
+            undefined,
+            true,
           )
         } replace />,
       },
@@ -36,11 +38,15 @@ const AppRouter = () => {
         path: getAppPath(
           PathTemplate.UNSELECTED_NOTE,
           new Map([["GRAPH_ID", ":graphId"]]),
+          undefined,
+          true,
         ),
         element: <Navigate to={
           getAppPath(
             PathTemplate.NEW_NOTE,
             new Map([["GRAPH_ID", ":graphId"]]),
+            undefined,
+            true,
           )
         } replace />,
       },
@@ -51,6 +57,8 @@ const AppRouter = () => {
             ["SLUG", ":slug"],
             ["GRAPH_ID", ":graphId"],
           ]),
+          undefined,
+          true,
         ),
         element: <NoteAccessProvider>
           <NoteView />
@@ -60,6 +68,8 @@ const AppRouter = () => {
         path: getAppPath(
           PathTemplate.LIST,
           new Map([["GRAPH_ID", ":graphId"]]),
+          undefined,
+          true,
         ),
         element: <NoteAccessProvider>
           <ListView />
@@ -69,6 +79,8 @@ const AppRouter = () => {
         path: getAppPath(
           PathTemplate.VISUAL,
           new Map([["GRAPH_ID", ":graphId"]]),
+          undefined,
+          true,
         ),
         element: <NoteAccessProvider>
           <VisualizationView />
@@ -78,6 +90,8 @@ const AppRouter = () => {
         path: getAppPath(
           PathTemplate.FILES,
           new Map([["GRAPH_ID", ":graphId"]]),
+          undefined,
+          true,
         ),
         element: <NoteAccessProvider>
           <FilesView />
@@ -90,6 +104,8 @@ const AppRouter = () => {
             ["GRAPH_ID", ":graphId"],
             ["FILE_ID", ":fileId"],
           ]),
+          undefined,
+          true,
         ),
         element: <NoteAccessProvider>
           <FileView />
@@ -99,6 +115,8 @@ const AppRouter = () => {
         path: getAppPath(
           PathTemplate.STATS,
           new Map([["GRAPH_ID", ":graphId"]]),
+          undefined,
+          true,
         ),
         element: <NoteAccessProvider>
           <StatsView />
@@ -108,6 +126,8 @@ const AppRouter = () => {
         path: getAppPath(
           PathTemplate.SETTINGS,
           new Map([["GRAPH_ID", ":graphId"]]),
+          undefined,
+          true,
         ),
         element: <NoteAccessProvider>
           <GraphSettingsView />

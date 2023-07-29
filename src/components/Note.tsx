@@ -34,7 +34,7 @@ import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import {
   extractFirstFileId,
   getMediaTypeFromFilename,
-  sluggifyLink,
+  sluggify,
 } from "../lib/notes/noteUtils";
 import { MediaType } from "../lib/notes/interfaces/MediaType";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
@@ -45,6 +45,7 @@ import NoteContentBlockImage from "./NoteContentBlockImage";
 import { FILE_SLUG_PREFIX } from "../lib/notes/config";
 import NotesProvider from "../lib/notes";
 import { getTransclusionContentFromNoteContent } from "../lib/Transclusion";
+import { LinkType } from "../types/LinkType";
 
 interface NoteComponentProps {
   isBusy: boolean,
@@ -266,8 +267,13 @@ const Note = ({
   };
 
 
-  const getLinkAvailability = async (linkText: string): Promise<boolean> => {
-    const slug = sluggifyLink(linkText);
+  const getLinkAvailability = async (
+    linkText: string,
+    linkType: LinkType,
+  ): Promise<boolean> => {
+    const slug = linkType === LinkType.WIKILINK
+      ? sluggify(linkText)
+      : linkText;
 
     if (linkText.startsWith(FILE_SLUG_PREFIX)) {
       const fileId = extractFirstFileId(slug);
@@ -408,7 +414,9 @@ const Note = ({
                         setUnsavedChanges(false);
                       }
 
-                      const slug = sluggifyLink(value);
+                      const slug = type === UserRequestType.SLASHLINK
+                        ? value
+                        : sluggify(value);
 
                       if (slug.startsWith(FILE_SLUG_PREFIX)) {
                         const fileId = extractFirstFileId(slug);

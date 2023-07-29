@@ -16,7 +16,7 @@ import StorageProvider from "./interfaces/StorageProvider.js";
 import {
   parseSerializedExistingNote,
   serializeNote,
-  sluggifyLink,
+  sluggify,
 } from "./noteUtils.js";
 import {
   Block,
@@ -137,7 +137,7 @@ export default class DatabaseIO {
       if (span.type === SpanType.SLASHLINK) {
         return span.text.substring(1);
       } else {
-        return sluggifyLink(span.text.substring(2, span.text.length - 2));
+        return sluggify(span.text.substring(2, span.text.length - 2));
       }
     });
   }

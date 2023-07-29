@@ -1001,20 +1001,23 @@ const trimSlug = (slug: string): string => {
 };
 
 
-const sluggifyNoteText = (text: string): string => {
+/*
+  Turns note text into a slug, without truncating.
+  For example, it can be used to obtain a slug from a Wikilink.
+  We will replace slashes and dots with dashes, as we do not allow
+  these chars as slug names for notes (even though they are generally allowed
+  yet, see TODO below).
+*/
+const sluggify = (text: string): string => {
   const slug = text
     // Trim leading/trailing whitespace
     .trim()
-    // Replace all invalid chars, and also slashes. Slashes are valid slug
-    // chars, but we want to replace them with dashes as they are reserved for
-    // special slugs like files, that point into different folders.
-    .replace(/[^\p{L}\d\-._]/gu, "-")
+    // remove invalid chars
+    .replace(/['’]+/g, "")
+    // Replace invalid chars with dashes.
+    .replace(/[^\p{L}\d\-_]+/gu, "-")
     // Replace runs of one or more dashes with a single dash
     .replace(/-+/g, "-")
-    // Truncate to avoid file name length limit issues.
-    // Windows systems can handle up to 255, but we truncate at 200 to leave
-    // a bit of room for things like version numbers.
-    .substring(0, 200)
     .toLowerCase();
 
   return trimSlug(slug);
@@ -1022,34 +1025,24 @@ const sluggifyNoteText = (text: string): string => {
 
 
 /*
-  sluggifyLink is used to turn a linking entity like a Wikilink into a slug.
-  Here we do not want to replace slashes with dashes, as slashes are valid
-  slug chars for links.
-
-  sluggifyNoteText replaces slashes with dashes, as slashes are reserved for
+  Transforms note text like into a slug and truncates it.
+  We will replace slashes and dots with dashes, as these are reserved for
   special slugs like files, that point into different folders. We do not want
-  to have slashes when creating a simple slug for a normal note.
+  to have these chars when creating a simple slug for a normal note.
 */
-
-
-const sluggifyLink = (text: string): string => {
-  const slug = text
-    // Trim leading/trailing whitespace
-    .trim()
-    // Replace all invalid chars.
-    .replace(/[^\p{L}\d\-._/]/gu, "-")
-    // Replace runs of one or more dashes with a single dash
-    .replace(/-+/g, "-")
+const sluggifyNoteText = (text: string): string => {
+  return sluggify(text)
     // Truncate to avoid file name length limit issues.
     // Windows systems can handle up to 255, but we truncate at 200 to leave
     // a bit of room for things like version numbers.
-    .substring(0, 200)
-    .toLowerCase();
-
-  return trimSlug(slug);
+    .substring(0, 200);
 };
 
 
+/*
+  TODO: Create new file id syntax, so that we can remove slashes and dots
+  from valid slug chars.
+*/
 const isValidSlug = (slug: Slug): boolean => {
   return (
     typeof slug === "string"
@@ -1215,7 +1208,7 @@ export {
   getNotesWithFlag,
   getBacklinks,
   getGraphLinks,
-  sluggifyLink,
+  sluggify,
   sluggifyNoteText,
   isValidSlug,
   createSlug,
