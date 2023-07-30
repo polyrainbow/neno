@@ -6,7 +6,7 @@ import {
 } from "../lib/LocalDataStorage";
 import useRunOnce from "./useRunOnce";
 import { useNavigate } from "react-router-dom";
-import { LOCAL_GRAPH_ID } from "../config";
+import { LOCAL_GRAPH_ID, ROOT_PATH } from "../config";
 
 export default async () => {
   const navigate = useNavigate();
@@ -23,7 +23,10 @@ export default async () => {
         ));
       } catch (e) {
         const urlParams = new URLSearchParams();
-        urlParams.set("redirect", window.location.pathname);
+        urlParams.set(
+          "redirect",
+          window.location.pathname.substring(ROOT_PATH.length - 1),
+        );
         navigate(getAppPath(PathTemplate.LOGIN, new Map(), urlParams));
       }
     }
