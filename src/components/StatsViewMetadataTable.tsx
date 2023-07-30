@@ -8,10 +8,6 @@ const StatsViewMetadataTable = ({ stats, databaseType }) => {
   return <table className="data-table">
     <tbody>
       <tr>
-        <td>{l("stats.metadata.id")}</td>
-        <td>{stats.id}</td>
-      </tr>
-      <tr>
         <td>{l("stats.metadata.type")}</td>
         <td>{databaseType}</td>
       </tr>

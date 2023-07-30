@@ -23,9 +23,6 @@ const StatsView = () => {
     updateStats();
   }, [notesProvider]);
 
-  // @ts-ignore calling constructor via instance
-  const databaseType = notesProvider.constructor.type;
-
   return <>
     <HeaderContainerLeftRight />
     <section className="content-section">
@@ -36,7 +33,7 @@ const StatsView = () => {
             <h2>{l("stats.metadata")}</h2>
             <StatsViewMetadataTable
               stats={stats}
-              databaseType={databaseType}
+              databaseType="local"
             />
             <h2>{l("stats.analysis")}</h2>
             <StatsViewAnalysisTable

@@ -31,17 +31,6 @@ const StatsViewAnalysisTable = ({
       ) / 100
       : NaN;
 
-  const maxPossibleLinks
-    = (numberOfAllNotes * (numberOfAllNotes - 1)) / 2;
-
-  // not to be confused with meshedness coefficient because this is not a
-  // planar graph
-  const meshedness = (maxPossibleLinks > 0)
-    ? (numberOfLinks / maxPossibleLinks)
-    : 0;
-
-  const meshednessPercentage = meshedness * 100;
-
   return <table className="data-table">
     <tbody>
       <tr>
@@ -79,12 +68,6 @@ const StatsViewAnalysisTable = ({
           (numberOfLinks - numberOfAllNotes + numberOfComponents)
             .toLocaleString()
         }</td>
-      </tr>
-      <tr>
-        <td>{l("stats.analysis.meshedness")}</td>
-        <td>{
-          meshednessPercentage.toLocaleString()
-        } %</td>
       </tr>
       <tr>
         <td>{emojis.hub} {l("stats.analysis.hubs")}</td>
