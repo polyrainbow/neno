@@ -25,7 +25,6 @@ import {
 
 export default (
   notesProvider: NotesProvider,
-  handleInvalidCredentialsError: () => void,
 ) => {
   const [unsavedChanges, setUnsavedChanges]
     = useContext(UnsavedChangesContext);
@@ -194,30 +193,21 @@ export default (
     const [rawNoteFile] = await getFilesFromUserSelection(types, false);
     const rawNote = await readFileAsString(rawNoteFile);
 
-    try {
-      const parsedNote = parseSerializedNewNote(rawNote);
-      const newActiveNote: UnsavedActiveNote = {
-        isUnsaved: true,
-        content: parsedNote.content,
-        initialContent: parsedNote.content,
-        keyValues: Object.entries(parsedNote.meta.custom),
-        flags: [...parsedNote.meta.flags, "IMPORTED"],
-        contentType: parsedNote.meta.contentType,
-        files: [],
-      };
-      setActiveNote(newActiveNote);
-      // For now, we let the system suggest the slug for imported notes.
-      // TODO: Could be improved in the future.
-      setSlugInput("");
-      setUnsavedChanges(true);
-    } catch (e) {
-      // if credentials are invalid, go to LoginView. If not, throw.
-      if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
-        await handleInvalidCredentialsError();
-      } else {
-        throw e;
-      }
-    }
+    const parsedNote = parseSerializedNewNote(rawNote);
+    const newActiveNote: UnsavedActiveNote = {
+      isUnsaved: true,
+      content: parsedNote.content,
+      initialContent: parsedNote.content,
+      keyValues: Object.entries(parsedNote.meta.custom),
+      flags: [...parsedNote.meta.flags, "IMPORTED"],
+      contentType: parsedNote.meta.contentType,
+      files: [],
+    };
+    setActiveNote(newActiveNote);
+    // For now, we let the system suggest the slug for imported notes.
+    // TODO: Could be improved in the future.
+    setSlugInput("");
+    setUnsavedChanges(true);
   };
 
 
@@ -279,9 +269,7 @@ export default (
       receivedNoteSlug = noteFromServer.meta.slug;
       updateEditorInstance();
     } catch (e) {
-      if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
-        await handleInvalidCredentialsError();
-      } else if (e instanceof Error && e.message === "NOTE_NOT_FOUND") {
+      if (e instanceof Error && e.message === "NOTE_NOT_FOUND") {
         createNewNote({
           slug,
           content: "",

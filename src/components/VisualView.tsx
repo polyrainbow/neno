@@ -1,10 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import GraphVisualizer from "../lib/GraphVisualizer";
 import GraphViewStatusIndicator from "./GraphViewStatusIndicator";
-import {
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import GraphViewHeader from "./GraphViewHeader";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
@@ -14,11 +11,8 @@ import { HighlightDetails } from "../types/GraphVisualizerConfig";
 import BackendGraphVisualization
   from "../lib/notes/interfaces/GraphVisualization";
 import { GraphVisualizationMode } from "../types/GraphVisualization";
-import { getAppPath } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
 import useNotesProvider from "../hooks/useNotesProvider";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
-import { removeAccess } from "../lib/LocalDataStorage";
 
 
 const VisualizationView = () => {
@@ -36,7 +30,6 @@ const VisualizationView = () => {
     = useContext(UnsavedChangesContext);
   const notesProvider = useNotesProvider();
   const [searchValue, setSearchValue] = useState<string>("");
-  const navigate = useNavigate();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
@@ -112,11 +105,6 @@ const VisualizationView = () => {
     };
   }, [handleKeydown]);
 
-  const handleInvalidCredentialsError = async () => {
-    await removeAccess();
-    navigate(getAppPath(PathTemplate.LOGIN));
-  };
-
 
   const initializeGraphInstance = async () => {
     if (!notesProvider) return;
@@ -126,38 +114,29 @@ const VisualizationView = () => {
     if (startedLoadingGraphVis.current) return;
     startedLoadingGraphVis.current = true;
 
-    try {
-      const graphObject: BackendGraphVisualization
-        = await notesProvider.getGraphVisualization();
+    const graphObject: BackendGraphVisualization
+      = await notesProvider.getGraphVisualization();
 
-      // for performance reasons, we disable labels above a certain
-      // amount of nodes
-      const initialMode = graphObject.nodes.length <= 500
-        ? GraphVisualizationMode.DEFAULT
-        : GraphVisualizationMode.NO_LABELS;
+    // for performance reasons, we disable labels above a certain
+    // amount of nodes
+    const initialMode = graphObject.nodes.length <= 500
+      ? GraphVisualizationMode.DEFAULT
+      : GraphVisualizationMode.NO_LABELS;
 
-      setMode(initialMode);
+    setMode(initialMode);
 
-      graphVisualizerInstance.current
-        = new GraphVisualizer({
-          parent: mainElement.current as HTMLElement,
-          graphObject,
-          onHighlight: (highlightDetails) => {
-            setStatus(highlightDetails);
-          },
-          onChange,
-          initialFocusNoteSlug: focusNoteSlug,
-          openNote: openNoteInEditor,
-          initialMode,
-        });
-    } catch (e) {
-      // if credentials are invalid, go to LoginView. If not, throw.
-      if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
-        await handleInvalidCredentialsError();
-      } else {
-        throw e;
-      }
-    }
+    graphVisualizerInstance.current
+      = new GraphVisualizer({
+        parent: mainElement.current as HTMLElement,
+        graphObject,
+        onHighlight: (highlightDetails) => {
+          setStatus(highlightDetails);
+        },
+        onChange,
+        initialFocusNoteSlug: focusNoteSlug,
+        openNote: openNoteInEditor,
+        initialMode,
+      });
   };
 
   useEffect(() => {

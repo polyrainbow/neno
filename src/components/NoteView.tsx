@@ -26,7 +26,6 @@ import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { Slug } from "../lib/notes/interfaces/Slug";
 import { inferNoteTitle } from "../lib/notes/noteUtils";
-import { removeAccess } from "../lib/LocalDataStorage";
 import NotesProvider from "../lib/notes";
 
 
@@ -58,11 +57,6 @@ const NoteView = () => {
   const [urlSearchParams] = useSearchParams();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
 
-  const handleInvalidCredentialsError = async () => {
-    await removeAccess();
-    navigate(Utils.getAppPath(PathTemplate.LOGIN));
-  };
-
   const {
     isBusy,
     activeNote,
@@ -81,7 +75,7 @@ const NoteView = () => {
     setSlugInput,
     editorInstanceId,
     updateEditorInstance,
-  } = useActiveNote(notesProvider, handleInvalidCredentialsError);
+  } = useActiveNote(notesProvider);
 
   const [headerStats, refreshHeaderStats] = useHeaderStats(notesProvider);
 
@@ -117,22 +111,13 @@ const NoteView = () => {
   };
 
 
-  const controlledNoteList = useControlledNoteList(
-    notesProvider,
-    handleInvalidCredentialsError,
-  );
+  const controlledNoteList = useControlledNoteList(notesProvider);
 
 
   const refreshContentViews = async (): Promise<void> => {
-    try {
-      await refreshHeaderStats();
-      await controlledNoteList.refresh();
-      await refreshPinnedNotes();
-    } catch (e) {
-      if (e instanceof Error && e.message !== "INVALID_CREDENTIALS") {
-        throw new Error(e.message, { cause: e });
-      }
-    }
+    await refreshHeaderStats();
+    await controlledNoteList.refresh();
+    await refreshPinnedNotes();
   };
 
 

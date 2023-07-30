@@ -19,12 +19,10 @@ export default (
     searchQuery,
     sortMode,
     page,
-    handleInvalidCredentialsError,
   }: {
     searchQuery: string,
     sortMode: NoteListSortMode,
     page: number,
-    handleInvalidCredentialsError: () => Promise<void>,
   },
 ): NoteList => {
   const currentRequestId = useRef<string>("");
@@ -59,25 +57,17 @@ export default (
 
       const requestId = crypto.randomUUID();
       currentRequestId.current = requestId;
-      try {
-        const {
-          results,
-          numberOfResults,
-        } = await notesProvider.getNotesList(options);
 
-        // ... some time later - check if this is the current request
-        if (currentRequestId.current === requestId) {
-          setNoteListItems(results);
-          setNumberOfResults(numberOfResults);
-          setIsBusy(false);
-        }
-      } catch (e) {
-        // if credentials are invalid, go to LoginView. If not, throw.
-        if (e instanceof Error && e.message === "INVALID_CREDENTIALS") {
-          await handleInvalidCredentialsError();
-        } else {
-          throw e;
-        }
+      const {
+        results,
+        numberOfResults,
+      } = await notesProvider.getNotesList(options);
+
+      // ... some time later - check if this is the current request
+      if (currentRequestId.current === requestId) {
+        setNoteListItems(results);
+        setNumberOfResults(numberOfResults);
+        setIsBusy(false);
       }
     },
     [searchQuery, page, sortMode, notesProvider],

@@ -10,22 +10,14 @@ export default (
   const [headerStats, setHeaderStats] = useState<GraphStats | null>(null);
 
   const refreshHeaderStats = async (): Promise<void> => {
-    try {
-      const stats = await notesProvider.getStats(
-        {
-          includeMetadata: false,
-          includeAnalysis: false,
-        },
-      );
+    const stats = await notesProvider.getStats(
+      {
+        includeMetadata: false,
+        includeAnalysis: false,
+      },
+    );
 
-      setHeaderStats(stats);
-    } catch (e) {
-      // if credentials are invalid, it's fine, refeshNotesList takes care of
-      // this. if there is another error, throw.
-      if (e instanceof Error && e.message !== "INVALID_CREDENTIALS") {
-        throw new Error(e.message, { cause: e });
-      }
-    }
+    setHeaderStats(stats);
   };
 
   return [headerStats, refreshHeaderStats];

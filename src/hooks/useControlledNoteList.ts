@@ -25,7 +25,6 @@ interface ControlledNoteList {
 // refreshes only when manually invoked
 export default (
   notesProvider: NotesProvider,
-  handleInvalidCredentialsError,
 ): ControlledNoteList => {
   const [searchQuery, setSearchQueryState] = useState<string>("");
   const [scrollTop, setScrollTop] = useState<number>(0);
@@ -56,7 +55,6 @@ export default (
       searchQuery,
       sortMode,
       page,
-      handleInvalidCredentialsError,
     },
   );
 

@@ -10,7 +10,6 @@ import useControlledNoteList from "../hooks/useControlledNoteList";
 import useNotesProvider from "../hooks/useNotesProvider";
 import useHeaderStats from "../hooks/useHeaderStats";
 import usePinnedNotes from "../hooks/usePinnedNotes";
-import { removeAccess } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
 
@@ -18,15 +17,7 @@ const ListView = () => {
   const navigate = useNavigate();
   const notesProvider = useNotesProvider();
 
-  const handleInvalidCredentialsError = async () => {
-    await removeAccess();
-    navigate(getAppPath(PathTemplate.LOGIN));
-  };
-
-  const controlledNoteList = useControlledNoteList(
-    notesProvider,
-    handleInvalidCredentialsError,
-  );
+  const controlledNoteList = useControlledNoteList(notesProvider);
 
   const [headerStats, refreshHeaderStats] = useHeaderStats(
     notesProvider,
