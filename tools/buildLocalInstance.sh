@@ -1,7 +1,7 @@
 '''
 builds a NENO instance intended for local mode only.
-make sure, you set ROOT_PATH in src/config.tsx to the correct basepath
-of your hosting environment before building
+make sure, you set ROOT_PATH in src/config.tsx, and the base property in the
+Vite config to the correct basepath of your hosting environment before building
 '''
 
 TARGET_DIRECTORY=../../neno-gh-pages
