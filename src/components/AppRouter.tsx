@@ -24,7 +24,7 @@ const AppRouter = () => {
         element: <Navigate to={
           getAppPath(
             PathTemplate.NEW_NOTE,
-            new Map([["GRAPH_ID", ":graphId"]]),
+            new Map([["GRAPH_ID", "local"]]),
             undefined,
             true,
           )
@@ -44,7 +44,7 @@ const AppRouter = () => {
         element: <Navigate to={
           getAppPath(
             PathTemplate.NEW_NOTE,
-            new Map([["GRAPH_ID", ":graphId"]]),
+            new Map([["GRAPH_ID", "local"]]),
             undefined,
             true,
           )
