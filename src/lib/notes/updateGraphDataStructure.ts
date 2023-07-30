@@ -1,3 +1,4 @@
+import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
 
 const formatHeader = (key: string, value: string) => {
@@ -25,7 +26,7 @@ const updateGraphDataStructure = async (graph: any) => {
       )
       + formatHeader(
         CanonicalNoteHeader.CONTENT_TYPE,
-        "text/subway",
+        DEFAULT_CONTENT_TYPE,
       )
       + formatHeader(
         CanonicalNoteHeader.FLAGS,

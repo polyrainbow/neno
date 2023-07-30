@@ -55,8 +55,6 @@ const FILE_PICKER_ACCEPT_TYPES: FilePickerAcceptType[] = [
   },
 ];
 
-const DEFAULT_CONTENT_TYPE = "text/subway";
-
 const DEFAULT_CONTENT_MODE = ContentMode.EDITOR;
 
 const SPAN_SEPARATOR = " · ";
@@ -64,6 +62,8 @@ const SPAN_SEPARATOR = " · ";
 const NOTE_FILE_EXTENSION = ".subtext";
 
 const NOTE_MIME_TYPE = "text/subtext";
+
+const DEFAULT_CONTENT_TYPE = NOTE_MIME_TYPE;
 
 const NOTE_FILE_DESCRIPTION = "NENO subtext note";
 
