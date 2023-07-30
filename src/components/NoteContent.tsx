@@ -40,7 +40,6 @@ const NoteContent = ({
   const blocks = subwaytext(note.content);
   const [resolvedFileInfos, setResolvedFileInfos] = useState<FileInfo[]>([]);
 
-
   /*
     When using a slashlink with a fileId in content, it is not guaranteed that
     we have the associated FileInfo ready in note.files
