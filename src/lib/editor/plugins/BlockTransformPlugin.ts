@@ -8,7 +8,9 @@
 
 import {
   $createParagraphNode,
+  $isRootNode,
   $setCompositionKey,
+  LineBreakNode,
   ParagraphNode,
   RootNode,
 } from "lexical";
@@ -88,6 +90,23 @@ export function BlockTransformPlugin(): JSX.Element | null {
       // Node.replace() sets a composition key, and does not reset it again,
       // so we have to do it manually to not break backspace functionality
       $setCompositionKey(null);
+    });
+
+    editor.registerNodeTransform(LineBreakNode, (node: LineBreakNode) => {
+      const element = node.getParent() as ParagraphNode;
+      if ($isRootNode(element)) {
+        return;
+      }
+      const prevSiblings = node.getPreviousSiblings();
+      const nextSiblings = node.getNextSiblings();
+      const n1 = $createParagraphNode();
+      n1.append(...prevSiblings);
+      const n2 = $createParagraphNode();
+      n2.append(...nextSiblings);
+
+      element.replace(n1, false);
+      n1.insertAfter(n2);
+      element.remove();
     });
   }, [editor]);
 
