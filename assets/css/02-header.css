@@ -1,0 +1,128 @@
+.app-header {
+  background: var(--header-background-color);
+  margin: 0;
+  padding: 0;
+  padding-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-bar-height);
+  user-select: none;
+  width: 100vw;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  z-index: 5;
+
+  .header-left {
+    display: flex;
+    justify-content: center;
+    height: var(--header-bar-height);
+    align-items: center;
+  }
+  
+  .header-right {
+    display: flex;
+    height: var(--header-bar-height);
+    align-items: center;
+  }
+
+  &.no-background {
+    background: none;
+  }
+
+  .header-stats {
+    white-space: pre;
+    display: flex;
+    gap: 15px;
+
+    .app-header-stats-item {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+  }
+
+  @media only screen and (max-width: 1280px) {
+    .header-stats {
+      display: none;
+    }
+  }
+
+  .pinned-notes {
+    align-items: center;
+    gap: 5px;
+    height: 100%;
+    overflow: auto;
+    justify-content: flex-start;
+    width: 100vw;
+  
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  
+    .pinned-notes-placeholder {
+      padding: 0 10px;
+    }
+  
+    .pinned-note {
+      background: transparent;
+
+      &:hover {
+        background-color: var(--nli-color-hover);
+      }
+  
+      &.active {
+        background-color: var(--accent-color-1-light);
+      }
+  
+      p {
+        white-space: pre;
+      }
+    }
+  
+    .pin-insert-indicator {
+      height: 100%;
+      background-color: var(--main-content-color);
+      width: 3px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.app-menu {
+  background-color: var(--header-background-color);
+  z-index: 10;
+  position: fixed;
+  top: 50px;
+  left: 0;
+
+  .app-menu-item {
+    display: flex;
+    padding: 15px 10px;
+    align-items: center;
+    cursor: pointer;
+
+    .label {
+      margin: 0;
+      margin-left: 15px;
+      color: inherit;
+    }
+
+    &.disabled {
+      cursor: default;
+
+      img.svg-icon {
+        filter: opacity(0.5);
+      }
+
+      .label {
+        color: var(--neno-gray-4);
+      }
+    }
+
+    &:not(.disabled):hover {
+      background-color: var(--accent-color-1-light);
+    }
+  }
+}
