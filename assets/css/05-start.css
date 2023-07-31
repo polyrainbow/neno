@@ -1,0 +1,68 @@
+/******************************
+  Start
+******************************/
+
+.section-start {
+  display: flex;
+  gap: calc(4 * var(--default-gap));
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+  max-width: 800px;
+  margin: auto;
+  height: calc(100vh - var(--header-bar-height));
+  overflow: auto;
+
+  .start-welcome {
+    margin: 0 auto;
+
+    #start-logo {
+      margin: auto;
+      width: 200px;
+      height: 200px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    div {
+      margin: auto;
+      text-align: center;
+      display: block;
+    }
+
+    .start-welcome-app-title {
+      font-size: var(--h1-font-size);
+      font-weight: var(--bold);
+    }
+  }
+
+  footer {
+    color: var(--font-color);
+    margin: 0;
+    text-align: center;
+
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: var(--default-gap);
+    }
+
+    .version {
+      font-size: var(--small-font-size);
+    }
+  }
+
+  #start-view-local {
+    text-align: center;
+  }
+
+  .memory-storage-providers {
+    display: flex;
+    justify-content: center;
+    gap: var(--default-gap);
+
+    button {
+      height: fit-content;
+    }
+  }
+}

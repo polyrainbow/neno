@@ -1,0 +1,20 @@
+{
+  "createdAt": 1690400000000,
+  "updatedAt": 1690400000000,
+  "screenPosition": {
+    "translateX": 200,
+    "translateY": 200,
+    "scale": 1
+  },
+  "pinnedNotes": [
+    "welcome-to-neno"
+  ],
+  "files": [
+    {
+      "slug": "files/beach.jpg",
+      "size": 301495,
+      "createdAt": 1690400000000
+    }
+  ],
+  "version": "2"
+}
