@@ -29,7 +29,9 @@ const emojis = {
 
 // base path of the hosting environment. if you want to serve the application on
 // domain.com/neno the ROOT_PATH must be set to "/neno/".
-const ROOT_PATH = "/";
+// The base path is currently set via the vite.config.js file.
+// @ts-ignore
+const ROOT_PATH = import.meta.env.BASE_URL;
 const ASSETS_PATH = `${ROOT_PATH}assets/`;
 const ICON_PATH = `${ASSETS_PATH}icons/`;
 
