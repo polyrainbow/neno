@@ -6,13 +6,12 @@
 :content-type:text/subtext
 
 # Welcome to NENO
-NENO is just another note-taking app that helps you create your personal knowledge graph. With NENO, you retain *full control* over your data because you decide where it is stored: On your device or on a cloud storage of your choice.
+NENO is just another note-taking app that helps you create your personal knowledge graph. With NENO, you retain *full control* over your data because you decide where it is stored: On your device or on a cloud storage of your choice. You could also use Git for versioning.
 To quote its creator:
 > NENO helped me manage my knowledge like no other app before.
 > You should give it a try.
 
-You can link other notes with a Wikilink like so: [[I like pizza]]. If the target note does not exist yet, the Wikilink will be show as read: [[Non-existing note]]. When clicking on it, you can create it.
+You can link other notes with a Wikilink like so: [[I like pizza]]. If the target note does not exist yet, the Wikilink is red: [[Non-existing note]]. When clicking on it, you can create it.
 
-You can also use slashlinks to create transclusions
-/2023-07-27
+Use slashlinks to create transclusions: /2023-07-27
 Other file types are also shown as transclusions: /files/9f6917da-9396-4e6f-b683-d117505ee5a7.jpg
