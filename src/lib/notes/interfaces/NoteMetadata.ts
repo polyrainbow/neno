@@ -15,8 +15,8 @@ export interface NewNoteMetadata extends BaseNoteMetadata {
 
 export interface ExistingNoteMetadata extends BaseNoteMetadata {
   slug: Slug,
-  createdAt: number,
-  updatedAt: number,
+  createdAt?: number,
+  updatedAt?: number,
   position: NodePosition,
 }
 

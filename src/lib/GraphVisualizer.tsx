@@ -907,6 +907,7 @@ export default class GraphVisualization {
       .append("g")
       .classed(consts.nodeClassName, true)
       .classed("new", (d: GraphVisualizationNode) => {
+        if (!d.createdAt) return false;
         const MAX_NEW_AGE = 1000 * 60 * 60 * 24 * 10; // 10 days
         return Date.now() - d.createdAt < MAX_NEW_AGE;
       })

@@ -1,6 +1,8 @@
 /* eslint-disable max-len */
 
+import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
+import NewNote from "./interfaces/NewNote.js";
 import {
   createSlug,
   getExtensionFromFilename,
@@ -8,6 +10,9 @@ import {
   getNotesWithUrl,
   inferNoteTitle,
   parseFileIds,
+  parseSerializedExistingNote,
+  parseSerializedNewNote,
+  serializeNote,
   sluggify,
 } from "./noteUtils.js";
 
@@ -228,7 +233,7 @@ describe("createSlug", () => {
   );
 
   it(
-    "should use add a number if the slug already exists",
+    "should add a number if the slug already exists",
     async () => {
       const noteContent = "content";
       expect(createSlug(noteContent, ["content"])).toBe("content-2");
@@ -263,6 +268,159 @@ describe("parseFileIds", () => {
         "9ab11718-5e6e-453d-a610-7207ac8a4488.jpg",
       ];
       expect(parseFileIds(noteContent)).toStrictEqual(expectedResult);
+    },
+  );
+});
+
+
+describe("serializeNote", () => {
+  it(
+    "should serialize a note correctly",
+    async () => {
+      const note: ExistingNote = {
+        content: "This is a note",
+        meta: {
+          slug: "1",
+          createdAt: 1000,
+          updatedAt: 2000,
+          position: {
+            x: 1.2,
+            y: 3.4,
+          },
+          custom: {
+            "custom-header-1": "custom-value-1",
+            "custom-header-2": "custom-value-2",
+          },
+          flags: [
+            "flag1",
+            "flag2",
+          ],
+          contentType: "text/plain",
+        },
+      };
+
+      const expectedResult = `:slug:1
+:created-at:1000
+:updated-at:2000
+:neno-default-graph-position:1.2,3.4
+:neno-flags:flag1,flag2
+:content-type:text/plain
+:custom-header-1:custom-value-1
+:custom-header-2:custom-value-2
+
+This is a note`;
+
+      expect(
+        serializeNote(note),
+      ).toBe(expectedResult);
+    },
+  );
+});
+
+
+describe("parseSerializedExistingNote", () => {
+  it(
+    "should parse a note with optional and custom headers",
+    async () => {
+      const serializedNote = `:slug:1
+:created-at:1000
+:updated-at:2000
+:neno-default-graph-position:1.2,3.4
+:neno-flags:flag1,flag2
+:content-type:text/plain
+:custom-header-1:custom-value-1
+:custom-header-2:custom-value-2
+
+This is a note`;
+
+      const expectedResult: ExistingNote = {
+        content: "This is a note",
+        meta: {
+          slug: "1",
+          createdAt: 1000,
+          updatedAt: 2000,
+          position: {
+            x: 1.2,
+            y: 3.4,
+          },
+          custom: {
+            "custom-header-1": "custom-value-1",
+            "custom-header-2": "custom-value-2",
+          },
+          flags: [
+            "flag1",
+            "flag2",
+          ],
+          contentType: "text/plain",
+        },
+      };
+
+      expect(
+        parseSerializedExistingNote(serializedNote),
+      ).toStrictEqual(expectedResult);
+    },
+  );
+
+  it(
+    "should parse a note without optional headers",
+    async () => {
+      const serializedNote = `:slug:1
+
+This is a note`;
+
+      const expectedResult: ExistingNote = {
+        content: "This is a note",
+        meta: {
+          slug: "1",
+          createdAt: undefined,
+          updatedAt: undefined,
+          position: {
+            x: 0,
+            y: 0,
+          },
+          custom: {},
+          flags: [],
+          contentType: "text/subtext",
+        },
+      };
+
+      expect(
+        parseSerializedExistingNote(serializedNote),
+      ).toStrictEqual(expectedResult);
+    },
+  );
+
+  it(
+    "should throw when required header :slug: is missing",
+    async () => {
+      const serializedNote = "Hello";
+
+      expect(
+        () => parseSerializedExistingNote(serializedNote),
+      ).toThrow();
+    },
+  );
+});
+
+
+describe("parseSerializedNewNote", () => {
+  it(
+    "should parse a note with no headers",
+    async () => {
+      const serializedNote = "This is a note";
+
+      const expectedResult: NewNote = {
+        content: "This is a note",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: DEFAULT_CONTENT_TYPE,
+        },
+      };
+
+      expect(
+        parseSerializedNewNote(serializedNote),
+      ).toStrictEqual(expectedResult);
     },
   );
 });

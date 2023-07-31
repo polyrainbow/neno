@@ -53,6 +53,7 @@
   "editor.stats.number-of-lines": "Number of lines",
   "editor.stats.number-of-links": "Number of links",
   "editor.stats.number-of-outgoing-links": "Number of outgoing links",
+  "editor.stats.unknown": "Unknown",
   "editor.stats.updated-at": "Updated at",
   "editor.stats.x-coordinate": "X coordinate",
   "editor.stats.y-coordinate": "Y coordinate",

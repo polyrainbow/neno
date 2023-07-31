@@ -53,6 +53,7 @@
   "editor.stats.number-of-lines": "Zeilen",
   "editor.stats.number-of-links": "Verbundene Notizen",
   "editor.stats.number-of-outgoing-links": "Anzahl der ausgehenden Links",
+  "editor.stats.unknown": "Unbekannt",
   "editor.stats.updated-at": "Letzte Aktualisierung",
   "editor.stats.x-coordinate": "X-Koordinate",
   "editor.stats.y-coordinate": "Y-Koordinate",

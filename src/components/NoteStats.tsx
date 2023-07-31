@@ -28,11 +28,19 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>{l("editor.stats.created-at")}</td>
-          <td>{makeTimestampHumanReadable(note.createdAt)}</td>
+          <td>{
+            note.createdAt === undefined
+              ? l("editor.stats.unknown")
+              : makeTimestampHumanReadable(note.createdAt)
+          }</td>
         </tr>
         <tr>
           <td>{l("editor.stats.updated-at")}</td>
-          <td>{makeTimestampHumanReadable(note.updatedAt)}</td>
+          <td>{
+            note.updatedAt === undefined
+              ? l("editor.stats.unknown")
+              : makeTimestampHumanReadable(note.updatedAt)
+          }</td>
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-blocks")}</td>

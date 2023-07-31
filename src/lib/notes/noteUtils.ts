@@ -26,6 +26,7 @@ import { Slug } from "./interfaces/Slug.js";
 import SparseNoteInfo from "./interfaces/SparseNoteInfo.js";
 import LinkCount from "./interfaces/LinkCount.js";
 import NotePreview from "./interfaces/NotePreview.js";
+import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 
 
 type NoteHeaders = Map<CanonicalNoteHeader | string, string>;
@@ -110,29 +111,21 @@ const parseSerializedExistingNote = (serializedNote: string): ExistingNote => {
     }
   }
 
-  partialMeta.custom = custom;
-
-  const requiredFields = [
-    "slug",
-    "position",
-    "createdAt",
-    "updatedAt",
-    "contentType",
-    "custom",
-    "flags",
-  ];
-
-  for (const requiredField of requiredFields) {
-    if (!(requiredField in partialMeta)) {
-      throw new Error(
-        "Could not parse note. Missing canonical header: "
-        + requiredField,
-      );
-    }
+  if (!partialMeta.slug) {
+    throw new Error(
+      "Could not parse note. Missing canonical header: slug",
+    );
   }
 
-  // https://stackoverflow.com/a/58986422/3890888
-  const meta = partialMeta as ExistingNoteMetadata;
+  const meta: ExistingNoteMetadata = {
+    slug: partialMeta.slug,
+    createdAt: partialMeta.createdAt,
+    updatedAt: partialMeta.updatedAt,
+    position: partialMeta.position ?? { x: 0, y: 0 },
+    flags: partialMeta.flags ?? [],
+    contentType: partialMeta.contentType ?? DEFAULT_CONTENT_TYPE,
+    custom,
+  };
 
   const note: ExistingNote = {
     content: serializedNote.substring(serializedNote.indexOf("\n\n") + 2),
@@ -160,28 +153,16 @@ const parseSerializedNewNote = (serializedNote: string): NewNote => {
     }
   }
 
-  partialMeta.custom = custom;
-
-  const requiredFields = [
-    "title",
-    "contentType",
-    "custom",
-  ];
-
-  for (const requiredField of requiredFields) {
-    if (!(requiredField in partialMeta)) {
-      throw new Error(
-        "Could not parse note. Missing canonical header: "
-        + requiredField,
-      );
-    }
-  }
-
-  // https://stackoverflow.com/a/58986422/3890888
-  const meta = partialMeta as NewNoteMetadata;
+  const meta: NewNoteMetadata = {
+    flags: partialMeta.flags ?? [],
+    contentType: partialMeta.contentType ?? DEFAULT_CONTENT_TYPE,
+    custom,
+  };
 
   const note: NewNote = {
-    content: serializedNote.substring(serializedNote.indexOf("\n\n") + 2),
+    content: headers.size > 0
+      ? serializedNote.substring(serializedNote.indexOf("\n\n") + 2)
+      : serializedNote,
     meta,
   };
   return note;
@@ -189,40 +170,49 @@ const parseSerializedNewNote = (serializedNote: string): NewNote => {
 
 
 const serializeNote = (note: ExistingNote): string => {
-  const headers: NoteHeaders = new Map([
+  const headersToSerialize: NoteHeaders = new Map([
     [
       CanonicalNoteHeader.SLUG,
       note.meta.slug.toString(),
     ],
-    [
+  ]);
+
+  if (note.meta.createdAt) {
+    headersToSerialize.set(
       CanonicalNoteHeader.CREATED_AT,
       note.meta.createdAt.toString(),
-    ],
-    [
+    );
+  }
+
+  if (note.meta.updatedAt) {
+    headersToSerialize.set(
       CanonicalNoteHeader.UPDATED_AT,
       note.meta.updatedAt.toString(),
-    ],
-    [
-      CanonicalNoteHeader.GRAPH_POSITION,
-      Object.values(note.meta.position).join(","),
-    ],
-    [
-      CanonicalNoteHeader.FLAGS,
-      note.meta.flags.join(","),
-    ],
-    [
-      CanonicalNoteHeader.CONTENT_TYPE,
-      note.meta.contentType,
-    ],
-  ]);
+    );
+  }
+
+  headersToSerialize.set(
+    CanonicalNoteHeader.GRAPH_POSITION,
+    Object.values(note.meta.position).join(","),
+  );
+
+  headersToSerialize.set(
+    CanonicalNoteHeader.FLAGS,
+    note.meta.flags.join(","),
+  );
+
+  headersToSerialize.set(
+    CanonicalNoteHeader.CONTENT_TYPE,
+    note.meta.contentType,
+  );
 
   for (const key in note.meta.custom) {
     if (Object.hasOwn(note.meta.custom, key)) {
-      headers.set(key, note.meta.custom[key]);
+      headersToSerialize.set(key, note.meta.custom[key]);
     }
   }
 
-  return serializeNoteHeaders(headers) + "\n\n" + note.content;
+  return serializeNoteHeaders(headersToSerialize) + "\n\n" + note.content;
 };
 
 
@@ -659,19 +649,19 @@ const getSortFunction = (
   const sortFunctions = {
     [NoteListSortMode.CREATION_DATE_ASCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
-        return a.createdAt - b.createdAt;
+        return (a.createdAt ?? 0) - (b.createdAt ?? 0);
       },
     [NoteListSortMode.CREATION_DATE_DESCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
-        return b.createdAt - a.createdAt;
+        return (b.createdAt ?? 0) - (a.createdAt ?? 0);
       },
     [NoteListSortMode.UPDATE_DATE_ASCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
-        return a.updatedAt - b.updatedAt;
+        return (a.updatedAt ?? 0) - (b.updatedAt ?? 0);
       },
     [NoteListSortMode.UPDATE_DATE_DESCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
-        return b.updatedAt - a.updatedAt;
+        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0);
       },
     [NoteListSortMode.TITLE_ASCENDING]:
       (a: NoteListItem, b: NoteListItem) => {

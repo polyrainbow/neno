@@ -20,8 +20,8 @@ export interface UnsavedActiveNote extends BaseActiveNote {
 export interface SavedActiveNote extends BaseActiveNote {
   slug: Slug,
   isUnsaved: false,
-  createdAt: number,
-  updatedAt: number,
+  createdAt?: number,
+  updatedAt?: number,
   position: NodePosition,
   numberOfCharacters: number,
   outgoingLinks: NotePreview[],
