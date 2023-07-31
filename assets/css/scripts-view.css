@@ -1,0 +1,45 @@
+.scripts-view {
+  .scripts {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--default-gap);
+
+    .scripting-view-item {
+      display: flex;
+      flex-direction: row;
+      gap: var(--default-gap);
+      align-items: center;
+
+      .title {
+        width: 23rem;
+        font-size: var(--large-font-size);
+        font-family: var(--code-font)
+      }
+
+      .controls {
+        display: flex;
+        gap: var(--default-gap);
+        justify-content: flex-start;
+      }
+    }
+  }
+
+  .create-script {
+    .controls {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--default-gap);
+
+      input {
+        margin: 0 0.313rem;
+      }
+    }
+
+    .error {
+      color: var(--error-and-danger-text-color);
+    }
+  }
+}
