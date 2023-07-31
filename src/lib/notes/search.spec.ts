@@ -3,6 +3,11 @@ import {
   getRawTokensFromQueryString,
 } from "./search.js";
 
+jest.mock("../../constants", () => {
+  return {
+    BASE_URL: "/",
+  };
+});
 
 describe("search", () => {
   it(

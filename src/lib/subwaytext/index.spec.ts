@@ -375,4 +375,63 @@ normal text`;
       expect(subwaytext(input)).toStrictEqual(result);
     },
   );
+
+  it(
+    "should parse wikilinks with a slash inside",
+    () => {
+      const input
+        = "Other [[Thinking tools / Tools for Thought]] similar to [[NENO]]";
+
+      const result = [
+        {
+          type: BlockType.PARAGRAPH,
+          data: {
+            text: [
+              {
+                text: "Other ",
+                type: "NORMAL_TEXT",
+              },
+              {
+                text: "[[Thinking tools / Tools for Thought]]",
+                type: "WIKILINK",
+              },
+              {
+                text: " similar to ",
+                type: "NORMAL_TEXT",
+              },
+              {
+                text: "[[NENO]]",
+                type: "WIKILINK",
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(subwaytext(input)).toStrictEqual(result);
+    },
+  );
+
+  it(
+    "should not detect a slashlink when single slash is followed by a space",
+    () => {
+      const input = "Thinking tools / Tools for Thought";
+
+      const result = [
+        {
+          type: BlockType.PARAGRAPH,
+          data: {
+            text: [
+              {
+                text: "Thinking tools / Tools for Thought",
+                type: "NORMAL_TEXT",
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(subwaytext(input)).toStrictEqual(result);
+    },
+  );
 });

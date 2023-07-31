@@ -16,6 +16,11 @@ import {
   sluggify,
 } from "./noteUtils.js";
 
+jest.mock("../../constants", () => {
+  return {
+    BASE_URL: "/",
+  };
+});
 
 describe("getExtensionFromFilename", () => {
   it(

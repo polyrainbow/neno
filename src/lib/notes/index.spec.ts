@@ -9,6 +9,12 @@ import { TextEncoder, TextDecoder } from "util";
 // @ts-ignore
 Object.assign(global, { TextDecoder, TextEncoder });
 
+jest.mock("../../constants", () => {
+  return {
+    BASE_URL: "/",
+  };
+});
+
 describe("Notes module", () => {
   it("should create and output notes", async () => {
     const notesProvider = new NotesProvider(new MockStorageProvider());

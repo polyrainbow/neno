@@ -1,3 +1,4 @@
+import { BASE_URL } from "./constants.js";
 import { ContentMode } from "./types/ContentMode.js";
 
 const VERSION = "v6.3.0";
@@ -30,8 +31,7 @@ const emojis = {
 // base path of the hosting environment. if you want to serve the application on
 // domain.com/neno the ROOT_PATH must be set to "/neno/".
 // The base path is currently set via the vite.config.js file.
-// @ts-ignore
-const ROOT_PATH = import.meta.env.BASE_URL;
+const ROOT_PATH = BASE_URL;
 const ASSETS_PATH = `${ROOT_PATH}assets/`;
 const ICON_PATH = `${ASSETS_PATH}icons/`;
 

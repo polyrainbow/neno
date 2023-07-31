@@ -50,6 +50,8 @@ export const parseText = (text: string): InlineText => {
         || isWhiteSpace(lastChar)
       )
       && char === "/"
+      && currentSpanType !== SpanType.WIKILINK
+      && !isWhiteSpace(iterator.peek(1).join(""))
     ) {
       spans.push({
         type: currentSpanType,
