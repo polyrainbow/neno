@@ -1,0 +1,212 @@
+div[data-lexical-editor] {
+  font-size: 1.125rem;
+  margin: auto;
+  padding: var(--default-padding);
+  min-height: 21.875rem;
+  border: none;
+  color: var(--main-content-color);
+  outline: none;
+  text-align: start;
+  max-width: var(--max-content-width);
+
+  & > p {
+    margin: 0;
+    line-height: var(--default-line-height);
+  }
+
+  .link {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--link-color);
+
+    /* Long external links should wrap after each char */
+    &[rel="noopener noreferrer"] {
+      word-break: break-all;
+    }
+  }
+
+  & > p.s-heading {
+    line-height: normal;
+    font-weight: var(--bold);
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    display: block;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    ::highlight(heading-block-sigil) {
+      color: var(--alt-content-color)
+    }
+  }
+
+  & > p.list-item {
+    margin-inline-start: 1.25rem;
+
+    .list-item-content {
+      margin-left: 0.063rem;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .list-item-sigil {
+      white-space: pre;
+      color: var(--alt-content-color);
+      font-weight: 900;
+      font-size: large;
+    }
+  }
+
+  .wikilink-content {
+    cursor: pointer;
+
+    &.available {
+      color: var(--link-color);
+    }
+
+    &.unavailable {
+      color: var(--error-and-danger-text-color);
+    }
+  }
+
+  .wikilink-punctuation {
+    color: var(--alt-content-color);
+  }
+
+  .bold {
+    font-weight: var(--bold);
+
+    &::highlight(bold-sigil) {
+      color: var(--alt-content-color);
+    }
+  }
+
+  .transclusion-wrapper {
+    user-select: none;
+    font-size: var(--default-font-size);
+    font-weight: normal;
+    line-height: var(--default-line-height);
+  }
+
+  .transclusion {
+    background: var(--accent-color-interactible);
+    border-radius: var(--border-radius);
+    padding: var(--small-interactive-element-padding);
+    margin: var(--small-gap) 0;
+    cursor: pointer;
+
+    &.unavailable {
+      background: var(--error-and-danger-background-color);
+
+      .not-available-disclaimer {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: var(--default-gap);
+      }
+    }
+
+    p {
+      margin: 0;
+    }
+
+    p.slug {
+      color: var(--alt-content-color);
+      font-size: var(--default-font-size);
+      margin-bottom: 0.313rem;
+    }
+
+    span.transclusion-note-title {
+      display: block;
+      font-weight: var(--bold);
+    }
+  }
+
+  .inline-code, .code-block {
+    font-family: var(--code-font);
+    background-color: var(--accent-color-interactible);
+
+    &::highlight(inline-code-sigil) {
+      color: var(--alt-content-color);
+    }
+  }
+
+  .quote-block {
+    border-left: 0.375rem solid var(--alt-content-color);
+    padding: 0.188rem var(--default-gap);
+    font-style: italic;
+    background: var(--accent-color-interactible);
+    margin-inline: 0;
+
+    ::highlight(quote-block-sigil) {
+      color: var(--alt-content-color);
+    }
+  }
+
+  /*
+    If a quote block is not followed by another, show gap
+    Goal: Gap between quote blocks and different kinds of blocks
+  */
+  .quote-block:not(:has(+ .quote-block)) {
+    margin-bottom: var(--small-gap);
+  }
+
+  /*
+    Elements that are not a quote block but followed by one should have a margin
+    Goal: Gap between quote blocks and different kinds of blocks
+    Only p.s-heading already have a margin-bottom by default that should not be
+    overridden.
+  */
+  :not(.quote-block, p.s-heading):has(+ .quote-block) {
+    margin-bottom: var(--small-gap);
+  }
+
+  /*
+    If a code block is not followed by another, show gap
+    Goal: Gap between code blocks and different kinds of blocks
+  */
+  .code-block:not(:has(+ .code-block)) {
+    margin-bottom: var(--small-gap);
+  }
+
+  /*
+    Elements that are not a code block but followed by one should have a margin
+    Goal: Gap between code blocks and different kinds of blocks
+    Only p.s-heading already have a margin-bottom by default that should not be
+    overridden.
+  */
+  :not(.code-block, p.s-heading):has(+ .code-block) {
+    margin-bottom: var(--small-gap);
+  }
+
+  /*
+    If a list item block is not followed by another, show gap
+    Goal: Gap between list item sections and different kinds of blocks
+  */
+  .list-item:not(:has(+ .list-item)) {
+    margin-bottom: var(--small-gap);
+  }
+
+  /*
+    Elements that are not a list item but followed by one should have a margin
+    Goal: Gap between list item sections and different kinds of blocks
+    Only p.s-heading already have a margin-bottom by default that should not be
+    overridden.
+  */
+  :not(.list-item, p.s-heading):has(+ .list-item) {
+    margin-bottom: var(--small-gap);
+  }
+
+
+  .key-value {
+    margin: var(--small-gap) 0;
+
+    .key-value-key {
+      font-family: var(--code-font);
+      color: var(--alt-content-color);
+      margin-left: 0.188rem;
+    }
+  }
+}
