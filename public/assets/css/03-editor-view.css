@@ -386,17 +386,14 @@ div[data-lexical-editor] > p {
   line-height: 1.5em;
 }
 
-.hashtag {
-  color: var(--alt-content-color);
-}
-
 .link {
   cursor: pointer;
   text-decoration: none;
   color: var(--link-color);
 }
 
-.s-heading {
+div[data-lexical-editor] > p.s-heading {
+  line-height: normal;
   font-weight: bold;
   font-size: 1.5em;
   margin-block-start: 0.83em;
