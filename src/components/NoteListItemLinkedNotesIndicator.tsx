@@ -15,9 +15,7 @@ const NoteListItemLinkedNotesIndicator = ({
       ? l("list.item.links.linked-to-x-notes", { numberOfLinkedNotes })
       : isActive
         ? l("list.item.links.currently-selected")
-        : isLinked
-          ? l("list.item.links.unlink")
-          : l("list.item.links.link");
+        : l("list.item.links.link");
 
 
   return <Tooltip

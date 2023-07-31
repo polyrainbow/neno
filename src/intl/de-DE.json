@@ -109,7 +109,6 @@
   "list.item.links.link": "Mit ausgewählter Notiz verbinden",
   "list.item.links.linked-to-x-notes": "Diese Notiz ist mit {numberOfLinkedNotes} anderen Notiz(en) verbunden.",
   "list.item.links.not-linked": "Nicht verbunden",
-  "list.item.links.unlink": "Verbindung zu ausgewählter Notiz entfernen",
   "list.note-list": "Notiz-Liste",
   "list.pagination.next-page": "Nächste Seite",
   "list.pagination.previous-page": "Vorherige Seite",

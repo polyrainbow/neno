@@ -109,7 +109,6 @@
   "list.item.links.link": "Link to selected note",
   "list.item.links.linked-to-x-notes": "This note is linked to {numberOfLinkedNotes} other note(s).",
   "list.item.links.not-linked": "Not linked",
-  "list.item.links.unlink": "Unlink selected note",
   "list.note-list": "Note list",
   "list.pagination.next-page": "Next page",
   "list.pagination.previous-page": "Previous page",
