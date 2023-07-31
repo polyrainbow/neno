@@ -1,0 +1,48 @@
+#app-menu-toggle {
+  display: none;
+}
+
+@media only screen and (max-width: 599px) {
+  #app-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.app-menu {
+  background-color: var(--header-background-color);
+  user-select: none;
+
+  &::backdrop {
+    background: var(--overlay-gradient);
+  }
+
+  .app-menu-item {
+    display: flex;
+    padding: var(--default-padding);
+    align-items: center;
+    background: transparent;
+    width: 100%;
+    gap: var(--default-gap);
+
+    .label {
+      margin: 0;
+      color: inherit;
+    }
+
+    &.disabled {
+      img.svg-icon {
+        filter: opacity(0.5);
+      }
+
+      .label {
+        color: var(--neno-gray-4);
+      }
+    }
+
+    &:not(.disabled):hover {
+      background-color: var(--accent-color-1-light);
+    }
+  }
+}
