@@ -58,6 +58,7 @@ import GraphVisualizerConfig, {
 } from "../types/GraphVisualizerConfig";
 import { Delaunay } from "d3";
 import { Slug } from "./notes/interfaces/Slug";
+import { l } from "./intl";
 
 const clamp = (value, min, max) => {
   return Math.min(Math.max(value, min), max);
@@ -928,7 +929,7 @@ export default class GraphVisualization {
         this.#onHighlight({
           active: true,
           type: "node",
-          title: d.title,
+          title: d.title || l("list.untitled-note"),
         });
       })
       .on("mouseout", (e) => {
@@ -1103,7 +1104,7 @@ export default class GraphVisualization {
             "transform",
             "translate(" + node.position.x + "," + node.position.y + ")",
           )
-          .text(nodes[i].title)
+          .text(nodes[i].title || l("list.untitled-note"))
           .attr("text-anchor", "middle")
           .style(
             "font-size",
@@ -1121,7 +1122,7 @@ export default class GraphVisualization {
           const domElement = domElements[i];
           this.#insertTitleLinebreaks(
             d3.select(domElement),
-            node.title,
+            node.title || l("list.untitled-note"),
           );
         });
     }
