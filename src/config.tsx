@@ -1,6 +1,6 @@
 import { ContentMode } from "./types/ContentMode.js";
 
-const VERSION = "v6.1.1";
+const VERSION = "v6.2.0";
 
 const DEFAULT_NOTE_CONTENT = "";
 
