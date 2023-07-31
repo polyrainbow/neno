@@ -1,0 +1,54 @@
+.script-view-main {
+  display: flex;
+  height: calc(100vh - 3.125rem);
+
+  &.active-script {
+    .editor-section {
+      border-right: var(--line-width) solid var(--main-content-color);
+      flex-shrink: 0;
+      width: 45vw;
+
+      .title-bar {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: var(--default-padding);
+
+        h2 {
+          margin: 0;
+        }
+      }
+
+      #editor-container {
+        height: 100%;
+      }
+    }
+
+    .output-section {
+      padding: var(--default-padding);
+      width: 100%;
+      overflow: auto;
+
+      .script-output {
+        font-family: var(--code-font);
+        white-space: pre;
+        overflow: auto;
+        margin: 0;
+        width: 100%;
+      }
+
+      .busy-indicator {
+        height: 5rem;
+      }
+    }
+  }
+}
+
+.script-view-main-busy {
+  padding: var(--default-padding);
+
+  .busy-indicator {
+    height: 6.25rem;
+  }
+}

@@ -1,0 +1,51 @@
+.navigation-rail {
+  background-color: var(--alt-background-color);
+  grid-area: navigation-rail;
+  border-right: var(--default-border);
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  @media only screen and (max-width: 599px) {
+    & {
+      display: none;
+    }
+  }
+
+  .active-view-indicator {
+    background: var(--accent-color-1-intense);
+    width: 0.313rem;
+    position: absolute;
+    height: 2.75rem;
+    left: 0;
+  }
+
+  button {
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: auto;
+  }
+
+  button:focus-visible {
+    z-index: 1;
+    position: relative;
+  }
+
+  button[disabled] {
+    @media (prefers-color-scheme: light) {
+      img.svg-icon {
+        filter: opacity(0.5);
+      }
+    }
+
+    .label {
+      color: var(--neno-gray-4);
+    }
+  }
+
+  button:not([disabled]):hover {
+    background-color: var(--accent-color-1-light);
+  }
+}

@@ -1,0 +1,99 @@
+:root {
+  --block-title-font-size: var(--default-font-size);
+  --block-subtitle-font-size: var(--small-font-size);
+  --block-filesize-color: var(--alt-content-color);
+  --block-title-font-weight: var(--bold);
+  --default-line-height: 1.6em;
+  --block-title-margin: 0;
+  --block-download-icon-fill-color: var(--neno-gray-5);
+}
+
+.preview-block-file-text {
+  padding: var(--small-interactive-element-padding);
+  font-family: var(--code-font);
+  white-space: break-spaces;
+  word-break: break-all;
+  background-color: var(--accent-color-interactible);
+  tab-size: 4;
+  font-size: var(--small-font-size);
+  margin-bottom: 0;
+}
+
+.preview-block-image-wrapper {
+  display: flex;
+  justify-content: center;
+
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: 43.75rem;
+    background-color: white;
+  }
+}
+
+.content-not-available {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--default-gap);
+  color: var(--error-and-danger-text-color);
+}
+
+.preview-block-file-wrapper {
+  display: block;
+
+  audio,
+  video {
+    width: 100%;
+    display: block;
+  }
+
+  .preview-block-file-first-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    .preview-block-file-info {
+      flex-grow: 8;
+      max-width: calc(100% - 5rem);
+
+      .preview-block-file-info-title {
+        font-size: var(--block-title-font-size);
+        font-weight: var(--block-title-font-weight);
+        line-height: var(--default-line-height);
+        margin: var(--block-title-margin);
+        white-space: pre-wrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        outline: none;
+      }
+
+      .preview-block-file-size {
+        font-size: var(--block-subtitle-font-size);
+        color: var(--block-filesize-color);
+      
+        &::after {
+          content: attr(data-size);
+          margin-left: 0.2em;
+        }
+      }
+    }
+
+    .preview-block-file-actions {
+      a {
+        display: inline-block;
+        height: 1.5rem;
+      }
+
+      .preview-block-file-download-button {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+
+        .preview-block-file-download-button svg {
+          fill: var(--block-download-icon-fill-color);
+        }
+      }
+    }
+  }
+}

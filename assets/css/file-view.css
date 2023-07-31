@@ -1,0 +1,93 @@
+.file-section {
+  h1 {
+    margin-top: var(--small-gap);
+    margin-bottom: 1.563rem;
+  }
+
+  .file-container {
+    justify-content: center;
+    background-color: var(--accent-color-interactible);
+  }
+
+  img,
+  audio,
+  video,
+  iframe {
+    margin: 0.938rem auto;
+  }
+
+  iframe {
+    height: 80vh;
+    width: 60vw;
+  }
+
+  pre {
+    width: 100%;
+  }
+
+  video {
+    max-height: 80vh;
+  }
+
+  audio {
+    width: 95vw;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  .preview-block-file-text {
+    margin: 0;
+  }
+
+  .action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--default-gap);
+  }
+
+  .busy-indicator {
+    height: 1.875rem;
+  }
+
+  .rename {
+    display: flex;
+    flex-direction: column;
+    gap: var(--default-gap);
+
+    .rename-section-input-line {
+      display: flex;
+      gap: var(--default-gap);
+      align-items: center;
+
+      label {
+        white-space: nowrap;
+      }
+
+      & input {
+        margin: 0;
+        width: 100%;
+      }
+    }
+
+    .update-references {
+      display: flex;
+      align-items: center;
+      gap: var(--default-gap);
+
+      .switch {
+        font-size: 1.75rem;
+      }
+    }
+
+    .error {
+      color: var(--error-and-danger-text-color);
+      margin: 0;
+    }
+
+    button {
+      width: fit-content;
+    }
+  }
+}

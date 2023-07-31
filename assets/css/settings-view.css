@@ -1,0 +1,23 @@
+.settings-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--default-gap);
+
+  h1 {
+    margin: 0;
+  }
+
+  .setting {
+    display: flex;
+    flex-direction: column;
+    gap: var(--default-gap);
+
+    h2 {
+      margin: 0;
+    }
+
+    select {
+      width: fit-content;
+    }
+  }
+}
