@@ -1,7 +1,7 @@
 import { BASE_URL } from "./constants.js";
 import { ContentMode } from "./types/ContentMode.js";
 
-const VERSION = "v6.3.0";
+const VERSION = "v6.3.1";
 
 const DEFAULT_NOTE_CONTENT = "";
 
