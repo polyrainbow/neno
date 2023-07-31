@@ -1,0 +1,8 @@
+# Welcome to NENO
+NENO is a note-taking app that helps you manage your personal knowledge garden. With NENO, you retain *full control* over your data because you decide where it is stored: On your device or on a cloud storage of your choice. You can also use Git for versioning.
+You can write notes in Subtext, a very simple markup format.
+> You should give NENO a try.
+
+You can link other notes with a Wikilink like so: [[Non-existing note]]. Click on the link create the note.
+
+You can use slashlinks to add files which will be rendered as transclusions: /files/beach.jpg
