@@ -12,7 +12,7 @@
   "dialog.create-one-note-per-line.heading": "Eine Notiz pro Zeile erstellen",
   "dialog.create-one-note-per-line.please-wait": "Bitte warte, während die Notizen erstellt werden …",
   "editor.add-links": "Notiz verbinden",
-  "editor.backlinks": "Backlinks",
+  "editor.backlinks": "Backlinks ({backlinks})",
   "editor.cancel": "Abbrechen",
   "editor.create-linked-note": "Neue verlinkte Notiz",
   "editor.discard-changes-confirmation.confirm": "Verwerfen",

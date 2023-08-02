@@ -12,7 +12,7 @@
   "dialog.create-one-note-per-line.heading": "Create one note per line",
   "dialog.create-one-note-per-line.please-wait": "Please wait while notes are created.",
   "editor.add-links": "Add links",
-  "editor.backlinks": "Backlinks",
+  "editor.backlinks": "Backlinks ({backlinks})",
   "editor.cancel": "Cancel",
   "editor.create-linked-note": "New linked note",
   "editor.discard-changes-confirmation.confirm": "Discard changes",
