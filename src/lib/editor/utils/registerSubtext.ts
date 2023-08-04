@@ -60,12 +60,6 @@ function onCopyForPlainText(
 
     if (selection !== null && clipboardData !== null) {
       event.preventDefault();
-      const htmlString = $getHtmlContent(editor);
-
-      if (htmlString !== null) {
-        clipboardData.setData("text/html", htmlString);
-      }
-
       clipboardData.setData("text/plain", selection.getTextContent());
     }
   });
