@@ -9,5 +9,5 @@ export default {
     "^(.+)\\.js\\?(.+)$": "$1",
   },
   "extensionsToTreatAsEsm": [".ts"],
-  "modulePathIgnorePatterns": ["<rootDir>/dist/"],
+  "modulePathIgnorePatterns": ["<rootDir>/dist/", "<rootDir>/tests/"],
 };

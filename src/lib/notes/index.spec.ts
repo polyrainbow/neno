@@ -249,4 +249,44 @@ describe("Notes module", () => {
     expect(note2.backlinks.length).toBe(1);
     expect(note2.backlinks[0].slug).toBe("note-1");
   });
+
+  it("should update existing slugs", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        content: "Note 1",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "note-1",
+    };
+
+    await notesProvider.put(noteSaveRequest);
+
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "Note 1 with new slug",
+        meta: {
+          slug: "note-1",
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "note-1a",
+    };
+
+    await notesProvider.put(noteSaveRequest2);
+
+    const notes = await notesProvider.getNotesList({});
+
+    expect(notes.numberOfResults).toBe(1);
+    expect(notes.results[0].slug).toBe("note-1a");
+  });
 });
