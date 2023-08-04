@@ -10,7 +10,6 @@
 import { CommandPayloadType, LexicalEditor } from "lexical";
 
 import {
-  $getHtmlContent,
   $insertDataTransferForPlainText,
 } from "@lexical/clipboard";
 import {
