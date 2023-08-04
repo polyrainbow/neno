@@ -26,7 +26,7 @@ interface NoteListWithControlsProps {
   setPage,
   activeNote,
   itemsAreLinkable,
-  onLinkIndicatorClick: (slug: Slug) => void,
+  onLinkIndicatorClick: (slug: Slug, title: string) => void,
 }
 
 const NoteListWithControls = ({

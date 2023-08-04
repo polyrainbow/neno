@@ -25,7 +25,7 @@ import useHeaderStats from "../hooks/useHeaderStats";
 import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { Slug } from "../lib/notes/interfaces/Slug";
-import { inferNoteTitle } from "../lib/notes/noteUtils";
+import { inferNoteTitle, sluggify } from "../lib/notes/noteUtils";
 import NotesProvider from "../lib/notes";
 
 
@@ -338,16 +338,24 @@ const NoteView = () => {
               setPage={controlledNoteList.setPage}
               stats={headerStats}
               itemsAreLinkable={true}
-              onLinkIndicatorClick={(slug: Slug) => {
+              onLinkIndicatorClick={(slug: Slug, title: string) => {
+                // If the title can be sluggified to the note's slug, use the
+                // title as link text, because it looks much nicer.
+                const wikilinkContent = sluggify(title) === slug
+                  ? title
+                  : slug;
+
+                const linkToInsert = `[[${wikilinkContent}]]`;
+
                 let newNoteContent;
 
                 if (
                   activeNote.content === ""
                   || activeNote.content.trimEnd() !== activeNote.content
                 ) {
-                  newNoteContent = activeNote.content + `[[${slug}]]`;
+                  newNoteContent = `${activeNote.content}${linkToInsert}`;
                 } else {
-                  newNoteContent = activeNote.content + ` [[${slug}]]`;
+                  newNoteContent = `${activeNote.content} ${linkToInsert}`;
                 }
 
                 setNoteContent(newNoteContent, true);

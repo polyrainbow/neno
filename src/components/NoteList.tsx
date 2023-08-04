@@ -32,7 +32,7 @@ interface NoteListProps {
   itemsAreLinkable: boolean,
   unsavedChanges: boolean,
   setUnsavedChanges: (unsavedChanges: boolean) => void,
-  onLinkIndicatorClick: (slug: Slug) => void,
+  onLinkIndicatorClick: (slug: Slug, title: string) => void,
 }
 
 const NoteList = ({
@@ -162,7 +162,7 @@ const NoteList = ({
             isLinkable={itemsAreLinkable}
             onLinkIndicatorClick={() => {
               if (isActive) return;
-              onLinkIndicatorClick(note.slug);
+              onLinkIndicatorClick(note.slug, note.title);
             }}
           />;
         })
