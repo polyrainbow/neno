@@ -38,21 +38,23 @@ const NoteBacklinks = ({
     }
     <div className="note-backlinks">
       {
-        note.backlinks.map((displayedLinkedNote) => <NoteListItem
-          key={"note-link-list-item-" + displayedLinkedNote.slug}
-          note={displayedLinkedNote}
-          onSelect={async () => {
-            if (unsavedChanges) {
-              await confirmDiscardingUnsavedChanges();
-              setUnsavedChanges(false);
-            }
+        note.backlinks
+          .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+          .map((displayedLinkedNote) => <NoteListItem
+            key={"note-link-list-item-" + displayedLinkedNote.slug}
+            note={displayedLinkedNote}
+            onSelect={async () => {
+              if (unsavedChanges) {
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
+              }
 
-            goToNote(displayedLinkedNote.slug);
-          }}
-          isActive={false}
-          isLinked={true}
-          isLinkable={true}
-        />)
+              goToNote(displayedLinkedNote.slug);
+            }}
+            isActive={false}
+            isLinked={true}
+            isLinkable={true}
+          />)
       }
     </div>
   </div>;
