@@ -1,11 +1,13 @@
 import { FileId } from "./notes/interfaces/FileId";
 import { PathTemplate } from "../enum/PathTemplate";
-import { UnsavedActiveNote } from "../types/ActiveNote";
+import ActiveNote, { UnsavedActiveNote } from "../types/ActiveNote";
 import * as Config from "../config";
 import { FileInfo } from "./notes/interfaces/FileInfo";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { FILE_SLUG_PREFIX } from "./notes/config.js";
 import { getUrlForFileId } from "./LocalDataStorage";
+import { Slug } from "./notes/interfaces/Slug";
+import { inferNoteTitle, sluggify } from "./notes/noteUtils";
 
 
 const shortenText = (text: string, maxLength: number): string => {
@@ -307,6 +309,24 @@ const getFirstLines = (text: string, numberOfLines: number): string => {
 };
 
 
+const getNoteTitleFromActiveNote = (activeNote: ActiveNote): string => {
+  return activeNote.keyValues.find((kv) => kv[0] === "title")?.[1]
+    ?? inferNoteTitle(activeNote.content);
+};
+
+
+const getWikilinkForNote = (slug: Slug, title: string): string => {
+  // If the title can be sluggified to the note's slug, use the
+  // title as link text, because it looks much nicer.
+  const wikilinkContent = sluggify(title) === slug
+    ? title
+    : slug;
+
+  const wikilink = `[[${wikilinkContent}]]`;
+  return wikilink;
+};
+
+
 export {
   getKeySortFunction,
   yyyymmdd,
@@ -330,4 +350,6 @@ export {
   readFileAsString,
   createContentFromFileIds,
   getFirstLines,
+  getWikilinkForNote,
+  getNoteTitleFromActiveNote,
 };

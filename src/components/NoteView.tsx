@@ -25,7 +25,6 @@ import useHeaderStats from "../hooks/useHeaderStats";
 import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { Slug } from "../lib/notes/interfaces/Slug";
-import { inferNoteTitle, sluggify } from "../lib/notes/noteUtils";
 import NotesProvider from "../lib/notes";
 
 
@@ -207,8 +206,7 @@ const NoteView = () => {
 
 
   useEffect(() => {
-    const title = activeNote.keyValues.find((kv) => kv[0] === "title")?.[1]
-      ?? inferNoteTitle(activeNote.content);
+    const title = Utils.getNoteTitleFromActiveNote(activeNote);
 
     const documentTitle = title.length > 0
       ? title
@@ -339,13 +337,7 @@ const NoteView = () => {
               stats={headerStats}
               itemsAreLinkable={true}
               onLinkIndicatorClick={(slug: Slug, title: string) => {
-                // If the title can be sluggified to the note's slug, use the
-                // title as link text, because it looks much nicer.
-                const wikilinkContent = sluggify(title) === slug
-                  ? title
-                  : slug;
-
-                const linkToInsert = `[[${wikilinkContent}]]`;
+                const wikilink = Utils.getWikilinkForNote(slug, title);
 
                 let newNoteContent;
 
@@ -353,9 +345,9 @@ const NoteView = () => {
                   activeNote.content === ""
                   || activeNote.content.trimEnd() !== activeNote.content
                 ) {
-                  newNoteContent = `${activeNote.content}${linkToInsert}`;
+                  newNoteContent = `${activeNote.content}${wikilink}`;
                 } else {
-                  newNoteContent = `${activeNote.content} ${linkToInsert}`;
+                  newNoteContent = `${activeNote.content} ${wikilink}`;
                 }
 
                 setNoteContent(newNoteContent, true);

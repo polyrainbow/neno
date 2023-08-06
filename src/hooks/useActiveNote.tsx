@@ -2,12 +2,16 @@ import {
   NewNoteSaveRequest,
   NoteSaveRequest,
 } from "../lib/notes/interfaces/NoteSaveRequest";
-import { parseSerializedNewNote } from "../lib/notes/noteUtils";
+import {
+  parseSerializedNewNote,
+} from "../lib/notes/noteUtils";
 import ActiveNote, { UnsavedActiveNote } from "../types/ActiveNote";
 import { useContext, useState } from "react";
 import {
   getFilesFromUserSelection,
   getNewNoteObject,
+  getNoteTitleFromActiveNote,
+  getWikilinkForNote,
   readFileAsString,
 } from "../lib/utils";
 import useConfirmDiscardingUnsavedChangesDialog
@@ -174,8 +178,13 @@ export default (
       throw new Error("Cannot create linked note of unsaved note");
     }
 
+    const wikilink = getWikilinkForNote(
+      activeNote.slug,
+      getNoteTitleFromActiveNote(activeNote),
+    );
+
     createNewNote({
-      content: `[[${activeNote.slug}]]\n`,
+      content: `${wikilink}\n`,
     });
   };
 
