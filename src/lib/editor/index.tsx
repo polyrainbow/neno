@@ -36,6 +36,7 @@ import { BlockTransformPlugin } from "./plugins/BlockTransformPlugin";
 import { QuoteBlockNode } from "./nodes/QuoteBlockNode";
 import { LinkType } from "../../types/LinkType";
 import { UserRequestType } from "./types/UserRequestType";
+import { ListItemNode } from "./nodes/ListItemNode";
 
 const theme = {
   ltr: "ltr",
@@ -52,6 +53,7 @@ const theme = {
   inlineCode: "inline-code",
   codeBlock: "code-block",
   quoteBlock: "quote-block",
+  listItem: "list-item",
 };
 
 
@@ -175,6 +177,7 @@ export const Editor = ({
       InlineCodeNode,
       CodeBlockNode,
       QuoteBlockNode,
+      ListItemNode,
     ],
   };
 

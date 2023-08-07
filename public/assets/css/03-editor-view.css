@@ -401,6 +401,10 @@ div[data-lexical-editor] > p.s-heading {
   display: block;
 }
 
+div[data-lexical-editor] > p.list-item {
+  margin-inline-start: 20px;
+}
+
 .wikilink-content {
   cursor: pointer;
 }
@@ -423,6 +427,9 @@ div[data-lexical-editor] > p.s-heading {
 
 div[data-lexical-editor] .transclusion-wrapper {
   user-select: none;
+  font-size: var(--default-font-size);
+  font-weight: normal;
+  line-height: 1.5em;
 }
 
 div[data-lexical-editor] .transclusion {

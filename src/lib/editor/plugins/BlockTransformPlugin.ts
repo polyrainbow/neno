@@ -25,8 +25,13 @@ import {
 import { $createQuoteBlockNode, QuoteBlockNode } from "../nodes/QuoteBlockNode";
 import { ElementNodeType } from "../types/ElementNodeType";
 import { $createHeadingNode, HeadingNode } from "../nodes/HeadingNode";
+import { $createListItemNode, ListItemNode } from "../nodes/ListItemNode";
 
-type BlockNode = ParagraphNode | CodeBlockNode | QuoteBlockNode | HeadingNode;
+type BlockNode = ParagraphNode
+| CodeBlockNode
+| QuoteBlockNode
+| HeadingNode
+| ListItemNode;
 
 const assignCorrectElementNodes = (
   elementNodes: BlockNode[],
@@ -47,6 +52,8 @@ const assignCorrectElementNodes = (
         typeNodeShouldHaveMap.set(node, ElementNodeType.QUOTE);
       } else if (nodeText.startsWith("#")) {
         typeNodeShouldHaveMap.set(node, ElementNodeType.HEADING);
+      } else if (nodeText.startsWith("-")) {
+        typeNodeShouldHaveMap.set(node, ElementNodeType.LIST_ITEM);
       } else {
         typeNodeShouldHaveMap.set(node, ElementNodeType.PARAGRAPH);
       }
@@ -74,6 +81,8 @@ const assignCorrectElementNodes = (
         elementNode.replace($createQuoteBlockNode(), true);
       } else if (typeNodeShouldHave === ElementNodeType.HEADING) {
         elementNode.replace($createHeadingNode(), true);
+      } else if (typeNodeShouldHave === ElementNodeType.LIST_ITEM) {
+        elementNode.replace($createListItemNode(), true);
       } else {
         throw new Error("Unknown node type: " + typeNodeShouldHave);
       }

@@ -77,7 +77,11 @@ export default (
     return;
   }
 
-  const slashlinks = node.getType() === ElementNodeType.PARAGRAPH
+  const slashlinks = [
+    ElementNodeType.PARAGRAPH,
+    ElementNodeType.LIST_ITEM,
+    ElementNodeType.HEADING,
+  ].includes(node.getType() as ElementNodeType)
     ? node.getChildren()
       .filter((child): child is AutoLinkNode => {
         return $isAutoLinkNode(child)

@@ -3,4 +3,5 @@ export enum ElementNodeType {
   PARAGRAPH = "paragraph",
   QUOTE = "quote",
   HEADING = "heading",
+  LIST_ITEM = "list-item",
 }
