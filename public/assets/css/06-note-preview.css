@@ -10,17 +10,11 @@
   --block-subtitle-font-size: var(--small-font-size);
   --block-filesize-color: var(--alt-content-color);
   --block-title-font-weight: var(--bold);
-  --block-title-line-height: 1.5em;
+  --default-line-height: 1.6em;
   --block-title-margin: 0;
   --block-download-icon-fill-color: var(--neno-gray-5);
 }
 
-.preview-block-paragraph,
-.preview-block-quote,
-.preview-block-list-unordered,
-.preview-block-list-ordered {
-  line-height: 1.6em;
-}
 
 .preview-block-quote {
   border-left: 6px solid var(--alt-content-color);
@@ -163,7 +157,7 @@
 .preview-block-file-info-title {
   font-size: var(--block-title-font-size);
   font-weight: var(--block-title-font-weight);
-  line-height: var(--block-title-line-height);
+  line-height: var(--default-line-height);
   margin: var(--block-title-margin);
   white-space: pre-wrap;
   text-overflow: ellipsis;
