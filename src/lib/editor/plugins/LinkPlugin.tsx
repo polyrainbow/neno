@@ -21,8 +21,9 @@ const URL_REGEX
 const EMAIL_REGEX
   = /(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/;
 
+// TODO: Align all regexes re. slashlink an slugs
 const SLASHLINK_REGEX
-  = /(@[\w-/]+)?(\/[\w-:.]+)+/;
+  = /(@[\p{L}\d\-/]+)?(\/[\p{L}\d\-:.]+)+/u;
 
 const MATCHERS = [
   createLinkMatcherWithRegExp(URL_REGEX, (text) => {
