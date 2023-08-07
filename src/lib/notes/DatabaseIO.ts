@@ -158,8 +158,6 @@ export default class DatabaseIO {
             [],
           );
           return outgoingLinks.concat(links);
-        } else if (block.type === BlockType.SLASHLINK) {
-          return outgoingLinks.concat([block.data.link]);
         } else {
           return outgoingLinks;
         }

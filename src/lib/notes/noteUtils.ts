@@ -14,6 +14,7 @@ import subwaytext from "../subwaytext/index.js";
 import {
   Block,
   BlockType,
+  Span,
 } from "../subwaytext/interfaces/Block.js";
 import {
   ExistingNoteMetadata,
@@ -27,6 +28,7 @@ import SparseNoteInfo from "./interfaces/SparseNoteInfo.js";
 import LinkCount from "./interfaces/LinkCount.js";
 import NotePreview from "./interfaces/NotePreview.js";
 import { DEFAULT_CONTENT_TYPE } from "../../config.js";
+import { SpanType } from "../subwaytext/interfaces/SpanType.js";
 
 
 type NoteHeaders = Map<CanonicalNoteHeader | string, string>;
@@ -533,43 +535,40 @@ const getBlocks = (
 };
 
 
+const getAllInlineSpans = (blocks: Block[]): Span[] => {
+  const spans: Span[] = [];
+  blocks.forEach((block) => {
+    if (block.type === BlockType.PARAGRAPH) {
+      spans.push(...block.data.text);
+    } else if (block.type === BlockType.HEADING) {
+      spans.push(...block.data.text);
+    } else if (block.type === BlockType.LIST) {
+      block.data.items.forEach((item) => {
+        spans.push(...item);
+      });
+    }
+  });
+  return spans;
+};
+
+
 const getNoteFeatures = (
   blocks: Block[],
 ): NoteListItemFeatures => {
-  let containsText = false;
-  let containsWeblink = false;
-  let containsCode = false;
+  const spans = getAllInlineSpans(blocks);
+
+  const containsText = spans.length > 0;
+  const containsWeblink
+    = spans.some((span) => span.type === SpanType.HYPERLINK);
+  const containsCode = blocks.some((block) => block.type === BlockType.CODE);
   let containsImages = false;
   let containsDocuments = false;
   let containsAudio = false;
   let containsVideo = false;
 
-  blocks.forEach((block) => {
-    if (
-      (
-        (block.type === BlockType.PARAGRAPH)
-        && block.data.text.length > 0
-      )
-      || (
-        (block.type === BlockType.HEADING)
-        && block.data.text.trim().length > 0
-      )
-      || (
-        (block.type === BlockType.LIST)
-        && block.data.items.length > 0
-        && block.data.items[0].length > 0
-      )
-    ) {
-      containsText = true;
-    }
-    if (block.type === BlockType.URL) {
-      containsWeblink = true;
-    }
-    if (block.type === BlockType.CODE) {
-      containsCode = true;
-    }
-    if (block.type === BlockType.SLASHLINK) {
-      const fileId = extractFirstFileId(block.data.link);
+  spans.forEach((span: Span) => {
+    if (span.type === SpanType.SLASHLINK) {
+      const fileId = extractFirstFileId(span.text.substring(1));
       if (fileId) {
         const mediaType = getMediaTypeFromFilename(fileId);
         if (mediaType === MediaType.IMAGE) {
@@ -1125,9 +1124,14 @@ const getNotesWithMediaTypes = (
       // every single note must contain blocks from all the types
       .filter((note: ExistingNote): boolean => {
         return types.every((type) => {
-          return getBlocks(note, graph.indexes.blocks).some((block) => {
-            if (block.type !== BlockType.SLASHLINK) return false;
-            const fileId = extractFirstFileId(block.data.link);
+          const inlineSpans
+            = getAllInlineSpans(
+              graph.indexes.blocks.get(note.meta.slug) as Block[],
+            );
+
+          return inlineSpans.some((span) => {
+            if (span.type !== SpanType.SLASHLINK) return false;
+            const fileId = extractFirstFileId(span.text.substring(1));
             if (!fileId) return false;
             return getMediaTypeFromFilename(fileId) === type;
           });
@@ -1136,10 +1140,15 @@ const getNotesWithMediaTypes = (
     // every note must contain one block with only one type of types:
     : notes
       .filter((note: ExistingNote): boolean => {
-        return getBlocks(note, graph.indexes.blocks)
-          .some((block) => {
-            if (block.type !== BlockType.SLASHLINK) return false;
-            const fileId = extractFirstFileId(block.data.link);
+        const inlineSpans
+          = getAllInlineSpans(
+            graph.indexes.blocks.get(note.meta.slug) as Block[],
+          );
+
+        return inlineSpans
+          .some((span: Span) => {
+            if (span.type !== SpanType.SLASHLINK) return false;
+            const fileId = extractFirstFileId(span.text.substring(1));
             if (!fileId) return false;
             return types.includes(getMediaTypeFromFilename(fileId));
           });
@@ -1206,4 +1215,5 @@ export {
   getRandomKey,
   removeWikilinkPunctuation,
   extractFirstFileId,
+  getAllInlineSpans,
 };

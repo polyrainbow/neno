@@ -12,13 +12,11 @@ import { LOCAL_GRAPH_ID } from "../config";
 interface NoteContentBlockImageProps {
   file: FileInfo,
   notesProvider: NotesProvider,
-  description: string,
 }
 
 
 const NoteContentBlockImage = ({
   file,
-  description,
   notesProvider,
 }: NoteContentBlockImageProps) => {
   const [url, setUrl] = useState<string>("");
@@ -44,10 +42,9 @@ const NoteContentBlockImage = ({
       >
         <img
           src={url}
-          alt={description}
+          alt={file.name}
         />
       </Link>
-      <figcaption>{description}</figcaption>
     </figure>
   </div>;
 };

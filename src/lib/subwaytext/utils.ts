@@ -10,17 +10,19 @@ export const isWhiteSpace = (string: string): boolean => {
 export const parseText = (text: string): InlineText => {
   const spans: Span[] = [];
   const iterator = new CharIterator(text);
-  let currentSpanType: SpanType = SpanType.NORMAL_TEXT;
+  let currentSpanType: SpanType | null = null;
   let currentSpanText = "";
 
 
   while (true) {
     const step = iterator.next();
     if (step.done) {
-      spans.push({
-        type: currentSpanType,
-        text: currentSpanText,
-      });
+      if (currentSpanType) {
+        spans.push({
+          type: currentSpanType,
+          text: currentSpanText,
+        });
+      }
       break;
     }
     const char = step.value;
@@ -37,10 +39,12 @@ export const parseText = (text: string): InlineText => {
         || iterator.peek(6).join("") === "ttps:/"
       )
     ) {
-      spans.push({
-        type: currentSpanType,
-        text: currentSpanText,
-      });
+      if (currentSpanType) {
+        spans.push({
+          type: currentSpanType,
+          text: currentSpanText,
+        });
+      }
 
       currentSpanText = "";
       currentSpanType = SpanType.HYPERLINK;
@@ -53,10 +57,12 @@ export const parseText = (text: string): InlineText => {
       && currentSpanType !== SpanType.WIKILINK
       && !isWhiteSpace(iterator.peek(1).join(""))
     ) {
-      spans.push({
-        type: currentSpanType,
-        text: currentSpanText,
-      });
+      if (currentSpanType) {
+        spans.push({
+          type: currentSpanType,
+          text: currentSpanText,
+        });
+      }
 
       currentSpanText = "";
       currentSpanType = SpanType.SLASHLINK;
@@ -65,10 +71,12 @@ export const parseText = (text: string): InlineText => {
       && currentSpanType !== SpanType.NORMAL_TEXT
       && currentSpanType !== SpanType.WIKILINK
     ) {
-      spans.push({
-        type: currentSpanType,
-        text: currentSpanText,
-      });
+      if (currentSpanType) {
+        spans.push({
+          type: currentSpanType,
+          text: currentSpanText,
+        });
+      }
       currentSpanText = "";
       currentSpanType = SpanType.NORMAL_TEXT;
     } else if (
@@ -79,10 +87,12 @@ export const parseText = (text: string): InlineText => {
       && !(iterator.charsUntil("]]", 2)?.includes("["))
       && !(iterator.charsUntil("]]", 2)?.includes("]"))
     ) {
-      spans.push({
-        type: currentSpanType,
-        text: currentSpanText,
-      });
+      if (currentSpanType) {
+        spans.push({
+          type: currentSpanType,
+          text: currentSpanText,
+        });
+      }
       currentSpanText = "";
       currentSpanType = SpanType.WIKILINK;
     } else if (
@@ -95,6 +105,8 @@ export const parseText = (text: string): InlineText => {
         text: currentSpanText,
       });
       currentSpanText = "";
+      currentSpanType = SpanType.NORMAL_TEXT;
+    } else if (!currentSpanType) {
       currentSpanType = SpanType.NORMAL_TEXT;
     }
     currentSpanText += char;

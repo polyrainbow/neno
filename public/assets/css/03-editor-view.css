@@ -455,7 +455,7 @@ div[data-lexical-editor] .transclusion p.slug {
 }
 
 .inline-code, .code-block {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--code-font);
   background-color: var(--accent-color-interactible);
 }
 

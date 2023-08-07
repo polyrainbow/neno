@@ -97,6 +97,7 @@
   --table-row-background-color-odd: var(--background-color);
   --table-row-background-color-even: var(--accent-color-interactible);
   --main-font: "Mona Sans", sans-serif;
+  --code-font: "IBM Plex Mono", monospace;
   --input-border-width: 1px;
   --border-radius: 7px;
   --default-gap: 15px;

@@ -39,13 +39,23 @@ A paragraph with a https://link.com and a /slashlink`;
       {
         type: BlockType.HEADING,
         data: {
-          text: "Heading",
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "Heading",
+            },
+          ],
         },
       },
       {
         type: BlockType.HEADING,
         data: {
-          text: "another heading",
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "another heading",
+            },
+          ],
         },
       },
       {
@@ -128,17 +138,29 @@ A paragraph with a https://link.com and a /slashlink`;
         },
       },
       {
-        type: BlockType.SLASHLINK,
+        type: BlockType.PARAGRAPH,
         data: {
-          link: "files/x",
-          text: "",
+          text: [
+            {
+              type: SpanType.SLASHLINK,
+              text: "/files/x",
+            },
+          ],
         },
       },
       {
-        type: BlockType.SLASHLINK,
+        type: BlockType.PARAGRAPH,
         data: {
-          link: "files/y.mp3",
-          text: "Some description",
+          text: [
+            {
+              type: SpanType.SLASHLINK,
+              text: "/files/y.mp3",
+            },
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "     Some description",
+            },
+          ],
         },
       },
       {
@@ -161,10 +183,18 @@ A paragraph with a https://link.com and a /slashlink`;
         },
       },
       {
-        type: BlockType.URL,
+        type: BlockType.PARAGRAPH,
         data: {
-          url: "https://example.com",
-          text: "Link to example.com",
+          text: [
+            {
+              type: SpanType.HYPERLINK,
+              text: "https://example.com",
+            },
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: " Link to example.com",
+            },
+          ],
         },
       },
       {
@@ -424,7 +454,38 @@ normal text`;
             text: [
               {
                 text: "Thinking tools / Tools for Thought",
-                type: "NORMAL_TEXT",
+                type: SpanType.NORMAL_TEXT,
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(subwaytext(input)).toStrictEqual(result);
+    },
+  );
+
+  it(
+    "should detect a wikilink when the line starts with a URL",
+    () => {
+      const input = "\nhttps://example.com [[Wikilink]]";
+
+      const result = [
+        {
+          type: BlockType.PARAGRAPH,
+          data: {
+            text: [
+              {
+                text: "https://example.com",
+                type: SpanType.HYPERLINK,
+              },
+              {
+                text: " ",
+                type: SpanType.NORMAL_TEXT,
+              },
+              {
+                text: "[[Wikilink]]",
+                type: SpanType.WIKILINK,
               },
             ],
           },

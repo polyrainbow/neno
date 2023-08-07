@@ -237,7 +237,6 @@ const Note = ({
           file={file}
           notesProvider={notesProvider}
           key={file.fileId}
-          description={""}
         />;
       } else if (mediaType === MediaType.TEXT) {
         return <NoteContentBlockTextFile

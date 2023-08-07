@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MediaType } from "../lib/notes/interfaces/MediaType";
 import subwaytext from "../lib/subwaytext/index";
 import {
-  BlockSlashlink,
   BlockType,
   ListBlockStyle,
+  Span,
 } from "../lib/subwaytext/interfaces/Block";
 import ActiveNote from "../types/ActiveNote";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
@@ -14,7 +14,6 @@ import NoteContentBlockParagraph from "./NoteContentBlockParagraph";
 import NoteContentBlockVideo from "./NoteContentBlockVideo";
 import NoteContentBlockImage from "./NoteContentBlockImage";
 import NoteContentEmptyDisclaimer from "./NoteContentEmptyDisclaimer";
-import NoteContentBlockUrl from "./NoteContentBlockUrl";
 import NoteContentInlineText from "./NoteContentInlineText";
 import NoteContentBlockTextFile from "./NoteContentBlockTextFile";
 import NoteContentBlockQuote from "./NoteContentBlockQuote";
@@ -23,8 +22,10 @@ import { FileId } from "../lib/notes/interfaces/FileId";
 import { FileInfo } from "../lib/notes/interfaces/FileInfo";
 import {
   extractFirstFileId,
+  getAllInlineSpans,
   getMediaTypeFromFilename,
 } from "../lib/notes/noteUtils";
+import { SpanType } from "../lib/subwaytext/interfaces/SpanType";
 
 interface NoteContentProps {
   note: ActiveNote,
@@ -48,15 +49,17 @@ const NoteContent = ({
     resolvedFileInfos with the file infos provided by note.files
   */
   useEffect(() => {
-    const fileIdsInContent = blocks
-      .filter((block): block is BlockSlashlink => {
-        if (block.type !== BlockType.SLASHLINK) return false;
-        const fileId = extractFirstFileId(block.data.link);
+    const inlineSpans = getAllInlineSpans(blocks);
+
+    const fileIdsInContent = inlineSpans
+      .filter((span: Span): boolean => {
+        if (span.type !== SpanType.SLASHLINK) return false;
+        const fileId = extractFirstFileId(span.text.substring(1));
         if (!fileId) return false;
         return true;
       })
-      .map((block): FileId => {
-        return extractFirstFileId(block.data.link) as string;
+      .map((span): FileId => {
+        return extractFirstFileId(span.text.substring(1)) as string;
       });
 
     const initiallyResolvedFileIds = note.files.map((file) => file.fileId);
@@ -102,8 +105,13 @@ const NoteContent = ({
   return <div className="note-content-view-mode">
     {
       blocks.map((block) => {
-        if (block.type === BlockType.SLASHLINK) {
-          const fileId = extractFirstFileId(block.data.link);
+        const slashlinks = getAllInlineSpans([block])
+          .filter((span) => span.type === SpanType.SLASHLINK);
+
+        const transclusions = slashlinks.map((slashlink) => {
+          const slug = slashlink.text.substring(1);
+
+          const fileId = extractFirstFileId(slug);
           if (!fileId) {
             return <NoteContentBlockEmptyFile
               key={Math.random()}
@@ -137,7 +145,6 @@ const NoteContent = ({
               file={file}
               notesProvider={notesProvider}
               key={file.fileId}
-              description={block.data.text}
             />;
           } else if (mediaType === MediaType.TEXT) {
             return <NoteContentBlockTextFile
@@ -151,9 +158,13 @@ const NoteContent = ({
               key={file.fileId}
             />;
           }
-        } else if (block.type === BlockType.LIST) {
+        });
+
+        let blockMarkup;
+
+        if (block.type === BlockType.LIST) {
           if (block.data.type === ListBlockStyle.UNORDERED) {
-            return <ul
+            blockMarkup = <ul
               key={Math.random()}
               className="preview-block-list-unordered"
             >
@@ -164,7 +175,7 @@ const NoteContent = ({
               })}
             </ul>;
           } else {
-            return <ol
+            blockMarkup = <ol
               key={Math.random()}
               className="preview-block-list-ordered"
             >
@@ -176,32 +187,34 @@ const NoteContent = ({
             </ol>;
           }
         } else if (block.type === BlockType.PARAGRAPH) {
-          return <NoteContentBlockParagraph
+          blockMarkup = <NoteContentBlockParagraph
             runningText={block.data.text}
             key={Math.random()}
           />;
         } else if (block.type === BlockType.QUOTE) {
-          return <NoteContentBlockQuote
+          blockMarkup = <NoteContentBlockQuote
             runningText={block.data.text}
             key={Math.random()}
           />;
         } else if (block.type === BlockType.CODE) {
-          return <pre
+          blockMarkup = <pre
             key={Math.random()}
             className="preview-block-code"
           >
             {block.data.code}
           </pre>;
         } else if (block.type === BlockType.HEADING) {
-          return <h2 key={Math.random()}>{block.data.text}</h2>;
-        } else if (block.type === BlockType.URL) {
-          return <NoteContentBlockUrl
-            key={Math.random()}
-            blockData={block.data}
-          />;
+          blockMarkup = <h2 key={Math.random()}>
+            <NoteContentInlineText runningText={block.data.text} />
+          </h2>;
         } else {
           throw new Error("Unexpected block type");
         }
+
+        return <React.Fragment key={Math.random()}>
+          {blockMarkup}
+          {transclusions}
+        </React.Fragment>;
       })
     }
   </div>;

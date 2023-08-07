@@ -2,8 +2,6 @@ import { SpanType } from "./SpanType";
 
 export enum BlockType {
   PARAGRAPH = "paragraph",
-  URL = "url",
-  SLASHLINK = "slashlink",
   HEADING = "heading",
   LIST = "list",
   CODE = "code",
@@ -27,29 +25,8 @@ export interface BlockParagraph {
   data: BlockParagraphData,
 }
 
-
-export interface BlockLinkData {
-  url: string,
-  text: string,
-}
-
-export interface BlockUrl {
-  readonly type: BlockType.URL,
-  data: BlockLinkData,
-}
-
-interface BlockSlashlinkData {
-  link: string,
-  text: string,
-}
-
-export interface BlockSlashlink {
-  readonly type: BlockType.SLASHLINK,
-  data: BlockSlashlinkData,
-}
-
 interface BlockHeadingData {
-  text: string,
+  text: InlineText,
 }
 
 export interface BlockHeading {
@@ -93,11 +70,9 @@ export interface BlockQuote {
 
 export type Block = (
   BlockParagraph
-  | BlockUrl
   | ListBlock
   | BlockHeading
   | BlockCode
-  | BlockSlashlink
   | BlockQuote
 );
 

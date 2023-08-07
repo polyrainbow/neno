@@ -42,7 +42,7 @@
 .preview-block-code,
 .preview-block-file-text {
   padding: 10px;
-  font-family: Hack, monospace;
+  font-family: var(--code-font);
   white-space: break-spaces;
   word-break: break-all;
   background-color: var(--accent-color-interactible);
@@ -91,34 +91,6 @@
   color: var(--error-and-danger-text-color);
 }
 
-.url-block-link {
-  text-decoration: none;
-}
-
-.url-block-title {
-  font-size: var(--block-title-font-size);
-  font-weight: var(--block-title-font-weight);
-  line-height: var(--block-title-line-height);
-  margin: var(--block-title-margin);
-  color: var(--main-content-color);
-  text-decoration: none;
-  word-break: break-word;
-}
-
-.url-block-hostname {
-  margin-top: 25px;
-  display: block;
-  font-size: 15px;
-  line-height: 1em;
-  color: var(--alt-content-color);
-  border: 0;
-  padding: 0;
-  text-decoration: none;
-}
-
-.url-block-url {
-  word-break: break-all;
-}
 
 .key-value-row {
   display: flex;

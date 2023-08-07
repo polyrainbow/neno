@@ -4,9 +4,7 @@ import {
   BlockHeading,
   BlockParagraph,
   BlockQuote,
-  BlockSlashlink,
   BlockType,
-  BlockUrl,
   ListBlock,
   ListBlockStyle,
 } from "./interfaces/Block.js";
@@ -14,7 +12,6 @@ import { parseText } from "./utils.js";
 
 export const HEADING_SIGIL = "#";
 export const CODE_SIGIL = "```";
-export const SLASHLINK_SIGIL = "/";
 export const QUOTE_SIGIL = ">";
 
 
@@ -100,7 +97,7 @@ const parse = (input: string): Block[] => {
           const newBlock: BlockHeading = {
             type: BlockType.HEADING,
             data: {
-              text: line.substring(1).trimStart(),
+              text: parseText(line.substring(1).trimStart()),
             },
           };
 
@@ -155,20 +152,6 @@ const parse = (input: string): Block[] => {
           blocks.push(newBlock);
 
           return blocks;
-        } else if (line.startsWith(SLASHLINK_SIGIL)) {
-          const link = line.substring(1).trim().split(/\s+/)[0];
-          const text = line.substring(1).substring(link.length).trim();
-          const newBlock: BlockSlashlink = {
-            type: BlockType.SLASHLINK,
-            data: {
-              link,
-              text,
-            },
-          };
-
-          blocks.push(newBlock);
-
-          return blocks;
         } else if (
           line.startsWith(CODE_SIGIL)
         ) {
@@ -180,24 +163,6 @@ const parse = (input: string): Block[] => {
             data: {
               code: "",
               contentType: line.substring(CODE_SIGIL.length).trim(),
-            },
-          };
-
-          blocks.push(newBlock);
-
-          return blocks;
-        } else if (
-          line.startsWith("http:/")
-            || line.startsWith("https:/")
-        ) {
-          const link = line.trim().split(/\s+/)[0];
-          const text = line.substring(link.length).trim();
-
-          const newBlock: BlockUrl = {
-            type: BlockType.URL,
-            data: {
-              url: link,
-              text,
             },
           };
 
@@ -223,7 +188,6 @@ const parse = (input: string): Block[] => {
     },
     [],
   );
-
 
   return blocks;
 };
