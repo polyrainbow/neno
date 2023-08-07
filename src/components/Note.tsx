@@ -109,7 +109,7 @@ const Note = ({
     addFilesToNoteObject(responses);
 
     const fileIds = responses.map((response) => response.fileId);
-    const fileBlocks = fileIds.map((fileId) => `/files/${fileId}`);
+    const slashlinks = fileIds.map((fileId) => `/files/${fileId}`);
 
     // only add line breaks if they're not already there
     let separator;
@@ -122,7 +122,7 @@ const Note = ({
     }
 
     setNoteContent(
-      `${note.content}${separator}${fileBlocks.join("\n")}`,
+      `${note.content}${separator}${slashlinks.join("\n")}`,
       true,
     );
   };

@@ -9,7 +9,8 @@ import {
 import ActiveNote from "../types/ActiveNote";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
 import NoteContentBlockDocument from "./NoteContentBlockDocument";
-import NoteContentBlockEmptyFile from "./NoteContentBlockEmptyFile";
+import NoteContentBlockUnavailableContent
+  from "./NoteContentBlockUnavailableContent";
 import NoteContentBlockParagraph from "./NoteContentBlockParagraph";
 import NoteContentBlockVideo from "./NoteContentBlockVideo";
 import NoteContentBlockImage from "./NoteContentBlockImage";
@@ -26,6 +27,11 @@ import {
   getMediaTypeFromFilename,
 } from "../lib/notes/noteUtils";
 import { SpanType } from "../lib/subwaytext/interfaces/SpanType";
+import { FILE_SLUG_PREFIX } from "../lib/notes/config";
+import { getTransclusionContentFromNoteContent } from "../lib/Transclusion";
+import ExistingNote from "../lib/notes/interfaces/ExistingNote";
+import { Slug } from "../lib/notes/interfaces/Slug";
+import NoteContentBlock from "./NoteContentBlock";
 
 interface NoteContentProps {
   note: ActiveNote,
@@ -40,6 +46,10 @@ const NoteContent = ({
   const notesProvider = useNotesProvider();
   const blocks = subwaytext(note.content);
   const [resolvedFileInfos, setResolvedFileInfos] = useState<FileInfo[]>([]);
+  const [
+    resolvedNoteTransclusions,
+    setResolvedNoteTransclusions,
+  ] = useState<ExistingNote[]>([]);
 
   /*
     When using a slashlink with a fileId in content, it is not guaranteed that
@@ -50,10 +60,12 @@ const NoteContent = ({
   */
   useEffect(() => {
     const inlineSpans = getAllInlineSpans(blocks);
+    const slashlinks = inlineSpans.filter((span) => {
+      return span.type === SpanType.SLASHLINK;
+    });
 
-    const fileIdsInContent = inlineSpans
+    const fileIdsInContent = slashlinks
       .filter((span: Span): boolean => {
-        if (span.type !== SpanType.SLASHLINK) return false;
         const fileId = extractFirstFileId(span.text.substring(1));
         if (!fileId) return false;
         return true;
@@ -87,6 +99,36 @@ const NoteContent = ({
 
         setResolvedFileInfos(resolvedFileInfos);
       });
+
+    // now, let's do the same for note transclusions
+    const noteGetPromises = slashlinks
+      .map((span): Slug => {
+        const slug = span.text.substring(1);
+        return slug;
+      })
+      .filter((slug: Slug) => {
+        return !slug.startsWith(FILE_SLUG_PREFIX);
+      })
+      .map((slug: Slug) => {
+        return notesProvider.get(slug);
+      });
+
+    Promise
+      .allSettled(noteGetPromises)
+      .then((results: PromiseSettledResult<ExistingNote>[]) => {
+        const resolvedNoteTransclusions = results
+          .filter(
+            (
+              result: PromiseSettledResult<ExistingNote>,
+            ): result is PromiseFulfilledResult<ExistingNote> => {
+              return result.status === "fulfilled";
+            })
+          .map((result) => {
+            return result.value;
+          });
+
+        setResolvedNoteTransclusions(resolvedNoteTransclusions);
+      });
   }, []);
 
 
@@ -111,53 +153,85 @@ const NoteContent = ({
         const transclusions = slashlinks.map((slashlink) => {
           const slug = slashlink.text.substring(1);
 
-          const fileId = extractFirstFileId(slug);
-          if (!fileId) {
-            return <NoteContentBlockEmptyFile
+          if (slug.startsWith(FILE_SLUG_PREFIX)) {
+            const fileId = extractFirstFileId(slug);
+            if (!fileId) {
+              return <NoteContentBlockUnavailableContent
+                key={Math.random()}
+              />;
+            }
+
+            const mediaType = getMediaTypeFromFilename(fileId);
+            const file
+              = allAvailableFileInfos.find((file) => file.fileId === fileId);
+            if (!file) {
+              return <NoteContentBlockUnavailableContent
+                key={Math.random()}
+              />;
+            }
+            if (
+              mediaType === MediaType.AUDIO
+            ) {
+              return <NoteContentBlockAudio
+                file={file}
+                notesProvider={notesProvider}
+                key={file.fileId}
+              />;
+            } else if (mediaType === MediaType.VIDEO) {
+              return <NoteContentBlockVideo
+                file={file}
+                notesProvider={notesProvider}
+                key={file.fileId}
+              />;
+            } else if (mediaType === MediaType.IMAGE) {
+              return <NoteContentBlockImage
+                file={file}
+                notesProvider={notesProvider}
+                key={file.fileId}
+              />;
+            } else if (mediaType === MediaType.TEXT) {
+              return <NoteContentBlockTextFile
+                file={file}
+                notesProvider={notesProvider}
+                key={file.fileId}
+              />;
+            } else {
+              return <NoteContentBlockDocument
+                file={file}
+                key={file.fileId}
+              />;
+            }
+          }
+
+          if ("outgoingLinks" in note) {
+            const linkedNote = note.outgoingLinks.find(
+              (link) => link.slug === slug,
+            );
+
+            if (linkedNote) {
+              return <NoteContentBlock
+                key={Math.random()}
+              >
+                {getTransclusionContentFromNoteContent(linkedNote.content)}
+              </NoteContentBlock>;
+            }
+          }
+
+          const linkedNote = resolvedNoteTransclusions.find((note) => {
+            return note.meta.slug === slug;
+          });
+
+          if (!linkedNote) {
+            return <NoteContentBlockUnavailableContent
               key={Math.random()}
             />;
           }
 
-          const mediaType = getMediaTypeFromFilename(fileId);
-          const file
-            = allAvailableFileInfos.find((file) => file.fileId === fileId);
-          if (!file) {
-            return <NoteContentBlockEmptyFile
-              key={Math.random()}
-            />;
-          }
-          if (
-            mediaType === MediaType.AUDIO
-          ) {
-            return <NoteContentBlockAudio
-              file={file}
-              notesProvider={notesProvider}
-              key={file.fileId}
-            />;
-          } else if (mediaType === MediaType.VIDEO) {
-            return <NoteContentBlockVideo
-              file={file}
-              notesProvider={notesProvider}
-              key={file.fileId}
-            />;
-          } else if (mediaType === MediaType.IMAGE) {
-            return <NoteContentBlockImage
-              file={file}
-              notesProvider={notesProvider}
-              key={file.fileId}
-            />;
-          } else if (mediaType === MediaType.TEXT) {
-            return <NoteContentBlockTextFile
-              file={file}
-              notesProvider={notesProvider}
-              key={file.fileId}
-            />;
-          } else {
-            return <NoteContentBlockDocument
-              file={file}
-              key={file.fileId}
-            />;
-          }
+          return <NoteContentBlock
+            key={Math.random()}
+          >
+            {getTransclusionContentFromNoteContent(linkedNote.content)}
+          </NoteContentBlock>;
         });
 
         let blockMarkup;

@@ -83,7 +83,7 @@
   background-color: white;
 }
 
-.file-not-available {
+.content-not-available {
   display: flex;
   justify-content: flex-start;
   align-items: center;
