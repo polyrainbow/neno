@@ -361,6 +361,11 @@ const removeHeadingSigil = (text: string): string => {
 };
 
 
+const removeQuoteBlockSigil = (text: string): string => {
+  return text.replace(/^>\s*/, "");
+};
+
+
 const inferNoteTitle = (noteContent: string, maxLength = 800): string => {
   const lines = noteContent.split("\n");
   const firstContentLine = lines.find((line) => line.trim().length > 0);
@@ -369,7 +374,7 @@ const inferNoteTitle = (noteContent: string, maxLength = 800): string => {
   }
 
   const textNormalized = removeWikilinkPunctuation(
-    removeHeadingSigil(firstContentLine),
+    removeHeadingSigil(removeQuoteBlockSigil(firstContentLine)),
   );
 
   const titleShortened = shortenText(textNormalized, maxLength).trim();

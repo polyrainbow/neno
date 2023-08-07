@@ -225,6 +225,15 @@ describe("infer note title", () => {
       )).toBe("A heading with # and ##");
     },
   );
+
+  it(
+    "should remove quote block sigil",
+    async () => {
+      expect(inferNoteTitle(
+        ">  A quote block with an <HTMLElement>",
+      )).toBe("A quote block with an <HTMLElement>");
+    },
+  );
 });
 
 
