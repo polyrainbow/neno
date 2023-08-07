@@ -14,9 +14,6 @@ import {
 import ActiveNote from "../types/ActiveNote";
 import { FILE_PICKER_ACCEPT_TYPES, LOCAL_GRAPH_ID } from "../config";
 import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import NoteContent from "./NoteContent";
-import { ContentMode } from "../types/ContentMode";
-import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import NoteKeyValues from "./NoteKeyValues";
 import { l } from "../lib/intl";
 import useNotesProvider from "../hooks/useNotesProvider";
@@ -66,8 +63,6 @@ interface NoteComponentProps {
   pinOrUnpinNote: (slug: Slug) => void,
   duplicateNote: (note: ActiveNote) => void,
   openInGraphView: (note: ActiveNote) => void,
-  contentMode: ContentMode,
-  toggleEditMode: () => void,
   importNote: (note: ActiveNote) => void,
   uploadInProgress: boolean,
   setUploadInProgress: (val: boolean) => void,
@@ -92,8 +87,6 @@ const Note = ({
   pinOrUnpinNote,
   duplicateNote,
   openInGraphView,
-  contentMode,
-  toggleEditMode,
   importNote,
   uploadInProgress,
   setUploadInProgress,
@@ -188,10 +181,6 @@ const Note = ({
     }
   };
 
-
-  useKeyboardShortcuts({
-    onCmdDot: () => toggleEditMode(),
-  });
 
   // This ref is required because the callback to getTransclusionContent()
   // is not updated inside the <Editor> component when the note changes.
@@ -302,7 +291,7 @@ const Note = ({
     if (noteElement.current) {
       noteElement.current.scrollTop = 0;
     }
-  }, ["slug" in note ? note.slug : "", contentMode]);
+  }, ["slug" in note ? note.slug : ""]);
 
 
   return <>
@@ -321,8 +310,6 @@ const Note = ({
       duplicateNote={duplicateNote}
       openInGraphView={openInGraphView}
       handleUploadFilesRequest={handleUploadFilesRequest}
-      contentMode={contentMode}
-      toggleEditMode={toggleEditMode}
       uploadInProgress={uploadInProgress}
       importNote={importNote}
     />
@@ -398,71 +385,51 @@ const Note = ({
                 : ""
             }
           </div>
-          {
-            contentMode === ContentMode.EDITOR
-              ? <Editor
-                initialText={note.initialContent}
-                instanceId={editorInstanceId}
-                onChange={(val) => {
-                  setNoteContent(val);
-                }}
-                onUserRequest={
-                  async (type: UserRequestType, value: string) => {
-                    if (type !== UserRequestType.HYPERLINK) {
-                      if (unsavedChanges) {
-                        await confirmDiscardingUnsavedChanges();
-                        setUnsavedChanges(false);
-                      }
-
-                      const slug = type === UserRequestType.SLASHLINK
-                        ? value
-                        : sluggify(value);
-
-                      if (slug.startsWith(FILE_SLUG_PREFIX)) {
-                        const fileId = extractFirstFileId(slug);
-
-                        if (!fileId) {
-                          return;
-                        }
-
-                        navigate(
-                          getAppPath(PathTemplate.FILE, new Map([
-                            ["GRAPH_ID", LOCAL_GRAPH_ID],
-                            ["FILE_ID", fileId],
-                          ])),
-                        );
-                      } else {
-                        goToNote(slug);
-                      }
-                    } else {
-                      window.open(value, "_blank");
-                    }
+          <Editor
+            initialText={note.initialContent}
+            instanceId={editorInstanceId}
+            onChange={(val) => {
+              setNoteContent(val);
+            }}
+            onUserRequest={
+              async (type: UserRequestType, value: string) => {
+                if (type !== UserRequestType.HYPERLINK) {
+                  if (unsavedChanges) {
+                    await confirmDiscardingUnsavedChanges();
+                    setUnsavedChanges(false);
                   }
+
+                  const slug = type === UserRequestType.SLASHLINK
+                    ? value
+                    : sluggify(value);
+
+                  if (slug.startsWith(FILE_SLUG_PREFIX)) {
+                    const fileId = extractFirstFileId(slug);
+
+                    if (!fileId) {
+                      return;
+                    }
+
+                    navigate(
+                      getAppPath(PathTemplate.FILE, new Map([
+                        ["GRAPH_ID", LOCAL_GRAPH_ID],
+                        ["FILE_ID", fileId],
+                      ])),
+                    );
+                  } else {
+                    goToNote(slug);
+                  }
+                } else {
+                  window.open(value, "_blank");
                 }
-                getTransclusionContent={getTransclusionContent}
-                getLinkAvailability={getLinkAvailability}
-              />
-              : ""
-          }
-          {
-            contentMode === ContentMode.VIEWER
-              ? <NoteContent
-                note={note}
-                toggleEditMode={toggleEditMode}
-              />
-              : ""
-          }
+              }
+            }
+            getTransclusionContent={getTransclusionContent}
+            getLinkAvailability={getLinkAvailability}
+          />
           <div
-            className={
-              "note-content "
-              + (contentMode === ContentMode.EDITOR ? "edit-mode" : "view-mode")
-            }
+            className="note-content edit-mode"
           >
-            {
-              contentMode === ContentMode.VIEWER
-                ? <hr/>
-                : ""
-            }
             <NoteBacklinks
               note={note}
               setUnsavedChanges={setUnsavedChanges}
@@ -492,8 +459,6 @@ const Note = ({
               duplicateNote={duplicateNote}
               openInGraphView={openInGraphView}
               handleUploadFilesRequest={handleUploadFilesRequest}
-              contentMode={contentMode}
-              toggleEditMode={toggleEditMode}
               importNote={importNote}
             />
           </div>

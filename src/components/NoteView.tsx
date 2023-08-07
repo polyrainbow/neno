@@ -16,8 +16,6 @@ import { ErrorMessage } from "../lib/notes/interfaces/ErrorMessage";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import { l } from "../lib/intl";
 import NoteListWithControls from "./NoteListWithControls";
-import { ContentMode } from "../types/ContentMode";
-import * as IDB from "idb-keyval";
 import useGoToNote from "../hooks/useGoToNote";
 import useNotesProvider from "../hooks/useNotesProvider";
 import useControlledNoteList from "../hooks/useControlledNoteList";
@@ -83,42 +81,14 @@ const NoteView = () => {
     pinOrUnpinNote,
     refreshPinnedNotes,
   } = usePinnedNotes(notesProvider);
-
-  const [contentMode, setContentMode] = useState<ContentMode>(
-    ContentMode.LOADING,
-  );
   const goToNote = useGoToNote();
-
-
-  const toggleEditMode = async () => {
-    if (contentMode === ContentMode.LOADING) return;
-
-    const newContentMode = contentMode === ContentMode.EDITOR
-      ? ContentMode.VIEWER
-      : ContentMode.EDITOR;
-    setContentMode(newContentMode);
-    await IDB.set("CONTENT_MODE", newContentMode);
-
-    if (newContentMode === ContentMode.EDITOR) {
-      // To make sure that the editor shows the current note content and not the
-      // initial one, let's refresh it.
-      setNoteContent(activeNote.content, true);
-      document.querySelector<HTMLDivElement>(
-        "div[data-lexical-editor]",
-      )?.focus();
-    }
-  };
-
-
   const controlledNoteList = useControlledNoteList(notesProvider);
-
 
   const refreshContentViews = async (): Promise<void> => {
     await refreshHeaderStats();
     await controlledNoteList.refresh();
     await refreshPinnedNotes();
   };
-
 
   const saveActiveNoteAndRefreshViews = async (
     ignoreDuplicateTitles: boolean,
@@ -225,31 +195,11 @@ const NoteView = () => {
 
 
   useEffect(() => {
-    IDB.get("CONTENT_MODE")
-      .then((value) => {
-        let startContentMode;
-
-        if (value === ContentMode.EDITOR) {
-          startContentMode = ContentMode.EDITOR;
-        } else if (value === ContentMode.VIEWER) {
-          startContentMode = ContentMode.VIEWER;
-        } else {
-          startContentMode = Config.DEFAULT_CONTENT_MODE;
-        }
-
-        setContentMode(startContentMode);
-
-        if (startContentMode === ContentMode.EDITOR) {
-          setTimeout(() => {
-            document.querySelector<HTMLDivElement>(
-              "div[data-lexical-editor]",
-            )?.focus();
-          });
-        }
-      })
-      .catch(() => {
-        setContentMode(Config.DEFAULT_CONTENT_MODE);
-      });
+    setTimeout(() => {
+      document.querySelector<HTMLDivElement>(
+        "div[data-lexical-editor]",
+      )?.focus();
+    });
   }, []);
 
 
@@ -411,8 +361,6 @@ const NoteView = () => {
               ),
             );
           }}
-          contentMode={contentMode}
-          toggleEditMode={toggleEditMode}
           importNote={importNote}
           uploadInProgress={uploadInProgress}
           setUploadInProgress={setUploadInProgress}

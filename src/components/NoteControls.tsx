@@ -10,7 +10,6 @@ import {
 } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
-import { ContentMode } from "../types/ContentMode";
 import ActiveNote from "../types/ActiveNote";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { exportNote } from "../lib/FrontendFunctions";
@@ -31,8 +30,6 @@ interface NoteControlsProps {
   duplicateNote: (note: ActiveNote) => void,
   openInGraphView: (note: ActiveNote) => void,
   handleUploadFilesRequest: (files: FileList) => void,
-  contentMode: ContentMode,
-  toggleEditMode: () => void,
   importNote: (note: ActiveNote) => void,
   disableNoteSaving: boolean,
 }
@@ -49,8 +46,6 @@ const NoteControls = ({
   duplicateNote,
   openInGraphView,
   handleUploadFilesRequest,
-  contentMode,
-  toggleEditMode,
   importNote,
   disableNoteSaving,
 }: NoteControlsProps) => {
@@ -101,16 +96,6 @@ const NoteControls = ({
         </>
         : null
     }
-    <IconButton
-      id="button_upload"
-      title={l(
-        contentMode === ContentMode.EDITOR
-          ? "editor.read-mode"
-          : "editor.edit-note",
-      )}
-      icon={contentMode === ContentMode.EDITOR ? "preview" : "create"}
-      onClick={toggleEditMode}
-    />
     <IconButton
       id="button_upload"
       title={l("editor.save-note")}

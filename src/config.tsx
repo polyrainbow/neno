@@ -1,5 +1,4 @@
 import { BASE_URL } from "./constants.js";
-import { ContentMode } from "./types/ContentMode.js";
 
 const VERSION = "v6.3.1";
 
@@ -57,8 +56,6 @@ const FILE_PICKER_ACCEPT_TYPES: FilePickerAcceptType[] = [
   },
 ];
 
-const DEFAULT_CONTENT_MODE = ContentMode.EDITOR;
-
 const SPAN_SEPARATOR = " · ";
 
 const NOTE_FILE_EXTENSION = ".subtext";
@@ -83,7 +80,6 @@ export {
   SERVER_DATABASE_ENABLED,
   FILE_PICKER_ACCEPT_TYPES,
   DEFAULT_CONTENT_TYPE,
-  DEFAULT_CONTENT_MODE,
   SPAN_SEPARATOR,
   LOCAL_GRAPH_ID,
   NOTE_FILE_EXTENSION,

@@ -1,7 +1,6 @@
 import ActiveNote from "../types/ActiveNote";
 import NoteControls from "./NoteControls";
 import StatusIndicator from "./StatusIndicator";
-import { ContentMode } from "../types/ContentMode";
 
 interface NoteMenuBarProps {
   activeNote: ActiveNote,
@@ -15,8 +14,6 @@ interface NoteMenuBarProps {
   duplicateNote,
   openInGraphView,
   handleUploadFilesRequest,
-  contentMode: ContentMode,
-  toggleEditMode: () => void,
   uploadInProgress: boolean,
   importNote,
   disableNoteSaving: boolean,
@@ -34,8 +31,6 @@ const NoteMenuBar = ({
   duplicateNote,
   openInGraphView,
   handleUploadFilesRequest,
-  contentMode,
-  toggleEditMode,
   uploadInProgress,
   importNote,
   disableNoteSaving,
@@ -54,8 +49,6 @@ const NoteMenuBar = ({
         duplicateNote={duplicateNote}
         openInGraphView={openInGraphView}
         handleUploadFilesRequest={handleUploadFilesRequest}
-        contentMode={contentMode}
-        toggleEditMode={toggleEditMode}
         importNote={importNote}
         disableNoteSaving={disableNoteSaving}
       />
