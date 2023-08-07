@@ -23,7 +23,7 @@ const NoteStats = ({
     <table className="data-table">
       <tbody>
         <tr>
-          <td>{l("editor.stats.id")}</td>
+          <td>{l("editor.stats.slug")}</td>
           <td>{note.slug}</td>
         </tr>
         <tr>

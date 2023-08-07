@@ -310,7 +310,7 @@
 
   .note {
     padding: 0;
-    overflow-y: scroll;
+    overflow-y: auto;
     margin: 0;
     height: calc(100vh - (2 * var(--header-bar-height)));
   }
@@ -383,7 +383,7 @@ div[data-lexical-editor] {
 
 div[data-lexical-editor] > p {
   margin: 0;
-  line-height: 1.5em;
+  line-height: var(--default-line-height);
 }
 
 .link {
@@ -429,7 +429,7 @@ div[data-lexical-editor] .transclusion-wrapper {
   user-select: none;
   font-size: var(--default-font-size);
   font-weight: normal;
-  line-height: 1.5em;
+  line-height: var(--default-line-height);
 }
 
 div[data-lexical-editor] .transclusion {
