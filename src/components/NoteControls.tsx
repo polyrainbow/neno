@@ -170,6 +170,25 @@ const NoteControls = ({
             icon="upload_file"
             onClick={handleUploadFilesRequest}
           />
+          <IconButton
+            id="button_random-note"
+            disabled={false}
+            title={l("editor.open-random-note")}
+            icon="question_mark"
+            onClick={async () => {
+              if (unsavedChanges) {
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
+              }
+              navigate(getAppPath(
+                PathTemplate.EXISTING_NOTE,
+                new Map([
+                  ["GRAPH_ID", LOCAL_GRAPH_ID],
+                  ["SLUG", "random"],
+                ]),
+              ));
+            }}
+          />
         </>
         : ""
     }
