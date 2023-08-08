@@ -87,10 +87,6 @@ const NoteStats = ({
           }</td>
         </tr>
         <tr>
-          <td>{l("editor.stats.coordinates")}</td>
-          <td>{"X: " + note.position.x}<br />{"Y: " + note.position.y}</td>
-        </tr>
-        <tr>
           <td>{l("editor.stats.flags")}</td>
           <td>{
             note.flags.length > 0
