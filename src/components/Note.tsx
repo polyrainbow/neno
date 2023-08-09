@@ -420,7 +420,7 @@ const Note = ({
                     goToNote(slug);
                   }
                 } else {
-                  window.open(value, "_blank");
+                  window.open(value, "_blank", "noopener,noreferrer");
                 }
               }
             }
