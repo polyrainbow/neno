@@ -548,6 +548,8 @@ const getAllInlineSpans = (blocks: Block[]): Span[] => {
       spans.push(...block.data.text);
     } else if (block.type === BlockType.HEADING) {
       spans.push(...block.data.text);
+    } else if (block.type === BlockType.QUOTE) {
+      spans.push(...block.data.text);
     } else if (block.type === BlockType.LIST) {
       block.data.items.forEach((item) => {
         spans.push(...item);
