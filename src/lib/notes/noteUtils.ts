@@ -14,6 +14,7 @@ import subwaytext from "../subwaytext/index.js";
 import {
   Block,
   BlockType,
+  InlineText,
   Span,
 } from "../subwaytext/interfaces/Block.js";
 import {
@@ -1174,6 +1175,22 @@ const getRandomKey = <K>(collection: Map<K, unknown>): K | null => {
 };
 
 
+const getSlugsFromInlineText = (text: InlineText): Slug[] => {
+  return text.filter(
+    (span: Span): boolean => {
+      return span.type === SpanType.SLASHLINK
+        || span.type === SpanType.WIKILINK;
+    },
+  ).map((span: Span): Slug => {
+    if (span.type === SpanType.SLASHLINK) {
+      return span.text.substring(1);
+    } else {
+      return sluggify(span.text.substring(2, span.text.length - 2));
+    }
+  });
+};
+
+
 export {
   getExtensionFromFilename,
   getMediaTypeFromFilename,
@@ -1221,4 +1238,5 @@ export {
   removeWikilinkPunctuation,
   extractFirstFileId,
   getAllInlineSpans,
+  getSlugsFromInlineText,
 };

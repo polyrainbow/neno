@@ -289,4 +289,42 @@ describe("Notes module", () => {
     expect(notes.numberOfResults).toBe(1);
     expect(notes.results[0].slug).toBe("note-1a");
   });
+
+  it(
+    "should correctly output number of links when link is in heading",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const noteSaveRequest1: NoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "note-1",
+      };
+
+      await notesProvider.put(noteSaveRequest1);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "# Heading with a link to [[Note 1]]",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+      };
+      const noteFromProvider = await notesProvider.put(noteSaveRequest2);
+
+      expect(noteFromProvider.outgoingLinks.length).toBe(1);
+      expect(noteFromProvider.outgoingLinks[0].slug).toBe("note-1");
+    },
+  );
 });

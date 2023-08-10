@@ -14,20 +14,17 @@ import Graph from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import {
+  getAllInlineSpans,
+  getSlugsFromInlineText,
   parseSerializedExistingNote,
   serializeNote,
-  sluggify,
 } from "./noteUtils.js";
 import {
   Block,
-  BlockType,
-  InlineText,
-  Span,
 } from "../subwaytext/interfaces/Block.js";
 import ByteRange from "./interfaces/ByteRange.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
 import { Slug } from "./interfaces/Slug.js";
-import { SpanType } from "../subwaytext/interfaces/SpanType.js";
 import { FILE_SLUG_PREFIX } from "./config.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
@@ -127,45 +124,10 @@ export default class DatabaseIO {
   }
 
 
-  static #getSlugsFromInlineText(text: InlineText): Slug[] {
-    return text.filter(
-      (span: Span): boolean => {
-        return span.type === SpanType.SLASHLINK
-          || span.type === SpanType.WIKILINK;
-      },
-    ).map((span: Span): Slug => {
-      if (span.type === SpanType.SLASHLINK) {
-        return span.text.substring(1);
-      } else {
-        return sluggify(span.text.substring(2, span.text.length - 2));
-      }
-    });
-  }
-
-
   static getSlugsFromParsedNote(note: Block[]): Slug[] {
-    const links = note.reduce(
-      (outgoingLinks: Slug[], block: Block): Slug[] => {
-        if (block.type === BlockType.PARAGRAPH) {
-          const links = DatabaseIO.#getSlugsFromInlineText(block.data.text);
-          return outgoingLinks.concat(links);
-        } else if (block.type === BlockType.LIST) {
-          const links = block.data.items.reduce(
-            (links: Slug[], item: InlineText): Slug[] => {
-              const itemLinks = DatabaseIO.#getSlugsFromInlineText(item);
-              return links.concat(itemLinks);
-            },
-            [],
-          );
-          return outgoingLinks.concat(links);
-        } else {
-          return outgoingLinks;
-        }
-      },
-      [],
-    );
-
-    return links;
+    const inlineSpans = getAllInlineSpans(note);
+    const slugs = getSlugsFromInlineText(inlineSpans);
+    return slugs;
   }
 
 
