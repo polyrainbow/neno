@@ -1,12 +1,13 @@
-import { Block, BlockType, ListBlockStyle } from "./interfaces/Block.js";
+import { Block, BlockType } from "./interfaces/Block.js";
 import subwaytext from "./index.js";
 import { SpanType } from "./interfaces/SpanType.js";
+import serialize from "./serialize.js";
 
 
 describe("subwaytext", () => {
   it("should parse basic documents correctly", () => {
     const input = `#Heading
-
+    
 
 #       another heading
 some
@@ -39,6 +40,7 @@ A paragraph with a https://link.com and a /slashlink`;
       {
         type: BlockType.HEADING,
         data: {
+          whitespace: "",
           text: [
             {
               type: SpanType.NORMAL_TEXT,
@@ -48,8 +50,21 @@ A paragraph with a https://link.com and a /slashlink`;
         },
       },
       {
+        type: BlockType.EMPTY,
+        data: {
+          whitespace: "    ",
+        },
+      },
+      {
+        type: BlockType.EMPTY,
+        data: {
+          whitespace: "",
+        },
+      },
+      {
         type: BlockType.HEADING,
         data: {
+          whitespace: "       ",
           text: [
             {
               type: SpanType.NORMAL_TEXT,
@@ -92,49 +107,84 @@ A paragraph with a https://link.com and a /slashlink`;
         },
       },
       {
-        type: BlockType.LIST,
+        type: BlockType.EMPTY,
         data: {
-          type: ListBlockStyle.UNORDERED,
-          items: [
-            [
-              {
-                type: SpanType.NORMAL_TEXT,
-                text: "List",
-              },
-            ],
-            [
-              {
-                type: SpanType.NORMAL_TEXT,
-                text: "unordered",
-              },
-            ],
+          whitespace: "",
+        },
+      },
+      {
+        type: BlockType.UNORDERED_LIST_ITEM,
+        data: {
+          whitespace: "",
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "List",
+            },
           ],
         },
       },
       {
-        type: BlockType.LIST,
+        type: BlockType.UNORDERED_LIST_ITEM,
         data: {
-          type: ListBlockStyle.ORDERED,
-          items: [
-            [
-              {
-                type: SpanType.NORMAL_TEXT,
-                text: "ordered list",
-              },
-            ],
-            [
-              {
-                type: SpanType.NORMAL_TEXT,
-                text: "another item",
-              },
-            ],
-            [
-              {
-                type: SpanType.NORMAL_TEXT,
-                text: ".item3",
-              },
-            ],
+          whitespace: "  ",
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "unordered",
+            },
           ],
+        },
+      },
+      {
+        type: BlockType.ORDERED_LIST_ITEM,
+        data: {
+          whitespace: "",
+          index: 1,
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "ordered list",
+            },
+          ],
+        },
+      },
+      {
+        type: BlockType.ORDERED_LIST_ITEM,
+        data: {
+          whitespace: " ",
+          index: 2,
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "another item",
+            },
+          ],
+        },
+      },
+      {
+        type: BlockType.ORDERED_LIST_ITEM,
+        data: {
+          whitespace: "",
+          index: 3,
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: ".item3",
+            },
+          ],
+        },
+      },
+      {
+        type: BlockType.EMPTY,
+        data: {
+          whitespace: "",
+        },
+      },
+      {
+        type: BlockType.EMPTY,
+        data: {
+          whitespace: "",
         },
       },
       {
@@ -175,11 +225,24 @@ A paragraph with a https://link.com and a /slashlink`;
         },
       },
       {
+        type: BlockType.EMPTY,
+        data: {
+          whitespace: "",
+        },
+      },
+      {
         type: BlockType.CODE,
         data: {
           // eslint-disable-next-line max-len
           code: "and here we have some multiline code\n\n\nconst x = [{}];\n!@#$%&*()",
           contentType: "javascript",
+          whitespace: "",
+        },
+      },
+      {
+        type: BlockType.EMPTY,
+        data: {
+          whitespace: "",
         },
       },
       {
@@ -239,6 +302,7 @@ code
         data: {
           code: "```\ncode\n```",
           contentType: "",
+          whitespace: "",
         },
       }];
 
@@ -261,6 +325,7 @@ code
         data: {
           code: "code",
           contentType: "",
+          whitespace: "",
         },
       },
       {
@@ -279,6 +344,7 @@ code
         data: {
           code: "code",
           contentType: "",
+          whitespace: "",
         },
       },
     ];
@@ -294,6 +360,7 @@ code
       {
         type: BlockType.QUOTE,
         data: {
+          whitespace: "   ",
           text: [
             {
               text: "This is a single-line quote block.",
@@ -310,16 +377,29 @@ code
 
   it("should recognize multiline quote blocks", () => {
     const input = `>   This is a quote block
-> that goes on for two lines.
+> another one
 After that, a text block.`;
 
     const result = [
       {
         type: BlockType.QUOTE,
         data: {
+          whitespace: "   ",
           text: [
             {
-              text: "This is a quote block\nthat goes on for two lines.",
+              text: "This is a quote block",
+              type: "NORMAL_TEXT",
+            },
+          ],
+        },
+      },
+      {
+        type: BlockType.QUOTE,
+        data: {
+          whitespace: " ",
+          text: [
+            {
+              text: "another one",
               type: "NORMAL_TEXT",
             },
           ],
@@ -355,6 +435,7 @@ normal text`;
           data: {
             code: "some code",
             contentType: "",
+            whitespace: "",
           },
         },
         {
@@ -472,6 +553,12 @@ normal text`;
 
       const result = [
         {
+          type: BlockType.EMPTY,
+          data: {
+            whitespace: "",
+          },
+        },
+        {
           type: BlockType.PARAGRAPH,
           data: {
             text: [
@@ -495,4 +582,40 @@ normal text`;
       expect(subwaytext(input)).toStrictEqual(result);
     },
   );
+
+  it("should round-trip basic documents correctly", () => {
+    const input = `#Heading
+    
+
+#       another heading
+some
+multiline
+text
+
+-List
+-  unordered
+1.ordered list
+2. another item
+3..item3
+
+
+/files/x
+/files/y.mp3     Some description
+here starts another paragraph
+
+\`\`\`javascript
+and here we have some multiline code
+
+
+const x = [{}];
+!@#$%&*()
+\`\`\`
+
+https://example.com Link to example.com
+A paragraph with a https://link.com and a /slashlink`;
+
+    const result = subwaytext(input);
+    const output = serialize(result);
+    expect(output).toStrictEqual(input);
+  });
 });

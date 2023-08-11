@@ -3,9 +3,11 @@ import { SpanType } from "./SpanType";
 export enum BlockType {
   PARAGRAPH = "paragraph",
   HEADING = "heading",
-  LIST = "list",
+  UNORDERED_LIST_ITEM = "unordered-list-item",
+  ORDERED_LIST_ITEM = "ordered-list-item",
   CODE = "code",
   QUOTE = "quote",
+  EMPTY = "empty",
 }
 
 
@@ -25,33 +27,35 @@ export interface BlockParagraph {
   data: BlockParagraphData,
 }
 
-interface BlockHeadingData {
+interface InlineTextWithWhitespace {
   text: InlineText,
+  whitespace: string,
 }
 
 export interface BlockHeading {
   readonly type: BlockType.HEADING,
-  data: BlockHeadingData,
+  data: InlineTextWithWhitespace,
 }
 
-export enum ListBlockStyle {
-  UNORDERED = "unordered",
-  ORDERED = "ordered",
+export interface UnorderedListItemBlock {
+  readonly type: BlockType.UNORDERED_LIST_ITEM,
+  data: InlineTextWithWhitespace,
 }
 
-interface BlockListData {
-  items: InlineText[],
-  type: ListBlockStyle,
+export interface OrderedListItemBlockData extends InlineTextWithWhitespace {
+  index: number,
 }
 
-export interface ListBlock {
-  readonly type: BlockType.LIST,
-  data: BlockListData,
+export interface OrderedListItemBlock {
+  readonly type: BlockType.ORDERED_LIST_ITEM,
+  data: OrderedListItemBlockData,
 }
+
 
 interface BlockCodeData {
   code: string,
   contentType: string,
+  whitespace: string,
 }
 
 export interface BlockCode {
@@ -59,27 +63,30 @@ export interface BlockCode {
   data: BlockCodeData,
 }
 
-interface BlockQuoteData {
-  text: InlineText,
-}
 
 export interface BlockQuote {
   readonly type: BlockType.QUOTE,
-  data: BlockQuoteData,
+  data: InlineTextWithWhitespace,
+}
+
+export interface BlockEmpty {
+  readonly type: BlockType.EMPTY,
+  data: {
+    whitespace: string,
+  },
 }
 
 export type Block = (
   BlockParagraph
-  | ListBlock
+  | UnorderedListItemBlock
+  | OrderedListItemBlock
   | BlockHeading
   | BlockCode
   | BlockQuote
+  | BlockEmpty
 );
 
 export type MultiLineBlock = (
-  BlockParagraph
-  | ListBlock
-  | BlockCode
-  | BlockQuote
+  BlockCode
 );
 

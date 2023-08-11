@@ -1,12 +1,13 @@
 import {
   Block,
   BlockCode,
+  BlockEmpty,
   BlockHeading,
   BlockParagraph,
   BlockQuote,
   BlockType,
-  ListBlock,
-  ListBlockStyle,
+  OrderedListItemBlock,
+  UnorderedListItemBlock,
 } from "./interfaces/Block.js";
 import { parseText } from "./utils.js";
 
@@ -17,45 +18,17 @@ export const QUOTE_SIGIL = ">";
 
 const parse = (input: string): Block[] => {
   const lines = input.replaceAll("\r", "").split("\n");
-  let lineIndex = -1;
   let withinBlock = false;
   let codeBlockJustStarted = false;
-  let multilineTextCollector = "";
 
   const blocks: Block[] = lines.reduce(
     (blocks: Block[], line: string): Block[] => {
-      lineIndex++;
-
       if (withinBlock) {
         /* within block, let's consider multiline blocks */
 
         const currentBlock = blocks[blocks.length - 1];
 
-        if (
-          currentBlock.type === BlockType.LIST
-            && currentBlock.data.type === ListBlockStyle.UNORDERED
-        ) {
-          if (line.startsWith("-")) {
-            currentBlock.data.items.push(
-              parseText(line.substring(1).trimStart()),
-            );
-            return blocks;
-          } else {
-            withinBlock = false;
-          }
-        } else if (
-          currentBlock.type === BlockType.LIST
-            && currentBlock.data.type === ListBlockStyle.ORDERED
-        ) {
-          if (line.match(/^[0-9]+\./g) !== null) {
-            const posOfDot = line.indexOf(".");
-            currentBlock.data.items
-              .push(parseText(line.substring(posOfDot + 1).trimStart()));
-            return blocks;
-          } else {
-            withinBlock = false;
-          }
-        } else if (currentBlock.type === BlockType.CODE) {
+        if (currentBlock.type === BlockType.CODE) {
           if (line.trimEnd() === CODE_SIGIL) {
             withinBlock = false;
             return blocks;
@@ -72,31 +45,17 @@ const parse = (input: string): Block[] => {
             currentBlock.data.code += "\n" + lineValue;
           }
           return blocks;
-        } else if (
-          currentBlock.type === BlockType.QUOTE
-        ) {
-          if (line.startsWith(QUOTE_SIGIL)) {
-            const lineValue = line.substring(1).trim();
-            multilineTextCollector += "\n" + lineValue;
-            if (lineIndex === lines.length - 1) {
-              withinBlock = false;
-              currentBlock.data.text = parseText(multilineTextCollector);
-              multilineTextCollector = "";
-            }
-            return blocks;
-          } else {
-            withinBlock = false;
-            currentBlock.data.text = parseText(multilineTextCollector);
-            multilineTextCollector = "";
-          }
+        } else {
+          throw new Error(
+            "Subwaytext parser: Within unknown block: " + currentBlock.type,
+          );
         }
-      }
-
-      if (!withinBlock) {
+      } else { // not within block
         if (line.startsWith(HEADING_SIGIL)) {
           const newBlock: BlockHeading = {
             type: BlockType.HEADING,
             data: {
+              whitespace: line.substring(1).match(/^\s*/g)?.[0] ?? "",
               text: parseText(line.substring(1).trimStart()),
             },
           };
@@ -105,47 +64,38 @@ const parse = (input: string): Block[] => {
 
           return blocks;
         } else if (line.startsWith("-")) {
-          withinBlock = true;
-          const newBlock: ListBlock = {
-            type: BlockType.LIST,
+          const newBlock: UnorderedListItemBlock = {
+            type: BlockType.UNORDERED_LIST_ITEM,
             data: {
-              items: [parseText(line.substring(1).trimStart())],
-              type: ListBlockStyle.UNORDERED,
+              whitespace: line.substring(1).match(/^\s*/g)?.[0] ?? "",
+              text: parseText(line.substring(1).trimStart()),
             },
           };
 
           blocks.push(newBlock);
-
           return blocks;
         } else if (line.startsWith(QUOTE_SIGIL)) {
-          withinBlock = true;
           const newBlock: BlockQuote = {
             type: BlockType.QUOTE,
             data: {
-              text: [],
+              whitespace: line.substring(1).match(/^\s*/g)?.[0] ?? "",
+              text: parseText(line.substring(1).trimStart()),
             },
           };
 
           blocks.push(newBlock);
-          const lineValue = line.substring(1).trim();
-          multilineTextCollector += lineValue;
-
-          if (lineIndex === lines.length - 1) {
-            withinBlock = false;
-            newBlock.data.text
-              = parseText(multilineTextCollector);
-            multilineTextCollector = "";
-            return blocks;
-          }
-
           return blocks;
-        } else if (line.startsWith("1.")) {
-          withinBlock = true;
-          const newBlock: ListBlock = {
-            type: BlockType.LIST,
+        } else if (line.match(/^\d+\./)) {
+          const index = parseInt(line.match(/^\d+/)?.[0] ?? "0");
+          const whitespace = line.match(/^\d+\.(\s*)/)?.[1] ?? "";
+          const textString = line.match(/^\d+\.\s*(.*)/)?.[1] ?? "";
+
+          const newBlock: OrderedListItemBlock = {
+            type: BlockType.ORDERED_LIST_ITEM,
             data: {
-              items: [parseText(line.substring(2).trimStart())],
-              type: ListBlockStyle.ORDERED,
+              index,
+              whitespace,
+              text: parseText(textString),
             },
           };
 
@@ -163,6 +113,7 @@ const parse = (input: string): Block[] => {
             data: {
               code: "",
               contentType: line.substring(CODE_SIGIL.length).trim(),
+              whitespace: line.substring(3).match(/^\s*/g)?.[0] ?? "",
             },
           };
 
@@ -170,6 +121,14 @@ const parse = (input: string): Block[] => {
 
           return blocks;
         } else if (line.trim().length === 0) {
+          const newBlock: BlockEmpty = {
+            type: BlockType.EMPTY,
+            data: {
+              whitespace: line,
+            },
+          };
+
+          blocks.push(newBlock);
           return blocks;
         } else {
           const newBlock: BlockParagraph = {
