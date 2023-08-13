@@ -514,6 +514,7 @@ button.dangerous-action {
   --toggle-slider-translation: calc(
     var(--toggle-width) - var(--toggle-slider-size) - 2 * var(--toggle-slider-gap)
   );
+
   /* the gap between the toggle border and the circular slider */
   --toggle-slider-gap: calc((var(--toggle-height) - var(--toggle-slider-size)) / 2);
 }
@@ -546,7 +547,7 @@ button.dangerous-action {
   transition: .3s;
 }
 
-.slider:before {
+.slider::before {
   position: absolute;
   content: "";
   height: var(--toggle-slider-size);
@@ -565,7 +566,7 @@ input:focus + .slider {
   box-shadow: 0 0 1px var(--accent-color-1-intense);;
 }
 
-input:checked + .slider:before {
+input:checked + .slider::before {
   transform: translateX(var(--toggle-slider-translation));
 }
 
@@ -574,6 +575,6 @@ input:checked + .slider:before {
   border-radius: 34px;
 }
 
-.slider.round:before {
+.slider.round::before {
   border-radius: 50%;
 }
