@@ -17,6 +17,8 @@ import {
   createSlug,
   getNoteTitle,
   getRandomKey,
+  changeSlugReferencesInNote,
+  sluggify,
 } from "./noteUtils.js";
 import GraphVisualization from "./interfaces/GraphVisualization.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
@@ -42,6 +44,8 @@ import DatabaseQuery from "./interfaces/DatabaseQuery.js";
 import NoteListPage from "./interfaces/NoteListPage.js";
 import ByteRange from "./interfaces/ByteRange.js";
 import { Slug } from "./interfaces/Slug.js";
+import { Block } from "../subwaytext/interfaces/Block.js";
+import serialize from "../subwaytext/serialize.js";
 
 
 export default class NotesProvider {
@@ -60,9 +64,13 @@ export default class NotesProvider {
     graph.indexes.outgoingLinks.delete(slug);
     graph.indexes.backlinks.delete(slug);
 
-    graph.indexes.outgoingLinks.forEach((backlinks: Set<Slug>) => {
-      backlinks.delete(slug);
-    });
+    /*
+      We will not remove occurences of this slug in other notes
+      (outgoing links), because that index is keeping all slugs, even with
+      non-existing targets.
+      This is because we do not want to re-index all notes when a note is
+      created/updated/deleted.
+    */
 
     graph.indexes.backlinks.forEach((backlinks: Set<Slug>) => {
       backlinks.delete(slug);
@@ -340,12 +348,47 @@ export default class NotesProvider {
         const oldSlug = existingNote.meta.slug;
         const newSlug = noteSaveRequest.changeSlugTo;
 
+        const notesReferencingOurNoteBeforeChange
+          = Array.from((graph.indexes.backlinks.get(oldSlug) as Set<Slug>))
+            .map((slug) => {
+              return graph.notes.get(slug) as ExistingNote;
+            });
+
         graph.notes.delete(oldSlug);
         NotesProvider.removeSlugFromIndexes(graph, oldSlug);
         await this.#io.flushChanges(graph, [oldSlug]);
 
         existingNote.meta.slug = newSlug;
         graph.notes.set(newSlug, existingNote);
+
+        if (
+          "updateReferences" in noteSaveRequest
+          && noteSaveRequest.updateReferences
+        ) {
+          NotesProvider.updateIndexes(graph, existingNote);
+          for (const thatNote of notesReferencingOurNoteBeforeChange) {
+            const blocks = graph.indexes.blocks.get(
+              thatNote.meta.slug,
+            ) as Block[];
+
+            const noteTitle = getNoteTitle(existingNote);
+            const newSluggifiableTitle = sluggify(noteTitle) === newSlug
+              ? noteTitle
+              : newSlug;
+
+            const newBlocks = changeSlugReferencesInNote(
+              blocks,
+              oldSlug,
+              newSlug,
+              newSluggifiableTitle,
+            );
+
+            thatNote.content = serialize(newBlocks);
+            graph.indexes.blocks.set(thatNote.meta.slug, newBlocks);
+            NotesProvider.updateIndexes(graph, thatNote);
+            await this.#io.flushChanges(graph, [thatNote.meta.slug]);
+          }
+        }
       } else {
         graph.notes.set(existingNote.meta.slug, existingNote);
       }

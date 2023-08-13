@@ -13,7 +13,7 @@ import VisualizationView from "./VisualView";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
 import StatsView from "./StatsView";
-import GraphSettingsView from "./GraphSettingsView";
+import SettingsView from "./SettingsView";
 import NoteAccessProvider from "./NoteAccessProvider";
 
 const AppRouter = () => {
@@ -123,15 +123,8 @@ const AppRouter = () => {
         </NoteAccessProvider>,
       },
       {
-        path: getAppPath(
-          PathTemplate.SETTINGS,
-          new Map([["GRAPH_ID", ":graphId"]]),
-          undefined,
-          true,
-        ),
-        element: <NoteAccessProvider>
-          <GraphSettingsView />
-        </NoteAccessProvider>,
+        path: getAppPath(PathTemplate.SETTINGS),
+        element: <SettingsView />,
       },
     ],
     {

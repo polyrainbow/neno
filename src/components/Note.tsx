@@ -44,6 +44,7 @@ import NotesProvider from "../lib/notes";
 import { getTransclusionContentFromNoteContent } from "../lib/Transclusion";
 import { LinkType } from "../types/LinkType";
 import { UserRequestType } from "../lib/editor/types/UserRequestType";
+import NoteSlug from "./NoteSlug";
 
 interface NoteComponentProps {
   isBusy: boolean,
@@ -66,6 +67,8 @@ interface NoteComponentProps {
   importNote: (note: ActiveNote) => void,
   uploadInProgress: boolean,
   setUploadInProgress: (val: boolean) => void,
+  updateReferences: boolean,
+  setUpdateReferences: (val: boolean) => void,
 }
 
 
@@ -90,6 +93,8 @@ const Note = ({
   importNote,
   uploadInProgress,
   setUploadInProgress,
+  updateReferences,
+  setUpdateReferences,
 }: NoteComponentProps) => {
   const noteElement = useRef<HTMLElement>(null);
   const notesProvider = useNotesProvider();
@@ -337,54 +342,14 @@ const Note = ({
             e.preventDefault();
           }}
         >
-          <div className="slug-line">
-            <input
-              type="text"
-              placeholder="slug"
-              className={
-                "note-slug "
-                + (
-                  !NotesProvider.isValidSlug(slugInput) && slugInput.length > 0
-                    ? "invalid"
-                    : ""
-                )
-              }
-              onInput={(e) => {
-                const element = e.currentTarget;
-                const newValue = element.value.replace(
-                  // In the input field, we also allow \p{SK} modifiers, as
-                  // they are used to create a full letter with modifier in a
-                  // second step. They are not valid slug characters on its own,
-                  // though.
-                  /[^\p{L}\p{Sk}\d\-/._]/gu,
-                  "",
-                ).toLowerCase();
-                setSlugInput(newValue);
-                setUnsavedChanges(true);
-              }}
-              value={slugInput}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  document.querySelector<HTMLDivElement>(
-                    "div[data-lexical-editor]",
-                  )?.focus();
-                }
-
-                if (e.key === "Escape") {
-                  e.preventDefault();
-                  setSlugInput("slug" in note ? note.slug : "");
-                }
-              }}
-            />
-            {
-              slugInput.length > 0 && !NotesProvider.isValidSlug(slugInput)
-                ? <div className="note-slug-validation-error">
-                  INVALID SLUG
-                </div>
-                : ""
-            }
-          </div>
+          <NoteSlug
+            note={note}
+            slugInput={slugInput}
+            setSlugInput={setSlugInput}
+            setUnsavedChanges={setUnsavedChanges}
+            updateReferences={updateReferences}
+            setUpdateReferences={setUpdateReferences}
+          />
           <Editor
             initialText={note.initialContent}
             instanceId={editorInstanceId}

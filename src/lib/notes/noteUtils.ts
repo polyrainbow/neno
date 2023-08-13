@@ -541,6 +541,27 @@ const getBlocks = (
 };
 
 
+const mapInlineSpans = (
+  blocks: Block[],
+  mapper: (span: Span) => Span,
+): Block[] => {
+  return blocks.map((block: Block): Block => {
+    if (block.type === BlockType.PARAGRAPH) {
+      block.data.text = block.data.text.map(mapper);
+    } else if (block.type === BlockType.HEADING) {
+      block.data.text = block.data.text.map(mapper);
+    } else if (block.type === BlockType.QUOTE) {
+      block.data.text = block.data.text.map(mapper);
+    } else if (block.type === BlockType.ORDERED_LIST_ITEM) {
+      block.data.text = block.data.text.map(mapper);
+    } else if (block.type === BlockType.UNORDERED_LIST_ITEM) {
+      block.data.text = block.data.text.map(mapper);
+    }
+    return block;
+  });
+};
+
+
 const getAllInlineSpans = (blocks: Block[]): Span[] => {
   const spans: Span[] = [];
   blocks.forEach((block) => {
@@ -1193,6 +1214,29 @@ const getSlugsFromInlineText = (text: InlineText): Slug[] => {
 };
 
 
+const changeSlugReferencesInNote = (
+  content: Block[],
+  oldSlug: Slug,
+  newSlug: Slug,
+  newSluggifiableTitle?: string,
+): Block[] => {
+  return mapInlineSpans(content, (span: Span): Span => {
+    if (
+      span.type === SpanType.SLASHLINK
+      && span.text.substring(1) === oldSlug
+    ) {
+      span.text = "/" + newSlug;
+    } else if (
+      span.type === SpanType.WIKILINK
+      && sluggify(span.text.substring(2, span.text.length - 2)) === oldSlug
+    ) {
+      span.text = "[[" + (newSluggifiableTitle ?? newSlug) + "]]";
+    }
+    return span;
+  });
+};
+
+
 export {
   getExtensionFromFilename,
   getMediaTypeFromFilename,
@@ -1241,4 +1285,5 @@ export {
   extractFirstFileId,
   getAllInlineSpans,
   getSlugsFromInlineText,
+  changeSlugReferencesInNote,
 };

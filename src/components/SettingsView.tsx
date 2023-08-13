@@ -3,7 +3,7 @@ import { l } from "../lib/intl";
 import ChangeLanguageSetting from "./ChangeLanguageSetting";
 
 
-const GraphSettingsView = () => {
+const SettingsView = () => {
   return <>
     <HeaderContainerLeftRight />
     <section className="content-section-wide file-section">
@@ -13,4 +13,4 @@ const GraphSettingsView = () => {
   </>;
 };
 
-export default GraphSettingsView;
+export default SettingsView;

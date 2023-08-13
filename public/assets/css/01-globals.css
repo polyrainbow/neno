@@ -493,3 +493,87 @@ button.dangerous-action {
   word-break: break-word;
   text-align: right;
 }
+
+
+/******************************
+  Toggle switch
+******************************/
+
+.update-references-toggle {
+  display: flex;
+  gap: 5px;
+  margin-right: 5px;
+  align-items: center;
+}
+
+:root {
+  --toggle-height: 1em;
+  --toggle-ratio: 1.75;
+  --toggle-width: calc(var(--toggle-height) * var(--toggle-ratio));
+  --toggle-slider-size: calc(var(--toggle-height) * 0.75);
+  --toggle-slider-translation: calc(
+    var(--toggle-width) - var(--toggle-slider-size) - 2 * var(--toggle-slider-gap)
+  );
+  /* the gap between the toggle border and the circular slider */
+  --toggle-slider-gap: calc((var(--toggle-height) - var(--toggle-slider-size)) / 2);
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  font-size: 19px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--alt-content-color);
+  transition: .3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: var(--toggle-slider-size);
+  width: var(--toggle-slider-size);
+  left: var(--toggle-slider-gap);
+  bottom: var(--toggle-slider-gap);
+  background-color: white;
+  transition: .3s;
+}
+
+input:checked + .slider {
+  background-color: var(--accent-color-1-intense);;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--accent-color-1-intense);;
+}
+
+input:checked + .slider:before {
+  transform: translateX(var(--toggle-slider-translation));
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

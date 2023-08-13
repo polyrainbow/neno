@@ -13,6 +13,7 @@ export interface NewNoteSaveRequest extends BaseNoteSaveRequest {
 
 export interface ExistingNoteSaveRequest extends BaseNoteSaveRequest {
   note: ExistingNote,
+  updateReferences?: boolean,
 }
 
 export type NoteSaveRequest = NewNoteSaveRequest | ExistingNoteSaveRequest;

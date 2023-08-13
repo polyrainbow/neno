@@ -10,5 +10,5 @@ export enum PathTemplate {
   STATS = "graph/%GRAPH_ID%/stats",
   FILES = "graph/%GRAPH_ID%/files",
   FILE = "graph/%GRAPH_ID%/files/%FILE_ID%",
-  SETTINGS = "graph/%GRAPH_ID%/settings",
+  SETTINGS = "settings",
 }

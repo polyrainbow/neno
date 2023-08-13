@@ -176,6 +176,8 @@
   "note.custom-metadata.add": "Hinzufügen",
   "note.custom-metadata.remove": "Entfernen",
   "note.download-file": "Datei herunterladen",
+  "note.slug.invalid-slug": "Ungültiger Slug",
+  "note.slug.update-references": "Links aktualisieren",
   "settings": "Einstellungen",
   "stats.analysis": "Analyse",
   "stats.analysis.components": "%EXTERNAL_LINK[Komponenten](https://en.wikipedia.org/wiki/Component_(graph_theory%29)",

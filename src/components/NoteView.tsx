@@ -72,6 +72,8 @@ const NoteView = () => {
     setSlugInput,
     editorInstanceId,
     updateEditorInstance,
+    updateReferences,
+    setUpdateReferences,
   } = useActiveNote(notesProvider);
 
   const [headerStats, refreshHeaderStats] = useHeaderStats(notesProvider);
@@ -364,6 +366,8 @@ const NoteView = () => {
           importNote={importNote}
           uploadInProgress={uploadInProgress}
           setUploadInProgress={setUploadInProgress}
+          updateReferences={updateReferences}
+          setUpdateReferences={setUpdateReferences}
         />
       </div>
     </main>

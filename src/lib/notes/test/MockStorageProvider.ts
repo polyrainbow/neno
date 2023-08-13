@@ -7,8 +7,10 @@ export default class MockStorageProvider implements StorageProvider {
     requestPath: string,
   ): Promise<string> {
     if (this.#files.has(requestPath)) {
-      const mapItem = this.#files.get(requestPath) as Uint8Array;
-      return Promise.resolve(mapItem.toString());
+      const bytes = this.#files.get(requestPath) as Uint8Array;
+      const decoder = new TextDecoder();
+      const string = decoder.decode(bytes);
+      return Promise.resolve(string);
     } else {
       throw new Error("File not found.");
     }
@@ -82,7 +84,7 @@ export default class MockStorageProvider implements StorageProvider {
 
 
   listDirectory(): Promise<string[]> {
-    return Promise.resolve([]);
+    return Promise.resolve(Array.from(this.#files.keys()));
   }
 
 

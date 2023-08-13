@@ -365,4 +365,203 @@ describe("Notes module", () => {
       expect(noteFromProvider.outgoingLinks[0].slug).toBe("note-1");
     },
   );
+
+  it("should update existing slugs with references", async () => {
+    const mockStorageProvider = new MockStorageProvider();
+    const notesProvider = new NotesProvider(mockStorageProvider);
+
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        content: "Note 1 with a reference to itself: [[Note 1]]",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "note-1",
+    };
+
+    await notesProvider.put(noteSaveRequest);
+
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "Note 2 with a wikilink to Note 1: [[Note 1]]",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "note-2",
+    };
+
+    await notesProvider.put(noteSaveRequest2);
+
+    const noteSaveRequest3: NoteSaveRequest = {
+      note: {
+        content: "Note 3 with a slashlink to Note 1: /note-1\n# [[Note 1]]",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "note-3",
+    };
+
+    await notesProvider.put(noteSaveRequest3);
+
+    // updating slug of note-1
+    const noteSaveRequest1a: NoteSaveRequest = {
+      note: {
+        content: "Note 1 with a reference to itself: [[Note 1]]",
+        meta: {
+          slug: "note-1",
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "note-1a",
+      updateReferences: true,
+    };
+
+    await notesProvider.put(noteSaveRequest1a);
+
+    const note1 = await notesProvider.get("note-1a");
+    const note2 = await notesProvider.get("note-2");
+    const note3 = await notesProvider.get("note-3");
+
+    expect(note1.meta.slug).toBe("note-1a");
+    expect(note1.backlinks.length).toBe(2);
+    expect(note1.outgoingLinks.length).toBe(0);
+
+    expect(note2.content).toBe("Note 2 with a wikilink to Note 1: [[note-1a]]");
+    expect(note2.outgoingLinks.length).toBe(1);
+
+    expect(note3.content).toBe(
+      "Note 3 with a slashlink to Note 1: /note-1a\n# [[note-1a]]",
+    );
+    expect(note3.outgoingLinks.length).toBe(1);
+  });
+
+
+  it("should update backlinks after renaming notes", async () => {
+    const mockStorageProvider = new MockStorageProvider();
+    const notesProvider = new NotesProvider(mockStorageProvider);
+
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        content: "[[n1]]",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "n2",
+    };
+
+    await notesProvider.put(noteSaveRequest);
+
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "n1",
+    };
+
+    await notesProvider.put(noteSaveRequest2);
+
+    // rename n1 to n1a
+    const noteSaveRequest3: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          slug: "n1",
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "n1a",
+      updateReferences: false,
+    };
+
+    const n1a = await notesProvider.put(noteSaveRequest3);
+
+    expect(n1a.backlinks.length).toBe(0);
+
+    // rename n1a to n1
+    const noteSaveRequest4: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          slug: "n1a",
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "n1",
+      updateReferences: false,
+    };
+
+    const n1 = await notesProvider.put(noteSaveRequest4);
+
+    expect(n1.backlinks.length).toBe(1);
+  });
+
+
+  it("should update backlinks after note removal", async () => {
+    const mockStorageProvider = new MockStorageProvider();
+    const notesProvider = new NotesProvider(mockStorageProvider);
+
+    const noteSaveRequest: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "n1",
+    };
+
+    await notesProvider.put(noteSaveRequest);
+
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "[[n1]]",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "n2",
+    };
+
+    await notesProvider.put(noteSaveRequest2);
+    await notesProvider.remove("n2");
+    const n1 = await notesProvider.get("n1");
+    expect(n1.backlinks.length).toBe(0);
+  });
 });

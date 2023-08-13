@@ -35,6 +35,11 @@ export default (
   const newNoteObject: UnsavedActiveNote = getNewNoteObject({});
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
   const [isBusy, setIsBusy] = useState<boolean>(false);
+
+  /* Deliberately setting this always to false instead of saving preference
+  in local storage, so the user has to make this decision more consciously. */
+  const [updateReferences, setUpdateReferences] = useState<boolean>(false);
+
   const [slugInput, setSlugInput] = useState<string>("");
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -119,16 +124,28 @@ export default (
   const prepareNoteSaveRequest = async (
     ignoreDuplicateTitles: boolean,
   ): Promise<NoteSaveRequest> => {
-    const noteSaveRequest = {
-      note: {
-        content: activeNote.content,
-        meta: activeNote.isUnsaved
-          ? {
+    if (activeNote.isUnsaved) {
+      return {
+        note: {
+          content: activeNote.content,
+          meta: {
             custom: Object.fromEntries(activeNote.keyValues),
             flags: activeNote.flags,
             contentType: activeNote.contentType,
-          }
-          : {
+          },
+        },
+        ignoreDuplicateTitles,
+        // for new notes, use slug input if available. for existing notes, use
+        // slug input only if it's different from the current slug.
+        changeSlugTo: NotesProvider.isValidSlug(slugInput)
+          ? slugInput
+          : undefined,
+      };
+    } else {
+      return {
+        note: {
+          content: activeNote.content,
+          meta: {
             custom: Object.fromEntries(activeNote.keyValues),
             slug: activeNote.slug,
             position: activeNote.position,
@@ -137,24 +154,19 @@ export default (
             flags: activeNote.flags,
             contentType: activeNote.contentType,
           },
-      },
-      ignoreDuplicateTitles,
-      // for new notes, use slug input if available. for existing notes, use
-      // slug input only if it's different from the current slug.
-      changeSlugTo: activeNote.isUnsaved
-        ? (
-          NotesProvider.isValidSlug(slugInput)
-            ? slugInput
-            : undefined
-        )
-        : (
-          slugInput !== activeNote.slug && NotesProvider.isValidSlug(slugInput)
-            ? slugInput
-            : undefined
-        ),
-    };
-
-    return noteSaveRequest;
+        },
+        ignoreDuplicateTitles,
+        // for new notes, use slug input if available. for existing notes, use
+        // slug input only if it's different from the current slug.
+        changeSlugTo: slugInput !== activeNote.slug
+          && NotesProvider.isValidSlug(slugInput)
+          ? slugInput
+          : undefined,
+        updateReferences: slugInput !== activeNote.slug
+          && NotesProvider.isValidSlug(slugInput)
+          && updateReferences,
+      };
+    }
   };
 
 
@@ -310,5 +322,7 @@ export default (
     setSlugInput,
     editorInstanceId,
     updateEditorInstance,
+    updateReferences,
+    setUpdateReferences,
   };
 };
