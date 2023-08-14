@@ -364,9 +364,9 @@ const Note = ({
                     setUnsavedChanges(false);
                   }
 
-                  const slug = type === UserRequestType.SLASHLINK
-                    ? value
-                    : sluggify(value);
+                  const slug = type === UserRequestType.WIKILINK
+                    ? sluggify(value)
+                    : value;
 
                   if (slug.startsWith(FILE_SLUG_PREFIX)) {
                     const fileId = extractFirstFileId(slug);
