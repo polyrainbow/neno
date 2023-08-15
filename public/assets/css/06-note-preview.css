@@ -164,3 +164,8 @@
   overflow: hidden;
   outline: none;
 }
+
+.preview-block-file-actions a {
+  display: inline-block;
+  height: 24px;
+}

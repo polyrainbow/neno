@@ -32,7 +32,7 @@ const NoteContentBlockDocument = ({
           {humanFileSize(file.size)}
         </div>
       </div>
-      <FlexContainer>
+      <FlexContainer className="preview-block-file-actions">
         <Link to={
           getAppPath(PathTemplate.FILE, new Map([
             ["GRAPH_ID", LOCAL_GRAPH_ID],
