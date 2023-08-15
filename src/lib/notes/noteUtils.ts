@@ -508,8 +508,8 @@ const trimSlug = (slug: string): string => {
   Turns note text into a slug, without truncating.
   For example, it can be used to obtain a slug from a Wikilink.
   We will replace slashes and dots with dashes, as we do not allow
-  these chars as slug names for notes (even though they are generally allowed
-  yet, see TODO below).
+  these chars in note slugs (even though they are generally allowed
+  in slugs, see TODO below).
 */
 const sluggify = (text: string): string => {
   const slug = text
@@ -529,8 +529,8 @@ const sluggify = (text: string): string => {
 
 /*
   Transforms note text like into a slug and truncates it.
-  We will replace slashes and dots with dashes, as these are reserved for
-  special slugs like files, that point into different folders. We do not want
+  We will replace slashes and dots with dashes, as these are not allowed for
+  note slugs (only allowed for general slugs). We do not want
   to have these chars when creating a simple slug for a normal note.
 */
 const sluggifyNoteText = (text: string): string => {
