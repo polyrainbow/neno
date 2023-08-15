@@ -168,9 +168,9 @@ export const search = async (
     } else if (key === "has-url") {
       matchingNotes = getNotesWithUrl(matchingNotes, value);
 
-    // search for notes with specific fileIds
+    // search for notes with specific file slugs
     } else if (key === "has-file") {
-      matchingNotes = getNotesWithFile(matchingNotes, value);
+      matchingNotes = getNotesWithFile(matchingNotes, graph, value);
     } else if (key === "has-flag") {
       matchingNotes = getNotesWithFlag(matchingNotes, value);
 
@@ -194,7 +194,12 @@ export const search = async (
       */
       const types = value.split("|") as MediaType[];
       matchingNotes
-        = getNotesWithMediaTypes(matchingNotes, graph, types, false);
+        = getNotesWithMediaTypes(
+          matchingNotes,
+          graph,
+          new Set(types),
+          false,
+        );
 
 
     // full-text search

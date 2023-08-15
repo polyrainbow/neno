@@ -14,13 +14,13 @@ const NoteStatsFileLink = ({
   file,
 }: NoteStatsFileLinkProps) => {
   return <Link
-    key={"note-stats-link-" + file.fileId}
+    key={"note-stats-link-" + file.slug}
     to={getAppPath(PathTemplate.FILE, new Map([
       ["GRAPH_ID", LOCAL_GRAPH_ID],
-      ["FILE_ID", file.fileId],
+      ["FILE_SLUG", file.slug],
     ]))}
   >
-    {file.name ?? file.fileId}
+    {file.slug}
   </Link>;
 };
 

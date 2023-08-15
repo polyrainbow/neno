@@ -68,10 +68,10 @@ const NoteStats = ({
             note.files.length > 0
               ? note.files
                 .map((file, i, array) => {
-                  const fileType = getMediaTypeFromFilename(file.fileId);
+                  const fileType = getMediaTypeFromFilename(file.slug);
 
                   return <Fragment
-                    key={"nsfwt_" + file.fileId + note.slug}
+                    key={"nsfwt_" + file.slug + note.slug}
                   >
                     <NoteStatsFileLink
                       file={file}

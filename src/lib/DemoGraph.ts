@@ -12,7 +12,7 @@ export const createDemoGraph = async (
   ];
 
   const demoFiles = [
-    "9f6917da-9396-4e6f-b683-d117505ee5a7.jpg",
+    "beach.jpg",
   ];
 
   for (const demoNoteSlug of demoNoteSlugs) {

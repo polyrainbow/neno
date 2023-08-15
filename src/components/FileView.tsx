@@ -32,21 +32,21 @@ const FileView = () => {
   // status can be READY, BUSY
   const [notes, setNotes] = useState<NoteListItem[] | null>(null);
   const [text, setText] = useState<string>("");
-  const { fileId } = useParams();
+  const { slug } = useParams();
 
   const navigate = useNavigate();
 
-  const type = fileId && getMediaTypeFromFilename(fileId);
+  const type = slug && getMediaTypeFromFilename(slug);
 
   const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
 
   useGraphAccessCheck();
 
   useEffect(() => {
-    if (typeof fileId !== "string") return;
+    if (typeof slug !== "string") return;
 
     const getFileInfo = async () => {
-      const fileInfo = await notesProvider.getFileInfo(fileId);
+      const fileInfo = await notesProvider.getFileInfo(slug);
       setFileInfo(fileInfo);
       const src = await getUrl(fileInfo);
       setSrc(src);
@@ -60,14 +60,14 @@ const FileView = () => {
 
     const getNotes = async () => {
       const response = await notesProvider.getNotesList({
-        searchString: "has-file:" + fileId,
+        searchString: "has-file:" + slug,
       });
       setNotes(response.results);
     };
 
     getFileInfo();
     getNotes();
-  }, [notesProvider, fileId]);
+  }, [notesProvider, slug]);
 
   if (!isInitialized()) {
     return <BusyIndicator height={80} alt={l("app.loading")} />;
@@ -81,7 +81,7 @@ const FileView = () => {
           PathTemplate.FILES, new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
         )}
       >{l("files.show-all-files")}</Link></p>
-      <h1>{fileInfo?.name}</h1>
+      <h1>{fileInfo?.slug}</h1>
       <p>{
         fileInfo ? humanFileSize(fileInfo.size) : ""
       }{SPAN_SEPARATOR}{
@@ -179,7 +179,7 @@ const FileView = () => {
               PathTemplate.NEW_NOTE,
               new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
               new URLSearchParams({
-                fileIds: fileInfo.fileId,
+                referenceSlugs: fileInfo.slug,
               }),
             ));
           }}
@@ -197,7 +197,7 @@ const FileView = () => {
               encourageConfirmation: false,
             });
 
-            await notesProvider.deleteFile(fileInfo.fileId);
+            await notesProvider.deleteFile(fileInfo.slug);
             navigate(getAppPath(
               PathTemplate.FILES,
               new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),

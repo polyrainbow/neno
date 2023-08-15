@@ -8,14 +8,13 @@
 */
 
 
-import { stringContainsUUID } from "../utils.js";
-import { FileId } from "./interfaces/FileId.js";
 import Graph from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import {
   getAllInlineSpans,
   getSlugsFromInlineText,
+  isFileSlug,
   parseSerializedExistingNote,
   serializeNote,
 } from "./noteUtils.js";
@@ -386,12 +385,16 @@ export default class DatabaseIO {
 
 
   async addFile(
-    fileId: FileId,
+    slug: Slug,
     source: ReadableStream,
   ): Promise<number> {
+    if (!isFileSlug(slug)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
-      fileId,
+      slug.substring(FILE_SLUG_PREFIX.length),
     );
     const size = await this.#storageProvider.writeObjectFromReadable(
       filepath,
@@ -402,42 +405,32 @@ export default class DatabaseIO {
 
 
   async deleteFile(
-    fileId: FileId,
+    slug: Slug,
   ): Promise<void> {
+    if (!isFileSlug(slug)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
     await this.#storageProvider.removeObject(
       this.#storageProvider.joinPath(
         this.#NAME_OF_FILES_SUBDIRECTORY,
-        fileId,
+        slug.substring(FILE_SLUG_PREFIX.length),
       ),
     );
   }
 
 
-  async getReadableGraphStream(
-    withFiles: boolean,
-  ): Promise<ReadableStream> {
-    if (!this.#storageProvider.getArchiveStreamOfFolder) {
-      throw new Error(ErrorMessage.NOT_SUPPORTED_BY_STORAGE_PROVIDER);
-    }
-
-    if (!withFiles) {
-      const stream = await this.#storageProvider.getReadableStream(
-        this.#GRAPH_METADATA_FILENAME,
-      );
-      return stream;
-    }
-
-    return this.#storageProvider.getArchiveStreamOfFolder();
-  }
-
-
   async getReadableFileStream(
-    fileId: FileId,
+    slug: Slug,
     range?: ByteRange,
   ): Promise<ReadableStream> {
+    if (!isFileSlug(slug)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
-      fileId,
+      slug.substring(FILE_SLUG_PREFIX.length),
     );
 
     const stream = await this.#storageProvider.getReadableStream(
@@ -450,11 +443,15 @@ export default class DatabaseIO {
 
 
   async getFileSize(
-    fileId: FileId,
+    slug: Slug,
   ): Promise<number> {
+    if (!isFileSlug(slug)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
-      fileId,
+      slug.substring(FILE_SLUG_PREFIX.length),
     );
     const fileSize
       = await this.#storageProvider.getFileSize(filepath);
@@ -463,14 +460,16 @@ export default class DatabaseIO {
   }
 
 
-  async getFiles(): Promise<FileId[]> {
+  async getFiles(): Promise<Slug[]> {
     // it could be that the directory does not exist yet
     try {
       const directoryListing = await this.#storageProvider.listDirectory(
         this.#NAME_OF_FILES_SUBDIRECTORY,
       );
       // filter out system files
-      const files = directoryListing.filter(stringContainsUUID);
+      const files = directoryListing.filter((filename: string): boolean => {
+        return !filename.startsWith(".");
+      });
       return files;
     } catch (e) {
       return [];

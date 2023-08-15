@@ -30,12 +30,12 @@ const NoteContentBlockVideo = ({
 
   return <div
     className="preview-block-file-wrapper"
-    key={file.fileId}
+    key={file.slug}
   >
     <div className="preview-block-file-first-line">
       <div className="preview-block-file-info">
         <div className="preview-block-file-info-title">
-          {file.name}
+          {file.slug}
         </div>
         <div className="preview-block-file-size">
           {humanFileSize(file.size)}
@@ -45,7 +45,7 @@ const NoteContentBlockVideo = ({
         <Link to={
           getAppPath(PathTemplate.FILE, new Map([
             ["GRAPH_ID", LOCAL_GRAPH_ID],
-            ["FILE_ID", file.fileId],
+            ["FILE_SLUG", file.slug],
           ]))
         }>
           <Icon

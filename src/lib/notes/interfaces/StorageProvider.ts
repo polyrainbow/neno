@@ -21,9 +21,4 @@ export default interface StorageProvider {
   getFileSize(requestPath: string): Promise<number>,
   listDirectory(requestPath?: string): Promise<string[]>,
   getFolderSize(requestPath?: string): Promise<number>,
-
-  // optional
-  getArchiveStreamOfFolder?: (
-    requestPath?: string,
-  ) => Promise<ReadableStream>,
 }

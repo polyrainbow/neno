@@ -7,7 +7,6 @@ import {
   createNoteListItems,
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
-  parseFileIds,
   getExtensionFromFilename,
   parseSerializedNewNote,
   serializeNewNote,
@@ -19,6 +18,10 @@ import {
   getRandomKey,
   changeSlugReferencesInNote,
   sluggify,
+  removeExtensionFromFilename,
+  getSlugsFromInlineText,
+  getAllInlineSpans,
+  isFileSlug,
 } from "./noteUtils.js";
 import GraphVisualization from "./interfaces/GraphVisualization.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
@@ -27,7 +30,6 @@ import GraphStats from "./interfaces/GraphStats.js";
 import GraphVisualizationFromUser
   from "./interfaces/GraphVisualizationFromUser.js";
 import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
-import { FileId } from "./interfaces/FileId.js";
 import * as config from "./config.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import GraphObject from "./interfaces/Graph.js";
@@ -499,13 +501,19 @@ export default class NotesProvider {
     filename: string,
   ): Promise<FileInfo> {
     const extension = getExtensionFromFilename(filename);
-    const fileId: FileId = crypto.randomUUID() + "." + extension;
-    const size = await this.#io.addFile(fileId, readable);
+    const filenameWithoutExtension = removeExtensionFromFilename(filename);
+    const slug: Slug = config.FILE_SLUG_PREFIX
+      + sluggify(filenameWithoutExtension)
+      + (
+        extension
+          ? "." + extension.trim().toLowerCase()
+          : ""
+      );
+    const size = await this.#io.addFile(slug, readable);
 
     const graph = await this.#io.getGraph();
     const fileInfo: FileInfo = {
-      fileId,
-      name: filename,
+      slug,
       size,
       createdAt: Date.now(),
     };
@@ -517,13 +525,13 @@ export default class NotesProvider {
 
 
   async deleteFile(
-    fileId: FileId,
+    slug: Slug,
   ): Promise<void> {
-    await this.#io.deleteFile(fileId);
+    await this.#io.deleteFile(slug);
 
     const graph = await this.#io.getGraph();
     graph.metadata.files
-      = graph.metadata.files.filter((file) => file.fileId !== fileId);
+      = graph.metadata.files.filter((file) => file.slug !== slug);
     await this.#io.flushChanges(graph, []);
   }
 
@@ -536,51 +544,42 @@ export default class NotesProvider {
   // get files not used in any note
   async getDanglingFiles(): Promise<FileInfo[]> {
     const graph = await this.#io.getGraph();
-    const fileIdsInNotes: FileId[] = Array.from(graph.notes.values()).reduce(
-      (accumulator: string[], note) => {
-        const fileIdsOfNote = parseFileIds(note.content);
-        return [...accumulator, ...fileIdsOfNote];
-      },
-      [],
-    );
+    const allBlocks: Block[]
+      = Array.from(graph.indexes.blocks.values()).flat();
+    const allInlineSpans = getAllInlineSpans(allBlocks);
+    const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
+    const allUsedFileSlugs = allUsedSlugs.filter(isFileSlug);
     const danglingFiles = graph.metadata.files.filter((file) => {
-      return !fileIdsInNotes.includes(file.fileId);
+      return !allUsedFileSlugs.includes(file.slug);
     });
     return danglingFiles;
   }
 
 
   async getReadableFileStream(
-    fileId: FileId,
+    slug: Slug,
     range?: ByteRange,
   ): Promise<ReadableStream> {
     const graph = await this.#io.getGraph();
-    if (!graph.metadata.files.map((file) => file.fileId).includes(fileId)) {
+    if (!graph.metadata.files.map((file) => file.slug).includes(slug)) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
-    const stream = await this.#io.getReadableFileStream(fileId, range);
+    const stream = await this.#io.getReadableFileStream(slug, range);
     return stream;
   }
 
 
   async getFileInfo(
-    fileId: FileId,
+    slug: Slug,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
     const fileInfo = graph.metadata.files.find(
-      (file) => file.fileId === fileId,
+      (file) => file.slug === slug,
     );
     if (!fileInfo) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
     return fileInfo;
-  }
-
-
-  getReadableGraphStream(
-    withFiles: boolean,
-  ): Promise<ReadableStream> {
-    return this.#io.getReadableGraphStream(withFiles);
   }
 
 

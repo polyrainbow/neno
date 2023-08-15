@@ -102,7 +102,7 @@ const AppRouter = () => {
           PathTemplate.FILE,
           new Map([
             ["GRAPH_ID", ":graphId"],
-            ["FILE_ID", ":fileId"],
+            ["FILE_SLUG", ":slug"],
           ]),
           undefined,
           true,

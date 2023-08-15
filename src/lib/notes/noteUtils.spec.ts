@@ -9,7 +9,6 @@ import {
   getNotesWithFlag,
   getNotesWithUrl,
   inferNoteTitle,
-  parseFileIds,
   parseSerializedExistingNote,
   parseSerializedNewNote,
   serializeNote,
@@ -254,34 +253,6 @@ describe("createSlug", () => {
 
       const noteContent2 = "content-2";
       expect(createSlug(noteContent2, ["content-2"])).toBe("content-2-2");
-    },
-  );
-});
-
-
-describe("parseFileIds", () => {
-  it(
-    "should find all valid file ids referenced with a slashlink",
-    async () => {
-      const noteContent = `/files/1ab11718-5e6e-453d-a610-7207ac8a4488.jpg valid
-      Valid: /files/2ab11718-5e6e-453d-a610-7207ac8a4488.jpg
-      Invalid:/files/3ab11718-5e6e-453d-a610-7207ac8a4488.jpg
-      Valid: /files/4ab11718-5e6e-453d-a610-7207ac8a4488.jpg test /files/5ab11718-5e6e-453d-a610-7207ac8a4488.jpg
-      Invalid: /file/6ab11718-5e6e-453d-a610-7207ac8a4488.jpg
-      Invalid: /files/7ab11718-5e6e-453d-a610-7207ac8a4488
-      Invalid: /files/8ab11718-5e6e-453d-a610-7207ac8a4488.jpg!
-      Invalid: /files/9.jpg
-/files/9ab11718-5e6e-453d-a610-7207ac8a4488.jpg valid
-      `;
-
-      const expectedResult = [
-        "1ab11718-5e6e-453d-a610-7207ac8a4488.jpg",
-        "2ab11718-5e6e-453d-a610-7207ac8a4488.jpg",
-        "4ab11718-5e6e-453d-a610-7207ac8a4488.jpg",
-        "5ab11718-5e6e-453d-a610-7207ac8a4488.jpg",
-        "9ab11718-5e6e-453d-a610-7207ac8a4488.jpg",
-      ];
-      expect(parseFileIds(noteContent)).toStrictEqual(expectedResult);
     },
   );
 });

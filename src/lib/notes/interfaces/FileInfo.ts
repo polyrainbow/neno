@@ -1,8 +1,7 @@
-import { FileId } from "./FileId";
+import { Slug } from "./Slug";
 
 export interface FileInfo {
-  fileId: FileId,
-  name: string,
+  slug: Slug,
   size: number,
   readonly createdAt: number,
 }

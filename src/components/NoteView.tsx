@@ -209,12 +209,12 @@ const NoteView = () => {
     refreshContentViews();
 
     if (getValidNoteSlug(slug) === null) {
-      const fileIds = urlSearchParams.has("fileIds")
-        ? (urlSearchParams.get("fileIds") as string).split(",")
+      const slugs = urlSearchParams.has("referenceSlugs")
+        ? (urlSearchParams.get("referenceSlugs") as string).split(",")
         : [];
 
       createNewNote({
-        content: Utils.createContentFromFileIds(fileIds),
+        content: Utils.createContentFromSlugs(slugs),
       });
       setCanonicalNewNotePath();
     }

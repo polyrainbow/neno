@@ -31,18 +31,18 @@ const NoteContentBlockImage = ({
 
   return <div
     className="preview-block-image-wrapper"
-    key={file.fileId}
+    key={file.slug}
   >
     <figure>
       <Link
         to={getAppPath(PathTemplate.FILE, new Map([
           ["GRAPH_ID", LOCAL_GRAPH_ID],
-          ["FILE_ID", file.fileId],
+          ["FILE_SLUG", file.slug],
         ]))}
       >
         <img
           src={url}
-          alt={file.name}
+          alt={file.slug}
         />
       </Link>
     </figure>

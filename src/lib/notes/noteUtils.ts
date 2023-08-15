@@ -1,5 +1,4 @@
 import Graph from "./interfaces/Graph.js";
-import { FileId } from "./interfaces/FileId.js";
 import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import { Link } from "./interfaces/Link.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
@@ -30,7 +29,11 @@ import LinkCount from "./interfaces/LinkCount.js";
 import NotePreview from "./interfaces/NotePreview.js";
 import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 import { SpanType } from "../subwaytext/interfaces/SpanType.js";
+import { FILE_SLUG_PREFIX } from "./config.js";
 
+const isFileSlug = (slug: Slug): boolean => {
+  return slug.startsWith(FILE_SLUG_PREFIX);
+};
 
 type NoteHeaders = Map<CanonicalNoteHeader | string, string>;
 type MetaModifier = (meta: Partial<ExistingNoteMetadata>, val: string) => void;
@@ -258,31 +261,6 @@ const removeCustomMetadataWithEmptyKeys = (
 };
 
 
-const extractFirstFileId = (input: string): FileId | null => {
-  // eslint-disable-next-line max-len
-  const regex = /files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})/g;
-  const results = [...input.matchAll(regex)].map((match) => match[1]);
-  if (results.length > 0) {
-    return results[0];
-  } else {
-    return null;
-  }
-};
-
-
-const parseFileIds = (noteContent: NoteContent): FileId[] => {
-  // eslint-disable-next-line max-len
-  const regex = /(^|\s)\/files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}.[a-z0-9]{1,4})($|\s)/g;
-  const matches = [...noteContent.matchAll(regex)];
-  return matches.map((match) => match[2]);
-};
-
-
-const getNumberOfFiles = (noteContent: string): number => {
-  return parseFileIds(noteContent).length;
-};
-
-
 const getExtensionFromFilename = (filename: string): string | null => {
   const posOfDot = filename.lastIndexOf(".");
   if (posOfDot === -1) {
@@ -295,6 +273,16 @@ const getExtensionFromFilename = (filename: string): string | null => {
   }
 
   return extension;
+};
+
+
+const removeExtensionFromFilename = (filename: string): string => {
+  const posOfDot = filename.lastIndexOf(".");
+  if (posOfDot === -1) {
+    return filename;
+  }
+
+  return filename.substring(0, posOfDot);
 };
 
 
@@ -492,13 +480,114 @@ const getNumberOfUnlinkedNotes = (graph: Graph): number => {
 };
 
 
+const getAllInlineSpans = (blocks: Block[]): Span[] => {
+  const spans: Span[] = [];
+  blocks.forEach((block) => {
+    if (block.type === BlockType.PARAGRAPH) {
+      spans.push(...block.data.text);
+    } else if (block.type === BlockType.HEADING) {
+      spans.push(...block.data.text);
+    } else if (block.type === BlockType.QUOTE) {
+      spans.push(...block.data.text);
+    } else if (block.type === BlockType.ORDERED_LIST_ITEM) {
+      spans.push(...block.data.text);
+    } else if (block.type === BlockType.UNORDERED_LIST_ITEM) {
+      spans.push(...block.data.text);
+    }
+  });
+  return spans;
+};
+
+
+const trimSlug = (slug: string): string => {
+  return slug.replace(/^-+/, "").replace(/-+$/, "");
+};
+
+
+/*
+  Turns note text into a slug, without truncating.
+  For example, it can be used to obtain a slug from a Wikilink.
+  We will replace slashes and dots with dashes, as we do not allow
+  these chars as slug names for notes (even though they are generally allowed
+  yet, see TODO below).
+*/
+const sluggify = (text: string): string => {
+  const slug = text
+    // Trim leading/trailing whitespace
+    .trim()
+    // remove invalid chars
+    .replace(/['’]+/g, "")
+    // Replace invalid chars with dashes.
+    .replace(/[^\p{L}\d\-_]+/gu, "-")
+    // Replace runs of one or more dashes with a single dash
+    .replace(/-+/g, "-")
+    .toLowerCase();
+
+  return trimSlug(slug);
+};
+
+
+/*
+  Transforms note text like into a slug and truncates it.
+  We will replace slashes and dots with dashes, as these are reserved for
+  special slugs like files, that point into different folders. We do not want
+  to have these chars when creating a simple slug for a normal note.
+*/
+const sluggifyNoteText = (text: string): string => {
+  return sluggify(text)
+    // Truncate to avoid file name length limit issues.
+    // Windows systems can handle up to 255, but we truncate at 200 to leave
+    // a bit of room for things like version numbers.
+    .substring(0, 200);
+};
+
+
+/*
+  TODO: Create new file id syntax, so that we can remove slashes and dots
+  from valid slug chars.
+*/
+const isValidSlug = (slug: Slug): boolean => {
+  return (
+    typeof slug === "string"
+    && slug.length > 0
+    && slug.length <= 200
+    && slug.match(/^[\p{L}\d_][\p{L}\d\-/._]*$/u) !== null
+  );
+};
+
+
+const getSlugsFromInlineText = (text: InlineText): Slug[] => {
+  return text.filter(
+    (span: Span): boolean => {
+      return span.type === SpanType.SLASHLINK
+        || span.type === SpanType.WIKILINK;
+    },
+  ).map((span: Span): Slug => {
+    if (span.type === SpanType.SLASHLINK) {
+      return span.text.substring(1);
+    } else {
+      return sluggify(span.text.substring(2, span.text.length - 2));
+    }
+  });
+};
+
+
+const getFileSlugsInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
+  const blocks: Block[]
+    = graph.indexes.blocks.get(noteSlug) as Block[];
+  const allInlineSpans = getAllInlineSpans(blocks);
+  const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
+  return allUsedSlugs.filter(isFileSlug);
+};
+
+
 const getFileInfos = (
   graph: Graph,
-  noteContent: NoteContent,
+  slug: Slug,
 ): FileInfo[] => {
-  const fileIds = parseFileIds(noteContent);
+  const fileSlugs = getFileSlugsInNote(graph, slug);
   const files = graph.metadata.files
-    .filter((file: FileInfo) => fileIds.includes(file.fileId));
+    .filter((file: FileInfo) => fileSlugs.includes(file.slug));
   return files;
 };
 
@@ -519,7 +608,7 @@ const createNoteToTransmit = async (
       }),
     backlinks: getBacklinks(graph, existingNote.meta.slug),
     numberOfCharacters: getNumberOfCharacters(existingNote),
-    files: getFileInfos(graph, existingNote.content),
+    files: getFileInfos(graph, existingNote.meta.slug),
   };
 
   return noteToTransmit;
@@ -562,28 +651,11 @@ const mapInlineSpans = (
 };
 
 
-const getAllInlineSpans = (blocks: Block[]): Span[] => {
-  const spans: Span[] = [];
-  blocks.forEach((block) => {
-    if (block.type === BlockType.PARAGRAPH) {
-      spans.push(...block.data.text);
-    } else if (block.type === BlockType.HEADING) {
-      spans.push(...block.data.text);
-    } else if (block.type === BlockType.QUOTE) {
-      spans.push(...block.data.text);
-    } else if (block.type === BlockType.ORDERED_LIST_ITEM) {
-      spans.push(...block.data.text);
-    } else if (block.type === BlockType.UNORDERED_LIST_ITEM) {
-      spans.push(...block.data.text);
-    }
-  });
-  return spans;
-};
-
-
 const getNoteFeatures = (
-  blocks: Block[],
+  note: ExistingNote,
+  graph: Graph,
 ): NoteListItemFeatures => {
+  const blocks = graph.indexes.blocks.get(note.meta.slug) as Block[];
   const spans = getAllInlineSpans(blocks);
 
   const containsText = spans.length > 0;
@@ -595,21 +667,17 @@ const getNoteFeatures = (
   let containsAudio = false;
   let containsVideo = false;
 
-  spans.forEach((span: Span) => {
-    if (span.type === SpanType.SLASHLINK) {
-      const fileId = extractFirstFileId(span.text.substring(1));
-      if (fileId) {
-        const mediaType = getMediaTypeFromFilename(fileId);
-        if (mediaType === MediaType.IMAGE) {
-          containsImages = true;
-        } else if (mediaType === MediaType.PDF) {
-          containsDocuments = true;
-        } else if (mediaType === MediaType.AUDIO) {
-          containsAudio = true;
-        } else if (mediaType === MediaType.VIDEO) {
-          containsVideo = true;
-        }
-      }
+  const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
+  fileSlugs.forEach((fileSlug: Slug) => {
+    const mediaType = getMediaTypeFromFilename(fileSlug);
+    if (mediaType === MediaType.IMAGE) {
+      containsImages = true;
+    } else if (mediaType === MediaType.PDF) {
+      containsDocuments = true;
+    } else if (mediaType === MediaType.AUDIO) {
+      containsAudio = true;
+    } else if (mediaType === MediaType.VIDEO) {
+      containsVideo = true;
     }
   });
 
@@ -627,21 +695,24 @@ const getNoteFeatures = (
 };
 
 
+const getNumberOfFiles = (graph: Graph, noteSlug: Slug): number => {
+  return getFileSlugsInNote(graph, noteSlug).length;
+};
+
+
 const createNoteListItem = (
   note: ExistingNote,
   graph: Graph,
 ): NoteListItem => {
-  const blocks = getBlocks(note, graph.indexes.blocks);
-
   const noteListItem: NoteListItem = {
     slug: note.meta.slug,
     title: getNoteTitle(note),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,
-    features: getNoteFeatures(blocks),
+    features: getNoteFeatures(note, graph),
     linkCount: getNumberOfLinkedNotes(graph, note.meta.slug),
     numberOfCharacters: getNumberOfCharacters(note),
-    numberOfFiles: getNumberOfFiles(note.content),
+    numberOfFiles: getNumberOfFiles(graph, note.meta.slug),
   };
 
   return noteListItem;
@@ -957,10 +1028,12 @@ const getNotesWithCustomMetadata = (
 
 const getNotesWithFile = (
   notes: ExistingNote[],
-  fileId: FileId,
+  graph: Graph,
+  fileSlug: Slug,
 ): ExistingNote[] => {
   return notes.filter((note: ExistingNote) => {
-    return parseFileIds(note.content).includes(fileId);
+    const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
+    return fileSlugs.includes(fileSlug);
   });
 };
 
@@ -1012,62 +1085,6 @@ const getNotesWithTitleOrSlugContainingToken = (
         || note.meta.slug.toLowerCase().includes(token.toLowerCase());
     }
   });
-};
-
-const trimSlug = (slug: string): string => {
-  return slug.replace(/^-+/, "").replace(/-+$/, "");
-};
-
-
-/*
-  Turns note text into a slug, without truncating.
-  For example, it can be used to obtain a slug from a Wikilink.
-  We will replace slashes and dots with dashes, as we do not allow
-  these chars as slug names for notes (even though they are generally allowed
-  yet, see TODO below).
-*/
-const sluggify = (text: string): string => {
-  const slug = text
-    // Trim leading/trailing whitespace
-    .trim()
-    // remove invalid chars
-    .replace(/['’]+/g, "")
-    // Replace invalid chars with dashes.
-    .replace(/[^\p{L}\d\-_]+/gu, "-")
-    // Replace runs of one or more dashes with a single dash
-    .replace(/-+/g, "-")
-    .toLowerCase();
-
-  return trimSlug(slug);
-};
-
-
-/*
-  Transforms note text like into a slug and truncates it.
-  We will replace slashes and dots with dashes, as these are reserved for
-  special slugs like files, that point into different folders. We do not want
-  to have these chars when creating a simple slug for a normal note.
-*/
-const sluggifyNoteText = (text: string): string => {
-  return sluggify(text)
-    // Truncate to avoid file name length limit issues.
-    // Windows systems can handle up to 255, but we truncate at 200 to leave
-    // a bit of room for things like version numbers.
-    .substring(0, 200);
-};
-
-
-/*
-  TODO: Create new file id syntax, so that we can remove slashes and dots
-  from valid slug chars.
-*/
-const isValidSlug = (slug: Slug): boolean => {
-  return (
-    typeof slug === "string"
-    && slug.length > 0
-    && slug.length <= 200
-    && slug.match(/^[\p{L}\d_][\p{L}\d\-/._]*$/u) !== null
-  );
 };
 
 
@@ -1141,45 +1158,41 @@ const getNotesWithBlocksOfTypes = (
       });
 };
 
+const setsAreEqual = <T>(a: Set<T>, b: Set<T>) => {
+  return a.size === b.size
+    && [...a].every((x) => b.has(x));
+};
 
 const getNotesWithMediaTypes = (
   notes: ExistingNote[],
   graph: Graph,
-  types: MediaType[],
-  notesMustContainAllMediaTypes: boolean,
+  requiredMediaTypes: Set<MediaType>,
+  everyNoteMustContainAllMediaTypes: boolean,
 ): ExistingNote[] => {
-  return notesMustContainAllMediaTypes
+  return everyNoteMustContainAllMediaTypes
     ? notes
       // every single note must contain blocks from all the types
       .filter((note: ExistingNote): boolean => {
-        return types.every((type) => {
-          const inlineSpans
-            = getAllInlineSpans(
-              graph.indexes.blocks.get(note.meta.slug) as Block[],
-            );
+        const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
+        const includedMediaTypes = new Set(
+          fileSlugs
+            .map((fileSlug) => getMediaTypeFromFilename(fileSlug)),
+        );
 
-          return inlineSpans.some((span) => {
-            if (span.type !== SpanType.SLASHLINK) return false;
-            const fileId = extractFirstFileId(span.text.substring(1));
-            if (!fileId) return false;
-            return getMediaTypeFromFilename(fileId) === type;
-          });
-        });
+        return setsAreEqual(requiredMediaTypes, includedMediaTypes);
       })
-    // every note must contain one block with only one type of types:
+    // every note must contain at least one of requiredMediaTypes:
     : notes
       .filter((note: ExistingNote): boolean => {
-        const inlineSpans
-          = getAllInlineSpans(
-            graph.indexes.blocks.get(note.meta.slug) as Block[],
-          );
+        const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
+        const includedMediaTypes = new Set(
+          fileSlugs
+            .map((fileSlug) => getMediaTypeFromFilename(fileSlug)),
+        );
 
-        return inlineSpans
-          .some((span: Span) => {
-            if (span.type !== SpanType.SLASHLINK) return false;
-            const fileId = extractFirstFileId(span.text.substring(1));
-            if (!fileId) return false;
-            return types.includes(getMediaTypeFromFilename(fileId));
+        return Array.from(requiredMediaTypes)
+          .some((requiredMediaType: MediaType): boolean => {
+            return includedMediaTypes.has(requiredMediaType);
           });
       });
 };
@@ -1195,22 +1208,6 @@ const getRandomKey = <K>(collection: Map<K, unknown>): K | null => {
     }
   }
   return null;
-};
-
-
-const getSlugsFromInlineText = (text: InlineText): Slug[] => {
-  return text.filter(
-    (span: Span): boolean => {
-      return span.type === SpanType.SLASHLINK
-        || span.type === SpanType.WIKILINK;
-    },
-  ).map((span: Span): Slug => {
-    if (span.type === SpanType.SLASHLINK) {
-      return span.text.substring(1);
-    } else {
-      return sluggify(span.text.substring(2, span.text.length - 2));
-    }
-  });
 };
 
 
@@ -1243,7 +1240,6 @@ export {
   inferNoteTitle,
   updateNotePosition,
   getNumberOfLinkedNotes,
-  parseFileIds,
   createNoteToTransmit,
   getNoteFeatures,
   getSortFunction,
@@ -1282,8 +1278,9 @@ export {
   getNoteTitle,
   getRandomKey,
   removeWikilinkPunctuation,
-  extractFirstFileId,
   getAllInlineSpans,
   getSlugsFromInlineText,
   changeSlugReferencesInNote,
+  removeExtensionFromFilename,
+  isFileSlug,
 };

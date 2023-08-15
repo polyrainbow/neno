@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
 import { l } from "../lib/intl";
 import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import { FileId } from "../lib/notes/interfaces/FileId";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
 import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
 import { isInitialized } from "../lib/LocalDataStorage";
 import BusyIndicator from "./BusyIndicator";
+import { Slug } from "../lib/notes/interfaces/Slug";
 
 enum FileSortMode {
   CREATED_AT_DESCENDING = "CREATED_AT_DESCENDING",
@@ -24,7 +24,7 @@ const FilesView = () => {
 
   const notesProvider = useNotesProvider();
   const [files, setFiles] = useState<FileInfo[]>([]);
-  const [danglingFileIds, setDanglingFileIds] = useState<FileId[]>([]);
+  const [danglingFileSlugs, setDanglingFileSlugs] = useState<Slug[]>([]);
   const [sortMode, setSortMode] = useState<FileSortMode>(
     FileSortMode.CREATED_AT_DESCENDING,
   );
@@ -35,7 +35,7 @@ const FilesView = () => {
     const danglingFiles: FileInfo[]
       = await notesProvider.getDanglingFiles();
 
-    setDanglingFileIds(danglingFiles.map((file) => file.fileId));
+    setDanglingFileSlugs(danglingFiles.map((file) => file.slug));
   };
 
   const displayedFiles = [...files].sort((a, b): number => {
@@ -44,12 +44,12 @@ const FilesView = () => {
     } else if (sortMode === FileSortMode.CREATED_AT_ASCENDING) {
       return a.createdAt - b.createdAt;
     } else if (sortMode === FileSortMode.NAME_ASCENDING) {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-      if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+      if (a.slug.toLowerCase() < b.slug.toLowerCase()) return -1;
+      if (a.slug.toLowerCase() > b.slug.toLowerCase()) return 1;
       return 0;
     } else if (sortMode === FileSortMode.NAME_DESCENDING) {
-      if (a.name.toLowerCase() < b.name.toLowerCase()) return 1;
-      if (a.name.toLowerCase() > b.name.toLowerCase()) return -1;
+      if (a.slug.toLowerCase() < b.slug.toLowerCase()) return 1;
+      if (a.slug.toLowerCase() > b.slug.toLowerCase()) return -1;
       return 0;
     } else if (sortMode === FileSortMode.SIZE_DESCENDING) {
       return b.size - a.size;
@@ -116,8 +116,8 @@ const FilesView = () => {
               {displayedFiles.map((file) => {
                 return <FilesViewPreviewBox
                   file={file}
-                  key={"img_" + file.fileId}
-                  isDangling={danglingFileIds.includes(file.fileId)}
+                  key={"img_" + file.slug}
+                  isDangling={danglingFileSlugs.includes(file.slug)}
                 />;
               })}
             </FlexContainer>

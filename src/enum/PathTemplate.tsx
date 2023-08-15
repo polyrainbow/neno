@@ -9,6 +9,6 @@ export enum PathTemplate {
   LOGIN = "login",
   STATS = "graph/%GRAPH_ID%/stats",
   FILES = "graph/%GRAPH_ID%/files",
-  FILE = "graph/%GRAPH_ID%/files/%FILE_ID%",
+  FILE = "graph/%GRAPH_ID%/files/%FILE_SLUG%",
   SETTINGS = "settings",
 }

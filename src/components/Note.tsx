@@ -29,8 +29,8 @@ import { useNavigate } from "react-router-dom";
 import { PathTemplate } from "../enum/PathTemplate";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import {
-  extractFirstFileId,
   getMediaTypeFromFilename,
+  isFileSlug,
   sluggify,
 } from "../lib/notes/noteUtils";
 import { MediaType } from "../lib/notes/interfaces/MediaType";
@@ -39,7 +39,6 @@ import NoteContentBlockVideo from "./NoteContentBlockVideo";
 import NoteContentBlockDocument from "./NoteContentBlockDocument";
 import NoteContentBlockTextFile from "./NoteContentBlockTextFile";
 import NoteContentBlockImage from "./NoteContentBlockImage";
-import { FILE_SLUG_PREFIX } from "../lib/notes/config";
 import NotesProvider from "../lib/notes";
 import { getTransclusionContentFromNoteContent } from "../lib/Transclusion";
 import { LinkType } from "../types/LinkType";
@@ -103,11 +102,11 @@ const Note = ({
     = useConfirmDiscardingUnsavedChangesDialog();
   const navigate = useNavigate();
 
-  const insertFilesToNote = (responses: FileInfo[]) => {
-    addFilesToNoteObject(responses);
+  const insertFileSlugsToNote = (fileInfos: FileInfo[]) => {
+    addFilesToNoteObject(fileInfos);
 
-    const fileIds = responses.map((response) => response.fileId);
-    const slashlinks = fileIds.map((fileId) => `/files/${fileId}`);
+    const fileSlugs = fileInfos.map((fileInfo) => fileInfo.slug);
+    const slashlinks = fileSlugs.map((slug) => `/${slug}`);
 
     // only add line breaks if they're not already there
     let separator;
@@ -144,7 +143,7 @@ const Note = ({
         ),
       );
 
-    insertFilesToNote(responses);
+    insertFileSlugsToNote(responses);
 
     setUploadInProgress(false);
   };
@@ -195,21 +194,20 @@ const Note = ({
   const getTransclusionContent = async (slug: Slug): Promise<ReactElement> => {
     const note = noteRef.current;
 
-    if (slug.startsWith(FILE_SLUG_PREFIX)) {
+    if (!slug) {
+      throw new Error("INVALID_FILE_SLUG");
+    }
+
+    if (isFileSlug(slug)) {
       const availableFileInfos = [
         ...note.files,
       ];
 
-      const fileId = extractFirstFileId(slug);
-      if (!fileId) {
-        throw new Error("INVALID_FILE_SLUG");
-      }
-
-      const mediaType = getMediaTypeFromFilename(fileId);
-      let file = availableFileInfos.find((file) => file.fileId === fileId);
+      const mediaType = getMediaTypeFromFilename(slug);
+      let file = availableFileInfos.find((file) => file.slug === slug);
 
       if (!file) {
-        file = await notesProvider.getFileInfo(fileId);
+        file = await notesProvider.getFileInfo(slug);
       }
 
       if (
@@ -218,30 +216,30 @@ const Note = ({
         return <NoteContentBlockAudio
           file={file}
           notesProvider={notesProvider}
-          key={file.fileId}
+          key={file.slug}
         />;
       } else if (mediaType === MediaType.VIDEO) {
         return <NoteContentBlockVideo
           file={file}
           notesProvider={notesProvider}
-          key={file.fileId}
+          key={file.slug}
         />;
       } else if (mediaType === MediaType.IMAGE) {
         return <NoteContentBlockImage
           file={file}
           notesProvider={notesProvider}
-          key={file.fileId}
+          key={file.slug}
         />;
       } else if (mediaType === MediaType.TEXT) {
         return <NoteContentBlockTextFile
           file={file}
           notesProvider={notesProvider}
-          key={file.fileId}
+          key={file.slug}
         />;
       } else {
         return <NoteContentBlockDocument
           file={file}
-          key={file.fileId}
+          key={file.slug}
         />;
       }
     }
@@ -269,15 +267,9 @@ const Note = ({
       ? sluggify(linkText)
       : linkText;
 
-    if (linkText.startsWith(FILE_SLUG_PREFIX)) {
-      const fileId = extractFirstFileId(slug);
-
-      if (!fileId) {
-        return false;
-      }
-
+    if (isFileSlug(slug)) {
       try {
-        await notesProvider.getFileInfo(fileId);
+        await notesProvider.getFileInfo(slug);
         return true;
       } catch (e) {
         return false;
@@ -368,17 +360,11 @@ const Note = ({
                     ? sluggify(value)
                     : value;
 
-                  if (slug.startsWith(FILE_SLUG_PREFIX)) {
-                    const fileId = extractFirstFileId(slug);
-
-                    if (!fileId) {
-                      return;
-                    }
-
+                  if (isFileSlug(slug)) {
                     navigate(
                       getAppPath(PathTemplate.FILE, new Map([
                         ["GRAPH_ID", LOCAL_GRAPH_ID],
-                        ["FILE_ID", fileId],
+                        ["FILE_SLUG", slug],
                       ])),
                     );
                   } else {

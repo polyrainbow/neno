@@ -1,11 +1,9 @@
-import { FileId } from "./notes/interfaces/FileId";
 import { PathTemplate } from "../enum/PathTemplate";
 import ActiveNote, { UnsavedActiveNote } from "../types/ActiveNote";
 import * as Config from "../config";
 import { FileInfo } from "./notes/interfaces/FileInfo";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
-import { FILE_SLUG_PREFIX } from "./notes/config.js";
-import { getUrlForFileId } from "./LocalDataStorage";
+import { getUrlForSlug } from "./LocalDataStorage";
 import { Slug } from "./notes/interfaces/Slug";
 import { inferNoteTitle, sluggify } from "./notes/noteUtils";
 
@@ -45,12 +43,12 @@ const makeTimestampHumanReadable = (timestamp: number): string => {
 };
 
 
-const createContentFromFileIds = (
-  fileIds: FileId[],
+const createContentFromSlugs = (
+  slugs: Slug[],
 ): string => {
-  return fileIds
-    .reduce((content, fileId) => {
-      return content + `/${FILE_SLUG_PREFIX}${fileId}` + "\n\n";
+  return slugs
+    .reduce((content, slug) => {
+      return content + `/${slug}` + "\n\n";
     }, "")
     .trim();
 };
@@ -203,8 +201,8 @@ const readFileAsString = async (file: File): Promise<string> => {
 export const onDownload = async (
   file: FileInfo,
 ): Promise<void> => {
-  const fileId = file.fileId;
-  const url = await getUrlForFileId(fileId);
+  const slug = file.slug;
+  const url = await getUrlForSlug(slug);
   window.open(url, "_blank");
 };
 
@@ -212,8 +210,8 @@ export const onDownload = async (
 export const getUrl = async (
   file: FileInfo,
 ) => {
-  const fileId = file.fileId;
-  const url = await getUrlForFileId(fileId);
+  const slug = file.slug;
+  const url = await getUrlForSlug(slug);
   return url;
 };
 
@@ -294,15 +292,6 @@ const getPagedMatches = <T>(
 };
 
 
-const stringContainsUUID = (string: string): boolean => {
-  return Array.isArray(
-    string.match(
-      /\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/g,
-    ),
-  );
-};
-
-
 const getFirstLines = (text: string, numberOfLines: number): string => {
   const lines = text.split("\n");
   return lines.slice(0, numberOfLines).join("\n");
@@ -334,7 +323,6 @@ export {
   isNotEmpty,
   isNotFalse,
   getPagedMatches,
-  stringContainsUUID,
   getParameterByName,
   makeTimestampHumanReadable,
   getNewNoteObject,
@@ -348,7 +336,7 @@ export {
   getFilesFromUserSelection,
   getWritableStream,
   readFileAsString,
-  createContentFromFileIds,
+  createContentFromSlugs,
   getFirstLines,
   getWikilinkForNote,
   getNoteTitleFromActiveNote,

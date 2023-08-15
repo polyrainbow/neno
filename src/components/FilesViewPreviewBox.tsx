@@ -8,7 +8,7 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import { getAppPath, getIconSrc } from "../lib/utils";
 import { getMediaTypeFromFilename } from "../lib/notes/noteUtils";
-import { getUrlForFileId } from "../lib/LocalDataStorage";
+import { getUrlForSlug } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
 interface FilesViewPreviewBoxProps{
@@ -21,13 +21,13 @@ const FilesViewPreviewBox = ({
   file,
   isDangling,
 }: FilesViewPreviewBoxProps) => {
-  const type = getMediaTypeFromFilename(file.fileId) || "unknown";
+  const type = getMediaTypeFromFilename(file.slug) || "unknown";
   const [thumbnailImageSrc, setThumbnailImageSrc]
     = useState<string | null>(null);
 
 
   useEffect(() => {
-    getUrlForFileId(file.fileId)
+    getUrlForSlug(file.slug)
       .then((src) => {
         const thumbnailImageSrcMap = {
           [MediaType.IMAGE]: src,
@@ -49,7 +49,7 @@ const FilesViewPreviewBox = ({
     <Link
       to={getAppPath(PathTemplate.FILE, new Map([
         ["GRAPH_ID", LOCAL_GRAPH_ID],
-        ["FILE_ID", file.fileId],
+        ["FILE_SLUG", file.slug],
       ]))}
     >
       <img
@@ -62,7 +62,7 @@ const FilesViewPreviewBox = ({
       >
         <div
           className="filename"
-        >{file.name}</div>
+        >{file.slug}</div>
         {
           isDangling
             ? <div

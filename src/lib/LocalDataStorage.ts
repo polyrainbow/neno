@@ -4,8 +4,8 @@ import FileSystemAccessAPIStorageProvider
 import { streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
-import { FileId } from "./notes/interfaces/FileId";
 import { createDemoGraph, folderHasGraph } from "./DemoGraph";
+import { Slug } from "./notes/interfaces/Slug";
 
 /*
   Notes:
@@ -118,16 +118,16 @@ export const getNotesProvider = (): NotesProvider | null => {
 };
 
 
-export const getUrlForFileId = async (fileId: FileId) => {
+export const getUrlForSlug = async (slug: Slug) => {
   if (!notesProvider) {
     throw new Error("Notes provider not initialized");
   }
 
   const readable
     = await notesProvider.getReadableFileStream(
-      fileId,
+      slug,
     );
-  const extension = NotesProvider.getExtensionFromFilename(fileId);
+  const extension = NotesProvider.getExtensionFromFilename(slug);
   const mimeType = extension && MimeTypes.has(extension)
     ? MimeTypes.get(extension) as string
     : "application/neno-filestream";
