@@ -44,8 +44,7 @@ const assignCorrectElementNodes = (
     const nodeText = node.getTextContent();
 
     if (!insideCodeBlock) {
-      // TODO: we should allow a language specification after backticks
-      if (nodeText === "```") {
+      if (nodeText.startsWith("```")) {
         typeNodeShouldHaveMap.set(node, ElementNodeType.CODE);
         insideCodeBlock = true;
       } else if (nodeText.startsWith(">")) {
