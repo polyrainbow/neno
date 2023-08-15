@@ -12,23 +12,28 @@
 ******************************/
 
 :root {
-  --neno-blue-0: #dff4ff;
-  --neno-blue-1: #98d8ff;
-  --neno-blue-2: #47b7ff;
-  --neno-blue-3: #09d;
-  --neno-blue-4: #0077b1;
-  --neno-blue-5: #005786;
-  --neno-blue-6: #00375f;
-  --neno-blue-7: #0f213e;
-  --neno-blue-8: #000;
-  --neno-red-0: #ff8697;
-  --neno-red-1: #ff4f71;
-  --neno-red-2: #ec0050;
-  --neno-red-3: #bd003e;
-  --neno-red-4: #91002d;
-  --neno-red-5: #67001e;
-  --neno-red-6: #40000f;
-  --neno-red-7: #000;
+  --neno-blue-0: #d1f3ff;
+  --neno-blue-1: #a3e3ff;
+  --neno-blue-2: #64ccff;
+  --neno-blue-3: #14b2ff;
+  --neno-blue-4: #008ee5;
+  --neno-blue-5: #086dbb;
+  --neno-blue-6: #045393;
+  --neno-blue-7: #024071;
+  --neno-blue-8: #083155;
+  --neno-blue-9: #00213b;
+
+  --neno-red-0: #ffe8e7;
+  --neno-red-1: #ffbbbc;
+  --neno-red-2: #ff8c93;
+  --neno-red-3: #ff596f;
+  --neno-red-4: #ec0050;
+  --neno-red-5: #c10040;
+  --neno-red-6: #9e0034;
+  --neno-red-7: #81002b;
+  --neno-red-8: #650023;
+  --neno-red-9: #51001e;
+
   --neno-gray-0: #f6f8fa;
   --neno-gray-1: #eaeef2;
   --neno-gray-2: #d0d7de;
@@ -45,11 +50,11 @@
   :root {
     --accent-color-1: var(--neno-blue-2);
     --accent-color-1-light: var(--neno-blue-1);
-    --accent-color-1-intense: var(--neno-blue-3);
-    --accent-color-2: var(--neno-red-0);
+    --accent-color-1-intense: var(--neno-blue-4);
+    --accent-color-2: var(--neno-red-2);
     --accent-color-interactible: var(--neno-gray-2);
-    --error-and-danger-background-color: var(--neno-red-1);
-    --error-and-danger-text-color: var(--neno-red-2);
+    --error-and-danger-background-color: var(--neno-red-3);
+    --error-and-danger-text-color: var(--neno-red-4);
     --background-color: white;
     --main-content-color: black;
     --alt-content-color: var(--neno-gray-5);
@@ -63,13 +68,13 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --accent-color-1: var(--neno-blue-6);
-    --accent-color-1-light: var(--neno-blue-7);
+    --accent-color-1: var(--neno-blue-8);
+    --accent-color-1-light: var(--neno-blue-9);
     --accent-color-1-intense: var(--neno-blue-5);
-    --accent-color-2: var(--neno-red-5);
+    --accent-color-2: var(--neno-red-7);
     --accent-color-interactible: var(--neno-gray-9);
-    --error-and-danger-background-color: var(--neno-red-4);
-    --error-and-danger-text-color: var(--neno-red-2);
+    --error-and-danger-background-color: var(--neno-red-7);
+    --error-and-danger-text-color: var(--neno-red-4);
     --background-color: black;
     --main-content-color: white;
     --alt-content-color: var(--neno-gray-4);
