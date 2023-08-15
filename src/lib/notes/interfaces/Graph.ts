@@ -12,6 +12,7 @@ export interface GraphMetadata {
   initialNodePosition: NodePosition,
   pinnedNotes: Slug[],
   files: FileInfo[],
+  version: "2",
 }
 
 // We are extensively using Maps here because they must be implemented with

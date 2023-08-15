@@ -618,6 +618,65 @@ describe("Notes module", () => {
   );
 
   it(
+    "should sluggify filenames correctly when slug already exists",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable1 = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      await notesProvider.addFile(
+        readable1,
+        "test.txt",
+      );
+
+      const readable2 = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo2 = await notesProvider.addFile(
+        readable2,
+        "test.txt",
+      );
+
+      expect(fileInfo2.slug).toBe("files/test-2.txt");
+
+      const readable3 = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo3 = await notesProvider.addFile(
+        readable3,
+        "test.txt",
+      );
+
+      expect(fileInfo3.slug).toBe("files/test-3.txt");
+    },
+  );
+
+  it(
     "should remove files correctly",
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());

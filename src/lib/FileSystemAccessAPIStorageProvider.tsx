@@ -125,6 +125,14 @@ implements StorageProvider {
     await writable.close();
   }
 
+  async renameFile(
+    requestPath: string,
+    newName: string,
+  ): Promise<void> {
+    const fileHandle = await this.#getFileHandle(requestPath, true);
+    // @ts-ignore not correctly typed
+    await fileHandle.move(newName);
+  }
 
   async writeObjectFromReadable(
     requestPath: string,

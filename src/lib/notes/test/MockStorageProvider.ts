@@ -67,6 +67,22 @@ export default class MockStorageProvider implements StorageProvider {
   }
 
 
+  async renameFile(requestPath: string, newName: string): Promise<void> {
+    if (this.#files.has(requestPath)) {
+      const value = this.#files.get(requestPath) as Uint8Array;
+      const newRequestPath = requestPath.substring(
+        0,
+        requestPath.lastIndexOf("/"),
+      ) + newName;
+      this.#files.set(newRequestPath, value);
+      this.#files.delete(requestPath);
+      return Promise.resolve();
+    } else {
+      throw new Error("File not found.");
+    }
+  }
+
+
   joinPath(...segments: string[]): string {
     return segments.join("/");
   }

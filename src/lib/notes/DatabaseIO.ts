@@ -8,7 +8,7 @@
 */
 
 
-import Graph from "./interfaces/Graph.js";
+import Graph, { GraphMetadata } from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
 import StorageProvider from "./interfaces/StorageProvider.js";
 import {
@@ -27,6 +27,7 @@ import { Slug } from "./interfaces/Slug.js";
 import { FILE_SLUG_PREFIX } from "./config.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
+import { GraphMetadataV1, migrateToV2 } from "./migrations/v2.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -69,7 +70,9 @@ export default class DatabaseIO {
     notes: string[],
     metadataSerialized: string,
   ): Promise<Graph> {
-    const parsedNotes: ExistingNote[] = [];
+    let migrationPerformed = false;
+
+    let parsedNotes: ExistingNote[] = [];
 
     for (const serializedNote of notes) {
       let parsedNote: ExistingNote;
@@ -81,7 +84,20 @@ export default class DatabaseIO {
       }
     }
 
-    const graphMetadata = JSON.parse(metadataSerialized);
+    let graphMetadata = JSON.parse(
+      metadataSerialized,
+    ) as GraphMetadata | GraphMetadataV1;
+
+    if (!("version" in graphMetadata)) {
+      const v2 = await migrateToV2(
+        graphMetadata,
+        parsedNotes,
+        this.#storageProvider,
+      );
+      graphMetadata = v2.metadata;
+      parsedNotes = v2.notes;
+      migrationPerformed = true;
+    }
 
     const blockIndex = await DatabaseIO.createBlockIndex(parsedNotes);
     const outgoingLinkIndex = DatabaseIO.createOutgoingLinkIndex(blockIndex);
@@ -100,6 +116,10 @@ export default class DatabaseIO {
       },
       metadata: graphMetadata,
     };
+
+    if (migrationPerformed) {
+      await this.flushChanges(parsedGraphObject);
+    }
 
     return parsedGraphObject;
   }
@@ -262,6 +282,7 @@ export default class DatabaseIO {
         },
         pinnedNotes: [],
         files: [],
+        version: "2",
       },
       notes: new Map(),
       indexes: {

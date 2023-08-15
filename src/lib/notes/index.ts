@@ -18,10 +18,10 @@ import {
   getRandomKey,
   changeSlugReferencesInNote,
   sluggify,
-  removeExtensionFromFilename,
   getSlugsFromInlineText,
   getAllInlineSpans,
   isFileSlug,
+  getSlugFromFilename,
 } from "./noteUtils.js";
 import GraphVisualization from "./interfaces/GraphVisualization.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
@@ -500,18 +500,10 @@ export default class NotesProvider {
     readable: ReadableStream,
     filename: string,
   ): Promise<FileInfo> {
-    const extension = getExtensionFromFilename(filename);
-    const filenameWithoutExtension = removeExtensionFromFilename(filename);
-    const slug: Slug = config.FILE_SLUG_PREFIX
-      + sluggify(filenameWithoutExtension)
-      + (
-        extension
-          ? "." + extension.trim().toLowerCase()
-          : ""
-      );
+    const graph = await this.#io.getGraph();
+    const slug = getSlugFromFilename(filename, graph.metadata.files);
     const size = await this.#io.addFile(slug, readable);
 
-    const graph = await this.#io.getGraph();
     const fileInfo: FileInfo = {
       slug,
       size,

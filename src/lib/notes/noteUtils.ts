@@ -1088,7 +1088,10 @@ const getNotesWithTitleOrSlugContainingToken = (
 };
 
 
-const createSlug = (noteContent: string, existingSlugs: Slug[]): Slug => {
+const createSlug = (
+  noteContent: string,
+  existingSlugs: Slug[],
+): Slug => {
   const title = inferNoteTitle(noteContent);
   let slugStem = sluggifyNoteText(title);
 
@@ -1234,6 +1237,44 @@ const changeSlugReferencesInNote = (
 };
 
 
+const getSlugFromFilename = (
+  filename: string,
+  existingFiles: FileInfo[],
+): Slug => {
+  const existingFileSlugs = existingFiles.map((file) => file.slug);
+  const extension = getExtensionFromFilename(filename);
+  const filenameWithoutExtension = removeExtensionFromFilename(filename);
+  const sluggifiedFileStem = sluggify(filenameWithoutExtension);
+
+  let n = 1;
+
+  while (true) {
+    // We don't want to use just "new" as a slug, because that would conflict
+    // with the "new" keyword in the URL schema. So let's use "new-1" instead.
+    // If that's taken, we'll try "new-2", etc.
+    // With other slugs, we only want to append a number if there's a conflict,
+    // starting with "2".
+    const showIntegerSuffix = n > 1;
+    const stemWithOptionalIntegerSuffix = showIntegerSuffix
+      ? `${sluggifiedFileStem}-${n}`
+      : sluggifiedFileStem;
+
+    const slug: Slug = FILE_SLUG_PREFIX
+      + stemWithOptionalIntegerSuffix
+      + (
+        extension
+          ? "." + extension.trim().toLowerCase()
+          : ""
+      );
+
+    if (!existingFileSlugs.includes(slug)) {
+      return slug;
+    }
+    n++;
+  }
+};
+
+
 export {
   getExtensionFromFilename,
   getMediaTypeFromFilename,
@@ -1283,4 +1324,6 @@ export {
   changeSlugReferencesInNote,
   removeExtensionFromFilename,
   isFileSlug,
+  mapInlineSpans,
+  getSlugFromFilename,
 };
