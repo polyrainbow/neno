@@ -84,10 +84,13 @@ const renameFiles = async (
   storageProvider: StorageProvider,
 ): Promise<void> => {
   for (const [fileId, fileInfo] of filesMap.entries()) {
-    await storageProvider.renameFile(
-      "files/" + fileId,
-      fileInfo.slug,
-    );
+    const newFilename = fileInfo.slug.substring(FILE_SLUG_PREFIX.length);
+    if (newFilename !== fileId) {
+      await storageProvider.renameFile(
+        "files/" + fileId,
+        newFilename,
+      );
+    }
   }
 };
 
