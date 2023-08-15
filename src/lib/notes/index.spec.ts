@@ -564,4 +564,121 @@ describe("Notes module", () => {
     const n1 = await notesProvider.get("n1");
     expect(n1.backlinks.length).toBe(0);
   });
+
+
+  it(
+    "should add files and return file info",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo = await notesProvider.addFile(
+        readable,
+        "test.txt",
+      );
+
+      expect(fileInfo.slug).toBe("files/test.txt");
+      expect(fileInfo.size).toBe(6);
+    },
+  );
+
+  it(
+    "should sluggify filenames correctly",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo = await notesProvider.addFile(
+        readable,
+        "test.test.test+.txt",
+      );
+
+      expect(fileInfo.slug).toBe("files/test-test-test.txt");
+    },
+  );
+
+  it(
+    "should remove files correctly",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo = await notesProvider.addFile(
+        readable,
+        "test.txt",
+      );
+
+      await notesProvider.deleteFile(fileInfo.slug);
+      const files = await notesProvider.getFiles();
+
+      expect(files.length).toBe(0);
+    },
+  );
+
+  it(
+    "should correctly retrieve files",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo = await notesProvider.addFile(
+        readable,
+        "test.txt",
+      );
+
+      const readableFromProvider
+        = await notesProvider.getReadableFileStream(fileInfo.slug);
+
+      const utf8ToString = (bytes: Uint8Array) => {
+        const decoder = new TextDecoder();
+        return decoder.decode(bytes);
+      };
+
+      const reader = readableFromProvider.getReader();
+      const result = await reader.read();
+      const content = utf8ToString(result.value);
+
+      expect(content).toBe("foobar");
+    },
+  );
 });
