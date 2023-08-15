@@ -106,7 +106,7 @@
   "list.item.files": "{files} Dateien",
   "list.item.hub": "Hub",
   "list.item.links.currently-selected": "Diese Notiz ist momentan ausgewählt. Sie kann nicht mit sich selbst verbunden werden.",
-  "list.item.links.link": "Mit ausgewählter Notiz verbinden",
+  "list.item.links.link": "Zu dieser Notiz verlinken",
   "list.item.links.linked-to-x-notes": "Diese Notiz ist mit {numberOfLinkedNotes} anderen Notiz(en) verbunden.",
   "list.item.links.not-linked": "Nicht verbunden",
   "list.note-list": "Notiz-Liste",
