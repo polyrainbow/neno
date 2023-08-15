@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-
 import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
 import NewNote from "./interfaces/NewNote.js";
