@@ -52,6 +52,7 @@
     "dev": "npx vite",
     "build": "npx tsc && npx vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "all-checks": "npm run stylelint && npm run lint && npm run test && npm run build",
     "lint-fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix"
   },
   "author": "Sebastian Zimmer",
