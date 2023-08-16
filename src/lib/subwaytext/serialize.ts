@@ -34,11 +34,15 @@ function serializeEmpty(block: BlockEmpty): string {
   return block.data.whitespace;
 }
 
-function serializeCode(block: BlockCode): string {
+function serializeCodeString(code: string): string {
+  return code.replace(/^```(.*)/gm, "\\```$1");
+}
+
+function serializeCodeBlock(block: BlockCode): string {
   return "```"
     + block.data.whitespace
     + block.data.contentType
-    + "\n" + block.data.code + "\n```";
+    + "\n" + serializeCodeString(block.data.code) + "\n```";
 }
 
 function serializeUnorderedListItem(block: UnorderedListItemBlock): string {
@@ -62,7 +66,7 @@ export default function serialize(blocks: Block[]): string {
       case BlockType.ORDERED_LIST_ITEM:
         return serializeOrderedListItem(block);
       case BlockType.CODE:
-        return serializeCode(block);
+        return serializeCodeBlock(block);
       case BlockType.QUOTE:
         return serializeQuote(block);
       case BlockType.EMPTY:

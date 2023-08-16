@@ -631,4 +631,17 @@ A paragraph with a https://link.com and a /slashlink`;
     const output = serialize(result);
     expect(output).toStrictEqual(input);
   });
+
+
+  it("should preserve backslash before code fences", () => {
+    const input = `\`\`\`
+\\\`\`\`
+code inside code
+\\\`\`\`
+\`\`\``;
+
+    const result = subwaytext(input);
+    const output = serialize(result);
+    expect(output).toStrictEqual(input);
+  });
 });
