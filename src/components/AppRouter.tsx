@@ -1,4 +1,4 @@
-import LoginView from "./LoginView";
+import StartView from "./StartView";
 import {
   Navigate,
   createBrowserRouter,
@@ -31,8 +31,8 @@ const AppRouter = () => {
         } replace />,
       },
       {
-        path: getAppPath(PathTemplate.LOGIN),
-        element: <LoginView />,
+        path: getAppPath(PathTemplate.START),
+        element: <StartView />,
       },
       {
         path: getAppPath(

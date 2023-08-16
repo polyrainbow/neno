@@ -1,24 +1,24 @@
-import LoginViewLocal from "./LoginViewLocal";
+import StartViewLocal from "./StartViewLocal";
 import { ASSETS_PATH, VERSION } from "../config";
 import { l } from "../lib/intl";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 
-const LoginView = () => {
+const StartView = () => {
   return <>
     <HeaderContainerLeftRight />
-    <section className="section-login">
+    <section className="section-start">
       <div
-        className="login-welcome"
+        className="start-welcome"
       >
         <img
           src={ASSETS_PATH + "app-icon/logo-circle.svg"}
-          alt={l("login.logo.alt")}
-          id="login-logo"
+          alt={l("start.logo.alt")}
+          id="start-logo"
         />
-        <div className="login-welcome-app-title">{l("app.title")}</div>
-        <div>{l("login.introduction")}</div>
+        <div className="start-welcome-app-title">{l("app.title")}</div>
+        <div>{l("start.introduction")}</div>
       </div>
-      <LoginViewLocal />
+      <StartViewLocal />
       <footer>
         <div className="links">
           <a
@@ -26,10 +26,10 @@ const LoginView = () => {
               "https://github.com/SebastianZimmer/neno/blob/main/docs/index.md"
             }
           >
-            {l("login.links.user-manual")}
+            {l("start.links.user-manual")}
           </a>
           <a href="https://github.com/SebastianZimmer/neno/">
-            {l("login.links.source-code")}
+            {l("start.links.source-code")}
           </a>
         </div>
         <p className="version">{VERSION}</p>
@@ -38,4 +38,4 @@ const LoginView = () => {
   </>;
 };
 
-export default LoginView;
+export default StartView;

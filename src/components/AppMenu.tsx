@@ -53,7 +53,7 @@ const AppMenu = () => {
           }
 
           await removeAccess();
-          navigate(getAppPath(PathTemplate.LOGIN));
+          navigate(getAppPath(PathTemplate.START));
           setIsAppMenuOpen(false);
           window.location.reload();
         }}

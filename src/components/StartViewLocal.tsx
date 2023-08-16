@@ -12,7 +12,7 @@ import {
 } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
-const LoginViewLocal = () => {
+const StartViewLocal = () => {
   const [localDisclaimer, setLocalDisclaimer]
     = useState<string | null>(null);
   const [
@@ -35,19 +35,19 @@ const LoginViewLocal = () => {
   // @ts-ignore
   if (typeof window.showDirectoryPicker !== "function") {
     return <>
-      <h1>{l("login.local.heading")}</h1>
+      <h1>{l("start.local.heading")}</h1>
       <p>
-        {l("login.local.unsupported")}
+        {l("start.local.unsupported")}
       </p>
     </>;
   }
 
   return <section>
-    <h1>{l("login.local.heading")}</h1>
+    <h1>{l("start.local.heading")}</h1>
     {
       localDisclaimer === "INVALID_FOLDER_HANDLE"
         ? <p className="error-text">
-          {l("login.local.error-accessing-folder")}
+          {l("start.local.error-accessing-folder")}
         </p>
         : ""
     }
@@ -55,7 +55,7 @@ const LoginViewLocal = () => {
       typeof localDatabaseFolderHandleName === "string"
         ? <>
           <p>
-            {l("login.local.already-created-folder")}
+            {l("start.local.already-created-folder")}
           </p>
           <button
             type="button"
@@ -84,7 +84,7 @@ const LoginViewLocal = () => {
             }}
           >
             {l(
-              "login.local.open-folder-x",
+              "start.local.open-folder-x",
               { dbName: localDatabaseFolderHandleName },
             )}
           </button>
@@ -92,7 +92,7 @@ const LoginViewLocal = () => {
         : ""
     }
     <p>
-      {l("login.local.select-folder.explainer")}
+      {l("start.local.select-folder.explainer")}
     </p>
     <button
       type="button"
@@ -111,9 +111,9 @@ const LoginViewLocal = () => {
         }
       }}
     >
-      {l("login.local.select-folder")}
+      {l("start.local.select-folder")}
     </button>
   </section>;
 };
 
-export default LoginViewLocal;
+export default StartViewLocal;

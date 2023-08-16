@@ -27,7 +27,7 @@ export default async () => {
           "redirect",
           window.location.pathname.substring(ROOT_PATH.length - 1),
         );
-        navigate(getAppPath(PathTemplate.LOGIN, new Map(), urlParams));
+        navigate(getAppPath(PathTemplate.START, new Map(), urlParams));
       }
     }
   };

@@ -1,8 +1,8 @@
 /******************************
-  Login
+  Start
 ******************************/
 
-.section-login {
+.section-start {
   display: grid;
   grid-gap: var(--default-gap);
   grid-template-columns: 1fr 1fr;
@@ -15,67 +15,67 @@
   overflow: auto;
 }
 
-.section-login .login-welcome {
+.section-start .start-welcome {
   margin: auto;
 }
 
-.section-login .login-welcome #login-logo {
+.section-start .start-welcome #start-logo {
   margin: auto;
   width: 200px;
   height: 200px;
   display: block;
 }
 
-.section-login .login-welcome div {
+.section-start .start-welcome div {
   margin: auto;
   text-align: center;
   display: block;
 }
 
-.login-welcome-app-title {
+.start-welcome-app-title {
   font-size: var(--h1-font-size);
   font-weight: var(--bold);
 }
 
-.section-login input {
+.section-start input {
   font-size: var(--large-font-size);
   color: var(--font-color);
   margin: 0;
 }
 
-.section-login footer {
+.section-start footer {
   color: var(--font-color);
   margin: 0;
   text-align: center;
 }
 
-.section-login footer .links {
+.section-start footer .links {
   display: flex;
   justify-content: center;
   gap: var(--default-gap);
 }
 
-.section-login footer .version {
+.section-start footer .version {
   font-size: var(--small-font-size);
 }
 
 @media only screen and (min-width: 1281px) {
-  .section-login .login-welcome {
+  .section-start .start-welcome {
     grid-area: 1 / 1 / 2 / 3;
   }
 
-  .section-login footer {
+  .section-start footer {
     grid-area: 3 / 1 / 4 / 3;
   }
 }
 
 @media only screen and (max-width: 1280px) {
-  .section-login {
+  .section-start {
     grid-template-columns: auto;
     grid-template-rows: auto auto auto;
   }
 
-  .section-login .login-welcome {
+  .section-start .start-welcome {
     grid-area: 1 / 1 / 2 / 2;
   }
 }

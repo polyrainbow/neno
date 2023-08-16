@@ -38,7 +38,7 @@ NENO is a powerful note-taking app that helps you create your personal knowledge
 
 ## Getting started
 
-Read the [user manual](./docs/index.md) or just [go to the app](https://sebastianzimmer.github.io/neno/login), select a folder on your device, and start taking notes. Please note that your browser
+Read the [user manual](./docs/index.md) or just [go to the app](https://sebastianzimmer.github.io/neno/start), select a folder on your device, and start taking notes. Please note that your browser
 [must meet certain criteria](./docs/index.md#local-mode).
 
 ## Further reading
