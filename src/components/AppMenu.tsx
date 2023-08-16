@@ -43,6 +43,22 @@ const AppMenu = () => {
   >
     <div className="app-menu">
       <AppMenuItem
+        disabled={false}
+        label={l("menu.launchpad")}
+        icon="rocket_launch"
+        onClick={async () => {
+          if (unsavedChanges) {
+            await confirmDiscardingUnsavedChanges();
+            setUnsavedChanges(false);
+          }
+
+          await removeAccess();
+          navigate(getAppPath(PathTemplate.LOGIN));
+          setIsAppMenuOpen(false);
+          window.location.reload();
+        }}
+      />
+      <AppMenuItem
         disabled={!isInitialized()}
         label={isSmallScreen ? l("menu.note-list") : l("menu.editor")}
         icon={isSmallScreen ? "list" : "create"}
@@ -126,7 +142,7 @@ const AppMenu = () => {
         }}
       />
       <AppMenuItem
-        disabled={!isInitialized()}
+        disabled={false}
         label={l("menu.settings")}
         icon="settings"
         onClick={async () => {
@@ -143,22 +159,6 @@ const AppMenu = () => {
 
           navigate(target);
           setIsAppMenuOpen(false);
-        }}
-      />
-      <AppMenuItem
-        disabled={!isInitialized()}
-        label={l("menu.close-graph")}
-        icon="logout"
-        onClick={async () => {
-          if (unsavedChanges) {
-            await confirmDiscardingUnsavedChanges();
-            setUnsavedChanges(false);
-          }
-
-          await removeAccess();
-          navigate(getAppPath(PathTemplate.LOGIN));
-          setIsAppMenuOpen(false);
-          window.location.reload();
         }}
       />
     </div>
