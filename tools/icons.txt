@@ -72,6 +72,7 @@ query_stats
 question_mark
 radio_button_unchecked
 refresh
+rocket_launch
 save_alt
 save
 saved_search
