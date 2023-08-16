@@ -140,7 +140,7 @@ A paragraph with a https://link.com and a /slashlink`;
         type: BlockType.ORDERED_LIST_ITEM,
         data: {
           whitespace: "",
-          index: 1,
+          index: "1",
           text: [
             {
               type: SpanType.NORMAL_TEXT,
@@ -153,7 +153,7 @@ A paragraph with a https://link.com and a /slashlink`;
         type: BlockType.ORDERED_LIST_ITEM,
         data: {
           whitespace: " ",
-          index: 2,
+          index: "2",
           text: [
             {
               type: SpanType.NORMAL_TEXT,
@@ -166,7 +166,7 @@ A paragraph with a https://link.com and a /slashlink`;
         type: BlockType.ORDERED_LIST_ITEM,
         data: {
           whitespace: "",
-          index: 3,
+          index: "3",
           text: [
             {
               type: SpanType.NORMAL_TEXT,
@@ -613,6 +613,19 @@ const x = [{}];
 
 https://example.com Link to example.com
 A paragraph with a https://link.com and a /slashlink`;
+
+    const result = subwaytext(input);
+    const output = serialize(result);
+    expect(output).toStrictEqual(input);
+  });
+
+
+  it("should preserve all digits in ordered lists", () => {
+    const input = `
+1.ordered list
+02. another item
+003.item3
+07.06.2021`;
 
     const result = subwaytext(input);
     const output = serialize(result);

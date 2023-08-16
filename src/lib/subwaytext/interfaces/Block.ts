@@ -43,7 +43,7 @@ export interface UnorderedListItemBlock {
 }
 
 export interface OrderedListItemBlockData extends InlineTextWithWhitespace {
-  index: number,
+  index: string,
 }
 
 export interface OrderedListItemBlock {

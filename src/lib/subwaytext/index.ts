@@ -86,7 +86,7 @@ const parse = (input: string): Block[] => {
           blocks.push(newBlock);
           return blocks;
         } else if (line.match(/^\d+\./)) {
-          const index = parseInt(line.match(/^\d+/)?.[0] ?? "0");
+          const index = line.match(/^\d+/)?.[0] ?? "0";
           const whitespace = line.match(/^\d+\.(\s*)/)?.[1] ?? "";
           const textString = line.match(/^\d+\.\s*(.*)/)?.[1] ?? "";
 
