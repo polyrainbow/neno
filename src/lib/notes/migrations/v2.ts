@@ -86,10 +86,15 @@ const renameFiles = async (
   for (const [fileId, fileInfo] of filesMap.entries()) {
     const newFilename = fileInfo.slug.substring(FILE_SLUG_PREFIX.length);
     if (newFilename !== fileId) {
-      await storageProvider.renameFile(
-        "files/" + fileId,
-        newFilename,
-      );
+      try {
+        await storageProvider.renameFile(
+          "files/" + fileId,
+          newFilename,
+        );
+      } catch (e) {
+        console.error("Failed to rename file", fileId, newFilename, e);
+        throw e;
+      }
     }
   }
 };
