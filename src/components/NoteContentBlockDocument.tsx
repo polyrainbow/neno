@@ -1,15 +1,6 @@
-import { Link } from "react-router-dom";
 import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import { PathTemplate } from "../enum/PathTemplate";
-import { l } from "../lib/intl";
-import {
-  getAppPath,
-  humanFileSize,
-  onDownload,
-} from "../lib/utils";
-import FlexContainer from "./FlexContainer";
-import Icon from "./Icon";
-import { LOCAL_GRAPH_ID } from "../config";
+import { humanFileSize } from "../lib/utils";
+import NoteContentBlockActions from "./NoteContentBlockActions";
 
 interface NoteContentBlockAudioProps {
   file: FileInfo,
@@ -32,30 +23,7 @@ const NoteContentBlockDocument = ({
           {humanFileSize(file.size)}
         </div>
       </div>
-      <FlexContainer className="preview-block-file-actions">
-        <Link to={
-          getAppPath(PathTemplate.FILE, new Map([
-            ["GRAPH_ID", LOCAL_GRAPH_ID],
-            ["FILE_SLUG", file.slug],
-          ]))
-        }>
-          <Icon
-            icon="info"
-            title="File details"
-            size={24}
-          />
-        </Link>
-        <a
-          className="preview-block-file-download-button"
-          onClick={() => onDownload(file)}
-        >
-          <Icon
-            icon="file_download"
-            title={l("note.download-file")}
-            size={24}
-          />
-        </a>
-      </FlexContainer>
+      <NoteContentBlockActions file={file} />
     </div>
   </div>;
 };

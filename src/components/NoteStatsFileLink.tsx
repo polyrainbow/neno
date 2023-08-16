@@ -5,6 +5,7 @@ import {
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../enum/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
+import { getFilenameFromFileSlug } from "../lib/notes/noteUtils";
 
 interface NoteStatsFileLinkProps {
   file: FileInfo,
@@ -20,7 +21,7 @@ const NoteStatsFileLink = ({
       ["FILE_SLUG", file.slug],
     ]))}
   >
-    {file.slug}
+    {getFilenameFromFileSlug(file.slug)}
   </Link>;
 };
 

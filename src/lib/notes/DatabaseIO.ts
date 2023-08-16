@@ -42,7 +42,7 @@ export default class DatabaseIO {
   static #workerPool: Worker[] = [];
 
 
-  static getFilenameForSlug(slug: Slug): string {
+  static getfilenameForNoteSlug(slug: Slug): string {
     if (!slug) {
       throw new Error("Cannot get filename for empty slug");
     }
@@ -310,7 +310,7 @@ export default class DatabaseIO {
     slug: Slug,
   ): Promise<string> {
     const rawNote = await this.#storageProvider.readObjectAsString(
-      DatabaseIO.getFilenameForSlug(slug),
+      DatabaseIO.getfilenameForNoteSlug(slug),
     );
     if (!rawNote) {
       throw new Error(ErrorMessage.GRAPH_NOT_FOUND);
@@ -379,7 +379,7 @@ export default class DatabaseIO {
 
     if (slugsToFlush) {
       await Promise.all(slugsToFlush.map(async (slug) => {
-        const filename = DatabaseIO.getFilenameForSlug(slug);
+        const filename = DatabaseIO.getfilenameForNoteSlug(slug);
         if (!graph.notes.has(slug)) {
           await this.#storageProvider.removeObject(filename);
         } else {
@@ -391,7 +391,7 @@ export default class DatabaseIO {
       }));
     } else {
       for (const [slug, note] of graph.notes) {
-        const filename = DatabaseIO.getFilenameForSlug(slug);
+        const filename = DatabaseIO.getfilenameForNoteSlug(slug);
         if (!graph.notes.has(slug)) {
           await this.#storageProvider.removeObject(filename);
         } else {

@@ -7,7 +7,10 @@ import { MediaType } from "../lib/notes/interfaces/MediaType";
 import { PathTemplate } from "../enum/PathTemplate";
 import { l } from "../lib/intl";
 import { getAppPath, getIconSrc } from "../lib/utils";
-import { getMediaTypeFromFilename } from "../lib/notes/noteUtils";
+import {
+  getFilenameFromFileSlug,
+  getMediaTypeFromFilename,
+} from "../lib/notes/noteUtils";
 import { getUrlForSlug } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
@@ -62,7 +65,7 @@ const FilesViewPreviewBox = ({
       >
         <div
           className="filename"
-        >{file.slug}</div>
+        >{getFilenameFromFileSlug(file.slug)}</div>
         {
           isDangling
             ? <div

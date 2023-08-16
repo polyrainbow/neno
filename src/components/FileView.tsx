@@ -20,7 +20,10 @@ import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
 import DialogActionBar from "./DialogActionBar";
-import { getMediaTypeFromFilename } from "../lib/notes/noteUtils";
+import {
+  getFilenameFromFileSlug,
+  getMediaTypeFromFilename,
+} from "../lib/notes/noteUtils";
 import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
 import { isInitialized } from "../lib/LocalDataStorage";
 
@@ -81,7 +84,7 @@ const FileView = () => {
           PathTemplate.FILES, new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
         )}
       >{l("files.show-all-files")}</Link></p>
-      <h1>{fileInfo?.slug}</h1>
+      <h1>{fileInfo ? getFilenameFromFileSlug(fileInfo.slug) : ""}</h1>
       <p>{
         fileInfo ? humanFileSize(fileInfo.size) : ""
       }{SPAN_SEPARATOR}{

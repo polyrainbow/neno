@@ -1275,6 +1275,16 @@ const getSlugFromFilename = (
 };
 
 
+const getFilenameFromFileSlug = (
+  fileSlug: Slug,
+) => {
+  if (!isFileSlug(fileSlug)) {
+    throw new Error("Not a file slug: " + fileSlug);
+  }
+  return fileSlug.substring(FILE_SLUG_PREFIX.length);
+};
+
+
 export {
   getExtensionFromFilename,
   getMediaTypeFromFilename,
@@ -1326,4 +1336,5 @@ export {
   isFileSlug,
   mapInlineSpans,
   getSlugFromFilename,
+  getFilenameFromFileSlug,
 };
