@@ -618,6 +618,49 @@ describe("Notes module", () => {
   );
 
   it(
+    "should sluggify dotfiles correctly",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo = await notesProvider.addFile(
+        readable,
+        ".graph.json",
+      );
+
+      expect(fileInfo.slug).toBe("files/graph.json");
+
+      const readable2 = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo2 = await notesProvider.addFile(
+        readable2,
+        ".htaccess",
+      );
+
+      expect(fileInfo2.slug).toBe("files/htaccess");
+    },
+  );
+
+  it(
     "should sluggify filenames correctly when slug already exists",
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());

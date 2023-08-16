@@ -6,9 +6,11 @@ import {
   getExtensionFromFilename,
   getNotesWithFlag,
   getNotesWithUrl,
+  getSlugFromFilename,
   inferNoteTitle,
   parseSerializedExistingNote,
   parseSerializedNewNote,
+  removeExtensionFromFilename,
   serializeNote,
   sluggify,
 } from "./noteUtils.js";
@@ -27,6 +29,30 @@ describe("getExtensionFromFilename", () => {
       expect(getExtensionFromFilename("AUDIO.MP3")).toBe("mp3");
       expect(getExtensionFromFilename("AUDIO. MP3")).toBe(" mp3");
       expect(getExtensionFromFilename("AUDIO.mp3  ")).toBe("mp3  ");
+    },
+  );
+});
+
+
+describe("removeExtensionFromFilename", () => {
+  it(
+    "should correctly normalize filenames",
+    async () => {
+      expect(removeExtensionFromFilename("AUDIO.mp3")).toBe("AUDIO");
+      expect(removeExtensionFromFilename("audio 1.MP3")).toBe("audio 1");
+      expect(removeExtensionFromFilename(".graph.json")).toBe(".graph");
+      expect(removeExtensionFromFilename(".htaccess")).toBe("");
+    },
+  );
+});
+
+
+describe("getSlugFromFilename", () => {
+  it(
+    "should correctly create slugs for dotfiles",
+    async () => {
+      expect(getSlugFromFilename(".graph.json", [])).toBe("files/graph.json");
+      expect(getSlugFromFilename(".htaccess", [])).toBe("files/htaccess");
     },
   );
 });

@@ -1263,7 +1263,11 @@ const getSlugFromFilename = (
       + stemWithOptionalIntegerSuffix
       + (
         extension
-          ? "." + extension.trim().toLowerCase()
+          ? (
+            stemWithOptionalIntegerSuffix
+              ? "."
+              : ""
+          ) + extension.trim().toLowerCase()
           : ""
       );
 
