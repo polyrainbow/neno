@@ -1,11 +1,10 @@
 import NotesProviderContext from "../contexts/NotesProviderContext";
-import BusyIndicator from "./BusyIndicator";
 import {
   getNotesProvider,
   isInitialized,
 } from "../lib/LocalDataStorage";
-import { l } from "../lib/intl";
 import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
+import BusyView from "./BusyView";
 
 
 const NoteAccessProvider = ({
@@ -14,7 +13,7 @@ const NoteAccessProvider = ({
   useGraphAccessCheck();
 
   if (!isInitialized()) {
-    return <BusyIndicator height={80} alt={l("app.loading")} />;
+    return <BusyView />;
   }
 
   return <NotesProviderContext.Provider

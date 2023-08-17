@@ -298,6 +298,15 @@ main {
   }
 }
 
+.busy-view {
+  padding: var(--default-padding);
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  align-items: center;
+  justify-content: center;
+}
+
 /******************************
   Checkerbox layout
 ******************************/
