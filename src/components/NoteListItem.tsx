@@ -66,7 +66,6 @@ const NoteListItem = ({
     {
       "linkCount" in note
         ? <NoteListItemLinkedNotesIndicator
-          isLinked={isLinked}
           isLinkable={isLinkable}
           isActive={isActive}
           numberOfLinkedNotes={note.linkCount.sum}

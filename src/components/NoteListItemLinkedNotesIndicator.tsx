@@ -4,7 +4,6 @@ import { l } from "../lib/intl";
 
 
 const NoteListItemLinkedNotesIndicator = ({
-  isLinked,
   isActive,
   numberOfLinkedNotes,
   onLinkIndicatorClick,
@@ -35,9 +34,7 @@ const NoteListItemLinkedNotesIndicator = ({
         className="note-list-item-linked-notes-indicator-content"
       >
         <img
-          src={
-            getIconSrc(isLinked ? "link_off" : "link")
-          }
+          src={getIconSrc("link")}
           alt={linkControlLabel}
           className="svg-icon"
         />
