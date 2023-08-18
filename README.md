@@ -11,15 +11,12 @@
 
 ## What is NENO?
 
-NENO is a powerful note-taking app that helps you create your personal knowledge graph. With NENO, you retain full control over your data because you decide where it is stored: On your device or on a cloud storage of your choice.
+NENO is a powerful note-taking app that helps you create your personal knowledge graph. With NENO, your data belongs to you and you decide where it is stored: On your device or on a cloud storage of your choice.
 
 ## Screenshots
 
 ![NENO Editor view](./docs/img/neno-light.png)
-*NENO Editor view*
-
-![NENO Graph view](./docs/img/graph%20view.png)
-*NENO Graph view*
+*NENO Editor view in light mode*
 
 ![NENO Editor view in dark mode](./docs/img/neno-dark.png)
 *NENO Editor view in dark mode*
@@ -27,19 +24,19 @@ NENO is a powerful note-taking app that helps you create your personal knowledge
 ## Features
 
 * Full data ownership: You decide where your data is stored: On your device or on a cloud storage of your choice.
-* Multiple media types: Paste video, audio, PDF documents, images and code into your note
+* Multiple media types: Paste video, audio, PDF documents, images and code, or any arbitrary file into your note
 * Graph View: Drag and drop nodes and create your custom knowledge graph visualization
-* Simple plaintext editor
+* Simple modeless markup with [Subtext](https://github.com/subconsciousnetwork/subtext/)
+* Interoperability: NENO's data format is backed by human-readable plain-text files for high interoperability
 * Powerful full-text search
-* Tap-to-link: One click is enough to link two notes
+* Tap-to-link: One click is enough to link one note to another
 * File overview: All files in one view
-* Lossless export: Export your data losslessly to create backups
 * Dark mode: Eye-friendly note-taking at night time
 
 ## Getting started
 
-Read the [user manual](./docs/index.md) or just [go to the app](https://sebastianzimmer.github.io/neno/start), select a folder on your device, and start taking notes. Please note that your browser
-[must meet certain criteria](./docs/index.md#local-mode).
+Read the [user manual](./docs/index.md) or just [go to the app](https://sebastianzimmer.github.io/neno). Please note that your browser
+must support File System Access (Chrome, Edge, ...).
 
 ## Further reading
 
