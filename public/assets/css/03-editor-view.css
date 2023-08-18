@@ -462,7 +462,12 @@ div[data-lexical-editor] .transclusion p {
 div[data-lexical-editor] .transclusion p.slug {
   color: var(--alt-content-color);
   font-size: var(--default-font-size);
-  margin-top: var(--default-padding);
+  margin-bottom: 5px;
+}
+
+div[data-lexical-editor] .transclusion span.transclusion-note-title {
+  display: block;
+  font-weight: bold;
 }
 
 .inline-code, .code-block {

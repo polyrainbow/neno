@@ -30,6 +30,7 @@ import { PathTemplate } from "../enum/PathTemplate";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import {
   getMediaTypeFromFilename,
+  getNoteTitle,
   isFileSlug,
   sluggify,
 } from "../lib/notes/noteUtils";
@@ -40,7 +41,7 @@ import NoteContentBlockDocument from "./NoteContentBlockDocument";
 import NoteContentBlockTextFile from "./NoteContentBlockTextFile";
 import NoteContentBlockImage from "./NoteContentBlockImage";
 import NotesProvider from "../lib/notes";
-import { getTransclusionContentFromNoteContent } from "../lib/Transclusion";
+import { getNoteTransclusionContent } from "../lib/Transclusion";
 import { LinkType } from "../types/LinkType";
 import { UserRequestType } from "../lib/editor/types/UserRequestType";
 import NoteSlug from "./NoteSlug";
@@ -250,12 +251,15 @@ const Note = ({
       );
 
       if (linkedNote) {
-        return getTransclusionContentFromNoteContent(linkedNote.content);
+        return getNoteTransclusionContent(linkedNote.content, linkedNote.title);
       }
     }
 
     const linkedNote = await notesProvider.get(slug);
-    return getTransclusionContentFromNoteContent(linkedNote.content);
+    return getNoteTransclusionContent(
+      linkedNote.content,
+      getNoteTitle(linkedNote),
+    );
   };
 
 

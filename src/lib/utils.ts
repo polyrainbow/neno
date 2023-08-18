@@ -292,9 +292,19 @@ const getPagedMatches = <T>(
 };
 
 
-const getFirstLines = (text: string, numberOfLines: number): string => {
-  const lines = text.split("\n");
-  return lines.slice(0, numberOfLines).join("\n");
+const getLines = (
+  text: string,
+  startOffset: number,
+  numberOfLines: number,
+  onlyNonEmptyLines: boolean,
+): string => {
+  let lines = text.split("\n");
+
+  if (onlyNonEmptyLines) {
+    lines = lines.filter((line) => line.trim().length > 0);
+  }
+
+  return lines.slice(startOffset, startOffset + numberOfLines).join("\n");
 };
 
 
@@ -337,7 +347,7 @@ export {
   getWritableStream,
   readFileAsString,
   createContentFromSlugs,
-  getFirstLines,
+  getLines,
   getWikilinkForNote,
   getNoteTitleFromActiveNote,
 };

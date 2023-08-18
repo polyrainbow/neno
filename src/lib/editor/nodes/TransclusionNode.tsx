@@ -55,6 +55,7 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
         className={"transclusion " + (isError ? "unavailable" : "")}
         data-transclusion-id={slug}
       >
+        <p className="slug">{this.__link}</p>
         {
           isError
             ? <div className="not-available-disclaimer">
@@ -67,7 +68,6 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
             </div>
             : (content ?? <div>Loading...</div>)
         }
-        <p className="slug">{this.__link}</p>
       </div>;
     };
 

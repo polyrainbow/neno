@@ -1,22 +1,36 @@
 import { ReactElement } from "react";
-import { getFirstLines } from "./utils";
+import { getLines } from "./utils";
 import { removeWikilinkPunctuation } from "./notes/noteUtils";
 
-export const getTransclusionContentFromNoteContent = (
+export const getNoteTransclusionContent = (
   noteContent: string,
+  noteTitle: string,
 ): ReactElement => {
-  const MAX_LINES = 6;
+  const MAX_LINES = 5;
 
-  const lines = noteContent.split("\n");
+  const nonEmptyLines = noteContent
+    .split("\n")
+    .filter((line) => line.trim().length > 0);
+
   let transclusionContent;
 
-  if (lines.length <= MAX_LINES) {
-    transclusionContent = noteContent;
+  const noteContentContainsTitle = nonEmptyLines[0].includes(noteTitle);
+
+  if (nonEmptyLines.length <= MAX_LINES) {
+    transclusionContent = noteContentContainsTitle
+      ? nonEmptyLines.slice(1).join("\n")
+      : nonEmptyLines.join("\n");
   } else {
-    transclusionContent = getFirstLines(noteContent, MAX_LINES) + "\n…";
+    transclusionContent = getLines(
+      noteContent,
+      noteContentContainsTitle ? 1 : 0,
+      MAX_LINES,
+      true,
+    ) + "\n…";
   }
 
   return <p className="transclusion-note-content">
+    <span className="transclusion-note-title">{noteTitle}</span>
     {removeWikilinkPunctuation(transclusionContent)}
   </p>;
 };
