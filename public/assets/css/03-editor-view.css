@@ -438,7 +438,7 @@ div[data-lexical-editor] .transclusion-wrapper {
 
 div[data-lexical-editor] .transclusion {
   background: var(--accent-color-interactible);
-  border-radius: 7px;
+  border-radius: var(--border-radius);
   padding: 10px;
   margin: 10px 0;
   cursor: pointer;
