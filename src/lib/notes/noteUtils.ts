@@ -872,7 +872,12 @@ const getGraphLinks = (graph: Graph): Link[] => {
             "Could not determine outgoing links for " + slug,
           );
         }
-        const targets = graph.indexes.outgoingLinks.get(slug) as Set<Slug>;
+        const targets = Array.from(
+          graph.indexes.outgoingLinks.get(slug) as Set<Slug>,
+        )
+          .filter((targetSlug: Slug): boolean => {
+            return graph.notes.has(targetSlug);
+          });
 
         targets.forEach((slugB) => {
           links.push([slug, slugB]);

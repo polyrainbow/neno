@@ -86,29 +86,6 @@ describe("Notes module", () => {
     expect(stats.numberOfUnlinkedNotes).toBe(2);
   });
 
-  it("should correctly output number of links", async () => {
-    const notesProvider = new NotesProvider(new MockStorageProvider());
-
-    const noteSaveRequest: NoteSaveRequest = {
-      note: {
-        content: "Note with a link to [[another existing note]]",
-        meta: {
-          custom: {},
-          flags: [],
-          contentType: "",
-        },
-      },
-      ignoreDuplicateTitles: false,
-    };
-    await notesProvider.put(noteSaveRequest);
-    const stats = await notesProvider.getStats({
-      includeMetadata: false,
-      includeAnalysis: false,
-    });
-    expect(stats.numberOfLinks).toBe(1);
-  });
-
-
   it(
     "search result only consider links to really existing notes",
     async () => {
@@ -781,6 +758,75 @@ describe("Notes module", () => {
       const content = utf8ToString(result.value);
 
       expect(content).toBe("foobar");
+    },
+  );
+
+
+  it("should correctly show actual links in stats", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
+    const noteSaveRequest1: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "another-existing-note",
+    };
+    await notesProvider.put(noteSaveRequest1);
+
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "Note with a link to [[another existing note]]",
+        meta: {
+          custom: {},
+          flags: [],
+          contentType: "",
+        },
+      },
+      ignoreDuplicateTitles: false,
+    };
+    await notesProvider.put(noteSaveRequest2);
+
+    const stats = await notesProvider.getStats({
+      includeMetadata: false,
+      includeAnalysis: false,
+    });
+    expect(stats.numberOfLinks).toBe(1);
+  });
+
+
+  it(
+    "should not consider links to non-existent notes in stats",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: `A note with several links to non-existent notes
+          [[foo]] [[bar]] /baz`,
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n2",
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const stats = await notesProvider.getStats({
+        includeAnalysis: false,
+        includeMetadata: false,
+      });
+
+      expect(stats.numberOfLinks).toBe(0);
     },
   );
 });
