@@ -14,7 +14,8 @@ export const getNoteTransclusionContent = (
 
   let transclusionContent;
 
-  const noteContentContainsTitle = nonEmptyLines[0].includes(noteTitle);
+  const noteContentContainsTitle = removeWikilinkPunctuation(nonEmptyLines[0])
+    .includes(noteTitle);
 
   if (nonEmptyLines.length <= MAX_LINES) {
     transclusionContent = noteContentContainsTitle
