@@ -4,7 +4,7 @@ One of NENO's best features is the Graph View. In the Graph View, your notes are
 displayed as graph nodes and links between notes are displayed as graph edges.
 You can zoom in and out with the mouse wheel, move notes and add/remove links.
 
-![NENO Graph view example](./img/graph%20view%20simple.png)
+![NENO Graph view example](./img/graph-view-simple-light.png)
 
 ## Accessing the Graph view
 
@@ -47,7 +47,7 @@ regardless of whether it is selected or not.
 
 ## Inflating the graph
 
-When you have a graph with a lot of nodes but do not have enough real estate to put more notes in between, you can inflate the graph by 10% by clicking on the button in the title bar.
+When you have a graph with a lot of nodes but do not have enough real estate to put more notes in between, you can inflate the graph by 10% by clicking on the button in the title bar. You can do the same for the current selection.
 
 Don't use this function too often for it will quickly result in a graph which
 is not well overseeable anymore. Use it only if absolutely necessary.

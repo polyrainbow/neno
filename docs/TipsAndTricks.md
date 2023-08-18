@@ -12,7 +12,7 @@ When you have a lot of nodes with a similar name, this may not be that helpful.
 
 In that case, you can type `exact:` followed by the exact title of the note in the search box. In that case, only notes whose title are an exact match are displayed.
 
-![Search for exact matches](./img/exact%20matches.png)
+![Search for exact matches](./img/exact-matches.png)
 
 ### `duplicates:` - Search for duplicates
 
@@ -57,7 +57,7 @@ You can also quickly query saved presets.
 
 It might be interesting to you to see some stats on your graph or see how many [components](https://en.wikipedia.org/wiki/Component_(graph_theory)) it has. Use the `Stats` view for this, which you can find in the app menu.
 
-![Exhaustive stats](./img/exhaustive%20stats.png)
+![Stats](./img/stats-view.png)
 
 ## Graph View
 
