@@ -1,0 +1,71 @@
+/* eslint-disable max-len */
+import { test, expect } from "@playwright/test";
+
+const DEMO_NOTE = `# Welcome to NENO
+Paragraph block
+
+> Quote block.
+- List item
+1. Numbered list item
+\`\`\`
+code block
+
+\`\`\``;
+
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
+  await page.waitForSelector("img[alt='NENO logo']");
+  await page.keyboard.press("Control+.");
+  await page.waitForSelector("button.memory-storage");
+  await page.click("button.memory-storage");
+});
+
+test.describe("Editor view", () => {
+  test("should show note list item", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+    await page.keyboard.type(DEMO_NOTE);
+    await page.click("#button_upload");
+    const noteListItems = await page.$$(".sidebar .note-list .note-list-item");
+
+    expect(noteListItems.length).toBe(1);
+    const titleElement = await noteListItems[0].$(".title");
+    const title = await titleElement?.innerText();
+    expect(title).toBe("Welcome to NENO");
+  });
+
+  test("should have correct number of editor paragraphs", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+    await page.keyboard.type(DEMO_NOTE);
+    await page.click("#button_upload");
+    const editorParagraphs = await page.$$("div[data-lexical-editor] .editor-paragraph");
+    expect(editorParagraphs.length).toBe(10);
+  });
+
+  test("slug bar should show correct value", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+    await page.keyboard.type(DEMO_NOTE);
+    await page.click("#button_upload");
+    const slugElement = await page.$(".slug-line .note-slug");
+    const slug = await slugElement?.inputValue();
+    expect(slug).toBe("welcome-to-neno");
+  });
+
+  test("editor paragraphs should have correct types", async ({ page }) => {
+    await page.keyboard.type(DEMO_NOTE);
+    await page.click("#button_upload");
+    const editorParagraphs = await page.$$("div[data-lexical-editor] .editor-paragraph");
+    const classes = await Promise.all(
+      editorParagraphs.map((p) => p.getAttribute("class")),
+    );
+    expect(classes[0]).toBe("editor-paragraph s-heading ltr");
+    expect(classes[1]).toBe("editor-paragraph ltr");
+    expect(classes[2]).toBe("editor-paragraph");
+    expect(classes[3]).toBe("editor-paragraph quote-block ltr");
+    expect(classes[4]).toBe("editor-paragraph list-item ltr");
+    expect(classes[5]).toBe("editor-paragraph ltr");
+    expect(classes[6]).toBe("editor-paragraph code-block");
+    expect(classes[7]).toBe("editor-paragraph code-block ltr");
+    expect(classes[8]).toBe("editor-paragraph code-block");
+    expect(classes[9]).toBe("editor-paragraph code-block");
+  });
+});

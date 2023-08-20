@@ -6,6 +6,7 @@ import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { createDemoGraph, folderHasGraph } from "./DemoGraph";
 import { Slug } from "./notes/interfaces/Slug";
+import MockStorageProvider from "./notes/test/MockStorageProvider";
 
 /*
   Notes:
@@ -74,8 +75,14 @@ export const getSavedFolderHandle = async (
 
 
 export const initializeNotesProvider = async (
-  newFolderHandle: FileSystemDirectoryHandle,
+  newFolderHandle?: FileSystemDirectoryHandle,
 ): Promise<NotesProvider> => {
+  if (!newFolderHandle) {
+    const memoryStorageProvider = new MockStorageProvider();
+    notesProvider = new NotesProvider(memoryStorageProvider);
+    return notesProvider;
+  }
+
   await verifyPermission(newFolderHandle, true);
 
   await IDB.set(
