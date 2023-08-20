@@ -1,7 +1,6 @@
-# Deploying NENO for local mode usage
+# Deploying NENO
 
-To deploy NENO for local mode usage, you need a web space capable of serving
-static files via HTTPS.
+To deploy NENO, you need a web space capable of serving static files via HTTPS.
 
 ## 1. Clone this repository
 

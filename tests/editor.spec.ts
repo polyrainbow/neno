@@ -68,4 +68,27 @@ test.describe("Editor view", () => {
     expect(classes[8]).toBe("editor-paragraph code-block");
     expect(classes[9]).toBe("editor-paragraph code-block");
   });
+
+  test(
+    "two slashlinks in one paragraph should be correctly linked",
+    async ({ page }) => {
+      await page.keyboard.type("Two /link-1 and /link-2");
+      await page.click("#button_upload");
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraphChildren = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ))!;
+
+      const nodeNames = await Promise.all(
+        paragraphChildren.map((p) => p.evaluate((node) => node.nodeName)),
+      );
+
+      expect(nodeNames[0]).toBe("SPAN");
+      expect(nodeNames[1]).toBe("A");
+      expect(await paragraphChildren[1].innerText()).toBe("/link-1");
+      expect(nodeNames[2]).toBe("SPAN");
+      expect(nodeNames[3]).toBe("A");
+      expect(await paragraphChildren[3].innerText()).toBe("/link-2");
+    },
+  );
 });
