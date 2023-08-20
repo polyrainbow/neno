@@ -1,15 +1,15 @@
 '''
-Builds a NENO instance intended for a deployment on GitHub pages.
+Deploys NENO to GitHub pages.
 
 Requires another repository (TARGET_DIRECTORY) that is checked out in the
 branch that will deploy to gh-pages.
-
-Make sure, you set the base property in the Vite config to the correct
-basepath of your hosting environment before building
-Example: domain.com/neno/ -> base: '/neno/'
 '''
 
 TARGET_DIRECTORY=../../neno-gh-pages
+
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+sed -i '' -E "s/\"\/\"/\"\/neno\/\"/" ../vite.config.ts
 
 npm run build
 
@@ -29,5 +29,9 @@ cd $TARGET_DIRECTORY
 git add -A
 git commit --amend --no-edit
 git push --force
+
+# Reset vite config
+cd $DIR
+sed -i '' -E "s/\"\/neno\/\"/\"\/\"/" ../vite.config.ts
 
 echo "Done."
