@@ -434,7 +434,7 @@ export default class NotesProvider {
         // point, we don't accidentally manipulate the initialNodePosition
         // object.
         // So let's copy the primitive values one by one. This actually
-        // prevents bugs from occuring in local mode, where API output from this
+        // prevents bugs from occuring, where API output from this
         // module is not consistently serialized and re-parsed. It could also be
         // cloned (e. g. via structuredClone()) without destroying references,
         // which would just defer the issue outside of this module.
