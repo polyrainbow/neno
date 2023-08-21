@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { test, expect } from "@playwright/test";
+import { test, expect, ElementHandle } from "@playwright/test";
 
 const DEMO_NOTE = `# Welcome to NENO
 Paragraph block
@@ -89,6 +89,26 @@ test.describe("Editor view", () => {
       expect(nodeNames[2]).toBe("SPAN");
       expect(nodeNames[3]).toBe("A");
       expect(await paragraphChildren[3].innerText()).toBe("/link-2");
+    },
+  );
+
+  test(
+    "backspace at the beginning of a heading should remove heading block",
+    async ({ page }) => {
+      await page.keyboard.type("test\n# heading");
+      await page.keyboard.press("Meta+ArrowLeft");
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Space");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraph = (
+        await page.$("div[data-lexical-editor] .editor-paragraph")
+      ) as ElementHandle<HTMLElement>;
+      const nodeName = await paragraph.evaluate((node) => node.nodeName);
+
+      expect(await paragraph.innerText()).toBe("test # heading");
+      expect(nodeName).toBe("P");
+      expect(await paragraph.getAttribute("class")).toBe("editor-paragraph ltr");
     },
   );
 });
