@@ -2,6 +2,8 @@
 
 import {
   $getRoot,
+  $getSelection,
+  $isRangeSelection,
   CLEAR_HISTORY_COMMAND,
   EditorState,
 } from "lexical";
@@ -145,6 +147,37 @@ const PlainTextStateExchangePlugin = ({
 };
 
 
+/*
+  This plugin is used to expose the insert function to some parent module that
+  is passed as prop to the editor.
+  The reason for this approach is that we cannot access the editor object
+  from outside the editor component <LexicalComposer/> to perform updates,
+  so we need to expose this functionality manually.
+*/
+const InsertPlugin = (
+  { parentModule }: {
+    parentModule: { insert?: (text: string) => void },
+  },
+) => {
+  const [editor] = useLexicalComposerContext();
+
+  const insert = (text: string) => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        selection.insertText(text);
+      }
+    });
+  };
+
+  useEffect(() => {
+    parentModule.insert = insert;
+  }, [insert]);
+
+  return "";
+};
+
+
 interface EditorProps {
   initialText: string,
   instanceId: number,
@@ -152,6 +185,7 @@ interface EditorProps {
   onUserRequest: (type: UserRequestType, value: string) => void,
   getTransclusionContent: (id: string) => Promise<ReactElement>,
   getLinkAvailability: (link: string, linkType: LinkType) => Promise<boolean>,
+  insertModule: any,
 }
 
 
@@ -162,6 +196,7 @@ export const Editor = ({
   onUserRequest,
   getTransclusionContent,
   getLinkAvailability,
+  insertModule,
 }: EditorProps) => {
   const initialConfig = {
     namespace: "MyEditor",
@@ -208,6 +243,7 @@ export const Editor = ({
           });
         }
       } />
+      <InsertPlugin parentModule={insertModule} />
       <HistoryPlugin />
       <MyCustomAutoFocusPlugin />
       <BoldPlugin />

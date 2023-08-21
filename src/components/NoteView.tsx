@@ -44,6 +44,7 @@ const getValidNoteSlug = (
   }
 };
 
+const insertModule: { insert?: (text: string) => void } = {};
 
 const NoteView = () => {
   const notesProvider = useNotesProvider();
@@ -290,19 +291,7 @@ const NoteView = () => {
               itemsAreLinkable={true}
               onLinkIndicatorClick={(slug: Slug, title: string) => {
                 const wikilink = Utils.getWikilinkForNote(slug, title);
-
-                let newNoteContent;
-
-                if (
-                  activeNote.content === ""
-                  || activeNote.content.trimEnd() !== activeNote.content
-                ) {
-                  newNoteContent = `${activeNote.content}${wikilink}`;
-                } else {
-                  newNoteContent = `${activeNote.content} ${wikilink}`;
-                }
-
-                setNoteContent(newNoteContent, true);
+                insertModule.insert?.(wikilink);
               }}
             />
           </div>
@@ -310,6 +299,7 @@ const NoteView = () => {
       }
       <div className="main-content-besides-sidebar">
         <Note
+          insertModule={insertModule}
           isBusy={isBusy}
           note={activeNote}
           editorInstanceId={editorInstanceId}

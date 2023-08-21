@@ -69,6 +69,7 @@ interface NoteComponentProps {
   setUploadInProgress: (val: boolean) => void,
   updateReferences: boolean,
   setUpdateReferences: (val: boolean) => void,
+  insertModule: { insert?: (text: string) => void },
 }
 
 
@@ -95,6 +96,7 @@ const Note = ({
   setUploadInProgress,
   updateReferences,
   setUpdateReferences,
+  insertModule,
 }: NoteComponentProps) => {
   const noteElement = useRef<HTMLElement>(null);
   const notesProvider = useNotesProvider();
@@ -347,6 +349,7 @@ const Note = ({
             setUpdateReferences={setUpdateReferences}
           />
           <Editor
+            insertModule={insertModule}
             initialText={note.initialContent}
             instanceId={editorInstanceId}
             onChange={(val) => {

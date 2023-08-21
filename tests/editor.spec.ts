@@ -111,4 +111,50 @@ test.describe("Editor view", () => {
       expect(await paragraph.getAttribute("class")).toBe("editor-paragraph ltr");
     },
   );
+
+  test(
+    "clicking on note list item link indicator should insert wikilink to this note at current editor selection",
+    async ({ page }) => {
+      await page.keyboard.type("Note 1");
+      await page.click("#button_upload");
+      await page.click("#button_new");
+
+      await page.keyboard.type("Foo bar baz");
+
+      // move cursor to "Foo bar| baz"
+      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.press("ArrowLeft");
+
+      // select "bar"
+      await page.keyboard.press("Shift+ArrowLeft");
+      await page.keyboard.press("Shift+ArrowLeft");
+      await page.keyboard.press("Shift+ArrowLeft");
+
+      await page.click(".note-list-item-linked-notes-indicator");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraph = (
+        await page.$("div[data-lexical-editor] .editor-paragraph")
+      ) as ElementHandle<HTMLElement>;
+
+      expect(await paragraph.innerText()).toBe("Foo [[Note 1]] baz");
+      expect(await paragraph.getAttribute("class")).toBe("editor-paragraph ltr");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraphChildren = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ))!;
+
+      expect(await paragraphChildren[0].innerText()).toBe("Foo ");
+      expect(await paragraphChildren[1].innerText()).toBe("[[");
+      expect(await paragraphChildren[1].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[2].innerText()).toBe("Note 1");
+      expect(await paragraphChildren[2].getAttribute("class")).toBe("wikilink-content available");
+      expect(await paragraphChildren[3].innerText()).toBe("]]");
+      expect(await paragraphChildren[3].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[4].innerText()).toBe(" baz");
+    },
+  );
 });
