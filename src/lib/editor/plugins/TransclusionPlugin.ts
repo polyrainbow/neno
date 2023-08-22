@@ -9,6 +9,8 @@ import { $isParagraphNode, LexicalEditor, ParagraphNode } from "lexical";
 import refreshTransclusionsForBlock
   from "../utils/refreshTransclusionsForBlock";
 import { AutoLinkNode } from "@lexical/link";
+import { ListItemNode } from "../nodes/ListItemNode";
+import { HeadingNode } from "../nodes/HeadingNode";
 
 
 const registerBlockNodeTransform = (
@@ -16,6 +18,14 @@ const registerBlockNodeTransform = (
   getTransclusionContent: (id: string) => Promise<ReactElement>,
 ) => {
   editor.registerNodeTransform(ParagraphNode, (node: ParagraphNode) => {
+    refreshTransclusionsForBlock(node, getTransclusionContent);
+  });
+
+  editor.registerNodeTransform(ListItemNode, (node: ListItemNode) => {
+    refreshTransclusionsForBlock(node, getTransclusionContent);
+  });
+
+  editor.registerNodeTransform(HeadingNode, (node: HeadingNode) => {
     refreshTransclusionsForBlock(node, getTransclusionContent);
   });
 

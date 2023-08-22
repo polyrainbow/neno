@@ -227,4 +227,82 @@ test.describe("Editor view", () => {
       expect(await paragraphChildren[8].getAttribute("class")).toBe("wikilink-punctuation");
     },
   );
+
+  test(
+    "transclusion should appear/disappear after adding/removing slashlink inside text block",
+    async ({ page }) => {
+      await page.keyboard.type("test /link");
+
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const transclusionSlug = (await page.$(
+        "div[data-lexical-editor] .transclusion .slug",
+      ))!;
+
+      expect(await transclusionSlug.innerText()).toBe("/link");
+
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+
+      const transclusionElement = (await page.$(
+        "div[data-lexical-editor] .transclusion",
+      ));
+
+      expect(transclusionElement).toBeNull();
+    },
+  );
+
+  test(
+    "transclusion should appear/disappear after adding/removing slashlink inside unordered list item",
+    async ({ page }) => {
+      await page.keyboard.type("- test /link");
+
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const transclusionSlug = (await page.$(
+        "div[data-lexical-editor] .transclusion .slug",
+      ))!;
+
+      expect(await transclusionSlug.innerText()).toBe("/link");
+
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+
+      const transclusionElement = (await page.$(
+        "div[data-lexical-editor] .transclusion",
+      ));
+
+      expect(transclusionElement).toBeNull();
+    },
+  );
+
+  test(
+    "transclusion should appear/disappear after adding/removing slashlink inside heading block",
+    async ({ page }) => {
+      await page.keyboard.type("# test /link");
+
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const transclusionSlug = (await page.$(
+        "div[data-lexical-editor] .transclusion .slug",
+      ))!;
+
+      expect(await transclusionSlug.innerText()).toBe("/link");
+
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace");
+
+      const transclusionElement = (await page.$(
+        "div[data-lexical-editor] .transclusion",
+      ));
+
+      expect(transclusionElement).toBeNull();
+    },
+  );
 });
