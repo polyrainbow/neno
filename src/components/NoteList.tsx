@@ -152,6 +152,14 @@ const NoteList = ({
             isLinked={isLinked}
             key={`main-notes-list-item-${note.slug}`}
             onSelect={async () => {
+              if (
+                activeNote
+                && "slug" in activeNote
+                && activeNote.slug === note.slug
+              ) {
+                return;
+              }
+
               if (unsavedChanges) {
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);

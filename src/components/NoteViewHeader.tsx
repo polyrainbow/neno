@@ -47,6 +47,14 @@ const NoteViewHeader = ({
                   key={`pinnedNote_${pinnedNote.meta.slug}`}
                   note={pinnedNote}
                   onClick={async () => {
+                    if (
+                      activeNote
+                      && "slug" in activeNote
+                      && pinnedNote.meta.slug === activeNote.slug
+                    ) {
+                      return;
+                    }
+
                     if (unsavedChanges) {
                       await confirmDiscardingUnsavedChanges();
                       setUnsavedChanges(false);

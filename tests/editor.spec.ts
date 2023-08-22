@@ -305,4 +305,35 @@ test.describe("Editor view", () => {
       expect(transclusionElement).toBeNull();
     },
   );
+
+  test(
+    "selecting already active note should not trigger confirm discarding changes dialog",
+    async ({ page }) => {
+      await page.keyboard.type("note");
+      await page.click("#button_upload");
+      await page.click("div[data-lexical-editor]");
+      await page.keyboard.type("more text");
+      await page.click(".note-list .note-list-item");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const dialog = await page.$("dialog");
+      expect(dialog).toBeNull();
+    },
+  );
+
+  test(
+    "selecting already active pin should not trigger confirm discarding changes dialog",
+    async ({ page }) => {
+      await page.keyboard.type("note");
+      await page.click("#button_upload");
+      await page.click("#button_pin");
+      await page.click("div[data-lexical-editor]");
+      await page.keyboard.type("more text");
+      await page.click(".pinned-note");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const dialog = await page.$("dialog");
+      expect(dialog).toBeNull();
+    },
+  );
 });
