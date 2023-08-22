@@ -19,7 +19,7 @@ const ListView = () => {
 
   const controlledNoteList = useControlledNoteList(notesProvider);
 
-  const [headerStats, refreshHeaderStats] = useHeaderStats(
+  const [headerStats] = useHeaderStats(
     notesProvider,
   );
 
@@ -43,11 +43,6 @@ const ListView = () => {
       searchValue={controlledNoteList.searchQuery}
       sortMode={controlledNoteList.sortMode}
       handleSortModeChange={controlledNoteList.setSortMode}
-      refreshContentViews={() => {
-        refreshHeaderStats();
-        controlledNoteList.refresh();
-        refreshPinnedNotes();
-      }}
       noteListItems={controlledNoteList.items}
       numberOfResults={controlledNoteList.numberOfResults}
       activeNote={null} /* in list view, no note is active */

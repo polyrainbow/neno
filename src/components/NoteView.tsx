@@ -278,7 +278,6 @@ const NoteView = () => {
               searchValue={controlledNoteList.searchQuery}
               sortMode={controlledNoteList.sortMode}
               handleSortModeChange={controlledNoteList.setSortMode}
-              refreshContentViews={refreshContentViews}
               noteListItems={controlledNoteList.items}
               numberOfResults={controlledNoteList.numberOfResults}
               activeNote={activeNote}

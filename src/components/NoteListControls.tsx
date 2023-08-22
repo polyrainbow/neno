@@ -11,7 +11,6 @@ const NoteListControls = ({
   setSortMode,
   view,
   setView,
-  refreshNoteList,
 }) => {
   const isSmallScreen = useIsSmallScreen();
 
@@ -24,7 +23,7 @@ const NoteListControls = ({
         value={value}
         onChange={onChange}
         inputStyle={{
-          width: isSmallScreen ? "auto" : "250px",
+          width: isSmallScreen ? "auto" : "265px",
         }}
       />
       <IconButton
@@ -39,16 +38,6 @@ const NoteListControls = ({
           );
         }}
       />
-      {
-        !isSmallScreen
-          ? <IconButton
-            id="button_refresh-note-list"
-            title={l("list.refresh")}
-            icon="refresh"
-            onClick={refreshNoteList}
-          />
-          : ""
-      }
     </FlexContainer>
     <FlexContainer centerAlignedItems>
       <select

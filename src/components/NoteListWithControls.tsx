@@ -11,7 +11,6 @@ import { Slug } from "../lib/notes/interfaces/Slug";
 type View = "note-list" | "search-presets";
 
 interface NoteListWithControlsProps {
-  refreshContentViews,
   stats,
   handleSearchInputChange,
   searchValue,
@@ -30,7 +29,6 @@ interface NoteListWithControlsProps {
 }
 
 const NoteListWithControls = ({
-  refreshContentViews,
   stats,
   handleSearchInputChange,
   searchValue,
@@ -58,7 +56,6 @@ const NoteListWithControls = ({
       setSortMode={handleSortModeChange}
       view={view}
       setView={setView}
-      refreshNoteList={refreshContentViews}
     />
     {
       view === "note-list"
