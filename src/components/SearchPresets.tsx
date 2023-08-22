@@ -65,11 +65,11 @@ const SearchPresetItem = ({
     >
       <button
         onClick={onClick}
-        className="default-button-small dialog-box-button"
+        className="default-button-small dialog-box-button default-action"
       >{l("list.search.presets.query")}</button>
       <button
         onClick={onDelete}
-        className="default-button-small dialog-box-button"
+        className="default-button-small dialog-box-button dangerous-action"
       >{l("list.search.presets.remove")}</button>
     </div>
   </div>;
@@ -118,10 +118,12 @@ const SearchPresets = ({
     }
     {
       currentQuery.trim().length > 2
-        ? <>
+        ? <div className="save-current-query">
           <h2>{l("list.search.presets.save-current-query")}</h2>
           <input
+            id="search-preset-name-input"
             type="text"
+            placeholder={l("list.search.presets.preset-name")}
             onInput={(e) => {
               setCurrentQueryLabel((e.target as HTMLInputElement).value);
             }}
@@ -131,9 +133,9 @@ const SearchPresets = ({
               query: currentQuery,
               label: currentQueryLabel,
             }])}
-            className="default-button-small"
+            className="default-button-small default-action"
           >{l("list.search.presets.save")}</button>
-        </>
+        </div>
         : ""
     }
     <div>

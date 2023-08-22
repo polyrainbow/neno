@@ -220,6 +220,20 @@
   gap: var(--small-gap);
 }
 
+.save-current-query {
+  display: flex;
+  flex-direction: column;
+  gap: var(--default-gap);
+}
+
+.save-current-query > h2{
+  margin: 0;
+}
+
+#search-preset-name-input {
+  margin: 0;
+}
+
 /******************************
   Pagination
 ******************************/
