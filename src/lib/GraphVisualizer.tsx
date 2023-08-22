@@ -849,7 +849,7 @@ export default class GraphVisualization {
     this.#nodeElements = this.#nodesContainer.selectAll("g.node");
 
     const nodesData = this.#mode === GraphVisualizationMode.HUBS_ONLY
-      ? this.#nodes.filter(this.#isHub)
+      ? this.#nodes.filter((node) => this.#isHub(node))
       : (
         this.#mode === GraphVisualizationMode.DEFAULT
         || this.#mode === GraphVisualizationMode.NO_LABELS
@@ -1067,7 +1067,7 @@ export default class GraphVisualization {
       || mode === GraphVisualizationMode.VORONOY_HUBS
     ) {
       const nodes = mode === GraphVisualizationMode.VORONOY_HUBS
-        ? this.#nodes.filter(this.#isHub)
+        ? this.#nodes.filter((node) => this.#isHub(node))
         : this.#nodes;
       const points = nodes.map(
         (node): [number, number] => [node.position.x, node.position.y],
