@@ -157,4 +157,74 @@ test.describe("Editor view", () => {
       expect(await paragraphChildren[4].innerText()).toBe(" baz");
     },
   );
+
+  test(
+    "recognize wikilinks next to each other without space in between",
+    async ({ page }) => {
+      await page.keyboard.type("[[Link 1]][[Link 2]][[Link 3]]");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraphChildren = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ))!;
+
+      expect(await paragraphChildren[0].innerText()).toBe("[[");
+      expect(await paragraphChildren[0].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[1].innerText()).toBe("Link 1");
+      expect(await paragraphChildren[1].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[2].innerText()).toBe("]]");
+      expect(await paragraphChildren[2].getAttribute("class")).toBe("wikilink-punctuation");
+
+      expect(await paragraphChildren[3].innerText()).toBe("[[");
+      expect(await paragraphChildren[3].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[4].innerText()).toBe("Link 2");
+      expect(await paragraphChildren[4].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[5].innerText()).toBe("]]");
+      expect(await paragraphChildren[5].getAttribute("class")).toBe("wikilink-punctuation");
+
+      expect(await paragraphChildren[6].innerText()).toBe("[[");
+      expect(await paragraphChildren[6].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[7].innerText()).toBe("Link 3");
+      expect(await paragraphChildren[7].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[8].innerText()).toBe("]]");
+      expect(await paragraphChildren[8].getAttribute("class")).toBe("wikilink-punctuation");
+    },
+  );
+
+  test(
+    "wikilinks should be restored after note navigation",
+    async ({ page }) => {
+      await page.keyboard.type("[[Link 1]][[Link 2]][[Link 3]]");
+
+      await page.click("#button_upload");
+      await page.click("#button_new");
+      await page.click(".note-list .note-list-item");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraphChildren = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ))!;
+
+      expect(await paragraphChildren[0].innerText()).toBe("[[");
+      expect(await paragraphChildren[0].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[1].innerText()).toBe("Link 1");
+      expect(await paragraphChildren[1].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[2].innerText()).toBe("]]");
+      expect(await paragraphChildren[2].getAttribute("class")).toBe("wikilink-punctuation");
+
+      expect(await paragraphChildren[3].innerText()).toBe("[[");
+      expect(await paragraphChildren[3].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[4].innerText()).toBe("Link 2");
+      expect(await paragraphChildren[4].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[5].innerText()).toBe("]]");
+      expect(await paragraphChildren[5].getAttribute("class")).toBe("wikilink-punctuation");
+
+      expect(await paragraphChildren[6].innerText()).toBe("[[");
+      expect(await paragraphChildren[6].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[7].innerText()).toBe("Link 3");
+      expect(await paragraphChildren[7].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[8].innerText()).toBe("]]");
+      expect(await paragraphChildren[8].getAttribute("class")).toBe("wikilink-punctuation");
+    },
+  );
 });

@@ -82,7 +82,6 @@ export const parseText = (text: string): InlineText => {
     } else if (
       char === "["
       && iterator.peek(1).join("") === "["
-      && currentSpanType !== SpanType.WIKILINK
       && iterator.getRest().includes("]]")
       && !(iterator.charsUntil("]]", 2)?.includes("["))
       && !(iterator.charsUntil("]]", 2)?.includes("]"))

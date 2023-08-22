@@ -25,7 +25,6 @@ SOFTWARE.
 import {
   $createTextNode,
   $getSelection,
-  $isTextNode,
   LexicalEditor,
   TextNode,
 } from "lexical";
@@ -80,7 +79,6 @@ function registerWikilinkTransforms(
       return;
     }
 
-    const prevSibling = node.getPreviousSibling();
     let text = node.getTextContent();
     let currentNode = node;
     let match: EntityMatch | null;
@@ -91,24 +89,8 @@ function registerWikilinkTransforms(
       const nextText = match === null ? "" : text.slice(match.end);
       text = nextText;
 
-      if (nextText !== "") {
-        const nextMatch = getWikiLinkMatch(nextText);
-
-        if (nextMatch !== null && nextMatch.start === 0) {
-          return;
-        }
-      }
-
       if (match === null) {
         return;
-      }
-
-      if (
-        match.start === 0
-        && $isTextNode(prevSibling)
-        && prevSibling.isTextEntity()
-      ) {
-        continue;
       }
 
       let nodeToReplace;

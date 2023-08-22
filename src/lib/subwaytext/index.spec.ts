@@ -644,4 +644,68 @@ code inside code
     const output = serialize(result);
     expect(output).toStrictEqual(input);
   });
+
+  it("should recognize wikilinks without space in between", () => {
+    const input = "[[link 1]][[link 2]][[link 3]]";
+
+    const expectedResult = [
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              type: SpanType.WIKILINK,
+              text: "[[link 1]]",
+            },
+            {
+              type: SpanType.WIKILINK,
+              text: "[[link 2]]",
+            },
+            {
+              type: SpanType.WIKILINK,
+              text: "[[link 3]]",
+            },
+          ],
+        },
+      },
+    ];
+
+    expect(subwaytext(input)).toStrictEqual(expectedResult);
+  });
+
+  it("should recognize wikilinks with letters in between", () => {
+    const input = "[[link 1]]a[[link 2]]a[[link 3]]";
+
+    const expectedResult = [
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              type: SpanType.WIKILINK,
+              text: "[[link 1]]",
+            },
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "a",
+            },
+            {
+              type: SpanType.WIKILINK,
+              text: "[[link 2]]",
+            },
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "a",
+            },
+            {
+              type: SpanType.WIKILINK,
+              text: "[[link 3]]",
+            },
+          ],
+        },
+      },
+    ];
+
+    expect(subwaytext(input)).toStrictEqual(expectedResult);
+  });
 });
