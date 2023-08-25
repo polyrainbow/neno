@@ -11,6 +11,9 @@
 The release package will now be built remotely with the script 
 `tools/buildReleasePackage.sh`
 
+## Commit convention
+See https://www.conventionalcommits.org/en/v1.0.0/
+
 ## Known issues
 
 - Dots in the URL (e.g. in a slug) stop Vite from using History API fallback https://github.com/vitejs/vite/issues/2415 This prevents files being opened directly via
