@@ -1,0 +1,23 @@
+:slug:welcome-to-neno
+:created-at:1690400000000
+:updated-at:1692946784333
+:neno-default-graph-position:13.864869117736816,-216.82258987426758
+:neno-flags:
+:content-type:text/subtext
+
+# Welcome to NENO
+NENO is just another note-taking app that helps you create your personal knowledge graph. With NENO, you retain *full control* over your data because you decide where it is stored: On your device or on a cloud storage of your choice. You can also use Git for versioning.
+Some of NENO's features:
+- Full data ownership: You decide where your data is stored: On your device or on a cloud storage of your choice.
+- Multiple media types: Paste video, audio, PDF documents, images and code, or any arbitrary file into your note
+- Simple modeless markup with Subtext
+- Interoperability: NENO's data format is backed by human-readable plain-text files for high interoperability
+- Powerful full-text search
+- Tap-to-link: One click is enough to link one note to another
+- File overview: All files in one view
+- Dark mode: Eye-friendly note-taking at night time
+
+You can link other notes with a Wikilink like so: [[I like pizza]]. If the target note does not exist yet, the Wikilink is red: [[Non-existing note]]. Click on the link to create that note.
+
+Use slashlinks to create transclusions: /2023-07-27
+Other file types are also shown as transclusions: /files/beach.jpg

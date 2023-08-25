@@ -1,0 +1,31 @@
+{
+  "createdAt": 1690400000000,
+  "updatedAt": 1692946788222,
+  "screenPosition": {
+    "translateX": 65.23245282438756,
+    "translateY": -106.9099381342902,
+    "scale": 1.1015595292490572
+  },
+  "initialNodePosition": {
+    "x": -290.6666564941406,
+    "y": 53.333335876464844
+  },
+  "pinnedNotes": [
+    "welcome-to-neno",
+    "i-like-pizza",
+    "journal"
+  ],
+  "files": [
+    {
+      "slug": "files/beach.jpg",
+      "size": 301495,
+      "createdAt": 1690400000000
+    },
+    {
+      "slug": "files/pizza.jpg",
+      "size": 790444,
+      "createdAt": 1692347504963
+    }
+  ],
+  "version": "2"
+}
