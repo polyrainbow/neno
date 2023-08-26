@@ -59,11 +59,6 @@ const serializeNoteHeaders = (headers: NoteHeaders): string => {
 
 const canonicalHeaderKeys = new Map<CanonicalNoteHeader, MetaModifier>([
   [
-    CanonicalNoteHeader.SLUG,
-    (meta, val) => {
-      meta.slug = val;
-    }],
-  [
     CanonicalNoteHeader.GRAPH_POSITION,
     (meta, val) => {
       const [x, y] = val.split(",").map((string) => parseFloat(string));
@@ -102,7 +97,10 @@ const canonicalHeaderKeys = new Map<CanonicalNoteHeader, MetaModifier>([
 ]);
 
 
-const parseSerializedExistingNote = (serializedNote: string): ExistingNote => {
+const parseSerializedExistingNote = (
+  serializedNote: string,
+  slug: Slug,
+): ExistingNote => {
   const headers = parseNoteHeaders(serializedNote);
   const partialMeta: Partial<ExistingNoteMetadata> = {};
   const custom: Record<string, string> = {};
@@ -117,14 +115,8 @@ const parseSerializedExistingNote = (serializedNote: string): ExistingNote => {
     }
   }
 
-  if (!partialMeta.slug) {
-    throw new Error(
-      "Could not parse note. Missing canonical header: slug",
-    );
-  }
-
   const meta: ExistingNoteMetadata = {
-    slug: partialMeta.slug,
+    slug,
     createdAt: partialMeta.createdAt,
     updatedAt: partialMeta.updatedAt,
     position: partialMeta.position ?? { x: 0, y: 0 },
@@ -134,7 +126,9 @@ const parseSerializedExistingNote = (serializedNote: string): ExistingNote => {
   };
 
   const note: ExistingNote = {
-    content: serializedNote.substring(serializedNote.indexOf("\n\n") + 2),
+    content: headers.size > 0
+      ? serializedNote.substring(serializedNote.indexOf("\n\n") + 2)
+      : serializedNote,
     meta,
   };
   return note;
@@ -146,9 +140,6 @@ const parseSerializedNewNote = (serializedNote: string): NewNote => {
   const partialMeta: Partial<NewNoteMetadata> = {};
   const custom: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
-    // we don't want to keep the old id for new notes
-    if (key === CanonicalNoteHeader.SLUG) continue;
-
     if (canonicalHeaderKeys.has(key as CanonicalNoteHeader)) {
       (canonicalHeaderKeys.get(key as CanonicalNoteHeader) as MetaModifier)(
         partialMeta,
@@ -176,12 +167,7 @@ const parseSerializedNewNote = (serializedNote: string): NewNote => {
 
 
 const serializeNote = (note: ExistingNote): string => {
-  const headersToSerialize: NoteHeaders = new Map([
-    [
-      CanonicalNoteHeader.SLUG,
-      note.meta.slug.toString(),
-    ],
-  ]);
+  const headersToSerialize: NoteHeaders = new Map();
 
   if (note.meta.createdAt) {
     headersToSerialize.set(

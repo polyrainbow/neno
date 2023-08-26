@@ -102,18 +102,20 @@ const renameFiles = async (
 
 export const migrateToV2 = async (
   metadata: GraphMetadataV1,
-  notes: ExistingNote[],
+  notes: Map<Slug, ExistingNote>,
   storageProvider: StorageProvider,
 ): Promise<{
   metadata: GraphMetadataV2,
-  notes: ExistingNote[],
+  notes: Map<Slug, ExistingNote>,
 }> => {
   const { newMetadata, filesMap } = migrateMetadataToV2(metadata);
 
   await renameFiles(filesMap, storageProvider);
 
-  const newNotes = notes.map((note: ExistingNote): ExistingNote => {
-    const blocks = subwaytext(note.content);
+  const newNotes = new Map<Slug, ExistingNote>();
+
+  for (const note of notes) {
+    const blocks = subwaytext(note[1].content);
     const newBlocks = mapInlineSpans(blocks, (span: Span): Span => {
       if (
         span.type === SpanType.SLASHLINK
@@ -132,11 +134,11 @@ export const migrateToV2 = async (
       return span;
     });
     const newNoteContent = serialize(newBlocks);
-    return {
-      ...note,
+    newNotes.set(note[0], {
+      ...note[1],
       content: newNoteContent,
-    };
-  });
+    });
+  }
 
   return {
     metadata: newMetadata,
