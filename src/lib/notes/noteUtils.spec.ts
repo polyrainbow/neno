@@ -308,8 +308,7 @@ describe("serializeNote", () => {
         },
       };
 
-      const expectedResult = `:slug:1
-:created-at:1000
+      const expectedResult = `:created-at:1000
 :updated-at:2000
 :neno-default-graph-position:1.2,3.4
 :neno-flags:flag1,flag2
@@ -331,8 +330,7 @@ describe("parseSerializedExistingNote", () => {
   it(
     "should parse a note with optional and custom headers",
     async () => {
-      const serializedNote = `:slug:1
-:created-at:1000
+      const serializedNote = `:created-at:1000
 :updated-at:2000
 :neno-default-graph-position:1.2,3.4
 :neno-flags:flag1,flag2
@@ -365,17 +363,15 @@ This is a note`;
       };
 
       expect(
-        parseSerializedExistingNote(serializedNote),
+        parseSerializedExistingNote(serializedNote, "1"),
       ).toStrictEqual(expectedResult);
     },
   );
 
   it(
-    "should parse a note without optional headers",
+    "should parse a note without headers",
     async () => {
-      const serializedNote = `:slug:1
-
-This is a note`;
+      const serializedNote = "This is a note";
 
       const expectedResult: ExistingNote = {
         content: "This is a note",
@@ -394,19 +390,8 @@ This is a note`;
       };
 
       expect(
-        parseSerializedExistingNote(serializedNote),
+        parseSerializedExistingNote(serializedNote, "1"),
       ).toStrictEqual(expectedResult);
-    },
-  );
-
-  it(
-    "should throw when required header :slug: is missing",
-    async () => {
-      const serializedNote = "Hello";
-
-      expect(
-        () => parseSerializedExistingNote(serializedNote),
-      ).toThrow();
     },
   );
 });

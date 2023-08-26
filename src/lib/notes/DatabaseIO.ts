@@ -28,6 +28,7 @@ import { FILE_SLUG_PREFIX } from "./config.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import { GraphMetadataV1, migrateToV2 } from "./migrations/v2.js";
+import { GraphMetadataV2, migrateToV3 } from "./migrations/v3.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -67,18 +68,17 @@ export default class DatabaseIO {
 
 
   private async parseGraph(
-    notes: string[],
+    serializedNotes: Map<Slug, string>,
     metadataSerialized: string,
   ): Promise<Graph> {
     let migrationPerformed = false;
+    let parsedNotes = new Map<Slug, ExistingNote>();
 
-    let parsedNotes: ExistingNote[] = [];
-
-    for (const serializedNote of notes) {
+    for (const [slug, serializedNote] of serializedNotes) {
       let parsedNote: ExistingNote;
       try {
-        parsedNote = parseSerializedExistingNote(serializedNote);
-        parsedNotes.push(parsedNote);
+        parsedNote = parseSerializedExistingNote(serializedNote, slug);
+        parsedNotes.set(slug, parsedNote);
       } catch (e) {
         continue;
       }
@@ -86,7 +86,7 @@ export default class DatabaseIO {
 
     let graphMetadata = JSON.parse(
       metadataSerialized,
-    ) as GraphMetadata | GraphMetadataV1;
+    ) as GraphMetadata | GraphMetadataV2 | GraphMetadataV1;
 
     if (!("version" in graphMetadata)) {
       const v2 = await migrateToV2(
@@ -99,16 +99,24 @@ export default class DatabaseIO {
       migrationPerformed = true;
     }
 
-    const blockIndex = await DatabaseIO.createBlockIndex(parsedNotes);
+    if (graphMetadata.version === "2") {
+      const v3 = await migrateToV3(
+        graphMetadata,
+        parsedNotes,
+      );
+      graphMetadata = v3.metadata;
+      parsedNotes = v3.notes;
+      migrationPerformed = true;
+    }
+
+    const blockIndex = await DatabaseIO.createBlockIndex(
+      Array.from(parsedNotes.values()),
+    );
     const outgoingLinkIndex = DatabaseIO.createOutgoingLinkIndex(blockIndex);
     const backlinkIndex = DatabaseIO.createBacklinkIndex(outgoingLinkIndex);
 
     const parsedGraphObject: Graph = {
-      notes: new Map(
-        parsedNotes.map((note: ExistingNote): [Slug, ExistingNote] => {
-          return [note.meta.slug, note];
-        }),
-      ),
+      notes: parsedNotes,
       indexes: {
         blocks: blockIndex,
         outgoingLinks: outgoingLinkIndex,
@@ -133,10 +141,22 @@ export default class DatabaseIO {
         this.#GRAPH_METADATA_FILENAME,
       );
 
-    const serializedNotes = await Promise.all(
-      noteFilenames.map(async (filename: string): Promise<string> => {
-        return await this.#storageProvider.readObjectAsString(filename);
-      }),
+    const serializedNotes = new Map(
+      await Promise.all(
+        noteFilenames.map(
+          async (filename: string): Promise<[Slug, string]> => {
+            const slug = filename.slice(
+              0,
+              -DatabaseIO.#NOTE_FILE_EXTENSION.length,
+            );
+            const serializedNote
+              = await this.#storageProvider.readObjectAsString(
+                filename,
+              );
+            return [slug, serializedNote];
+          },
+        ),
+      ),
     );
 
     return this.parseGraph(serializedNotes, graphMetadataSerialized);
@@ -282,7 +302,7 @@ export default class DatabaseIO {
         },
         pinnedNotes: [],
         files: [],
-        version: "2",
+        version: "3",
       },
       notes: new Map(),
       indexes: {
