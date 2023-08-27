@@ -85,6 +85,7 @@ const NoteListWithControls = ({
             setView("note-list");
           }}
           currentQuery={searchValue}
+          onClose={() => setView("note-list")}
         />
     }
 

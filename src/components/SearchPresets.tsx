@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { l } from "../lib/intl";
 import * as IDB from "idb-keyval";
+import IconButton from "./IconButton";
+import SearchPresetsItem from "./SearchPresetsItem";
 
 interface SearchPreset {
   label: string,
@@ -48,38 +50,18 @@ const DEFAULT_SEARCH_PRESETS: SearchPreset[] = [
 ];
 
 
-const SearchPresetItem = ({
-  label,
-  query,
-  onClick,
-  onDelete,
-}) => {
-  return <div
-    className="search-preset"
-  >
-    <span>
-      {label}<br /><code>{query}</code>
-    </span>
-    <div
-      className="search-preset-buttons"
-    >
-      <button
-        onClick={onClick}
-        className="default-button-small dialog-box-button default-action"
-      >{l("list.search.presets.query")}</button>
-      <button
-        onClick={onDelete}
-        className="default-button-small dialog-box-button dangerous-action"
-      >{l("list.search.presets.remove")}</button>
-    </div>
-  </div>;
-};
+interface SearchPresetsProps {
+  onSelect: (query: string) => void,
+  currentQuery: string,
+  onClose: () => void,
+}
 
 
 const SearchPresets = ({
   onSelect,
   currentQuery,
-}) => {
+  onClose,
+}: SearchPresetsProps) => {
   const [searchPresets, setSearchPresets] = useState<SearchPreset[]>([]);
   const [currentQueryLabel, setCurrentQueryLabel] = useState<string>("");
 
@@ -100,10 +82,18 @@ const SearchPresets = ({
   return <section
     className="list-section"
   >
-    <h1>{l("list.search.presets")}</h1>
+    <div className="search-presets-heading-row">
+      <h1>{l("list.search.presets")}</h1>
+      <IconButton
+        id="close-search-presets"
+        icon="close"
+        title={l("close")}
+        onClick={onClose}
+      />
+    </div>
     {
       searchPresets.map((preset) => {
-        return <SearchPresetItem
+        return <SearchPresetsItem
           key={preset.query + "__" + preset.label}
           onClick={() => onSelect(preset.query)}
           label={preset.label}
