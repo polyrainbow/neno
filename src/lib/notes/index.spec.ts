@@ -4,6 +4,7 @@ import {
   NewNoteSaveRequest,
   NoteSaveRequest,
 } from "./interfaces/NoteSaveRequest.js";
+import subwaytext from "../subwaytext/index.js";
 // @ts-ignore
 import { TextEncoder, TextDecoder } from "util";
 // @ts-ignore
@@ -14,6 +15,48 @@ jest.mock("../../constants", () => {
     BASE_URL: "/",
   };
 });
+
+// @ts-ignore
+globalThis.navigator = {
+  hardwareConcurrency: 4,
+};
+
+class subwaytextWorkerMock {
+  _callback: any;
+
+  postMessage(eventData: any) {
+    if (eventData.action === "PARSE_NOTES") {
+      const notes = eventData.notes;
+
+      if (!Array.isArray(notes)) {
+        throw new Error(
+          "Subwaytext worker: Expected an array of notes, received "
+          + typeof notes
+          + " instead.",
+        );
+      }
+
+      const notesParsed = notes
+        .map((note) => {
+          return {
+            id: note.id,
+            parsedContent: subwaytext(note.content),
+          };
+        });
+
+      this._callback?.({
+        data: notesParsed,
+      });
+    }
+  }
+
+  set onmessage(callback) {
+    this._callback = callback;
+  }
+}
+
+// @ts-ignore
+globalThis.Worker = subwaytextWorkerMock;
 
 describe("Notes module", () => {
   it("should create and output notes", async () => {
@@ -827,6 +870,20 @@ describe("Notes module", () => {
       });
 
       expect(stats.numberOfLinks).toBe(0);
+    },
+  );
+
+  it(
+    "should recognize notes created via another tool",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      await storageProvider.writeObject("note.subtext", "Test note");
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const notes = await notesProvider.getNotesList({});
+
+      expect(notes.numberOfResults).toBe(1);
+      expect(notes.results[0].slug).toBe("note");
     },
   );
 });
