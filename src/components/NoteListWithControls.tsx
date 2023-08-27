@@ -88,7 +88,6 @@ const NoteListWithControls = ({
           onClose={() => setView("note-list")}
         />
     }
-
   </>;
 };
 
