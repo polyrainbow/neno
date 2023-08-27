@@ -214,6 +214,16 @@
   margin-bottom: var(--default-gap);
 }
 
+.search-presets-heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-presets-heading-row h1 {
+  margin: 0;
+}
+
 .search-preset-buttons {
   display: flex;
   flex-shrink: 0;
