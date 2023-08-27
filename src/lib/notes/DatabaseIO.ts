@@ -2,8 +2,8 @@
   This class communicates with the Storage provider it is given to do
   IO operations on the file system.
   This class knows about the folder structure inside a graph folder but not
-  about the outside folder structure. That is why it always passes a graph id
-  to the storage provider and a path relative to the graph folder. The storage
+  about the outside folder structure. That is why it always passes
+  a path relative to the graph folder. The storage
   provider is responsible to resolve the graph id to an absolute folder path.
 */
 
@@ -40,10 +40,13 @@ export default class DatabaseIO {
   #GRAPH_METADATA_FILENAME = ".graph.json";
   #NAME_OF_FILES_SUBDIRECTORY = "files";
   static #NOTE_FILE_EXTENSION = ".subtext";
+
+  // Block parsing is CPU intensive, so we use a web worker pool to parse
+  // multiple notes in parallel.
   static #workerPool: Worker[] = [];
 
-
-  static getfilenameForNoteSlug(slug: Slug): string {
+  // Returns the filename for a note with the given slug.
+  static getFilenameForNoteSlug(slug: Slug): string {
     if (!slug) {
       throw new Error("Cannot get filename for empty slug");
     }
@@ -145,7 +148,7 @@ export default class DatabaseIO {
           this.#GRAPH_METADATA_FILENAME,
         );
     } catch (e) {
-      // if the file does not exist, we just create a new one
+      // if the file does not exist, we just create a new one later
       graphMetadataSerialized = undefined;
     }
 
@@ -171,6 +174,7 @@ export default class DatabaseIO {
   }
 
 
+  // getSlugsFromParsedNote returns all slugs that are referenced in the note.
   static getSlugsFromParsedNote(note: Block[]): Slug[] {
     const inlineSpans = getAllInlineSpans(note);
     const slugs = getSlugsFromInlineText(inlineSpans);
@@ -178,6 +182,10 @@ export default class DatabaseIO {
   }
 
 
+  /*
+    The outgoing link index contains all links that are referenced in a note,
+    no matter if the link target exists or not.
+  */
   private static createOutgoingLinkIndex(
     blockIndex: Map<Slug, Block[]>,
   ): Map<Slug, Set<Slug>> {
@@ -194,6 +202,10 @@ export default class DatabaseIO {
   }
 
 
+  /*
+    The backlinks index only contains slugs of existing notes that
+    reference a note.
+  */
   private static createBacklinkIndex(
     outgoingLinks: Map<Slug, Set<Slug>>,
   ): Map<Slug, Set<Slug>> {
@@ -331,7 +343,7 @@ export default class DatabaseIO {
     slug: Slug,
   ): Promise<string> {
     const rawNote = await this.#storageProvider.readObjectAsString(
-      DatabaseIO.getfilenameForNoteSlug(slug),
+      DatabaseIO.getFilenameForNoteSlug(slug),
     );
     if (!rawNote) {
       throw new Error(ErrorMessage.GRAPH_NOT_FOUND);
@@ -356,20 +368,21 @@ export default class DatabaseIO {
         resolve();
       };
     });
-    // we try to get the requested graph object in 3 ways:
 
+    // Now let's try to get the requested graph object in 2 ways:
     // Way 1: Fast memory access: try to get it from loaded graph objects
     if (this.#loadedGraph) {
       this.#finishedObtainingGraph();
       return this.#loadedGraph;
     }
 
-    // Way 2: Slow disk access
+    // Way 2: Slow disk access. We first need to read from disk,
+    // parse everything, and create indexes.
     const graphFromDisk: Graph
       = await this.readAndParseGraphFromDisk();
 
-    // flushing these changes will also save the graph in memory for
-    // faster access the next time
+    // Flushing the graph will also save it in memory for
+    // faster access the next time.
     await this.flushChanges(graphFromDisk, []);
     this.#finishedObtainingGraph();
     return graphFromDisk;
@@ -377,9 +390,12 @@ export default class DatabaseIO {
 
 
   // flushChanges makes sure that the changes applied to the graph object are
-  // written to the disk and thus are persistent. it should always be called
-  // after any operation on the main data object has been performed.
-  // if slugsToFlush is not provided, all notes will be flushed.
+  // written to the disk and thus are persistent. It should always be called
+  // after any operation on the internal graph representation
+  // has been performed.
+  // If slugsToFlush is not provided, all notes will be flushed. This should
+  // only be done if really necessary.
+  // The graph metadata file will always be refreshed.
   async flushChanges(
     graph: Graph,
     slugsToFlush?: Slug[],
@@ -390,7 +406,7 @@ export default class DatabaseIO {
 
     if (slugsToFlush) {
       await Promise.all(slugsToFlush.map(async (slug) => {
-        const filename = DatabaseIO.getfilenameForNoteSlug(slug);
+        const filename = DatabaseIO.getFilenameForNoteSlug(slug);
         if (!graph.notes.has(slug)) {
           await this.#storageProvider.removeObject(filename);
         } else {
@@ -402,7 +418,7 @@ export default class DatabaseIO {
       }));
     } else {
       for (const [slug, note] of graph.notes) {
-        const filename = DatabaseIO.getfilenameForNoteSlug(slug);
+        const filename = DatabaseIO.getFilenameForNoteSlug(slug);
         if (!graph.notes.has(slug)) {
           await this.#storageProvider.removeObject(filename);
         } else {
@@ -493,12 +509,13 @@ export default class DatabaseIO {
 
 
   async getFiles(): Promise<Slug[]> {
-    // it could be that the directory does not exist yet
+    // It could be that the directory does not exist yet. In that case, return
+    // an empty array.
     try {
       const directoryListing = await this.#storageProvider.listDirectory(
         this.#NAME_OF_FILES_SUBDIRECTORY,
       );
-      // filter out system files
+      // Filter out system files
       const files = directoryListing.filter((filename: string): boolean => {
         return !filename.startsWith(".");
       });
