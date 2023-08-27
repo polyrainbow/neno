@@ -69,7 +69,7 @@ export default class DatabaseIO {
 
   private async parseGraph(
     serializedNotes: Map<Slug, string>,
-    metadataSerialized: string,
+    metadataSerialized?: string,
   ): Promise<Graph> {
     let migrationPerformed = false;
     let parsedNotes = new Map<Slug, ExistingNote>();
@@ -84,9 +84,11 @@ export default class DatabaseIO {
       }
     }
 
-    let graphMetadata = JSON.parse(
-      metadataSerialized,
-    ) as GraphMetadata | GraphMetadataV2 | GraphMetadataV1;
+    let graphMetadata = typeof metadataSerialized === "string"
+      ? JSON.parse(
+        metadataSerialized,
+      ) as GraphMetadata | GraphMetadataV2 | GraphMetadataV1
+      : this.createEmptyGraphMetadata();
 
     if (!("version" in graphMetadata)) {
       const v2 = await migrateToV2(
@@ -136,10 +138,16 @@ export default class DatabaseIO {
   private async readAndParseGraphFromDisk(): Promise<Graph> {
     const noteFilenames = await this.getNoteFilenamesFromGraphDirectory();
 
-    const graphMetadataSerialized
-      = await this.#storageProvider.readObjectAsString(
-        this.#GRAPH_METADATA_FILENAME,
-      );
+    let graphMetadataSerialized: string | undefined;
+    try {
+      graphMetadataSerialized
+        = await this.#storageProvider.readObjectAsString(
+          this.#GRAPH_METADATA_FILENAME,
+        );
+    } catch (e) {
+      // if the file does not exist, we just create a new one
+      graphMetadataSerialized = undefined;
+    }
 
     const serializedNotes = new Map(
       await Promise.all(
@@ -255,10 +263,7 @@ export default class DatabaseIO {
             };
           });
         const worker = DatabaseIO.#workerPool[t];
-        worker.postMessage({
-          "action": "PARSE_NOTES",
-          "notes": notesForThread,
-        });
+
         worker.onmessage = (event: MessageEvent<ParsedDocument[]>) => {
           const notesParsed = event.data;
           for (const noteParsed of notesParsed) {
@@ -269,9 +274,15 @@ export default class DatabaseIO {
             return;
           }
         };
+
         worker.onerror = (event: ErrorEvent) => {
           reject(event.error);
         };
+
+        worker.postMessage({
+          "action": "PARSE_NOTES",
+          "notes": notesForThread,
+        });
       }
     });
   }
@@ -286,33 +297,23 @@ export default class DatabaseIO {
   }
 
 
-  private createEmptyGraph(): Graph {
-    const newGraph: Graph = {
-      metadata: {
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        screenPosition: {
-          translateX: 200, // good value to see INPI completely
-          translateY: 200, // good value to see INPI completely
-          scale: 1,
-        },
-        initialNodePosition: {
-          x: 0,
-          y: 0,
-        },
-        pinnedNotes: [],
-        files: [],
-        version: "3",
+  private createEmptyGraphMetadata(): GraphMetadata {
+    return {
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      screenPosition: {
+        translateX: 200, // good value to see INPI completely
+        translateY: 200, // good value to see INPI completely
+        scale: 1,
       },
-      notes: new Map(),
-      indexes: {
-        blocks: new Map<Slug, Block[]>(),
-        backlinks: new Map<Slug, Set<Slug>>(),
-        outgoingLinks: new Map<Slug, Set<Slug>>(),
+      initialNodePosition: {
+        x: 0,
+        y: 0,
       },
+      pinnedNotes: [],
+      files: [],
+      version: "3",
     };
-
-    return newGraph;
   }
 
   /**
@@ -363,25 +364,15 @@ export default class DatabaseIO {
       return this.#loadedGraph;
     }
 
-    // Way 2: Slow disk access: try to get it from the file on the disk
-    try {
-      const graphFromDisk: Graph
-        = await this.readAndParseGraphFromDisk();
+    // Way 2: Slow disk access
+    const graphFromDisk: Graph
+      = await this.readAndParseGraphFromDisk();
 
-      // flushing these changes will also save the graph in memory for
-      // faster access the next time
-      await this.flushChanges(graphFromDisk, []);
-      this.#finishedObtainingGraph();
-      return graphFromDisk;
-    } catch (error) {
-      // Way 3: If there is no graph object in memory or on the disk,
-      // create a new graph object
-      const newGraph: Graph = this.createEmptyGraph();
-      // write it to memory and disk
-      await this.flushChanges(newGraph);
-      this.#finishedObtainingGraph();
-      return newGraph;
-    }
+    // flushing these changes will also save the graph in memory for
+    // faster access the next time
+    await this.flushChanges(graphFromDisk, []);
+    this.#finishedObtainingGraph();
+    return graphFromDisk;
   }
 
 
