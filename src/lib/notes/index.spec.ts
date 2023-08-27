@@ -886,4 +886,19 @@ describe("Notes module", () => {
       expect(notes.results[0].slug).toBe("note");
     },
   );
+
+  it(
+    "should create graph metadata file if missing",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      await notesProvider.getNotesList({});
+
+      const graphFile = await storageProvider.readObjectAsString(".graph.json");
+      const graph = JSON.parse(graphFile);
+
+      expect(graph.version).toBe("3");
+    },
+  );
 });
