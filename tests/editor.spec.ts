@@ -336,4 +336,24 @@ test.describe("Editor view", () => {
       expect(dialog).toBeNull();
     },
   );
+
+  test(
+    "clicking on a backlink's 'Link to this' should add a wikilink to the editor",
+    async ({ page }) => {
+      await page.keyboard.type("Note 1\nwith link to [[Note 2]]");
+      await page.click("#button_upload"); // save as "note-1"
+      await page.click("#button_new");
+      await page.keyboard.type("Note 2\nwith link to ");
+      await page.click("#button_upload"); // save as "note-2"
+
+      await page.click(".note-backlinks .note-list-item-linked-notes-indicator");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraph = (
+        await page.$("div[data-lexical-editor] .editor-paragraph:nth-child(2)")
+      ) as ElementHandle<HTMLElement>;
+
+      expect(await paragraph.innerText()).toBe("with link to [[Note 1]]");
+    },
+  );
 });

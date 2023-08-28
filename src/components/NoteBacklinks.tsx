@@ -4,12 +4,14 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
+import { Slug } from "../lib/notes/interfaces/Slug";
 
 
 interface NoteBacklinksProps {
   note: ActiveNote,
   setUnsavedChanges: (val: boolean) => void,
   unsavedChanges: boolean,
+  onLinkIndicatorClick: (slug: Slug, title: string) => void,
 }
 
 
@@ -17,6 +19,7 @@ const NoteBacklinks = ({
   note,
   setUnsavedChanges,
   unsavedChanges,
+  onLinkIndicatorClick,
 }: NoteBacklinksProps) => {
   const goToNote = useGoToNote();
   const confirmDiscardingUnsavedChanges
@@ -54,6 +57,12 @@ const NoteBacklinks = ({
             isActive={false}
             isLinked={true}
             isLinkable={true}
+            onLinkIndicatorClick={() => {
+              onLinkIndicatorClick(
+                displayedLinkedNote.slug,
+                displayedLinkedNote.title,
+              );
+            }}
           />)
       }
     </div>

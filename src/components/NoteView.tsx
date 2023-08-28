@@ -357,6 +357,10 @@ const NoteView = () => {
           setUploadInProgress={setUploadInProgress}
           updateReferences={updateReferences}
           setUpdateReferences={setUpdateReferences}
+          onLinkIndicatorClick={(slug: Slug, title: string) => {
+            const wikilink = Utils.getWikilinkForNote(slug, title);
+            insertModule.insert?.(wikilink);
+          }}
         />
       </div>
     </main>

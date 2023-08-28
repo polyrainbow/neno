@@ -63,16 +63,12 @@ const NoteListItem = ({
         }
       </div>
     </div>
-    {
-      "linkCount" in note
-        ? <NoteListItemLinkedNotesIndicator
-          isLinkable={isLinkable}
-          isActive={isActive}
-          numberOfLinkedNotes={note.linkCount.sum}
-          onLinkIndicatorClick={onLinkIndicatorClick}
-        />
-        : ""
-    }
+    <NoteListItemLinkedNotesIndicator
+      isLinkable={isLinkable}
+      isActive={isActive}
+      numberOfLinkedNotes={"linkCount" in note ? note.linkCount.sum : null}
+      onLinkIndicatorClick={onLinkIndicatorClick}
+    />
   </div>;
 };
 

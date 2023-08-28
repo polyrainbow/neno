@@ -2,16 +2,25 @@ import Tooltip from "./Tooltip";
 import { getIconSrc } from "../lib/utils";
 import { l } from "../lib/intl";
 
+interface NoteListItemLinkedNotesIndicatorProps {
+  isActive: boolean,
+  numberOfLinkedNotes: number | null,
+  onLinkIndicatorClick?: () => void,
+  isLinkable: boolean,
+}
+
 
 const NoteListItemLinkedNotesIndicator = ({
   isActive,
   numberOfLinkedNotes,
   onLinkIndicatorClick,
   isLinkable,
-}) => {
+}: NoteListItemLinkedNotesIndicatorProps) => {
   const linkControlLabel
-    = (!isLinkable)
-      ? l("list.item.links.linked-to-x-notes", { numberOfLinkedNotes })
+    = (!isLinkable) && typeof numberOfLinkedNotes === "number"
+      ? l("list.item.links.linked-to-x-notes", {
+        numberOfLinkedNotes: numberOfLinkedNotes.toString(),
+      })
       : isActive
         ? l("list.item.links.currently-selected")
         : l("list.item.links.link");
@@ -26,7 +35,7 @@ const NoteListItemLinkedNotesIndicator = ({
         + (isLinkable ? "linkable" : "not-linkable")
       }
       onClick={(e) => {
-        onLinkIndicatorClick();
+        onLinkIndicatorClick?.();
         e.stopPropagation();
       }}
     >

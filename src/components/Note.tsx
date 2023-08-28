@@ -70,6 +70,7 @@ interface NoteComponentProps {
   updateReferences: boolean,
   setUpdateReferences: (val: boolean) => void,
   insertModule: { insert?: (text: string) => void },
+  onLinkIndicatorClick: (slug: Slug, title: string) => void,
 }
 
 
@@ -97,6 +98,7 @@ const Note = ({
   updateReferences,
   setUpdateReferences,
   insertModule,
+  onLinkIndicatorClick,
 }: NoteComponentProps) => {
   const noteElement = useRef<HTMLElement>(null);
   const notesProvider = useNotesProvider();
@@ -392,6 +394,7 @@ const Note = ({
               note={note}
               setUnsavedChanges={setUnsavedChanges}
               unsavedChanges={unsavedChanges}
+              onLinkIndicatorClick={onLinkIndicatorClick}
             />
             <NoteKeyValues
               note={note}
