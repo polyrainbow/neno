@@ -901,4 +901,50 @@ describe("Notes module", () => {
       expect(graph.version).toBe("3");
     },
   );
+
+  it(
+    "should update pinned note on slug update",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "A note that will be pinned",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n1",
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      await notesProvider.pin("n1");
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "A note that will be pinned",
+          meta: {
+            slug: "n1",
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n2",
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+
+      const pinnedNotes = await notesProvider.getPins();
+
+      expect(pinnedNotes.length).toBe(1);
+      expect(pinnedNotes[0].meta.slug).toBe("n2");
+    },
+  );
 });

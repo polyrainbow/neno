@@ -358,6 +358,13 @@ export default class NotesProvider {
 
         graph.notes.delete(oldSlug);
         NotesProvider.removeSlugFromIndexes(graph, oldSlug);
+
+        for (let i = 0; i < graph.metadata.pinnedNotes.length; i++) {
+          if (graph.metadata.pinnedNotes[i] === oldSlug) {
+            graph.metadata.pinnedNotes[i] = newSlug;
+          }
+        }
+
         await this.#io.flushChanges(graph, [oldSlug]);
 
         existingNote.meta.slug = newSlug;
