@@ -68,6 +68,9 @@
 
 .note-list-item-linked-notes-indicator-content {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .note-list-item-linked-notes-indicator-content .svg-icon {
@@ -75,7 +78,6 @@
   height: 20px;
   width: 28px;
   object-fit: cover;
-  margin-bottom: 4px;
 }
 
 .note-list-item:not(.active) .note-list-item-linked-notes-indicator.linkable {

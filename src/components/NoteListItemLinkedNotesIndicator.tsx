@@ -47,25 +47,27 @@ const NoteListItemLinkedNotesIndicator = ({
           alt={linkControlLabel}
           className="svg-icon"
         />
-        <div
-          className="linked-notes-indicator-number"
-        >
-          {
-            (
-              typeof numberOfLinkedNotes === "number"
-              && !isNaN(numberOfLinkedNotes)
-            )
-              ? numberOfLinkedNotes > 0
-                ? <span title={numberOfLinkedNotes + " Links"}>
-                  {numberOfLinkedNotes}
-                </span>
-                : <div
-                  title={l("list.item.links.not-linked")}
-                  className="unlinked-note-indicator"
-                />
-              : ""
-          }
-        </div>
+        {
+          (
+            typeof numberOfLinkedNotes === "number"
+            && !isNaN(numberOfLinkedNotes)
+          )
+            ? <div
+              className="linked-notes-indicator-number"
+            >
+              {
+                numberOfLinkedNotes > 0
+                  ? <span title={numberOfLinkedNotes + " Links"}>
+                    {numberOfLinkedNotes}
+                  </span>
+                  : <div
+                    title={l("list.item.links.not-linked")}
+                    className="unlinked-note-indicator"
+                  />
+              }
+            </div>
+            : ""
+        }
       </div>
     </div>
   </Tooltip>;
