@@ -70,7 +70,6 @@ const SearchPresets = ({
       .then((searchPresets) => {
         setSearchPresets(searchPresets || DEFAULT_SEARCH_PRESETS);
       })
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       .catch(() => {});
   }, []);
 

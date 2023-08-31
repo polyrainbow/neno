@@ -34,7 +34,6 @@ export default class DatabaseIO {
   #storageProvider: StorageProvider;
   #loadedGraph: Graph | null = null;
   #graphRetrievalInProgress: Promise<void> | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   #finishedObtainingGraph: (() => void) = () => {};
 
   #GRAPH_METADATA_FILENAME = ".graph.json";
@@ -225,7 +224,6 @@ export default class DatabaseIO {
           (!slug.startsWith(FILE_SLUG_PREFIX)
           && !link.startsWith(FILE_SLUG_PREFIX))
         ) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           backlinkIndex.get(link)!.add(slug);
         }
       }
