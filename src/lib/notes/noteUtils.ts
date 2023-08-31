@@ -97,11 +97,17 @@ const canonicalHeaderKeys = new Map<CanonicalNoteHeader, MetaModifier>([
 ]);
 
 
+const cleanSerializedNote = (serializedNote: string): string => {
+  return serializedNote.replace(/\r/g, "");
+};
+
+
 const parseSerializedExistingNote = (
   serializedNote: string,
   slug: Slug,
 ): ExistingNote => {
-  const headers = parseNoteHeaders(serializedNote);
+  const serializedNoteCleaned = cleanSerializedNote(serializedNote);
+  const headers = parseNoteHeaders(serializedNoteCleaned);
   const partialMeta: Partial<ExistingNoteMetadata> = {};
   const custom: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
@@ -127,8 +133,10 @@ const parseSerializedExistingNote = (
 
   const note: ExistingNote = {
     content: headers.size > 0
-      ? serializedNote.substring(serializedNote.indexOf("\n\n") + 2)
-      : serializedNote,
+      ? serializedNoteCleaned.substring(
+        serializedNoteCleaned.indexOf("\n\n") + 2,
+      )
+      : serializedNoteCleaned,
     meta,
   };
   return note;
@@ -136,7 +144,8 @@ const parseSerializedExistingNote = (
 
 
 const parseSerializedNewNote = (serializedNote: string): NewNote => {
-  const headers = parseNoteHeaders(serializedNote);
+  const serializedNoteCleaned = cleanSerializedNote(serializedNote);
+  const headers = parseNoteHeaders(serializedNoteCleaned);
   const partialMeta: Partial<NewNoteMetadata> = {};
   const custom: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
@@ -158,8 +167,10 @@ const parseSerializedNewNote = (serializedNote: string): NewNote => {
 
   const note: NewNote = {
     content: headers.size > 0
-      ? serializedNote.substring(serializedNote.indexOf("\n\n") + 2)
-      : serializedNote,
+      ? serializedNoteCleaned.substring(
+        serializedNoteCleaned.indexOf("\n\n") + 2,
+      )
+      : serializedNoteCleaned,
     meta,
   };
   return note;

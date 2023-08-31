@@ -230,7 +230,7 @@ describe("sluggify", () => {
   );
 });
 
-describe("infer note title", () => {
+describe("inferNoteTitle", () => {
   it(
     "should remove wikilink punctuation",
     async () => {
@@ -386,6 +386,49 @@ This is a note`;
           custom: {},
           flags: [],
           contentType: "text/subtext",
+        },
+      };
+
+      expect(
+        parseSerializedExistingNote(serializedNote, "1"),
+      ).toStrictEqual(expectedResult);
+    },
+  );
+
+  it(
+    "should parse a note with CR chars",
+    async () => {
+      const serializedNote = `:created-at:1000\r
+:updated-at:2000\r
+:neno-default-graph-position:1.2,3.4\r
+:neno-flags:flag1,flag2\r
+:content-type:text/plain\r
+:custom-header-1:custom-value-1\r
+:custom-header-2:custom-value-2\r
+\r
+This is a note\r
+with several\r
+blocks`;
+
+      const expectedResult: ExistingNote = {
+        content: "This is a note\nwith several\nblocks",
+        meta: {
+          slug: "1",
+          createdAt: 1000,
+          updatedAt: 2000,
+          position: {
+            x: 1.2,
+            y: 3.4,
+          },
+          custom: {
+            "custom-header-1": "custom-value-1",
+            "custom-header-2": "custom-value-2",
+          },
+          flags: [
+            "flag1",
+            "flag2",
+          ],
+          contentType: "text/plain",
         },
       };
 
