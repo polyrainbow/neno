@@ -18,7 +18,7 @@ const SearchPresetsItem = ({
       <button
         onClick={onClick}
         className="default-button-small dialog-box-button default-action"
-      >{l("list.search.presets.query")}</button>
+      >{l("list.search.presets.find")}</button>
       <button
         onClick={onDelete}
         className="default-button-small dialog-box-button dangerous-action"
