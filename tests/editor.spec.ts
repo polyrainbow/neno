@@ -95,8 +95,10 @@ test.describe("Editor view", () => {
   test(
     "backspace at the beginning of a heading should remove heading block",
     async ({ page }) => {
+      const isMac = process.platform === "darwin";
+
       await page.keyboard.type("test\n# heading");
-      await page.keyboard.press("Meta+ArrowLeft");
+      await page.keyboard.press(isMac ? "Meta+ArrowLeft" : "Home");
       await page.keyboard.press("Backspace");
       await page.keyboard.press("Space");
 
