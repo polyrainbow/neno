@@ -41,7 +41,7 @@ const DEFAULT_SEARCH_PRESETS: SearchPreset[] = [
   },
   {
     "label": l("list.search.presets.has-list"),
-    "query": "has-block:list",
+    "query": "has-block:unordered-list-item|ordered-list-item",
   },
   {
     "label": l("list.search.presets.has-custom-metadata"),
