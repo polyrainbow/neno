@@ -358,4 +358,19 @@ test.describe("Editor view", () => {
       expect(await paragraph.innerText()).toBe("with link to [[Note 1]]");
     },
   );
+
+  test(
+    "enable URLs with hashbangs in the editor",
+    async ({ page }) => {
+      await page.keyboard.type("http://example.com/page#!hashbang");
+
+      const link = (
+        await page.$("div[data-lexical-editor] .editor-paragraph a")
+      ) as ElementHandle<HTMLElement>;
+
+      expect(await link.getAttribute("href")).toBe(
+        "http://example.com/page#!hashbang",
+      );
+    },
+  );
 });
