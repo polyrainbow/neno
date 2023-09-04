@@ -43,9 +43,7 @@ const NoteListItem = ({
     className={trClassList.join(" ")}
   >
     <div
-      className={
-        "note-list-item-main " + ("linkCount" in note ? "with-link-edge" : "")
-      }
+      className="note-list-item-main with-link-edge"
       onClick={onSelect}
     >
       <div
