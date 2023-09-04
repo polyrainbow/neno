@@ -108,7 +108,7 @@
   "list.item.hub": "Hub",
   "list.item.links.currently-selected": "Diese Notiz ist momentan ausgewählt. Sie kann nicht mit sich selbst verbunden werden.",
   "list.item.links.link": "Zu dieser Notiz verlinken",
-  "list.item.links.linked-to-x-notes": "Diese Notiz ist mit {numberOfLinkedNotes} anderen Notiz(en) verbunden.",
+  "list.item.links.linked-to-x-notes": "Die Summe der ausgehenden Links und Backlinks dieser Notiz beträgt {numberOfLinkedNotes}.",
   "list.item.links.not-linked": "Nicht verbunden",
   "list.note-list": "Notiz-Liste",
   "list.pagination.next-page": "Nächste Seite",

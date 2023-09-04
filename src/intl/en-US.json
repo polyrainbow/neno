@@ -108,7 +108,7 @@
   "list.item.hub": "Hub",
   "list.item.links.currently-selected": "This is the currently selected note. It cannot be linked to itself.",
   "list.item.links.link": "Link to this note",
-  "list.item.links.linked-to-x-notes": "This note is linked to {numberOfLinkedNotes} other note(s).",
+  "list.item.links.linked-to-x-notes": "The sum of this note's outgoing links and backlinks is {numberOfLinkedNotes}.",
   "list.item.links.not-linked": "Not linked",
   "list.note-list": "Note list",
   "list.pagination.next-page": "Next page",
