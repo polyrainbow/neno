@@ -7,17 +7,13 @@
  *
  */
 
-import { CommandPayloadType, LexicalEditor } from "lexical";
-
 import {
-  $insertDataTransferForPlainText,
-} from "@lexical/clipboard";
-import {
-  $moveCharacter,
-  $shouldOverrideDefaultCharacterSelection,
-} from "@lexical/selection";
-import { mergeRegister } from "@lexical/utils";
-import {
+  $createRangeSelection,
+  $getRoot,
+  $setSelection,
+  CommandPayloadType,
+  LexicalEditor,
+  SELECT_ALL_COMMAND,
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_EDITOR,
@@ -39,6 +35,14 @@ import {
   PASTE_COMMAND,
   REMOVE_TEXT_COMMAND,
 } from "lexical";
+import {
+  $insertDataTransferForPlainText,
+} from "@lexical/clipboard";
+import {
+  $moveCharacter,
+  $shouldOverrideDefaultCharacterSelection,
+} from "@lexical/selection";
+import { mergeRegister } from "@lexical/utils";
 import {
   CAN_USE_BEFORE_INPUT,
   IS_APPLE_WEBKIT,
@@ -202,6 +206,33 @@ export function registerSubtext(editor: LexicalEditor): () => void {
 
         selection.removeText();
         selection.insertParagraph();
+        return true;
+      },
+      COMMAND_PRIORITY_EDITOR,
+    ),
+    editor.registerCommand<boolean>(
+      SELECT_ALL_COMMAND,
+      () => {
+        const selection = $createRangeSelection();
+        const allParagraphs = $getRoot().getChildren();
+        if (allParagraphs.length > 0) {
+          const firstParagraph = allParagraphs[0];
+          const firstTextNode = firstParagraph.getFirstChild();
+          const lastParagraph = allParagraphs[allParagraphs.length - 1];
+          const lastTextNode = lastParagraph.getLastChild();
+
+          selection.focus.set(
+            firstTextNode.getKey(),
+            0,
+            "text",
+          );
+          selection.anchor.set(
+            lastTextNode.getKey(),
+            lastTextNode.getTextContentSize(),
+            "text",
+          );
+          $setSelection(selection);
+        }
         return true;
       },
       COMMAND_PRIORITY_EDITOR,

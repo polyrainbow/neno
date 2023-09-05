@@ -287,7 +287,6 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("# test /link");
 
-
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const transclusionSlug = (await page.$(
         "div[data-lexical-editor] .transclusion .slug",
@@ -371,6 +370,23 @@ test.describe("Editor view", () => {
       expect(await link.getAttribute("href")).toBe(
         "http://example.com/page#!hashbang",
       );
+    },
+  );
+
+  test(
+    "select all command works",
+    async ({ page }) => {
+      const isMac = process.platform === "darwin";
+      await page.keyboard.type("# block 1\n- block 2\nblock 3");
+      await page.keyboard.press(isMac ? "Meta+A" : "Control+A");
+      await page.keyboard.press("Backspace");
+
+      const paragraphs = (
+        await page.$$("div[data-lexical-editor] .editor-paragraph")
+      ) as ElementHandle<HTMLElement>[];
+
+      expect(paragraphs.length).toBe(1);
+      expect((await paragraphs[0].innerText()).trim()).toBe("");
     },
   );
 });
