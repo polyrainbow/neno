@@ -33,7 +33,7 @@ export default defineConfig({
     See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
 
-    video: "retain-on-failure",
+    video: process.env.CI ? "off" : "retain-on-failure",
     // Viewport used for all pages in the context.
     viewport: { width: 1440, height: 800 },
   },
@@ -50,7 +50,7 @@ export default defineConfig({
         /* Collect trace when retrying the failed test.
         See https://playwright.dev/docs/trace-viewer */
         trace: "on-first-retry",
-        video: "retain-on-failure",
+        video: process.env.CI ? "off" : "retain-on-failure",
         // Viewport used for all pages in the context.
         viewport: { width: 1440, height: 800 },
       },
