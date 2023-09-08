@@ -123,23 +123,32 @@ test.describe("Editor view", () => {
 
       await page.keyboard.type("Foo bar baz");
 
+      /*
+        When pressing the same key (combination) multiple times, we should
+        add a delay, so the browser will recognize all of them as a separate
+        key press events.
+        See also
+        https://stackoverflow.com/questions/75284988/how-to-avoid-that-playwright-ignore-multiple-key-press
+      */
+
       // move cursor to "Foo bar| baz"
-      await page.keyboard.press("ArrowLeft");
-      await page.keyboard.press("ArrowLeft");
-      await page.keyboard.press("ArrowLeft");
-      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.press("ArrowLeft", { delay: 10 });
+      await page.keyboard.press("ArrowLeft", { delay: 10 });
+      await page.keyboard.press("ArrowLeft", { delay: 10 });
+      await page.keyboard.press("ArrowLeft", { delay: 10 });
 
       // select "bar"
-      await page.keyboard.press("Shift+ArrowLeft");
-      await page.keyboard.press("Shift+ArrowLeft");
-      await page.keyboard.press("Shift+ArrowLeft");
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 10 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 10 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 10 });
 
       await page.click(".note-list-item-linked-notes-indicator");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const paragraph = (
-        await page.$("div[data-lexical-editor] .editor-paragraph")
-      ) as ElementHandle<HTMLElement>;
+      const paragraph = page.locator("div[data-lexical-editor] .editor-paragraph", {
+        hasText: "Foo [[Note 1]] baz",
+      });
+
+      await paragraph.waitFor();
 
       expect(await paragraph.innerText()).toBe("Foo [[Note 1]] baz");
       expect(await paragraph.getAttribute("class")).toBe("editor-paragraph ltr");
