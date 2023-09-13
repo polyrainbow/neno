@@ -98,10 +98,10 @@ export default class NotesProvider {
     const ourOutgoingLinks = DatabaseIO.getSlugsFromParsedNote(blocks);
     graph.indexes.outgoingLinks.set(ourSlug, new Set(ourOutgoingLinks));
 
-    // Backlinks index
-    const ourBacklinks = new Set<Slug>();
-
+    // Backlinks index: Let's first check if we need to create one
+    let ourBacklinks: Set<Slug> | null = null;
     if (!graph.indexes.backlinks.has(ourSlug)) {
+      ourBacklinks = new Set<Slug>();
       graph.indexes.backlinks.set(ourSlug, ourBacklinks);
     }
 
@@ -118,12 +118,16 @@ export default class NotesProvider {
           .delete(ourSlug);
       }
 
-      const theirOutgoingLinks = graph.indexes.outgoingLinks.get(
-        someExistingSlug,
-      ) as Set<Slug>;
+      // we only need to create a new backlink index if we created the Set
+      // `ourBacklinks` earlier
+      if (ourBacklinks) {
+        const theirOutgoingLinks = graph.indexes.outgoingLinks.get(
+          someExistingSlug,
+        ) as Set<Slug>;
 
-      if (theirOutgoingLinks.has(ourSlug)) {
-        ourBacklinks.add(someExistingSlug);
+        if (theirOutgoingLinks.has(ourSlug)) {
+          ourBacklinks.add(someExistingSlug);
+        }
       }
     }
   };

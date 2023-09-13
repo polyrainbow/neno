@@ -117,7 +117,10 @@ export default class DatabaseIO {
       Array.from(parsedNotes.values()),
     );
     const outgoingLinkIndex = DatabaseIO.createOutgoingLinkIndex(blockIndex);
-    const backlinkIndex = DatabaseIO.createBacklinkIndex(outgoingLinkIndex);
+    const backlinkIndex = DatabaseIO.createBacklinkIndex(
+      outgoingLinkIndex,
+      new Set<Slug>(parsedNotes.keys()),
+    );
 
     const parsedGraphObject: Graph = {
       notes: parsedNotes,
@@ -207,28 +210,31 @@ export default class DatabaseIO {
   */
   private static createBacklinkIndex(
     outgoingLinks: Map<Slug, Set<Slug>>,
+    existingNoteSlugs: Set<Slug>,
   ): Map<Slug, Set<Slug>> {
     const backlinkIndex = new Map<Slug, Set<Slug>>();
 
     for (const [slug, links] of outgoingLinks) {
+      if (!existingNoteSlugs.has(slug)) {
+        continue;
+      }
+
       if (!backlinkIndex.has(slug)) {
         backlinkIndex.set(slug, new Set<Slug>());
       }
 
       for (const link of links) {
+        if (!existingNoteSlugs.has(link)) {
+          continue;
+        }
+
         if (!backlinkIndex.has(link)) {
           backlinkIndex.set(link, new Set<Slug>());
         }
 
-        if (
-          (!slug.startsWith(FILE_SLUG_PREFIX)
-          && !link.startsWith(FILE_SLUG_PREFIX))
-        ) {
-          backlinkIndex.get(link)!.add(slug);
-        }
+        backlinkIndex.get(link)!.add(slug);
       }
     }
-
     return backlinkIndex;
   }
 

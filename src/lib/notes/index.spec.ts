@@ -947,4 +947,67 @@ describe("Notes module", () => {
       expect(pinnedNotes[0].meta.slug).toBe("n2");
     },
   );
+
+  it(
+    // eslint-disable-next-line max-len
+    "should show all backlinks of a newly created note, including those from notes created in previous sessions",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note with link to [[Foo Bar]]",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n1",
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      // Let's create a second notes provider to simulate a new session
+      const notesProvider2 = new NotesProvider(storageProvider);
+
+      expect(notesProvider2.get("n1")).resolves.toBeDefined();
+      expect(
+        (await notesProvider2.getNotesList({})).numberOfResults,
+      ).toBe(1);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 2 with link to [[Foo Bar]]",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n2",
+      };
+
+      await notesProvider2.put(noteSaveRequest2);
+
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "Foo Bar",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+      };
+
+      const note3 = await notesProvider2.put(noteSaveRequest3);
+
+      expect(note3.backlinks.length).toBe(2);
+    },
+  );
 });
