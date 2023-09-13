@@ -215,10 +215,6 @@ export default class DatabaseIO {
     const backlinkIndex = new Map<Slug, Set<Slug>>();
 
     for (const [slug, links] of outgoingLinks) {
-      if (!existingNoteSlugs.has(slug)) {
-        continue;
-      }
-
       if (!backlinkIndex.has(slug)) {
         backlinkIndex.set(slug, new Set<Slug>());
       }
