@@ -35,15 +35,13 @@ const StartViewLocal = () => {
   // @ts-ignore
   if (typeof window.showDirectoryPicker !== "function") {
     return <>
-      <h1>{l("start.local.heading")}</h1>
       <p>
         {l("start.local.unsupported")}
       </p>
     </>;
   }
 
-  return <section>
-    <h1>{l("start.local.heading")}</h1>
+  return <section id="start-view-local">
     {
       localDisclaimer === "INVALID_FOLDER_HANDLE"
         ? <p className="error-text">

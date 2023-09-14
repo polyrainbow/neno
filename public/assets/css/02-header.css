@@ -33,6 +33,10 @@
 
 }
 
+.app-header.no-background {
+  background: none;
+}
+
 
 .header-right input {
   width: 240px;

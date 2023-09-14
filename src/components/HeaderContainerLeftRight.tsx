@@ -6,16 +6,18 @@ import HeaderContainer from "./HeaderContainer";
 interface HeaderContainerLeftRightProps {
   leftContent?: React.ReactNode,
   rightContent?: React.ReactNode,
+  noBackground?: boolean,
 }
 
 const HeaderContainerLeftRight = ({
   leftContent,
   rightContent,
+  noBackground,
 }: HeaderContainerLeftRightProps) => {
   const { toggleAppMenu } = useContext(AppMenuContext);
 
   return (
-    <HeaderContainer>
+    <HeaderContainer noBackground={noBackground}>
       <div className="header-left">
         <AppTitle
           toggleAppMenu={toggleAppMenu}
