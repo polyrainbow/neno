@@ -1,5 +1,5 @@
-import { ASSETS_PATH } from "../config";
 import { l } from "../lib/intl";
+import IconButton from "./IconButton";
 
 
 interface AppTitleProps {
@@ -8,18 +8,11 @@ interface AppTitleProps {
 
 
 const AppTitle = ({ toggleAppMenu }: AppTitleProps) => {
-  return <button
+  return <IconButton
     onClick={toggleAppMenu}
-    className="app-title clickable"
+    icon="menu"
     title={l("app.menu-button.alt")}
-  >
-    <img
-      width="40"
-      height="40"
-      src={ASSETS_PATH + "app-icon/logo-circle.svg"}
-      alt={l("app.menu-button.alt")}
-    />
-  </button>;
+  />;
 };
 
 export default AppTitle;

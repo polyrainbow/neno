@@ -31,7 +31,7 @@ const StartView = () => {
         className="start-welcome"
       >
         <img
-          src={ASSETS_PATH + "app-icon/logo-circle.svg"}
+          src={ASSETS_PATH + "app-icon/logo.svg"}
           alt={l("start.logo.alt")}
           id="start-logo"
         />

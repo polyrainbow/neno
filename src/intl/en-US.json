@@ -1,6 +1,6 @@
 {
   "app.loading": "Loading",
-  "app.menu-button.alt": "NENO logo and menu button",
+  "app.menu-button.alt": "Menu",
   "app.pinned-notes-placeholder": "Your pinned notes will appear here",
   "app.title": "NENO",
   "change-language.change": "Change",
@@ -170,7 +170,7 @@
   "note.slug.invalid-slug": "Invalid slug",
   "note.slug.update-references": "Update references",
   "settings": "Settings",
-  "start.introduction": "Your personal knowledge graph",
+  "start.introduction": "Your personal knowledge garden",
   "start.links.source-code": "Source code",
   "start.links.user-manual": "User manual",
   "start.local.already-created-folder": "You have already created a folder that you can just open.",
