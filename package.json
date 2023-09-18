@@ -11,7 +11,8 @@
     "jest-environment-jsdom": "^29.5.0",
     "lexical": "^0.12.2",
     "ts-jest": "^29.1.1",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "vite-plugin-pwa": "^0.16.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",
