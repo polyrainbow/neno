@@ -4,16 +4,14 @@
 
   /* in the mobile view, we don't set a fixed height of the bar, so the margin
   of these elements must be set that it matches a total height of 50px */
+
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 30px;
 }
 
 .note-list-sort-mode-select {
   width: 265px;
-}
-
-@media only screen and (max-width: 1280px) {
-  .note-list-sort-mode-select {
-    width: 75px;
-  }
 }
 
 /******************************
@@ -347,9 +345,12 @@
     grid-template-columns: 1fr;
   }
 
-  .note-controls,
-  .note-list-controls {
+  .note-controls {
     flex-wrap: wrap;
+  }
+
+  .note-list-controls {
+    flex-wrap: nowrap;
   }
 
   .main-content-besides-sidebar {
