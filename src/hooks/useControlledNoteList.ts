@@ -6,6 +6,8 @@ import useNoteList from "./useNoteList";
 import NoteListItem from "../lib/notes/interfaces/NoteListItem";
 import NotesProvider from "../lib/notes";
 
+const SORT_MODE_LOCAL_STORAGE_KEY = "NOTE_LIST_SORT_MODE";
+
 interface ControlledNoteList {
   items: NoteListItem[],
   numberOfResults: number,
@@ -29,9 +31,10 @@ export default (
   const [searchQuery, setSearchQueryState] = useState<string>("");
   const [scrollTop, setScrollTop] = useState<number>(0);
   const [page, setPageState] = useState<number>(1);
-  const [sortMode, setSortMode] = useState<NoteListSortMode>(
-    NoteListSortMode.UPDATE_DATE_DESCENDING,
-  );
+  const initialSortMode = localStorage.getItem(
+    SORT_MODE_LOCAL_STORAGE_KEY,
+  ) as NoteListSortMode ?? NoteListSortMode.UPDATE_DATE_DESCENDING;
+  const [sortMode, setSortMode] = useState<NoteListSortMode>(initialSortMode);
 
   const setSearchQuery = (value) => {
     setSearchQueryState(value);
@@ -66,7 +69,10 @@ export default (
     page,
     setPage,
     sortMode,
-    setSortMode,
+    setSortMode: (value) => {
+      setSortMode(value);
+      localStorage.setItem(SORT_MODE_LOCAL_STORAGE_KEY, value);
+    },
     searchQuery,
     setSearchQuery,
     scrollTop,
