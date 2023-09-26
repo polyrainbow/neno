@@ -32,6 +32,9 @@ export default defineConfig({
     // eslint-disable-next-line new-cap
     VitePWA({
       registerType: "autoUpdate",
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,svg,jpg,subtext,json,woff2}"],
+      },
       manifest: {
         "name": "NENO",
         "theme_color": "#ff8598",
