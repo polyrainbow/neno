@@ -382,6 +382,24 @@ test.describe("Editor view", () => {
     },
   );
 
+  // unfortunately, this test fails due to https://github.com/facebook/lexical/issues/3546
+  /*
+  test(
+    "enable URLs with semicolons in the editor",
+    async ({ page }) => {
+      await page.keyboard.type("http://example.com/page;1");
+
+      const link = (
+        await page.$("div[data-lexical-editor] .editor-paragraph a")
+      ) as ElementHandle<HTMLElement>;
+
+      expect(await link.getAttribute("href")).toBe(
+        "http://example.com/page;1",
+      );
+    },
+  );
+  */
+
   test(
     "select all command works",
     async ({ page }) => {
