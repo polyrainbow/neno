@@ -12,7 +12,6 @@ interface NoteMenuBarProps {
   setUnsavedChanges,
   pinOrUnpinNote,
   duplicateNote,
-  openInGraphView,
   handleUploadFilesRequest,
   uploadInProgress: boolean,
   importNote,
@@ -29,7 +28,6 @@ const NoteMenuBar = ({
   setUnsavedChanges,
   pinOrUnpinNote,
   duplicateNote,
-  openInGraphView,
   handleUploadFilesRequest,
   uploadInProgress,
   importNote,
@@ -47,7 +45,6 @@ const NoteMenuBar = ({
         setUnsavedChanges={setUnsavedChanges}
         pinOrUnpinNote={pinOrUnpinNote}
         duplicateNote={duplicateNote}
-        openInGraphView={openInGraphView}
         handleUploadFilesRequest={handleUploadFilesRequest}
         importNote={importNote}
         disableNoteSaving={disableNoteSaving}

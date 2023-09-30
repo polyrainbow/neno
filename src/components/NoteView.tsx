@@ -337,21 +337,6 @@ const NoteView = () => {
             goToNote(duplicate.meta.slug);
             updateEditorInstance();
           }}
-          openInGraphView={() => {
-            if (activeNote.isUnsaved) {
-              throw new Error("Cannot open an unsaved note in graph view");
-            }
-
-            navigate(
-              Utils.getAppPath(
-                PathTemplate.VISUAL_WITH_FOCUS_NOTE,
-                new Map([
-                  ["GRAPH_ID", Config.LOCAL_GRAPH_ID],
-                  ["FOCUS_NOTE_SLUG", activeNote.slug],
-                ]),
-              ),
-            );
-          }}
           importNote={importNote}
           uploadInProgress={uploadInProgress}
           setUploadInProgress={setUploadInProgress}

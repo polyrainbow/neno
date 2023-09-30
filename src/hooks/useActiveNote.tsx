@@ -104,7 +104,6 @@ export default (
       slug: noteFromServer.meta.slug,
       createdAt: noteFromServer.meta.createdAt,
       updatedAt: noteFromServer.meta.updatedAt,
-      position: noteFromServer.meta.position,
       outgoingLinks: noteFromServer.outgoingLinks,
       backlinks: noteFromServer.backlinks,
       numberOfCharacters: noteFromServer.numberOfCharacters,
@@ -148,7 +147,6 @@ export default (
           meta: {
             custom: Object.fromEntries(activeNote.keyValues),
             slug: activeNote.slug,
-            position: activeNote.position,
             createdAt: activeNote.createdAt,
             updatedAt: activeNote.updatedAt,
             flags: activeNote.flags,
@@ -261,10 +259,6 @@ export default (
       note: {
         meta: {
           custom: Object.fromEntries(activeNote.keyValues),
-          position: {
-            x: activeNote.position.x + 20,
-            y: activeNote.position.y + 20,
-          },
           flags: [...activeNote.flags, `DUPLICATE_OF(${activeNote.slug})`],
           contentType: activeNote.contentType,
         },

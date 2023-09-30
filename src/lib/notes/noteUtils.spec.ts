@@ -69,10 +69,6 @@ describe("getNotesWithUrl", () => {
             slug: "0",
             createdAt: 0,
             updatedAt: 0,
-            position: {
-              x: 0,
-              y: 0,
-            },
             custom: {},
             flags: [],
             contentType: "",
@@ -84,10 +80,6 @@ describe("getNotesWithUrl", () => {
             slug: "1",
             createdAt: 0,
             updatedAt: 0,
-            position: {
-              x: 0,
-              y: 0,
-            },
             custom: {},
             flags: [],
             contentType: "",
@@ -99,10 +91,6 @@ describe("getNotesWithUrl", () => {
             slug: "2",
             createdAt: 0,
             updatedAt: 0,
-            position: {
-              x: 0,
-              y: 0,
-            },
             custom: {},
             flags: [],
             contentType: "",
@@ -114,10 +102,6 @@ describe("getNotesWithUrl", () => {
             slug: "3",
             createdAt: 0,
             updatedAt: 0,
-            position: {
-              x: 0,
-              y: 0,
-            },
             custom: {},
             flags: [],
             contentType: "",
@@ -129,10 +113,6 @@ describe("getNotesWithUrl", () => {
             slug: "4",
             createdAt: 0,
             updatedAt: 0,
-            position: {
-              x: 0,
-              y: 0,
-            },
             custom: {},
             flags: [],
             contentType: "",
@@ -161,10 +141,6 @@ describe("getNotesWithFlag", () => {
             slug: "0",
             createdAt: 0,
             updatedAt: 0,
-            position: {
-              x: 0,
-              y: 0,
-            },
             custom: {},
             flags: ["CREATED_WITH_BROWSER_EXTENSION"],
             contentType: "",
@@ -176,10 +152,6 @@ describe("getNotesWithFlag", () => {
             slug: "1",
             createdAt: 0,
             updatedAt: 0,
-            position: {
-              x: 0,
-              y: 0,
-            },
             custom: {},
             flags: ["DUPLICATE_OF(232)"],
             contentType: "",
@@ -292,10 +264,6 @@ describe("serializeNote", () => {
           slug: "1",
           createdAt: 1000,
           updatedAt: 2000,
-          position: {
-            x: 1.2,
-            y: 3.4,
-          },
           custom: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",
@@ -310,7 +278,6 @@ describe("serializeNote", () => {
 
       const expectedResult = `:created-at:1000
 :updated-at:2000
-:neno-default-graph-position:1.2,3.4
 :neno-flags:flag1,flag2
 :content-type:text/plain
 :custom-header-1:custom-value-1
@@ -332,7 +299,6 @@ describe("parseSerializedExistingNote", () => {
     async () => {
       const serializedNote = `:created-at:1000
 :updated-at:2000
-:neno-default-graph-position:1.2,3.4
 :neno-flags:flag1,flag2
 :content-type:text/plain
 :custom-header-1:custom-value-1
@@ -346,10 +312,6 @@ This is a note`;
           slug: "1",
           createdAt: 1000,
           updatedAt: 2000,
-          position: {
-            x: 1.2,
-            y: 3.4,
-          },
           custom: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",
@@ -379,10 +341,6 @@ This is a note`;
           slug: "1",
           createdAt: undefined,
           updatedAt: undefined,
-          position: {
-            x: 0,
-            y: 0,
-          },
           custom: {},
           flags: [],
           contentType: "text/subtext",
@@ -400,7 +358,6 @@ This is a note`;
     async () => {
       const serializedNote = `:created-at:1000\r
 :updated-at:2000\r
-:neno-default-graph-position:1.2,3.4\r
 :neno-flags:flag1,flag2\r
 :content-type:text/plain\r
 :custom-header-1:custom-value-1\r
@@ -416,10 +373,6 @@ blocks`;
           slug: "1",
           createdAt: 1000,
           updatedAt: 2000,
-          position: {
-            x: 1.2,
-            y: 3.4,
-          },
           custom: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",

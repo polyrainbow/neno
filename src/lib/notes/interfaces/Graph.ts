@@ -1,6 +1,4 @@
 import ExistingNote from "./ExistingNote.js";
-import NodePosition from "./NodePosition.js";
-import ScreenPosition from "./ScreenPosition.js";
 import { FileInfo } from "./FileInfo.js";
 import { Block } from "../../subwaytext/interfaces/Block.js";
 import { Slug } from "./Slug.js";
@@ -8,11 +6,9 @@ import { Slug } from "./Slug.js";
 export interface GraphMetadata {
   readonly createdAt: number,
   updatedAt: number,
-  screenPosition: ScreenPosition,
-  initialNodePosition: NodePosition,
   pinnedNotes: Slug[],
   files: FileInfo[],
-  version: "3",
+  version: "4",
 }
 
 // We are extensively using Maps here because they must be implemented with

@@ -58,7 +58,3 @@ You can also quickly query saved presets.
 It might be interesting to you to see some stats on your graph or see how many [components](https://en.wikipedia.org/wiki/Component_(graph_theory)) it has. Use the `Stats` view for this, which you can find in the app menu.
 
 ![Stats](./img/stats-view.png)
-
-## Graph View
-
-See [How to use the Graph view](./GraphView.md)

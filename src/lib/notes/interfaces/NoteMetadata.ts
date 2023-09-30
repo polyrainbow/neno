@@ -1,4 +1,3 @@
-import NodePosition from "./NodePosition";
 import { Slug } from "./Slug";
 
 interface BaseNoteMetadata {
@@ -9,15 +8,12 @@ interface BaseNoteMetadata {
   }
 }
 
-export interface NewNoteMetadata extends BaseNoteMetadata {
-  position?: NodePosition,
-}
+export type NewNoteMetadata = BaseNoteMetadata;
 
 export interface ExistingNoteMetadata extends BaseNoteMetadata {
   slug: Slug,
   createdAt?: number,
   updatedAt?: number,
-  position: NodePosition,
 }
 
 export type NoteMetadata = NewNoteMetadata | ExistingNoteMetadata;

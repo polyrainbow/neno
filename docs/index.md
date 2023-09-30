@@ -52,15 +52,6 @@ chain icon of your first note in the note list:
 
 ![Link to another note](./img/link-to-another-note.png)
 
-This will add a Wikilink to your note content. After saving your note, you can see the new link in the Graph view as well:
-
-![Two linked notes in Graph view](./img/two-linked-notes-in-graph-view.png)
-
-## Graph View
-
-One of the best features of NENO is the Graph view.
-[Read here how to use the Graph view](./GraphView.md)
-
 ## Tips and Tricks
 
 Now you should already be familiar with NENO's basic functionality. But there

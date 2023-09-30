@@ -6,10 +6,6 @@
     "translateY": 200,
     "scale": 1
   },
-  "initialNodePosition": {
-    "x": 0,
-    "y": 0
-  },
   "pinnedNotes": [
     "welcome-to-neno"
   ],

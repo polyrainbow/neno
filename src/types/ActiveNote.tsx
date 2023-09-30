@@ -1,5 +1,4 @@
 import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import NodePosition from "../lib/notes/interfaces/NodePosition";
 import NotePreview from "../lib/notes/interfaces/NotePreview";
 import { Slug } from "../lib/notes/interfaces/Slug";
 import SparseNoteInfo from "../lib/notes/interfaces/SparseNoteInfo";
@@ -22,7 +21,6 @@ export interface SavedActiveNote extends BaseActiveNote {
   isUnsaved: false,
   createdAt?: number,
   updatedAt?: number,
-  position: NodePosition,
   numberOfCharacters: number,
   outgoingLinks: NotePreview[],
   backlinks: SparseNoteInfo[],

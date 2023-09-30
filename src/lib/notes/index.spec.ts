@@ -898,7 +898,7 @@ describe("Notes module", () => {
       const graphFile = await storageProvider.readObjectAsString(".graph.json");
       const graph = JSON.parse(graphFile);
 
-      expect(graph.version).toBe("3");
+      expect(graph.version).toBe("4");
     },
   );
 

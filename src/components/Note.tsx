@@ -63,7 +63,6 @@ interface NoteComponentProps {
   unsavedChanges: boolean,
   pinOrUnpinNote: (slug: Slug) => void,
   duplicateNote: (note: ActiveNote) => void,
-  openInGraphView: (note: ActiveNote) => void,
   importNote: (note: ActiveNote) => void,
   uploadInProgress: boolean,
   setUploadInProgress: (val: boolean) => void,
@@ -91,7 +90,6 @@ const Note = ({
   unsavedChanges,
   pinOrUnpinNote,
   duplicateNote,
-  openInGraphView,
   importNote,
   uploadInProgress,
   setUploadInProgress,
@@ -313,7 +311,6 @@ const Note = ({
       setUnsavedChanges={setUnsavedChanges}
       pinOrUnpinNote={pinOrUnpinNote}
       duplicateNote={duplicateNote}
-      openInGraphView={openInGraphView}
       handleUploadFilesRequest={handleUploadFilesRequest}
       uploadInProgress={uploadInProgress}
       importNote={importNote}
@@ -418,7 +415,6 @@ const Note = ({
               setUnsavedChanges={setUnsavedChanges}
               pinOrUnpinNote={pinOrUnpinNote}
               duplicateNote={duplicateNote}
-              openInGraphView={openInGraphView}
               handleUploadFilesRequest={handleUploadFilesRequest}
               importNote={importNote}
             />

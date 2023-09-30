@@ -1,5 +1,4 @@
 import Graph from "./interfaces/Graph.js";
-import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import { Link } from "./interfaces/Link.js";
 import ExistingNote from "./interfaces/ExistingNote.js";
 import NoteListItem from "./interfaces/NoteListItem.js";
@@ -59,16 +58,6 @@ const serializeNoteHeaders = (headers: NoteHeaders): string => {
 
 const canonicalHeaderKeys = new Map<CanonicalNoteHeader, MetaModifier>([
   [
-    CanonicalNoteHeader.GRAPH_POSITION,
-    (meta, val) => {
-      const [x, y] = val.split(",").map((string) => parseFloat(string));
-      meta.position = {
-        x,
-        y,
-      };
-    },
-  ],
-  [
     CanonicalNoteHeader.CREATED_AT,
     (meta, val) => {
       meta.createdAt = parseInt(val);
@@ -125,7 +114,6 @@ const parseSerializedExistingNote = (
     slug,
     createdAt: partialMeta.createdAt,
     updatedAt: partialMeta.updatedAt,
-    position: partialMeta.position ?? { x: 0, y: 0 },
     flags: partialMeta.flags ?? [],
     contentType: partialMeta.contentType ?? DEFAULT_CONTENT_TYPE,
     custom,
@@ -193,11 +181,6 @@ const serializeNote = (note: ExistingNote): string => {
       note.meta.updatedAt.toString(),
     );
   }
-
-  headersToSerialize.set(
-    CanonicalNoteHeader.GRAPH_POSITION,
-    Object.values(note.meta.position).join(","),
-  );
 
   headersToSerialize.set(
     CanonicalNoteHeader.FLAGS,
@@ -374,21 +357,6 @@ const getNoteTitle = (note: ExistingNote): string => {
   } else {
     return inferNoteTitle(note.content);
   }
-};
-
-
-const updateNotePosition = (
-  graph: Graph,
-  nodePositionUpdate: GraphNodePositionUpdate,
-): boolean => {
-  if (!graph.notes.has(nodePositionUpdate.slug)) {
-    return false;
-  }
-  const note: ExistingNote
-    = graph.notes.get(nodePositionUpdate.slug) as ExistingNote;
-
-  note.meta.position = nodePositionUpdate.position;
-  return true;
 };
 
 
@@ -1295,7 +1263,6 @@ export {
   getExtensionFromFilename,
   getMediaTypeFromFilename,
   inferNoteTitle,
-  updateNotePosition,
   getNumberOfLinkedNotes,
   createNoteToTransmit,
   getNoteFeatures,

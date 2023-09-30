@@ -27,8 +27,7 @@ import { Slug } from "./interfaces/Slug.js";
 import { FILE_SLUG_PREFIX } from "./config.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
-import { GraphMetadataV1, migrateToV2 } from "./migrations/v2.js";
-import { GraphMetadataV2, migrateToV3 } from "./migrations/v3.js";
+import { GraphMetadataV3, migrateToV4 } from "./migrations/v4.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -74,7 +73,7 @@ export default class DatabaseIO {
     metadataSerialized?: string,
   ): Promise<Graph> {
     let migrationPerformed = false;
-    let parsedNotes = new Map<Slug, ExistingNote>();
+    const parsedNotes = new Map<Slug, ExistingNote>();
 
     for (const [slug, serializedNote] of serializedNotes) {
       let parsedNote: ExistingNote;
@@ -89,27 +88,15 @@ export default class DatabaseIO {
     let graphMetadata = typeof metadataSerialized === "string"
       ? JSON.parse(
         metadataSerialized,
-      ) as GraphMetadata | GraphMetadataV2 | GraphMetadataV1
+      ) as GraphMetadata | GraphMetadataV3
       : this.createEmptyGraphMetadata();
 
-    if (!("version" in graphMetadata)) {
-      const v2 = await migrateToV2(
+    if (graphMetadata.version === "3") {
+      const v4 = await migrateToV4(
         graphMetadata,
-        parsedNotes,
         this.#storageProvider,
       );
-      graphMetadata = v2.metadata;
-      parsedNotes = v2.notes;
-      migrationPerformed = true;
-    }
-
-    if (graphMetadata.version === "2") {
-      const v3 = await migrateToV3(
-        graphMetadata,
-        parsedNotes,
-      );
-      graphMetadata = v3.metadata;
-      parsedNotes = v3.notes;
+      graphMetadata = v4.metadata;
       migrationPerformed = true;
     }
 
@@ -313,18 +300,9 @@ export default class DatabaseIO {
     return {
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      screenPosition: {
-        translateX: 200, // good value to see INPI completely
-        translateY: 200, // good value to see INPI completely
-        scale: 1,
-      },
-      initialNodePosition: {
-        x: 0,
-        y: 0,
-      },
       pinnedNotes: [],
       files: [],
-      version: "3",
+      version: "4",
     };
   }
 

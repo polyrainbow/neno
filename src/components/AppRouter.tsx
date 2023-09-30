@@ -9,7 +9,6 @@ import { PathTemplate } from "../enum/PathTemplate";
 import { ROOT_PATH } from "../config";
 import NoteView from "./NoteView";
 import ListView from "./ListView";
-import VisualizationView from "./VisualView";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
 import StatsView from "./StatsView";
@@ -73,17 +72,6 @@ const AppRouter = () => {
         ),
         element: <NoteAccessProvider>
           <ListView />
-        </NoteAccessProvider>,
-      },
-      {
-        path: getAppPath(
-          PathTemplate.VISUAL,
-          new Map([["GRAPH_ID", ":graphId"]]),
-          undefined,
-          true,
-        ),
-        element: <NoteAccessProvider>
-          <VisualizationView />
         </NoteAccessProvider>,
       },
       {

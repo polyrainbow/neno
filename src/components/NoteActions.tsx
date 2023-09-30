@@ -28,7 +28,6 @@ interface NoteActionsProps {
   setUnsavedChanges: (val: boolean) => void,
   pinOrUnpinNote: (slug: Slug) => void,
   duplicateNote: (note: ActiveNote) => void,
-  openInGraphView: (note: ActiveNote) => void,
   handleUploadFilesRequest: (files: FileList) => void,
   importNote: (note: ActiveNote) => void,
 }
@@ -43,7 +42,6 @@ const NoteActions = ({
   setUnsavedChanges,
   pinOrUnpinNote,
   duplicateNote,
-  openInGraphView,
   handleUploadFilesRequest,
   importNote,
 }: NoteActionsProps) => {
@@ -136,13 +134,6 @@ const NoteActions = ({
           if (activeNote.isUnsaved) return;
           pinOrUnpinNote(activeNote.slug);
         }}
-      />
-      <IconButtonWithLabel
-        id="button_open-in-graph-view"
-        disabled={activeNote.isUnsaved}
-        title={l("editor.reveal-note-in-graph")}
-        icon="center_focus_strong"
-        onClick={openInGraphView}
       />
       <IconButtonWithLabel
         id="button_import-note"

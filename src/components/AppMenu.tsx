@@ -83,26 +83,6 @@ const AppMenu = () => {
       />
       <AppMenuItem
         disabled={!isInitialized()}
-        label={l("menu.graph")}
-        icon="scatter_plot"
-        onClick={async () => {
-          const target = getAppPath(
-            PathTemplate.VISUAL,
-            new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-          );
-          if (pathname === target) return;
-
-          if (unsavedChanges) {
-            await confirmDiscardingUnsavedChanges();
-            setUnsavedChanges(false);
-          }
-
-          navigate(target);
-          setIsAppMenuOpen(false);
-        }}
-      />
-      <AppMenuItem
-        disabled={!isInitialized()}
         label={l("menu.files")}
         icon="grid_view"
         onClick={async () => {

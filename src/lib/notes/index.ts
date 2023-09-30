@@ -1,6 +1,5 @@
 import DatabaseIO from "./DatabaseIO.js";
 import {
-  updateNotePosition,
   createNoteToTransmit,
   getSortFunction,
   getNumberOfLinkedNotes,
@@ -23,13 +22,8 @@ import {
   isFileSlug,
   getSlugFromFilename,
 } from "./noteUtils.js";
-import GraphVisualization from "./interfaces/GraphVisualization.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
-import GraphNode from "./interfaces/GraphVisualizationNode.js";
 import GraphStats from "./interfaces/GraphStats.js";
-import GraphVisualizationFromUser
-  from "./interfaces/GraphVisualizationFromUser.js";
-import GraphNodePositionUpdate from "./interfaces/NodePositionUpdate.js";
 import * as config from "./config.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import GraphObject from "./interfaces/Graph.js";
@@ -190,40 +184,6 @@ export default class NotesProvider {
   }
 
 
-  async getGraphVisualization(
-  ): Promise<GraphVisualization> {
-    const graph = await this.#io.getGraph();
-
-    const graphNodes: GraphNode[] = Array.from(graph.notes.values()).map(
-      (note: ExistingNote) => {
-        const graphNode: GraphNode = {
-          slug: note.meta.slug,
-          title: getNoteTitle(note),
-          position: note.meta.position,
-          createdAt: note.meta.createdAt,
-          updatedAt: note.meta.updatedAt,
-        };
-        return graphNode;
-      },
-    );
-
-    const graphVisualization: GraphVisualization = {
-      nodes: graphNodes,
-      links: getGraphLinks(graph),
-      screenPosition: graph.metadata.screenPosition,
-      initialNodePosition: graph.metadata.initialNodePosition,
-    };
-
-    /*
-      It's necessary to make the returned object from this class
-      mutation-resistant, because manipulating this object by the consumer
-      would trigger changes in our data storage.
-      So let's create a clone.
-    */
-    return structuredClone(graphVisualization);
-  }
-
-
   async getStats(
     options: GraphStatsRetrievalOptions,
   ): Promise<GraphStats> {
@@ -283,32 +243,6 @@ export default class NotesProvider {
     }
 
     return stats;
-  }
-
-
-  async setGraphVisualization(
-    graphVisualizationFromUser: GraphVisualizationFromUser,
-  ): Promise<void> {
-    const graph: GraphObject = await this.#io.getGraph();
-    const nodePositionUpdates = graphVisualizationFromUser.nodePositionUpdates;
-    nodePositionUpdates.forEach(
-      (nodePositionUpdate: GraphNodePositionUpdate): void => {
-        updateNotePosition(graph, nodePositionUpdate);
-      },
-    );
-
-    graph.metadata.screenPosition
-      = graphVisualizationFromUser.screenPosition;
-    graph.metadata.initialNodePosition
-      = graphVisualizationFromUser.initialNodePosition;
-    await this.#io.flushChanges(
-      graph,
-      nodePositionUpdates.map(
-        (update: GraphNodePositionUpdate): Slug => {
-          return update.slug;
-        },
-      ),
-    );
   }
 
 
@@ -441,18 +375,6 @@ export default class NotesProvider {
     const newNote: ExistingNote = {
       meta: {
         slug,
-        // Let's make sure that when manipulating the position object at some
-        // point, we don't accidentally manipulate the initialNodePosition
-        // object.
-        // So let's copy the primitive values one by one. This actually
-        // prevents bugs from occuring, where API output from this
-        // module is not consistently serialized and re-parsed. It could also be
-        // cloned (e. g. via structuredClone()) without destroying references,
-        // which would just defer the issue outside of this module.
-        position: noteFromUser.meta.position ?? {
-          x: graph.metadata.initialNodePosition.x,
-          y: graph.metadata.initialNodePosition.y,
-        },
         createdAt: Date.now(),
         updatedAt: Date.now(),
         custom: removeCustomMetadataWithEmptyKeys(
