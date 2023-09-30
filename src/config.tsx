@@ -23,7 +23,6 @@ const emojis = {
   "audio": "🎧",
   "video": "📺",
   "pin": "📌",
-  "hub": "🐙",
   "text": "✏️",
 };
 

@@ -24,12 +24,7 @@ const NoteListItem = ({
   onLinkIndicatorClick,
   isLinkable,
 }: NoteListItemProps) => {
-  const isHub = "linkCount" in note && note.linkCount.sum >= 5;
-
   const trClassList = ["note-list-item"];
-  if (isHub) {
-    trClassList.push("hub");
-  }
   if (isActive) {
     trClassList.push("active");
   }

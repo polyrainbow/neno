@@ -19,7 +19,6 @@ const StatsViewAnalysisTable = ({
     numberOfUnlinkedNotes,
     numberOfLinks,
     numberOfComponents,
-    numberOfHubs,
     nodesWithHighestNumberOfLinks,
     numberOfComponentsWithMoreThanOneNode,
   } = stats;
@@ -67,12 +66,6 @@ const StatsViewAnalysisTable = ({
         <td>{
           (numberOfLinks - numberOfAllNotes + numberOfComponents)
             .toLocaleString()
-        }</td>
-      </tr>
-      <tr>
-        <td>{emojis.hub} {l("stats.analysis.hubs")}</td>
-        <td>{
-          numberOfHubs.toLocaleString()
         }</td>
       </tr>
       <tr>

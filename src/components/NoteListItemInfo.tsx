@@ -1,4 +1,4 @@
-import { emojis, SPAN_SEPARATOR } from "../config";
+import { SPAN_SEPARATOR } from "../config";
 import { l } from "../lib/intl";
 import NoteListItemFeatures from "./NoteListItemFeatures";
 import NoteListItem from "../lib/notes/interfaces/NoteListItem";
@@ -11,8 +11,6 @@ const NoteListItemInfo = ({
 }: {
   note: NoteListItem
 }) => {
-  const isHub = note.linkCount.sum >= 5;
-
   const sections = [
     <>/{shortenText(note.slug, 50)}</>,
   ];
@@ -41,14 +39,6 @@ const NoteListItemInfo = ({
       <NoteListItemFeatures
         features={note.features}
       />,
-    );
-  }
-
-  if (isHub) {
-    sections.push(
-      <span>{
-        emojis.hub + " " + l("list.item.hub")
-      }</span>,
     );
   }
 

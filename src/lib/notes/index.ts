@@ -2,7 +2,6 @@ import DatabaseIO from "./DatabaseIO.js";
 import {
   createNoteToTransmit,
   getSortFunction,
-  getNumberOfLinkedNotes,
   createNoteListItems,
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
@@ -24,7 +23,6 @@ import {
 } from "./noteUtils.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import GraphStats from "./interfaces/GraphStats.js";
-import * as config from "./config.js";
 import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
 import GraphObject from "./interfaces/Graph.js";
 import { ErrorMessage } from "./interfaces/ErrorMessage.js";
@@ -223,16 +221,6 @@ export default class NotesProvider {
         numberOfComponents,
         numberOfComponentsWithMoreThanOneNode:
           numberOfComponents - numberOfUnlinkedNotes,
-        numberOfHubs: Array.from(graph.notes.values())
-          .filter((note) => {
-            const numberOfLinkedNotes = getNumberOfLinkedNotes(
-              graph,
-              note.meta.slug,
-            );
-            return numberOfLinkedNotes.sum
-              >= config.MIN_NUMBER_OF_LINKS_FOR_HUB;
-          })
-          .length,
         nodesWithHighestNumberOfLinks: createNoteListItems(
           Array.from(graph.notes.values()),
           graph,
