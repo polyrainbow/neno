@@ -623,7 +623,6 @@ const getNoteFeatures = (
   const blocks = graph.indexes.blocks.get(note.meta.slug) as Block[];
   const spans = getAllInlineSpans(blocks);
 
-  const containsText = spans.length > 0;
   const containsWeblink
     = spans.some((span) => span.type === SpanType.HYPERLINK);
   const containsCode = blocks.some((block) => block.type === BlockType.CODE);
@@ -647,7 +646,6 @@ const getNoteFeatures = (
   });
 
   const features: NoteListItemFeatures = {
-    containsText,
     containsWeblink,
     containsCode,
     containsImages,

@@ -14,14 +14,6 @@ const NoteListItemFeatures = ({
     className="note-features"
   >
     {
-      features.containsText
-        ? <Tooltip
-          title={l("list.item.features.contains-text")}>
-          <span>{emojis.text}</span>
-        </Tooltip>
-        : null
-    }
-    {
       features.containsWeblink
         ? <Tooltip
           title={l("list.item.features.contains-links")}>
