@@ -416,4 +416,35 @@ test.describe("Editor view", () => {
       expect((await paragraphs[0].innerText()).trim()).toBe("");
     },
   );
+
+  test(
+    "remove wikilink opening punctuation at once should remove the whole wikilink",
+    async ({ page }) => {
+      const isMac = process.platform === "darwin";
+      await page.keyboard.type("[[link]]");
+      await page.keyboard.press(
+        isMac ? "Meta+ArrowLeft" : "Control+ArrowLeft",
+        { delay: 10 },
+      );
+      await page.keyboard.press(
+        isMac ? "Shift+ArrowRight" : "Shift+ArrowRight",
+        { delay: 10 },
+      );
+      await page.keyboard.press(
+        isMac ? "Shift+ArrowRight" : "Shift+ArrowRight",
+        { delay: 10 },
+      );
+      await page.keyboard.press("Backspace");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraphChildren = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ))!;
+
+      expect(paragraphChildren.length).toBe(1);
+      expect(await paragraphChildren[0].innerText()).toBe("link]]");
+      // expect node to be a text node
+      expect(await paragraphChildren[0].getAttribute("class")).toBe(null);
+    },
+  );
 });

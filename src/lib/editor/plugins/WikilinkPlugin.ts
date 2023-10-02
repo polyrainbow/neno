@@ -161,9 +161,6 @@ function registerWikilinkTransforms(
     const prevSibling = node.getPreviousSibling();
     const nextSibling = node.getNextSibling();
 
-    if (!prevSibling?.getParent()) return;
-    if (!nextSibling?.getParent()) return;
-
     if (
       !$isWikiLinkPunctuationNode(prevSibling)
       || !$isWikiLinkPunctuationNode(nextSibling)
