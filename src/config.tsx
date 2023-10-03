@@ -1,6 +1,6 @@
 import { BASE_URL } from "./constants.js";
 
-const VERSION = "v7.0.0";
+const VERSION = "v7.0.1";
 
 const DEFAULT_NOTE_CONTENT = "";
 
