@@ -426,12 +426,40 @@ test.describe("Editor view", () => {
         isMac ? "Meta+ArrowLeft" : "Control+ArrowLeft",
         { delay: 10 },
       );
+      await page.keyboard.press("Shift+ArrowRight", { delay: 10 });
+      await page.keyboard.press("Shift+ArrowRight", { delay: 10 });
+      await page.keyboard.press("Backspace");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraphChildren = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ))!;
+
+      expect(paragraphChildren.length).toBe(1);
+      expect(await paragraphChildren[0].innerText()).toBe("link]]");
+      // expect node to be a text node
+      expect(await paragraphChildren[0].getAttribute("class")).toBe(null);
+    },
+  );
+
+  test(
+    "remove wikilink closing punctuation with some content should remove the whole wikilink",
+    async ({ page }) => {
+      await page.keyboard.type("[[link]]");
       await page.keyboard.press(
-        isMac ? "Shift+ArrowRight" : "Shift+ArrowRight",
+        "Shift+ArrowLeft",
         { delay: 10 },
       );
       await page.keyboard.press(
-        isMac ? "Shift+ArrowRight" : "Shift+ArrowRight",
+        "Shift+ArrowLeft",
+        { delay: 10 },
+      );
+      await page.keyboard.press(
+        "Shift+ArrowLeft",
+        { delay: 10 },
+      );
+      await page.keyboard.press(
+        "Shift+ArrowLeft",
         { delay: 10 },
       );
       await page.keyboard.press("Backspace");
@@ -442,7 +470,7 @@ test.describe("Editor view", () => {
       ))!;
 
       expect(paragraphChildren.length).toBe(1);
-      expect(await paragraphChildren[0].innerText()).toBe("link]]");
+      expect(await paragraphChildren[0].innerText()).toBe("[[li");
       // expect node to be a text node
       expect(await paragraphChildren[0].getAttribute("class")).toBe(null);
     },
