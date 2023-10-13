@@ -1010,4 +1010,92 @@ describe("Notes module", () => {
       expect(note3.backlinks.length).toBe(2);
     },
   );
+
+  it(
+    "should not update the timestamp in graph metadata on a note update",
+    async () => {
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      await notesProvider.getNotesList({});
+
+      const graphFileCheck1
+        = await storageProvider.readObjectAsString(".graph.json");
+      const graphCheck1 = JSON.parse(graphFileCheck1);
+      const graphMetadataUpdateTimeCheck1 = graphCheck1.updatedAt;
+
+      await sleep(100);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n1",
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const graphFileCheck2
+        = await storageProvider.readObjectAsString(".graph.json");
+      const graphCheck2 = JSON.parse(graphFileCheck2);
+      const graphMetadataUpdateTimeCheck2 = graphCheck2.updatedAt;
+
+      expect(graphMetadataUpdateTimeCheck2).toBe(graphMetadataUpdateTimeCheck1);
+    },
+  );
+
+
+  it(
+    "should update the timestamp in graph metadata on pin update",
+    async () => {
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      await notesProvider.getNotesList({});
+
+      const graphFileCheck1
+        = await storageProvider.readObjectAsString(".graph.json");
+      const graphCheck1 = JSON.parse(graphFileCheck1);
+      const graphMetadataUpdateTimeCheck1 = graphCheck1.updatedAt;
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n1",
+      };
+
+      await notesProvider.put(noteSaveRequest);
+      await sleep(100);
+      await notesProvider.pin("n1");
+
+      const graphFileCheck2
+        = await storageProvider.readObjectAsString(".graph.json");
+      const graphCheck2 = JSON.parse(graphFileCheck2);
+      const graphMetadataUpdateTimeCheck2 = graphCheck2.updatedAt;
+
+      expect(graphMetadataUpdateTimeCheck2)
+        .toBeGreaterThan(graphMetadataUpdateTimeCheck1);
+    },
+  );
 });
