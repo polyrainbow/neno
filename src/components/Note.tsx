@@ -18,7 +18,6 @@ import NoteKeyValues from "./NoteKeyValues";
 import { l } from "../lib/intl";
 import useNotesProvider from "../hooks/useNotesProvider";
 import NoteMenuBar from "./NoteMenuBar";
-import NoteActions from "./NoteActions";
 import BusyIndicator from "./BusyIndicator";
 import NoteBacklinks from "./NoteBacklinks";
 import { Slug } from "../lib/notes/interfaces/Slug";
@@ -405,19 +404,6 @@ const Note = ({
                 />
                 : null
             }
-            <NoteActions
-              activeNote={note}
-              createNewNote={createNewNote}
-              createNewLinkedNote={createNewLinkedNote}
-              handleNoteSaveRequest={handleNoteSaveRequest}
-              removeActiveNote={removeActiveNote}
-              unsavedChanges={unsavedChanges}
-              setUnsavedChanges={setUnsavedChanges}
-              pinOrUnpinNote={pinOrUnpinNote}
-              duplicateNote={duplicateNote}
-              handleUploadFilesRequest={handleUploadFilesRequest}
-              importNote={importNote}
-            />
           </div>
         </section>
     }
