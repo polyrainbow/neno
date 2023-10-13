@@ -20,6 +20,8 @@ import {
   getAllInlineSpans,
   isFileSlug,
   getSlugFromFilename,
+  getGraphUpdateTimestamp,
+  getGraphCreationTimestamp,
 } from "./noteUtils.js";
 import NoteToTransmit from "./interfaces/NoteToTransmit.js";
 import GraphStats from "./interfaces/GraphStats.js";
@@ -40,6 +42,7 @@ import ByteRange from "./interfaces/ByteRange.js";
 import { Slug } from "./interfaces/Slug.js";
 import { Block } from "../subwaytext/interfaces/Block.js";
 import serialize from "../subwaytext/serialize.js";
+import WriteGraphMetadataAction from "./interfaces/FlushGraphMetadataAction.js";
 
 
 export default class NotesProvider {
@@ -200,8 +203,8 @@ export default class NotesProvider {
     if (options.includeMetadata) {
       stats = {
         ...stats,
-        createdAt: graph.metadata.createdAt,
-        updatedAt: graph.metadata.updatedAt,
+        createdAt: getGraphCreationTimestamp(graph),
+        updatedAt: getGraphUpdateTimestamp(graph),
         size: {
           graph: await this.#io.getSizeOfGraph(),
           files: await this.#io.getSizeOfGraphFiles(),
@@ -285,13 +288,16 @@ export default class NotesProvider {
         graph.notes.delete(oldSlug);
         NotesProvider.removeSlugFromIndexes(graph, oldSlug);
 
+        let flushMetadata = WriteGraphMetadataAction.NONE;
+
         for (let i = 0; i < graph.metadata.pinnedNotes.length; i++) {
           if (graph.metadata.pinnedNotes[i] === oldSlug) {
             graph.metadata.pinnedNotes[i] = newSlug;
+            flushMetadata = WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE;
           }
         }
 
-        await this.#io.flushChanges(graph, [oldSlug]);
+        await this.#io.flushChanges(graph, flushMetadata, [oldSlug]);
 
         existingNote.meta.slug = newSlug;
         graph.notes.set(newSlug, existingNote);
@@ -321,7 +327,11 @@ export default class NotesProvider {
             thatNote.content = serialize(newBlocks);
             graph.indexes.blocks.set(thatNote.meta.slug, newBlocks);
             NotesProvider.updateIndexes(graph, thatNote);
-            await this.#io.flushChanges(graph, [thatNote.meta.slug]);
+            await this.#io.flushChanges(
+              graph,
+              WriteGraphMetadataAction.NONE,
+              [thatNote.meta.slug],
+            );
           }
         }
       } else {
@@ -329,7 +339,11 @@ export default class NotesProvider {
       }
 
       NotesProvider.updateIndexes(graph, existingNote);
-      await this.#io.flushChanges(graph, [existingNote.meta.slug]);
+      await this.#io.flushChanges(
+        graph,
+        WriteGraphMetadataAction.NONE,
+        [existingNote.meta.slug],
+      );
 
       const noteToTransmit: NoteToTransmit
         = await createNoteToTransmit(existingNote, graph);
@@ -376,7 +390,11 @@ export default class NotesProvider {
 
     graph.notes.set(slug, newNote);
     NotesProvider.updateIndexes(graph, newNote);
-    await this.#io.flushChanges(graph, [newNote.meta.slug]);
+    await this.#io.flushChanges(
+      graph,
+      WriteGraphMetadataAction.NONE,
+      [newNote.meta.slug],
+    );
 
     const noteToTransmit: NoteToTransmit
       = await createNoteToTransmit(newNote, graph);
@@ -408,12 +426,18 @@ export default class NotesProvider {
     }
 
     graph.notes.delete(slug);
+    let flushMetadata = WriteGraphMetadataAction.NONE;
     graph.metadata.pinnedNotes
-      = graph.metadata.pinnedNotes.filter((s) => s !== slug);
+      = graph.metadata.pinnedNotes.filter((s) => {
+        if (s === slug) {
+          flushMetadata = WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE;
+        }
+        return s !== slug;
+      });
 
     NotesProvider.removeSlugFromIndexes(graph, slug);
 
-    await this.#io.flushChanges(graph, [slug]);
+    await this.#io.flushChanges(graph, flushMetadata, [slug]);
   }
 
 
@@ -431,7 +455,11 @@ export default class NotesProvider {
       createdAt: Date.now(),
     };
     graph.metadata.files.push(fileInfo);
-    await this.#io.flushChanges(graph, []);
+    await this.#io.flushChanges(
+      graph,
+      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      [],
+    );
 
     return fileInfo;
   }
@@ -445,7 +473,11 @@ export default class NotesProvider {
     const graph = await this.#io.getGraph();
     graph.metadata.files
       = graph.metadata.files.filter((file) => file.slug !== slug);
-    await this.#io.flushChanges(graph, []);
+    await this.#io.flushChanges(
+      graph,
+      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      [],
+    );
   }
 
 
@@ -526,11 +558,18 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.NOTE_NOT_FOUND);
     }
 
+    const oldLength = graph.metadata.pinnedNotes.length;
+
     graph.metadata.pinnedNotes = Array.from(
       new Set([...graph.metadata.pinnedNotes, slug]),
     );
 
-    await this.#io.flushChanges(graph, []);
+    const newLength = graph.metadata.pinnedNotes.length;
+
+    const updateMetadata = oldLength !== newLength
+      ? WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
+      : WriteGraphMetadataAction.NONE;
+    await this.#io.flushChanges(graph, updateMetadata, []);
 
     return this.getPins();
   }
@@ -541,10 +580,17 @@ export default class NotesProvider {
   ): Promise<NoteToTransmit[]> {
     const graph = await this.#io.getGraph();
 
-    graph.metadata.pinnedNotes
-      = graph.metadata.pinnedNotes.filter((s) => s !== slug);
+    let updateMetadata = WriteGraphMetadataAction.NONE;
 
-    await this.#io.flushChanges(graph, []);
+    graph.metadata.pinnedNotes
+      = graph.metadata.pinnedNotes.filter((s) => {
+        if (s === slug) {
+          updateMetadata = WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE;
+        }
+        s !== slug;
+      });
+
+    await this.#io.flushChanges(graph, updateMetadata, []);
 
     return this.getPins();
   }

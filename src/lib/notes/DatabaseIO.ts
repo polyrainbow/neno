@@ -28,6 +28,7 @@ import { FILE_SLUG_PREFIX } from "./config.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import { GraphMetadataV3, migrateToV4 } from "./migrations/v4.js";
+import WriteGraphMetadataAction from "./interfaces/FlushGraphMetadataAction.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -120,7 +121,10 @@ export default class DatabaseIO {
     };
 
     if (migrationPerformed) {
-      await this.flushChanges(parsedGraphObject);
+      await this.flushChanges(
+        parsedGraphObject,
+        WriteGraphMetadataAction.WRITE,
+      );
     }
 
     return parsedGraphObject;
@@ -359,9 +363,10 @@ export default class DatabaseIO {
     const graphFromDisk: Graph
       = await this.readAndParseGraphFromDisk();
 
-    // Flushing the graph will also save it in memory for
-    // faster access the next time.
-    await this.flushChanges(graphFromDisk, []);
+    // Flushing the graph will save it in memory for
+    // faster access the next time. Also, if no graph metadata file is present
+    // in the directory, we create a new one.
+    await this.flushChanges(graphFromDisk, WriteGraphMetadataAction.WRITE, []);
     this.#finishedObtainingGraph();
     return graphFromDisk;
   }
@@ -373,14 +378,26 @@ export default class DatabaseIO {
   // has been performed.
   // If slugsToFlush is not provided, all notes will be flushed. This should
   // only be done if really necessary.
-  // The graph metadata file will always be refreshed.
   async flushChanges(
     graph: Graph,
+    writeGraphMetadata: WriteGraphMetadataAction,
     slugsToFlush?: Slug[],
   ): Promise<void> {
-    graph.metadata.updatedAt = Date.now();
+    if (
+      writeGraphMetadata === WriteGraphMetadataAction.WRITE
+      || writeGraphMetadata
+        === WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
+    ) {
+      if (
+        writeGraphMetadata
+          === WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
+      ) {
+        graph.metadata.updatedAt = Date.now();
+      }
+      await this.writeGraphMetadataFile(graph);
+    }
+
     this.#loadedGraph = graph;
-    await this.writeGraphMetadataFile(graph);
 
     if (slugsToFlush) {
       await Promise.all(slugsToFlush.map(async (slug) => {

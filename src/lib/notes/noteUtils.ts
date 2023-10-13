@@ -1257,6 +1257,30 @@ const getFilenameFromFileSlug = (
 };
 
 
+const getGraphCreationTimestamp = (graph: Graph): number => {
+  return Math.min(
+    ...Array.from(graph.notes.values())
+      .map((note: ExistingNote) => note.meta.createdAt)
+      .filter((createdAt: number | undefined): createdAt is number => {
+        return createdAt !== undefined;
+      }),
+    graph.metadata.createdAt,
+  );
+};
+
+
+const getGraphUpdateTimestamp = (graph: Graph): number => {
+  return Math.max(
+    ...Array.from(graph.notes.values())
+      .map((note: ExistingNote) => note.meta.updatedAt)
+      .filter((updatedAt: number | undefined): updatedAt is number => {
+        return updatedAt !== undefined;
+      }),
+    graph.metadata.updatedAt,
+  );
+};
+
+
 export {
   getExtensionFromFilename,
   getMediaTypeFromFilename,
@@ -1308,4 +1332,6 @@ export {
   mapInlineSpans,
   getSlugFromFilename,
   getFilenameFromFileSlug,
+  getGraphCreationTimestamp,
+  getGraphUpdateTimestamp,
 };
