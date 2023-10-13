@@ -4,8 +4,8 @@ import { Block } from "../../subwaytext/interfaces/Block.js";
 import { Slug } from "./Slug.js";
 
 export interface GraphMetadata {
-  readonly createdAt: number,
-  updatedAt: number,
+  readonly createdAt: number, // the time of creation of this metadata object
+  updatedAt: number, // the time of the last change of this metadata object
   pinnedNotes: Slug[],
   files: FileInfo[],
   version: "4",
