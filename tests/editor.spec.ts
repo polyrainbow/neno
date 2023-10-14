@@ -428,7 +428,7 @@ test.describe("Editor view", () => {
       );
       await page.keyboard.press("Shift+ArrowRight", { delay: 10 });
       await page.keyboard.press("Shift+ArrowRight", { delay: 10 });
-      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace", { delay: 10 });
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraphChildren = (await page.$$(
@@ -475,4 +475,19 @@ test.describe("Editor view", () => {
       expect(await paragraphChildren[0].getAttribute("class")).toBe(null);
     },
   );
+
+  test("should delete notes", async ({ page }) => {
+    await page.keyboard.type(DEMO_NOTE);
+    await page.click("#button_upload");
+    const noteListItems1 = await page.$$(".sidebar .note-list .note-list-item");
+    expect(noteListItems1.length).toBe(1);
+    const titleElement = await noteListItems1[0].$(".title");
+    const title = await titleElement?.innerText();
+    expect(title).toBe("Welcome to NENO");
+    await page.click("#button_remove");
+    const removeNoteButton = page.getByRole("dialog").getByText("Remove note");
+    await removeNoteButton.click();
+    const noteListItems2 = await page.$$(".sidebar .note-list .note-list-item");
+    expect(noteListItems2.length).toBe(0);
+  });
 });
