@@ -13,6 +13,3 @@ root.render(
     <App />
   </StrictMode>,
 );
-
-
-// TODO: set noImplicitAny in tsconfig to true
