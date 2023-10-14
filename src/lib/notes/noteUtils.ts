@@ -474,7 +474,7 @@ const trimSlug = (slug: string): string => {
   For example, it can be used to obtain a slug from a Wikilink.
   We will replace slashes and dots with dashes, as we do not allow
   these chars in note slugs (even though they are generally allowed
-  in slugs, see TODO below).
+  in slugs).
 */
 const sluggify = (text: string): string => {
   const slug = text
@@ -507,10 +507,6 @@ const sluggifyNoteText = (text: string): string => {
 };
 
 
-/*
-  TODO: Create new file id syntax, so that we can remove slashes and dots
-  from valid slug chars.
-*/
 const isValidSlug = (slug: Slug): boolean => {
   return (
     typeof slug === "string"

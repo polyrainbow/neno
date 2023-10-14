@@ -406,7 +406,6 @@ export function registerSubtext(editor: LexicalEditor): () => void {
           return false;
         }
 
-        // TODO: Make drag and drop work at some point.
         event.preventDefault();
         return true;
       },
@@ -421,7 +420,6 @@ export function registerSubtext(editor: LexicalEditor): () => void {
           return false;
         }
 
-        // TODO: Make drag and drop work at some point.
         event.preventDefault();
         return true;
       },
