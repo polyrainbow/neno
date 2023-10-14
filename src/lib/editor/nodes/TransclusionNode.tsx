@@ -7,6 +7,7 @@ import {
 import { ReactElement, ReactNode, useEffect, useState } from "react";
 import Icon from "../../../components/Icon";
 import { l } from "../../intl";
+import { Slug } from "../../notes/interfaces/Slug";
 
 
 export class TransclusionNode extends DecoratorNode<ReactNode> {
@@ -23,6 +24,7 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
   }
 
   __link: string;
+  __getTransclusionContent: (id: string) => Promise<ReactElement>;
 
   constructor(
     link: string,
@@ -35,7 +37,7 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
-    const Transclusion = ({ slug }) => {
+    const Transclusion = ({ slug }: { slug: Slug }) => {
       const [content, setContent] = useState<ReactElement | null>(null);
       const [isError, setIsError] = useState(false);
 

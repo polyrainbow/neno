@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-/**
- * @param {Object} ref
- * @param {Object} callback
- */
-function useOutsideAlerter(ref, callback) {
+function useOutsideAlerter(
+  ref: React.MutableRefObject<HTMLDivElement | null>,
+  callback: () => void,
+) {
   /*
     with react 18, React now always synchronously flushes effect functions if
     the update was triggered during a discrete user input event such as a click
@@ -26,14 +25,12 @@ function useOutsideAlerter(ref, callback) {
    * Alert if clicked on outside of element
    * @param {Object} event
    */
-  function handleClickOutside(event) {
-    if (ref.current && !ref.current.contains(event.target)) {
-      if (typeof callback === "function") {
-        if (hasAlreadyBeenTriggeredOnce) {
-          callback();
-        } else {
-          setHasAlreadyBeenTriggeredOnce(true);
-        }
+  function handleClickOutside(event: MouseEvent) {
+    if (ref.current && !ref.current.contains(event.target as Node)) {
+      if (hasAlreadyBeenTriggeredOnce) {
+        callback();
+      } else {
+        setHasAlreadyBeenTriggeredOnce(true);
       }
     }
   }
@@ -48,19 +45,23 @@ function useOutsideAlerter(ref, callback) {
   });
 }
 
-/**
- * Component that alerts if you click outside of it
- * @param {Object} props
- * @return {Object}
- */
-function OutsideAlerter(props) {
-  const wrapperRef = useRef(null);
-  useOutsideAlerter(wrapperRef, props.onOutsideClick);
+interface OutsideAlerterProps {
+  onOutsideClick: () => void;
+  children: React.ReactNode;
+}
+
+/* Component that alerts if you click outside of it */
+function OutsideAlerter({
+  children,
+  onOutsideClick,
+}: OutsideAlerterProps) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useOutsideAlerter(wrapperRef, onOutsideClick);
 
   return <div
     ref={wrapperRef}
     className="outside-alerter"
-  >{props.children}</div>;
+  >{children}</div>;
 }
 
 export default OutsideAlerter;

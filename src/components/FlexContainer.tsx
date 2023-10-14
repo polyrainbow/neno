@@ -1,14 +1,24 @@
+interface FlexContainerProps {
+  onClick?: () => void;
+  className?: string;
+  centerAlignedItems?: boolean;
+}
 
-const FlexContainer = (props) => {
+const FlexContainer = ({
+  onClick,
+  className,
+  centerAlignedItems,
+  children,
+}: React.PropsWithChildren<FlexContainerProps>) => {
   return <div
-    onClick={props.onClick}
+    onClick={onClick}
     className={
       "flex-container"
-      + (props.className ? " " + props.className : "")
-      + (props.centerAlignedItems ? " center-aligned-items" : "")
+      + (className ? " " + className : "")
+      + (centerAlignedItems ? " center-aligned-items" : "")
     }
   >
-    {props.children}
+    {children}
   </div>;
 };
 

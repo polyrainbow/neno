@@ -39,13 +39,23 @@ const RadioOption = ({
   </div>;
 };
 
+interface RadioGroupProps {
+  id: string,
+  options: {
+    value: string | number,
+    label: string,
+  }[],
+  selectedValue: string | number,
+  onChange: any,
+}
+
 
 const RadioGroup = ({
   id,
   options,
   selectedValue,
   onChange,
-}) => {
+}: RadioGroupProps) => {
   const radioOptions = options.map((option) => {
     return <RadioOption
       key={"radioGroupOption_" + id + "_" + option.value}

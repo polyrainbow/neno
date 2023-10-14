@@ -1,11 +1,18 @@
 import { l } from "../lib/intl";
 
+interface SearchPresetsItemProps {
+  label: string;
+  query: string;
+  onClick: () => void;
+  onDelete: () => void;
+}
+
 const SearchPresetsItem = ({
   label,
   query,
   onClick,
   onDelete,
-}) => {
+}: SearchPresetsItemProps) => {
   return <div
     className="search-preset"
   >

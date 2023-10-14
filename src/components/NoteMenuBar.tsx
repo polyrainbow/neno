@@ -1,20 +1,22 @@
+import { Slug } from "../lib/notes/interfaces/Slug";
 import ActiveNote from "../types/ActiveNote";
+import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import NoteControls from "./NoteControls";
 import StatusIndicator from "./StatusIndicator";
 
 interface NoteMenuBarProps {
   activeNote: ActiveNote,
-  createNewNote,
-  createNewLinkedNote,
-  handleNoteSaveRequest,
-  removeActiveNote,
-  unsavedChanges,
-  setUnsavedChanges,
-  pinOrUnpinNote,
-  duplicateNote,
-  handleUploadFilesRequest,
+  createNewNote: (params: CreateNewNoteParams) => void,
+  createNewLinkedNote: () => void,
+  handleNoteSaveRequest: () => void,
+  removeActiveNote: () => void,
+  unsavedChanges: boolean,
+  setUnsavedChanges: (value: boolean) => void,
+  pinOrUnpinNote: (slug: Slug) => void,
+  duplicateNote: (note: ActiveNote) => void,
+  handleUploadFilesRequest: () => void,
   uploadInProgress: boolean,
-  importNote,
+  importNote: (note: ActiveNote) => void,
   disableNoteSaving: boolean,
 }
 

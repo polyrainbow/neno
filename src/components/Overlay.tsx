@@ -1,10 +1,16 @@
+interface OverlayProps {
+  onClick: () => void;
+}
 
-const Overlay = (props) => {
+const Overlay = ({
+  onClick,
+  children,
+}: React.PropsWithChildren<OverlayProps>) => {
   return <div
-    onClick={props.onClick}
+    onClick={onClick}
     className="overlay"
   >
-    {props.children}
+    {children}
   </div>;
 };
 

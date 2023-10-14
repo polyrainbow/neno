@@ -73,7 +73,9 @@ const SearchPresets = ({
       .catch(() => {});
   }, []);
 
-  const setSearchPresetsPersistently = async (searchPresets) => {
+  const setSearchPresetsPersistently = async (
+    searchPresets: SearchPreset[],
+  ) => {
     setSearchPresets(searchPresets);
     await IDB.set("SEARCH_PRESETS", searchPresets);
   };

@@ -2,7 +2,10 @@ import usePagination from "../hooks/usePagination";
 import { l } from "../lib/intl";
 
 
-const getNumberOfPages = (numberOfResults, searchResultsPerPage) => {
+const getNumberOfPages = (
+  numberOfResults: number,
+  searchResultsPerPage: number,
+) => {
   let numberOfPages;
 
   const numberOfFullPages = Math.floor(
@@ -18,12 +21,19 @@ const getNumberOfPages = (numberOfResults, searchResultsPerPage) => {
   return numberOfPages;
 };
 
+interface PaginationProps {
+  numberOfResults: number;
+  searchResultsPerPage: number;
+  page: number;
+  onChange: (newPage: number) => void;
+}
 
-const Pagination = (props) => {
-  const numberOfResults = props.numberOfResults;
-  const searchResultsPerPage = props.searchResultsPerPage;
-  const page = props.page;
-
+const Pagination = ({
+  numberOfResults,
+  searchResultsPerPage,
+  page,
+  onChange,
+}: PaginationProps) => {
   const doRenderPageButtons = numberOfResults > searchResultsPerPage;
 
   const numberOfPages = getNumberOfPages(
@@ -34,7 +44,7 @@ const Pagination = (props) => {
   const { items } = usePagination({
     count: numberOfPages,
     page,
-    onChange: (_event, newPage) => props.onChange(newPage),
+    onChange: (_event, newPage) => onChange(newPage),
   });
 
   if (!doRenderPageButtons) return null;

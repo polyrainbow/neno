@@ -1,5 +1,5 @@
 import {
-  useEffect, useContext, useState,
+  useEffect, useState,
 } from "react";
 import NoteViewHeader from "./NoteViewHeader";
 import Note from "./Note";
@@ -13,7 +13,6 @@ import { PathTemplate } from "../enum/PathTemplate";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import { FileInfo } from "../lib/notes/interfaces/FileInfo";
 import { ErrorMessage } from "../lib/notes/interfaces/ErrorMessage";
-import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import { l } from "../lib/intl";
 import NoteListWithControls from "./NoteListWithControls";
 import useGoToNote from "../hooks/useGoToNote";
@@ -24,6 +23,7 @@ import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { Slug } from "../lib/notes/interfaces/Slug";
 import NotesProvider from "../lib/notes";
+import useConfirm from "../hooks/useConfirm";
 
 
 const getValidNoteSlug = (
@@ -50,7 +50,7 @@ const NoteView = () => {
   const notesProvider = useNotesProvider();
   const isSmallScreen = useIsSmallScreen();
   const navigate = useNavigate();
-  const confirm = useContext(ConfirmationServiceContext) as (val: any) => void;
+  const confirm = useConfirm();
   const { slug } = useParams();
   const [urlSearchParams] = useSearchParams();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
@@ -286,7 +286,7 @@ const NoteView = () => {
               setNoteListScrollTop={controlledNoteList.setScrollTop}
               page={controlledNoteList.page}
               setPage={controlledNoteList.setPage}
-              stats={headerStats}
+              numberOfAllNotes={headerStats?.numberOfAllNotes}
               itemsAreLinkable={true}
               onLinkIndicatorClick={(slug: Slug, title: string) => {
                 const wikilink = Utils.getWikilinkForNote(slug, title);

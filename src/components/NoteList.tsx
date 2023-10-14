@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
-import NoteListStatus from "./NoteListStatus";
+import NoteListStatusIndicator, {
+  NoteListStatus,
+} from "./NoteListStatusIndicator";
 import NoteListItem from "./NoteListItem";
 import Pagination from "./Pagination";
 import NoteSearchDisclaimer from "./NoteSearchDisclaimer";
@@ -13,7 +15,6 @@ import {
 } from "../lib/notes/interfaces/NoteListSortMode";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import NoteListItemType from "../lib/notes/interfaces/NoteListItem";
-import GraphStats from "../lib/notes/interfaces/GraphStats";
 import { Slug } from "../lib/notes/interfaces/Slug";
 
 
@@ -28,7 +29,7 @@ interface NoteListProps {
   sortMode: NoteListSortMode,
   page: number,
   setPage: (newPage: number) => void,
-  stats: GraphStats,
+  numberOfAllNotes?: number,
   itemsAreLinkable: boolean,
   unsavedChanges: boolean,
   setUnsavedChanges: (unsavedChanges: boolean) => void,
@@ -46,7 +47,7 @@ const NoteList = ({
   sortMode,
   page,
   setPage,
-  stats,
+  numberOfAllNotes,
   itemsAreLinkable,
   unsavedChanges,
   setUnsavedChanges,
@@ -58,14 +59,14 @@ const NoteList = ({
     = useConfirmDiscardingUnsavedChangesDialog();
   const isSmallScreen = useIsSmallScreen();
 
-  let status = "DEFAULT";
+  let status = NoteListStatus.DEFAULT;
 
   if (searchValue.length > 0 && searchValue.length < 3) {
-    status = "SEARCH_VALUE_TOO_SHORT";
+    status = NoteListStatus.SEARCH_VALUE_TOO_SHORT;
   }
 
   if (isBusy) {
-    status = "BUSY";
+    status = NoteListStatus.BUSY;
   }
 
   useEffect(() => {
@@ -95,15 +96,18 @@ const NoteList = ({
     container.scrollTop = scrollTop;
   }, [notes, status, sortMode]);
 
-  if (status === "BUSY" || status === "SEARCH_VALUE_TOO_SHORT") {
-    return <NoteListStatus
+  if (
+    status === NoteListStatus.BUSY
+    || status === NoteListStatus.SEARCH_VALUE_TOO_SHORT
+  ) {
+    return <NoteListStatusIndicator
       status={status}
     />;
   }
 
   if (!Array.isArray(notes) || (notes.length === 0)) {
-    return <NoteListStatus
-      status="NO_NOTES_FOUND"
+    return <NoteListStatusIndicator
+      status={NoteListStatus.NO_NOTES_FOUND}
     />;
   }
 
@@ -124,7 +128,7 @@ const NoteList = ({
     <NoteSearchDisclaimer
       searchValue={searchValue}
       numberOfResults={numberOfResults}
-      stats={stats}
+      numberOfAllNotes={numberOfAllNotes}
     />
     <div className="note-list">
       {

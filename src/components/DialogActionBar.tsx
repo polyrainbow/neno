@@ -1,5 +1,5 @@
 
-const DialogActionBar = ({ children }) => {
+const DialogActionBar = ({ children }: React.PropsWithChildren) => {
   return <div
     className="dialog-action-bar"
   >

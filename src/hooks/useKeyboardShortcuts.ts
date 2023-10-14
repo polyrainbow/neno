@@ -7,7 +7,7 @@ interface KeyboardShortCutHandlers {
 }
 
 export default (handlers: KeyboardShortCutHandlers): void => {
-  const handleKeydown = (e) => {
+  const handleKeydown = (e: KeyboardEvent) => {
     if (
       handlers.onSave
       // @ts-ignore

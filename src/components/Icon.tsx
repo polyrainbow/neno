@@ -11,7 +11,7 @@ const Icon = ({
   icon,
   title,
   size,
-}: IconProps, ref) => {
+}: IconProps, ref: React.ForwardedRef<HTMLImageElement>) => {
   return <img
     ref={ref}
     src={getIconSrc(icon)}

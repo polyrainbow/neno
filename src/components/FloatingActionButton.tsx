@@ -1,12 +1,19 @@
 import Tooltip from "./Tooltip";
 import { getIconSrc } from "../lib/utils";
 
+interface FloatingActionButtonProps {
+  title: string;
+  icon: string;
+  onClick: () => void;
+  disabled?: boolean;
+}
+
 const FloatingActionButton = ({
   title,
   icon,
   onClick,
   disabled = false,
-}) => {
+}: FloatingActionButtonProps) => {
   return <Tooltip
     title={title}
   >

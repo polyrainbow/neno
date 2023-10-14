@@ -89,10 +89,19 @@ interface UsePaginationProps {
   siblingCount?: number;
 }
 
+export enum PaginationItemType {
+  First = "first",
+  Previous = "previous",
+  Page = "page",
+  Next = "next",
+  Last = "last",
+  StartEllipsis = "start-ellipsis",
+  EndEllipsis = "end-ellipsis",
+}
+
 interface UsePaginationItem {
   onClick: React.ReactEventHandler;
-  type: "page" | "first" | "last" | "next" | "previous" | "start-ellipsis"
-  | "end-ellipsis";
+  type: PaginationItemType;
   page: number | null;
   selected: boolean;
   disabled: boolean;
@@ -126,17 +135,17 @@ export default function usePagination(
     default: defaultPage,
   });
 
-  const handleClick = (event, value) => {
+  const handleClick = (event: React.ChangeEvent, value: number | null) => {
     if (!pageProp) {
-      setPageState(value);
+      value && setPageState(value);
     }
-    if (handleChange) {
+    if (handleChange && value !== null) {
       handleChange(event, value);
     }
   };
 
   // https://dev.to/namirsab/comment/2050
-  const range = (start, end) => {
+  const range = (start: number, end: number) => {
     const length = end - start + 1;
     return Array.from({ length }, (_, i) => start + i);
   };
@@ -172,15 +181,15 @@ export default function usePagination(
   // Basic list of items to render
   // e.g. itemList = ['first', 'previous', 1, 'ellipsis', 4, 5, 6, 'ellipsis',
   // 10, 'next', 'last']
-  const itemList = [
-    ...(showFirstButton ? ["first"] : []),
-    ...(hidePrevButton ? [] : ["previous"]),
+  const itemList: (PaginationItemType | number)[] = [
+    ...(showFirstButton ? [PaginationItemType.First] : []),
+    ...(hidePrevButton ? [] : [PaginationItemType.Previous]),
     ...startPages,
 
     // Start ellipsis
 
     ...(siblingsStart > boundaryCount + 2
-      ? ["start-ellipsis"]
+      ? [PaginationItemType.StartEllipsis]
       : boundaryCount + 1 < count - boundaryCount
         ? [boundaryCount + 1]
         : []),
@@ -191,26 +200,26 @@ export default function usePagination(
     // End ellipsis
 
     ...(siblingsEnd < count - boundaryCount - 1
-      ? ["end-ellipsis"]
+      ? [PaginationItemType.EndEllipsis]
       : count - boundaryCount > boundaryCount
         ? [count - boundaryCount]
         : []),
 
     ...endPages,
-    ...(hideNextButton ? [] : ["next"]),
-    ...(showLastButton ? ["last"] : []),
+    ...(hideNextButton ? [] : [PaginationItemType.Next]),
+    ...(showLastButton ? [PaginationItemType.Last] : []),
   ];
 
   // Map the button type to its page number
-  const buttonPage = (type) => {
+  const buttonPage = (type: PaginationItemType): number | null => {
     switch (type) {
-      case "first":
+      case PaginationItemType.First:
         return 1;
-      case "previous":
+      case PaginationItemType.Previous:
         return page - 1;
-      case "next":
+      case PaginationItemType.Next:
         return page + 1;
-      case "last":
+      case PaginationItemType.Last:
         return count;
       default:
         return null;
@@ -221,17 +230,17 @@ export default function usePagination(
   const items: UsePaginationItem[] = itemList.map((item) => {
     return typeof item === "number"
       ? {
-        "onClick": (event) => {
+        "onClick": (event: React.ChangeEvent) => {
           handleClick(event, item);
         },
-        "type": "page",
+        "type": PaginationItemType.Page,
         "page": item,
         "selected": item === page,
         disabled,
         "aria-current": item === page ? "true" : undefined,
       }
       : {
-        onClick: (event) => {
+        onClick: (event: React.ChangeEvent) => {
           handleClick(event, buttonPage(item));
         },
         type: item,

@@ -7,29 +7,34 @@ import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import SearchPresets from "./SearchPresets";
 import { Slug } from "../lib/notes/interfaces/Slug";
+import NoteListItemType from "../lib/notes/interfaces/NoteListItem";
+import ActiveNote from "../types/ActiveNote";
 
-type View = "note-list" | "search-presets";
+export enum NoteListView {
+  DEFAULT = "default",
+  SEARCH_PRESETS = "search-presets",
+}
 
 interface NoteListWithControlsProps {
-  stats,
-  handleSearchInputChange,
-  searchValue,
+  numberOfAllNotes?: number,
+  handleSearchInputChange: (value: string) => void,
+  searchValue: string,
   sortMode: NoteListSortMode,
-  handleSortModeChange,
-  noteListItems,
-  numberOfResults,
-  noteListIsBusy,
+  handleSortModeChange: (mode: NoteListSortMode) => void,
+  noteListItems: NoteListItemType[],
+  numberOfResults: number,
+  noteListIsBusy: boolean,
   noteListScrollTop: number,
-  setNoteListScrollTop,
+  setNoteListScrollTop: (scrollTop: number) => void,
   page: number,
-  setPage,
-  activeNote,
-  itemsAreLinkable,
+  setPage: (newPage: number) => void,
+  activeNote: ActiveNote | null,
+  itemsAreLinkable: boolean,
   onLinkIndicatorClick: (slug: Slug, title: string) => void,
 }
 
 const NoteListWithControls = ({
-  stats,
+  numberOfAllNotes,
   handleSearchInputChange,
   searchValue,
   sortMode,
@@ -45,7 +50,7 @@ const NoteListWithControls = ({
   itemsAreLinkable,
   onLinkIndicatorClick,
 }: NoteListWithControlsProps) => {
-  const [view, setView] = useState<View>("note-list");
+  const [view, setView] = useState<NoteListView>(NoteListView.DEFAULT);
   const [unsavedChanges, setUnsavedChanges] = useContext(UnsavedChangesContext);
 
   return <>
@@ -58,7 +63,7 @@ const NoteListWithControls = ({
       setView={setView}
     />
     {
-      view === "note-list"
+      view === NoteListView.DEFAULT
         ? <NoteList
           notes={noteListItems}
           numberOfResults={numberOfResults}
@@ -73,7 +78,7 @@ const NoteListWithControls = ({
             setPage(page);
             setNoteListScrollTop(0);
           }}
-          stats={stats}
+          numberOfAllNotes={numberOfAllNotes}
           itemsAreLinkable={itemsAreLinkable}
           setUnsavedChanges={setUnsavedChanges}
           unsavedChanges={unsavedChanges}
@@ -82,10 +87,10 @@ const NoteListWithControls = ({
         : <SearchPresets
           onSelect={(preset) => {
             handleSearchInputChange(preset);
-            setView("note-list");
+            setView(NoteListView.DEFAULT);
           }}
           currentQuery={searchValue}
-          onClose={() => setView("note-list")}
+          onClose={() => setView(NoteListView.DEFAULT)}
         />
     }
   </>;

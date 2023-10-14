@@ -18,9 +18,7 @@ const StatsViewAnalysisTable = ({
     numberOfAllNotes,
     numberOfUnlinkedNotes,
     numberOfLinks,
-    numberOfComponents,
-    nodesWithHighestNumberOfLinks,
-    numberOfComponentsWithMoreThanOneNode,
+    analysis,
   } = stats;
 
   const percentageOfUnlinkedNotes
@@ -53,18 +51,18 @@ const StatsViewAnalysisTable = ({
       </tr>
       <tr>
         <td>{lf("stats.analysis.components")}</td>
-        <td>{numberOfComponents.toLocaleString()}</td>
+        <td>{analysis.numberOfComponents.toLocaleString()}</td>
       </tr>
       <tr>
         <td>{l("stats.analysis.components-with-more-than-one-node")}</td>
         <td>{
-          numberOfComponentsWithMoreThanOneNode.toLocaleString()
+          analysis.numberOfComponentsWithMoreThanOneNode.toLocaleString()
         }</td>
       </tr>
       <tr>
         <td>{lf("stats.analysis.cyclomatic-number")}</td>
         <td>{
-          (numberOfLinks - numberOfAllNotes + numberOfComponents)
+          (numberOfLinks - numberOfAllNotes + analysis.numberOfComponents)
             .toLocaleString()
         }</td>
       </tr>
@@ -73,7 +71,7 @@ const StatsViewAnalysisTable = ({
         <td>
           {
             numberOfAllNotes > 0
-              ? nodesWithHighestNumberOfLinks.map((note) => {
+              ? analysis.nodesWithHighestNumberOfLinks.map((note) => {
                 return <p
                   key={
                     `stats_nodesWithHighesNumberOfLinks_${note.slug}`

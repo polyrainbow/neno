@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
-import ConfirmationDialog from "./ConfirmationDialog";
+import ConfirmationDialog, {
+  ConfirmationDialogParams,
+} from "./ConfirmationDialog";
 import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 
-const ConfirmationServiceProvider = (props) => {
+const ConfirmationServiceProvider = ({
+  children,
+}: React.PropsWithChildren) => {
   const [
     confirmationState,
     setConfirmationState,
@@ -10,8 +14,8 @@ const ConfirmationServiceProvider = (props) => {
 
   const awaitingPromiseRef = React.useRef<any>();
 
-  const openConfirmation = (options) => {
-    setConfirmationState(options);
+  const openConfirmation = (params: ConfirmationDialogParams) => {
+    setConfirmationState(params);
     return new Promise((resolve, reject) => {
       awaitingPromiseRef.current = { resolve, reject };
     });
@@ -39,7 +43,7 @@ const ConfirmationServiceProvider = (props) => {
 
   /* close dialog on Escape press */
   useEffect(() => {
-    const handleKeyPress = (e) => {
+    const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         handleCancel();
       }
@@ -54,16 +58,15 @@ const ConfirmationServiceProvider = (props) => {
 
   return <>
     <ConfirmationDialog
-      isOpen={Boolean(confirmationState)}
+      params={confirmationState}
       onConfirm={handleConfirm}
       onCancel={handleCancel}
-      {...confirmationState}
     />
     <ConfirmationServiceContext.Provider
       // @ts-ignore
       value={openConfirmation}
     >
-      {props.children}
+      {children}
     </ConfirmationServiceContext.Provider>
   </>;
 };

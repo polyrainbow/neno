@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   useParams, Link, useNavigate,
 } from "react-router-dom";
@@ -15,7 +15,6 @@ import { MediaType } from "../lib/notes/interfaces/MediaType";
 import { FileInfo } from "../lib/notes/interfaces/FileInfo";
 import BusyIndicator from "./BusyIndicator";
 import { LOCAL_GRAPH_ID, SPAN_SEPARATOR } from "../config";
-import ConfirmationServiceContext from "../contexts/ConfirmationServiceContext";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
@@ -26,6 +25,7 @@ import {
 } from "../lib/notes/noteUtils";
 import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
 import { isInitialized } from "../lib/LocalDataStorage";
+import useConfirm from "../hooks/useConfirm";
 
 
 const FileView = () => {
@@ -38,10 +38,8 @@ const FileView = () => {
   const { slug } = useParams();
 
   const navigate = useNavigate();
-
   const type = slug && getMediaTypeFromFilename(slug);
-
-  const confirm = React.useContext(ConfirmationServiceContext) as (any) => void;
+  const confirm = useConfirm();
 
   useGraphAccessCheck();
 

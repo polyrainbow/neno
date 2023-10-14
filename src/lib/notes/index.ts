@@ -192,7 +192,7 @@ export default class NotesProvider {
 
     const numberOfUnlinkedNotes = getNumberOfUnlinkedNotes(graph);
 
-    let stats: GraphStats = {
+    const stats: GraphStats = {
       numberOfAllNotes: graph.notes.size,
       numberOfLinks: getGraphLinks(graph).length,
       numberOfFiles: graph.metadata.files.length,
@@ -201,8 +201,7 @@ export default class NotesProvider {
     };
 
     if (options.includeMetadata) {
-      stats = {
-        ...stats,
+      stats.metadata = {
         createdAt: getGraphCreationTimestamp(graph),
         updatedAt: getGraphUpdateTimestamp(graph),
         size: {
@@ -219,8 +218,7 @@ export default class NotesProvider {
     if (options.includeAnalysis) {
       const numberOfComponents = getNumberOfComponents(graph);
 
-      stats = {
-        ...stats,
+      stats.analysis = {
         numberOfComponents,
         numberOfComponentsWithMoreThanOneNode:
           numberOfComponents - numberOfUnlinkedNotes,

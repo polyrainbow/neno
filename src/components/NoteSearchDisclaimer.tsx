@@ -1,15 +1,21 @@
 import { l } from "../lib/intl";
 
+interface NoteSearchDisclaimerProps {
+  searchValue: string;
+  numberOfResults: number;
+  numberOfAllNotes?: number;
+}
+
 const NoteSearchDisclaimer = ({
   searchValue,
   numberOfResults,
-  stats,
-}) => {
+  numberOfAllNotes,
+}: NoteSearchDisclaimerProps) => {
   let label = "";
   if (numberOfResults) {
     if (
-      typeof stats?.numberOfAllNotes === "number"
-      && (numberOfResults === stats.numberOfAllNotes)
+      typeof numberOfAllNotes === "number"
+      && (numberOfResults === numberOfAllNotes)
     ) {
       label = "";
     } else if (searchValue.length > 2) {

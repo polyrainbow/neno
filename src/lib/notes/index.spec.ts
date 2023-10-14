@@ -7,6 +7,7 @@ import {
 import subwaytext from "../subwaytext/index.js";
 // @ts-ignore
 import { TextEncoder, TextDecoder } from "util";
+import { Block } from "../subwaytext/interfaces/Block.js";
 // @ts-ignore
 Object.assign(global, { TextDecoder, TextEncoder });
 
@@ -50,7 +51,16 @@ class subwaytextWorkerMock {
     }
   }
 
-  set onmessage(callback) {
+  set onmessage(
+    callback: (
+      response: {
+        data: {
+          id: string,
+          parsedContent: Block[],
+        },
+      }
+    ) => void,
+  ) {
     this._callback = callback;
   }
 }
@@ -1014,7 +1024,7 @@ describe("Notes module", () => {
   it(
     "should not update the timestamp in graph metadata on a note update",
     async () => {
-      function sleep(ms) {
+      function sleep(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
@@ -1058,7 +1068,7 @@ describe("Notes module", () => {
   it(
     "should update the timestamp in graph metadata on pin update",
     async () => {
-      function sleep(ms) {
+      function sleep(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
 

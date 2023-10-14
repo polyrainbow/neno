@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import ConfirmationServiceContext
-  from "../contexts/ConfirmationServiceContext";
 import {
   getAppPath,
 } from "../lib/utils";
@@ -13,10 +11,10 @@ import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { exportNote } from "../lib/FrontendFunctions";
-import { useContext } from "react";
 import { Slug } from "../lib/notes/interfaces/Slug";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { LOCAL_GRAPH_ID } from "../config";
+import useConfirm from "../hooks/useConfirm";
 
 interface NoteControlsProps {
   activeNote: ActiveNote,
@@ -52,7 +50,7 @@ const NoteControls = ({
     = useConfirmDiscardingUnsavedChangesDialog();
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
-  const confirm = useContext(ConfirmationServiceContext) as (arg0: any) => void;
+  const confirm = useConfirm();
 
 
   return <>

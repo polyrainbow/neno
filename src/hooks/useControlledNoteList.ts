@@ -12,15 +12,15 @@ interface ControlledNoteList {
   items: NoteListItem[],
   numberOfResults: number,
   isBusy: boolean,
-  refresh,
+  refresh: () => void,
   page: number,
-  setPage,
+  setPage: (page: number) => void,
   sortMode: NoteListSortMode,
-  setSortMode,
+  setSortMode: (value: NoteListSortMode) => void,
   searchQuery: string,
-  setSearchQuery,
+  setSearchQuery: (value: string) => void,
   scrollTop: number,
-  setScrollTop,
+  setScrollTop: (value: number) => void,
 }
 
 // hook for retrieving graph stats for the application header
@@ -36,13 +36,13 @@ export default (
   ) as NoteListSortMode ?? NoteListSortMode.UPDATE_DATE_DESCENDING;
   const [sortMode, setSortMode] = useState<NoteListSortMode>(initialSortMode);
 
-  const setSearchQuery = (value) => {
+  const setSearchQuery = (value: string) => {
     setSearchQueryState(value);
     setScrollTop(0);
     setPageState(1);
   };
 
-  const setPage = (page) => {
+  const setPage = (page: number) => {
     setPageState(page);
     setScrollTop(0);
   };
