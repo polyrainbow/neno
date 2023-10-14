@@ -424,11 +424,11 @@ test.describe("Editor view", () => {
       await page.keyboard.type("[[link]]");
       await page.keyboard.press(
         isMac ? "Meta+ArrowLeft" : "Control+ArrowLeft",
-        { delay: 10 },
+        { delay: 20 },
       );
-      await page.keyboard.press("Shift+ArrowRight", { delay: 10 });
-      await page.keyboard.press("Shift+ArrowRight", { delay: 10 });
-      await page.keyboard.press("Backspace", { delay: 10 });
+      await page.keyboard.press("Shift+ArrowRight", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowRight", { delay: 20 });
+      await page.keyboard.press("Backspace", { delay: 20 });
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraphChildren = (await page.$$(
@@ -462,7 +462,7 @@ test.describe("Editor view", () => {
         "Shift+ArrowLeft",
         { delay: 10 },
       );
-      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace", { delay: 10 });
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraphChildren = (await page.$$(
