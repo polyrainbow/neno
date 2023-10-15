@@ -1,4 +1,4 @@
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
+import { FileInfo } from "../lib/notes/types/FileInfo";
 
 interface FileInfoAndSrc extends FileInfo{
   src: string,

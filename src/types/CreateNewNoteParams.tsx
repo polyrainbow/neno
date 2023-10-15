@@ -1,4 +1,4 @@
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 
 export default interface CreateNewNoteParams {
   useForce?: boolean,

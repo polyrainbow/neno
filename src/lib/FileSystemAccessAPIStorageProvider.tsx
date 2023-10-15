@@ -4,8 +4,8 @@
   More info: https://web.dev/file-system-access/
 */
 
-import ByteRange from "../lib/notes/interfaces/ByteRange";
-import StorageProvider from "../lib/notes/interfaces/StorageProvider";
+import ByteRange from "./notes/types/ByteRange";
+import StorageProvider from "./notes/types/StorageProvider";
 
 export default class FileSystemAccessAPIStorageProvider
 implements StorageProvider {

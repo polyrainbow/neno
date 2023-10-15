@@ -8,7 +8,7 @@ import {
   BlockType,
   OrderedListItemBlock,
   UnorderedListItemBlock,
-} from "./interfaces/Block.js";
+} from "./types/Block.js";
 import { parseText } from "./utils.js";
 
 export const HEADING_SIGIL = "#";

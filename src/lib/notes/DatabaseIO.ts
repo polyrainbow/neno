@@ -8,9 +8,9 @@
 */
 
 
-import Graph, { GraphMetadata } from "./interfaces/Graph.js";
-import { ErrorMessage } from "./interfaces/ErrorMessage.js";
-import StorageProvider from "./interfaces/StorageProvider.js";
+import Graph, { GraphMetadata } from "./types/Graph.js";
+import { ErrorMessage } from "./types/ErrorMessage.js";
+import StorageProvider from "./types/StorageProvider.js";
 import {
   getAllInlineSpans,
   getSlugsFromInlineText,
@@ -20,15 +20,15 @@ import {
 } from "./noteUtils.js";
 import {
   Block,
-} from "../subwaytext/interfaces/Block.js";
-import ByteRange from "./interfaces/ByteRange.js";
-import ExistingNote from "./interfaces/ExistingNote.js";
-import { Slug } from "./interfaces/Slug.js";
+} from "../subwaytext/types/Block.js";
+import ByteRange from "./types/ByteRange.js";
+import ExistingNote from "./types/ExistingNote.js";
+import { Slug } from "./types/Slug.js";
 import { FILE_SLUG_PREFIX } from "./config.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import { GraphMetadataV3, migrateToV4 } from "./migrations/v4.js";
-import WriteGraphMetadataAction from "./interfaces/FlushGraphMetadataAction.js";
+import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;

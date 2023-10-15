@@ -1,4 +1,4 @@
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
+import { FileInfo } from "../lib/notes/types/FileInfo";
 import { humanFileSize } from "../lib/utils";
 import NoteContentBlockActions from "./NoteContentBlockActions";
 

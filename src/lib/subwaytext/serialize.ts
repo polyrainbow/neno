@@ -10,7 +10,7 @@ import {
   OrderedListItemBlock,
   Span,
   UnorderedListItemBlock,
-} from "./interfaces/Block";
+} from "./types/Block";
 
 function serializeInlineText(spans: InlineText): string {
   return spans.reduce((acc: string, span: Span) => {

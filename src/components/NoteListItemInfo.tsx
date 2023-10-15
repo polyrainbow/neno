@@ -1,7 +1,7 @@
 import { SPAN_SEPARATOR } from "../config";
 import { l } from "../lib/intl";
 import NoteListItemFeatures from "./NoteListItemFeatures";
-import NoteListItem from "../lib/notes/interfaces/NoteListItem";
+import NoteListItem from "../lib/notes/types/NoteListItem";
 import { shortenText } from "../lib/utils";
 import { Fragment } from "react";
 

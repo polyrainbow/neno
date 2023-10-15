@@ -7,7 +7,7 @@ import {
 import { ReactElement, ReactNode, useEffect, useState } from "react";
 import Icon from "../../../components/Icon";
 import { l } from "../../intl";
-import { Slug } from "../../notes/interfaces/Slug";
+import { Slug } from "../../notes/types/Slug";
 
 
 export class TransclusionNode extends DecoratorNode<ReactNode> {

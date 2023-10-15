@@ -6,7 +6,7 @@ import AppMenuContext from "../contexts/AppMenuContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { getAppPath } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";

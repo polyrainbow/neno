@@ -1,5 +1,5 @@
 import { useState } from "react";
-import GraphStats from "../lib/notes/interfaces/GraphStats";
+import GraphStats from "../lib/notes/types/GraphStats";
 import NotesProvider from "../lib/notes";
 
 // hook for retrieving graph stats for the application header

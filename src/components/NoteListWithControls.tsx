@@ -1,13 +1,13 @@
 import { useContext, useState } from "react";
 import {
   NoteListSortMode,
-} from "../lib/notes/interfaces/NoteListSortMode";
+} from "../lib/notes/types/NoteListSortMode";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import NoteList from "./NoteList";
 import NoteListControls from "./NoteListControls";
 import SearchPresets from "./SearchPresets";
-import { Slug } from "../lib/notes/interfaces/Slug";
-import NoteListItemType from "../lib/notes/interfaces/NoteListItem";
+import { Slug } from "../lib/notes/types/Slug";
+import NoteListItemType from "../lib/notes/types/NoteListItem";
 import ActiveNote from "../types/ActiveNote";
 
 export enum NoteListView {

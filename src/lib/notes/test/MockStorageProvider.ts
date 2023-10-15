@@ -1,4 +1,4 @@
-import StorageProvider from "../interfaces/StorageProvider";
+import StorageProvider from "../types/StorageProvider";
 
 export default class MockStorageProvider implements StorageProvider {
   #files = new Map<string, Uint8Array>();

@@ -2,8 +2,8 @@ import NoteListItemLinkedNotesIndicator
   from "./NoteListItemLinkedNotesIndicator";
 import NoteListItemInfo from "./NoteListItemInfo";
 import { l } from "../lib/intl";
-import NoteListItemType from "../lib/notes/interfaces/NoteListItem";
-import SparseNoteInfo from "../lib/notes/interfaces/SparseNoteInfo";
+import NoteListItemType from "../lib/notes/types/NoteListItem";
+import SparseNoteInfo from "../lib/notes/types/SparseNoteInfo";
 
 interface NoteListItemProps {
   key: string,

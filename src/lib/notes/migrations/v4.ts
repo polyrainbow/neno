@@ -1,7 +1,7 @@
-import { FileInfo } from "../interfaces/FileInfo";
-import { Slug } from "../interfaces/Slug";
-import { GraphMetadata as GraphMetadataV4 } from "../interfaces/Graph";
-import StorageProvider from "../interfaces/StorageProvider";
+import { FileInfo } from "../types/FileInfo";
+import { Slug } from "../types/Slug";
+import { GraphMetadata as GraphMetadataV4 } from "../types/Graph";
+import StorageProvider from "../types/StorageProvider";
 
 export interface GraphMetadataV3 {
   readonly createdAt: number,

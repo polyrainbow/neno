@@ -1,4 +1,4 @@
-import { Block } from "../../subwaytext/interfaces/Block";
+import { Block } from "../../subwaytext/types/Block";
 import { NoteContent } from "./NoteContent";
 import { ExistingNoteMetadata } from "./NoteMetadata";
 

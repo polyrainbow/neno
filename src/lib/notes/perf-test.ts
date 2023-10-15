@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 /* eslint-disable no-console */
 import NotesProvider from "./index";
-import { NoteSaveRequest } from "./interfaces/NoteSaveRequest";
+import { NoteSaveRequest } from "./types/NoteSaveRequest";
 import MockStorageProvider from "./test/MockStorageProvider";
 
 const tests = [

@@ -1,9 +1,9 @@
 import {
   useNavigate,
 } from "react-router-dom";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { getAppPath } from "../lib/utils";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 import { LOCAL_GRAPH_ID } from "../config";
 
 const useGoToNote = () => {

@@ -5,7 +5,7 @@ import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import { initializeNotesProvider } from "../lib/LocalDataStorage";
 import { getAppPath } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";

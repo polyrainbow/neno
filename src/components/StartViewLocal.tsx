@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   useNavigate,
 } from "react-router-dom";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
 import {

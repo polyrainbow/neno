@@ -1,6 +1,6 @@
 import { useState } from "react";
-import NoteToTransmit from "../lib/notes/interfaces/NoteToTransmit";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
+import { Slug } from "../lib/notes/types/Slug";
 import NotesProvider from "../lib/notes";
 
 export default (

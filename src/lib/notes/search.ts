@@ -1,8 +1,8 @@
-import NoteListItem from "./interfaces/NoteListItem.js";
-import NoteListPage from "./interfaces/NoteListPage.js";
-import DatabaseQuery from "./interfaces/DatabaseQuery.js";
-import { BlockType } from "../subwaytext/interfaces/Block.js";
-import { MediaType } from "./interfaces/MediaType.js";
+import NoteListItem from "./types/NoteListItem.js";
+import NoteListPage from "./types/NoteListPage.js";
+import DatabaseQuery from "./types/DatabaseQuery.js";
+import { BlockType } from "../subwaytext/types/Block.js";
+import { MediaType } from "./types/MediaType.js";
 import {
   getSortFunction,
   createNoteListItems,
@@ -19,8 +19,8 @@ import {
   getNotesWithCustomMetadata,
   getNotesWithFlag,
 } from "./noteUtils.js";
-import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
-import GraphObject from "./interfaces/Graph.js";
+import { NoteListSortMode } from "./types/NoteListSortMode.js";
+import GraphObject from "./types/Graph.js";
 import { getPagedMatches } from "../utils.js";
 import * as config from "./config.js";
 import CharIterator from "../subwaytext/CharIterator.js";

@@ -2,7 +2,7 @@ import SearchInput from "./SearchInput";
 import IconButton from "./IconButton";
 import { l } from "../lib/intl";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import { NoteListSortMode } from "../lib/notes/interfaces/NoteListSortMode";
+import { NoteListSortMode } from "../lib/notes/types/NoteListSortMode";
 import { NoteListView } from "./NoteListWithControls";
 
 interface NoteListControlsProps {

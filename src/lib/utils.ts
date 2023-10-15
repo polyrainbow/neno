@@ -1,10 +1,10 @@
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import ActiveNote, { UnsavedActiveNote } from "../types/ActiveNote";
 import * as Config from "../config";
-import { FileInfo } from "./notes/interfaces/FileInfo";
+import { FileInfo } from "./notes/types/FileInfo";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { getUrlForSlug } from "./LocalDataStorage";
-import { Slug } from "./notes/interfaces/Slug";
+import { Slug } from "./notes/types/Slug";
 import { inferNoteTitle, sluggify } from "./notes/noteUtils";
 
 

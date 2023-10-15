@@ -4,7 +4,7 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 
 
 interface NoteBacklinksProps {

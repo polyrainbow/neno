@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import FloatingActionButton from "./FloatingActionButton";
 import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import useControlledNoteList from "../hooks/useControlledNoteList";
 import useNotesProvider from "../hooks/useNotesProvider";
 import useHeaderStats from "../hooks/useHeaderStats";

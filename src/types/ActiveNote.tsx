@@ -1,7 +1,7 @@
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import NotePreview from "../lib/notes/interfaces/NotePreview";
-import { Slug } from "../lib/notes/interfaces/Slug";
-import SparseNoteInfo from "../lib/notes/interfaces/SparseNoteInfo";
+import { FileInfo } from "../lib/notes/types/FileInfo";
+import NotePreview from "../lib/notes/types/NotePreview";
+import { Slug } from "../lib/notes/types/Slug";
+import SparseNoteInfo from "../lib/notes/types/SparseNoteInfo";
 
 interface BaseActiveNote {
   content: string,

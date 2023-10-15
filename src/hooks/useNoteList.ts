@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import NoteListItem from "../lib/notes/interfaces/NoteListItem";
+import NoteListItem from "../lib/notes/types/NoteListItem";
 import * as Config from "../config";
-import DatabaseQuery from "../lib/notes/interfaces/DatabaseQuery";
+import DatabaseQuery from "../lib/notes/types/DatabaseQuery";
 import {
   NoteListSortMode,
-} from "../lib/notes/interfaces/NoteListSortMode";
+} from "../lib/notes/types/NoteListSortMode";
 import NotesProvider from "../lib/notes";
 
 type NoteList = [

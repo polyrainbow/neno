@@ -1,6 +1,6 @@
-import { Block, BlockType } from "./interfaces/Block.js";
+import { Block, BlockType } from "./types/Block.js";
 import subwaytext from "./index.js";
-import { SpanType } from "./interfaces/SpanType.js";
+import { SpanType } from "./types/SpanType.js";
 import serialize from "./serialize.js";
 
 

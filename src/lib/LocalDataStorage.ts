@@ -5,7 +5,7 @@ import { streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { createDemoGraph, folderHasGraph } from "./DemoGraph";
-import { Slug } from "./notes/interfaces/Slug";
+import { Slug } from "./notes/types/Slug";
 import MockStorageProvider from "./notes/test/MockStorageProvider";
 
 /*

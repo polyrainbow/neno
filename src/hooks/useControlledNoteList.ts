@@ -1,9 +1,9 @@
 import { useState } from "react";
 import {
   NoteListSortMode,
-} from "../lib/notes/interfaces/NoteListSortMode";
+} from "../lib/notes/types/NoteListSortMode";
 import useNoteList from "./useNoteList";
-import NoteListItem from "../lib/notes/interfaces/NoteListItem";
+import NoteListItem from "../lib/notes/types/NoteListItem";
 import NotesProvider from "../lib/notes";
 
 const SORT_MODE_LOCAL_STORAGE_KEY = "NOTE_LIST_SORT_MODE";

@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import {
   FileInfo,
-} from "../lib/notes/interfaces/FileInfo";
+} from "../lib/notes/types/FileInfo";
 import { getAppPath } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
 import { getFilenameFromFileSlug } from "../lib/notes/noteUtils";
 

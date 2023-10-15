@@ -13,19 +13,19 @@ import {
 } from "../lib/utils";
 import ActiveNote from "../types/ActiveNote";
 import { FILE_PICKER_ACCEPT_TYPES, LOCAL_GRAPH_ID } from "../config";
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
+import { FileInfo } from "../lib/notes/types/FileInfo";
 import NoteKeyValues from "./NoteKeyValues";
 import { l } from "../lib/intl";
 import useNotesProvider from "../hooks/useNotesProvider";
 import NoteMenuBar from "./NoteMenuBar";
 import BusyIndicator from "./BusyIndicator";
 import NoteBacklinks from "./NoteBacklinks";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 import useGoToNote from "../hooks/useGoToNote";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { useNavigate } from "react-router-dom";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import {
   getMediaTypeFromFilename,
@@ -33,7 +33,7 @@ import {
   isFileSlug,
   sluggify,
 } from "../lib/notes/noteUtils";
-import { MediaType } from "../lib/notes/interfaces/MediaType";
+import { MediaType } from "../lib/notes/types/MediaType";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
 import NoteContentBlockVideo from "./NoteContentBlockVideo";
 import NoteContentBlockDocument from "./NoteContentBlockDocument";

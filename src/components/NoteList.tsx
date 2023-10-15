@@ -12,10 +12,10 @@ import useConfirmDiscardingUnsavedChangesDialog
 import ActiveNote from "../types/ActiveNote";
 import {
   NoteListSortMode,
-} from "../lib/notes/interfaces/NoteListSortMode";
+} from "../lib/notes/types/NoteListSortMode";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import NoteListItemType from "../lib/notes/interfaces/NoteListItem";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import NoteListItemType from "../lib/notes/types/NoteListItem";
+import { Slug } from "../lib/notes/types/Slug";
 
 
 interface NoteListProps {

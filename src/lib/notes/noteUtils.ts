@@ -1,33 +1,33 @@
-import Graph from "./interfaces/Graph.js";
-import { Link } from "./interfaces/Link.js";
-import ExistingNote from "./interfaces/ExistingNote.js";
-import NoteListItem from "./interfaces/NoteListItem.js";
-import NoteListItemFeatures from "./interfaces/NoteListItemFeatures.js";
-import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
-import NoteToTransmit from "./interfaces/NoteToTransmit.js";
-import { MediaType } from "./interfaces/MediaType.js";
-import { NoteContent } from "./interfaces/NoteContent.js";
-import { FileInfo } from "./interfaces/FileInfo.js";
+import Graph from "./types/Graph.js";
+import { Link } from "./types/Link.js";
+import ExistingNote from "./types/ExistingNote.js";
+import NoteListItem from "./types/NoteListItem.js";
+import NoteListItemFeatures from "./types/NoteListItemFeatures.js";
+import { NoteListSortMode } from "./types/NoteListSortMode.js";
+import NoteToTransmit from "./types/NoteToTransmit.js";
+import { MediaType } from "./types/MediaType.js";
+import { NoteContent } from "./types/NoteContent.js";
+import { FileInfo } from "./types/FileInfo.js";
 import subwaytext from "../subwaytext/index.js";
 import {
   Block,
   BlockType,
   InlineText,
   Span,
-} from "../subwaytext/interfaces/Block.js";
+} from "../subwaytext/types/Block.js";
 import {
   ExistingNoteMetadata,
   NewNoteMetadata,
   NoteMetadata,
-} from "./interfaces/NoteMetadata.js";
-import { CanonicalNoteHeader } from "./interfaces/CanonicalNoteHeader.js";
-import NewNote from "./interfaces/NewNote.js";
-import { Slug } from "./interfaces/Slug.js";
-import SparseNoteInfo from "./interfaces/SparseNoteInfo.js";
-import LinkCount from "./interfaces/LinkCount.js";
-import NotePreview from "./interfaces/NotePreview.js";
+} from "./types/NoteMetadata.js";
+import { CanonicalNoteHeader } from "./types/CanonicalNoteHeader.js";
+import NewNote from "./types/NewNote.js";
+import { Slug } from "./types/Slug.js";
+import SparseNoteInfo from "./types/SparseNoteInfo.js";
+import LinkCount from "./types/LinkCount.js";
+import NotePreview from "./types/NotePreview.js";
 import { DEFAULT_CONTENT_TYPE } from "../../config.js";
-import { SpanType } from "../subwaytext/interfaces/SpanType.js";
+import { SpanType } from "../subwaytext/types/SpanType.js";
 import { FILE_SLUG_PREFIX } from "./config.js";
 
 const isFileSlug = (slug: Slug): boolean => {

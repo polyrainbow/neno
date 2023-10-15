@@ -6,8 +6,8 @@ import useGoToNote from "../hooks/useGoToNote";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { l } from "../lib/intl";
-import GraphStats from "../lib/notes/interfaces/GraphStats";
-import NoteToTransmit from "../lib/notes/interfaces/NoteToTransmit";
+import GraphStats from "../lib/notes/types/GraphStats";
+import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
 import ActiveNote from "../types/ActiveNote";
 import HeaderContainer from "./HeaderContainer";
 import FlexContainer from "./FlexContainer";

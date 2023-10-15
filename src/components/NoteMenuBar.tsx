@@ -1,4 +1,4 @@
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 import ActiveNote from "../types/ActiveNote";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import NoteControls from "./NoteControls";

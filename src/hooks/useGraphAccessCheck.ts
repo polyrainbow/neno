@@ -1,4 +1,4 @@
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { getAppPath } from "../lib/utils";
 import {
   initializeNotesProviderWithExistingFolderHandle,

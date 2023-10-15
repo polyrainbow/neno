@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
 import { l } from "../lib/intl";
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
+import { FileInfo } from "../lib/notes/types/FileInfo";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
 import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
 import { isInitialized } from "../lib/LocalDataStorage";
 import BusyIndicator from "./BusyIndicator";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 
 enum FileSortMode {
   CREATED_AT_DESCENDING = "CREATED_AT_DESCENDING",

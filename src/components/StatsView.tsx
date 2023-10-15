@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import StatsViewAnalysisTable from "./StatsViewAnalysisTable";
 import { l } from "../lib/intl";
-import GraphStats from "../lib/notes/interfaces/GraphStats";
+import GraphStats from "../lib/notes/types/GraphStats";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import BusyIndicator from "./BusyIndicator";

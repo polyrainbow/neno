@@ -3,11 +3,11 @@ import MockStorageProvider from "./test/MockStorageProvider.js";
 import {
   NewNoteSaveRequest,
   NoteSaveRequest,
-} from "./interfaces/NoteSaveRequest.js";
+} from "./types/NoteSaveRequest.js";
 import subwaytext from "../subwaytext/index.js";
 // @ts-ignore
 import { TextEncoder, TextDecoder } from "util";
-import { Block } from "../subwaytext/interfaces/Block.js";
+import { Block } from "../subwaytext/types/Block.js";
 // @ts-ignore
 Object.assign(global, { TextDecoder, TextEncoder });
 

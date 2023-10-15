@@ -5,7 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { getAppPath } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { ROOT_PATH } from "../config";
 import NoteView from "./NoteView";
 import ListView from "./ListView";

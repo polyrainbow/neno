@@ -9,10 +9,10 @@ import {
   useNavigate, useParams, useSearchParams,
 } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import { ErrorMessage } from "../lib/notes/interfaces/ErrorMessage";
+import { FileInfo } from "../lib/notes/types/FileInfo";
+import { ErrorMessage } from "../lib/notes/types/ErrorMessage";
 import { l } from "../lib/intl";
 import NoteListWithControls from "./NoteListWithControls";
 import useGoToNote from "../hooks/useGoToNote";
@@ -21,7 +21,7 @@ import useControlledNoteList from "../hooks/useControlledNoteList";
 import useHeaderStats from "../hooks/useHeaderStats";
 import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 import NotesProvider from "../lib/notes";
 import useConfirm from "../hooks/useConfirm";
 

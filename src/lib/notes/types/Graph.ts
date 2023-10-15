@@ -1,6 +1,6 @@
 import ExistingNote from "./ExistingNote.js";
 import { FileInfo } from "./FileInfo.js";
-import { Block } from "../../subwaytext/interfaces/Block.js";
+import { Block } from "../../subwaytext/types/Block.js";
 import { Slug } from "./Slug.js";
 
 export interface GraphMetadata {

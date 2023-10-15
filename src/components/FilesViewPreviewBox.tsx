@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import {
   Link,
 } from "react-router-dom";
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import { MediaType } from "../lib/notes/interfaces/MediaType";
-import { PathTemplate } from "../enum/PathTemplate";
+import { FileInfo } from "../lib/notes/types/FileInfo";
+import { MediaType } from "../lib/notes/types/MediaType";
+import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import { getAppPath, getIconSrc } from "../lib/utils";
 import {

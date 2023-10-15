@@ -1,7 +1,7 @@
 import {
   NewNoteSaveRequest,
   NoteSaveRequest,
-} from "../lib/notes/interfaces/NoteSaveRequest";
+} from "../lib/notes/types/NoteSaveRequest";
 import {
   parseSerializedNewNote,
 } from "../lib/notes/noteUtils";
@@ -16,9 +16,9 @@ import {
 } from "../lib/utils";
 import useConfirmDiscardingUnsavedChangesDialog
   from "./useConfirmDiscardingUnsavedChangesDialog";
-import NoteToTransmit from "../lib/notes/interfaces/NoteToTransmit";
+import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import NotesProvider from "../lib/notes";
 import {

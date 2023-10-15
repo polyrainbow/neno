@@ -1,6 +1,6 @@
 import CharIterator from "./CharIterator.js";
-import { InlineText, Span } from "./interfaces/Block.js";
-import { SpanType } from "./interfaces/SpanType.js";
+import { InlineText, Span } from "./types/Block.js";
+import { SpanType } from "./types/SpanType.js";
 
 export const isWhiteSpace = (string: string): boolean => {
   return string.trim().length === 0;

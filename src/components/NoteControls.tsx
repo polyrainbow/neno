@@ -6,12 +6,12 @@ import useConfirmDiscardingUnsavedChangesDialog
 import {
   getAppPath,
 } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { exportNote } from "../lib/FrontendFunctions";
-import { Slug } from "../lib/notes/interfaces/Slug";
+import { Slug } from "../lib/notes/types/Slug";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { LOCAL_GRAPH_ID } from "../config";
 import useConfirm from "../hooks/useConfirm";

@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import {
   useParams, Link, useNavigate,
 } from "react-router-dom";
-import NoteListItem from "../lib/notes/interfaces/NoteListItem";
+import NoteListItem from "../lib/notes/types/NoteListItem";
 import {
   getAppPath,
   getUrl,
   humanFileSize,
   makeTimestampHumanReadable,
 } from "../lib/utils";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
-import { MediaType } from "../lib/notes/interfaces/MediaType";
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
+import { MediaType } from "../lib/notes/types/MediaType";
+import { FileInfo } from "../lib/notes/types/FileInfo";
 import BusyIndicator from "./BusyIndicator";
 import { LOCAL_GRAPH_ID, SPAN_SEPARATOR } from "../config";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";

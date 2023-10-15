@@ -23,26 +23,26 @@ import {
   getGraphUpdateTimestamp,
   getGraphCreationTimestamp,
 } from "./noteUtils.js";
-import NoteToTransmit from "./interfaces/NoteToTransmit.js";
-import GraphStats from "./interfaces/GraphStats.js";
-import { NoteListSortMode } from "./interfaces/NoteListSortMode.js";
-import GraphObject from "./interfaces/Graph.js";
-import { ErrorMessage } from "./interfaces/ErrorMessage.js";
+import NoteToTransmit from "./types/NoteToTransmit.js";
+import GraphStats from "./types/GraphStats.js";
+import { NoteListSortMode } from "./types/NoteListSortMode.js";
+import GraphObject from "./types/Graph.js";
+import { ErrorMessage } from "./types/ErrorMessage.js";
 import GraphStatsRetrievalOptions
-  from "./interfaces/GraphStatsRetrievalOptions.js";
-import StorageProvider from "./interfaces/StorageProvider.js";
-import { FileInfo } from "./interfaces/FileInfo.js";
-import ExistingNote from "./interfaces/ExistingNote.js";
-import { NoteSaveRequest } from "./interfaces/NoteSaveRequest.js";
+  from "./types/GraphStatsRetrievalOptions.js";
+import StorageProvider from "./types/StorageProvider.js";
+import { FileInfo } from "./types/FileInfo.js";
+import ExistingNote from "./types/ExistingNote.js";
+import { NoteSaveRequest } from "./types/NoteSaveRequest.js";
 import subwaytext from "../subwaytext/index.js";
 import { search } from "./search.js";
-import DatabaseQuery from "./interfaces/DatabaseQuery.js";
-import NoteListPage from "./interfaces/NoteListPage.js";
-import ByteRange from "./interfaces/ByteRange.js";
-import { Slug } from "./interfaces/Slug.js";
-import { Block } from "../subwaytext/interfaces/Block.js";
+import DatabaseQuery from "./types/DatabaseQuery.js";
+import NoteListPage from "./types/NoteListPage.js";
+import ByteRange from "./types/ByteRange.js";
+import { Slug } from "./types/Slug.js";
+import { Block } from "../subwaytext/types/Block.js";
 import serialize from "../subwaytext/serialize.js";
-import WriteGraphMetadataAction from "./interfaces/FlushGraphMetadataAction.js";
+import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
 
 
 export default class NotesProvider {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
-import { PathTemplate } from "../enum/PathTemplate";
+import { FileInfo } from "../lib/notes/types/FileInfo";
+import { PathTemplate } from "../types/PathTemplate";
 import {
   getAppPath,
   getUrl,

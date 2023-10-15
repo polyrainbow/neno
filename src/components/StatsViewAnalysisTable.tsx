@@ -3,9 +3,9 @@ import {
   getAppPath,
 } from "../lib/utils";
 import { Link } from "react-router-dom";
-import { PathTemplate } from "../enum/PathTemplate";
+import { PathTemplate } from "../types/PathTemplate";
 import { l, lf } from "../lib/intl";
-import GraphStats from "../lib/notes/interfaces/GraphStats";
+import GraphStats from "../lib/notes/types/GraphStats";
 
 interface StatsViewAnalysisTableProps {
   stats: Required<GraphStats>,

@@ -1,5 +1,5 @@
 import { l } from "../lib/intl";
-import GraphStats from "../lib/notes/interfaces/GraphStats";
+import GraphStats from "../lib/notes/types/GraphStats";
 import AppHeaderStatsItem from "./AppHeaderStatsItem";
 import BusyIndicator from "./BusyIndicator";
 

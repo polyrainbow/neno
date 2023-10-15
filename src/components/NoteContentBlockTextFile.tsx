@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileInfo } from "../lib/notes/interfaces/FileInfo";
+import { FileInfo } from "../lib/notes/types/FileInfo";
 import { getUrl } from "../lib/utils";
 import NotesProvider from "../lib/notes";
 import NoteContentBlockActions from "./NoteContentBlockActions";

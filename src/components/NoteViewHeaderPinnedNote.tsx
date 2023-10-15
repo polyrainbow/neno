@@ -1,4 +1,4 @@
-import NoteToTransmit from "../lib/notes/interfaces/NoteToTransmit";
+import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
 import { getIconSrc, shortenText } from "../lib/utils";
 import { getNoteTitle } from "../lib/notes/noteUtils";
 

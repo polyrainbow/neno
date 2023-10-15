@@ -2,7 +2,7 @@ import Tooltip from "./Tooltip";
 import { emojis } from "../config";
 import { l } from "../lib/intl";
 import NoteListItemFeaturesType
-  from "../lib/notes/interfaces/NoteListItemFeatures";
+  from "../lib/notes/types/NoteListItemFeatures";
 
 
 const NoteListItemFeatures = ({
