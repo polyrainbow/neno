@@ -47,11 +47,25 @@
   overflow: hidden;
 }
 
-.note-list-item-second-row {
+.note-list-item-info {
   font-size: var(--small-font-size);
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  width: 100%;
+}
+
+.note-list-item-info span {
+  white-space: nowrap;
+}
+
+.note-list-item-info .slug {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.note-list-item-info .separator {
+  white-space: pre;
 }
 
 .note-list-item .note-list-item-linked-notes-indicator {

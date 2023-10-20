@@ -2,7 +2,6 @@ import { SPAN_SEPARATOR } from "../config";
 import { l } from "../lib/intl";
 import NoteListItemFeatures from "./NoteListItemFeatures";
 import NoteListItem from "../lib/notes/types/NoteListItem";
-import { shortenText } from "../lib/utils";
 import { Fragment } from "react";
 
 
@@ -12,7 +11,7 @@ const NoteListItemInfo = ({
   note: NoteListItem
 }) => {
   const sections = [
-    <>/{shortenText(note.slug, 50)}</>,
+    <span className="slug" key={"nli-" + note.slug}>/{note.slug}</span>,
   ];
 
   if (typeof note.updatedAt === "number") {
@@ -43,7 +42,7 @@ const NoteListItemInfo = ({
   }
 
   return <div
-    className="info"
+    className="note-list-item-info"
   >
     {sections.map((section, i, sections) => <Fragment
       key={"nlii_" + i}

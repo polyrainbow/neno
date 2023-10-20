@@ -46,15 +46,13 @@ const NoteListItem = ({
       >
         {note.title || l("list.untitled-note")}
       </div>
-      <div className="note-list-item-second-row">
-        {
-          "linkCount" in note
-            ? <>
-              <NoteListItemInfo note={note} />
-            </>
-            : "/" + note.slug
-        }
-      </div>
+      {
+        "linkCount" in note
+          ? <>
+            <NoteListItemInfo note={note} />
+          </>
+          : "/" + note.slug
+      }
     </div>
     <NoteListItemLinkedNotesIndicator
       isLinkable={isLinkable}
