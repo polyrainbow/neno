@@ -272,6 +272,7 @@ const getMediaTypeFromFilename = (
   const map = new Map<string, MediaType>(Object.entries({
     "png": MediaType.IMAGE,
     "jpg": MediaType.IMAGE,
+    "jpeg": MediaType.IMAGE,
     "webp": MediaType.IMAGE,
     "gif": MediaType.IMAGE,
     "svg": MediaType.IMAGE,
