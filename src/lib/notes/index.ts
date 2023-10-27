@@ -405,9 +405,8 @@ export default class NotesProvider {
   ): Promise<NoteToTransmit> {
     const note = parseSerializedNewNote(rawNote);
 
-    const noteSaveRequest = {
+    const noteSaveRequest: NoteSaveRequest = {
       note,
-      changes: [],
       ignoreDuplicateTitles: true,
     };
 
