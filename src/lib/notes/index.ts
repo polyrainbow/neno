@@ -573,7 +573,7 @@ export default class NotesProvider {
 
 
   async unpin(
-    slug: Slug,
+    slugToRemove: Slug,
   ): Promise<NoteToTransmit[]> {
     const graph = await this.#io.getGraph();
 
@@ -581,10 +581,10 @@ export default class NotesProvider {
 
     graph.metadata.pinnedNotes
       = graph.metadata.pinnedNotes.filter((s) => {
-        if (s === slug) {
+        if (s === slugToRemove) {
           updateMetadata = WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE;
         }
-        s !== slug;
+        return s !== slugToRemove;
       });
 
     await this.#io.flushChanges(graph, updateMetadata, []);

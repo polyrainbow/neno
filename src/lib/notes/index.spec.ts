@@ -1108,4 +1108,67 @@ describe("Notes module", () => {
         .toBeGreaterThan(graphMetadataUpdateTimeCheck1);
     },
   );
+
+  it(
+    "should correctly unpin a specific slug",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest1: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n1",
+      };
+
+      await notesProvider.put(noteSaveRequest1);
+      await notesProvider.pin("n1");
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 2",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n2",
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+      await notesProvider.pin("n2");
+
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "Note 3",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n3",
+      };
+
+      await notesProvider.put(noteSaveRequest3);
+      await notesProvider.pin("n3");
+
+      await notesProvider.unpin("n2");
+
+      const pins = await notesProvider.getPins();
+      const pinSlugs = pins.map((pin) => pin.meta.slug);
+
+      expect(pinSlugs).toEqual(["n1", "n3"]);
+    },
+  );
 });
