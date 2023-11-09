@@ -40,7 +40,12 @@ const NoteSlug = ({
           // they are used to create a full letter with modifier in a
           // second step. They are not valid slug characters on its own,
           // though.
-          /[^\p{L}\p{Sk}\d\-/._]/gu,
+          // We also allow apostrophes ('), as they might be used as a dead key
+          // for letters like é.
+          // Unfortunately, it seems like we cannot simulate pressing dead keys
+          // in Playwright currently, so we cannot add a meaningful test for
+          // this.
+          /[^\p{L}\p{Sk}\d\-/._']/gu,
           "",
         ).toLowerCase();
         setSlugInput(newValue);
