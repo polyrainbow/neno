@@ -132,15 +132,15 @@ test.describe("Editor view", () => {
       */
 
       // move cursor to "Foo bar| baz"
-      await page.keyboard.press("ArrowLeft", { delay: 10 });
-      await page.keyboard.press("ArrowLeft", { delay: 10 });
-      await page.keyboard.press("ArrowLeft", { delay: 10 });
-      await page.keyboard.press("ArrowLeft", { delay: 10 });
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
 
       // select "bar"
-      await page.keyboard.press("Shift+ArrowLeft", { delay: 10 });
-      await page.keyboard.press("Shift+ArrowLeft", { delay: 10 });
-      await page.keyboard.press("Shift+ArrowLeft", { delay: 10 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
 
       await page.click(".note-list-item-linked-notes-indicator");
 
@@ -447,26 +447,25 @@ test.describe("Editor view", () => {
       await page.keyboard.type("[[link]]");
       await page.keyboard.press(
         "Shift+ArrowLeft",
-        { delay: 10 },
+        { delay: 20 },
       );
       await page.keyboard.press(
         "Shift+ArrowLeft",
-        { delay: 10 },
+        { delay: 20 },
       );
       await page.keyboard.press(
         "Shift+ArrowLeft",
-        { delay: 10 },
+        { delay: 20 },
       );
       await page.keyboard.press(
         "Shift+ArrowLeft",
-        { delay: 10 },
+        { delay: 20 },
       );
-      await page.keyboard.press("Backspace", { delay: 10 });
+      await page.keyboard.press("Backspace", { delay: 20 });
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const paragraphChildren = (await page.$$(
+      const paragraphChildren = await page.locator(
         "div[data-lexical-editor] .editor-paragraph > *",
-      ))!;
+      ).all();
 
       expect(paragraphChildren.length).toBe(1);
       expect(await paragraphChildren[0].innerText()).toBe("[[li");
