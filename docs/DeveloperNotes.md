@@ -16,6 +16,4 @@ See https://www.conventionalcommits.org/en/v1.0.0/
 
 ## Known issues
 
-- Dots in the URL (e.g. in a slug) stop Vite from using History API fallback https://github.com/vitejs/vite/issues/2415 This prevents files being opened directly via
-a URL.
 - Some URLs are not parsed correctly by the editor. There is an open Lexical issue & an open PR for this: https://github.com/facebook/lexical/issues/3546 and https://github.com/facebook/lexical/pull/4430 When the fix is released, check if we still need our customized version of `AutoLinkNode` due to our transclusion nodes, or if we can just use the fixed upstream version.
