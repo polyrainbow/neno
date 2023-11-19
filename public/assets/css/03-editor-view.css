@@ -8,6 +8,7 @@
   flex-grow: 1;
   flex-shrink: 1;
   min-width: 30px;
+  height: 36px;
 }
 
 .note-list-sort-mode-select {
@@ -158,12 +159,15 @@
 
 .note-controls,
 .note-list-controls {
-  padding: 0 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   max-width: 100vw;
   overflow: hidden;
+}
+
+.note-list-controls {
+  padding: 0 10px;
 }
 
 .note-controls {
