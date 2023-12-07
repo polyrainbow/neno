@@ -25,6 +25,7 @@ SOFTWARE.
 import {
   $createTextNode,
   $getSelection,
+  $isRangeSelection,
   LexicalEditor,
   TextNode,
 } from "lexical";
@@ -124,8 +125,7 @@ function registerWikilinkTransforms(
       let selectionOffset = NaN;
       // check if original selection was inside node to be removed
       if (
-        selection
-        && "focus" in selection
+        $isRangeSelection(selection)
         && selection.focus.key === nodeToReplace.getKey()
       ) {
         selectionOffset = selection.focus.offset;
