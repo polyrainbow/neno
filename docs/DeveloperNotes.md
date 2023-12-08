@@ -13,7 +13,3 @@ The release package will now be built remotely with the script
 
 ## Commit convention
 See https://www.conventionalcommits.org/en/v1.0.0/
-
-## Known issues
-
-- Some URLs are not parsed correctly by the editor. There is an open Lexical issue & an open PR for this: https://github.com/facebook/lexical/issues/3546 and https://github.com/facebook/lexical/pull/4430 When the fix is released, check if we still need our customized version of `AutoLinkNode` due to our transclusion nodes, or if we can just use the fixed upstream version.

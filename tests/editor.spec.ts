@@ -382,8 +382,7 @@ test.describe("Editor view", () => {
     },
   );
 
-  // unfortunately, this test fails due to https://github.com/facebook/lexical/issues/3546
-  /*
+
   test(
     "enable URLs with semicolons in the editor",
     async ({ page }) => {
@@ -398,7 +397,6 @@ test.describe("Editor view", () => {
       );
     },
   );
-  */
 
   test(
     "select all command works",
