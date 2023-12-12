@@ -399,6 +399,24 @@ test.describe("Editor view", () => {
   );
 
   test(
+    "select all command works with URL",
+    async ({ page }) => {
+      const isMac = process.platform === "darwin";
+
+      await page.keyboard.type("http://example.com");
+      await page.keyboard.press(isMac ? "Meta+A" : "Control+A");
+      await page.keyboard.press("Backspace");
+
+      const paragraphs = (
+        await page.$$("div[data-lexical-editor] .editor-paragraph")
+      ) as ElementHandle<HTMLElement>[];
+
+      expect(paragraphs.length).toBe(1);
+      expect((await paragraphs[0].innerText()).trim()).toBe("");
+    },
+  );
+
+  test(
     "select all command works",
     async ({ page }) => {
       const isMac = process.platform === "darwin";
