@@ -8,9 +8,6 @@
  */
 
 import {
-  $createRangeSelection,
-  $getRoot,
-  $setSelection,
   CommandPayloadType,
   LexicalEditor,
   SELECT_ALL_COMMAND,
@@ -34,6 +31,7 @@ import {
   KEY_ENTER_COMMAND,
   PASTE_COMMAND,
   REMOVE_TEXT_COMMAND,
+  $selectAll,
 } from "lexical";
 import {
   $insertDataTransferForPlainText,
@@ -213,26 +211,7 @@ export function registerSubtext(editor: LexicalEditor): () => void {
     editor.registerCommand<boolean>(
       SELECT_ALL_COMMAND,
       () => {
-        const selection = $createRangeSelection();
-        const allParagraphs = $getRoot().getChildren();
-        if (allParagraphs.length > 0) {
-          const firstParagraph = allParagraphs[0];
-          const firstTextNode = firstParagraph.getFirstChild();
-          const lastParagraph = allParagraphs[allParagraphs.length - 1];
-          const lastTextNode = lastParagraph.getLastChild();
-
-          selection.focus.set(
-            firstTextNode.getKey(),
-            0,
-            "text",
-          );
-          selection.anchor.set(
-            lastTextNode.getKey(),
-            lastTextNode.getTextContentSize(),
-            "text",
-          );
-          $setSelection(selection);
-        }
+        $selectAll();
         return true;
       },
       COMMAND_PRIORITY_EDITOR,
