@@ -202,7 +202,6 @@ export function registerSubtext(editor: LexicalEditor): () => void {
           return false;
         }
 
-        selection.removeText();
         selection.insertParagraph();
         return true;
       },
@@ -225,7 +224,6 @@ export function registerSubtext(editor: LexicalEditor): () => void {
           return false;
         }
 
-        selection.removeText();
         selection.insertParagraph();
         return true;
       },
