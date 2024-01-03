@@ -5,7 +5,7 @@
 :content-type:text/subtext
 
 # Welcome to NENO
-NENO is just another note-taking app that helps you create your personal knowledge garden. With NENO, you retain *full control* over your data because you decide where it is stored: On your device or on a cloud storage of your choice. You can also use Git for versioning.
+NENO is a powerful note-taking app that helps you manage your personal knowledge garden. With NENO, you retain *full control* over your data because you decide where it is stored: On your device or on a cloud storage of your choice. You can also use Git for versioning.
 Some of NENO's features:
 - Full data ownership: You decide where your data is stored: On your device or on a cloud storage of your choice.
 - Multiple media types: Paste video, audio, PDF documents, images and code, or any arbitrary file into your note

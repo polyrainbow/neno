@@ -16,7 +16,7 @@ Hello there and welcome to the NENO user manual. 👋 Thank you for your interes
 ![NENO Editor view](./img/neno-light.png)
 ![NENO Graph view](./img/graph-view.png)
 
-NENO is a powerful note-taking app that helps you create your personal knowledge garden. If you do not know what a personal knowledge graph is, read [this great introduction by Dan McCreary](https://towardsdatascience.com/personal-knowledge-graphs-9a23a0b099af). With NENO, you retain full control over your data because you decide where it is stored: On your device, on a cloud storage of your choice, or even on a server under your control.
+NENO is a powerful note-taking app that helps you manage your personal knowledge garden. If you do not know what a personal knowledge graph is, read [this great introduction by Dan McCreary](https://towardsdatascience.com/personal-knowledge-graphs-9a23a0b099af). With NENO, you retain full control over your data because you decide where it is stored: On your device, on a cloud storage of your choice, or even on a server under your control.
 
 NENO is open-source software which means it is completely free to use.
 
