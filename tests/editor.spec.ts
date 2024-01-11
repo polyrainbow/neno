@@ -399,6 +399,20 @@ test.describe("Editor view", () => {
   );
 
   test(
+    "enable complex URLs with apostrophes in the editor",
+    async ({ page }) => {
+      const URL = "https://example.com/#:~:text=But%20as%20Hannah%20Arendt%20observes,nature'%E2%80%9D%20(469).";
+      await page.keyboard.type(URL);
+
+      const link = (
+        await page.$("div[data-lexical-editor] .editor-paragraph a")
+      ) as ElementHandle<HTMLElement>;
+
+      expect(await link.getAttribute("href")).toBe(URL);
+    },
+  );
+
+  test(
     "select all command works with URL",
     async ({ page }) => {
       const isMac = process.platform === "darwin";
