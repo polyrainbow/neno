@@ -412,6 +412,10 @@
   margin: 0 5px;
 }
 
+.alias-control-button {
+  display: flex;
+  padding: 4px;
+}
 
 div[data-lexical-editor] {
   font-size: 18px;

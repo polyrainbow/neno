@@ -2,6 +2,7 @@ import ActiveNote from "../types/ActiveNote";
 import NotesProvider from "../lib/notes";
 import NoteSlugUpdateReferencesToggle from "./NoteSlugUpdateReferencesToggle";
 import { l } from "../lib/intl";
+import Icon from "./Icon";
 
 interface NoteSlugProps {
   note: ActiveNote,
@@ -93,12 +94,19 @@ const NoteSlug = ({
           : ""
       }
       <button
+        className="alias-control-button"
         onClick={() => {
           const newDisplayedSlugAliases = [...displayedSlugAliases];
           newDisplayedSlugAliases.push("");
           setDisplayedSlugAliases(newDisplayedSlugAliases);
         }}
-      >+</button>
+      >
+        <Icon
+          icon={"add"}
+          title={"Add alias"}
+          size={14}
+        />
+      </button>
     </div>
     {
       displayedSlugAliases.map((slugAlias, index) => {
@@ -148,12 +156,14 @@ const NoteSlug = ({
 
               if (e.key === "Escape") {
                 e.preventDefault();
-                setSlugInput("slug" in note ? note.slug : "");
+                const newDisplayedSlugAliases
+                  = Array.from(displayedSlugAliases).splice(index, 1);
+                setDisplayedSlugAliases(newDisplayedSlugAliases);
               }
             }}
           />
           {
-            slugInput.length > 0 && !NotesProvider.isValidSlug(slugInput)
+            slugInput.length > 0 && !NotesProvider.isValidSlug(slugAlias)
               ? <div className="note-slug-validation-error">
                 {l("note.slug.invalid-slug").toLocaleUpperCase()}
               </div>
@@ -161,25 +171,32 @@ const NoteSlug = ({
           }
           {
             (
-              "slug" in note
-              && note.slug !== slugInput
-              && NotesProvider.isValidSlug(slugInput)
+              "aliases" in note
+              && Array.from(note.aliases)[index] !== slugAlias
+              && NotesProvider.isValidSlug(slugAlias)
             )
               ? <NoteSlugUpdateReferencesToggle
                 isActivated={updateReferences}
                 setIsActivated={(val: boolean) => {
-                  setUpdateReferences(val);
+                  // TODO: setUpdateAliasReferences(val);
                 }}
               />
               : ""
           }
           <button
+            className="alias-control-button"
             onClick={() => {
               const newDisplayedSlugAliases = [...displayedSlugAliases];
               newDisplayedSlugAliases.splice(index, 1);
               setDisplayedSlugAliases(newDisplayedSlugAliases);
             }}
-          >-</button>
+          >
+            <Icon
+              icon={"delete"}
+              title={"Remove alias"}
+              size={14}
+            />
+          </button>
         </div>;
       })
     }

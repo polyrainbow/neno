@@ -107,6 +107,8 @@ export default (
   const setActiveNoteFromServer = (noteFromServer: NoteToTransmit): void => {
     setActiveNote({
       slug: noteFromServer.meta.slug,
+      // might be better to create a new set here
+      aliases: new Set(noteFromServer.aliases),
       createdAt: noteFromServer.meta.createdAt,
       updatedAt: noteFromServer.meta.updatedAt,
       outgoingLinks: noteFromServer.outgoingLinks,
