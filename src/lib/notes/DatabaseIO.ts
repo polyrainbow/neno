@@ -427,8 +427,6 @@ export default class DatabaseIO {
       );
     });
 
-    // TODO: Update alias files. But how?
-
     if (Array.isArray(canonicalSlugsToFlush)) {
       await Promise.all(canonicalSlugsToFlush.map(async (slug) => {
         const filename = DatabaseIO.getFilenameForNoteSlug(slug);

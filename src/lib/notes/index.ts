@@ -494,12 +494,12 @@ export default class NotesProvider {
 
     graph.notes.delete(slug);
     const aliasesToRemove: Slug[] = [];
-    graph.aliases.forEach((alias, canonicalSlug) => {
+    for (const [alias, canonicalSlug] of graph.aliases.entries()) {
       if (canonicalSlug === slug) {
         graph.aliases.delete(alias);
         aliasesToRemove.push(alias);
       }
-    });
+    }
 
     let flushMetadata = WriteGraphMetadataAction.NONE;
     graph.metadata.pinnedNotes
