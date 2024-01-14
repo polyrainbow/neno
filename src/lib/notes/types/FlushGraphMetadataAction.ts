@@ -1,3 +1,8 @@
+/*
+  An enum that determines if and how graph metadata should be written to disk
+  on a flush.
+*/
+
 enum WriteGraphMetadataAction {
   NONE = "NONE",
   WRITE = "WRITE",

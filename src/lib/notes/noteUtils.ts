@@ -390,6 +390,11 @@ const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
   return {
     content: note.content,
     slug,
+    aliases: new Set(
+      Array.from(graph.aliases.entries())
+        .filter((entry) => entry[1] === slug)
+        .map((entry) => entry[0]),
+    ),
     title: getNoteTitle(note),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,
@@ -416,6 +421,11 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
     .map((note: ExistingNote) => {
       const backlink: SparseNoteInfo = {
         slug: note.meta.slug,
+        aliases: new Set(
+          Array.from(graph.aliases.entries())
+            .filter((entry) => entry[1] === slug)
+            .map((entry) => entry[0]),
+        ),
         title: getNoteTitle(note),
         createdAt: note.meta.createdAt,
         updatedAt: note.meta.updatedAt,
@@ -666,6 +676,11 @@ const createNoteListItem = (
 ): NoteListItem => {
   const noteListItem: NoteListItem = {
     slug: note.meta.slug,
+    aliases: new Set(
+      Array.from(graph.aliases.entries())
+        .filter((entry) => entry[1] === note.meta.slug)
+        .map((entry) => entry[0]),
+    ),
     title: getNoteTitle(note),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,

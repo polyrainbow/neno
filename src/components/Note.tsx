@@ -51,6 +51,8 @@ interface NoteComponentProps {
   editorInstanceId: number,
   slugInput: string,
   setSlugInput: (val: string) => void,
+  displayedSlugAliases: string[],
+  setDisplayedSlugAliases: (val: string[]) => void,
   setNote: (note: ActiveNote) => void,
   setNoteContent: (title: string, refreshEditor?: boolean) => void,
   addFilesToNoteObject: (responses: FileInfo[]) => void,
@@ -79,6 +81,8 @@ const Note = ({
   setNote,
   slugInput,
   setSlugInput,
+  displayedSlugAliases,
+  setDisplayedSlugAliases,
   setNoteContent,
   addFilesToNoteObject,
   setUnsavedChanges,
@@ -342,6 +346,8 @@ const Note = ({
             note={note}
             slugInput={slugInput}
             setSlugInput={setSlugInput}
+            displayedSlugAliases={displayedSlugAliases}
+            setDisplayedSlugAliases={setDisplayedSlugAliases}
             setUnsavedChanges={setUnsavedChanges}
             updateReferences={updateReferences}
             setUpdateReferences={setUpdateReferences}

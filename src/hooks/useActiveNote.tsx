@@ -41,6 +41,10 @@ export default (
   const [updateReferences, setUpdateReferences] = useState<boolean>(false);
 
   const [slugInput, setSlugInput] = useState<string>("");
+  const [
+    displayedSlugAliases,
+    setDisplayedSlugAliases,
+  ] = useState<string[]>([]);
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const [editorInstanceId, setEditorInstanceId] = useState<number>(
@@ -139,6 +143,7 @@ export default (
         changeSlugTo: NotesProvider.isValidSlug(slugInput)
           ? slugInput
           : undefined,
+        aliases: new Set(),
       };
     } else {
       return {
@@ -163,6 +168,7 @@ export default (
         updateReferences: slugInput !== activeNote.slug
           && NotesProvider.isValidSlug(slugInput)
           && updateReferences,
+        aliases: new Set(),
       };
     }
   };
@@ -265,6 +271,7 @@ export default (
         content: activeNote.content,
       },
       ignoreDuplicateTitles: true,
+      aliases: new Set(),
     };
     const noteFromServer = await notesProvider.put(noteSaveRequest);
 
@@ -314,6 +321,8 @@ export default (
     setUnsavedChanges,
     slugInput,
     setSlugInput,
+    displayedSlugAliases,
+    setDisplayedSlugAliases,
     editorInstanceId,
     updateEditorInstance,
     updateReferences,

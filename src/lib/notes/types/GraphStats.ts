@@ -23,6 +23,7 @@ export default interface GraphStats {
   readonly numberOfLinks: number,
   readonly numberOfFiles: number,
   readonly numberOfPins: number,
+  readonly numberOfAliases: number,
   readonly numberOfUnlinkedNotes: number,
   metadata?: GraphStatsMetadata,
   analysis?: GraphStatsAnalysis,

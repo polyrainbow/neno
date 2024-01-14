@@ -70,17 +70,23 @@ export default class DatabaseIO {
 
 
   private async parseGraph(
-    serializedNotes: Map<Slug, string>,
+    serializedNotesAndAliases: Map<Slug, string>,
     metadataSerialized?: string,
   ): Promise<Graph> {
     let migrationPerformed = false;
     const parsedNotes = new Map<Slug, ExistingNote>();
+    const aliases = new Map<Slug, Slug>();
 
-    for (const [slug, serializedNote] of serializedNotes) {
+    for (const [slug, serializedNote] of serializedNotesAndAliases) {
       let parsedNote: ExistingNote;
       try {
-        parsedNote = parseSerializedExistingNote(serializedNote, slug);
-        parsedNotes.set(slug, parsedNote);
+        if (serializedNote.startsWith(":alias-of:")) {
+          const canonicalSlug = serializedNote.slice(":alias-of:".length);
+          aliases.set(slug, canonicalSlug);
+        } else {
+          parsedNote = parseSerializedExistingNote(serializedNote, slug);
+          parsedNotes.set(slug, parsedNote);
+        }
       } catch (e) {
         continue;
       }
@@ -112,6 +118,7 @@ export default class DatabaseIO {
 
     const parsedGraphObject: Graph = {
       notes: parsedNotes,
+      aliases,
       indexes: {
         blocks: blockIndex,
         outgoingLinks: outgoingLinkIndex,
@@ -124,6 +131,7 @@ export default class DatabaseIO {
       await this.flushChanges(
         parsedGraphObject,
         WriteGraphMetadataAction.WRITE,
+        "all",
       );
     }
 
@@ -132,7 +140,9 @@ export default class DatabaseIO {
 
 
   private async readAndParseGraphFromDisk(): Promise<Graph> {
-    const noteFilenames = await this.getNoteFilenamesFromGraphDirectory();
+    /*
+      METADATA
+    */
 
     let graphMetadataSerialized: string | undefined;
     try {
@@ -144,6 +154,12 @@ export default class DatabaseIO {
       // if the file does not exist, we just create a new one later
       graphMetadataSerialized = undefined;
     }
+
+    /*
+      NOTES AND ALIASES
+    */
+
+    const noteFilenames = await this.getNoteFilenamesFromGraphDirectory();
 
     const serializedNotes = new Map(
       await Promise.all(
@@ -376,12 +392,10 @@ export default class DatabaseIO {
   // written to the disk and thus are persistent. It should always be called
   // after any operation on the internal graph representation
   // has been performed.
-  // If slugsToFlush is not provided, all notes will be flushed. This should
-  // only be done if really necessary.
   async flushChanges(
     graph: Graph,
     writeGraphMetadata: WriteGraphMetadataAction,
-    slugsToFlush?: Slug[],
+    slugsToFlush: Slug[] | "all",
   ): Promise<void> {
     if (
       writeGraphMetadata === WriteGraphMetadataAction.WRITE
@@ -399,7 +413,16 @@ export default class DatabaseIO {
 
     this.#loadedGraph = graph;
 
-    if (slugsToFlush) {
+    graph.aliases.forEach(async (slug: Slug, alias: Slug) => {
+      await this.#storageProvider.writeObject(
+        `${alias}${DatabaseIO.#NOTE_FILE_EXTENSION}`,
+        ":alias-of:" + slug,
+      );
+    });
+
+    // TODO: Update alias files. But how?
+
+    if (Array.isArray(slugsToFlush)) {
       await Promise.all(slugsToFlush.map(async (slug) => {
         const filename = DatabaseIO.getFilenameForNoteSlug(slug);
         if (!graph.notes.has(slug)) {

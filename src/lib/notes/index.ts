@@ -141,11 +141,13 @@ export default class NotesProvider {
   ): Promise<NoteToTransmit> {
     const graph = await this.#io.getGraph();
 
-    if (!graph.notes.has(slug)) {
+    const canonicalSlug = graph.aliases.get(slug) || slug;
+
+    if (!graph.notes.has(canonicalSlug)) {
       throw new Error(ErrorMessage.NOTE_NOT_FOUND);
     }
 
-    const noteFromDB = graph.notes.get(slug) as ExistingNote;
+    const noteFromDB = graph.notes.get(canonicalSlug) as ExistingNote;
 
     const noteToTransmit: NoteToTransmit
       = await createNoteToTransmit(noteFromDB, graph);
@@ -173,7 +175,9 @@ export default class NotesProvider {
   async getRawNote(
     slug: Slug,
   ): Promise<string> {
-    return this.#io.getRawNote(slug);
+    const graph = await this.#io.getGraph();
+    const canonicalSlug = graph.aliases.get(slug) || slug;
+    return this.#io.getRawNote(canonicalSlug);
   }
 
 
@@ -197,6 +201,7 @@ export default class NotesProvider {
       numberOfLinks: getGraphLinks(graph).length,
       numberOfFiles: graph.metadata.files.length,
       numberOfPins: graph.metadata.pinnedNotes.length,
+      numberOfAliases: graph.aliases.size,
       numberOfUnlinkedNotes,
     };
 
@@ -264,6 +269,28 @@ export default class NotesProvider {
         noteFromUser.meta.custom,
       );
 
+      graph.aliases.forEach((alias, canonicalSlug) => {
+        if (canonicalSlug === existingNote.meta.slug) {
+          graph.aliases.delete(alias);
+        }
+      });
+
+      noteSaveRequest.aliases.forEach((alias, canonicalSlug) => {
+        if (canonicalSlug === existingNote.meta.slug) {
+          throw new Error(ErrorMessage.ALIAS_EXISTS);
+        }
+        if (
+          graph.aliases.has(alias)
+          && graph.aliases.get(alias) !== canonicalSlug
+        ) {
+          throw new Error(ErrorMessage.ALIAS_EXISTS);
+        }
+        if (graph.notes.has(alias)) {
+          throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+        }
+        graph.aliases.set(alias, canonicalSlug);
+      });
+
       if (
         "changeSlugTo" in noteSaveRequest
         && typeof noteSaveRequest.changeSlugTo === "string"
@@ -273,6 +300,9 @@ export default class NotesProvider {
         }
         if (graph.notes.has(noteSaveRequest.changeSlugTo)) {
           throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+        }
+        if (graph.aliases.has(noteSaveRequest.changeSlugTo)) {
+          throw new Error(ErrorMessage.ALIAS_EXISTS);
         }
         const oldSlug = existingNote.meta.slug;
         const newSlug = noteSaveRequest.changeSlugTo;
@@ -349,7 +379,10 @@ export default class NotesProvider {
     }
 
     /* create new note */
-    const existingSlugs = Array.from(graph.notes.keys());
+    const existingSlugs = [
+      ...Array.from(graph.notes.keys()),
+      ...Array.from(graph.aliases.keys()),
+    ];
     let slug: Slug;
 
     if (
@@ -359,7 +392,10 @@ export default class NotesProvider {
       if (!isValidSlug(noteSaveRequest.changeSlugTo)) {
         throw new Error(ErrorMessage.INVALID_SLUG);
       }
-      if (graph.notes.has(noteSaveRequest.changeSlugTo)) {
+      if (
+        graph.notes.has(noteSaveRequest.changeSlugTo)
+        || graph.aliases.has(noteSaveRequest.changeSlugTo)
+      ) {
         throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
       }
 
@@ -370,6 +406,19 @@ export default class NotesProvider {
         existingSlugs,
       );
     }
+
+    noteSaveRequest.aliases.forEach((alias) => {
+      if (
+        graph.aliases.has(alias)
+        && graph.aliases.get(alias) !== slug
+      ) {
+        throw new Error(ErrorMessage.ALIAS_EXISTS);
+      }
+      if (graph.notes.has(alias)) {
+        throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+      }
+      graph.aliases.set(alias, slug);
+    });
 
     // the new note becomes an existing note, that's why the funny typing here
     const newNote: ExistingNote = {
@@ -407,6 +456,7 @@ export default class NotesProvider {
 
     const noteSaveRequest: NoteSaveRequest = {
       note,
+      aliases: new Set(),
       ignoreDuplicateTitles: true,
     };
 
@@ -423,6 +473,13 @@ export default class NotesProvider {
     }
 
     graph.notes.delete(slug);
+
+    graph.aliases.forEach((alias, canonicalSlug) => {
+      if (canonicalSlug === slug) {
+        graph.aliases.delete(alias);
+      }
+    });
+
     let flushMetadata = WriteGraphMetadataAction.NONE;
     graph.metadata.pinnedNotes
       = graph.metadata.pinnedNotes.filter((s) => {

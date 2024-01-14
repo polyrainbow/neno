@@ -82,6 +82,7 @@ describe("Notes module", () => {
         },
       },
       ignoreDuplicateTitles: false,
+      aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest1);
     const noteSaveRequest2: NoteSaveRequest = {
@@ -94,6 +95,7 @@ describe("Notes module", () => {
         },
       },
       ignoreDuplicateTitles: false,
+      aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest2);
     const page = await notesProvider.getNotesList({});
@@ -113,6 +115,7 @@ describe("Notes module", () => {
         },
       },
       ignoreDuplicateTitles: false,
+      aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest1);
     const noteSaveRequest2: NoteSaveRequest = {
@@ -125,6 +128,7 @@ describe("Notes module", () => {
         },
       },
       ignoreDuplicateTitles: false,
+      aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest2);
 
@@ -159,6 +163,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "1",
+        aliases: new Set(),
       };
       await notesProvider.put(noteSaveRequest);
 
@@ -173,6 +178,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "2",
+        aliases: new Set(),
       };
       await notesProvider.put(noteSaveRequest2);
 
@@ -187,6 +193,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "test",
+        aliases: new Set(),
       };
       await notesProvider.put(noteSaveRequest3);
 
@@ -217,6 +224,7 @@ describe("Notes module", () => {
         },
       },
       ignoreDuplicateTitles: false,
+      aliases: new Set(),
     };
 
     const note = await notesProvider.put(noteSaveRequest);
@@ -234,6 +242,7 @@ describe("Notes module", () => {
         },
       },
       ignoreDuplicateTitles: false,
+      aliases: new Set(),
     };
 
     const updatedNote = await notesProvider.put(noteSaveRequest2);
@@ -255,6 +264,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "note-1",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest);
@@ -272,6 +282,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "note-2",
+      aliases: new Set(),
     };
 
     const note2 = await notesProvider.put(noteSaveRequest2);
@@ -294,6 +305,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "note-1",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest);
@@ -310,6 +322,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "note-1a",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest2);
@@ -336,6 +349,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "note-1",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest1);
@@ -350,6 +364,7 @@ describe("Notes module", () => {
           },
         },
         ignoreDuplicateTitles: false,
+        aliases: new Set(),
       };
       const noteFromProvider = await notesProvider.put(noteSaveRequest2);
 
@@ -374,6 +389,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "note-1",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest1);
@@ -388,6 +404,7 @@ describe("Notes module", () => {
           },
         },
         ignoreDuplicateTitles: false,
+        aliases: new Set(),
       };
       const noteFromProvider = await notesProvider.put(noteSaveRequest2);
 
@@ -411,6 +428,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "note-1",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest);
@@ -426,6 +444,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "note-2",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest2);
@@ -441,6 +460,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "note-3",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest3);
@@ -459,6 +479,7 @@ describe("Notes module", () => {
       ignoreDuplicateTitles: false,
       changeSlugTo: "note-1a",
       updateReferences: true,
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest1a);
@@ -496,6 +517,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "n2",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest);
@@ -511,6 +533,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "n1",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest2);
@@ -529,6 +552,7 @@ describe("Notes module", () => {
       ignoreDuplicateTitles: false,
       changeSlugTo: "n1a",
       updateReferences: false,
+      aliases: new Set(),
     };
 
     const n1a = await notesProvider.put(noteSaveRequest3);
@@ -549,6 +573,7 @@ describe("Notes module", () => {
       ignoreDuplicateTitles: false,
       changeSlugTo: "n1",
       updateReferences: false,
+      aliases: new Set(),
     };
 
     const n1 = await notesProvider.put(noteSaveRequest4);
@@ -572,6 +597,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "n1",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest);
@@ -587,6 +613,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "n2",
+      aliases: new Set(),
     };
 
     await notesProvider.put(noteSaveRequest2);
@@ -829,6 +856,7 @@ describe("Notes module", () => {
       },
       ignoreDuplicateTitles: false,
       changeSlugTo: "another-existing-note",
+      aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest1);
 
@@ -842,6 +870,7 @@ describe("Notes module", () => {
         },
       },
       ignoreDuplicateTitles: false,
+      aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest2);
 
@@ -870,6 +899,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest);
@@ -929,6 +959,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest);
@@ -947,6 +978,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest2);
@@ -976,6 +1008,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest);
@@ -999,6 +1032,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
+        aliases: new Set(),
       };
 
       await notesProvider2.put(noteSaveRequest2);
@@ -1013,6 +1047,7 @@ describe("Notes module", () => {
           },
         },
         ignoreDuplicateTitles: false,
+        aliases: new Set(),
       };
 
       const note3 = await notesProvider2.put(noteSaveRequest3);
@@ -1051,6 +1086,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest);
@@ -1093,6 +1129,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest);
@@ -1126,6 +1163,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest1);
@@ -1142,6 +1180,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest2);
@@ -1158,6 +1197,7 @@ describe("Notes module", () => {
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "n3",
+        aliases: new Set(),
       };
 
       await notesProvider.put(noteSaveRequest3);
@@ -1169,6 +1209,91 @@ describe("Notes module", () => {
       const pinSlugs = pins.map((pin) => pin.meta.slug);
 
       expect(pinSlugs).toEqual(["n1", "n3"]);
+    },
+  );
+
+  /*
+    ALIASES
+  */
+
+  it(
+    "should parse alias files correctly",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      await storageProvider.writeObject("note.subtext", "Test note");
+      await storageProvider.writeObject("note-alias.subtext", ":alias-of:note");
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const notes = await notesProvider.getNotesList({});
+
+      expect(notes.numberOfResults).toBe(1);
+      expect(notes.results[0].slug).toBe("note");
+      const aliases = notes.results[0].aliases;
+      expect(aliases.size).toBe(1);
+      expect(aliases.has("note-alias")).toBe(true);
+    },
+  );
+
+  it(
+    "should correctly create aliases",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set(["note-alias"]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const notes = await notesProvider.getNotesList({});
+
+      expect(notes.numberOfResults).toBe(1);
+      const aliases = notes.results[0].aliases;
+      expect(aliases.size).toBe(1);
+      expect(aliases.has("note-alias")).toBe(true);
+    },
+  );
+
+  it(
+    "should correctly create aliases for new note when "
+    + "canonical slug is defined manually",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "a",
+        aliases: new Set(["b", "c"]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const notes = await notesProvider.getNotesList({});
+
+      expect(notes.numberOfResults).toBe(1);
+      const aliases = notes.results[0].aliases;
+      expect(aliases.size).toBe(2);
+      expect(aliases.has("b")).toBe(true);
+      expect(aliases.has("c")).toBe(true);
     },
   );
 });
