@@ -115,6 +115,7 @@ export default class DatabaseIO {
     const backlinkIndex = DatabaseIO.createBacklinkIndex(
       outgoingLinkIndex,
       new Set<Slug>(parsedNotes.keys()),
+      aliases,
     );
 
     const parsedGraphObject: Graph = {
@@ -215,11 +216,12 @@ export default class DatabaseIO {
 
   /*
     The backlinks index only contains slugs of existing notes that
-    reference a note.
+    reference a note or one of its aliases.
   */
   private static createBacklinkIndex(
     outgoingLinks: Map<Slug, Set<Slug>>,
     existingNoteSlugs: Set<Slug>,
+    aliases: Map<Slug, Slug>,
   ): Map<Slug, Set<Slug>> {
     const backlinkIndex = new Map<Slug, Set<Slug>>();
 
@@ -229,15 +231,23 @@ export default class DatabaseIO {
       }
 
       for (const link of links) {
-        if (!existingNoteSlugs.has(link)) {
-          continue;
+        // We only want to add backlinks to existing notes
+        if (existingNoteSlugs.has(link)) {
+          if (!backlinkIndex.has(link)) {
+            backlinkIndex.set(link, new Set<Slug>());
+          }
+
+          backlinkIndex.get(link)!.add(slug);
         }
 
-        if (!backlinkIndex.has(link)) {
-          backlinkIndex.set(link, new Set<Slug>());
-        }
+        if (aliases.has(link)) {
+          const canonicalSlug = aliases.get(link) as Slug;
+          if (!backlinkIndex.has(canonicalSlug)) {
+            backlinkIndex.set(canonicalSlug, new Set<Slug>());
+          }
 
-        backlinkIndex.get(link)!.add(slug);
+          backlinkIndex.get(canonicalSlug)!.add(slug);
+        }
       }
     }
     return backlinkIndex;

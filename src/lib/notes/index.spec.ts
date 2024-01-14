@@ -1458,5 +1458,22 @@ describe("Notes module", () => {
 
       expect(note1.backlinks.length).toBe(1);
       expect(note1.backlinks[0].slug).toBe("note-2");
-    });
+    },
+  );
+
+  it(
+    "should create backlinks for aliases on initial index generation",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      await storageProvider.writeObject("note.subtext", "Test note");
+      await storageProvider.writeObject("note-alias.subtext", ":alias-of:note");
+      await storageProvider.writeObject("note-2.subtext", "[[note-alias]]");
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteFromServer = await notesProvider.get("note");
+
+      expect(noteFromServer.backlinks.length).toBe(1);
+      expect(noteFromServer.backlinks[0].slug).toBe("note-2");
+    },
+  );
 });
