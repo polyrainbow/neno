@@ -581,6 +581,11 @@ const createNoteToTransmit = async (
     backlinks: getBacklinks(graph, existingNote.meta.slug),
     numberOfCharacters: getNumberOfCharacters(existingNote),
     files: getFileInfos(graph, existingNote.meta.slug),
+    aliases: new Set(
+      Array.from(graph.aliases.entries())
+        .filter((entry) => entry[1] === existingNote.meta.slug)
+        .map((entry) => entry[0]),
+    ),
   };
 
   return noteToTransmit;

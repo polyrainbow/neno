@@ -275,20 +275,20 @@ export default class NotesProvider {
         }
       });
 
-      noteSaveRequest.aliases.forEach((alias, canonicalSlug) => {
-        if (canonicalSlug === existingNote.meta.slug) {
+      noteSaveRequest.aliases.forEach((alias) => {
+        if (alias === existingNote.meta.slug) {
           throw new Error(ErrorMessage.ALIAS_EXISTS);
         }
         if (
           graph.aliases.has(alias)
-          && graph.aliases.get(alias) !== canonicalSlug
+          && graph.aliases.get(alias) !== existingNote.meta.slug
         ) {
           throw new Error(ErrorMessage.ALIAS_EXISTS);
         }
         if (graph.notes.has(alias)) {
           throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
         }
-        graph.aliases.set(alias, canonicalSlug);
+        graph.aliases.set(alias, existingNote.meta.slug);
       });
 
       if (

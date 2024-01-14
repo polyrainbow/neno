@@ -8,4 +8,5 @@ export default interface NoteToTransmit extends ExistingNote {
   readonly outgoingLinks: NotePreview[],
   readonly files: FileInfo[],
   readonly numberOfCharacters: number,
+  readonly aliases: Set<string>,
 }

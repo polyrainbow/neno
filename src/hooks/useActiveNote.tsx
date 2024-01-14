@@ -84,6 +84,7 @@ export default (
     const newNoteObject: UnsavedActiveNote = getNewNoteObject(params);
     setActiveNote(newNoteObject);
     setSlugInput(params.slug || "");
+    setDisplayedSlugAliases([]);
   };
 
 
@@ -121,6 +122,7 @@ export default (
     });
 
     setSlugInput(noteFromServer.meta.slug);
+    setDisplayedSlugAliases([...noteFromServer.aliases]);
   };
 
 
@@ -143,7 +145,7 @@ export default (
         changeSlugTo: NotesProvider.isValidSlug(slugInput)
           ? slugInput
           : undefined,
-        aliases: new Set(),
+        aliases: new Set(displayedSlugAliases),
       };
     } else {
       return {
@@ -168,7 +170,7 @@ export default (
         updateReferences: slugInput !== activeNote.slug
           && NotesProvider.isValidSlug(slugInput)
           && updateReferences,
-        aliases: new Set(),
+        aliases: new Set(displayedSlugAliases),
       };
     }
   };

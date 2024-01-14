@@ -104,11 +104,11 @@ const NoteSlug = ({
       displayedSlugAliases.map((slugAlias, index) => {
         return <div
           className="slug-line canonical"
-          key={"sla-" + index + "_" + slugAlias}
+          key={"sla-" + index}
         >
           <input
             type="text"
-            placeholder="slug"
+            placeholder="alias"
             className={
               "note-slug "
               + (
