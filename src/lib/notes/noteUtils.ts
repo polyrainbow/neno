@@ -372,8 +372,19 @@ const getOutgoingLinksToOtherNotes = (
   const slugs = graph.indexes.outgoingLinks.get(slug) as Set<Slug>;
 
   const validNoteSlugs = Array.from(slugs)
-    .filter((theirSlug: Slug) => {
-      return graph.notes.has(theirSlug) && theirSlug !== slug;
+    .filter((outgoingSlug: Slug) => {
+      return (
+        (graph.notes.has(outgoingSlug) && outgoingSlug !== slug)
+        || (
+          graph.aliases.has(outgoingSlug)
+          && graph.aliases.get(outgoingSlug) !== slug
+        )
+      );
+    })
+    .map((outgoingSlug: Slug) => {
+      return graph.aliases.has(outgoingSlug)
+        ? graph.aliases.get(outgoingSlug) as Slug
+        : outgoingSlug;
     });
 
   return new Set<Slug>(validNoteSlugs);

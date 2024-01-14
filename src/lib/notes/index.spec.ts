@@ -1476,4 +1476,44 @@ describe("Notes module", () => {
       expect(noteFromServer.backlinks[0].slug).toBe("note-2");
     },
   );
+
+  it(
+    "note's outgoing links should include aliases",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1 with an alias.",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "note-1",
+        aliases: new Set(["alias"]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 2 with a link to the [[alias]].",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "note-2",
+        aliases: new Set(),
+      };
+
+      const note2 = await notesProvider.put(noteSaveRequest2);
+      expect(note2.outgoingLinks.length).toBe(1);
+      expect(note2.outgoingLinks[0].slug).toBe("note-1");
+    },
+  );
 });
