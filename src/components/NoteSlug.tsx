@@ -104,7 +104,7 @@ const NoteSlug = ({
         <Icon
           icon={"add"}
           title={"Add alias"}
-          size={14}
+          size={20}
         />
       </button>
     </div>
@@ -194,7 +194,7 @@ const NoteSlug = ({
             <Icon
               icon={"delete"}
               title={"Remove alias"}
-              size={14}
+              size={20}
             />
           </button>
         </div>;
