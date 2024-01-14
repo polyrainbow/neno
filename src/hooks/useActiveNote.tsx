@@ -147,7 +147,11 @@ export default (
         changeSlugTo: NotesProvider.isValidSlug(slugInput)
           ? slugInput
           : undefined,
-        aliases: new Set(displayedSlugAliases),
+        aliases: new Set(displayedSlugAliases.filter((a) => {
+          return a !== slugInput
+            && a.trim().length > 0
+            && NotesProvider.isValidSlug(a);
+        })),
       };
     } else {
       return {
@@ -172,7 +176,11 @@ export default (
         updateReferences: slugInput !== activeNote.slug
           && NotesProvider.isValidSlug(slugInput)
           && updateReferences,
-        aliases: new Set(displayedSlugAliases),
+        aliases: new Set(displayedSlugAliases.filter((a) => {
+          return a !== slugInput
+            && a.trim().length > 0
+            && NotesProvider.isValidSlug(a);
+        })),
       };
     }
   };

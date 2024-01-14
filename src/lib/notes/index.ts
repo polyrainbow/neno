@@ -279,6 +279,9 @@ export default class NotesProvider {
       }
 
       noteSaveRequest.aliases.forEach((alias) => {
+        if (!(isValidSlug(alias) && alias.length > 0)) {
+          throw new Error(ErrorMessage.INVALID_ALIAS);
+        }
         if (alias === existingNote.meta.slug) {
           throw new Error(ErrorMessage.ALIAS_EXISTS);
         }
@@ -426,6 +429,9 @@ export default class NotesProvider {
 
     const aliasesToUpdate: Slug[] = [];
     noteSaveRequest.aliases.forEach((alias) => {
+      if (!(isValidSlug(alias) && alias.length > 0)) {
+        throw new Error(ErrorMessage.INVALID_ALIAS);
+      }
       if (
         graph.aliases.has(alias)
         && graph.aliases.get(alias) !== slug

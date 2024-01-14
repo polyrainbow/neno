@@ -1318,6 +1318,73 @@ describe("Notes module", () => {
     },
   );
 
+
+  it(
+    "should disallow empty aliases on new notes",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set([""]),
+      };
+
+      await expect(notesProvider.put(noteSaveRequest)).rejects
+        .toThrow("INVALID_ALIAS");
+    },
+  );
+
+
+  it(
+    "should disallow empty aliases on existing notes",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set(),
+        changeSlugTo: "note-1",
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            slug: "note-1",
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set([""]),
+      };
+
+      await expect(notesProvider.put(noteSaveRequest2)).rejects
+        .toThrow("INVALID_ALIAS");
+    },
+  );
+
   it(
     "should correctly create aliases for new note when "
     + "canonical slug is defined manually",
