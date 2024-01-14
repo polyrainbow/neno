@@ -1235,7 +1235,31 @@ describe("Notes module", () => {
   );
 
   it(
-    "should delete aliases from disk",
+    "should delete aliases from disk on note removal",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      await storageProvider.writeObject("note.subtext", "Test note");
+      await storageProvider.writeObject(
+        "note-alias-1.subtext",
+        ":alias-of:note",
+      );
+      await storageProvider.writeObject(
+        "note-alias-2.subtext",
+        ":alias-of:note",
+      );
+      const notesProvider = new NotesProvider(storageProvider);
+
+      await notesProvider.remove("note");
+
+      await expect(storageProvider.readObjectAsString("note-alias-1.subtext"))
+        .rejects.toThrow("File not found.");
+      await expect(storageProvider.readObjectAsString("note-alias-2.subtext"))
+        .rejects.toThrow("File not found.");
+    },
+  );
+
+  it(
+    "should delete aliases from disk on alias removal",
     async () => {
       const storageProvider = new MockStorageProvider();
       await storageProvider.writeObject("note.subtext", "Test note");
