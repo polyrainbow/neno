@@ -74,26 +74,12 @@ export default class NotesProvider {
     });
   }
 
-  static updateIndexes = (
+  static updateBacklinksIndex = (
     graph: GraphObject,
-    existingNote: ExistingNote,
+    ourSlug: Slug,
+    ourOutgoingLinks: Slug[],
   ): void => {
-    // Block index
-    const blocks = subwaytext(existingNote.content);
-
-    graph.indexes.blocks.set(
-      existingNote.meta.slug,
-      blocks,
-    );
-
-    const ourSlug = existingNote.meta.slug;
-    graph.indexes.blocks.set(ourSlug, blocks);
-
-    // Outgoing links index
-    const ourOutgoingLinks = DatabaseIO.getSlugsFromParsedNote(blocks);
-    graph.indexes.outgoingLinks.set(ourSlug, new Set(ourOutgoingLinks));
-
-    // Backlinks index: Let's first check if we need to create one
+    // Let's first check if we need to create a backlink index for *our* note
     let ourBacklinks: Set<Slug> | null = null;
     if (!graph.indexes.backlinks.has(ourSlug)) {
       ourBacklinks = new Set<Slug>();
@@ -113,8 +99,9 @@ export default class NotesProvider {
           .delete(ourSlug);
       }
 
-      // we only need to create a new backlink index if we created the Set
-      // `ourBacklinks` earlier
+      // If we had to create an index for our note's backlinks earlier,
+      // let's fill it now with the outgoing links of the other note that
+      // lead to our note
       if (ourBacklinks) {
         const theirOutgoingLinks = graph.indexes.outgoingLinks.get(
           someExistingSlug,
@@ -125,6 +112,28 @@ export default class NotesProvider {
         }
       }
     }
+  };
+
+  static updateIndexes = (
+    graph: GraphObject,
+    existingNote: ExistingNote,
+  ): void => {
+    // Block index
+    const blocks = subwaytext(existingNote.content);
+
+    graph.indexes.blocks.set(
+      existingNote.meta.slug,
+      blocks,
+    );
+
+    const ourSlug = existingNote.meta.slug;
+    graph.indexes.blocks.set(ourSlug, blocks);
+
+    // Outgoing links index
+    const ourOutgoingLinks = DatabaseIO.getSlugsFromParsedNote(blocks);
+    graph.indexes.outgoingLinks.set(ourSlug, new Set(ourOutgoingLinks));
+
+    NotesProvider.updateBacklinksIndex(graph, ourSlug, ourOutgoingLinks);
   };
 
   #io: DatabaseIO;
