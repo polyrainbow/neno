@@ -99,6 +99,21 @@ export default class NotesProvider {
           .delete(ourSlug);
       }
 
+      const aliasesOfSomeExistingSlug = Array.from(graph.aliases.entries())
+        .filter((entry) => {
+          return entry[1] === someExistingSlug;
+        })
+        .map((entry) => {
+          return entry[0];
+        });
+
+      if (ourOutgoingLinks.some((outgoingLink) => {
+        return aliasesOfSomeExistingSlug.includes(outgoingLink);
+      })) {
+        (graph.indexes.backlinks.get(someExistingSlug) as Set<Slug>)
+          .add(ourSlug);
+      }
+
       // If we had to create an index for our note's backlinks earlier,
       // let's fill it now with the outgoing links of the other note that
       // lead to our note
