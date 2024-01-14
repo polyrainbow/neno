@@ -39,6 +39,7 @@ export default class DatabaseIO {
   #GRAPH_METADATA_FILENAME = ".graph.json";
   #NAME_OF_FILES_SUBDIRECTORY = "files";
   static #NOTE_FILE_EXTENSION = ".subtext";
+  #ALIAS_HEADER = ":alias-of:";
 
   // Block parsing is CPU intensive, so we use a web worker pool to parse
   // multiple notes in parallel.
@@ -80,8 +81,8 @@ export default class DatabaseIO {
     for (const [slug, serializedNote] of serializedNotesAndAliases) {
       let parsedNote: ExistingNote;
       try {
-        if (serializedNote.startsWith(":alias-of:")) {
-          const canonicalSlug = serializedNote.slice(":alias-of:".length);
+        if (serializedNote.startsWith(this.#ALIAS_HEADER)) {
+          const canonicalSlug = serializedNote.slice(this.#ALIAS_HEADER.length);
           aliases.set(slug, canonicalSlug);
         } else {
           parsedNote = parseSerializedExistingNote(serializedNote, slug);
@@ -423,7 +424,7 @@ export default class DatabaseIO {
     graph.aliases.forEach(async (slug: Slug, alias: Slug) => {
       await this.#storageProvider.writeObject(
         `${alias}${DatabaseIO.#NOTE_FILE_EXTENSION}`,
-        ":alias-of:" + slug,
+        this.#ALIAS_HEADER + slug,
       );
     });
 
@@ -463,7 +464,7 @@ export default class DatabaseIO {
           const canonicalSlug = graph.aliases.get(alias) as Slug;
           await this.#storageProvider.writeObject(
             filename,
-            `:alias-of:${canonicalSlug}`,
+            `${this.#ALIAS_HEADER}${canonicalSlug}`,
           );
         }
       }));
@@ -475,7 +476,7 @@ export default class DatabaseIO {
         } else {
           await this.#storageProvider.writeObject(
             filename,
-            `:alias-of:${canonicalSlug}`,
+            `${this.#ALIAS_HEADER}${canonicalSlug}`,
           );
         }
       }
