@@ -163,7 +163,7 @@ const NoteSlug = ({
             }}
           />
           {
-            slugInput.length > 0 && !NotesProvider.isValidSlug(slugAlias)
+            slugAlias.length > 0 && !NotesProvider.isValidSlug(slugAlias)
               ? <div className="note-slug-validation-error">
                 {l("note.slug.invalid-slug").toLocaleUpperCase()}
               </div>
