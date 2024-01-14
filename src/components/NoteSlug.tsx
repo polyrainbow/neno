@@ -169,20 +169,6 @@ const NoteSlug = ({
               </div>
               : ""
           }
-          {
-            /* (
-              "aliases" in note
-              && Array.from(note.aliases)[index] !== slugAlias
-              && NotesProvider.isValidSlug(slugAlias)
-            )
-              ? <NoteSlugUpdateReferencesToggle
-                isActivated={updateReferences}
-                setIsActivated={(val: boolean) => {
-                  // TODO: setUpdateAliasReferences(val);
-                }}
-              />
-              : ""*/
-          }
           <button
             className="alias-control-button"
             onClick={() => {
