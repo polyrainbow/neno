@@ -170,7 +170,7 @@ const NoteSlug = ({
               : ""
           }
           {
-            (
+            /* (
               "aliases" in note
               && Array.from(note.aliases)[index] !== slugAlias
               && NotesProvider.isValidSlug(slugAlias)
@@ -181,7 +181,7 @@ const NoteSlug = ({
                   // TODO: setUpdateAliasReferences(val);
                 }}
               />
-              : ""
+              : ""*/
           }
           <button
             className="alias-control-button"

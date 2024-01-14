@@ -1235,6 +1235,36 @@ describe("Notes module", () => {
   );
 
   it(
+    "should delete aliases from disk",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      await storageProvider.writeObject("note.subtext", "Test note");
+      await storageProvider.writeObject("note-alias.subtext", ":alias-of:note");
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const putRequest: NoteSaveRequest = {
+        ignoreDuplicateTitles: false,
+        aliases: new Set([]),
+        note: {
+          content: "Test note",
+          meta: {
+            slug: "note",
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+      };
+
+      const noteFromServer = await notesProvider.put(putRequest);
+
+      expect(noteFromServer.aliases.size).toBe(0);
+      await expect(storageProvider.readObjectAsString("note-alias.subtext"))
+        .rejects.toThrow("File not found.");
+    },
+  );
+
+  it(
     "should correctly create aliases",
     async () => {
       const storageProvider = new MockStorageProvider();

@@ -269,11 +269,14 @@ export default class NotesProvider {
         noteFromUser.meta.custom,
       );
 
-      graph.aliases.forEach((alias, canonicalSlug) => {
+      const aliasesToUpdate: Slug[] = [];
+
+      for (const [alias, canonicalSlug] of graph.aliases.entries()) {
         if (canonicalSlug === existingNote.meta.slug) {
           graph.aliases.delete(alias);
+          aliasesToUpdate.push(alias);
         }
-      });
+      }
 
       noteSaveRequest.aliases.forEach((alias) => {
         if (alias === existingNote.meta.slug) {
@@ -289,6 +292,7 @@ export default class NotesProvider {
           throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
         }
         graph.aliases.set(alias, existingNote.meta.slug);
+        aliasesToUpdate.push(alias);
       });
 
       if (
@@ -325,7 +329,18 @@ export default class NotesProvider {
           }
         }
 
-        await this.#io.flushChanges(graph, flushMetadata, [oldSlug]);
+        const aliasesToUpdate: Slug[] = [];
+        for (const [alias, canonicalSlug] of graph.aliases.entries()) {
+          if (canonicalSlug === oldSlug) {
+            graph.aliases.delete(alias);
+            graph.aliases.set(alias, newSlug);
+            aliasesToUpdate.push(alias);
+          }
+        }
+
+        await this.#io.flushChanges(
+          graph, flushMetadata, [oldSlug], aliasesToUpdate,
+        );
 
         existingNote.meta.slug = newSlug;
         graph.notes.set(newSlug, existingNote);
@@ -359,6 +374,7 @@ export default class NotesProvider {
               graph,
               WriteGraphMetadataAction.NONE,
               [thatNote.meta.slug],
+              [],
             );
           }
         }
@@ -371,6 +387,7 @@ export default class NotesProvider {
         graph,
         WriteGraphMetadataAction.NONE,
         [existingNote.meta.slug],
+        aliasesToUpdate,
       );
 
       const noteToTransmit: NoteToTransmit
@@ -407,6 +424,7 @@ export default class NotesProvider {
       );
     }
 
+    const aliasesToUpdate: Slug[] = [];
     noteSaveRequest.aliases.forEach((alias) => {
       if (
         graph.aliases.has(alias)
@@ -418,6 +436,7 @@ export default class NotesProvider {
         throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
       }
       graph.aliases.set(alias, slug);
+      aliasesToUpdate.push(alias);
     });
 
     // the new note becomes an existing note, that's why the funny typing here
@@ -441,6 +460,7 @@ export default class NotesProvider {
       graph,
       WriteGraphMetadataAction.NONE,
       [newNote.meta.slug],
+      aliasesToUpdate,
     );
 
     const noteToTransmit: NoteToTransmit
@@ -473,10 +493,11 @@ export default class NotesProvider {
     }
 
     graph.notes.delete(slug);
-
+    const aliasesToRemove: Slug[] = [];
     graph.aliases.forEach((alias, canonicalSlug) => {
       if (canonicalSlug === slug) {
         graph.aliases.delete(alias);
+        aliasesToRemove.push(alias);
       }
     });
 
@@ -491,7 +512,7 @@ export default class NotesProvider {
 
     NotesProvider.removeSlugFromIndexes(graph, slug);
 
-    await this.#io.flushChanges(graph, flushMetadata, [slug]);
+    await this.#io.flushChanges(graph, flushMetadata, [slug], aliasesToRemove);
   }
 
 
@@ -513,6 +534,7 @@ export default class NotesProvider {
       graph,
       WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
       [],
+      [],
     );
 
     return fileInfo;
@@ -530,6 +552,7 @@ export default class NotesProvider {
     await this.#io.flushChanges(
       graph,
       WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      [],
       [],
     );
   }
@@ -623,7 +646,7 @@ export default class NotesProvider {
     const updateMetadata = oldLength !== newLength
       ? WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
       : WriteGraphMetadataAction.NONE;
-    await this.#io.flushChanges(graph, updateMetadata, []);
+    await this.#io.flushChanges(graph, updateMetadata, [], []);
 
     return this.getPins();
   }
@@ -644,7 +667,7 @@ export default class NotesProvider {
         return s !== slugToRemove;
       });
 
-    await this.#io.flushChanges(graph, updateMetadata, []);
+    await this.#io.flushChanges(graph, updateMetadata, [], []);
 
     return this.getPins();
   }

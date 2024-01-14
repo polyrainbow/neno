@@ -132,6 +132,7 @@ export default class DatabaseIO {
         parsedGraphObject,
         WriteGraphMetadataAction.WRITE,
         "all",
+        "all",
       );
     }
 
@@ -382,7 +383,12 @@ export default class DatabaseIO {
     // Flushing the graph will save it in memory for
     // faster access the next time. Also, if no graph metadata file is present
     // in the directory, we create a new one.
-    await this.flushChanges(graphFromDisk, WriteGraphMetadataAction.WRITE, []);
+    await this.flushChanges(
+      graphFromDisk,
+      WriteGraphMetadataAction.WRITE,
+      [],
+      [],
+    );
     this.#finishedObtainingGraph();
     return graphFromDisk;
   }
@@ -395,7 +401,8 @@ export default class DatabaseIO {
   async flushChanges(
     graph: Graph,
     writeGraphMetadata: WriteGraphMetadataAction,
-    slugsToFlush: Slug[] | "all",
+    canonicalSlugsToFlush: Slug[] | "all",
+    aliasesToFlush: Slug[] | "all",
   ): Promise<void> {
     if (
       writeGraphMetadata === WriteGraphMetadataAction.WRITE
@@ -422,8 +429,8 @@ export default class DatabaseIO {
 
     // TODO: Update alias files. But how?
 
-    if (Array.isArray(slugsToFlush)) {
-      await Promise.all(slugsToFlush.map(async (slug) => {
+    if (Array.isArray(canonicalSlugsToFlush)) {
+      await Promise.all(canonicalSlugsToFlush.map(async (slug) => {
         const filename = DatabaseIO.getFilenameForNoteSlug(slug);
         if (!graph.notes.has(slug)) {
           await this.#storageProvider.removeObject(filename);
@@ -443,6 +450,34 @@ export default class DatabaseIO {
           await this.#storageProvider.writeObject(
             filename,
             serializeNote(note),
+          );
+        }
+      }
+    }
+
+
+    if (Array.isArray(aliasesToFlush)) {
+      await Promise.all(aliasesToFlush.map(async (alias) => {
+        const filename = DatabaseIO.getFilenameForNoteSlug(alias);
+        if (!graph.aliases.has(alias)) {
+          await this.#storageProvider.removeObject(filename);
+        } else {
+          const canonicalSlug = graph.aliases.get(alias) as Slug;
+          await this.#storageProvider.writeObject(
+            filename,
+            `:alias-of:${canonicalSlug}`,
+          );
+        }
+      }));
+    } else {
+      for (const [alias, canonicalSlug] of graph.aliases) {
+        const filename = DatabaseIO.getFilenameForNoteSlug(alias);
+        if (!graph.aliases.has(alias)) {
+          await this.#storageProvider.removeObject(filename);
+        } else {
+          await this.#storageProvider.writeObject(
+            filename,
+            `:alias-of:${canonicalSlug}`,
           );
         }
       }
