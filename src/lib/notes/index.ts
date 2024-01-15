@@ -5,21 +5,16 @@ import {
   createNoteListItems,
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
-  getExtensionFromFilename,
   parseSerializedNewNote,
   serializeNewNote,
   removeCustomMetadataWithEmptyKeys,
   getGraphLinks,
-  isValidSlug,
-  createSlug,
   getNoteTitle,
-  getRandomKey,
   changeSlugReferencesInNote,
   sluggify,
   getSlugsFromInlineText,
   getAllInlineSpans,
   isFileSlug,
-  getSlugFromFilename,
   getGraphUpdateTimestamp,
   getGraphCreationTimestamp,
 } from "./noteUtils.js";
@@ -43,6 +38,8 @@ import { Slug } from "./types/Slug.js";
 import { Block } from "../subwaytext/types/Block.js";
 import serialize from "../subwaytext/serialize.js";
 import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
+import { getExtensionFromFilename, getRandomKey } from "./utils.js";
+import { createSlug, getSlugFromFilename, isValidSlug } from "./slugUtils.js";
 
 
 export default class NotesProvider {

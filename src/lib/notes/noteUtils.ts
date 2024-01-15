@@ -12,7 +12,6 @@ import subwaytext from "../subwaytext/index.js";
 import {
   Block,
   BlockType,
-  InlineText,
   Span,
 } from "../subwaytext/types/Block.js";
 import {
@@ -28,11 +27,9 @@ import LinkCount from "./types/LinkCount.js";
 import NotePreview from "./types/NotePreview.js";
 import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
-import { FILE_SLUG_PREFIX } from "./config.js";
+import { getMediaTypeFromFilename, shortenText } from "./utils.js";
+import { getSlugsFromInlineText, isFileSlug, sluggify } from "./slugUtils.js";
 
-const isFileSlug = (slug: Slug): boolean => {
-  return slug.startsWith(FILE_SLUG_PREFIX);
-};
 
 type NoteHeaders = Map<CanonicalNoteHeader | string, string>;
 type MetaModifier = (meta: Partial<ExistingNoteMetadata>, val: string) => void;
@@ -241,87 +238,6 @@ const removeCustomMetadataWithEmptyKeys = (
 };
 
 
-const getExtensionFromFilename = (filename: string): string | null => {
-  const posOfDot = filename.lastIndexOf(".");
-  if (posOfDot === -1) {
-    return null;
-  }
-
-  const extension = filename.substring(posOfDot + 1).toLowerCase();
-  if (extension.length === 0) {
-    return null;
-  }
-
-  return extension;
-};
-
-
-const removeExtensionFromFilename = (filename: string): string => {
-  const posOfDot = filename.lastIndexOf(".");
-  if (posOfDot === -1) {
-    return filename;
-  }
-
-  return filename.substring(0, posOfDot);
-};
-
-
-const getMediaTypeFromFilename = (
-  filename: string,
-): MediaType => {
-  const map = new Map<string, MediaType>(Object.entries({
-    "png": MediaType.IMAGE,
-    "jpg": MediaType.IMAGE,
-    "jpeg": MediaType.IMAGE,
-    "webp": MediaType.IMAGE,
-    "gif": MediaType.IMAGE,
-    "svg": MediaType.IMAGE,
-
-    "pdf": MediaType.PDF,
-
-    "wav": MediaType.AUDIO,
-    "mp3": MediaType.AUDIO,
-    "ogg": MediaType.AUDIO,
-    "flac": MediaType.AUDIO,
-
-    "mp4": MediaType.VIDEO,
-    "webm": MediaType.VIDEO,
-
-    "html": MediaType.TEXT,
-    "css": MediaType.TEXT,
-    "js": MediaType.TEXT,
-    "json": MediaType.TEXT,
-    "c": MediaType.TEXT,
-    "cpp": MediaType.TEXT,
-    "rs": MediaType.TEXT,
-    "txt": MediaType.TEXT,
-    "md": MediaType.TEXT,
-    "xq": MediaType.TEXT,
-    "xql": MediaType.TEXT,
-    "xqm": MediaType.TEXT,
-    "opml": MediaType.TEXT,
-  }));
-
-  const extension = getExtensionFromFilename(filename);
-  if (!extension) {
-    return MediaType.TEXT;
-  }
-
-  return map.has(extension)
-    ? map.get(extension) as MediaType
-    : MediaType.OTHER;
-};
-
-
-const shortenText = (text: string, maxLength: number): string => {
-  if (text.length > maxLength) {
-    return text.trim().substring(0, maxLength) + "…";
-  } else {
-    return text;
-  }
-};
-
-
 const removeWikilinkPunctuation = (text: string): string => {
   return text.replace(/(\[\[)|(]])/g, "");
 };
@@ -483,75 +399,6 @@ const getAllInlineSpans = (blocks: Block[]): Span[] => {
     }
   });
   return spans;
-};
-
-
-const trimSlug = (slug: string): string => {
-  return slug.replace(/^-+/, "").replace(/-+$/, "");
-};
-
-
-/*
-  Turns note text into a slug, without truncating.
-  For example, it can be used to obtain a slug from a Wikilink.
-  We will replace slashes and dots with dashes, as we do not allow
-  these chars in note slugs (even though they are generally allowed
-  in slugs).
-*/
-const sluggify = (text: string): string => {
-  const slug = text
-    // Trim leading/trailing whitespace
-    .trim()
-    // remove invalid chars
-    .replace(/['’]+/g, "")
-    // Replace invalid chars with dashes.
-    .replace(/[^\p{L}\d\-_]+/gu, "-")
-    // Replace runs of one or more dashes with a single dash
-    .replace(/-+/g, "-")
-    .toLowerCase();
-
-  return trimSlug(slug);
-};
-
-
-/*
-  Transforms note text like into a slug and truncates it.
-  We will replace slashes and dots with dashes, as these are not allowed for
-  note slugs (only allowed for general slugs). We do not want
-  to have these chars when creating a simple slug for a normal note.
-*/
-const sluggifyNoteText = (text: string): string => {
-  return sluggify(text)
-    // Truncate to avoid file name length limit issues.
-    // Windows systems can handle up to 255, but we truncate at 200 to leave
-    // a bit of room for things like version numbers.
-    .substring(0, 200);
-};
-
-
-const isValidSlug = (slug: Slug): boolean => {
-  return (
-    typeof slug === "string"
-    && slug.length > 0
-    && slug.length <= 200
-    && slug.match(/^[\p{L}\d_][\p{L}\d\-/._]*$/u) !== null
-  );
-};
-
-
-const getSlugsFromInlineText = (text: InlineText): Slug[] => {
-  return text.filter(
-    (span: Span): boolean => {
-      return span.type === SpanType.SLASHLINK
-        || span.type === SpanType.WIKILINK;
-    },
-  ).map((span: Span): Slug => {
-    if (span.type === SpanType.SLASHLINK) {
-      return span.text.substring(1);
-    } else {
-      return sluggify(span.text.substring(2, span.text.length - 2));
-    }
-  });
 };
 
 
@@ -911,305 +758,6 @@ const getNumberOfComponents = (
 };
 
 
-// this returns all notes that contain a url that is used in another note too
-const getNotesWithDuplicateUrls = (notes: ExistingNote[]): ExistingNote[] => {
-  const urlIndex = new Map<string, Set<ExistingNote>>();
-
-  notes.forEach((note: ExistingNote): void => {
-    const urls = getURLsOfNote(note.content);
-
-    urls.forEach((url) => {
-      if (urlIndex.has(url)) {
-        (urlIndex.get(url) as Set<ExistingNote>).add(note);
-      } else {
-        urlIndex.set(url, new Set([note]));
-      }
-    });
-  });
-
-  const duplicates: Set<ExistingNote> = new Set();
-
-  for (const notesWithUrl of urlIndex.values()) {
-    if (notesWithUrl.size > 1) {
-      notesWithUrl.forEach((note) => {
-        duplicates.add(note);
-      });
-    }
-  }
-
-  return Array.from(duplicates);
-};
-
-
-const getNotesWithDuplicateTitles = (notes: ExistingNote[]): ExistingNote[] => {
-  const titleIndex = new Map<string, Set<ExistingNote>>();
-
-  notes.forEach((note: ExistingNote): void => {
-    const noteTitle = getNoteTitle(note);
-
-    if (titleIndex.has(noteTitle)) {
-      (titleIndex.get(noteTitle) as Set<ExistingNote>).add(note);
-    } else {
-      titleIndex.set(noteTitle, new Set([note]));
-    }
-  });
-
-  const duplicates: Set<ExistingNote> = new Set();
-
-  for (const notesWithOneTitle of titleIndex.values()) {
-    if (notesWithOneTitle.size > 1) {
-      notesWithOneTitle.forEach((note) => {
-        duplicates.add(note);
-      });
-    }
-  }
-
-  return Array.from(duplicates);
-};
-
-
-const getNotesByTitle = (
-  notes: ExistingNote[],
-  query: string,
-  caseSensitive: boolean,
-): ExistingNote[] => {
-  return notes.filter((note: ExistingNote) => {
-    const title = getNoteTitle(note);
-
-    return caseSensitive
-      ? title === query
-      : title.toLowerCase() === query.toLowerCase();
-  });
-};
-
-
-const getNotesWithUrl = (
-  notes: ExistingNote[],
-  url: string,
-): ExistingNote[] => {
-  return notes.filter((note: ExistingNote) => {
-    return note.content.includes(url)
-      // there should be no char after url string or it should be a
-      // whitespace char
-      && !(note.content[note.content.indexOf(url) + url.length]?.trim());
-  });
-};
-
-
-const getNotesWithKeyValue = (
-  notes: ExistingNote[],
-  key: string,
-  value: string,
-) => {
-  return notes.filter((note: ExistingNote) => {
-    return (
-      key in note.meta.custom
-      && (
-        value.length === 0
-        || note.meta.custom[key].includes(value)
-      )
-    );
-  });
-};
-
-
-const getNotesWithCustomMetadata = (
-  notes: ExistingNote[],
-) => {
-  return notes.filter((note: ExistingNote) => {
-    return Object.entries(note.meta.custom).length > 0;
-  });
-};
-
-
-const getNotesWithFile = (
-  notes: ExistingNote[],
-  graph: Graph,
-  fileSlug: Slug,
-): ExistingNote[] => {
-  return notes.filter((note: ExistingNote) => {
-    const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
-    return fileSlugs.includes(fileSlug);
-  });
-};
-
-
-const getNotesWithFlag = (
-  notes: ExistingNote[],
-  flag: string,
-): ExistingNote[] => {
-  return notes.filter((note: ExistingNote) => {
-    return note.meta.flags.includes(flag);
-  });
-};
-
-
-const getNotesWithTitleContainingToken = (
-  notes: ExistingNote[],
-  token: string,
-  caseSensitive: boolean,
-): ExistingNote[] => {
-  return notes.filter((note: ExistingNote) => {
-    if (token.length === 0) {
-      return true;
-    }
-
-    if (caseSensitive) {
-      return getNoteTitle(note).includes(token);
-    } else {
-      return getNoteTitle(note).toLowerCase().includes(token.toLowerCase());
-    }
-  });
-};
-
-
-const getNotesWithTitleOrSlugContainingToken = (
-  notes: ExistingNote[],
-  token: string,
-  caseSensitive: boolean,
-): ExistingNote[] => {
-  return notes.filter((note: ExistingNote) => {
-    if (token.length === 0) {
-      return true;
-    }
-
-    if (caseSensitive) {
-      return getNoteTitle(note).includes(token)
-       || note.meta.slug.includes(token);
-    } else {
-      return getNoteTitle(note).toLowerCase().includes(token.toLowerCase())
-        || note.meta.slug.toLowerCase().includes(token.toLowerCase());
-    }
-  });
-};
-
-
-const createSlug = (
-  noteContent: string,
-  existingSlugs: Slug[],
-): Slug => {
-  const title = inferNoteTitle(noteContent);
-  let slugStem = sluggifyNoteText(title);
-
-  let n = 1;
-
-  if (!slugStem) {
-    slugStem = "new";
-  }
-
-  while (true) {
-    // We don't want to use just "new" as a slug, because that would conflict
-    // with the "new" keyword in the URL schema. So let's use "new-1" instead.
-    // If that's taken, we'll try "new-2", etc.
-    // With other slugs, we only want to append a number if there's a conflict,
-    // starting with "2".
-    const showIntegerSuffix = slugStem === "new" || n > 1;
-    const slug = showIntegerSuffix ? `${slugStem}-${n}` : slugStem;
-    if (!existingSlugs.includes(slug)) {
-      return slug;
-    }
-    n++;
-  }
-};
-
-
-const getNotesThatContainTokens = (
-  notes: ExistingNote[],
-  query: string,
-  caseSensitive: boolean,
-): ExistingNote[] => {
-  const queryTokens = query.split(" ");
-
-  return notes
-    .filter((note: ExistingNote) => {
-      const noteContent = note.content;
-
-      // the note text must include every query token to be a positive
-      return queryTokens.every((queryToken) => {
-        return caseSensitive
-          ? noteContent.includes(queryToken)
-          : noteContent.toLowerCase().includes(queryToken.toLowerCase());
-      });
-    });
-};
-
-
-const getNotesWithBlocksOfTypes = (
-  notes: ExistingNote[],
-  graph: Graph,
-  types: BlockType[],
-  notesMustContainAllBlockTypes: boolean,
-): ExistingNote[] => {
-  return notesMustContainAllBlockTypes
-    ? notes
-      // every single note must contain blocks from all the types
-      .filter((note: ExistingNote): boolean => {
-        return types.every((type) => {
-          return getBlocks(note, graph.indexes.blocks)
-            .some((block) => block.type === type);
-        });
-      })
-    // every note must contain one block with only one type of types:
-    : notes
-      .filter((note: ExistingNote): boolean => {
-        return getBlocks(note, graph.indexes.blocks)
-          .some((block) => types.includes(block.type));
-      });
-};
-
-const setsAreEqual = <T>(a: Set<T>, b: Set<T>) => {
-  return a.size === b.size
-    && [...a].every((x) => b.has(x));
-};
-
-const getNotesWithMediaTypes = (
-  notes: ExistingNote[],
-  graph: Graph,
-  requiredMediaTypes: Set<MediaType>,
-  everyNoteMustContainAllMediaTypes: boolean,
-): ExistingNote[] => {
-  return everyNoteMustContainAllMediaTypes
-    ? notes
-      // every single note must contain blocks from all the types
-      .filter((note: ExistingNote): boolean => {
-        const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
-        const includedMediaTypes = new Set(
-          fileSlugs
-            .map((fileSlug) => getMediaTypeFromFilename(fileSlug)),
-        );
-
-        return setsAreEqual(requiredMediaTypes, includedMediaTypes);
-      })
-    // every note must contain at least one of requiredMediaTypes:
-    : notes
-      .filter((note: ExistingNote): boolean => {
-        const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
-        const includedMediaTypes = new Set(
-          fileSlugs
-            .map((fileSlug) => getMediaTypeFromFilename(fileSlug)),
-        );
-
-        return Array.from(requiredMediaTypes)
-          .some((requiredMediaType: MediaType): boolean => {
-            return includedMediaTypes.has(requiredMediaType);
-          });
-      });
-};
-
-
-// returns random key from Set or Map
-const getRandomKey = <K>(collection: Map<K, unknown>): K | null => {
-  const index = Math.floor(Math.random() * collection.size);
-  let cntr = 0;
-  for (const key of collection.keys()) {
-    if (cntr++ === index) {
-      return key;
-    }
-  }
-  return null;
-};
-
-
 const changeSlugReferencesInNote = (
   content: Block[],
   oldSlug: Slug,
@@ -1230,58 +778,6 @@ const changeSlugReferencesInNote = (
     }
     return span;
   });
-};
-
-
-const getSlugFromFilename = (
-  filename: string,
-  existingFiles: FileInfo[],
-): Slug => {
-  const existingFileSlugs = existingFiles.map((file) => file.slug);
-  const extension = getExtensionFromFilename(filename);
-  const filenameWithoutExtension = removeExtensionFromFilename(filename);
-  const sluggifiedFileStem = sluggify(filenameWithoutExtension);
-
-  let n = 1;
-
-  while (true) {
-    // We don't want to use just "new" as a slug, because that would conflict
-    // with the "new" keyword in the URL schema. So let's use "new-1" instead.
-    // If that's taken, we'll try "new-2", etc.
-    // With other slugs, we only want to append a number if there's a conflict,
-    // starting with "2".
-    const showIntegerSuffix = n > 1;
-    const stemWithOptionalIntegerSuffix = showIntegerSuffix
-      ? `${sluggifiedFileStem}-${n}`
-      : sluggifiedFileStem;
-
-    const slug: Slug = FILE_SLUG_PREFIX
-      + stemWithOptionalIntegerSuffix
-      + (
-        extension
-          ? (
-            stemWithOptionalIntegerSuffix
-              ? "."
-              : ""
-          ) + extension.trim().toLowerCase()
-          : ""
-      );
-
-    if (!existingFileSlugs.includes(slug)) {
-      return slug;
-    }
-    n++;
-  }
-};
-
-
-const getFilenameFromFileSlug = (
-  fileSlug: Slug,
-) => {
-  if (!isFileSlug(fileSlug)) {
-    throw new Error("Not a file slug: " + fileSlug);
-  }
-  return fileSlug.substring(FILE_SLUG_PREFIX.length);
 };
 
 
@@ -1310,7 +806,6 @@ const getGraphUpdateTimestamp = (graph: Graph): number => {
 
 
 export {
-  getExtensionFromFilename,
   getMediaTypeFromFilename,
   inferNoteTitle,
   getNumberOfLinkedNotes,
@@ -1323,43 +818,25 @@ export {
   createNoteListItems,
   getNumberOfComponents,
   getNumberOfUnlinkedNotes,
-  getNotesWithDuplicateUrls,
-  getNotesWithDuplicateTitles,
-  getNotesByTitle,
-  getNotesWithUrl,
-  getNotesWithFile,
-  getNotesWithTitleContainingToken,
-  getNotesWithTitleOrSlugContainingToken,
-  getNotesThatContainTokens,
-  getNotesWithBlocksOfTypes,
-  getNotesWithMediaTypes,
-  getNotesWithKeyValue,
   parseNoteHeaders,
   serializeNoteHeaders,
   parseSerializedExistingNote,
   parseSerializedNewNote,
   serializeNote,
   serializeNewNote,
-  getNotesWithCustomMetadata,
   removeCustomMetadataWithEmptyKeys,
-  getNotesWithFlag,
   getBacklinks,
   getGraphLinks,
   sluggify,
-  sluggifyNoteText,
-  isValidSlug,
-  createSlug,
   getNoteTitle,
-  getRandomKey,
   removeWikilinkPunctuation,
   getAllInlineSpans,
   getSlugsFromInlineText,
   changeSlugReferencesInNote,
-  removeExtensionFromFilename,
   isFileSlug,
   mapInlineSpans,
-  getSlugFromFilename,
-  getFilenameFromFileSlug,
   getGraphCreationTimestamp,
   getGraphUpdateTimestamp,
+  getBlocks,
+  getFileSlugsInNote,
 };
