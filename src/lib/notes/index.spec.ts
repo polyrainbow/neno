@@ -1557,4 +1557,49 @@ describe("Notes module", () => {
       expect(note2.backlinks[0].slug).toBe("z");
     },
   );
+
+  it(
+    "stats links should include links to aliases",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "x",
+        aliases: new Set(["y"]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "link to [[y]]",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "z",
+        aliases: new Set([]),
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+
+      const stats = await notesProvider.getStats({
+        includeAnalysis: false,
+        includeMetadata: false,
+      });
+
+      expect(stats.numberOfLinks).toBe(1);
+    },
+  );
 });

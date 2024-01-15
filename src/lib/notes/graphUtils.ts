@@ -125,18 +125,23 @@ const getGraphLinks = (graph: Graph): Link[] => {
             "Could not determine outgoing links for " + slug,
           );
         }
-        const targets = Array.from(
+        const linksFromThisSlug = Array.from(
           graph.indexes.outgoingLinks.get(slug) as Set<Slug>,
         )
           .filter((targetSlug: Slug): boolean => {
-            return graph.notes.has(targetSlug);
+            return graph.notes.has(targetSlug)
+              || graph.aliases.has(targetSlug);
+          })
+          .map((targetSlug: Slug): Link => {
+            const canonicalTargetSlug
+              = graph.aliases.get(targetSlug) ?? targetSlug;
+            return [slug, canonicalTargetSlug];
           });
 
-        targets.forEach((slugB) => {
-          links.push([slug, slugB]);
-        });
-
-        return links;
+        return [
+          ...links,
+          ...linksFromThisSlug,
+        ];
       },
       [] as Link[],
     );
