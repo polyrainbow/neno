@@ -5,7 +5,8 @@ import { FileInfo } from "./notes/types/FileInfo";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { getUrlForSlug } from "./LocalDataStorage";
 import { Slug } from "./notes/types/Slug";
-import { inferNoteTitle, sluggify } from "./notes/noteUtils";
+import { inferNoteTitle } from "./notes/noteUtils";
+import { sluggify } from "./notes/slugUtils";
 
 
 const shortenText = (text: string, maxLength: number): string => {

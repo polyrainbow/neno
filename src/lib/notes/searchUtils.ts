@@ -2,7 +2,6 @@ import { BlockType } from "../subwaytext/types/Block";
 import {
   getBlocks,
   getFileSlugsInNote,
-  getMediaTypeFromFilename,
   getNoteTitle,
   getURLsOfNote,
 } from "./noteUtils";
@@ -10,7 +9,7 @@ import ExistingNote from "./types/ExistingNote.js";
 import Graph from "./types/Graph.js";
 import { MediaType } from "./types/MediaType";
 import { Slug } from "./types/Slug.js";
-import { setsAreEqual } from "./utils";
+import { getMediaTypeFromFilename, setsAreEqual } from "./utils";
 
 // this returns all notes that contain a url that is used in another note too
 const getNotesWithDuplicateUrls = (notes: ExistingNote[]): ExistingNote[] => {

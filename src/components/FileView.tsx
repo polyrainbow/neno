@@ -20,9 +20,11 @@ import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
 import DialogActionBar from "./DialogActionBar";
 import {
-  getFilenameFromFileSlug,
   getMediaTypeFromFilename,
-} from "../lib/notes/noteUtils";
+} from "../lib/notes/utils";
+import {
+  getFilenameFromFileSlug,
+} from "../lib/notes/slugUtils";
 import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
 import { isInitialized } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";

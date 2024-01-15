@@ -4,7 +4,6 @@ import DatabaseQuery from "./types/DatabaseQuery.js";
 import { BlockType } from "../subwaytext/types/Block.js";
 import { MediaType } from "./types/MediaType.js";
 import {
-  getSortFunction,
   createNoteListItems,
 } from "./noteUtils.js";
 import {
@@ -26,6 +25,7 @@ import GraphObject from "./types/Graph.js";
 import { getPagedMatches } from "../utils.js";
 import * as config from "./config.js";
 import CharIterator from "../subwaytext/CharIterator.js";
+import { getSortFunction } from "./graphUtils.js";
 
 export const isWhiteSpace = (string: string): boolean => {
   return string.trim().length === 0;

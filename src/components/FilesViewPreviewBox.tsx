@@ -8,9 +8,11 @@ import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import { getAppPath, getIconSrc } from "../lib/utils";
 import {
-  getFilenameFromFileSlug,
   getMediaTypeFromFilename,
-} from "../lib/notes/noteUtils";
+} from "../lib/notes/utils";
+import {
+  getFilenameFromFileSlug,
+} from "../lib/notes/slugUtils";
 import { getUrlForSlug } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 

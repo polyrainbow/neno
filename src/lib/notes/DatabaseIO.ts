@@ -12,9 +12,7 @@ import Graph, { GraphMetadata } from "./types/Graph.js";
 import { ErrorMessage } from "./types/ErrorMessage.js";
 import StorageProvider from "./types/StorageProvider.js";
 import {
-  getAllInlineSpans,
-  getSlugsFromInlineText,
-  isFileSlug,
+  getSlugsFromParsedNote,
   parseSerializedExistingNote,
   serializeNote,
 } from "./noteUtils.js";
@@ -29,6 +27,7 @@ import { FILE_SLUG_PREFIX } from "./config.js";
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import { GraphMetadataV3, migrateToV4 } from "./migrations/v4.js";
 import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
+import { isFileSlug } from "./slugUtils.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -61,14 +60,12 @@ export default class DatabaseIO {
     });
   }
 
-
   private async getNoteFilenamesFromGraphDirectory(): Promise<string[]> {
     return (await this.#storageProvider.listDirectory())
       .filter((entry: string): boolean => {
         return entry.endsWith(DatabaseIO.#NOTE_FILE_EXTENSION);
       });
   }
-
 
   private async parseGraph(
     serializedNotesAndAliases: Map<Slug, string>,
@@ -186,14 +183,6 @@ export default class DatabaseIO {
   }
 
 
-  // getSlugsFromParsedNote returns all slugs that are referenced in the note.
-  static getSlugsFromParsedNote(note: Block[]): Slug[] {
-    const inlineSpans = getAllInlineSpans(note);
-    const slugs = getSlugsFromInlineText(inlineSpans);
-    return slugs;
-  }
-
-
   /*
     The outgoing link index contains all links that are referenced in a note,
     no matter if the link target exists or not.
@@ -204,7 +193,7 @@ export default class DatabaseIO {
     const outgoingLinkIndex = new Map<Slug, Set<Slug>>();
 
     for (const [slug, blocks] of blockIndex) {
-      const outgoingLinks = DatabaseIO.getSlugsFromParsedNote(blocks)
+      const outgoingLinks = getSlugsFromParsedNote(blocks)
         .filter((link: Slug): boolean => {
           return !link.startsWith(FILE_SLUG_PREFIX);
         });

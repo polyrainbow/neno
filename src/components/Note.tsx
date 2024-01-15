@@ -29,10 +29,14 @@ import { PathTemplate } from "../types/PathTemplate";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import {
   getMediaTypeFromFilename,
+} from "../lib/notes/utils";
+import {
   getNoteTitle,
+} from "../lib/notes/noteUtils";
+import {
   isFileSlug,
   sluggify,
-} from "../lib/notes/noteUtils";
+} from "../lib/notes/slugUtils";
 import { MediaType } from "../lib/notes/types/MediaType";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
 import NoteContentBlockVideo from "./NoteContentBlockVideo";

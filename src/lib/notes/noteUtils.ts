@@ -1,9 +1,7 @@
 import Graph from "./types/Graph.js";
-import { Link } from "./types/Link.js";
 import ExistingNote from "./types/ExistingNote.js";
 import NoteListItem from "./types/NoteListItem.js";
 import NoteListItemFeatures from "./types/NoteListItemFeatures.js";
-import { NoteListSortMode } from "./types/NoteListSortMode.js";
 import NoteToTransmit from "./types/NoteToTransmit.js";
 import { MediaType } from "./types/MediaType.js";
 import { NoteContent } from "./types/NoteContent.js";
@@ -28,8 +26,24 @@ import NotePreview from "./types/NotePreview.js";
 import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
 import { getMediaTypeFromFilename, shortenText } from "./utils.js";
-import { getSlugsFromInlineText, isFileSlug, sluggify } from "./slugUtils.js";
-
+import {
+  createSlug,
+  getSlugsFromInlineText,
+  isFileSlug,
+  isValidSlug,
+  sluggify,
+} from "./slugUtils.js";
+import { ErrorMessage } from "./types/ErrorMessage.js";
+import {
+  ExistingNoteSaveRequest,
+  NewNoteSaveRequest,
+  NoteSaveRequest,
+} from "./types/NoteSaveRequest.js";
+import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
+import serialize from "../subwaytext/serialize.js";
+import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
+import DatabaseIO from "./DatabaseIO.js";
+import GraphObject from "./types/Graph.js";
 
 type NoteHeaders = Map<CanonicalNoteHeader | string, string>;
 type MetaModifier = (meta: Partial<ExistingNoteMetadata>, val: string) => void;
@@ -572,78 +586,6 @@ const createNoteListItems = (
 };
 
 
-const getSortKeyForTitle = (title: string): string => {
-  return title
-    .toLowerCase()
-    .replace(/(["'.“”„‘’—\-»#*[\]/])/g, "")
-    .trim();
-};
-
-
-const getSortFunction = (
-  sortMode: NoteListSortMode,
-):((a: NoteListItem, b: NoteListItem) => number) => {
-  const sortFunctions = {
-    [NoteListSortMode.CREATION_DATE_ASCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return (a.createdAt ?? 0) - (b.createdAt ?? 0);
-      },
-    [NoteListSortMode.CREATION_DATE_DESCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return (b.createdAt ?? 0) - (a.createdAt ?? 0);
-      },
-    [NoteListSortMode.UPDATE_DATE_ASCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return (a.updatedAt ?? 0) - (b.updatedAt ?? 0);
-      },
-    [NoteListSortMode.UPDATE_DATE_DESCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0);
-      },
-    [NoteListSortMode.TITLE_ASCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        const aNormalized = getSortKeyForTitle(a.title);
-        const bNormalized = getSortKeyForTitle(b.title);
-
-        return aNormalized.localeCompare(bNormalized);
-      },
-    [NoteListSortMode.TITLE_DESCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        const aNormalized = getSortKeyForTitle(a.title);
-        const bNormalized = getSortKeyForTitle(b.title);
-
-        return bNormalized.localeCompare(aNormalized);
-      },
-    [NoteListSortMode.NUMBER_OF_LINKS_ASCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return a.linkCount.sum - b.linkCount.sum;
-      },
-    [NoteListSortMode.NUMBER_OF_LINKS_DESCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return b.linkCount.sum - a.linkCount.sum;
-      },
-    [NoteListSortMode.NUMBER_OF_FILES_ASCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return a.numberOfFiles - b.numberOfFiles;
-      },
-    [NoteListSortMode.NUMBER_OF_FILES_DESCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return b.numberOfFiles - a.numberOfFiles;
-      },
-    [NoteListSortMode.NUMBER_OF_CHARACTERS_ASCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return a.numberOfCharacters - b.numberOfCharacters;
-      },
-    [NoteListSortMode.NUMBER_OF_CHARACTERS_DESCENDING]:
-      (a: NoteListItem, b: NoteListItem) => {
-        return b.numberOfCharacters - a.numberOfCharacters;
-      },
-  };
-
-  return sortFunctions[sortMode] ?? sortFunctions.UPDATE_DATE_ASCENDING;
-};
-
-
 const getURLsOfNote = (noteContent: NoteContent): string[] => {
   /*
     We use a simple regex for this as we don't want to implement a full
@@ -659,102 +601,6 @@ const getURLsOfNote = (noteContent: NoteContent): string[] => {
   // eslint-disable-next-line max-len
   const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=,]*)/g;
   return [...noteContent.matchAll(regex)].map((match) => match[0]);
-};
-
-
-// https://en.wikipedia.org/wiki/Breadth-first_search
-const breadthFirstSearch = (
-  nodes: ExistingNote[],
-  links: Link[],
-  root: ExistingNote,
-): ExistingNote[] => {
-  const queue: ExistingNote[] = [];
-  const discovered: ExistingNote[] = [];
-  discovered.push(root);
-  queue.push(root);
-
-  while (queue.length > 0) {
-    const v = queue.shift() as ExistingNote;
-    const connectedNodes = links
-      .filter((link: Link): boolean => {
-        return (link[0] === v.meta.slug) || (link[1] === v.meta.slug);
-      })
-      .map((link: Link): ExistingNote | undefined => {
-        const linkedNoteId = (link[0] === v.meta.slug) ? link[1] : link[0];
-        return nodes.find(
-          (n) => (n.meta.slug === linkedNoteId),
-        );
-      })
-      .filter((n): n is ExistingNote => {
-        return n !== undefined;
-      });
-    for (let i = 0; i < connectedNodes.length; i++) {
-      const w = connectedNodes[i];
-      if (!discovered.includes(w)) {
-        discovered.push(w);
-        queue.push(w);
-      }
-    }
-  }
-
-  return discovered;
-};
-
-
-const getGraphLinks = (graph: Graph): Link[] => {
-  return Array.from(graph.notes.keys())
-    .reduce(
-      (links: Link[], slug: Slug): Link[] => {
-        if (!graph.indexes.outgoingLinks.has(slug)) {
-          throw new Error(
-            "Could not determine outgoing links for " + slug,
-          );
-        }
-        const targets = Array.from(
-          graph.indexes.outgoingLinks.get(slug) as Set<Slug>,
-        )
-          .filter((targetSlug: Slug): boolean => {
-            return graph.notes.has(targetSlug);
-          });
-
-        targets.forEach((slugB) => {
-          links.push([slug, slugB]);
-        });
-
-        return links;
-      },
-      [] as Link[],
-    );
-};
-
-
-// https://en.wikipedia.org/wiki/Component_(graph_theory)#Algorithms
-const getNumberOfComponents = (
-  graph: Graph,
-): number => {
-  const nodes = Array.from(graph.notes.values());
-  const links = getGraphLinks(graph);
-  let totallyDiscovered: ExistingNote[] = [];
-  let numberOfComponents = 0;
-
-  let i = 0;
-
-  while (totallyDiscovered.length < nodes.length) {
-    let root = nodes[i];
-    while (totallyDiscovered.includes(root)) {
-      i++;
-      root = nodes[i];
-    }
-    const inComponent = breadthFirstSearch(nodes, links, root);
-    totallyDiscovered = [
-      ...totallyDiscovered,
-      ...inComponent,
-    ] as ExistingNote[];
-    numberOfComponents++;
-    i++;
-  }
-
-  return numberOfComponents;
 };
 
 
@@ -781,42 +627,262 @@ const changeSlugReferencesInNote = (
 };
 
 
-const getGraphCreationTimestamp = (graph: Graph): number => {
-  return Math.min(
-    ...Array.from(graph.notes.values())
-      .map((note: ExistingNote) => note.meta.createdAt)
-      .filter((createdAt: number | undefined): createdAt is number => {
-        return createdAt !== undefined;
-      }),
-    graph.metadata.createdAt,
-  );
+// getSlugsFromParsedNote returns all slugs that are referenced in the note.
+const getSlugsFromParsedNote = (note: Block[]): Slug[] => {
+  const inlineSpans = getAllInlineSpans(note);
+  const slugs = getSlugsFromInlineText(inlineSpans);
+  return slugs;
 };
 
 
-const getGraphUpdateTimestamp = (graph: Graph): number => {
-  return Math.max(
-    ...Array.from(graph.notes.values())
-      .map((note: ExistingNote) => note.meta.updatedAt)
-      .filter((updatedAt: number | undefined): updatedAt is number => {
-        return updatedAt !== undefined;
-      }),
-    graph.metadata.updatedAt,
+const handleExistingNoteUpdate = async (
+  noteSaveRequest: ExistingNoteSaveRequest,
+  io: DatabaseIO,
+): Promise<NoteToTransmit> => {
+  const graph: GraphObject = await io.getGraph();
+  const noteFromUser = noteSaveRequest.note;
+  const existingNote = graph.notes.get(noteFromUser.meta.slug) || null;
+
+  if (existingNote === null) {
+    throw new Error(ErrorMessage.NOTE_NOT_FOUND);
+  }
+
+  existingNote.content = noteFromUser.content;
+  existingNote.meta.updatedAt = Date.now();
+  existingNote.meta.flags = noteFromUser.meta.flags;
+  existingNote.meta.contentType = noteFromUser.meta.contentType;
+  existingNote.meta.custom = removeCustomMetadataWithEmptyKeys(
+    noteFromUser.meta.custom,
   );
+
+  const aliasesToUpdate: Slug[] = [];
+
+  for (const [alias, canonicalSlug] of graph.aliases.entries()) {
+    if (canonicalSlug === existingNote.meta.slug) {
+      graph.aliases.delete(alias);
+      aliasesToUpdate.push(alias);
+    }
+  }
+
+  noteSaveRequest.aliases.forEach((alias) => {
+    if (!(isValidSlug(alias) && alias.length > 0)) {
+      throw new Error(ErrorMessage.INVALID_ALIAS);
+    }
+    if (alias === existingNote.meta.slug) {
+      throw new Error(ErrorMessage.ALIAS_EXISTS);
+    }
+    if (
+      graph.aliases.has(alias)
+      && graph.aliases.get(alias) !== existingNote.meta.slug
+    ) {
+      throw new Error(ErrorMessage.ALIAS_EXISTS);
+    }
+    if (graph.notes.has(alias)) {
+      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+    }
+    graph.aliases.set(alias, existingNote.meta.slug);
+    aliasesToUpdate.push(alias);
+  });
+
+  if (
+    "changeSlugTo" in noteSaveRequest
+    && typeof noteSaveRequest.changeSlugTo === "string"
+  ) {
+    if (!isValidSlug(noteSaveRequest.changeSlugTo)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+    if (graph.notes.has(noteSaveRequest.changeSlugTo)) {
+      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+    }
+    if (graph.aliases.has(noteSaveRequest.changeSlugTo)) {
+      throw new Error(ErrorMessage.ALIAS_EXISTS);
+    }
+    const oldSlug = existingNote.meta.slug;
+    const newSlug = noteSaveRequest.changeSlugTo;
+
+    const notesReferencingOurNoteBeforeChange
+      = Array.from((graph.indexes.backlinks.get(oldSlug) as Set<Slug>))
+        .map((slug) => {
+          return graph.notes.get(slug) as ExistingNote;
+        });
+
+    graph.notes.delete(oldSlug);
+    removeSlugFromIndexes(graph, oldSlug);
+
+    let flushMetadata = WriteGraphMetadataAction.NONE;
+
+    for (let i = 0; i < graph.metadata.pinnedNotes.length; i++) {
+      if (graph.metadata.pinnedNotes[i] === oldSlug) {
+        graph.metadata.pinnedNotes[i] = newSlug;
+        flushMetadata = WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE;
+      }
+    }
+
+    const aliasesToUpdate: Slug[] = [];
+    for (const [alias, canonicalSlug] of graph.aliases.entries()) {
+      if (canonicalSlug === oldSlug) {
+        graph.aliases.delete(alias);
+        graph.aliases.set(alias, newSlug);
+        aliasesToUpdate.push(alias);
+      }
+    }
+
+    await io.flushChanges(
+      graph, flushMetadata, [oldSlug], aliasesToUpdate,
+    );
+
+    existingNote.meta.slug = newSlug;
+    graph.notes.set(newSlug, existingNote);
+
+    if (
+      "updateReferences" in noteSaveRequest
+      && noteSaveRequest.updateReferences
+    ) {
+      updateIndexes(graph, existingNote);
+      for (const thatNote of notesReferencingOurNoteBeforeChange) {
+        const blocks = graph.indexes.blocks.get(
+          thatNote.meta.slug,
+        ) as Block[];
+
+        const noteTitle = getNoteTitle(existingNote);
+        const newSluggifiableTitle = sluggify(noteTitle) === newSlug
+          ? noteTitle
+          : newSlug;
+
+        const newBlocks = changeSlugReferencesInNote(
+          blocks,
+          oldSlug,
+          newSlug,
+          newSluggifiableTitle,
+        );
+
+        thatNote.content = serialize(newBlocks);
+        graph.indexes.blocks.set(thatNote.meta.slug, newBlocks);
+        updateIndexes(graph, thatNote);
+        await io.flushChanges(
+          graph,
+          WriteGraphMetadataAction.NONE,
+          [thatNote.meta.slug],
+          [],
+        );
+      }
+    }
+  } else {
+    graph.notes.set(existingNote.meta.slug, existingNote);
+  }
+
+  updateIndexes(graph, existingNote);
+  await io.flushChanges(
+    graph,
+    WriteGraphMetadataAction.NONE,
+    [existingNote.meta.slug],
+    aliasesToUpdate,
+  );
+
+  const noteToTransmit: NoteToTransmit
+    = await createNoteToTransmit(existingNote, graph);
+  return noteToTransmit;
+};
+
+
+const isExistingNoteSaveRequest = (
+  noteSaveRequest: NoteSaveRequest,
+): noteSaveRequest is ExistingNoteSaveRequest => {
+  return "slug" in noteSaveRequest.note.meta;
+};
+
+
+const handleNewNoteSaveRequest = async (
+  noteSaveRequest: NewNoteSaveRequest,
+  io: DatabaseIO,
+): Promise<NoteToTransmit> => {
+  const graph: GraphObject = await io.getGraph();
+  const noteFromUser = noteSaveRequest.note;
+  const existingSlugs = [
+    ...Array.from(graph.notes.keys()),
+    ...Array.from(graph.aliases.keys()),
+  ];
+  let slug: Slug;
+
+  if (
+    "changeSlugTo" in noteSaveRequest
+    && typeof noteSaveRequest.changeSlugTo === "string"
+  ) {
+    if (!isValidSlug(noteSaveRequest.changeSlugTo)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+    if (
+      graph.notes.has(noteSaveRequest.changeSlugTo)
+      || graph.aliases.has(noteSaveRequest.changeSlugTo)
+    ) {
+      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+    }
+
+    slug = noteSaveRequest.changeSlugTo;
+  } else {
+    slug = createSlug(
+      noteFromUser.content,
+      existingSlugs,
+    );
+  }
+
+  const aliasesToUpdate: Slug[] = [];
+  noteSaveRequest.aliases.forEach((alias) => {
+    if (!(isValidSlug(alias) && alias.length > 0)) {
+      throw new Error(ErrorMessage.INVALID_ALIAS);
+    }
+    if (
+      graph.aliases.has(alias)
+      && graph.aliases.get(alias) !== slug
+    ) {
+      throw new Error(ErrorMessage.ALIAS_EXISTS);
+    }
+    if (graph.notes.has(alias)) {
+      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+    }
+    graph.aliases.set(alias, slug);
+    aliasesToUpdate.push(alias);
+  });
+
+  // the new note becomes an existing note, that's why the funny typing here
+  const newNote: ExistingNote = {
+    meta: {
+      slug,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      custom: removeCustomMetadataWithEmptyKeys(
+        noteFromUser.meta.custom,
+      ),
+      flags: noteFromUser.meta.flags,
+      contentType: noteFromUser.meta.contentType,
+    },
+    content: noteFromUser.content,
+  };
+
+  graph.notes.set(slug, newNote);
+  updateIndexes(graph, newNote);
+  await io.flushChanges(
+    graph,
+    WriteGraphMetadataAction.NONE,
+    [newNote.meta.slug],
+    aliasesToUpdate,
+  );
+
+  const noteToTransmit: NoteToTransmit
+    = await createNoteToTransmit(newNote, graph);
+  return noteToTransmit;
 };
 
 
 export {
-  getMediaTypeFromFilename,
   inferNoteTitle,
   getNumberOfLinkedNotes,
   createNoteToTransmit,
   getNoteFeatures,
-  getSortFunction,
   getNumberOfCharacters,
   getURLsOfNote,
   createNoteListItem,
   createNoteListItems,
-  getNumberOfComponents,
   getNumberOfUnlinkedNotes,
   parseNoteHeaders,
   serializeNoteHeaders,
@@ -826,17 +892,16 @@ export {
   serializeNewNote,
   removeCustomMetadataWithEmptyKeys,
   getBacklinks,
-  getGraphLinks,
-  sluggify,
   getNoteTitle,
   removeWikilinkPunctuation,
   getAllInlineSpans,
   getSlugsFromInlineText,
   changeSlugReferencesInNote,
-  isFileSlug,
   mapInlineSpans,
-  getGraphCreationTimestamp,
-  getGraphUpdateTimestamp,
   getBlocks,
   getFileSlugsInNote,
+  handleExistingNoteUpdate,
+  getSlugsFromParsedNote,
+  isExistingNoteSaveRequest,
+  handleNewNoteSaveRequest,
 };
