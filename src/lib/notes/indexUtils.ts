@@ -43,6 +43,7 @@ const updateBacklinksIndex = (
       continue;
     }
 
+    // Refresh their backlinks with our outgoing links
     if (ourOutgoingLinks.includes(someExistingSlug)) {
       (graph.indexes.backlinks.get(someExistingSlug) as Set<Slug>)
         .add(ourSlug);
@@ -51,6 +52,7 @@ const updateBacklinksIndex = (
         .delete(ourSlug);
     }
 
+    // Refresh their backlinks with our mentioning of their aliases
     const aliasesOfSomeExistingSlug = Array.from(graph.aliases.entries())
       .filter((entry) => {
         return entry[1] === someExistingSlug;
@@ -68,13 +70,26 @@ const updateBacklinksIndex = (
 
     // If we had to create an index for our note's backlinks earlier,
     // let's fill it now with the outgoing links of the other note that
-    // lead to our note
+    // lead to our note or our aliases
     if (ourBacklinks) {
       const theirOutgoingLinks = graph.indexes.outgoingLinks.get(
         someExistingSlug,
       ) as Set<Slug>;
 
-      if (theirOutgoingLinks.has(ourSlug)) {
+      const ourAliases = Array.from(graph.aliases.entries()).filter(
+        (entry) => {
+          return entry[1] === ourSlug;
+        },
+      ).map((entry) => {
+        return entry[0];
+      });
+
+      if (
+        theirOutgoingLinks.has(ourSlug)
+        || ourAliases.some((alias) => {
+          return theirOutgoingLinks.has(alias);
+        })
+      ) {
         ourBacklinks.add(someExistingSlug);
       }
     }
