@@ -12,9 +12,7 @@ import Graph, { GraphMetadata } from "./types/Graph.js";
 import { ErrorMessage } from "./types/ErrorMessage.js";
 import StorageProvider from "./types/StorageProvider.js";
 import {
-  getAllInlineSpans,
-  getSlugsFromInlineText,
-  isFileSlug,
+  getSlugsFromParsedNote,
   parseSerializedExistingNote,
   serializeNote,
 } from "./noteUtils.js";
@@ -29,6 +27,7 @@ import { FILE_SLUG_PREFIX } from "./config.js";
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import { GraphMetadataV3, migrateToV4 } from "./migrations/v4.js";
 import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
+import { isFileSlug } from "./slugUtils.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -39,6 +38,7 @@ export default class DatabaseIO {
   #GRAPH_METADATA_FILENAME = ".graph.json";
   #NAME_OF_FILES_SUBDIRECTORY = "files";
   static #NOTE_FILE_EXTENSION = ".subtext";
+  #ALIAS_HEADER = ":alias-of:";
 
   // Block parsing is CPU intensive, so we use a web worker pool to parse
   // multiple notes in parallel.
@@ -60,7 +60,6 @@ export default class DatabaseIO {
     });
   }
 
-
   private async getNoteFilenamesFromGraphDirectory(): Promise<string[]> {
     return (await this.#storageProvider.listDirectory())
       .filter((entry: string): boolean => {
@@ -68,19 +67,24 @@ export default class DatabaseIO {
       });
   }
 
-
   private async parseGraph(
-    serializedNotes: Map<Slug, string>,
+    serializedNotesAndAliases: Map<Slug, string>,
     metadataSerialized?: string,
   ): Promise<Graph> {
     let migrationPerformed = false;
     const parsedNotes = new Map<Slug, ExistingNote>();
+    const aliases = new Map<Slug, Slug>();
 
-    for (const [slug, serializedNote] of serializedNotes) {
+    for (const [slug, serializedNote] of serializedNotesAndAliases) {
       let parsedNote: ExistingNote;
       try {
-        parsedNote = parseSerializedExistingNote(serializedNote, slug);
-        parsedNotes.set(slug, parsedNote);
+        if (serializedNote.startsWith(this.#ALIAS_HEADER)) {
+          const canonicalSlug = serializedNote.slice(this.#ALIAS_HEADER.length);
+          aliases.set(slug, canonicalSlug);
+        } else {
+          parsedNote = parseSerializedExistingNote(serializedNote, slug);
+          parsedNotes.set(slug, parsedNote);
+        }
       } catch (e) {
         continue;
       }
@@ -108,10 +112,12 @@ export default class DatabaseIO {
     const backlinkIndex = DatabaseIO.createBacklinkIndex(
       outgoingLinkIndex,
       new Set<Slug>(parsedNotes.keys()),
+      aliases,
     );
 
     const parsedGraphObject: Graph = {
       notes: parsedNotes,
+      aliases,
       indexes: {
         blocks: blockIndex,
         outgoingLinks: outgoingLinkIndex,
@@ -124,6 +130,8 @@ export default class DatabaseIO {
       await this.flushChanges(
         parsedGraphObject,
         WriteGraphMetadataAction.WRITE,
+        "all",
+        "all",
       );
     }
 
@@ -132,7 +140,9 @@ export default class DatabaseIO {
 
 
   private async readAndParseGraphFromDisk(): Promise<Graph> {
-    const noteFilenames = await this.getNoteFilenamesFromGraphDirectory();
+    /*
+      METADATA
+    */
 
     let graphMetadataSerialized: string | undefined;
     try {
@@ -144,6 +154,12 @@ export default class DatabaseIO {
       // if the file does not exist, we just create a new one later
       graphMetadataSerialized = undefined;
     }
+
+    /*
+      NOTES AND ALIASES
+    */
+
+    const noteFilenames = await this.getNoteFilenamesFromGraphDirectory();
 
     const serializedNotes = new Map(
       await Promise.all(
@@ -167,14 +183,6 @@ export default class DatabaseIO {
   }
 
 
-  // getSlugsFromParsedNote returns all slugs that are referenced in the note.
-  static getSlugsFromParsedNote(note: Block[]): Slug[] {
-    const inlineSpans = getAllInlineSpans(note);
-    const slugs = getSlugsFromInlineText(inlineSpans);
-    return slugs;
-  }
-
-
   /*
     The outgoing link index contains all links that are referenced in a note,
     no matter if the link target exists or not.
@@ -185,7 +193,7 @@ export default class DatabaseIO {
     const outgoingLinkIndex = new Map<Slug, Set<Slug>>();
 
     for (const [slug, blocks] of blockIndex) {
-      const outgoingLinks = DatabaseIO.getSlugsFromParsedNote(blocks)
+      const outgoingLinks = getSlugsFromParsedNote(blocks)
         .filter((link: Slug): boolean => {
           return !link.startsWith(FILE_SLUG_PREFIX);
         });
@@ -197,11 +205,12 @@ export default class DatabaseIO {
 
   /*
     The backlinks index only contains slugs of existing notes that
-    reference a note.
+    reference a note or one of its aliases.
   */
   private static createBacklinkIndex(
     outgoingLinks: Map<Slug, Set<Slug>>,
     existingNoteSlugs: Set<Slug>,
+    aliases: Map<Slug, Slug>,
   ): Map<Slug, Set<Slug>> {
     const backlinkIndex = new Map<Slug, Set<Slug>>();
 
@@ -211,15 +220,23 @@ export default class DatabaseIO {
       }
 
       for (const link of links) {
-        if (!existingNoteSlugs.has(link)) {
-          continue;
+        // We only want to add backlinks to existing notes
+        if (existingNoteSlugs.has(link)) {
+          if (!backlinkIndex.has(link)) {
+            backlinkIndex.set(link, new Set<Slug>());
+          }
+
+          backlinkIndex.get(link)!.add(slug);
         }
 
-        if (!backlinkIndex.has(link)) {
-          backlinkIndex.set(link, new Set<Slug>());
-        }
+        if (aliases.has(link)) {
+          const canonicalSlug = aliases.get(link) as Slug;
+          if (!backlinkIndex.has(canonicalSlug)) {
+            backlinkIndex.set(canonicalSlug, new Set<Slug>());
+          }
 
-        backlinkIndex.get(link)!.add(slug);
+          backlinkIndex.get(canonicalSlug)!.add(slug);
+        }
       }
     }
     return backlinkIndex;
@@ -366,7 +383,12 @@ export default class DatabaseIO {
     // Flushing the graph will save it in memory for
     // faster access the next time. Also, if no graph metadata file is present
     // in the directory, we create a new one.
-    await this.flushChanges(graphFromDisk, WriteGraphMetadataAction.WRITE, []);
+    await this.flushChanges(
+      graphFromDisk,
+      WriteGraphMetadataAction.WRITE,
+      [],
+      [],
+    );
     this.#finishedObtainingGraph();
     return graphFromDisk;
   }
@@ -376,12 +398,11 @@ export default class DatabaseIO {
   // written to the disk and thus are persistent. It should always be called
   // after any operation on the internal graph representation
   // has been performed.
-  // If slugsToFlush is not provided, all notes will be flushed. This should
-  // only be done if really necessary.
   async flushChanges(
     graph: Graph,
     writeGraphMetadata: WriteGraphMetadataAction,
-    slugsToFlush?: Slug[],
+    canonicalSlugsToFlush: Slug[] | "all",
+    aliasesToFlush: Slug[] | "all",
   ): Promise<void> {
     if (
       writeGraphMetadata === WriteGraphMetadataAction.WRITE
@@ -399,8 +420,15 @@ export default class DatabaseIO {
 
     this.#loadedGraph = graph;
 
-    if (slugsToFlush) {
-      await Promise.all(slugsToFlush.map(async (slug) => {
+    graph.aliases.forEach(async (slug: Slug, alias: Slug) => {
+      await this.#storageProvider.writeObject(
+        `${alias}${DatabaseIO.#NOTE_FILE_EXTENSION}`,
+        this.#ALIAS_HEADER + slug,
+      );
+    });
+
+    if (Array.isArray(canonicalSlugsToFlush)) {
+      await Promise.all(canonicalSlugsToFlush.map(async (slug) => {
         const filename = DatabaseIO.getFilenameForNoteSlug(slug);
         if (!graph.notes.has(slug)) {
           await this.#storageProvider.removeObject(filename);
@@ -420,6 +448,34 @@ export default class DatabaseIO {
           await this.#storageProvider.writeObject(
             filename,
             serializeNote(note),
+          );
+        }
+      }
+    }
+
+
+    if (Array.isArray(aliasesToFlush)) {
+      await Promise.all(aliasesToFlush.map(async (alias) => {
+        const filename = DatabaseIO.getFilenameForNoteSlug(alias);
+        if (!graph.aliases.has(alias)) {
+          await this.#storageProvider.removeObject(filename);
+        } else {
+          const canonicalSlug = graph.aliases.get(alias) as Slug;
+          await this.#storageProvider.writeObject(
+            filename,
+            `${this.#ALIAS_HEADER}${canonicalSlug}`,
+          );
+        }
+      }));
+    } else {
+      for (const [alias, canonicalSlug] of graph.aliases) {
+        const filename = DatabaseIO.getFilenameForNoteSlug(alias);
+        if (!graph.aliases.has(alias)) {
+          await this.#storageProvider.removeObject(filename);
+        } else {
+          await this.#storageProvider.writeObject(
+            filename,
+            `${this.#ALIAS_HEADER}${canonicalSlug}`,
           );
         }
       }

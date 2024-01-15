@@ -21,6 +21,7 @@ const tests = [
         },
         ignoreDuplicateTitles: false,
         changeSlugTo: "another-existing-note",
+        aliases: new Set(),
       };
       await notesProvider.put(noteSaveRequest1);
 
@@ -34,6 +35,7 @@ const tests = [
           },
         },
         ignoreDuplicateTitles: false,
+        aliases: new Set(),
       };
       await notesProvider.put(noteSaveRequest2);
 

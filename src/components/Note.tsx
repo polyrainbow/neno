@@ -29,10 +29,14 @@ import { PathTemplate } from "../types/PathTemplate";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import {
   getMediaTypeFromFilename,
+} from "../lib/notes/utils";
+import {
   getNoteTitle,
+} from "../lib/notes/noteUtils";
+import {
   isFileSlug,
   sluggify,
-} from "../lib/notes/noteUtils";
+} from "../lib/notes/slugUtils";
 import { MediaType } from "../lib/notes/types/MediaType";
 import NoteContentBlockAudio from "./NoteContentBlockAudio";
 import NoteContentBlockVideo from "./NoteContentBlockVideo";
@@ -51,6 +55,8 @@ interface NoteComponentProps {
   editorInstanceId: number,
   slugInput: string,
   setSlugInput: (val: string) => void,
+  displayedSlugAliases: string[],
+  setDisplayedSlugAliases: (val: string[]) => void,
   setNote: (note: ActiveNote) => void,
   setNoteContent: (title: string, refreshEditor?: boolean) => void,
   addFilesToNoteObject: (responses: FileInfo[]) => void,
@@ -79,6 +85,8 @@ const Note = ({
   setNote,
   slugInput,
   setSlugInput,
+  displayedSlugAliases,
+  setDisplayedSlugAliases,
   setNoteContent,
   addFilesToNoteObject,
   setUnsavedChanges,
@@ -342,6 +350,8 @@ const Note = ({
             note={note}
             slugInput={slugInput}
             setSlugInput={setSlugInput}
+            displayedSlugAliases={displayedSlugAliases}
+            setDisplayedSlugAliases={setDisplayedSlugAliases}
             setUnsavedChanges={setUnsavedChanges}
             updateReferences={updateReferences}
             setUpdateReferences={setUpdateReferences}

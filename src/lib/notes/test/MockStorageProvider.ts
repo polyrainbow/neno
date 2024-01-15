@@ -12,7 +12,7 @@ export default class MockStorageProvider implements StorageProvider {
       const string = decoder.decode(bytes);
       return Promise.resolve(string);
     } else {
-      throw new Error("File not found.");
+      return Promise.reject(new Error("File not found."));
     }
   }
 

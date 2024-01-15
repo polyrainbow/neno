@@ -16,6 +16,10 @@ export interface GraphMetadata {
 export default interface GraphObject {
   metadata: GraphMetadata,
   notes: Map<Slug, ExistingNote>,
+  aliases: Map<Slug, Slug>,
+  /*
+    In the indexes, we include only canonical slugs that are not aliases.
+  */
   indexes: {
     // maps slug to parsed blocks
     blocks: Map<Slug, Block[]>,

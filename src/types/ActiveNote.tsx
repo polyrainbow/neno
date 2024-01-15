@@ -18,6 +18,7 @@ export interface UnsavedActiveNote extends BaseActiveNote {
 
 export interface SavedActiveNote extends BaseActiveNote {
   slug: Slug,
+  aliases: Set<Slug>,
   isUnsaved: false,
   createdAt?: number,
   updatedAt?: number,

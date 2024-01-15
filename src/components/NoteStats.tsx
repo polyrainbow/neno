@@ -6,7 +6,7 @@ import {
   humanFileSize,
 } from "../lib/utils";
 import NoteStatsFileLink from "./NoteStatsFileLink";
-import { getMediaTypeFromFilename } from "../lib/notes/noteUtils";
+import { getMediaTypeFromFilename } from "../lib/notes/utils";
 import { Fragment } from "react";
 
 interface NoteStatsProps {

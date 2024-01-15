@@ -71,6 +71,8 @@ const NoteView = () => {
     setUnsavedChanges,
     slugInput,
     setSlugInput,
+    displayedSlugAliases,
+    setDisplayedSlugAliases,
     editorInstanceId,
     updateEditorInstance,
     updateReferences,
@@ -305,6 +307,8 @@ const NoteView = () => {
           setNote={setActiveNote}
           setSlugInput={setSlugInput}
           slugInput={slugInput}
+          displayedSlugAliases={displayedSlugAliases}
+          setDisplayedSlugAliases={setDisplayedSlugAliases}
           setNoteContent={setNoteContent}
           addFilesToNoteObject={(files: FileInfo[]): void => {
             setActiveNote((previousState) => {

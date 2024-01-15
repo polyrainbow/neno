@@ -41,6 +41,10 @@ export default (
   const [updateReferences, setUpdateReferences] = useState<boolean>(false);
 
   const [slugInput, setSlugInput] = useState<string>("");
+  const [
+    displayedSlugAliases,
+    setDisplayedSlugAliases,
+  ] = useState<string[]>([]);
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const [editorInstanceId, setEditorInstanceId] = useState<number>(
@@ -80,6 +84,7 @@ export default (
     const newNoteObject: UnsavedActiveNote = getNewNoteObject(params);
     setActiveNote(newNoteObject);
     setSlugInput(params.slug || "");
+    setDisplayedSlugAliases([]);
   };
 
 
@@ -102,6 +107,8 @@ export default (
   const setActiveNoteFromServer = (noteFromServer: NoteToTransmit): void => {
     setActiveNote({
       slug: noteFromServer.meta.slug,
+      // might be better to create a new set here
+      aliases: new Set(noteFromServer.aliases),
       createdAt: noteFromServer.meta.createdAt,
       updatedAt: noteFromServer.meta.updatedAt,
       outgoingLinks: noteFromServer.outgoingLinks,
@@ -117,6 +124,7 @@ export default (
     });
 
     setSlugInput(noteFromServer.meta.slug);
+    setDisplayedSlugAliases([...noteFromServer.aliases]);
   };
 
 
@@ -139,6 +147,11 @@ export default (
         changeSlugTo: NotesProvider.isValidSlug(slugInput)
           ? slugInput
           : undefined,
+        aliases: new Set(displayedSlugAliases.filter((a) => {
+          return a !== slugInput
+            && a.trim().length > 0
+            && NotesProvider.isValidSlug(a);
+        })),
       };
     } else {
       return {
@@ -163,6 +176,11 @@ export default (
         updateReferences: slugInput !== activeNote.slug
           && NotesProvider.isValidSlug(slugInput)
           && updateReferences,
+        aliases: new Set(displayedSlugAliases.filter((a) => {
+          return a !== slugInput
+            && a.trim().length > 0
+            && NotesProvider.isValidSlug(a);
+        })),
       };
     }
   };
@@ -265,6 +283,7 @@ export default (
         content: activeNote.content,
       },
       ignoreDuplicateTitles: true,
+      aliases: new Set(),
     };
     const noteFromServer = await notesProvider.put(noteSaveRequest);
 
@@ -314,6 +333,8 @@ export default (
     setUnsavedChanges,
     slugInput,
     setSlugInput,
+    displayedSlugAliases,
+    setDisplayedSlugAliases,
     editorInstanceId,
     updateEditorInstance,
     updateReferences,
