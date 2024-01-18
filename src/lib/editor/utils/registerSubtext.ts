@@ -81,6 +81,23 @@ function onPasteForPlainText(
           : event.clipboardData;
 
       if (clipboardData !== null && $isRangeSelection(selection)) {
+        /*
+          For unknown reasons, there are some cases where Lexical throws the
+          following error when trying to paste:
+
+          updateEditor: selection has been lost because the previously
+          selected nodes have been removed and selection wasn't moved to
+          another node. Ensure selection changes after removing/replacing a
+          selected node.
+
+          Example:
+          The selection is a multiline selection with anchor on the end of the
+          second line and focus at the start of the first line.
+
+          The removal of the selection text before paste is a workaround to
+          prevent the error.
+        */
+        selection.removeText();
         $insertDataTransferForPlainText(clipboardData, selection);
       }
     },
