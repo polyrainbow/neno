@@ -534,4 +534,44 @@ test.describe("Editor view", () => {
       expect((await paragraphs[1].innerText()).trim()).toBe("");
     },
   );
+
+  test(
+    "copying and pasting multiline text should work",
+    async ({ page }) => {
+      const isMac = process.platform === "darwin";
+
+      await page.keyboard.type("1", { delay: 20 });
+      await page.keyboard.press("Enter", { delay: 20 });
+      await page.keyboard.type("2", { delay: 20 });
+      await page.keyboard.press("Enter", { delay: 20 });
+      await page.keyboard.type("3", { delay: 20 });
+      await page.keyboard.press("Enter", { delay: 20 });
+      await page.keyboard.type("4", { delay: 20 });
+
+      // select 3 and 4
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowUp", { delay: 20 });
+
+      // copy
+      await page.keyboard.press(isMac ? "Meta+C" : "Control+C", { delay: 20 });
+
+      // move cursor to end of line 2
+      await page.keyboard.press("ArrowUp", { delay: 20 });
+      await page.keyboard.press("ArrowRight", { delay: 20 });
+
+      // select 1 and 2
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowUp", { delay: 20 });
+
+      // paste
+      await page.keyboard.press(isMac ? "Meta+V" : "Control+V", { delay: 20 });
+
+      const paragraphs = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph",
+      ))!;
+
+      expect(await paragraphs[0].innerText()).toBe("3");
+      expect(await paragraphs[1].innerText()).toBe("4");
+    },
+  );
 });
