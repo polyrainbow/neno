@@ -1419,7 +1419,7 @@ describe("Notes module", () => {
   );
 
   it(
-    "should output notes that mention an alias in backlinks",
+    "backlinks of a note should include notes that link to aliases of the note",
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
       const noteSaveRequest: NoteSaveRequest = {
