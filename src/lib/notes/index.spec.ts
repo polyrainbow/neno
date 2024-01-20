@@ -1559,6 +1559,65 @@ describe("Notes module", () => {
   );
 
   it(
+    "adding an alias to an existing note should update backlinks",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+      // create y with a link to alias
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "link to [[alias]]",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "y",
+        aliases: new Set([]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      // create x
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "x",
+        aliases: new Set([]),
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+
+      // add alias to x
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            slug: "x",
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set(["alias"]),
+      };
+
+      const x = await notesProvider.put(noteSaveRequest3);
+      expect(x.backlinks.length).toBe(1);
+      expect(x.backlinks[0].slug).toBe("y");
+    },
+  );
+
+  it(
     "stats links should include links to aliases",
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());

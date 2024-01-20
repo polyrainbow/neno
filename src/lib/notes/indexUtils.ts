@@ -26,17 +26,35 @@ const removeSlugFromIndexes = (
 };
 
 
+const getAliasesOfSlug = (
+  graph: GraphObject,
+  slug: Slug,
+): Slug[] => {
+  return Array.from(graph.aliases.entries())
+    .filter((entry) => {
+      return entry[1] === slug;
+    })
+    .map((entry) => {
+      return entry[0];
+    });
+};
+
+
 const updateBacklinksIndex = (
   graph: GraphObject,
   ourSlug: Slug,
   ourOutgoingLinks: Slug[],
 ): void => {
   // Let's first check if we need to create a backlink index for *our* note
-  let ourBacklinks: Set<Slug> | null = null;
-  if (!graph.indexes.backlinks.has(ourSlug)) {
+  let ourBacklinks: Set<Slug>;
+  if (graph.indexes.backlinks.has(ourSlug)) {
+    ourBacklinks = graph.indexes.backlinks.get(ourSlug) as Set<Slug>;
+  } else {
     ourBacklinks = new Set<Slug>();
     graph.indexes.backlinks.set(ourSlug, ourBacklinks);
   }
+
+  const ourAliases = getAliasesOfSlug(graph, ourSlug);
 
   for (const someExistingSlug of graph.notes.keys()) {
     if (someExistingSlug === ourSlug) {
@@ -53,13 +71,7 @@ const updateBacklinksIndex = (
     }
 
     // Refresh their backlinks with our mentioning of their aliases
-    const aliasesOfSomeExistingSlug = Array.from(graph.aliases.entries())
-      .filter((entry) => {
-        return entry[1] === someExistingSlug;
-      })
-      .map((entry) => {
-        return entry[0];
-      });
+    const aliasesOfSomeExistingSlug = getAliasesOfSlug(graph, someExistingSlug);
 
     if (ourOutgoingLinks.some((outgoingLink) => {
       return aliasesOfSomeExistingSlug.includes(outgoingLink);
@@ -68,30 +80,19 @@ const updateBacklinksIndex = (
         .add(ourSlug);
     }
 
-    // If we had to create an index for our note's backlinks earlier,
-    // let's fill it now with the outgoing links of the other note that
-    // lead to our note or our aliases
-    if (ourBacklinks) {
-      const theirOutgoingLinks = graph.indexes.outgoingLinks.get(
-        someExistingSlug,
-      ) as Set<Slug>;
+    // let's fill our note's backlinks with the outgoing links of the
+    // other notes that lead to our note or our aliases
+    const theirOutgoingLinks = graph.indexes.outgoingLinks.get(
+      someExistingSlug,
+    ) as Set<Slug>;
 
-      const ourAliases = Array.from(graph.aliases.entries()).filter(
-        (entry) => {
-          return entry[1] === ourSlug;
-        },
-      ).map((entry) => {
-        return entry[0];
-      });
-
-      if (
-        theirOutgoingLinks.has(ourSlug)
-        || ourAliases.some((alias) => {
-          return theirOutgoingLinks.has(alias);
-        })
-      ) {
-        ourBacklinks.add(someExistingSlug);
-      }
+    if (
+      theirOutgoingLinks.has(ourSlug)
+      || ourAliases.some((alias) => {
+        return theirOutgoingLinks.has(alias);
+      })
+    ) {
+      ourBacklinks.add(someExistingSlug);
     }
   }
 };
