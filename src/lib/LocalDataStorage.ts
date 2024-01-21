@@ -12,12 +12,6 @@ import MockStorageProvider from "./notes/test/MockStorageProvider";
   Notes:
   FileSystemHandle.requestPermission currently requires to be called
   from a user gesture: https://stackoverflow.com/a/69897694/3890888
-
-  Persistent file handle permissions not yet implemented:
-  https://bugs.chromium.org/p/chromium/issues/detail?id=1354695
-  https://bugs.chromium.org/p/chromium/issues/detail?id=1373962
-  https://bugs.chromium.org/p/chromium/issues/detail?id=1011533
-  https://bugs.chromium.org/p/chromium/issues/detail?id=1467574
 */
 
 async function verifyPermission(
