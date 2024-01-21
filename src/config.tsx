@@ -39,9 +39,6 @@ const SEARCH_RESULTS_PER_PAGE = 50;
 
 const DEFAULT_DOCUMENT_TITLE = "NENO";
 
-// disable this if you want to build a local-only instance
-const SERVER_DATABASE_ENABLED = true;
-
 // @ts-ignore
 const FILE_PICKER_ACCEPT_TYPES: FilePickerAcceptType[] = [
   {
@@ -76,7 +73,6 @@ export {
   MAX_WIDTH_SMALL_SCREEN,
   SEARCH_RESULTS_PER_PAGE,
   DEFAULT_DOCUMENT_TITLE,
-  SERVER_DATABASE_ENABLED,
   FILE_PICKER_ACCEPT_TYPES,
   DEFAULT_CONTENT_TYPE,
   SPAN_SEPARATOR,
