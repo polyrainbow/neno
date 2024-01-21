@@ -362,16 +362,12 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
     throw new Error("Could not determine backlinks for slug " + slug);
   }
 
-  const notes: ExistingNote[] = Array.from(backlinkSlugs)
-    .map((slug: Slug): ExistingNote => {
+  return Array.from(backlinkSlugs)
+    .map((slug: Slug): SparseNoteInfo => {
       // we are sure that the notes we are retrieving from slugs in links
-      // really exist. that's why we cast the result of findNote as
-      // ExistingNote
-      return graph.notes.get(slug) as ExistingNote;
-    });
+      // really exist. that's why we cast the result as ExistingNote
+      const note = graph.notes.get(slug) as ExistingNote;
 
-  const backlinks: SparseNoteInfo[] = notes
-    .map((note: ExistingNote) => {
       const backlink: SparseNoteInfo = {
         slug: note.meta.slug,
         aliases: getAliasesOfSlug(graph, note.meta.slug),
@@ -381,8 +377,6 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
       };
       return backlink;
     });
-
-  return backlinks;
 };
 
 
