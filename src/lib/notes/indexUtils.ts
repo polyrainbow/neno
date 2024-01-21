@@ -2,7 +2,7 @@ import ExistingNote from "./types/ExistingNote";
 import GraphObject from "./types/Graph";
 import subwaytext from "../subwaytext/index.js";
 import { Slug } from "./types/Slug";
-import { getSlugsFromParsedNote } from "./noteUtils";
+import { getAliasesOfSlug, getSlugsFromParsedNote } from "./noteUtils";
 
 const removeSlugFromIndexes = (
   graph: GraphObject,
@@ -23,20 +23,6 @@ const removeSlugFromIndexes = (
   graph.indexes.backlinks.forEach((backlinks: Set<Slug>) => {
     backlinks.delete(slug);
   });
-};
-
-
-const getAliasesOfSlug = (
-  graph: GraphObject,
-  slug: Slug,
-): Slug[] => {
-  return Array.from(graph.aliases.entries())
-    .filter((entry) => {
-      return entry[1] === slug;
-    })
-    .map((entry) => {
-      return entry[0];
-    });
 };
 
 
@@ -74,7 +60,7 @@ const updateBacklinksIndex = (
     const aliasesOfSomeExistingSlug = getAliasesOfSlug(graph, someExistingSlug);
 
     if (ourOutgoingLinks.some((outgoingLink) => {
-      return aliasesOfSomeExistingSlug.includes(outgoingLink);
+      return aliasesOfSomeExistingSlug.has(outgoingLink);
     })) {
       (graph.indexes.backlinks.get(someExistingSlug) as Set<Slug>)
         .add(ourSlug);
@@ -88,7 +74,7 @@ const updateBacklinksIndex = (
 
     if (
       theirOutgoingLinks.has(ourSlug)
-      || ourAliases.some((alias) => {
+      || [...ourAliases].some((alias) => {
         return theirOutgoingLinks.has(alias);
       })
     ) {

@@ -321,6 +321,22 @@ const getOutgoingLinksToOtherNotes = (
 };
 
 
+const getAliasesOfSlug = (
+  graph: GraphObject,
+  slug: Slug,
+): Set<Slug> => {
+  return new Set(
+    Array.from(graph.aliases.entries())
+      .filter((entry) => {
+        return entry[1] === slug;
+      })
+      .map((entry) => {
+        return entry[0];
+      }),
+  );
+};
+
+
 const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
   if (!graph.notes.has(slug)) {
     throw new Error("Could not generate note preview of " + slug);
@@ -331,11 +347,7 @@ const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
   return {
     content: note.content,
     slug,
-    aliases: new Set(
-      Array.from(graph.aliases.entries())
-        .filter((entry) => entry[1] === slug)
-        .map((entry) => entry[0]),
-    ),
+    aliases: getAliasesOfSlug(graph, slug),
     title: getNoteTitle(note),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,
@@ -362,11 +374,7 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
     .map((note: ExistingNote) => {
       const backlink: SparseNoteInfo = {
         slug: note.meta.slug,
-        aliases: new Set(
-          Array.from(graph.aliases.entries())
-            .filter((entry) => entry[1] === slug)
-            .map((entry) => entry[0]),
-        ),
+        aliases: getAliasesOfSlug(graph, note.meta.slug),
         title: getNoteTitle(note),
         createdAt: note.meta.createdAt,
         updatedAt: note.meta.updatedAt,
@@ -453,11 +461,7 @@ const createNoteToTransmit = async (
     backlinks: getBacklinks(graph, existingNote.meta.slug),
     numberOfCharacters: getNumberOfCharacters(existingNote),
     files: getFileInfos(graph, existingNote.meta.slug),
-    aliases: new Set(
-      Array.from(graph.aliases.entries())
-        .filter((entry) => entry[1] === existingNote.meta.slug)
-        .map((entry) => entry[0]),
-    ),
+    aliases: getAliasesOfSlug(graph, existingNote.meta.slug),
   };
 
   return noteToTransmit;
@@ -553,11 +557,7 @@ const createNoteListItem = (
 ): NoteListItem => {
   const noteListItem: NoteListItem = {
     slug: note.meta.slug,
-    aliases: new Set(
-      Array.from(graph.aliases.entries())
-        .filter((entry) => entry[1] === note.meta.slug)
-        .map((entry) => entry[0]),
-    ),
+    aliases: getAliasesOfSlug(graph, note.meta.slug),
     title: getNoteTitle(note),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,
@@ -904,4 +904,5 @@ export {
   getSlugsFromParsedNote,
   isExistingNoteSaveRequest,
   handleNewNoteSaveRequest,
+  getAliasesOfSlug,
 };
