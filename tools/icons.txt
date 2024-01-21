@@ -36,6 +36,7 @@ file_upload
 filter_center_focus
 grain
 grid_view
+headphones
 help
 help_outline
 home
@@ -69,6 +70,7 @@ people_outline
 photo_library
 post_add
 preview
+public
 push_pin
 query_stats
 question_mark

@@ -1,9 +1,10 @@
 import Tooltip from "./Tooltip";
-import { emojis } from "../config";
 import { l } from "../lib/intl";
 import NoteListItemFeaturesType
   from "../lib/notes/types/NoteListItemFeatures";
+import Icon from "./Icon";
 
+const ICON_SIZE = 15;
 
 const NoteListItemFeatures = ({
   features,
@@ -17,7 +18,11 @@ const NoteListItemFeatures = ({
       features.containsWeblink
         ? <Tooltip
           title={l("list.item.features.contains-links")}>
-          <span>{emojis.weblink}</span>
+          <Icon
+            icon="public"
+            title={l("list.item.features.contains-links")}
+            size={ICON_SIZE}
+          />
         </Tooltip>
         : null
     }
@@ -25,7 +30,11 @@ const NoteListItemFeatures = ({
       features.containsCode
         ? <Tooltip
           title={l("list.item.features.contains-code")}>
-          <span>{emojis.code}</span>
+          <Icon
+            icon="code"
+            title={l("list.item.features.contains-code")}
+            size={ICON_SIZE}
+          />
         </Tooltip>
         : null
     }
@@ -33,7 +42,11 @@ const NoteListItemFeatures = ({
       features.containsImages
         ? <Tooltip
           title={l("list.item.features.contains-images")}>
-          <span>{emojis.image}</span>
+          <Icon
+            icon="image"
+            title={l("list.item.features.contains-images")}
+            size={ICON_SIZE}
+          />
         </Tooltip>
         : null
     }
@@ -41,7 +54,11 @@ const NoteListItemFeatures = ({
       features.containsDocuments
         ? <Tooltip
           title={l("list.item.features.contains-documents")}>
-          <span>{emojis.document}</span>
+          <Icon
+            icon="note"
+            title={l("list.item.features.contains-documents")}
+            size={ICON_SIZE}
+          />
         </Tooltip>
         : null
     }
@@ -49,7 +66,11 @@ const NoteListItemFeatures = ({
       features.containsAudio
         ? <Tooltip
           title={l("list.item.features.contains-audio")}>
-          <span>{emojis.audio}</span>
+          <Icon
+            icon="headphones"
+            title={l("list.item.features.contains-audio")}
+            size={ICON_SIZE}
+          />
         </Tooltip>
         : null
     }
@@ -57,7 +78,11 @@ const NoteListItemFeatures = ({
       features.containsVideo
         ? <Tooltip
           title={l("list.item.features.contains-video")}>
-          <span>{emojis.video}</span>
+          <Icon
+            icon="movie"
+            title={l("list.item.features.contains-video")}
+            size={ICON_SIZE}
+          />
         </Tooltip>
         : null
     }

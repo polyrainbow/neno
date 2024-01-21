@@ -1,4 +1,4 @@
-import { LOCAL_GRAPH_ID, emojis } from "../config";
+import { LOCAL_GRAPH_ID } from "../config";
 import {
   getAppPath,
 } from "../lib/utils";
@@ -31,15 +31,15 @@ const StatsViewAnalysisTable = ({
   return <table className="data-table">
     <tbody>
       <tr>
-        <td>{emojis.note} {l("stats.analysis.nodes-notes")}</td>
+        <td>{l("stats.analysis.nodes-notes")}</td>
         <td>{numberOfAllNotes.toLocaleString()}</td>
       </tr>
       <tr>
-        <td>{emojis.link} {l("stats.analysis.links-edges")}</td>
+        <td>{l("stats.analysis.links-edges")}</td>
         <td>{numberOfLinks.toLocaleString()}</td>
       </tr>
       <tr>
-        <td>{emojis.unlinked} {l("stats.unlinked-notes")}</td>
+        <td>{l("stats.unlinked-notes")}</td>
         <td>{
           numberOfUnlinkedNotes.toLocaleString()
           + (

@@ -105,8 +105,9 @@
   width: 56px;
 }
 
-.note-features span {
-  margin: 0 2px;
+.note-features {
+  align-self: center;
+  display: inline-flex;
 }
 
 .note-list-item .linked-notes-indicator-number {

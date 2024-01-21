@@ -8,24 +8,6 @@ const MINIMUM_SEARCH_QUERY_LENGTH = 3;
 
 const LOCAL_GRAPH_ID = "local";
 
-const emojis = {
-  "note": "📝",
-  "link": "🔗",
-  "unlinked": "🔴",
-  "new": "🆕",
-  "unsavedChanges": "✳️",
-  "noUnsavedChanges": "✔️",
-  "weblink": "🌍",
-  "file": "📎",
-  "document": "📄",
-  "image": "🖼️",
-  "code": "🤖",
-  "audio": "🎧",
-  "video": "📺",
-  "pin": "📌",
-  "text": "✏️",
-};
-
 // base path of the hosting environment. if you want to serve the application on
 // domain.com/neno the ROOT_PATH must be set to "/neno/".
 // The base path is currently set via the vite.config.js file.
@@ -66,7 +48,6 @@ export {
   VERSION,
   DEFAULT_NOTE_CONTENT,
   MINIMUM_SEARCH_QUERY_LENGTH,
-  emojis,
   ROOT_PATH,
   ASSETS_PATH,
   ICON_PATH,
