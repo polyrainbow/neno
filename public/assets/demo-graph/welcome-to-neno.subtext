@@ -8,7 +8,6 @@ To quote its creator:
 > NENO helped me manage my knowledge like no other app before.
 > You should give it a try.
 
-You can link other notes with a Wikilink like so: [[I like pizza]]. If the target note does not exist yet, the Wikilink is red: [[Non-existing note]]. When clicking on it, you can create it.
+You can link other notes with a Wikilink like so: [[Non-existing note]]. Click on the link create the note.
 
-Use slashlinks to create transclusions: /2023-07-27
-Other file types are also shown as transclusions: /files/beach.jpg
+You can add files via slashlinks: /files/beach.jpg

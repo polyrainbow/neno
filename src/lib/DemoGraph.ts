@@ -7,8 +7,6 @@ export const createDemoGraph = async (
 
   const demoNoteSlugs = [
     "welcome-to-neno",
-    "i-like-pizza",
-    "2023-07-27",
   ];
 
   const demoFiles = [
