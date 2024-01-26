@@ -1,12 +1,13 @@
 import * as IDB from "idb-keyval";
 import FileSystemAccessAPIStorageProvider
   from "./FileSystemAccessAPIStorageProvider";
-import { streamToBlob } from "./utils";
+import { getWritableStream, streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { createDemoGraph, folderHasGraph } from "./DemoGraph";
 import { Slug } from "./notes/types/Slug";
 import MockStorageProvider from "./notes/test/MockStorageProvider";
+import { getFilenameFromFileSlug } from "./notes/slugUtils";
 
 /*
   Notes:
@@ -135,4 +136,30 @@ export const getUrlForSlug = async (slug: Slug) => {
   const blob = await streamToBlob(readable, mimeType);
   const url = URL.createObjectURL(blob);
   return url;
+};
+
+export const saveFile = async (slug: Slug) => {
+  if (!notesProvider) {
+    throw new Error("Notes provider not initialized");
+  }
+
+  const readable
+    = await notesProvider.getReadableFileStream(
+      slug,
+    );
+  const extension = NotesProvider.getExtensionFromFilename(slug);
+  const mimeType = extension && MimeTypes.has(extension)
+    ? MimeTypes.get(extension) as string
+    : "application/neno-filestream";
+
+  const writable = await getWritableStream({
+    types: [{
+      accept: {
+        [mimeType]: ["." + extension],
+      },
+    }],
+    suggestedName: getFilenameFromFileSlug(slug),
+  });
+
+  await readable.pipeTo(writable);
 };

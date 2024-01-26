@@ -27,7 +27,7 @@ import { FILE_SLUG_PREFIX } from "./config.js";
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import { GraphMetadataV3, migrateToV4 } from "./migrations/v4.js";
 import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
-import { isFileSlug } from "./slugUtils.js";
+import { getFilenameFromFileSlug, isFileSlug } from "./slugUtils.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -529,7 +529,7 @@ export default class DatabaseIO {
 
     const filepath = this.#storageProvider.joinPath(
       this.#NAME_OF_FILES_SUBDIRECTORY,
-      slug.substring(FILE_SLUG_PREFIX.length),
+      getFilenameFromFileSlug(slug),
     );
 
     const stream = await this.#storageProvider.getReadableStream(

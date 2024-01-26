@@ -72,6 +72,7 @@
   "files.delete": "Delete",
   "files.fetching": "Fetching files…",
   "files.files-heading": "Files ({numberOfFiles})",
+  "files.save-duplicate": "Save duplicate",
   "files.show-all-files": "Show all files",
   "files.sort-mode.created-at.ascending": "Oldest first",
   "files.sort-mode.created-at.descending": "Newest first",

@@ -199,16 +199,7 @@ const readFileAsString = async (file: File): Promise<string> => {
 };
 
 
-export const onDownload = async (
-  file: FileInfo,
-): Promise<void> => {
-  const slug = file.slug;
-  const url = await getUrlForSlug(slug);
-  window.open(url, "_blank");
-};
-
-
-export const getUrl = async (
+const getUrl = async (
   file: FileInfo,
 ) => {
   const slug = file.slug;
@@ -351,4 +342,5 @@ export {
   getLines,
   getWikilinkForNote,
   getNoteTitleFromActiveNote,
+  getUrl,
 };

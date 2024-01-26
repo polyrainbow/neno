@@ -26,7 +26,7 @@ import {
   getFilenameFromFileSlug,
 } from "../lib/notes/slugUtils";
 import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
-import { isInitialized } from "../lib/LocalDataStorage";
+import { isInitialized, saveFile } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
 
 
@@ -76,6 +76,8 @@ const FileView = () => {
     return <BusyIndicator height={80} alt={l("app.loading")} />;
   }
 
+  const canShowPreview = type !== MediaType.OTHER;
+
   return <>
     <HeaderContainerLeftRight />
     <section className="content-section-wide file-section">
@@ -94,57 +96,53 @@ const FileView = () => {
             + makeTimestampHumanReadable(fileInfo.createdAt)
           : ""
       }</p>
-      <FlexContainer
-        className="file-container"
-      >
-        {
-          type === MediaType.IMAGE
-            ? <img
-              className="checkerboard-background"
-              src={src}
-              loading="lazy"
-            />
-            : ""
-        }
-        {
-          type === MediaType.AUDIO
-            ? <audio
-              src={src}
-              controls
-            />
-            : ""
-        }
-        {
-          type === MediaType.VIDEO
-            ? <video
-              src={src}
-              controls
-            />
-            : ""
-        }
-        {
-          type === MediaType.PDF
-            ? <iframe
-              src={src}
-            />
-            : ""
-        }
-        {
-          type === MediaType.TEXT
-            ? <pre
-              className="preview-block-file-text"
-            >{text}</pre>
-            : ""
-        }
-        {
-          type === MediaType.OTHER
-            ? <a
-              download
-              href={src}
-            >Download</a>
-            : ""
-        }
-      </FlexContainer>
+      {
+        canShowPreview
+          ? <FlexContainer
+            className="file-container"
+          >
+            {
+              type === MediaType.IMAGE
+                ? <img
+                  className="checkerboard-background"
+                  src={src}
+                  loading="lazy"
+                />
+                : ""
+            }
+            {
+              type === MediaType.AUDIO
+                ? <audio
+                  src={src}
+                  controls
+                />
+                : ""
+            }
+            {
+              type === MediaType.VIDEO
+                ? <video
+                  src={src}
+                  controls
+                />
+                : ""
+            }
+            {
+              type === MediaType.PDF
+                ? <iframe
+                  src={src}
+                />
+                : ""
+            }
+            {
+              type === MediaType.TEXT
+                ? <pre
+                  className="preview-block-file-text"
+                >{text}</pre>
+                : ""
+            }
+          </FlexContainer>
+          : ""
+      }
       <h2>{l("files.used-in")}</h2>
       {
         notes
@@ -188,6 +186,15 @@ const FileView = () => {
           }}
           className="default-button default-action"
         >{l("files.create-note-with-file")}</button>
+        <button
+          className="default-button default-action"
+          onClick={async () => {
+            if (!fileInfo) return;
+            await saveFile(fileInfo.slug);
+          }}
+        >
+          {l("files.save-duplicate")}
+        </button>
         <button
           disabled={!fileInfo}
           onClick={async () => {
