@@ -93,6 +93,24 @@ test.describe("Editor view", () => {
   );
 
   test(
+    "slashlink with combining diacritic mark should be correctly linked",
+    async ({ page }) => {
+      await page.keyboard.type("/ö.txt"); // ö with combining diacritic mark
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const paragraphChildren = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ))!;
+
+      const nodeNames = await Promise.all(
+        paragraphChildren.map((p) => p.evaluate((node) => node.nodeName)),
+      );
+
+      expect(nodeNames[0]).toBe("A");
+      expect(await paragraphChildren[0].innerText()).toBe("/ö.txt");
+    },
+  );
+
+  test(
     "backspace at the beginning of a heading should remove heading block",
     async ({ page }) => {
       const isMac = process.platform === "darwin";

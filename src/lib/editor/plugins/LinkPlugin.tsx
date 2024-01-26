@@ -39,7 +39,7 @@ const EMAIL_REGEX
 
 // TODO: Align all regexes re. slashlink and slugs
 const SLASHLINK_REGEX
-  = /(@[\p{L}\d\-_/]+)?(\/[\p{L}\d\-_:.]+)+/u;
+  = /(@[\p{L}\p{M}\d\-_/]+)?(\/[\p{L}\p{M}\d\-_:.]+)+/u;
 
 const MATCHERS = [
   createLinkMatcherWithRegExp(
