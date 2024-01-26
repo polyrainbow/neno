@@ -37,7 +37,7 @@ const sluggify = (text: string): string => {
     // remove invalid chars
     .replace(/['’]+/g, "")
     // Replace invalid chars with dashes.
-    .replace(/[^\p{L}\d\-_]+/gu, "-")
+    .replace(/[^\p{L}\p{M}\d\-_]+/gu, "-")
     // Replace runs of one or more dashes with a single dash
     .replace(/-+/g, "-")
     .toLowerCase();

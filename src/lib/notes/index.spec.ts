@@ -777,6 +777,31 @@ describe("Notes module", () => {
   );
 
   it(
+    "should sluggify umlauts with combining diacritical marks correctly",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable1 = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo = await notesProvider.addFile(
+        readable1,
+        "ö.txt", // <-- ö with combining diacritical mark
+      );
+
+      expect(fileInfo.slug).toBe("files/ö.txt");
+    },
+  );
+
+  it(
     "should remove files correctly",
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
