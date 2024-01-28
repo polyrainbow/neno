@@ -99,88 +99,82 @@ const NoteControls = ({
       disabled={disableNoteSaving}
       onClick={handleNoteSaveRequest}
     />
-    {
-      !isSmallScreen
-        ? <>
-          <IconButton
-            id="button_remove"
-            disabled={activeNote.isUnsaved}
-            title={l("editor.remove-note")}
-            icon={"delete"}
-            onClick={async () => {
-              await confirm({
-                text: l("editor.remove-note.confirm.text"),
-                confirmText: l("editor.remove-note.confirm.confirm"),
-                cancelText: l("dialog.cancel"),
-                encourageConfirmation: false,
-              });
+    <IconButton
+      id="button_remove"
+      disabled={activeNote.isUnsaved}
+      title={l("editor.remove-note")}
+      icon={"delete"}
+      onClick={async () => {
+        await confirm({
+          text: l("editor.remove-note.confirm.text"),
+          confirmText: l("editor.remove-note.confirm.confirm"),
+          cancelText: l("dialog.cancel"),
+          encourageConfirmation: false,
+        });
 
-              removeActiveNote();
-            }}
-          />
-          <IconButton
-            id="button_duplicate"
-            disabled={activeNote.isUnsaved}
-            title={l("editor.duplicate-note")}
-            icon="content_copy"
-            onClick={duplicateNote}
-          />
-          <IconButton
-            id="button_pin"
-            disabled={activeNote.isUnsaved}
-            title={l("editor.pin-note")}
-            icon="push_pin"
-            onClick={() => {
-              if (activeNote.isUnsaved) return;
-              pinOrUnpinNote(activeNote.slug);
-            }}
-          />
-          <IconButton
-            id="button_import-note"
-            disabled={!activeNote.isUnsaved}
-            title={l("editor.import-note")}
-            icon="file_upload"
-            onClick={importNote}
-          />
-          <IconButton
-            id="button_export-note"
-            disabled={false}
-            title={l("editor.export-note")}
-            icon="file_download"
-            onClick={() => {
-              if (!notesProvider) return;
-              exportNote(activeNote, notesProvider);
-            }}
-          />
-          <IconButton
-            id="button_upload-file"
-            disabled={false}
-            title={l("editor.upload-file")}
-            icon="upload_file"
-            onClick={handleUploadFilesRequest}
-          />
-          <IconButton
-            id="button_random-note"
-            disabled={false}
-            title={l("editor.open-random-note")}
-            icon="question_mark"
-            onClick={async () => {
-              if (unsavedChanges) {
-                await confirmDiscardingUnsavedChanges();
-                setUnsavedChanges(false);
-              }
-              navigate(getAppPath(
-                PathTemplate.EXISTING_NOTE,
-                new Map([
-                  ["GRAPH_ID", LOCAL_GRAPH_ID],
-                  ["SLUG", "random"],
-                ]),
-              ));
-            }}
-          />
-        </>
-        : ""
-    }
+        removeActiveNote();
+      }}
+    />
+    <IconButton
+      id="button_duplicate"
+      disabled={activeNote.isUnsaved}
+      title={l("editor.duplicate-note")}
+      icon="content_copy"
+      onClick={duplicateNote}
+    />
+    <IconButton
+      id="button_pin"
+      disabled={activeNote.isUnsaved}
+      title={l("editor.pin-note")}
+      icon="push_pin"
+      onClick={() => {
+        if (activeNote.isUnsaved) return;
+        pinOrUnpinNote(activeNote.slug);
+      }}
+    />
+    <IconButton
+      id="button_import-note"
+      disabled={!activeNote.isUnsaved}
+      title={l("editor.import-note")}
+      icon="file_upload"
+      onClick={importNote}
+    />
+    <IconButton
+      id="button_export-note"
+      disabled={false}
+      title={l("editor.export-note")}
+      icon="file_download"
+      onClick={() => {
+        if (!notesProvider) return;
+        exportNote(activeNote, notesProvider);
+      }}
+    />
+    <IconButton
+      id="button_upload-file"
+      disabled={false}
+      title={l("editor.upload-file")}
+      icon="upload_file"
+      onClick={handleUploadFilesRequest}
+    />
+    <IconButton
+      id="button_random-note"
+      disabled={false}
+      title={l("editor.open-random-note")}
+      icon="question_mark"
+      onClick={async () => {
+        if (unsavedChanges) {
+          await confirmDiscardingUnsavedChanges();
+          setUnsavedChanges(false);
+        }
+        navigate(getAppPath(
+          PathTemplate.EXISTING_NOTE,
+          new Map([
+            ["GRAPH_ID", LOCAL_GRAPH_ID],
+            ["SLUG", "random"],
+          ]),
+        ));
+      }}
+    />
   </>;
 };
 
