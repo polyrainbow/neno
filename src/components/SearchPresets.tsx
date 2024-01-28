@@ -81,7 +81,7 @@ const SearchPresets = ({
   };
 
   return <section
-    className="list-section"
+    className="search-presets"
   >
     <div className="search-presets-heading-row">
       <h1>{l("list.search.presets")}</h1>
