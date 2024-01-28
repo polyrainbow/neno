@@ -268,6 +268,14 @@
 .pagination {
   text-align: center;
   word-break: break-all;
+
+  &.top {
+    padding-top: var(--default-padding);
+  }
+
+  &.bottom {
+    padding-bottom: var(--default-padding);
+  }
 }
 
 .pagination ul {
@@ -294,7 +302,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--default-gap);
-  padding: var(--default-gap) 0;
 }
 
 .search-presets {
@@ -320,6 +327,7 @@
   font-size: var(--default-font-size);
   margin: 0;
   text-align: center;
+  padding-top: var(--default-padding);
 }
 
 .note-list {
@@ -343,12 +351,19 @@
     height: var(--header-bar-height);
   }
 
-  .list-section, .search-presets {
+  .list-section {
+    overflow-y: scroll;
+
+    /* height is 100vh minus 2 headers of 50px height */
+    height: calc(100vh - (2 * var(--header-bar-height)));
+  }
+
+  .search-presets {
     overflow-y: scroll;
 
     /* height is 100vh minus 2 headers of 50px height and minus top padding of
     this element */
-    height: calc(100vh - (2 * var(--header-bar-height)) - (2 * var(--default-gap)));
+    height: calc(100vh - (2 * var(--header-bar-height)) - 2 * var(--default-padding));
   }
 
   .main-content-besides-sidebar {
