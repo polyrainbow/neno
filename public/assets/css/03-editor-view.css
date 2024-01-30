@@ -556,3 +556,52 @@ div[data-lexical-editor] .transclusion span.transclusion-note-title {
   background: var(--accent-color-interactible);
   margin-inline: 0;
 }
+
+/*
+  If a code block is not followed by another, show gap
+  Goal: Gap between quote blocks and different kinds of blocks
+*/
+.quote-block:not(:has(+ .quote-block)) {
+  margin-bottom: 10px;
+}
+
+/*
+  Elements that are not a quote block but followed by one should have a margin
+  Goal: Gap between quote blocks and different kinds of blocks
+*/
+:not(.quote-block):has(+ .quote-block) {
+  margin-bottom: 10px;
+}
+
+
+/*
+  If a code block is not followed by another, show gap
+  Goal: Gap between code blocks and different kinds of blocks
+*/
+.code-block:not(:has(+ .code-block)) {
+  margin-bottom: 10px;
+}
+
+/*
+  Elements that are not a code block but followed by one should have a margin
+  Goal: Gap between code blocks and different kinds of blocks
+*/
+:not(.code-block):has(+ .code-block) {
+  margin-bottom: 10px;
+}
+
+/*
+  If a list item block is not followed by another, show gap
+  Goal: Gap between list item sections and different kinds of blocks
+*/
+.list-item:not(:has(+ .list-item)) {
+  margin-bottom: 10px;
+}
+
+/*
+  Elements that are not a list item but followed by one should have a margin
+  Goal: Gap between list item sections and different kinds of blocks
+*/
+:not(.list-item):has(+ .list-item) {
+  margin-bottom: 10px;
+}
