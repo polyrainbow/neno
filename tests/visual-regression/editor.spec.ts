@@ -51,6 +51,7 @@ test.beforeEach(async ({ page }) => {
   await page.keyboard.press("Control+.");
   await page.waitForSelector("button.memory-storage");
   await page.click("button.memory-storage");
+  await page.getByText("No notes found").waitFor();
 });
 
 test.describe("Editor", () => {
