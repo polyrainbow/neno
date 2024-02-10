@@ -56,6 +56,7 @@ const NoteBacklinks = ({
             }}
             isActive={false}
             isLinked={true}
+            isSelected={false}
             isLinkable={true}
             onLinkIndicatorClick={() => {
               onLinkIndicatorClick(

@@ -21,6 +21,8 @@ interface ControlledNoteList {
   setSearchQuery: (value: string) => void,
   scrollTop: number,
   setScrollTop: (value: number) => void,
+  selectedIndex: number,
+  setSelectedIndex: (value: number) => void,
 }
 
 // hook for retrieving graph stats for the application header
@@ -35,16 +37,19 @@ export default (
     SORT_MODE_LOCAL_STORAGE_KEY,
   ) as NoteListSortMode ?? NoteListSortMode.UPDATE_DATE_DESCENDING;
   const [sortMode, setSortMode] = useState<NoteListSortMode>(initialSortMode);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const setSearchQuery = (value: string) => {
     setSearchQueryState(value);
     setScrollTop(0);
     setPageState(1);
+    setSelectedIndex(0);
   };
 
   const setPage = (page: number) => {
     setPageState(page);
     setScrollTop(0);
+    setSelectedIndex(0);
   };
 
   const [
@@ -77,5 +82,7 @@ export default (
     setSearchQuery,
     scrollTop,
     setScrollTop,
+    selectedIndex,
+    setSelectedIndex,
   };
 };

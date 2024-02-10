@@ -132,7 +132,6 @@
   "list.sort-mode.update-date-descending": "Letzte Aktualisierung (absteigend)",
   "list.status.busy": "Notizen werden geladen …",
   "list.status.no-notes-found": "Keine Notizen gefunden",
-  "list.status.too-short": "Bitte gib mindestens 3 Zeichen zum Suchen ein.",
   "list.untitled-note": "Unbenannte Notiz",
   "menu.change-language": "Sprache ändern",
   "menu.close-graph": "Graph schließen",

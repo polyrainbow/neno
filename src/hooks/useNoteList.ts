@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import NoteListItem from "../lib/notes/types/NoteListItem";
-import * as Config from "../config";
 import DatabaseQuery from "../lib/notes/types/DatabaseQuery";
 import {
   NoteListSortMode,
@@ -33,16 +32,6 @@ export default (
   const refreshNoteList = useCallback(
     async () => {
       setNoteListItems([]);
-
-      // if searchValue is given but below MINIMUM_SEARCH_QUERY_LENGTH,
-      // we don't do anything and leave the note list empty
-      if (
-        searchQuery.length > 0
-        && searchQuery.length < Config.MINIMUM_SEARCH_QUERY_LENGTH
-      ) {
-        return;
-      }
-
       setIsBusy(true);
 
       const options: DatabaseQuery = {
@@ -51,9 +40,7 @@ export default (
         caseSensitive: false,
       };
 
-      if (searchQuery.length >= Config.MINIMUM_SEARCH_QUERY_LENGTH) {
-        options.searchString = searchQuery;
-      }
+      options.searchString = searchQuery;
 
       const requestId = crypto.randomUUID();
       currentRequestId.current = requestId;

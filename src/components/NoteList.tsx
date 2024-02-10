@@ -34,6 +34,7 @@ interface NoteListProps {
   unsavedChanges: boolean,
   setUnsavedChanges: (unsavedChanges: boolean) => void,
   onLinkIndicatorClick: (slug: Slug, title: string) => void,
+  selectedIndex: number,
 }
 
 const NoteList = ({
@@ -52,6 +53,7 @@ const NoteList = ({
   unsavedChanges,
   setUnsavedChanges,
   onLinkIndicatorClick,
+  selectedIndex,
 }: NoteListProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const goToNote = useGoToNote();
@@ -60,10 +62,6 @@ const NoteList = ({
   const isSmallScreen = useIsSmallScreen();
 
   let status = NoteListStatus.DEFAULT;
-
-  if (searchValue.length > 0 && searchValue.length < 3) {
-    status = NoteListStatus.SEARCH_VALUE_TOO_SHORT;
-  }
 
   if (isBusy) {
     status = NoteListStatus.BUSY;
@@ -96,10 +94,7 @@ const NoteList = ({
     container.scrollTop = scrollTop;
   }, [notes, status, sortMode]);
 
-  if (
-    status === NoteListStatus.BUSY
-    || status === NoteListStatus.SEARCH_VALUE_TOO_SHORT
-  ) {
+  if (status === NoteListStatus.BUSY) {
     return <NoteListStatusIndicator
       status={status}
     />;
@@ -131,9 +126,11 @@ const NoteList = ({
       numberOfResults={numberOfResults}
       numberOfAllNotes={numberOfAllNotes}
     />
-    <div className="note-list">
+    <div
+      className="note-list"
+    >
       {
-        notes.map((note) => {
+        notes.map((note, i) => {
           const isActive
             = !!activeNote
               && (!activeNote.isUnsaved)
@@ -153,6 +150,7 @@ const NoteList = ({
 
           return <NoteListItem
             note={note}
+            isSelected={i === selectedIndex}
             isActive={isActive}
             isLinked={isLinked}
             key={`main-notes-list-item-${note.slug}`}

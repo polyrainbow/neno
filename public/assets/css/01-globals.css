@@ -121,7 +121,6 @@
   --content-element-border: var(--input-border-width) solid var(--main-content-color) !important;
   --content-element-border-radius: 0;
   --input-padding: 8px;
-  --focus-outline: var(--font-color) auto 1px;
   --bold: 765;
 }
 
@@ -196,6 +195,10 @@ button {
 
 main {
   display: grid;
+}
+
+:focus-visible {
+  outline: 2px solid var(--font-color);
 }
 
 @media only screen and (min-width: 1281px) {
@@ -379,6 +382,11 @@ button {
   cursor: pointer;
   background-color: var(--buton-background-color);
   color: var(--font-color);
+
+  &[disabled] {
+    cursor: inherit;
+    color: var(--alt-content-color);
+  }
 }
 
 
@@ -399,10 +407,6 @@ button.dangerous-action {
   font-size: var(--large-font-size);
   padding: 10px 20px;
   user-select: none;
-}
-
-.default-button:focus {
-  outline: var(--focus-outline);
 }
 
 .default-button-with-icon {

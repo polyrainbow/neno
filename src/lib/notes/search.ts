@@ -25,7 +25,7 @@ import GraphObject from "./types/Graph.js";
 import { getPagedMatches } from "../utils.js";
 import * as config from "./config.js";
 import CharIterator from "../subwaytext/CharIterator.js";
-import { getSortFunction } from "./graphUtils.js";
+import { getNoteSortFunction, getSortFunction } from "./graphUtils.js";
 
 export const isWhiteSpace = (string: string): boolean => {
   return string.trim().length === 0;
@@ -230,28 +230,53 @@ export const search = async (
     }
   }
 
+  const SIMPLE_SORT_MODES: NoteListSortMode[] = [
+    NoteListSortMode.CREATION_DATE_ASCENDING,
+    NoteListSortMode.CREATION_DATE_DESCENDING,
+    NoteListSortMode.UPDATE_DATE_ASCENDING,
+    NoteListSortMode.UPDATE_DATE_DESCENDING,
+    NoteListSortMode.NUMBER_OF_CHARACTERS_ASCENDING,
+    NoteListSortMode.NUMBER_OF_CHARACTERS_DESCENDING,
+  ];
 
-  // now we need to transform all notes into NoteListItems before we can
-  // sort those
-  let noteListItems: NoteListItem[] = createNoteListItems(matchingNotes, graph)
-    .sort(getSortFunction(sortMode));
+  // perf optimization: if we're using a simple sort mode, we can
+  // avoid creating note list items of *all* notes and only create
+  // them for the notes we're going to display
+  if (SIMPLE_SORT_MODES.includes(sortMode)) {
+    matchingNotes = matchingNotes.sort(getNoteSortFunction(sortMode));
 
-  // let's only slice the array if it makes sense to do so
-  if (limit > 0 && limit < noteListItems.length) {
-    noteListItems = noteListItems.slice(0, limit);
+    // let's see if we should limit the number of results
+    if (limit > 0 && limit < matchingNotes.length) {
+      matchingNotes = matchingNotes.slice(0, limit);
+    }
+
+    // let's extract the list items for the requested page
+    const pagedMatches = getPagedMatches(
+      matchingNotes,
+      page,
+      config.NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE,
+    );
+
+    return {
+      results: createNoteListItems(pagedMatches, graph),
+      numberOfResults: matchingNotes.length,
+    };
+  } else {
+    const noteListItems: NoteListItem[] = createNoteListItems(
+      matchingNotes,
+      graph,
+    )
+      .sort(getSortFunction(sortMode));
+
+    const pagedMatches = getPagedMatches(
+      noteListItems,
+      page,
+      config.NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE,
+    );
+
+    return {
+      results: pagedMatches,
+      numberOfResults: matchingNotes.length,
+    };
   }
-
-  // let's extract the list items for the requested page
-  const noteListItemsOfPage: NoteListItem[] = getPagedMatches(
-    noteListItems,
-    page,
-    config.NUMBER_OF_RESULTS_PER_NOTE_LIST_PAGE,
-  );
-
-  const noteListPage: NoteListPage = {
-    results: noteListItemsOfPage,
-    numberOfResults: noteListItems.length,
-  };
-
-  return noteListPage;
 };

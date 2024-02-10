@@ -177,6 +177,9 @@ const NoteView = () => {
       createNewNote({});
       setCanonicalNewNotePath();
     },
+    onCmdE: () => {
+      document.getElementById("search-input")?.focus();
+    },
   });
 
 
@@ -294,6 +297,8 @@ const NoteView = () => {
                 const wikilink = Utils.getWikilinkForNote(slug, title);
                 insertModule.insert?.(wikilink);
               }}
+              selectedIndex={controlledNoteList.selectedIndex}
+              setSelectedIndex={controlledNoteList.setSelectedIndex}
             />
           </div>
           : null

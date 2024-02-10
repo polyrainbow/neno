@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   NoteListSortMode,
 } from "../lib/notes/types/NoteListSortMode";
@@ -9,6 +9,8 @@ import SearchPresets from "./SearchPresets";
 import { Slug } from "../lib/notes/types/Slug";
 import NoteListItemType from "../lib/notes/types/NoteListItem";
 import ActiveNote from "../types/ActiveNote";
+import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
+import useGoToNote from "../hooks/useGoToNote";
 
 export enum NoteListView {
   DEFAULT = "default",
@@ -29,6 +31,8 @@ interface NoteListWithControlsProps {
   page: number,
   setPage: (newPage: number) => void,
   activeNote: ActiveNote | null,
+  selectedIndex: number,
+  setSelectedIndex: (value: number) => void,
   itemsAreLinkable: boolean,
   onLinkIndicatorClick: (slug: Slug, title: string) => void,
 }
@@ -49,11 +53,41 @@ const NoteListWithControls = ({
   activeNote,
   itemsAreLinkable,
   onLinkIndicatorClick,
+  selectedIndex,
+  setSelectedIndex,
 }: NoteListWithControlsProps) => {
   const [view, setView] = useState<NoteListView>(NoteListView.DEFAULT);
+  const noteListWithControlsRef = useRef<HTMLElement | null>(null);
   const [unsavedChanges, setUnsavedChanges] = useContext(UnsavedChangesContext);
+  const goToNote = useGoToNote();
 
-  return <>
+  useKeyboardShortcuts(
+    {
+      onArrowUp: () => {
+        const newIndex = selectedIndex > -1
+          ? selectedIndex - 1
+          : selectedIndex;
+        setSelectedIndex(newIndex);
+      },
+      onArrowDown: () => {
+        const newIndex = selectedIndex < noteListItems.length - 1
+          ? selectedIndex + 1
+          : selectedIndex;
+        setSelectedIndex(newIndex);
+      },
+      onEnter: () => {
+        if (selectedIndex > -1) {
+          const note = noteListItems[selectedIndex];
+          goToNote(note.slug);
+        }
+      },
+    },
+    noteListWithControlsRef,
+  );
+
+  return <section
+    ref={noteListWithControlsRef}
+  >
     <NoteListControls
       onChange={handleSearchInputChange}
       value={searchValue}
@@ -83,6 +117,7 @@ const NoteListWithControls = ({
           setUnsavedChanges={setUnsavedChanges}
           unsavedChanges={unsavedChanges}
           onLinkIndicatorClick={onLinkIndicatorClick}
+          selectedIndex={selectedIndex}
         />
         : <SearchPresets
           onSelect={(preset) => {
@@ -93,7 +128,7 @@ const NoteListWithControls = ({
           onClose={() => setView(NoteListView.DEFAULT)}
         />
     }
-  </>;
+  </section>;
 };
 
 export default NoteListWithControls;

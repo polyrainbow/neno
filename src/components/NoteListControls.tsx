@@ -34,6 +34,7 @@ const NoteListControls = ({
       inputStyle={{
         width: isSmallScreen ? "auto" : "265px",
       }}
+      autoComplete="off"
     />
     <IconButton
       id="button_show-search-presets"

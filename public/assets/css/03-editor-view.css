@@ -31,13 +31,15 @@
 }
 
 .note-list-item-main {
+  display: flex;
+  flex-direction: column;
   cursor: pointer;
   padding: var(--default-padding);
   width: 100%;
 }
 
 .note-list-item-main.with-link-edge {
-  width: calc(100% - 70px);
+  width: calc(100% - 40px);
 }
 
 .note-list-item-main .title {
@@ -45,6 +47,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  width: 100%;
+  text-align: left;
 }
 
 .note-list-item-info {
@@ -76,6 +80,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: content-box;
+  font-size: var(--default-font-size);
 }
 
 .note-list-item-linked-notes-indicator-content {
@@ -137,11 +143,12 @@
   display: inline;
 }
 
-.note-list-item:not(.active) .note-list-item-main:hover {
+.note-list-item:not(.active) .note-list-item-main:hover,
+.note-list-item.selected:not(.active) .note-list-item-main {
   background-color: var(--nli-color-hover);
 }
 
-.note-list-item[class*="active"] {
+.note-list-item.active .note-list-item-main{
   background-color: var(--nli-color-active) !important;
 }
 

@@ -1,18 +1,51 @@
-import { useEffect } from "react";
+import { RefObject, useEffect } from "react";
+
+/*
+> = Overridden with
+CMD+
+  A - Select all
+  B - NENO: New note
+  C - Copy
+  D - Add bookmark
+  E - NENO: Search
+  F - Find
+  G - Find
+  H - Go to last app
+  I -
+  N - New window
+  P - Print
+  Q - Quit app
+  R - Reload
+  S - Save > NENO: Save
+  T - New tab
+  U -
+  V - Paste
+  W - Close tab
+  X - Cut
+  Z - Undo
+*/
 
 interface KeyboardShortCutHandlers {
   onSave?: () => void,
   onCmdDot?: () => void,
   onCmdB?: () => void,
+  onCmdE?: () => void,
+  onArrowUp?: () => void,
+  onArrowDown?: () => void,
+  onEnter?: () => void,
 }
 
-export default (handlers: KeyboardShortCutHandlers): void => {
+export default (
+  handlers: KeyboardShortCutHandlers,
+  elementRef?: RefObject<HTMLElement>,
+): void => {
   const handleKeydown = (e: KeyboardEvent) => {
     if (
       handlers.onSave
       // @ts-ignore
       && (navigator.userAgentData.platform === "macOS" ? e.metaKey : e.ctrlKey)
       && e.key === "s"
+      && !e.shiftKey
     ) {
       handlers.onSave();
       e.preventDefault();
@@ -37,13 +70,55 @@ export default (handlers: KeyboardShortCutHandlers): void => {
       handlers.onCmdB();
       e.preventDefault();
     }
+
+    if (
+      handlers.onCmdE
+      // @ts-ignore
+      && (navigator.userAgentData.platform === "macOS" ? e.metaKey : e.ctrlKey)
+      && e.key === "e"
+    ) {
+      handlers.onCmdE();
+      e.preventDefault();
+    }
+
+    if (
+      handlers.onArrowUp
+      && e.key === "ArrowUp"
+    ) {
+      handlers.onArrowUp();
+      e.preventDefault();
+    }
+
+    if (
+      handlers.onArrowDown
+      && e.key === "ArrowDown"
+    ) {
+      handlers.onArrowDown();
+      e.preventDefault();
+    }
+
+    if (
+      handlers.onEnter
+      && e.key === "Enter"
+    ) {
+      handlers.onEnter();
+      e.preventDefault();
+    }
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeydown);
+    if (elementRef?.current) {
+      elementRef.current.addEventListener("keydown", handleKeydown);
+    } else {
+      document.body.addEventListener("keydown", handleKeydown);
+    }
 
     return () => {
-      window.removeEventListener("keydown", handleKeydown);
+      if (elementRef?.current) {
+        elementRef.current.removeEventListener("keydown", handleKeydown);
+      } else {
+        document.body.removeEventListener("keydown", handleKeydown);
+      }
     };
-  }, [handleKeydown, handlers]);
+  }, [handleKeydown, handlers, elementRef]);
 };

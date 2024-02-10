@@ -76,6 +76,56 @@ const getSortFunction = (
   return sortFunctions[sortMode] ?? sortFunctions.UPDATE_DATE_ASCENDING;
 };
 
+type ExistingNoteSortFunction = (a: ExistingNote, b: ExistingNote) => number;
+
+const getNoteSortFunction = (
+  sortMode: NoteListSortMode,
+):((a: ExistingNote, b: ExistingNote) => number) => {
+  const sortFunctions = new Map<NoteListSortMode, ExistingNoteSortFunction>([
+    [
+      NoteListSortMode.CREATION_DATE_ASCENDING,
+      (a: ExistingNote, b: ExistingNote) => {
+        return (a.meta.createdAt ?? 0) - (b.meta.createdAt ?? 0);
+      },
+    ],
+    [
+      NoteListSortMode.CREATION_DATE_DESCENDING,
+      (a: ExistingNote, b: ExistingNote) => {
+        return (b.meta.createdAt ?? 0) - (a.meta.createdAt ?? 0);
+      },
+    ],
+    [
+      NoteListSortMode.UPDATE_DATE_ASCENDING,
+      (a: ExistingNote, b: ExistingNote) => {
+        return (a.meta.updatedAt ?? 0) - (b.meta.updatedAt ?? 0);
+      },
+    ],
+    [
+      NoteListSortMode.UPDATE_DATE_DESCENDING,
+      (a: ExistingNote, b: ExistingNote) => {
+        return (b.meta.updatedAt ?? 0) - (a.meta.updatedAt ?? 0);
+      },
+    ],
+    [
+      NoteListSortMode.NUMBER_OF_CHARACTERS_ASCENDING,
+      (a: ExistingNote, b: ExistingNote) => {
+        return a.content.length - b.content.length;
+      },
+    ],
+    [
+      NoteListSortMode.NUMBER_OF_CHARACTERS_DESCENDING,
+      (a: ExistingNote, b: ExistingNote) => {
+        return b.content.length - a.content.length;
+      },
+    ],
+  ]);
+
+  return sortFunctions.get(sortMode)
+    ?? sortFunctions.get(
+      NoteListSortMode.UPDATE_DATE_ASCENDING,
+    ) as ExistingNoteSortFunction;
+};
+
 
 // https://en.wikipedia.org/wiki/Breadth-first_search
 const breadthFirstSearch = (
@@ -207,4 +257,5 @@ export {
   getGraphCreationTimestamp,
   getGraphUpdateTimestamp,
   getGraphLinks,
+  getNoteSortFunction,
 };
