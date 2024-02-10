@@ -13,12 +13,14 @@ interface NoteListItemProps {
   onSelect: any,
   onLinkIndicatorClick?: () => void,
   isLinkable: boolean,
+  isSelected: boolean,
 }
 
 
 const NoteListItem = ({
   note,
   isActive,
+  isSelected,
   isLinked,
   onSelect,
   onLinkIndicatorClick,
@@ -31,13 +33,16 @@ const NoteListItem = ({
   if (isLinked) {
     trClassList.push("linked");
   }
+  if (isSelected) {
+    trClassList.push("selected");
+  }
   trClassList.push(isLinkable ? "linkable" : "not-linkable");
 
 
   return <div
     className={trClassList.join(" ")}
   >
-    <div
+    <button
       className="note-list-item-main with-link-edge"
       onClick={onSelect}
     >
@@ -47,7 +52,7 @@ const NoteListItem = ({
         {note.title || l("list.untitled-note")}
       </div>
       <NoteListItemInfo note={note} />
-    </div>
+    </button>
     <NoteListItemLinkedNotesIndicator
       isLinkable={isLinkable}
       isActive={isActive}

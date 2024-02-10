@@ -132,7 +132,6 @@
   "list.sort-mode.update-date-descending": "Update date (descending)",
   "list.status.busy": "Loading notes…",
   "list.status.no-notes-found": "No notes found",
-  "list.status.too-short": "Please type at least 3 characters to search",
   "list.untitled-note": "Untitled note",
   "menu.change-language": "Change language",
   "menu.close-graph": "Close graph",

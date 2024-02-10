@@ -4,8 +4,6 @@ const VERSION = "v7.6.0";
 
 const DEFAULT_NOTE_CONTENT = "";
 
-const MINIMUM_SEARCH_QUERY_LENGTH = 3;
-
 const LOCAL_GRAPH_ID = "local";
 
 // base path of the hosting environment. if you want to serve the application on
@@ -47,7 +45,6 @@ const NOTE_FILE_DESCRIPTION = "NENO subtext note";
 export {
   VERSION,
   DEFAULT_NOTE_CONTENT,
-  MINIMUM_SEARCH_QUERY_LENGTH,
   ROOT_PATH,
   ASSETS_PATH,
   ICON_PATH,

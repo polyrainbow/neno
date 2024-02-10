@@ -5,7 +5,6 @@ import BusyIndicator from "./BusyIndicator";
 export enum NoteListStatus {
   DEFAULT = "DEFAULT",
   BUSY = "BUSY",
-  SEARCH_VALUE_TOO_SHORT = "SEARCH_VALUE_TOO_SHORT",
   NO_NOTES_FOUND = "NO_NOTES_FOUND",
 }
 
@@ -28,13 +27,6 @@ const NoteListStatusIndicator = ({
     label: string;
     icon: string;
   }> = new Map([
-    [
-      NoteListStatus.SEARCH_VALUE_TOO_SHORT,
-      {
-        label: l("list.status.too-short"),
-        icon: "looks_3",
-      },
-    ],
     [
       NoteListStatus.NO_NOTES_FOUND,
       {

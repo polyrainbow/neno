@@ -29,7 +29,7 @@ const NoteListItemLinkedNotesIndicator = ({
   return <Tooltip
     title={linkControlLabel}
   >
-    <div
+    <button
       className={
         "note-list-item-linked-notes-indicator "
         + (isLinkable ? "linkable" : "not-linkable")
@@ -69,7 +69,7 @@ const NoteListItemLinkedNotesIndicator = ({
             : ""
         }
       </div>
-    </div>
+    </button>
   </Tooltip>;
 };
 

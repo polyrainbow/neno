@@ -56,6 +56,8 @@ const ListView = () => {
       onLinkIndicatorClick={() => {
         return;
       }}
+      selectedIndex={controlledNoteList.selectedIndex}
+      setSelectedIndex={controlledNoteList.setSelectedIndex}
     />
     <FloatingActionButton
       title={l("editor.new-note")}

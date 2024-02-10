@@ -18,7 +18,7 @@ const NoteSearchDisclaimer = ({
       && (numberOfResults === numberOfAllNotes)
     ) {
       label = "";
-    } else if (searchValue.length > 2) {
+    } else {
       label = l(
         numberOfResults === 1
           ? "list.search.x-note-found"
