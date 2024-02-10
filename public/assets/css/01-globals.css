@@ -121,7 +121,6 @@
   --content-element-border: var(--input-border-width) solid var(--main-content-color) !important;
   --content-element-border-radius: 0;
   --input-padding: 8px;
-  --focus-outline: var(--font-color) auto 2px;
   --bold: 765;
 }
 
