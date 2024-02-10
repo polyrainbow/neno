@@ -78,7 +78,9 @@ const NoteListWithControls = ({
       onEnter: () => {
         if (selectedIndex > -1) {
           const note = noteListItems[selectedIndex];
-          goToNote(note.slug);
+          if (note) {
+            goToNote(note.slug);
+          }
         }
       },
     },
