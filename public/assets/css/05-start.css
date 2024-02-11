@@ -3,10 +3,9 @@
 ******************************/
 
 .section-start {
-  display: grid;
-  grid-gap: var(--default-gap);
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto auto;
+  display: flex;
+  gap: calc(4 * var(--default-gap));
+  flex-direction: column;
   padding: 20px;
   box-sizing: border-box;
   max-width: 800px;
@@ -16,7 +15,7 @@
 }
 
 .section-start .start-welcome {
-  margin: auto;
+  margin: 0 auto;
 }
 
 .section-start .start-welcome #start-logo {
@@ -62,20 +61,14 @@
 
 #start-view-local {
   text-align: center;
-  grid-area: 2 / 1 / 3 / 3;
 }
 
-.section-start .start-welcome {
-  grid-area: 1 / 1 / 2 / 3;
-}
+.memory-storage-providers {
+  display: flex;
+  justify-content: center;
+  gap: var(--default-gap);
 
-.section-start footer {
-  grid-area: 3 / 1 / 4 / 3;
-}
-
-@media only screen and (max-width: 1280px) {
-  .section-start {
-    grid-template-columns: auto;
-    grid-template-rows: auto auto auto;
+  button {
+    height: fit-content;
   }
 }
