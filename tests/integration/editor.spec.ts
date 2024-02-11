@@ -16,8 +16,8 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
   await page.waitForSelector("img[alt='NENO logo']");
   await page.keyboard.press("Control+.");
-  await page.waitForSelector("button.memory-storage");
-  await page.click("button.memory-storage");
+  await page.waitForSelector("#memory-storage-load-button");
+  await page.click("#memory-storage-load-button");
   await page.getByText("No notes found").waitFor();
 });
 

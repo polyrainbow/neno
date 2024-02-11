@@ -334,7 +334,10 @@
   font-size: var(--default-font-size);
   margin: 0;
   text-align: center;
-  padding-top: var(--default-padding);
+}
+
+.list-section > *:first-child:not(.note-list) {
+  padding-top: var(--default-gap);
 }
 
 .note-list {

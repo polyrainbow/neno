@@ -1,30 +1,6 @@
 /* eslint-disable max-len */
-import { test, expect, Page } from "@playwright/test";
-
-// Set default date for all tests.
-// See https://github.com/microsoft/playwright/issues/6347#issuecomment-1085850728
-const setDefaultDate = async (page: Page): Promise<void> => {
-  // Pick the new/fake "now" for you test pages.
-  const fakeNow = new Date("January 02 2030 14:00:00").valueOf();
-
-  // Update the Date accordingly in your test pages
-  await page.addInitScript(`{
-    // Extend Date constructor to default to fakeNow
-    Date = class extends Date {
-      constructor(...args) {
-        if (args.length === 0) {
-          super(${fakeNow});
-        } else {
-          super(...args);
-        }
-      }
-    }
-    // Override Date.now() to start from fakeNow
-    const __DateNowOffset = ${fakeNow} - Date.now();
-    const __DateNow = Date.now;
-    Date.now = () => __DateNow() + __DateNowOffset;
-  }`);
-};
+import { test, expect } from "@playwright/test";
+import { setDefaultDate } from "../utils";
 
 const TEST_NOTE = `# Heading
 Paragraph block
@@ -49,8 +25,8 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
   await page.waitForSelector("img[alt='NENO logo']");
   await page.keyboard.press("Control+.");
-  await page.waitForSelector("button.memory-storage");
-  await page.click("button.memory-storage");
+  await page.waitForSelector("#memory-storage-load-button");
+  await page.click("#memory-storage-load-button");
   await page.getByText("No notes found").waitFor();
 });
 
@@ -106,5 +82,29 @@ test.describe("Editor", () => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.click("#button_show-search-presets");
     expect(await page.screenshot()).toMatchSnapshot("search-presets-dark.png");
+  });
+
+  test("search results disclaimer - light", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "light" });
+    await page.keyboard.type("1");
+    await page.click("#button_upload");
+    await page.click("#button_new");
+    await page.keyboard.type("2");
+    await page.click("#button_upload");
+    await page.locator("#search-input").click();
+    await page.keyboard.type("1", { delay: 20 });
+    expect(await page.screenshot()).toMatchSnapshot("editor-search-results-disclaimer-light.png");
+  });
+
+  test("search results disclaimer - dark", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+    await page.keyboard.type("1");
+    await page.click("#button_upload");
+    await page.click("#button_new");
+    await page.keyboard.type("2");
+    await page.click("#button_upload");
+    await page.locator("#search-input").click();
+    await page.keyboard.type("1", { delay: 20 });
+    expect(await page.screenshot()).toMatchSnapshot("editor-search-results-disclaimer-dark.png");
   });
 });

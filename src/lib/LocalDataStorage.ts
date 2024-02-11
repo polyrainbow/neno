@@ -71,9 +71,18 @@ export const getSavedFolderHandle = async (
 
 export const initializeNotesProvider = async (
   newFolderHandle?: FileSystemDirectoryHandle,
+  createDummyNotes?: boolean,
 ): Promise<NotesProvider> => {
   if (!newFolderHandle) {
     const memoryStorageProvider = new MockStorageProvider();
+    if (createDummyNotes) {
+      for (let i = 1; i <= 1000; i++) {
+        await memoryStorageProvider.writeObject(
+          "note-" + i + ".subtext",
+          "Test note " + i,
+        );
+      }
+    }
     notesProvider = new NotesProvider(memoryStorageProvider);
     return notesProvider;
   }

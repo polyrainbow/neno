@@ -41,23 +41,50 @@ const StartView = () => {
       <StartViewLocal />
       {
         memoryStorageProviderVisbility
-          ? <p><button
-            type="button"
-            className="default-button default-action memory-storage"
-            onClick={async () => {
-              await initializeNotesProvider();
-              const urlSearchParams
-                = new URLSearchParams(window.location.search);
-              if (urlSearchParams.has("redirect")) {
-                navigate(urlSearchParams.get("redirect") ?? "/");
-              } else {
-                navigate(getAppPath(
-                  PathTemplate.NEW_NOTE,
-                  new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-                ));
-              }
-            }}
-          >Memory Storage</button></p>
+          ? <div
+            className="memory-storage-providers"
+          >
+            <button
+              type="button"
+              className="default-button default-action"
+              id="memory-storage-load-button"
+              onClick={async () => {
+                await initializeNotesProvider(undefined, false);
+                const urlSearchParams
+                  = new URLSearchParams(window.location.search);
+                if (urlSearchParams.has("redirect")) {
+                  navigate(urlSearchParams.get("redirect") ?? "/");
+                } else {
+                  navigate(getAppPath(
+                    PathTemplate.NEW_NOTE,
+                    new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+                  ));
+                }
+              }}
+            >
+              Memory Storage
+            </button>
+            <button
+              type="button"
+              className="default-button memory-storage"
+              id="memory-storage-dummy-notes-load-button"
+              onClick={async () => {
+                await initializeNotesProvider(undefined, true);
+                const urlSearchParams
+                  = new URLSearchParams(window.location.search);
+                if (urlSearchParams.has("redirect")) {
+                  navigate(urlSearchParams.get("redirect") ?? "/");
+                } else {
+                  navigate(getAppPath(
+                    PathTemplate.NEW_NOTE,
+                    new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+                  ));
+                }
+              }}
+            >
+              Memory Storage with dummy notes
+            </button>
+          </div>
           : ""
       }
       <footer>
