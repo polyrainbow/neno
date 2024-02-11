@@ -44,7 +44,10 @@ const getValidNoteSlug = (
   }
 };
 
-const insertModule: { insert?: (text: string) => void } = {};
+const insertModule: {
+  insert?: (text: string) => void,
+  toggleWikilinkWrap?: () => void,
+} = {};
 
 const NoteView = () => {
   const notesProvider = useNotesProvider();
@@ -179,6 +182,9 @@ const NoteView = () => {
     },
     onCmdE: () => {
       document.getElementById("search-input")?.focus();
+    },
+    onCmdI: () => {
+      insertModule.toggleWikilinkWrap?.();
     },
   });
 

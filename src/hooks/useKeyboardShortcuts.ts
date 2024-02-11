@@ -11,7 +11,7 @@ CMD+
   F - Find
   G - Find
   H - Go to last app
-  I -
+  I - NENO: Toggle Wikilink wrap
   N - New window
   P - Print
   Q - Quit app
@@ -30,6 +30,7 @@ interface KeyboardShortCutHandlers {
   onCmdDot?: () => void,
   onCmdB?: () => void,
   onCmdE?: () => void,
+  onCmdI?: () => void,
   onArrowUp?: () => void,
   onArrowDown?: () => void,
   onEnter?: () => void,
@@ -78,6 +79,16 @@ export default (
       && e.key === "e"
     ) {
       handlers.onCmdE();
+      e.preventDefault();
+    }
+
+    if (
+      handlers.onCmdI
+      // @ts-ignore
+      && (navigator.userAgentData.platform === "macOS" ? e.metaKey : e.ctrlKey)
+      && e.key === "i"
+    ) {
+      handlers.onCmdI();
       e.preventDefault();
     }
 

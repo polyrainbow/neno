@@ -156,7 +156,10 @@ const PlainTextStateExchangePlugin = ({
 */
 const InsertPlugin = (
   { parentModule }: {
-    parentModule: { insert?: (text: string) => void },
+    parentModule: {
+      insert?: (text: string) => void,
+      toggleWikilinkWrap?: () => void,
+    },
   },
 ) => {
   const [editor] = useLexicalComposerContext();
@@ -170,8 +173,27 @@ const InsertPlugin = (
     });
   };
 
+  const toggleWikilinkWrap = () => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        const text = selection.getTextContent();
+        if (text.startsWith("[[") && text.endsWith("]]")) {
+          selection.insertText(text.substring(2, text.length - 2));
+        } else {
+          selection.insertText(`[[${text}]]`);
+          if (text.length === 0) {
+            selection.anchor.offset -= 2;
+            selection.focus.offset -= 2;
+          }
+        }
+      }
+    });
+  };
+
   useEffect(() => {
     parentModule.insert = insert;
+    parentModule.toggleWikilinkWrap = toggleWikilinkWrap;
   }, [insert]);
 
   return "";
