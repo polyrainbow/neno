@@ -34,8 +34,14 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,jpg,subtext,json,woff2}"],
+        // default is ["**\/*.{js,css,html}"] but we'll remove css as
+        // we'll only use CSS as public assets
+        globPatterns: ["**/*.{js,html}"],
       },
+      // public resources to be added to the PWA manifest (with revisions)
+      includeAssets: [
+        "**/*.{css,woff2,svg,subtext,json,jpg}",
+      ],
       manifest: {
         "name": "NENO",
         "theme_color": "#ff8598",
