@@ -96,9 +96,5 @@ const renderToc = (toc) => {
 };
 
 const toc = createToc();
-
 createAnchors(toc);
-
-console.log(toc);
-
 renderToc(toc);
