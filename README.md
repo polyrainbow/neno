@@ -41,5 +41,4 @@ must support File System Access (Chrome, Edge, ...).
 ## Further reading
 
 * [User manual](https://sebastianzimmer.github.io/neno/docs)
-* [Why I built NENO](https://sebastianzimmer.github.io/neno/docs/serendipity.html)
 * [Contributing](./CONTRIBUTING.md)
