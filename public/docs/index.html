@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>NENO User Manual</title>
+  <link rel="stylesheet" href="css/reboot.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg" href="/assets/app-icon/logo.svg">
+</head>
+<body>
+  <img
+    id="app-icon"
+    style="text-align: center;"
+    src="../public/assets/app-icon/logo.svg"
+    alt="NENO Logo"
+    width="200" height="200" 
+  >
+  <main>
+  <h1>NENO User Manual</h1>
+  
+  <p>
+    Hello and welcome to the NENO user manual.
+    Thank you for your interest in NENO. We hope that this manual provides
+    you with all you need to become a productive user.
+  </p>
+
+  <div id="toc"></div>
+  
+  <h2>What is NENO?</h2>
+  
+  <figure>
+    <img alt="NENO Editor view" src="./img/neno-light.png">
+    <figcaption>NENO Editor view</figcaption>
+  </figure>
+  
+  <p>
+    NENO is a powerful note-taking app that helps you create and manage your
+    personal knowledge garden. A personal knowledge garden is a graph of notes
+    linked together. Here is a
+    <a href="https://towardsdatascience.com/personal-knowledge-graphs-9a23a0b099af">
+      nice introduction to personal knowledge graphs by Dan McCreary</a>.
+    With NENO, you retain full control over your data because you decide
+    where it is stored: On your device, on a cloud storage of your choice,
+    or even on a server under your control.
+    <br>
+    NENO is open-source software which means it is completely free to use.
+  </p>
+
+  <figure>
+    <img alt="NENO Editor view in dark mode" src="./img/neno-dark.png">
+    <figcaption>NENO Editor view in dark mode</figcaption>
+  </figure>
+
+  <h2>Design Principles</h2>
+  <p>
+    It is important to understand why NENO is designed the way it is.
+    So let's consider our 4 core design principles.
+  </p>
+
+  <h3>Freedom to exit</h3>
+
+  <p>
+    NENO and its data format are not only open-source, they are designed
+    for
+    <a href="https://subconscious.substack.com/p/credible-exit">credible exit</a>
+    as they follow the
+    <a href="https://stephango.com/file-over-app">file over app</a> paradigm.
+    NENO's exchange format is not one big JSON blob, which might be open,
+    but is hard to be used with another app. NENO's data format is a bunch
+    of human-readable plain text files which can be opened and edited with
+    any simple text editor. Even if you decide to stop using NENO, you can
+    still access your notes and use them with another app.
+  </p>
+
+  <p>
+    We think that credible exit is an essential factor for serious
+    tools for thought, because we think that a person's knowledge is
+    so precious that there should not even be the slightest possibility for it to 
+    get stuck or even get lost in a proprietary app or hard-to-parse data
+    format.
+  </p>
+
+  <h3>Local-first</h3>
+
+  <p>
+    <a href="https://www.inkandswitch.com/local-first/">
+      Local-first</a> means that you own your
+    data, in spite of the cloud. We want to give ownership and agency to our
+    users. We want to give them the freedom to store and use their data in
+    any way they want.
+    Another way to put it is one of the three
+    inverted key relationships that define today's computing, proposed by
+    Bernhard Seefeld:
+    <a href="https://www.wildbuilt.world/p/inverting-three-key-relationships">
+      Services come to the data instead of data going to services</a>. 
+  </p>
+
+  <h3>Bottom-up organization</h3>
+
+  <p>
+    NENO prominently shows backlinks of notes to enable
+    <a href="https://sociologica.unibo.it/article/view/8350/8270">serendipity</a>
+    and a bottom-up organization of ideas.
+    Tyler Angert
+    <a href="https://tyler.cafe/information_forest">sums this up pretty well</a>:
+  </p>
+
+  <blockquote>
+    Anytime you link to something, both ends of the link should have
+    references to it. This means that organization of pages and ideas is
+    bottom up. You don’t have to create folders or categories ahead of time;
+    the relationships between things define their organization. The idea of
+    things being in one place becomes antiquated. You shouldn’t have to spend
+    extra time deciding what folder something should live in when it’s
+    related 10 other things.
+  </blockquote>
+
+  <p>
+    This also means that there are no pre-defined categories like "book",
+    "project", or "person" in NENO (or categories like the ones used in Tiago Forte's
+    <a href="https://fortelabs.com/blog/para/">PARA</a> model, for that matter).
+    However you can create any category you need yourself.
+  </p>
+
+  <h3>Modeless markup</h3>
+
+  <p>
+    NENO does not use Markdown or different editing modes or views. Why?
+    Gordon Brander
+    <a href="https://subconscious.substack.com/p/what-if-links-werent-meant-to-be">
+      sums it up pretty well</a>:
+
+    <blockquote>
+      Markup like [HTML's or Markdown's link syntax] implies that apps should
+      have a distinction
+      between an edit-mode meant for writing, and a view-mode meant for
+      reading. This creates indirection. Editing becomes something abstract.
+      You have to hold in your head the difference between the symbolic
+      markup and the rendered text, and imagine the rendered text while
+      editing. This kind of indirection might be ok for an audience-centric
+      publishing tool, but feels like a lot of cognitive overhead for
+      taking notes.
+    </blockquote>
+  </p>
+
+  <h2>Getting started</h2>
+  <p>
+    To get started with NENO, you do not need to create an account or
+    install any software. NENO is a web app that runs in your browser.
+  </p>
+
+  <p>
+    <a href="https://sebastianzimmer.github.io/neno">Open the app.</a>
+  </p>
+
+  <h3>Optional installation</h3>
+
+  <p>
+    Even though you don't need to install NENO, doing so has some advantages.
+    Click on the install button in the address bar of your browser to install
+    NENO as a PWA (Progressive Web App). This way, you can start NENO from
+    your device like any other app.
+  </p>
+
+  <h3>Opening a folder</h3>
+  
+  <p>
+    When you open NENO for the first time, you will be asked to select a folder
+    where your notes will be stored.
+
+    NENO stores all data in a folder of your choice on your
+    device. If you want, you could also select a cloud storage folder so that
+    your notes are synchronized to all your devices. You could also use a Git
+    repository to manage your notes. That way, you also get versioning for free.
+    <strong>Even though NENO is a web app, it does not send any user data to a
+    web server</strong>.
+  </p>
+  
+  <p>
+  Beware that yor web browser has to support a feature called
+  "File System Access API". At the time of writing, the desktop versions
+  of Chrome, Edge, Opera, and Safari do support it.
+  Mobile browser versions are not supported yet.
+  We recommend to use a Chromium-based browser (Chrome, Opera, Edge, etc.).
+  </p>
+  
+  <h2>Taking notes</h2>
+  <p>
+    Taking notes in NENO is quite straight-forward. Just start writing your note
+    in the editor and save it. You will see that the note list on the left now
+    contains your first note:
+  </p>
+
+  <figure>
+    <img alt="My first note" src="./img/my-first-note.png">
+    <figcaption>My first note</figcaption>
+  </figure>
+  
+  
+  <p>
+    Notes are written in
+    <a href="https://github.com/subconsciousnetwork/subtext">Subtext</a>,
+    a format specifically developed for note-taking. Subtext documents are
+    easily composable as Subtext is a block-based plain-text format with
+    minimal markup syntax.
+  </p>
+
+  <figure>
+    <img alt="The features of Subtext" src="./img/subtext-in-action.png">
+    <figcaption>The features of Subtext</figcaption>
+  </figure>
+
+  <h3>Linking other notes</h3>
+
+  <p>
+    You can link to other notes either via <code>[[Wikilinks]]</code> or
+    <code>/slashlinks</code>.
+    When using Slashlinks, the editor will show a transclusion of the linked note.
+    <br>
+    When you create another note, you can add a link to the first note
+    by clicking on the
+    "Link to this note" button with the chain icon next to the
+    list entry of that note:
+  </p>
+  
+  <figure>
+    <img alt="Link to another note" src="./img/link-to-this-note.png">
+    <figcaption>Link to another note</figcaption>
+  </figure>
+
+  <h3>Slugs</h3>
+  <p>
+    Every note that you create is assigned a slug, which is a unique key to
+    identify and find the note. The slug is also used as a note's filename.
+    The slug is either generated based on the note's content, or you can
+    manually set it.
+    When referencing a note in a Wikilink, the link text is normalized to
+    a slug.
+    E.g. when writing the Wikilink <code>[[My Favorite Note (probably)]]</code>,
+    the note with the slug <code>my-favorite-note-probably</code> from the
+    file <code>my-favorite-note-probably.subtext</code> will be
+    linked. The same note will be linked when using these Wikilinks:
+
+    <ul>
+      <li><code>[[my favorite<span style="white-space: pre;">       </span>note probably]]</code></li>
+      <li><code>[[My-Favorite.Note-Probably]]</code></li>
+      <li><code>[[My Favorite Note *probably*]]</code></li>
+    </ul>
+  </p>
+
+  <p>
+    When using slashlinks, you have to use the unmodified slug:
+    <code>/my-favorite-note-probably</code>
+  </p>
+
+  <h3>Aliases</h3>
+
+  <p>
+    You can add aliases to a note. Aliases are alternative slugs that
+    can be used to find the note.
+    Click on the plus icon in the to create a note alias, and enter the alias
+    in the new alias field.
+  </p>
+
+  <figure>
+    <img alt="A note with several aliases" src="./img/aliases.png">
+    <figcaption>A note with several aliases</figcaption>
+  </figure>
+
+  <p>
+    Aliases are a useful feature when writing notes in multiple languages.
+    For example, you can create a note with the slug "entropy" and assign it the
+    German word "entropie" as note alias.
+  </p>
+
+  <h3>Pins</h3>
+  You can pin notes to the topbar by clicking on the pin icon. Click it again
+  to unpin the note.
+
+  <figure>
+    <img alt="Pinned notes on the top bar" src="./img/pins.png">
+    <figcaption>Pinned notes on the top bar</figcaption>
+  </figure>
+
+  <h2>Search</h2>
+  <p>
+    By default, entering a value in the search input will search for note titles
+    that include all the words given.
+    By entering a token prefix followed by a
+    <code>:</code> before
+    the actual search string, you can change that behavior.
+  </p>
+
+  <h3>Token prefixes</h3>
+
+  <p>
+    <code>exact:</code> - Search for exact titles
+    <br>
+    Only notes whose title is an exact match are displayed.
+
+    <figure>
+      <img alt="Search for exact matches" src="./img/exact-search.png">
+      <figcaption>Search for exact matches</figcaption>
+    </figure>
+  </p>
+
+  <p>
+    <code>duplicates:url</code> - Show notes with same URLs
+
+    When you have a lot of notes, chances are that the same URL is included in
+    several notes. This search query helps you find those notes.
+  </p>
+
+  <p>
+    <code>duplicates:title</code> - Show notes with non-unique titles
+  </p>
+
+  <p>
+    <code>ft:</code> - Full-text search
+    Perform a full-text search on all notes by typing `ft:` followed by
+    the search query
+    into the search box. The full-text search is case-insensitive.
+  </p>
+
+  <p>
+    <code>has-block:</code> - Search for notes that contain a specific block type.
+
+    For example <code>has-block:list</code>. The following block types are supported:
+    <ul>
+      <li>paragraph</li>
+      <li>heading</li>
+      <li>code</li>
+      <li>list</li>
+    </ul>
+  </p>
+
+  <p>
+    <code>has-media:</code> - Search for notes that contain a specific media type.
+
+    For example <code>has-media:audio</code>. The following media types are supported:
+
+    <ul>
+      <li>audio</li>
+      <li>image</li>
+      <li>video</li>
+      <li>pdf</li>
+    </ul>
+  </p>
+
+  <p>
+    <code>has-url:</code> - Search for notes that contain a specific url
+
+    For example <code>has-url:https://example.com</code>
+  </p>
+
+  <p>
+    <code>has:custom-metadata</code> - Search for notes with any custom metadata fields
+  </p>
+
+  <p>
+    <code>$[KEY]:</code> - Search for notes with custom metadata fields with
+    the key <code>[KEY]</code>.
+    For example <code>$check-back:</code> will find
+    all notes that have a custom metadata field with the key <code>check-back</code>.
+  </p>
+
+  <p>
+    <code>$[KEY]:[VALUE]</code> - Search for notes with custom metadata fields with
+    the key <code>[KEY]</code> and the value <code>[VALUE]</code>.
+    For example <code>$check-back:2040-01-01</code> will find
+    all notes that have a custom metadata field with the key <code>check-back</code>
+    and the value <code>2040-01-01</code>.
+  </p>
+
+  <h3>Search presets</h3>
+
+  <p>
+    You can save every search query as a preset by opening the
+    "Search presets" view by clicking the button next to the search
+    input field. You can also quickly query saved presets.
+  </p>
+
+  <figure>
+    <img alt="Search presets" src="./img/search-presets.png">
+    <figcaption>Search presets</figcaption>
+  </figure>
+
+  <h2>Keyboard Shortcuts</h2>
+  <p>
+    NENO has a few keyboard shortcuts to make your note-taking experience
+    more efficient.
+  </p>
+
+  <ul>
+    <li>Save note: <code>CTRL</code>/<code>CMD</code> + <code>S</code></li>
+    <li>Create new note: <code>CTRL</code>/<code>CMD</code> + <code>B</code></li>
+    <li>Go to search input: <code>CTRL</code>/<code>CMD</code> + <code>E</code></li>
+    <li>Wrap selection in Wikilink: <code>CTRL</code>/<code>CMD</code> + <code>I</code></li>
+  </ul>
+
+  <p>
+    When the search input is focused you can select results with
+    <code>⬆</code>/<code>⬇</code>
+    and open the selected note with <code>Enter</code>.
+  </p>
+
+
+  <h2>Working with files</h2>
+
+  <p>
+    You can import any file into NENO and reference it in several notes.
+    When importing a file, a slashlink to the file and a transclusion
+    of the file is automatically added to
+    the currently active note. If applicable, the transclusion contains a preview
+    (for images) or a player for the file (video, audio).
+  </p>
+
+  <figure>
+    <img alt="Note with a video" src="./img/note-with-audio.png">
+    <figcaption>Note with a video</figcaption>
+  </figure>
+
+  <p>
+    In the files view, you get an overview of all files in your notes folder.
+    These files are stored in a subdirectory called <code>files</code>.
+    In the single file view, you can see all notes that reference the file.
+    You can also create a new note that references the file.
+  </p>
+
+  <figure>
+    <img alt="Single file view" src="./img/single-file-view.png">
+    <figcaption>Single file view</figcaption>
+  </figure>
+
+  <h2>Stats</h2>
+
+  <p>
+    It might be interesting to you to see some stats on your graph or see how
+    many
+    <a href="https://en.wikipedia.org/wiki/Component_(graph_theory)">components</a>
+    it has. Use the "Stats" view for this, which you can find in the app menu.
+  </p>
+
+  <h2>Acknowledgements</h2>
+  <p>
+    NENO's primitives are inspired by the work of the
+    <a href="https://subconscious.network/">Subconscious project</a>.
+  </p>
+
+  <p>
+    Significant inspiration for the project comes from my work at the
+    <a href="https://niklas-luhmann-archiv.de/">Niklas Luhmann Archive</a>,
+    from the people of the
+    <a href="https://discord.com/invite/wyHPzGraBh">Subconscious Discord channel</a>
+    and from the work of
+    <a href="https://notes.andymatuschak.org/About_these_notes">Andy Matuschak</a>.
+  </p>
+
+  <p>
+    NENO is built with the help of many open-source projects. Here are the most
+    important ones:
+    <ul>
+      <li>React</li>
+      <li>TypeScript</li>
+      <li>Node.js</li>
+      <li>Lexical</li>
+      <li>Vite</li>
+      <li>Subtext</li>
+    </ul>
+  </p>
+
+  <h2>License</h2>
+
+  <p>
+    NENO is licensed under the
+    <a href="https://github.com/SebastianZimmer/neno/blob/main/LICENSE">
+      Apache License, Version 2.0</a>.
+  </p>
+
+
+  </main>
+
+  <footer>
+    <p>Discovered an error?
+      <a href="https://github.com/SebastianZimmer/neno/issues/new">Let us know</a>
+      or fix it yourself by creating a PR on the
+      <a href="https://github.com/SebastianZimmer/neno/">repository</a>
+      .</p>
+  </footer>
+
+  <script src="js/toc.js" type="module"></script>
+</body>
+</html>

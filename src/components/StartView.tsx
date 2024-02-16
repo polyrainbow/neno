@@ -1,5 +1,5 @@
 import StartViewLocal from "./StartViewLocal";
-import { ASSETS_PATH, VERSION } from "../config";
+import { ASSETS_PATH, ROOT_PATH, VERSION } from "../config";
 import { l } from "../lib/intl";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
@@ -91,7 +91,7 @@ const StartView = () => {
         <div className="links">
           <a
             href={
-              "https://github.com/SebastianZimmer/neno/blob/main/docs/index.md"
+              ROOT_PATH + "docs/index.html"
             }
           >
             {l("start.links.user-manual")}

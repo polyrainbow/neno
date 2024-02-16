@@ -15,10 +15,10 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
 
 ## Screenshots
 
-![NENO Editor view](./docs/img/neno-light.png)
+![NENO Editor view](./public/docs/img/neno-light.png)
 *NENO Editor view in light mode*
 
-![NENO Editor view in dark mode](./docs/img/neno-dark.png)
+![NENO Editor view in dark mode](./public/docs/img/neno-dark.png)
 *NENO Editor view in dark mode*
 
 ## Features
@@ -40,6 +40,5 @@ must support File System Access (Chrome, Edge, ...).
 
 ## Further reading
 
-* [User manual](./docs/index.md)
-* [Why I built NENO](./docs/posts/Serendipity.md)
+* [User manual](https://sebastianzimmer.github.io/neno/docs)
 * [Contributing](./CONTRIBUTING.md)

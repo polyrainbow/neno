@@ -1,0 +1,95 @@
+@font-face {
+  font-family: "Mona Sans";
+  /* stylelint-disable-next-line function-no-unknown */
+  src: url("../../assets/fonts/Mona-Sans.woff2") format("woff2") tech(variations);
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background-color: #fff;
+    --primary-color: #000;
+    --alt-color: #d4d4d4;
+    --link-color: #3131ff;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #000;
+    --primary-color: #fff;
+    --alt-color: #333;
+    --link-color: #85a6ff;
+  }
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--primary-color);
+  padding: 20px;
+  font-family: "Mona Sans", sans-serif;
+}
+
+a {
+  color: var(--link-color);
+}
+
+#app-icon {
+  text-align: center;
+  margin: 2em auto;
+  display: block;
+  width: 140px;
+  height: 140px;
+}
+
+main {
+  max-width: 900px;
+  margin: auto;
+}
+
+h2 {
+  margin-top: 1em;
+}
+
+h3 {
+  margin-bottom: 1rem;
+}
+
+p {
+  line-height: 1.6em;
+  font-size: large;
+}
+
+ul {
+  font-size: large;
+}
+
+blockquote {
+  background: var(--alt-color);
+  padding: 20px;
+  border-left: 5px solid var(--primary-color);
+}
+
+img {
+  max-width: 100%;
+}
+
+figure {
+  text-align: center;
+  margin: 1rem auto;
+
+  img {
+    max-width: 70%;
+    border: 2px solid #CCC;
+  }
+
+  figcaption {
+    font-style: italic;
+  }
+}
+
+footer {
+  text-align: center;
+  padding-top: 50px;
+}
