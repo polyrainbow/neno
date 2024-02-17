@@ -7,7 +7,7 @@
   >
 </p>
 
-# NENO ![Build](https://github.com/SebastianZimmer/neno/actions/workflows/build.yml/badge.svg)
+# NENO ![Build](https://github.com/polyrainbow/neno/actions/workflows/build.yml/badge.svg)
 
 ## What is NENO?
 
@@ -35,10 +35,10 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
 
 ## Getting started
 
-Read the [user manual](./docs/index.md) or just [go to the app](https://sebastianzimmer.github.io/neno). Please note that your browser
+Read the [user manual](./docs/index.md) or just [go to the app](https://polyrainbow.github.io/neno). Please note that your browser
 must support File System Access (Chrome, Edge, ...).
 
 ## Further reading
 
-* [User manual](https://sebastianzimmer.github.io/neno/docs)
+* [User manual](https://polyrainbow.github.io/neno/docs/index.html)
 * [Contributing](./CONTRIBUTING.md)
