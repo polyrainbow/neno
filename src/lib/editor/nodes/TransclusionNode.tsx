@@ -37,6 +37,7 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
+    // eslint-disable-next-line react/prop-types
     const Transclusion = ({ slug }: { slug: Slug }) => {
       const [content, setContent] = useState<ReactElement | null>(null);
       const [isError, setIsError] = useState(false);
