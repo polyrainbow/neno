@@ -51,9 +51,9 @@
     "subwaytext-performance-test": "npm run compile && node dist/lib/subwaytext/examples/performance-test.js",
     "dev": "npx vite",
     "build": "npx tsc && npx vite build",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "npx eslint src --ext ts,tsx --report-unused-disable-directives",
     "all-checks": "npm run stylelint && npm run lint && npm run test && npm run integration-test && npm run build",
-    "lint-fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix"
+    "lint-fix": "npx eslint src --ext ts,tsx --report-unused-disable-directives --fix"
   },
   "author": "Sebastian Zimmer",
   "license": "Apache License 2.0"
