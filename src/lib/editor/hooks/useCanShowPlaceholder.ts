@@ -7,11 +7,9 @@
  */
 
 import type { LexicalEditor } from "lexical";
-
 import { $canShowPlaceholderCurry } from "@lexical/text";
 import { mergeRegister } from "@lexical/utils";
-import { useState } from "react";
-import useLayoutEffect from "./useLayoutEffect";
+import { useState, useLayoutEffect } from "react";
 
 function canShowPlaceholderFromCurrentEditorState(
   editor: LexicalEditor,

@@ -1,11 +1,10 @@
 import type { LexicalEditor } from "lexical";
-
 import { mergeRegister } from "@lexical/utils";
-import useLayoutEffectImpl from "./useLayoutEffect";
 import { registerSubtext } from "../utils/registerSubtext";
+import { useLayoutEffect } from "react";
 
 export function useSubtextSetup(editor: LexicalEditor): void {
-  useLayoutEffectImpl(() => {
+  useLayoutEffect(() => {
     return mergeRegister(
       registerSubtext(editor),
     );

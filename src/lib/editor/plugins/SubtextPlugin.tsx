@@ -26,7 +26,6 @@ import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
 import useLexicalEditable from "@lexical/react/useLexicalEditable";
-
 import { useSubtextSetup } from "../hooks/useSubtextSetup";
 import { useCanShowPlaceholder } from "../hooks/useCanShowPlaceholder";
 import { ErrorBoundaryType, useDecorators } from "../hooks/useDecorators";

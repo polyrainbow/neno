@@ -31,7 +31,6 @@ https://github.com/facebook/lexical/blob/main/packages/lexical-react/src/Lexical
 
 import type { LinkAttributes } from "@lexical/link";
 import type { ElementNode, LexicalEditor, LexicalNode } from "lexical";
-
 import {
   $createAutoLinkNode,
   $isAutoLinkNode,

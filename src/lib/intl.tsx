@@ -44,7 +44,7 @@ export function l(key: string, replacements?: Replacements): string {
 export function lf(
   key: string,
   replacements?: Replacements,
-): React.ReactFragment {
+): Iterable<React.ReactNode> {
   const output = l(key, replacements);
 
   if (output.includes("%EXTERNAL_LINK")) {

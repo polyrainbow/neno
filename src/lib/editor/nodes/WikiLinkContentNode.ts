@@ -11,7 +11,6 @@ import type {
   LexicalNode,
   SerializedTextNode,
 } from "lexical";
-
 import { addClassNamesToElement } from "@lexical/utils";
 import { $applyNodeReplacement, TextNode } from "lexical";
 

@@ -568,7 +568,7 @@ div[data-lexical-editor] .transclusion span.transclusion-note-title {
 }
 
 /*
-  If a code block is not followed by another, show gap
+  If a quote block is not followed by another, show gap
   Goal: Gap between quote blocks and different kinds of blocks
 */
 .quote-block:not(:has(+ .quote-block)) {

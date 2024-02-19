@@ -1,5 +1,4 @@
 import type { TextNode } from "lexical";
-
 import { $createInlineCodeNode, InlineCodeNode } from "../nodes/InlineCodeNode";
 import {
   useLexicalComposerContext,

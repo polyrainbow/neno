@@ -7,7 +7,6 @@
  */
 
 import type { TextNode } from "lexical";
-
 import { $createBoldNode, BoldNode } from "../nodes/BoldNode";
 import {
   useLexicalComposerContext,
