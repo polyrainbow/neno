@@ -1,7 +1,6 @@
 import SearchInput from "./SearchInput";
 import IconButton from "./IconButton";
 import { l } from "../lib/intl";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { NoteListSortMode } from "../lib/notes/types/NoteListSortMode";
 import { NoteListView } from "./NoteListWithControls";
 
@@ -22,8 +21,6 @@ const NoteListControls = ({
   view,
   setView,
 }: NoteListControlsProps) => {
-  const isSmallScreen = useIsSmallScreen();
-
   return <section
     className="note-list-controls"
   >
