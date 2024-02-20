@@ -1,9 +1,9 @@
 
 interface SearchInputProps {
   value: string,
-  onChange: any,
+  onChange: (val: string) => void,
   placeholder?: string,
-  inputStyle?: any,
+  inputStyle?: Record<string, string>,
   autoComplete?: string,
 }
 

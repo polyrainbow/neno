@@ -16,7 +16,7 @@ import {
 import { getUrlForSlug } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
-interface FilesViewPreviewBoxProps{
+interface FilesViewPreviewBoxProps {
   key: string,
   file: FileInfo,
   isDangling: boolean,

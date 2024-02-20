@@ -13,10 +13,10 @@ interface NoteMenuBarProps {
   unsavedChanges: boolean,
   setUnsavedChanges: (value: boolean) => void,
   pinOrUnpinNote: (slug: Slug) => void,
-  duplicateNote: (note: ActiveNote) => void,
+  duplicateNote: () => void,
   handleUploadFilesRequest: () => void,
   uploadInProgress: boolean,
-  importNote: (note: ActiveNote) => void,
+  importNote: () => void,
   disableNoteSaving: boolean,
 }
 

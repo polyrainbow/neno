@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+/* eslint-disable @stylistic/max-len */
 
 import {
   $getRoot,
@@ -78,6 +78,7 @@ function MyCustomAutoFocusPlugin() {
 // or throw them as needed. If you don't throw them, Lexical will
 // try to recover gracefully without losing user data.
 function onError(error: unknown) {
+  // eslint-disable-next-line no-console
   console.error(error);
 }
 
@@ -207,7 +208,7 @@ interface EditorProps {
   onUserRequest: (type: UserRequestType, value: string) => void,
   getTransclusionContent: (id: string) => Promise<ReactElement>,
   getLinkAvailability: (link: string, linkType: LinkType) => Promise<boolean>,
-  insertModule: any,
+  insertModule: { insert?: (text: string) => void },
 }
 
 

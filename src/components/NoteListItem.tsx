@@ -10,7 +10,7 @@ interface NoteListItemProps {
   note: NoteListItemType | SparseNoteInfo,
   isActive: boolean,
   isLinked: boolean,
-  onSelect: any,
+  onSelect: () => void,
   onLinkIndicatorClick?: () => void,
   isLinkable: boolean,
   isSelected: boolean,
@@ -44,7 +44,7 @@ const NoteListItem = ({
   >
     <button
       className="note-list-item-main with-link-edge"
-      onClick={onSelect}
+      onClick={() => onSelect()}
     >
       <div
         className="title"

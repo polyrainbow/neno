@@ -22,10 +22,27 @@ globalThis.navigator = {
   hardwareConcurrency: 4,
 };
 
-class subwaytextWorkerMock {
-  _callback: any;
+interface EventData {
+  action: string,
+  notes: {
+    id: string,
+    content: string,
+  }[],
+}
 
-  postMessage(eventData: any) {
+type Callback = (
+  response: {
+    data: {
+      id: string,
+      parsedContent: Block[],
+    }[],
+  }
+) => void;
+
+class subwaytextWorkerMock {
+  _callback: Callback | undefined;
+
+  postMessage(eventData: EventData) {
     if (eventData.action === "PARSE_NOTES") {
       const notes = eventData.notes;
 
@@ -52,14 +69,7 @@ class subwaytextWorkerMock {
   }
 
   set onmessage(
-    callback: (
-      response: {
-        data: {
-          id: string,
-          parsedContent: Block[],
-        },
-      }
-    ) => void,
+    callback: Callback,
   ) {
     this._callback = callback;
   }
@@ -1016,7 +1026,7 @@ describe("Notes module", () => {
   );
 
   it(
-    // eslint-disable-next-line max-len
+    // eslint-disable-next-line @stylistic/max-len
     "should show all backlinks of a newly created note, including those from notes created in previous sessions",
     async () => {
       const storageProvider = new MockStorageProvider();

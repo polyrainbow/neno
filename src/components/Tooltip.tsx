@@ -3,6 +3,7 @@ import { JSXElementConstructor } from "react";
 
 interface TooltipProps {
   title: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   children: React.ReactElement<any, string | JSXElementConstructor<any>>;
 }
 

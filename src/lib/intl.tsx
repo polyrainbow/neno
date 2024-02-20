@@ -35,6 +35,7 @@ export function l(key: string, replacements?: Replacements): string {
 
     return output;
   } else {
+    // eslint-disable-next-line no-console
     console.warn("Translation not available: " + key);
     return key;
   }

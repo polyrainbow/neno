@@ -233,7 +233,7 @@ A paragraph with a https://link.com and a /slashlink`;
       {
         type: BlockType.CODE,
         data: {
-          // eslint-disable-next-line max-len
+          // eslint-disable-next-line @stylistic/max-len
           code: "and here we have some multiline code\n\n\nconst x = [{}];\n!@#$%&*()",
           contentType: "javascript",
           whitespace: "",

@@ -10,8 +10,9 @@ const ConfirmationServiceProvider = ({
   const [
     confirmationState,
     setConfirmationState,
-  ] = React.useState<any>(null);
+  ] = React.useState<ConfirmationDialogParams | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const awaitingPromiseRef = React.useRef<any>();
 
   const openConfirmation = (params: ConfirmationDialogParams) => {
@@ -24,10 +25,6 @@ const ConfirmationServiceProvider = ({
   const handleCancel = () => {
     if (!confirmationState) {
       return;
-    }
-
-    if (confirmationState.catchOnCancel && awaitingPromiseRef.current) {
-      awaitingPromiseRef.current.reject();
     }
 
     setConfirmationState(null);

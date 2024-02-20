@@ -217,41 +217,6 @@ const getWritableStream = async (opts: SaveFilePickerOptions) => {
   return writableStream;
 };
 
-const getKeySortFunction = function(
-  key: string | number,
-  doCaseInsensitiveSort: boolean,
-): (a: any, b: any) => number {
-  return function(a, b): number {
-    let x = a[key];
-    let y = b[key];
-
-    if (doCaseInsensitiveSort && (typeof x === "string")) {
-      x = x.toLowerCase();
-      y = y.toLowerCase();
-    }
-
-    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-  };
-};
-
-
-const deepFreeze = (o: any) => {
-  Object.freeze(o);
-  if (o === undefined) {
-    return o;
-  }
-
-  Object.getOwnPropertyNames(o).forEach(function(prop) {
-    if (o[prop] !== null
-    && (typeof o[prop] === "object" || typeof o[prop] === "function")
-    && !Object.isFrozen(o[prop])) {
-      deepFreeze(o[prop]);
-    }
-  });
-
-  return o;
-};
-
 
 function isNotEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined;
@@ -319,9 +284,7 @@ const getWikilinkForNote = (slug: Slug, title: string): string => {
 
 
 export {
-  getKeySortFunction,
   yyyymmdd,
-  deepFreeze,
   isNotEmpty,
   isNotFalse,
   getPagedMatches,
