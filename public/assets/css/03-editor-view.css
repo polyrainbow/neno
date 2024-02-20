@@ -2,13 +2,17 @@
 .note-list-controls select {
   margin: 6.5px 0;
 
-  /* in the mobile view, we don't set a fixed height of the bar, so the margin
-  of these elements must be set that it matches a total height of 50px */
+  /*
+    In the mobile view, we don't set a fixed height of the
+    note-list-controls bar, so the margin
+    of these elements must be set so that it matches a total height of 50px.
+  */
 
   flex-grow: 1;
   flex-shrink: 1;
   min-width: 30px;
   height: 36px;
+  width: 265px;
 }
 
 .note-list-sort-mode-select {
