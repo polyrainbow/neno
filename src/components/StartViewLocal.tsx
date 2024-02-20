@@ -72,8 +72,6 @@ const StartViewLocal = () => {
                   ));
                 }
               } catch (e) {
-                console.error(e);
-
                 // it could be that the folder is not there anymore but we
                 // still have a handle
                 setLocalDatabaseFolderHandleName(null);
@@ -105,7 +103,7 @@ const StartViewLocal = () => {
             new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
           ));
         } catch (e) {
-          console.error(e);
+          // It is fine if the user aborts the directory selection
         }
       }}
     >

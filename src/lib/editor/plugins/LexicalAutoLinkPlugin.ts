@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable max-len */
+/* eslint-disable @stylistic/max-len */
 /*
 MIT License
 

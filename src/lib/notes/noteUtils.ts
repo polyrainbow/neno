@@ -592,7 +592,7 @@ const getURLsOfNote = (noteContent: NoteContent): string[] => {
     - comma (,)
     There might be more to come.
   */
-  // eslint-disable-next-line max-len
+  // eslint-disable-next-line @stylistic/max-len
   const regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=,]*)/g;
   return [...noteContent.matchAll(regex)].map((match) => match[0]);
 };

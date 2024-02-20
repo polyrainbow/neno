@@ -13,7 +13,7 @@ describe("search", () => {
   it(
     "should correctly parse all search tokens",
     async () => {
-      // eslint-disable-next-line max-len
+      // eslint-disable-next-line @stylistic/max-len
       const input = "   has:code has-media:image first-token \"one token\" ft:\"full : text : tokens\"    -check-again: -check-again:2023-01-01 :another-token     ";
       const expectedOutput = [
         "has:code",
@@ -32,7 +32,7 @@ describe("search", () => {
   it(
     "should correctly parse all query string",
     async () => {
-      // eslint-disable-next-line max-len
+      // eslint-disable-next-line @stylistic/max-len
       const input = "   has:code has-media:image first-token \"one token\" ft:\"full : text : tokens\"    -check-again: -check-again:2023-01-01 :another-token     ";
       const expectedOutput = [
         ["has", "code"],

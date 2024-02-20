@@ -11,7 +11,7 @@ export interface ConfirmationDialogParams {
 interface ConfirmationDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
-  params?: ConfirmationDialogParams;
+  params: ConfirmationDialogParams | null;
 }
 
 const ConfirmationDialog = ({

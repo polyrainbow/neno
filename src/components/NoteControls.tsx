@@ -25,9 +25,9 @@ interface NoteControlsProps {
   unsavedChanges: boolean,
   setUnsavedChanges: (val: boolean) => void,
   pinOrUnpinNote: (slug: Slug) => void,
-  duplicateNote: (note: ActiveNote) => void,
-  handleUploadFilesRequest: (files: FileList) => void,
-  importNote: (note: ActiveNote) => void,
+  duplicateNote: () => void,
+  handleUploadFilesRequest: () => void,
+  importNote: () => void,
   disableNoteSaving: boolean,
 }
 
@@ -51,7 +51,6 @@ const NoteControls = ({
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
   const confirm = useConfirm();
-
 
   return <>
     {
@@ -120,7 +119,7 @@ const NoteControls = ({
       disabled={activeNote.isUnsaved}
       title={l("editor.duplicate-note")}
       icon="content_copy"
-      onClick={duplicateNote}
+      onClick={() => duplicateNote()}
     />
     <IconButton
       id="button_pin"
@@ -137,7 +136,7 @@ const NoteControls = ({
       disabled={!activeNote.isUnsaved}
       title={l("editor.import-note")}
       icon="file_upload"
-      onClick={importNote}
+      onClick={() => importNote()}
     />
     <IconButton
       id="button_export-note"
@@ -154,7 +153,7 @@ const NoteControls = ({
       disabled={false}
       title={l("editor.upload-file")}
       icon="upload_file"
-      onClick={handleUploadFilesRequest}
+      onClick={() => handleUploadFilesRequest()}
     />
     <IconButton
       id="button_random-note"

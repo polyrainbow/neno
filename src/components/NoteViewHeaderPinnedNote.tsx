@@ -6,7 +6,7 @@ interface NoteViewHeaderPinnedNoteProps {
   key: string,
   note: NoteToTransmit,
   isActive: boolean,
-  onClick: any,
+  onClick: () => void,
 }
 
 const NoteViewHeaderPinnedNote = ({
@@ -16,7 +16,7 @@ const NoteViewHeaderPinnedNote = ({
 }: NoteViewHeaderPinnedNoteProps) => {
   return <button
     className={"pinned-note " + (isActive ? "active" : "")}
-    onClick={onClick}
+    onClick={() => onClick()}
   >
     <img
       src={getIconSrc("push_pin")}

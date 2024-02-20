@@ -4,7 +4,7 @@ interface RadioOptionProps {
   groupId: string,
   value: string | number,
   label: string,
-  onSelect: any,
+  onSelect: () => void,
   isSelected: boolean,
 }
 
@@ -46,7 +46,7 @@ interface RadioGroupProps {
     label: string,
   }[],
   selectedValue: string | number,
-  onChange: any,
+  onChange: (value: string | number) => void,
 }
 
 

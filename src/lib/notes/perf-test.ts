@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable no-console */
 import NotesProvider from "./index";
 import { NoteSaveRequest } from "./types/NoteSaveRequest";
@@ -66,4 +65,5 @@ for (let t = 0; t<tests.length; t++) {
 }
 
 // run via
-// node --loader ts-node/esm --experimental-specifier-resolution=node perf-test.ts
+// node --loader ts-node/esm --experimental-specifier-resolution=node \
+// perf-test.ts

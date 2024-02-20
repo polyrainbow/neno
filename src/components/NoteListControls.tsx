@@ -32,7 +32,7 @@ const NoteListControls = ({
       value={value}
       onChange={onChange}
       inputStyle={{
-        width: isSmallScreen ? "auto" : "265px",
+        width: isSmallScreen ? "auto" : "265px", // TODO: move to CSS
       }}
       autoComplete="off"
     />

@@ -5,7 +5,7 @@ interface IconButtonProps {
   id?: string,
   title: string,
   icon: string,
-  onClick: any,
+  onClick: () => void,
   disabled?: boolean,
 }
 
