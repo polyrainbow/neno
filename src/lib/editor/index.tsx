@@ -1,22 +1,13 @@
-/* eslint-disable @stylistic/max-len */
-
 import {
   $getRoot,
-  $getSelection,
-  $isRangeSelection,
-  CLEAR_HISTORY_COMMAND,
   EditorState,
 } from "lexical";
-import { ReactElement, useEffect, useRef } from "react";
-
+import { ReactElement } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import {
-  useLexicalComposerContext,
-} from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode } from "./nodes/HeadingNode";
 import LinkPlugin from "./plugins/LinkPlugin";
@@ -29,7 +20,6 @@ import { BoldPlugin } from "./plugins/BoldPlugin";
 import { TransclusionNode } from "./nodes/TransclusionNode";
 import TransclusionPlugin from "./plugins/TransclusionPlugin";
 import { SubtextPlugin } from "./plugins/SubtextPlugin";
-import setSubtext from "./utils/setSubtext";
 import getSubtextFromEditor from "./utils/getSubtextFromEditor";
 import { InlineCodeNode } from "./nodes/InlineCodeNode";
 import { InlineCodePlugin } from "./plugins/InlineCodePlugin";
@@ -39,167 +29,19 @@ import { QuoteBlockNode } from "./nodes/QuoteBlockNode";
 import { LinkType } from "../../types/LinkType";
 import { UserRequestType } from "./types/UserRequestType";
 import { ListItemNode } from "./nodes/ListItemNode";
-
-const theme = {
-  ltr: "ltr",
-  rtl: "rtl",
-  placeholder: "editor-placeholder",
-  paragraph: "editor-paragraph",
-  hashtag: "hashtag",
-  link: "link",
-  sHeading: "s-heading", // "heading" seems to be a reserved word
-  wikiLinkPunctuation: "wikilink-punctuation",
-  wikiLinkContent: "wikilink-content",
-  bold: "bold",
-  subtext: "subtext",
-  inlineCode: "inline-code",
-  codeBlock: "code-block",
-  quoteBlock: "quote-block",
-  listItem: "list-item",
-};
-
-
-// Lexical React plugins are React components, which makes them
-// highly composable. Furthermore, you can lazy load plugins if
-// desired, so you don't pay the cost for plugins until you
-// actually use them.
-function MyCustomAutoFocusPlugin() {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    // Focus the editor when the effect fires!
-    editor.focus();
-  }, [editor]);
-
-  return null;
-}
-
-// Catch any errors that occur during Lexical updates and log them
-// or throw them as needed. If you don't throw them, Lexical will
-// try to recover gracefully without losing user data.
-function onError(error: unknown) {
-  // eslint-disable-next-line no-console
-  console.error(error);
-}
+import PlainTextStateExchangePlugin
+  from "./plugins/PlainTextStateExchangePlugin";
+import InsertPlugin from "./plugins/InsertPlugin";
+import theme from "./theme";
+import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
 
 /*
-Convention:
-Every subtext block is rendered as a normal editor ParagraphNode.
-We cannot extend ParagraphNode to some BlockNode, because then we cannot make
-use of RangeSelection.insertParagraph(). RangeSelection.insertNodes([blockNode])
-works differently.
+  Convention:
+  Every subtext block is rendered as a normal editor ParagraphNode.
+  We cannot extend ParagraphNode to some BlockNode, because then we cannot make
+  use of RangeSelection.insertParagraph().
+  RangeSelection.insertNodes([blockNode]) works differently.
 */
-
-const PlainTextStateExchangePlugin = ({
-  initialText,
-  instanceId,
-}: {
-  initialText: string,
-  instanceId: number,
-}) => {
-  const [editor] = useLexicalComposerContext();
-  const currentInstanceIdRef = useRef<number>(0);
-
-  useEffect(() => {
-    editor.update(() => {
-      const root = $getRoot();
-      const currentText = getSubtextFromEditor(root);
-      /*
-        If the new initial text is not different from the current text, we do
-        not need to perform the update as it would just move the cursor from
-        the current position. The user probably just has saved their note with
-        CTRL/CMD+S.
-        This is just an issue if there are two notes with the same
-        non-empty content, e.g. when creating a duplicate.
-        In that case, the cursor would not reset.
-        That's why we also check if the instanceId has changed.
-      */
-      if (
-        currentInstanceIdRef.current !== instanceId
-        || initialText !== currentText
-      ) {
-        setSubtext(root, initialText);
-        editor.dispatchCommand(CLEAR_HISTORY_COMMAND, undefined);
-        /*
-          When we open a new note, the instanceId changes and the cursor should
-          be at the beginning of the note and the view should be scrolled to the
-          top.
-          When the instanceId has not changed, the user is editing an existing
-          note from outside the editor (e.g. appending a link). In this case,
-          we should move the cursor to the end.
-        */
-        if (currentInstanceIdRef.current === instanceId) {
-          root.getLastChild()?.selectEnd();
-        } else {
-          // We need to get the selection inside the first block, because
-          // otherwise, the selection is at the beginning of the root node and
-          // typing would create a new block before the first one.
-          root.getFirstChild()?.selectStart();
-        }
-
-        editor.focus();
-      }
-
-      currentInstanceIdRef.current = instanceId;
-    });
-  }, [editor, initialText, instanceId]);
-
-  return null;
-};
-
-
-/*
-  This plugin is used to expose the insert function to some parent module that
-  is passed as prop to the editor.
-  The reason for this approach is that we cannot access the editor object
-  from outside the editor component <LexicalComposer/> to perform updates,
-  so we need to expose this functionality manually.
-*/
-const InsertPlugin = (
-  { parentModule }: {
-    parentModule: {
-      insert?: (text: string) => void,
-      toggleWikilinkWrap?: () => void,
-    },
-  },
-) => {
-  const [editor] = useLexicalComposerContext();
-
-  const insert = (text: string) => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        selection.insertText(text);
-      }
-    });
-  };
-
-  const toggleWikilinkWrap = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        const text = selection.getTextContent();
-        if (text.startsWith("[[") && text.endsWith("]]")) {
-          selection.insertText(text.substring(2, text.length - 2));
-        } else {
-          selection.insertText(`[[${text}]]`);
-          if (text.length === 0) {
-            selection.anchor.offset -= 2;
-            selection.focus.offset -= 2;
-          }
-        }
-      }
-    });
-  };
-
-  useEffect(() => {
-    parentModule.insert = insert;
-    parentModule.toggleWikilinkWrap = toggleWikilinkWrap;
-  }, [insert]);
-
-  return "";
-};
-
 
 interface EditorProps {
   initialText: string,
@@ -224,7 +66,10 @@ export const Editor = ({
   const initialConfig = {
     namespace: "MyEditor",
     theme,
-    onError,
+    onError: (error: unknown) => {
+      // eslint-disable-next-line no-console
+      console.error(error);
+    },
     nodes: [
       AutoLinkNode,
       HeadingNode,
@@ -243,7 +88,7 @@ export const Editor = ({
     HashtagPlugin is disabled for now, since not part of spec yet and
     collisions with HeadingPlugin.
     See also
-    https://github.com/subconsciousnetwork/subtext/issues/21#issuecomment-1651543966
+https://github.com/subconsciousnetwork/subtext/issues/21#issuecomment-1651543966
   */
 
   return (
@@ -268,7 +113,7 @@ export const Editor = ({
       } />
       <InsertPlugin parentModule={insertModule} />
       <HistoryPlugin />
-      <MyCustomAutoFocusPlugin />
+      <AutoFocusPlugin />
       <BoldPlugin />
       <InlineCodePlugin />
       <LinkPlugin />

@@ -30,7 +30,6 @@ export default defineConfig({
       promiseImportName: (i) => `__tla_${i}`,
     }),
     wasmContentTypePlugin,
-    // eslint-disable-next-line new-cap
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
