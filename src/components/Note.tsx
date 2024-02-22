@@ -1,7 +1,6 @@
 import {
   DragEvent,
   DragEventHandler,
-  ReactElement,
   useEffect,
   useRef,
 } from "react";
@@ -28,23 +27,11 @@ import { useNavigate } from "react-router-dom";
 import { PathTemplate } from "../types/PathTemplate";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import {
-  getMediaTypeFromFilename,
-} from "../lib/notes/utils";
-import {
-  getNoteTitle,
-} from "../lib/notes/noteUtils";
-import {
   isFileSlug,
   sluggify,
 } from "../lib/notes/slugUtils";
-import { MediaType } from "../lib/notes/types/MediaType";
-import NoteContentBlockAudio from "./NoteContentBlockAudio";
-import NoteContentBlockVideo from "./NoteContentBlockVideo";
-import NoteContentBlockDocument from "./NoteContentBlockDocument";
-import NoteContentBlockTextFile from "./NoteContentBlockTextFile";
-import NoteContentBlockImage from "./NoteContentBlockImage";
 import NotesProvider from "../lib/notes";
-import { getNoteTransclusionContent } from "../lib/Transclusion";
+import { getTransclusionContent } from "../lib/Transclusion";
 import { LinkType } from "../types/LinkType";
 import { UserRequestType } from "../lib/editor/types/UserRequestType";
 import NoteSlug from "./NoteSlug";
@@ -196,82 +183,6 @@ const Note = ({
   };
 
 
-  // This ref is required because the callback to getTransclusionContent()
-  // is not updated inside the <Editor> component when the note changes.
-  const noteRef = useRef<ActiveNote>(note);
-  noteRef.current = note;
-
-  const getTransclusionContent = async (slug: Slug): Promise<ReactElement> => {
-    const note = noteRef.current;
-
-    if (!slug) {
-      throw new Error("INVALID_FILE_SLUG");
-    }
-
-    if (isFileSlug(slug)) {
-      const availableFileInfos = [
-        ...note.files,
-      ];
-
-      const mediaType = getMediaTypeFromFilename(slug);
-      let file = availableFileInfos.find((file) => file.slug === slug);
-
-      if (!file) {
-        file = await notesProvider.getFileInfo(slug);
-      }
-
-      if (
-        mediaType === MediaType.AUDIO
-      ) {
-        return <NoteContentBlockAudio
-          file={file}
-          notesProvider={notesProvider}
-          key={file.slug}
-        />;
-      } else if (mediaType === MediaType.VIDEO) {
-        return <NoteContentBlockVideo
-          file={file}
-          notesProvider={notesProvider}
-          key={file.slug}
-        />;
-      } else if (mediaType === MediaType.IMAGE) {
-        return <NoteContentBlockImage
-          file={file}
-          notesProvider={notesProvider}
-          key={file.slug}
-        />;
-      } else if (mediaType === MediaType.TEXT) {
-        return <NoteContentBlockTextFile
-          file={file}
-          notesProvider={notesProvider}
-          key={file.slug}
-        />;
-      } else {
-        return <NoteContentBlockDocument
-          file={file}
-          key={file.slug}
-        />;
-      }
-    }
-
-    if ("outgoingLinks" in note) {
-      const linkedNote = note.outgoingLinks.find(
-        (link) => link.slug === slug,
-      );
-
-      if (linkedNote) {
-        return getNoteTransclusionContent(linkedNote.content, linkedNote.title);
-      }
-    }
-
-    const linkedNote = await notesProvider.get(slug);
-    return getNoteTransclusionContent(
-      linkedNote.content,
-      getNoteTitle(linkedNote),
-    );
-  };
-
-
   const getLinkAvailability = async (
     linkText: string,
     linkType: LinkType,
@@ -390,7 +301,9 @@ const Note = ({
                 }
               }
             }
-            getTransclusionContent={getTransclusionContent}
+            getTransclusionContent={(slug: Slug) => {
+              return getTransclusionContent(slug, note, notesProvider);
+            }}
             getLinkAvailability={getLinkAvailability}
           />
           <div
