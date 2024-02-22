@@ -94,7 +94,6 @@ https://github.com/subconsciousnetwork/subtext/issues/21#issuecomment-1651543966
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <SubtextPlugin
-        placeholder={null}
         contentEditable={<ContentEditable />}
         ErrorBoundary={LexicalErrorBoundary}
       />

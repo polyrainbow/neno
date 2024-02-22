@@ -25,42 +25,14 @@ SOFTWARE.
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import useLexicalEditable from "@lexical/react/useLexicalEditable";
 import { useSubtextSetup } from "../hooks/useSubtextSetup";
-import { useCanShowPlaceholder } from "../hooks/useCanShowPlaceholder";
 import { ErrorBoundaryType, useDecorators } from "../hooks/useDecorators";
-
-function Placeholder({
-  content,
-}: {
-  content: ((isEditable: boolean) => null | JSX.Element) | null | JSX.Element;
-}): null | JSX.Element {
-  const [editor] = useLexicalComposerContext();
-  const showPlaceholder = useCanShowPlaceholder(editor);
-  const editable = useLexicalEditable();
-
-  if (!showPlaceholder) {
-    return null;
-  }
-
-  if (typeof content === "function") {
-    return content(editable);
-  } else {
-    return content;
-  }
-}
-
 
 export function SubtextPlugin({
   contentEditable,
-  placeholder,
   ErrorBoundary,
 }: {
   contentEditable: JSX.Element;
-  placeholder:
-  | ((isEditable: boolean) => null | JSX.Element)
-  | null
-  | JSX.Element;
   ErrorBoundary: ErrorBoundaryType;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -69,7 +41,6 @@ export function SubtextPlugin({
 
   return <>
     {contentEditable}
-    <Placeholder content={placeholder} />
     {decorators}
   </>;
 }
