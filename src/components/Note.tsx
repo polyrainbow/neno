@@ -394,7 +394,7 @@ const Note = ({
             getLinkAvailability={getLinkAvailability}
           />
           <div
-            className="note-content edit-mode"
+            className="note-content"
           >
             <NoteBacklinks
               note={note}

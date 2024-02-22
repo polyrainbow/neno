@@ -1,7 +1,7 @@
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { ReactElement, useEffect } from "react";
+import { useEffect } from "react";
 import {
   TransclusionNode,
 } from "../nodes/TransclusionNode";
