@@ -12,7 +12,6 @@ import {
   ParagraphNode,
 } from "lexical";
 import { $isAutoLinkNode, AutoLinkNode } from "@lexical/link";
-import { ReactElement } from "react";
 import { ElementNodeType } from "../types/ElementNodeType";
 import { TransclusionContentGetter } from "../types/TransclusionContentGetter";
 

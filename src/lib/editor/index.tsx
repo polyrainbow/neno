@@ -2,7 +2,6 @@ import {
   $getRoot,
   EditorState,
 } from "lexical";
-import { ReactElement } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
