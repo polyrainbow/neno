@@ -3,13 +3,7 @@ import {
   getSlugFromFilename,
   sluggify,
 } from "./slugUtils.js";
-
-
-jest.mock("../../constants", () => {
-  return {
-    BASE_URL: "/",
-  };
-});
+import { describe, it, expect } from "vitest";
 
 describe("getSlugFromFilename", () => {
   it(

@@ -10,12 +10,7 @@ import { TextEncoder, TextDecoder } from "util";
 import { Block } from "../subwaytext/types/Block.js";
 // @ts-ignore
 Object.assign(global, { TextDecoder, TextEncoder });
-
-jest.mock("../../constants", () => {
-  return {
-    BASE_URL: "/",
-  };
-});
+import { describe, it, expect } from "vitest";
 
 // @ts-ignore
 globalThis.navigator = {

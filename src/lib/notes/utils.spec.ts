@@ -2,7 +2,7 @@ import {
   getExtensionFromFilename,
   removeExtensionFromFilename,
 } from "./utils.js";
-
+import { expect, it, describe } from "vitest";
 
 describe("getExtensionFromFilename", () => {
   it(
@@ -15,7 +15,6 @@ describe("getExtensionFromFilename", () => {
     },
   );
 });
-
 
 describe("removeExtensionFromFilename", () => {
   it(

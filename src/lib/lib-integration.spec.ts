@@ -1,12 +1,7 @@
 import { changeSlugReferencesInNote } from "./notes/noteUtils";
 import subwaytext from "./subwaytext";
 import serialize from "./subwaytext/serialize";
-
-jest.mock("../constants", () => {
-  return {
-    BASE_URL: "/",
-  };
-});
+import { describe, it, expect } from "vitest";
 
 describe("changing slug references in a note", () => {
   it(

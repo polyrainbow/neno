@@ -2,12 +2,7 @@ import {
   parseQueryString,
   getRawTokensFromQueryString,
 } from "./search.js";
-
-jest.mock("../../constants", () => {
-  return {
-    BASE_URL: "/",
-  };
-});
+import { describe, it, expect } from "vitest";
 
 describe("search", () => {
   it(

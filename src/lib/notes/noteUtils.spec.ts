@@ -7,14 +7,7 @@ import {
   parseSerializedNewNote,
   serializeNote,
 } from "./noteUtils.js";
-
-
-jest.mock("../../constants", () => {
-  return {
-    BASE_URL: "/",
-  };
-});
-
+import { describe, it, expect } from "vitest";
 
 describe("inferNoteTitle", () => {
   it(

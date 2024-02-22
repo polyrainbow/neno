@@ -1,11 +1,8 @@
+// @vitest-environment jsdom
+
 import { exportedForTesting } from "./Transclusion";
 const { getSummary } = exportedForTesting;
-
-jest.mock("../constants", () => {
-  return {
-    BASE_URL: "/",
-  };
-});
+import { describe, it, expect } from "vitest";
 
 describe("getSummary", () => {
   it("should ignore first line when identical with note title", async () => {

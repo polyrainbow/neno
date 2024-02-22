@@ -2,7 +2,7 @@ import { Block, BlockType } from "./types/Block.js";
 import subwaytext from "./index.js";
 import { SpanType } from "./types/SpanType.js";
 import serialize from "./serialize.js";
-
+import { describe, it, expect } from "vitest";
 
 describe("subwaytext", () => {
   it("should parse basic documents correctly", () => {

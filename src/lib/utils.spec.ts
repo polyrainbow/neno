@@ -1,11 +1,5 @@
 import { getWikilinkForNote } from "./utils";
-
-jest.mock("../constants", () => {
-  return {
-    BASE_URL: "/",
-  };
-});
-
+import { describe, it, expect } from "vitest";
 
 describe("getWikilinkForNote", () => {
   it("should use slug if title does not match slug", async () => {

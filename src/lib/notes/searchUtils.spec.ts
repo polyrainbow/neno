@@ -3,12 +3,7 @@ import {
   getNotesWithUrl,
 } from "./searchUtils.js";
 import ExistingNote from "./types/ExistingNote.js";
-
-jest.mock("../../constants", () => {
-  return {
-    BASE_URL: "/",
-  };
-});
+import { describe, it, expect } from "vitest";
 
 describe("getNotesWithUrl", () => {
   it(

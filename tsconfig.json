@@ -20,7 +20,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
 
-    "types": ["jest", "vite/client"],
+    "types": ["vite/client"],
 
     "esModuleInterop": true,
 
