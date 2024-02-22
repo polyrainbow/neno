@@ -8,6 +8,7 @@ import { ReactElement, ReactNode, useEffect, useState } from "react";
 import Icon from "../../../components/Icon";
 import { l } from "../../intl";
 import { Slug } from "../../notes/types/Slug";
+import { TransclusionContentGetter } from "../types/TransclusionContentGetter";
 
 
 export class TransclusionNode extends DecoratorNode<ReactNode> {
@@ -24,11 +25,11 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
   }
 
   __link: string;
-  __getTransclusionContent: (id: string) => Promise<ReactElement>;
+  __getTransclusionContent: TransclusionContentGetter;
 
   constructor(
     link: string,
-    getTransclusionContent: (id: string) => Promise<ReactElement>,
+    getTransclusionContent: TransclusionContentGetter,
     key?: NodeKey,
   ) {
     super(key);
@@ -103,7 +104,7 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
 
 export function $createTransclusionNode(
   link: string,
-  getTransclusionContent: (id: string) => Promise<ReactElement>,
+  getTransclusionContent: TransclusionContentGetter,
 ): TransclusionNode {
   return new TransclusionNode(link, getTransclusionContent);
 }

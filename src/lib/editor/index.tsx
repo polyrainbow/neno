@@ -34,6 +34,7 @@ import PlainTextStateExchangePlugin
 import InsertPlugin from "./plugins/InsertPlugin";
 import theme from "./theme";
 import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
+import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
 
 /*
   Convention:
@@ -48,7 +49,7 @@ interface EditorProps {
   instanceId: number,
   onChange: (text: string) => void,
   onUserRequest: (type: UserRequestType, value: string) => void,
-  getTransclusionContent: (id: string) => Promise<ReactElement>,
+  getTransclusionContent: TransclusionContentGetter,
   getLinkAvailability: (link: string, linkType: LinkType) => Promise<boolean>,
   insertModule: { insert?: (text: string) => void },
 }

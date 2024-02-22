@@ -14,6 +14,7 @@ import {
 import { $isAutoLinkNode, AutoLinkNode } from "@lexical/link";
 import { ReactElement } from "react";
 import { ElementNodeType } from "../types/ElementNodeType";
+import { TransclusionContentGetter } from "../types/TransclusionContentGetter";
 
 const transclusionsMatchSlashlinks = (
   slashlinks: AutoLinkNode[],
@@ -66,7 +67,7 @@ const splitParagraphAtLineBreaks = (node: ParagraphNode): void => {
 
 export default (
   node: ParagraphNode,
-  getTransclusionContent: (id: string) => Promise<ReactElement>,
+  getTransclusionContent: TransclusionContentGetter,
 ) => {
   // this usually happens after a paste event, so let's fix the structure first
   if (

@@ -11,11 +11,12 @@ import refreshTransclusionsForBlock
 import { AutoLinkNode } from "@lexical/link";
 import { ListItemNode } from "../nodes/ListItemNode";
 import { HeadingNode } from "../nodes/HeadingNode";
+import { TransclusionContentGetter } from "../types/TransclusionContentGetter";
 
 
 const registerBlockNodeTransform = (
   editor: LexicalEditor,
-  getTransclusionContent: (id: string) => Promise<ReactElement>,
+  getTransclusionContent: TransclusionContentGetter,
 ) => {
   editor.registerNodeTransform(ParagraphNode, (node: ParagraphNode) => {
     refreshTransclusionsForBlock(node, getTransclusionContent);
@@ -40,7 +41,7 @@ const registerBlockNodeTransform = (
 
 
 interface TransclusionPluginProps {
-  getTransclusionContent: (id: string) => Promise<ReactElement>
+  getTransclusionContent: TransclusionContentGetter
 }
 
 
