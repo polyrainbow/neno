@@ -6,13 +6,12 @@
   "dependencies": {
     "@lexical/link": "^0.13.1",
     "@lexical/react": "^0.13.1",
-    "@stylistic/eslint-plugin": "^1.6.2",
     "lexical": "^0.13.1",
-    "ts-node": "^10.9.2",
     "vite-plugin-pwa": "^0.18.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.2",
+    "@stylistic/eslint-plugin": "^1.6.2",
     "@stylistic/eslint-plugin-ts": "^1.6.2",
     "@tippyjs/react": "^4.2.6",
     "@types/react": "^18.2.43",
@@ -51,6 +50,7 @@
     "build": "npx tsc && npx vite build",
     "lint": "npx eslint src --report-unused-disable-directives",
     "all-checks": "npm run stylelint && npm run lint && npm run test && npm run integration-test && npm run build",
+    "all-checks-visual": "npm run all-checks && npm run visual-regression-test",
     "lint-fix": "npx eslint src --report-unused-disable-directives --fix"
   },
   "author": "Sebastian Zimmer",
