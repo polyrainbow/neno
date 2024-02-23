@@ -30,7 +30,6 @@ import { UserRequestType } from "./types/UserRequestType";
 import { ListItemNode } from "./nodes/ListItemNode";
 import PlainTextStateExchangePlugin
   from "./plugins/PlainTextStateExchangePlugin";
-import InsertPlugin from "./plugins/InsertPlugin";
 import theme from "./theme";
 import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
 import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
@@ -41,6 +40,11 @@ import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
   We cannot extend ParagraphNode to some BlockNode, because then we cannot make
   use of RangeSelection.insertParagraph().
   RangeSelection.insertNodes([blockNode]) works differently.
+
+  HashtagPlugin is disabled for now, since not part of spec yet and
+  collisions with HeadingPlugin.
+  See also
+https://github.com/subconsciousnetwork/subtext/issues/21#issuecomment-1651543966
 */
 
 interface EditorProps {
@@ -50,9 +54,7 @@ interface EditorProps {
   onUserRequest: (type: UserRequestType, value: string) => void,
   getTransclusionContent: TransclusionContentGetter,
   getLinkAvailability: (link: string, linkType: LinkType) => Promise<boolean>,
-  insertModule: { insert?: (text: string) => void },
 }
-
 
 export const Editor = ({
   initialText,
@@ -61,8 +63,89 @@ export const Editor = ({
   onUserRequest,
   getTransclusionContent,
   getLinkAvailability,
-  insertModule,
 }: EditorProps) => {
+  return <>
+    <ContentEditable />
+    <SubtextPlugin
+      ErrorBoundary={LexicalErrorBoundary}
+    />
+    <PlainTextStateExchangePlugin
+      initialText={initialText}
+      instanceId={instanceId}
+    />
+    <OnChangePlugin onChange={
+      (editorState: EditorState) => {
+        editorState.read(() => {
+          // Read the contents of the EditorState here.
+          const root = $getRoot();
+          onChange(getSubtextFromEditor(root));
+        });
+      }
+    } />
+    <HistoryPlugin />
+    <AutoFocusPlugin />
+    <BoldPlugin />
+    <InlineCodePlugin />
+    <LinkPlugin />
+    <WikiLinkPlugin getLinkAvailability={(linkText: string) => {
+      return getLinkAvailability(linkText, LinkType.WIKILINK);
+    }} />
+    <TransclusionPlugin
+      getTransclusionContent={getTransclusionContent}
+    />
+    <BlockTransformPlugin />
+    <NodeEventPlugin
+      nodeType={AutoLinkNode}
+      eventType="click"
+      eventListener={(e: Event) => {
+        const isSlashlink = (str: string) => {
+          return str.startsWith("@") || str.startsWith("/");
+        };
+        if (!(e && e.target)) return;
+        const link = (e.target as HTMLElement).innerText;
+        if (isSlashlink(link)) {
+          onUserRequest(UserRequestType.SLASHLINK, link.substring(1));
+        } else {
+          onUserRequest(UserRequestType.HYPERLINK, link);
+        }
+      }}
+    />
+    <NodeEventPlugin
+      nodeType={WikiLinkContentNode}
+      eventType="click"
+      eventListener={(e: Event) => {
+        if (!(e && e.target)) return;
+        const link = (e.target as HTMLElement).innerText;
+        onUserRequest(UserRequestType.WIKILINK, link);
+      }}
+    />
+    <NodeEventPlugin
+      nodeType={TransclusionNode}
+      eventType="click"
+      eventListener={(e: Event) => {
+        if (!(e && e.target)) return;
+        let cursorElement = e.target as HTMLElement;
+        do {
+          if ("transclusionId" in cursorElement.dataset) {
+            const transclusionId
+              = cursorElement.dataset.transclusionId as string;
+            onUserRequest(
+              UserRequestType.TRANSCLUSION_TARGET,
+              transclusionId,
+            );
+            return;
+          }
+
+          cursorElement = cursorElement.parentElement as HTMLElement;
+        } while (cursorElement);
+      }}
+    />
+  </>;
+};
+
+const Context = ({
+  children,
+}: React.PropsWithChildren) => {
   const initialConfig = {
     namespace: "MyEditor",
     theme,
@@ -84,91 +167,14 @@ export const Editor = ({
     ],
   };
 
-  /*
-    HashtagPlugin is disabled for now, since not part of spec yet and
-    collisions with HeadingPlugin.
-    See also
-https://github.com/subconsciousnetwork/subtext/issues/21#issuecomment-1651543966
-  */
-
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <SubtextPlugin
-        contentEditable={<ContentEditable />}
-        ErrorBoundary={LexicalErrorBoundary}
-      />
-      <PlainTextStateExchangePlugin
-        initialText={initialText}
-        instanceId={instanceId}
-      />
-      <OnChangePlugin onChange={
-        (editorState: EditorState) => {
-          editorState.read(() => {
-            // Read the contents of the EditorState here.
-            const root = $getRoot();
-            onChange(getSubtextFromEditor(root));
-          });
-        }
-      } />
-      <InsertPlugin parentModule={insertModule} />
-      <HistoryPlugin />
-      <AutoFocusPlugin />
-      <BoldPlugin />
-      <InlineCodePlugin />
-      <LinkPlugin />
-      <WikiLinkPlugin getLinkAvailability={(linkText: string) => {
-        return getLinkAvailability(linkText, LinkType.WIKILINK);
-      }} />
-      <TransclusionPlugin
-        getTransclusionContent={getTransclusionContent}
-      />
-      <BlockTransformPlugin />
-      <NodeEventPlugin
-        nodeType={AutoLinkNode}
-        eventType="click"
-        eventListener={(e: Event) => {
-          const isSlashlink = (str: string) => {
-            return str.startsWith("@") || str.startsWith("/");
-          };
-          if (!(e && e.target)) return;
-          const link = (e.target as HTMLElement).innerText;
-          if (isSlashlink(link)) {
-            onUserRequest(UserRequestType.SLASHLINK, link.substring(1));
-          } else {
-            onUserRequest(UserRequestType.HYPERLINK, link);
-          }
-        }}
-      />
-      <NodeEventPlugin
-        nodeType={WikiLinkContentNode}
-        eventType="click"
-        eventListener={(e: Event) => {
-          if (!(e && e.target)) return;
-          const link = (e.target as HTMLElement).innerText;
-          onUserRequest(UserRequestType.WIKILINK, link);
-        }}
-      />
-      <NodeEventPlugin
-        nodeType={TransclusionNode}
-        eventType="click"
-        eventListener={(e: Event) => {
-          if (!(e && e.target)) return;
-          let cursorElement = e.target as HTMLElement;
-          do {
-            if ("transclusionId" in cursorElement.dataset) {
-              const transclusionId
-                = cursorElement.dataset.transclusionId as string;
-              onUserRequest(
-                UserRequestType.TRANSCLUSION_TARGET,
-                transclusionId,
-              );
-              return;
-            }
-
-            cursorElement = cursorElement.parentElement as HTMLElement;
-          } while (cursorElement);
-        }}
-      />
+      {children}
     </LexicalComposer>
   );
+};
+
+export {
+  ContentEditable,
+  Context,
 };

@@ -20,26 +20,23 @@ import NoteMenuBar from "./NoteMenuBar";
 import BusyIndicator from "./BusyIndicator";
 import NoteBacklinks from "./NoteBacklinks";
 import { Slug } from "../lib/notes/types/Slug";
-import useGoToNote from "../hooks/useGoToNote";
+import CreateNewNoteParams from "../types/CreateNewNoteParams";
+import NotesProvider from "../lib/notes";
+import NoteSlug from "./NoteSlug";
+import { UserRequestType } from "../lib/editor/types/UserRequestType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import { useNavigate } from "react-router-dom";
-import { PathTemplate } from "../types/PathTemplate";
-import CreateNewNoteParams from "../types/CreateNewNoteParams";
-import {
-  isFileSlug,
-  sluggify,
-} from "../lib/notes/slugUtils";
-import NotesProvider from "../lib/notes";
-import { getTransclusionContent } from "../lib/Transclusion";
+import { isFileSlug, sluggify } from "../lib/notes/slugUtils";
 import { LinkType } from "../types/LinkType";
-import { UserRequestType } from "../lib/editor/types/UserRequestType";
-import NoteSlug from "./NoteSlug";
+import useGoToNote from "../hooks/useGoToNote";
+import { getTransclusionContent } from "../lib/Transclusion";
+import { PathTemplate } from "../types/PathTemplate";
+import { useNavigate } from "react-router-dom";
 
 interface NoteComponentProps {
+  editorInstanceId: number,
   isBusy: boolean,
   note: ActiveNote,
-  editorInstanceId: number,
   slugInput: string,
   setSlugInput: (val: string) => void,
   displayedSlugAliases: string[],
@@ -60,15 +57,14 @@ interface NoteComponentProps {
   setUploadInProgress: (val: boolean) => void,
   updateReferences: boolean,
   setUpdateReferences: (val: boolean) => void,
-  insertModule: { insert?: (text: string) => void },
   onLinkIndicatorClick: (slug: Slug, title: string) => void,
 }
 
 
 const Note = ({
+  editorInstanceId,
   isBusy,
   note,
-  editorInstanceId,
   setNote,
   slugInput,
   setSlugInput,
@@ -89,7 +85,6 @@ const Note = ({
   setUploadInProgress,
   updateReferences,
   setUpdateReferences,
-  insertModule,
   onLinkIndicatorClick,
 }: NoteComponentProps) => {
   const noteElement = useRef<HTMLElement>(null);
@@ -268,10 +263,9 @@ const Note = ({
             setUpdateReferences={setUpdateReferences}
           />
           <Editor
-            insertModule={insertModule}
             initialText={note.initialContent}
             instanceId={editorInstanceId}
-            onChange={(val) => {
+            onChange={(val: string) => {
               setNoteContent(val);
             }}
             onUserRequest={

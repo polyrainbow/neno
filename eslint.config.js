@@ -21,7 +21,7 @@ export default [
       }
     },
     "rules": {
-      // eslint
+      // eslint - https://eslint.org/docs/latest/rules/
       "eqeqeq": ["error"],
       "vars-on-top": ["error"],
       "no-eq-null": ["error"],
@@ -51,7 +51,7 @@ export default [
         2
       ],
 
-      // @stylistic
+      // @stylistic - https://eslint.style/packages/default#rules
       "@stylistic/linebreak-style": [
         "error",
         "unix"
@@ -59,8 +59,9 @@ export default [
       "@stylistic/no-mixed-spaces-and-tabs": ["error"],
       "@stylistic/operator-linebreak": ["error", "before"],
       "@stylistic/max-len": ["error", { "code": 80 }],
+      "@stylistic/no-trailing-spaces": ["error"],
 
-      // @stylistic/ts
+      // @stylistic/ts - https://eslint.style/packages/ts#rules
       "@stylistic/ts/comma-dangle": ["error", "always-multiline"],
       "@stylistic/ts/semi": ["error", "always"],
       "@stylistic/ts/space-before-blocks": ["error", "always"],

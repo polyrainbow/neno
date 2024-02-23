@@ -29,10 +29,8 @@ import { useSubtextSetup } from "../hooks/useSubtextSetup";
 import { ErrorBoundaryType, useDecorators } from "../hooks/useDecorators";
 
 export function SubtextPlugin({
-  contentEditable,
   ErrorBoundary,
 }: {
-  contentEditable: JSX.Element;
   ErrorBoundary: ErrorBoundaryType;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -40,7 +38,6 @@ export function SubtextPlugin({
   useSubtextSetup(editor);
 
   return <>
-    {contentEditable}
     {decorators}
   </>;
 }

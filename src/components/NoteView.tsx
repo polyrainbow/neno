@@ -9,13 +9,11 @@ import {
   useNavigate, useParams, useSearchParams,
 } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import { PathTemplate } from "../types/PathTemplate";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import { ErrorMessage } from "../lib/notes/types/ErrorMessage";
 import { l } from "../lib/intl";
 import NoteListWithControls from "./NoteListWithControls";
-import useGoToNote from "../hooks/useGoToNote";
 import useNotesProvider from "../hooks/useNotesProvider";
 import useControlledNoteList from "../hooks/useControlledNoteList";
 import useHeaderStats from "../hooks/useHeaderStats";
@@ -24,6 +22,13 @@ import usePinnedNotes from "../hooks/usePinnedNotes";
 import { Slug } from "../lib/notes/types/Slug";
 import NotesProvider from "../lib/notes";
 import useConfirm from "../hooks/useConfirm";
+import { Context } from "../lib/editor";
+import useGoToNote from "../hooks/useGoToNote";
+import { PathTemplate } from "../types/PathTemplate";
+import { insert, toggleWikilinkWrap } from "../lib/editorManipulations";
+import {
+  useLexicalComposerContext,
+} from "@lexical/react/LexicalComposerContext";
 
 
 const getValidNoteSlug = (
@@ -44,10 +49,6 @@ const getValidNoteSlug = (
   }
 };
 
-const insertModule: {
-  insert?: (text: string) => void,
-  toggleWikilinkWrap?: () => void,
-} = {};
 
 const NoteView = () => {
   const notesProvider = useNotesProvider();
@@ -57,6 +58,8 @@ const NoteView = () => {
   const { slug } = useParams();
   const [urlSearchParams] = useSearchParams();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
+  const goToNote = useGoToNote();
+  const [editor] = useLexicalComposerContext();
 
   const {
     isBusy,
@@ -89,7 +92,6 @@ const NoteView = () => {
     pinOrUnpinNote,
     refreshPinnedNotes,
   } = usePinnedNotes(notesProvider);
-  const goToNote = useGoToNote();
   const controlledNoteList = useControlledNoteList(notesProvider);
 
   const refreshContentViews = async (): Promise<void> => {
@@ -184,7 +186,7 @@ const NoteView = () => {
       document.getElementById("search-input")?.focus();
     },
     onCmdI: () => {
-      insertModule.toggleWikilinkWrap?.();
+      toggleWikilinkWrap(editor);
     },
   });
 
@@ -301,7 +303,7 @@ const NoteView = () => {
               itemsAreLinkable={true}
               onLinkIndicatorClick={(slug: Slug, title: string) => {
                 const wikilink = Utils.getWikilinkForNote(slug, title);
-                insertModule.insert?.(wikilink);
+                insert(wikilink, editor);
               }}
               selectedIndex={controlledNoteList.selectedIndex}
               setSelectedIndex={controlledNoteList.setSelectedIndex}
@@ -311,10 +313,9 @@ const NoteView = () => {
       }
       <div className="main-content-besides-sidebar">
         <Note
-          insertModule={insertModule}
+          editorInstanceId={editorInstanceId}
           isBusy={isBusy}
           note={activeNote}
-          editorInstanceId={editorInstanceId}
           setNote={setActiveNote}
           setSlugInput={setSlugInput}
           slugInput={slugInput}
@@ -359,7 +360,7 @@ const NoteView = () => {
           setUpdateReferences={setUpdateReferences}
           onLinkIndicatorClick={(slug: Slug, title: string) => {
             const wikilink = Utils.getWikilinkForNote(slug, title);
-            insertModule.insert?.(wikilink);
+            insert(wikilink, editor);
           }}
         />
       </div>
@@ -367,4 +368,11 @@ const NoteView = () => {
   </>;
 };
 
-export default NoteView;
+
+const NoteViewWithEditorContext = () => {
+  return <Context>
+    <NoteView />
+  </Context>;
+};
+
+export default NoteViewWithEditorContext;
