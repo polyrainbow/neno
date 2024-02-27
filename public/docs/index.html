@@ -255,6 +255,50 @@
     <code>/my-favorite-note-probably</code>
   </p>
 
+  <h3>Updating slugs and references</h3>
+
+  <p>
+    Slugs of already saved notes can be updated any time. When editing the
+    slug of an already saved note in the slug input, a toggle with the label
+    "Update references" is displayed. When you save the new slug with the toggle
+    activated, all wikilink and slashlink references to the current note
+    will also be updated, throughout the whole note graph.
+  </p>
+
+  <figure>
+    <img alt="Editing a slug of an already saved note will show the &quot;Update
+    references&quot; toggle." src="./img/update-references.png">
+    <figcaption>
+      Editing a slug of an already saved note will show the "Update
+      references" toggle.
+    </figcaption>
+  </figure>
+
+  <p>
+    If the title of the current note can be normalized to the new note slug,
+    Wikilink references will be assigned the title as link text.
+  </p>
+
+  <p>
+    Example:
+    <br>
+    Let's change the slug of a note from <code>old-note</code> to
+    <code>new-note</code> with the "Update references" toggle activated.
+    <br>
+    All slashlinks will change accordingly from <code>/old-note</code> to
+    <code>/new-note</code>.
+    <br>
+    All wikilinks will change from <code>Old note</code> to
+    <code>New note</code> when the title of the new note is "New note".
+    <br>
+    All wikilinks will change from <code>Old note</code> to
+    <code>new-note</code> when the title of the new note is "Old note".
+  </p>
+
+  <p>
+    Be aware that the state of the toggle is saved for future slug edits.
+  </p>
+
   <h3>Aliases</h3>
 
   <p>
