@@ -63,11 +63,15 @@ const sluggifyNoteText = (text: string): string => {
 
 const isValidSlug = (slug: Slug): boolean => {
   return (
-    typeof slug === "string"
-    && slug.length > 0
+    slug.length > 0
     && slug.length <= 200
     && slug.match(/^[\p{L}\d_][\p{L}\d\-/._]*$/u) !== null
   );
+};
+
+
+const isValidSlugOrEmpty = (slug: Slug): boolean => {
+  return isValidSlug(slug) || slug.length === 0;
 };
 
 
@@ -178,4 +182,5 @@ export {
   sluggify,
   sluggifyNoteText,
   trimSlug,
+  isValidSlugOrEmpty,
 };

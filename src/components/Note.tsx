@@ -213,9 +213,7 @@ const Note = ({
   return <>
     <NoteMenuBar
       activeNote={note}
-      disableNoteSaving={
-        !NotesProvider.isValidSlug(slugInput) && slugInput !== ""
-      }
+      disableNoteSaving={!NotesProvider.isValidSlugOrEmpty(slugInput)}
       createNewNote={createNewNote}
       createNewLinkedNote={createNewLinkedNote}
       handleNoteSaveRequest={handleNoteSaveRequest}

@@ -659,7 +659,7 @@ const handleExistingNoteUpdate = async (
   }
 
   noteSaveRequest.aliases.forEach((alias) => {
-    if (!(isValidSlug(alias) && alias.length > 0)) {
+    if (!isValidSlug(alias)) {
       throw new Error(ErrorMessage.INVALID_ALIAS);
     }
     if (alias === existingNote.meta.slug) {
@@ -822,7 +822,7 @@ const handleNewNoteSaveRequest = async (
 
   const aliasesToUpdate: Slug[] = [];
   noteSaveRequest.aliases.forEach((alias) => {
-    if (!(isValidSlug(alias) && alias.length > 0)) {
+    if (!isValidSlug(alias)) {
       throw new Error(ErrorMessage.INVALID_ALIAS);
     }
     if (

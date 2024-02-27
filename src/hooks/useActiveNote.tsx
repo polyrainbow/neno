@@ -189,7 +189,7 @@ export default (
   const saveActiveNote = async (
     ignoreDuplicateTitles: boolean,
   ): Promise<NoteToTransmit> => {
-    if ((!NotesProvider.isValidSlug(slugInput)) && slugInput !== "") {
+    if (!NotesProvider.isValidSlugOrEmpty(slugInput)) {
       throw new Error("Tried saving an invalid slug. This should not happen!");
     }
 

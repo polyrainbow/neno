@@ -173,7 +173,7 @@ const NoteView = () => {
 
   useKeyboardShortcuts({
     onSave: () => {
-      if (!NotesProvider.isValidSlug(slugInput) && slugInput.length > 0) {
+      if (!NotesProvider.isValidSlugOrEmpty(slugInput)) {
         return;
       }
       handleNoteSaveRequest();

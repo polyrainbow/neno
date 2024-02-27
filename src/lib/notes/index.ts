@@ -42,6 +42,7 @@ import { getExtensionFromFilename, getRandomKey } from "./utils.js";
 import {
   getSlugFromFilename,
   isValidSlug,
+  isValidSlugOrEmpty,
   isFileSlug,
 } from "./slugUtils.js";
 import { removeSlugFromIndexes } from "./indexUtils.js";
@@ -54,6 +55,7 @@ export default class NotesProvider {
   static parseSerializedNewNote = parseSerializedNewNote;
   static serializeNewNote = serializeNewNote;
   static isValidSlug = isValidSlug;
+  static isValidSlugOrEmpty = isValidSlugOrEmpty;
 
   #io: DatabaseIO;
 
