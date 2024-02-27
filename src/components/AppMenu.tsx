@@ -10,7 +10,7 @@ import { PathTemplate } from "../types/PathTemplate";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import { isInitialized, removeAccess } from "../lib/LocalDataStorage";
+import { isInitialized } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
 /*
@@ -52,10 +52,8 @@ const AppMenu = () => {
             setUnsavedChanges(false);
           }
 
-          await removeAccess();
           navigate(getAppPath(PathTemplate.START));
           setIsAppMenuOpen(false);
-          window.location.reload();
         }}
       />
       <AppMenuItem

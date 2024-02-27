@@ -44,7 +44,7 @@ const NoteSlug = ({
           const newValue = element.value.replace(
             // In the input field, we also allow \p{SK} modifiers, as
             // they are used to create a full letter with modifier in a
-            // second step. They are not valid slug characters on its own,
+            // second step. They are not valid slug characters on their own,
             // though.
             // We also allow apostrophes ('), as they might be used as a
             // dead key for letters like é.

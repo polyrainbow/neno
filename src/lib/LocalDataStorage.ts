@@ -116,14 +116,6 @@ export const isInitialized = (): boolean => {
   return notesProvider instanceof NotesProvider;
 };
 
-
-export const removeAccess = async (): Promise<void> => {
-  folderHandle = null;
-  await IDB.del(FOLDER_HANDLE_STORAGE_KEY);
-  notesProvider = null;
-};
-
-
 export const getNotesProvider = (): NotesProvider | null => {
   return notesProvider;
 };
