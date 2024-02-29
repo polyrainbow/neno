@@ -403,6 +403,22 @@ test.describe("Editor view", () => {
 
 
   test(
+    "enable localhost URLs in the editor",
+    async ({ page }) => {
+      await page.keyboard.type("http://localhost:8080/page");
+
+      const link = (
+        await page.$("div[data-lexical-editor] .editor-paragraph a")
+      ) as ElementHandle<HTMLElement>;
+
+      expect(await link.getAttribute("href")).toBe(
+        "http://localhost:8080/page",
+      );
+    },
+  );
+
+
+  test(
     "enable URLs with semicolons in the editor",
     async ({ page }) => {
       await page.keyboard.type("http://example.com/page;1");
