@@ -10,12 +10,11 @@ import { TextEncoder, TextDecoder } from "util";
 import { Block } from "../subwaytext/types/Block.js";
 // @ts-ignore
 Object.assign(global, { TextDecoder, TextEncoder });
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
-// @ts-ignore
-globalThis.navigator = {
+vi.stubGlobal("navigator", {
   hardwareConcurrency: 4,
-};
+});
 
 interface EventData {
   action: string,
