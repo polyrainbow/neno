@@ -60,6 +60,8 @@ export default [
       "@stylistic/operator-linebreak": ["error", "before"],
       "@stylistic/max-len": ["error", { "code": 80 }],
       "@stylistic/no-trailing-spaces": ["error"],
+      "@stylistic/eol-last": ["error", "always"],
+      "@stylistic/dot-location": ["error", "property"],
 
       // @stylistic/ts - https://eslint.style/packages/ts#rules
       "@stylistic/ts/comma-dangle": ["error", "always-multiline"],
@@ -70,6 +72,7 @@ export default [
         "double"
       ],
       "@stylistic/ts/key-spacing": ["error", { "beforeColon": false }],
+      "@stylistic/ts/keyword-spacing": ["error"],
     },
   },
 ];
