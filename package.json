@@ -10,10 +10,9 @@
     "vite-plugin-pwa": "^0.18.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.41.2",
+    "@playwright/test": "^1.42.0",
     "@stylistic/eslint-plugin": "^1.6.2",
     "@stylistic/eslint-plugin-ts": "^1.6.2",
-    "@tippyjs/react": "^4.2.6",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.5",
     "@vitejs/plugin-react": "^4.2.0",
@@ -28,7 +27,6 @@
     "react-router-dom": "^6.22.0",
     "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.0",
-    "tippy.js": "^6.3.7",
     "typescript": "^5.2.2",
     "typescript-eslint": "^7.0.2",
     "vite": "^5.1.1",

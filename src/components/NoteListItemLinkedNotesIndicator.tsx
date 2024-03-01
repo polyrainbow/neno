@@ -1,4 +1,3 @@
-import Tooltip from "./Tooltip";
 import { getIconSrc } from "../lib/utils";
 import { l } from "../lib/intl";
 
@@ -26,51 +25,48 @@ const NoteListItemLinkedNotesIndicator = ({
         : l("list.item.links.link");
 
 
-  return <Tooltip
+  return <button
+    className={
+      "note-list-item-linked-notes-indicator "
+      + (isLinkable ? "linkable" : "not-linkable")
+    }
+    onClick={(e) => {
+      onLinkIndicatorClick?.();
+      e.stopPropagation();
+    }}
     title={linkControlLabel}
   >
-    <button
-      className={
-        "note-list-item-linked-notes-indicator "
-        + (isLinkable ? "linkable" : "not-linkable")
-      }
-      onClick={(e) => {
-        onLinkIndicatorClick?.();
-        e.stopPropagation();
-      }}
+    <div
+      className="note-list-item-linked-notes-indicator-content"
     >
-      <div
-        className="note-list-item-linked-notes-indicator-content"
-      >
-        <img
-          src={getIconSrc("link")}
-          alt={linkControlLabel}
-          className="svg-icon"
-        />
-        {
-          (
-            typeof numberOfLinkedNotes === "number"
-            && !isNaN(numberOfLinkedNotes)
-          )
-            ? <div
-              className="linked-notes-indicator-number"
-            >
-              {
-                numberOfLinkedNotes > 0
-                  ? <span title={numberOfLinkedNotes + " Links"}>
-                    {numberOfLinkedNotes}
-                  </span>
-                  : <div
-                    title={l("list.item.links.not-linked")}
-                    className="unlinked-note-indicator"
-                  />
-              }
-            </div>
-            : ""
-        }
-      </div>
-    </button>
-  </Tooltip>;
+      <img
+        src={getIconSrc("link")}
+        alt={linkControlLabel}
+        className="svg-icon"
+      />
+      {
+        (
+          typeof numberOfLinkedNotes === "number"
+          && !isNaN(numberOfLinkedNotes)
+        )
+          ? <div
+            className="linked-notes-indicator-number"
+          >
+            {
+              numberOfLinkedNotes > 0
+                ? <span>
+                  {numberOfLinkedNotes}
+                </span>
+                : <div
+                  title={l("list.item.links.not-linked")}
+                  className="unlinked-note-indicator"
+                />
+            }
+          </div>
+          : ""
+      }
+    </div>
+  </button>;
 };
 
 export default NoteListItemLinkedNotesIndicator;

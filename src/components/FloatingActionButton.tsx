@@ -1,4 +1,3 @@
-import Tooltip from "./Tooltip";
 import { getIconSrc } from "../lib/utils";
 
 interface FloatingActionButtonProps {
@@ -14,23 +13,20 @@ const FloatingActionButton = ({
   onClick,
   disabled = false,
 }: FloatingActionButtonProps) => {
-  return <Tooltip
+  return <button
+    className="icon-button-floating"
+    onClick={onClick}
+    disabled={disabled}
     title={title}
   >
-    <button
-      className="icon-button-floating"
-      onClick={onClick}
-      disabled={disabled}
-    >
-      <img
-        src={getIconSrc(icon)}
-        alt={title}
-        width="24"
-        height="24"
-        className="svg-icon"
-      />
-    </button>
-  </Tooltip>;
+    <img
+      src={getIconSrc(icon)}
+      alt={title}
+      width="24"
+      height="24"
+      className="svg-icon"
+    />
+  </button>;
 };
 
 export default FloatingActionButton;

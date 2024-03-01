@@ -1,4 +1,3 @@
-import Tooltip from "./Tooltip";
 import Icon from "./Icon";
 
 interface AppHeaderStatsItemProps {
@@ -12,13 +11,10 @@ const AppHeaderStatsItem = ({
   label,
   value,
 }: AppHeaderStatsItemProps) => {
-  return <Tooltip
+  return <div
+    className="app-header-stats-item"
     title={label}
-  >
-    <div
-      className="app-header-stats-item"
-    ><Icon icon={icon} size={24} title={label}/> {value}</div>
-  </Tooltip>;
+  ><Icon icon={icon} size={24} title={label}/> {value}</div>;
 };
 
 
