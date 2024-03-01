@@ -593,3 +593,18 @@ input:checked + .slider::before {
 .slider.round::before {
   border-radius: 50%;
 }
+
+/******************************
+  Tooltips
+******************************/
+
+.tooltip:popover-open {
+  position: absolute;
+  inset: unset;
+  background: var(--accent-color-interactible);
+  color: var(--main-content-color);
+  border: none;
+  font-size: var(--small-font-size);
+  padding: 10px;
+  border-radius: var(--border-radius);
+}

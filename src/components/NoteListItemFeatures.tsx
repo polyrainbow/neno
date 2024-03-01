@@ -1,4 +1,3 @@
-import Tooltip from "./Tooltip";
 import { l } from "../lib/intl";
 import NoteListItemFeaturesType
   from "../lib/notes/types/NoteListItemFeatures";
@@ -16,74 +15,56 @@ const NoteListItemFeatures = ({
   >
     {
       features.containsWeblink
-        ? <Tooltip
-          title={l("list.item.features.contains-links")}>
-          <Icon
-            icon="public"
-            title={l("list.item.features.contains-links")}
-            size={ICON_SIZE}
-          />
-        </Tooltip>
+        ? <Icon
+          icon="public"
+          title={l("list.item.features.contains-links")}
+          size={ICON_SIZE}
+        />
         : null
     }
     {
       features.containsCode
-        ? <Tooltip
-          title={l("list.item.features.contains-code")}>
-          <Icon
-            icon="code"
-            title={l("list.item.features.contains-code")}
-            size={ICON_SIZE}
-          />
-        </Tooltip>
+        ? <Icon
+          icon="code"
+          title={l("list.item.features.contains-code")}
+          size={ICON_SIZE}
+        />
         : null
     }
     {
       features.containsImages
-        ? <Tooltip
-          title={l("list.item.features.contains-images")}>
-          <Icon
-            icon="image"
-            title={l("list.item.features.contains-images")}
-            size={ICON_SIZE}
-          />
-        </Tooltip>
+        ? <Icon
+          icon="image"
+          title={l("list.item.features.contains-images")}
+          size={ICON_SIZE}
+        />
         : null
     }
     {
       features.containsDocuments
-        ? <Tooltip
-          title={l("list.item.features.contains-documents")}>
-          <Icon
-            icon="note"
-            title={l("list.item.features.contains-documents")}
-            size={ICON_SIZE}
-          />
-        </Tooltip>
+        ? <Icon
+          icon="note"
+          title={l("list.item.features.contains-documents")}
+          size={ICON_SIZE}
+        />
         : null
     }
     {
       features.containsAudio
-        ? <Tooltip
-          title={l("list.item.features.contains-audio")}>
-          <Icon
-            icon="headphones"
-            title={l("list.item.features.contains-audio")}
-            size={ICON_SIZE}
-          />
-        </Tooltip>
+        ? <Icon
+          icon="headphones"
+          title={l("list.item.features.contains-audio")}
+          size={ICON_SIZE}
+        />
         : null
     }
     {
       features.containsVideo
-        ? <Tooltip
-          title={l("list.item.features.contains-video")}>
-          <Icon
-            icon="movie"
-            title={l("list.item.features.contains-video")}
-            size={ICON_SIZE}
-          />
-        </Tooltip>
+        ? <Icon
+          icon="movie"
+          title={l("list.item.features.contains-video")}
+          size={ICON_SIZE}
+        />
         : null
     }
   </span>;

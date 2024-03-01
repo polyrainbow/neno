@@ -1,4 +1,3 @@
-import Tooltip from "./Tooltip";
 import Icon from "./Icon";
 
 interface StatusIndicatorItemProps {
@@ -15,15 +14,11 @@ const StatusIndicatorItem = ({
   return <>
     {
       isActive
-        ? <Tooltip
+        ? <Icon
+          icon={icon}
           title={title}
-        >
-          <Icon
-            icon={icon}
-            title={title}
-            size={24}
-          />
-        </Tooltip>
+          size={24}
+        />
         : ""
     }
   </>;

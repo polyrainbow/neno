@@ -22,7 +22,7 @@ paragraph`;
 
 test.beforeEach(async ({ page }) => {
   await setDefaultDate(page); // needs to be added before page.goto
-  await page.goto("/");
+  await page.goto("/", {"waitUntil": "networkidle"});
   await page.waitForSelector("img[alt='NENO logo']");
   await page.keyboard.press("Control+.");
   await page.waitForSelector("#memory-storage-load-button");
