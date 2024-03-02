@@ -336,6 +336,31 @@ test.describe("Editor view", () => {
   );
 
   test(
+    "transclusions should be refreshed after removing space between two slashlinks",
+    async ({ page }) => {
+      await page.keyboard.type("/1 /2");
+
+      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.press("Backspace");
+
+      const paragraphChildren = (await page.$$(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ))!;
+
+      // make sure "/1/2" is one slashlink node
+      expect(await paragraphChildren[0].innerText()).toBe("/1/2");
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const transclusionSlug = (await page.$(
+        "div[data-lexical-editor] .transclusion .slug",
+      ))!;
+
+      expect(await transclusionSlug.innerText()).toBe("/1/2");
+    },
+  );
+
+  test(
     "selecting already active note should not trigger confirm discarding changes dialog",
     async ({ page }) => {
       await page.keyboard.type("note");

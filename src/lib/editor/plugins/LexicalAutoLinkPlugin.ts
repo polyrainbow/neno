@@ -46,6 +46,7 @@ import {
   $isElementNode,
   $isLineBreakNode,
   $isTextNode,
+  ParagraphNode,
   TextNode,
 } from "lexical";
 import { useEffect } from "react";
@@ -334,6 +335,25 @@ function useAutoLink(
           }
 
           handleBadNeighbors(textNode, matchers, onChangeWrapped);
+        }
+      }),
+      /*
+        We need a paragraph node transformer here for the following use case:
+        Removing the space between "/1 /2". This whitespace removal would not
+        trigger the above text node transform as it would just remove the
+        text node between the two link nodes which stay untouched. But we need
+        to unify these two link nodes into one: "/1/2". So let's check if there
+        are two link nodes next to each other and remove one of them to trigger
+        another transform.
+      */
+      editor.registerNodeTransform(ParagraphNode, (paragraphNode: ParagraphNode) => {
+        const children = paragraphNode.getChildren();
+        for (let childrenIndex = 0; childrenIndex < children.length; childrenIndex++) {
+          const child = children[childrenIndex];
+          const nextChild = children[childrenIndex + 1];
+          if ($isAutoLinkNode(child) && $isAutoLinkNode(nextChild)) {
+            replaceWithChildren(child);
+          }
         }
       }),
     );
