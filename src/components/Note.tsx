@@ -32,6 +32,10 @@ import useGoToNote from "../hooks/useGoToNote";
 import { getTransclusionContent } from "../lib/Transclusion";
 import { PathTemplate } from "../types/PathTemplate";
 import { useNavigate } from "react-router-dom";
+import {
+  useLexicalComposerContext,
+} from "@lexical/react/LexicalComposerContext";
+import { insertFileSlugs } from "../lib/editorManipulations";
 
 interface NoteComponentProps {
   editorInstanceId: number,
@@ -93,27 +97,12 @@ const Note = ({
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const navigate = useNavigate();
+  const [editor] = useLexicalComposerContext();
 
   const insertFileSlugsToNote = (fileInfos: FileInfo[]) => {
     addFilesToNoteObject(fileInfos);
-
     const fileSlugs = fileInfos.map((fileInfo) => fileInfo.slug);
-    const slashlinks = fileSlugs.map((slug) => `/${slug}`);
-
-    // only add line breaks if they're not already there
-    let separator;
-    if (note.content.endsWith("\n\n") || note.content.length === 0) {
-      separator = "";
-    } else if (note.content.endsWith("\n")) {
-      separator = "\n";
-    } else {
-      separator = "\n\n";
-    }
-
-    setNoteContent(
-      `${note.content}${separator}${slashlinks.join("\n")}`,
-      true,
-    );
+    insertFileSlugs(fileSlugs, editor);
   };
 
 
