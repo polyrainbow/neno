@@ -3,12 +3,48 @@ import {
   $isRangeSelection,
   LexicalEditor,
 } from "lexical";
+import { Slug } from "./notes/types/Slug";
+import { isWhiteSpace } from "./subwaytext/utils";
 
 export const insert = (text: string, editor: LexicalEditor) => {
   editor.update(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
       selection.insertText(text);
+    }
+  });
+};
+
+
+export const insertFileSlugs = (fileSlugs: Slug[], editor: LexicalEditor) => {
+  const slashlinks = fileSlugs.map((slug) => `/${slug}`);
+
+  editor.update(() => {
+    const selection = $getSelection();
+    if ($isRangeSelection(selection)) {
+      let textToBeInserted = slashlinks.join(" ");
+
+      const selectionIsCollapsed
+        = selection.focus.key === selection.anchor.key
+        && selection.focus.offset === selection.anchor.offset;
+
+      if (selectionIsCollapsed) {
+        const charBeforeCursor = selection.anchor.getNode()
+          .getTextContent()[selection.anchor.offset - 1];
+
+        if (charBeforeCursor && !isWhiteSpace(charBeforeCursor)) {
+          textToBeInserted = " " + textToBeInserted;
+        }
+
+        const charAfterCursor = selection.anchor.getNode()
+          .getTextContent()[selection.anchor.offset];
+
+        if (charAfterCursor && !isWhiteSpace(charAfterCursor)) {
+          textToBeInserted = textToBeInserted + " ";
+        }
+      }
+
+      selection.insertText(textToBeInserted);
     }
   });
 };

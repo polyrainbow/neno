@@ -59,7 +59,6 @@ export default (
 
   const setNoteContent = (
     newContent: string,
-    refreshEditor?: boolean,
   ): void => {
     if (activeNote.content !== newContent) {
       setUnsavedChanges(true);
@@ -70,10 +69,6 @@ export default (
         ...previousState,
         content: newContent,
       };
-
-      if (refreshEditor) {
-        newNote.initialContent = newContent;
-      }
 
       return newNote;
     });
