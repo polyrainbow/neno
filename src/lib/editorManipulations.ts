@@ -29,15 +29,21 @@ export const insertFileSlugs = (fileSlugs: Slug[], editor: LexicalEditor) => {
         && selection.focus.offset === selection.anchor.offset;
 
       if (selectionIsCollapsed) {
-        const charBeforeCursor = selection.anchor.getNode()
+        const anchorNode = selection.anchor.getNode();
+
+        const charBeforeCursor = anchorNode
           .getTextContent()[selection.anchor.offset - 1];
 
         if (charBeforeCursor && !isWhiteSpace(charBeforeCursor)) {
           textToBeInserted = " " + textToBeInserted;
         }
 
-        const charAfterCursor = selection.anchor.getNode()
+        let charAfterCursor = anchorNode
           .getTextContent()[selection.anchor.offset];
+
+        if (!charAfterCursor && anchorNode.getNextSibling()) {
+          charAfterCursor = anchorNode.getNextSibling().getTextContent()[0];
+        }
 
         if (charAfterCursor && !isWhiteSpace(charAfterCursor)) {
           textToBeInserted = textToBeInserted + " ";
