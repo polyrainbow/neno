@@ -44,11 +44,11 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-blocks")}</td>
-          <td>{subwaytext(note.content).length}</td>
+          <td>{subwaytext(note.initialContent).length}</td>
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-lines")}</td>
-          <td>{note.content.split("\n").length}</td>
+          <td>{note.initialContent.split("\n").length}</td>
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-outgoing-links")}</td>

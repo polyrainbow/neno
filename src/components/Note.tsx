@@ -46,7 +46,7 @@ interface NoteComponentProps {
   displayedSlugAliases: string[],
   setDisplayedSlugAliases: (val: string[]) => void,
   setNote: (note: ActiveNote) => void,
-  setNoteContent: (title: string, refreshEditor?: boolean) => void,
+  handleEditorContentChange: (title: string) => void,
   addFilesToNoteObject: (responses: FileInfo[]) => void,
   setUnsavedChanges: (val: boolean) => void,
   createNewNote: (params: CreateNewNoteParams) => void,
@@ -62,6 +62,7 @@ interface NoteComponentProps {
   updateReferences: boolean,
   setUpdateReferences: (val: boolean) => void,
   onLinkIndicatorClick: (slug: Slug, title: string) => void,
+  handleNoteExportRequest: () => void,
 }
 
 
@@ -74,7 +75,7 @@ const Note = ({
   setSlugInput,
   displayedSlugAliases,
   setDisplayedSlugAliases,
-  setNoteContent,
+  handleEditorContentChange,
   addFilesToNoteObject,
   setUnsavedChanges,
   createNewNote,
@@ -90,6 +91,7 @@ const Note = ({
   updateReferences,
   setUpdateReferences,
   onLinkIndicatorClick,
+  handleNoteExportRequest,
 }: NoteComponentProps) => {
   const noteElement = useRef<HTMLElement>(null);
   const notesProvider = useNotesProvider();
@@ -214,6 +216,7 @@ const Note = ({
       handleUploadFilesRequest={handleUploadFilesRequest}
       uploadInProgress={uploadInProgress}
       importNote={importNote}
+      handleNoteExportRequest={handleNoteExportRequest}
     />
     {
       isBusy
@@ -253,7 +256,7 @@ const Note = ({
             initialText={note.initialContent}
             instanceId={editorInstanceId}
             onChange={(val: string) => {
-              setNoteContent(val);
+              handleEditorContentChange(val);
             }}
             onUserRequest={
               async (type: UserRequestType, value: string) => {

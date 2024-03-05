@@ -6,7 +6,6 @@
 
 import ByteRange from "./notes/types/ByteRange";
 import StorageProvider from "./notes/types/StorageProvider";
-
 export default class FileSystemAccessAPIStorageProvider
 implements StorageProvider {
   constructor(directoryHandle: FileSystemDirectoryHandle) {
