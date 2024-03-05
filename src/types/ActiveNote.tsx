@@ -4,7 +4,6 @@ import { Slug } from "../lib/notes/types/Slug";
 import SparseNoteInfo from "../lib/notes/types/SparseNoteInfo";
 
 interface BaseActiveNote {
-  content: string,
   initialContent: string,
   files: FileInfo[],
   keyValues: [string, string][],

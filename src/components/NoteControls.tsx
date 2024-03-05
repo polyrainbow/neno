@@ -9,8 +9,6 @@ import {
 import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
-import useNotesProvider from "../hooks/useNotesProvider";
-import { exportNote } from "../lib/FrontendFunctions";
 import { Slug } from "../lib/notes/types/Slug";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { LOCAL_GRAPH_ID } from "../config";
@@ -29,6 +27,7 @@ interface NoteControlsProps {
   handleUploadFilesRequest: () => void,
   importNote: () => void,
   disableNoteSaving: boolean,
+  handleNoteExportRequest: () => void,
 }
 
 const NoteControls = ({
@@ -44,8 +43,8 @@ const NoteControls = ({
   handleUploadFilesRequest,
   importNote,
   disableNoteSaving,
+  handleNoteExportRequest,
 }: NoteControlsProps) => {
-  const notesProvider = useNotesProvider();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const navigate = useNavigate();
@@ -143,10 +142,7 @@ const NoteControls = ({
       disabled={false}
       title={l("editor.export-note")}
       icon="file_download"
-      onClick={() => {
-        if (!notesProvider) return;
-        exportNote(activeNote, notesProvider);
-      }}
+      onClick={() => handleNoteExportRequest()}
     />
     <IconButton
       id="button_upload-file"

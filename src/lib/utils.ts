@@ -58,7 +58,6 @@ const createContentFromSlugs = (
 const getNewNoteObject = (params: CreateNewNoteParams): UnsavedActiveNote => {
   const note: UnsavedActiveNote = {
     isUnsaved: true,
-    content: params.content ?? Config.DEFAULT_NOTE_CONTENT,
     initialContent: params.content ?? Config.DEFAULT_NOTE_CONTENT,
     // Note may already have files, but the files list will be populated by
     // notesProvider
@@ -267,7 +266,7 @@ const getLines = (
 
 const getNoteTitleFromActiveNote = (activeNote: ActiveNote): string => {
   return activeNote.keyValues.find((kv) => kv[0] === "title")?.[1]
-    ?? inferNoteTitle(activeNote.content);
+    ?? inferNoteTitle(activeNote.initialContent);
 };
 
 

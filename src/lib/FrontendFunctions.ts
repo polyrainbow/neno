@@ -12,6 +12,7 @@ import {
 
 export const exportNote = async (
   activeNote: ActiveNote,
+  noteContent: string,
   notesProvider: NotesProvider,
 ): Promise<void> => {
   let rawNote: string;
@@ -25,7 +26,7 @@ export const exportNote = async (
         contentType: DEFAULT_CONTENT_TYPE,
         flags: ["EXPORT_FROM_DRAFT"],
       },
-      content: activeNote.content,
+      content: noteContent,
     };
 
     rawNote = serializeNewNote(note);

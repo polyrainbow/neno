@@ -72,7 +72,7 @@ const NoteView = () => {
     loadNote,
     importNote,
     setActiveNote,
-    setNoteContent,
+    handleEditorContentChange,
     unsavedChanges,
     setUnsavedChanges,
     slugInput,
@@ -83,6 +83,7 @@ const NoteView = () => {
     updateEditorInstance,
     updateReferences,
     setUpdateReferences,
+    handleNoteExportRequest,
   } = useActiveNote(notesProvider);
 
   const [headerStats, refreshHeaderStats] = useHeaderStats(notesProvider);
@@ -321,7 +322,7 @@ const NoteView = () => {
           slugInput={slugInput}
           displayedSlugAliases={displayedSlugAliases}
           setDisplayedSlugAliases={setDisplayedSlugAliases}
-          setNoteContent={setNoteContent}
+          handleEditorContentChange={handleEditorContentChange}
           addFilesToNoteObject={(files: FileInfo[]): void => {
             setActiveNote((previousState) => {
               return {
@@ -362,6 +363,7 @@ const NoteView = () => {
             const wikilink = Utils.getWikilinkForNote(slug, title);
             insert(wikilink, editor);
           }}
+          handleNoteExportRequest={handleNoteExportRequest}
         />
       </div>
     </main>

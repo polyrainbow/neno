@@ -6,7 +6,7 @@ import {
   parseSerializedNewNote,
 } from "../lib/notes/noteUtils";
 import ActiveNote, { UnsavedActiveNote } from "../types/ActiveNote";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   getFilesFromUserSelection,
   getNewNoteObject,
@@ -26,6 +26,7 @@ import {
   NOTE_FILE_EXTENSION,
   NOTE_MIME_TYPE,
 } from "../config";
+import { exportNote } from "../lib/FrontendFunctions";
 
 export default (
   notesProvider: NotesProvider,
@@ -35,6 +36,7 @@ export default (
   const newNoteObject: UnsavedActiveNote = getNewNoteObject({});
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
   const [isBusy, setIsBusy] = useState<boolean>(false);
+  const noteContentRef = useRef<string>("");
 
   /* Deliberately setting this always to false instead of saving preference
   in local storage, so the user has to make this decision more consciously. */
@@ -57,21 +59,14 @@ export default (
   };
 
 
-  const setNoteContent = (
+  const handleEditorContentChange = (
     newContent: string,
   ): void => {
-    if (activeNote.content !== newContent) {
+    if (noteContentRef.current !== newContent) {
       setUnsavedChanges(true);
     }
 
-    setActiveNote((previousState: ActiveNote): ActiveNote => {
-      const newNote: ActiveNote = {
-        ...previousState,
-        content: newContent,
-      };
-
-      return newNote;
-    });
+    noteContentRef.current = newContent;
   };
 
 
@@ -80,6 +75,7 @@ export default (
     setActiveNote(newNoteObject);
     setSlugInput(params.slug || "");
     setDisplayedSlugAliases([]);
+    noteContentRef.current = "";
   };
 
 
@@ -99,7 +95,22 @@ export default (
   };
 
 
-  const setActiveNoteFromServer = (noteFromServer: NoteToTransmit): void => {
+  const setActiveNoteFromServer = (
+    noteFromServer: NoteToTransmit,
+  ): void => {
+    /*
+      When we load another existing note, we should refresh our noteContentRef
+      as it should represent the current state of the editor.
+      When we call this function after a note save, we should not update
+      noteContentRef because the editor might already be in a newer state which
+      we do not want to overwrite with force.
+    */
+    if (
+      !("slug" in activeNote)
+      || noteFromServer.meta.slug !== activeNote.slug
+    ) {
+      noteContentRef.current = noteFromServer.content;
+    }
     setActiveNote({
       slug: noteFromServer.meta.slug,
       // might be better to create a new set here
@@ -110,26 +121,24 @@ export default (
       backlinks: noteFromServer.backlinks,
       numberOfCharacters: noteFromServer.numberOfCharacters,
       isUnsaved: false,
-      content: noteFromServer.content,
       initialContent: noteFromServer.content,
       files: noteFromServer.files,
       keyValues: Object.entries(noteFromServer.meta.custom),
       flags: noteFromServer.meta.flags,
       contentType: noteFromServer.meta.contentType,
     });
-
     setSlugInput(noteFromServer.meta.slug);
     setDisplayedSlugAliases([...noteFromServer.aliases]);
   };
 
 
-  const prepareNoteSaveRequest = async (
+  const prepareNoteSaveRequest = (
     ignoreDuplicateTitles: boolean,
-  ): Promise<NoteSaveRequest> => {
+  ): NoteSaveRequest => {
     if (activeNote.isUnsaved) {
       return {
         note: {
-          content: activeNote.content,
+          content: noteContentRef.current,
           meta: {
             custom: Object.fromEntries(activeNote.keyValues),
             flags: activeNote.flags,
@@ -151,7 +160,7 @@ export default (
     } else {
       return {
         note: {
-          content: activeNote.content,
+          content: noteContentRef.current,
           meta: {
             custom: Object.fromEntries(activeNote.keyValues),
             slug: activeNote.slug,
@@ -188,10 +197,15 @@ export default (
       throw new Error("Tried saving an invalid slug. This should not happen!");
     }
 
-    const noteSaveRequest = await prepareNoteSaveRequest(ignoreDuplicateTitles);
+    const noteSaveRequest = prepareNoteSaveRequest(ignoreDuplicateTitles);
     const noteFromDatabase = await notesProvider.put(noteSaveRequest);
     setActiveNoteFromServer(noteFromDatabase);
-    setUnsavedChanges(false);
+    // After the saving has been done, let's check if there was an editor update
+    // in the meantime. Only if there was no editor update, we can be sure
+    // that we have no new unsaved changes.
+    if (noteFromDatabase.content === noteContentRef.current) {
+      setUnsavedChanges(false);
+    }
     return noteFromDatabase;
   };
 
@@ -228,7 +242,6 @@ export default (
     const parsedNote = parseSerializedNewNote(rawNote);
     const newActiveNote: UnsavedActiveNote = {
       isUnsaved: true,
-      content: parsedNote.content,
       initialContent: parsedNote.content,
       keyValues: Object.entries(parsedNote.meta.custom),
       flags: [...parsedNote.meta.flags, "IMPORTED"],
@@ -240,6 +253,8 @@ export default (
     // TODO: Could be improved in the future.
     setSlugInput("");
     setUnsavedChanges(true);
+    noteContentRef.current = parsedNote.content;
+    updateEditorInstance();
   };
 
 
@@ -275,7 +290,7 @@ export default (
           flags: [...activeNote.flags, `DUPLICATE_OF(${activeNote.slug})`],
           contentType: activeNote.contentType,
         },
-        content: activeNote.content,
+        content: noteContentRef.current,
       },
       ignoreDuplicateTitles: true,
       aliases: new Set(),
@@ -283,6 +298,11 @@ export default (
     const noteFromServer = await notesProvider.put(noteSaveRequest);
 
     return noteFromServer;
+  };
+
+
+  const handleNoteExportRequest = () => {
+    exportNote(activeNote, noteContentRef.current, notesProvider);
   };
 
 
@@ -315,7 +335,7 @@ export default (
   return {
     isBusy,
     activeNote,
-    setNoteContent,
+    handleEditorContentChange,
     saveActiveNote,
     setActiveNote,
     createNewNote,
@@ -334,5 +354,6 @@ export default (
     updateEditorInstance,
     updateReferences,
     setUpdateReferences,
+    handleNoteExportRequest,
   };
 };

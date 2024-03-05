@@ -18,6 +18,7 @@ interface NoteMenuBarProps {
   uploadInProgress: boolean,
   importNote: () => void,
   disableNoteSaving: boolean,
+  handleNoteExportRequest: () => void,
 }
 
 const NoteMenuBar = ({
@@ -34,6 +35,7 @@ const NoteMenuBar = ({
   uploadInProgress,
   importNote,
   disableNoteSaving,
+  handleNoteExportRequest,
 }: NoteMenuBarProps) => {
   return <section className="note-controls">
     <div className="note-controls-left">
@@ -50,6 +52,7 @@ const NoteMenuBar = ({
         handleUploadFilesRequest={handleUploadFilesRequest}
         importNote={importNote}
         disableNoteSaving={disableNoteSaving}
+        handleNoteExportRequest={handleNoteExportRequest}
       />
     </div>
     <div className="note-controls-right">
