@@ -92,6 +92,7 @@ const NoteView = () => {
     pinnedNotes,
     pinOrUnpinNote,
     refreshPinnedNotes,
+    move,
   } = usePinnedNotes(notesProvider);
   const controlledNoteList = useControlledNoteList(notesProvider);
 
@@ -281,6 +282,7 @@ const NoteView = () => {
     <NoteViewHeader
       stats={headerStats}
       pinnedNotes={pinnedNotes}
+      movePin={move}
       activeNote={activeNote}
     />
     <main>

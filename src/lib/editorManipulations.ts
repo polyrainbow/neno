@@ -3,8 +3,8 @@ import {
   $isRangeSelection,
   LexicalEditor,
 } from "lexical";
-import { Slug } from "./notes/types/Slug";
 import { isWhiteSpace } from "./subwaytext/utils";
+import { InsertItem } from "../types/InsertItem";
 
 export const insert = (text: string, editor: LexicalEditor) => {
   editor.update(() => {
@@ -16,13 +16,36 @@ export const insert = (text: string, editor: LexicalEditor) => {
 };
 
 
-export const insertFileSlugs = (fileSlugs: Slug[], editor: LexicalEditor) => {
-  const slashlinks = fileSlugs.map((slug) => `/${slug}`);
+export const concatenateInsertItems = (items: InsertItem[]): string => {
+  let concatenatedText = "";
 
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const itemBefore = i > 0 ? items[i] : null;
+
+    if (item.type === "file-slug") {
+      if (itemBefore?.value.endsWith(" ") || itemBefore?.type === "file-slug") {
+        concatenatedText += " ";
+      }
+    } else {
+      if (itemBefore?.type === "file-slug" && !item.value.startsWith(" ")) {
+        concatenatedText += " ";
+      }
+    }
+
+    concatenatedText += item.value;
+  }
+
+  return concatenatedText;
+};
+
+
+export const insertItems = (items: InsertItem[], editor: LexicalEditor) => {
   editor.update(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
-      let textToBeInserted = slashlinks.join(" ");
+
+      let concatenatedText = concatenateInsertItems(items);
 
       const selectionIsCollapsed
         = selection.focus.key === selection.anchor.key
@@ -35,7 +58,7 @@ export const insertFileSlugs = (fileSlugs: Slug[], editor: LexicalEditor) => {
           .getTextContent()[selection.anchor.offset - 1];
 
         if (charBeforeCursor && !isWhiteSpace(charBeforeCursor)) {
-          textToBeInserted = " " + textToBeInserted;
+          concatenatedText = " " + concatenatedText;
         }
 
         let charAfterCursor = anchorNode
@@ -46,11 +69,11 @@ export const insertFileSlugs = (fileSlugs: Slug[], editor: LexicalEditor) => {
         }
 
         if (charAfterCursor && !isWhiteSpace(charAfterCursor)) {
-          textToBeInserted = textToBeInserted + " ";
+          concatenatedText = concatenatedText + " ";
         }
       }
 
-      selection.insertText(textToBeInserted);
+      selection.insertText(concatenatedText);
     }
   });
 };

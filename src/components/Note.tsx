@@ -35,7 +35,8 @@ import { useNavigate } from "react-router-dom";
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { insertFileSlugs } from "../lib/editorManipulations";
+import { InsertItem } from "../types/InsertItem";
+import { insertItems } from "../lib/editorManipulations";
 
 interface NoteComponentProps {
   editorInstanceId: number,
@@ -101,34 +102,59 @@ const Note = ({
   const navigate = useNavigate();
   const [editor] = useLexicalComposerContext();
 
-  const insertFileSlugsToNote = (fileInfos: FileInfo[]) => {
-    addFilesToNoteObject(fileInfos);
-    const fileSlugs = fileInfos.map((fileInfo) => fileInfo.slug);
-    insertFileSlugs(fileSlugs, editor);
+  /*
+    Items can be a string or a file, very similar to
+    DataTransferItem.kind:
+    https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/kind
+  */
+  const insertFilesAndStringsToNote = (fileOrString: (FileInfo | string)[]) => {
+    const items: InsertItem[] = fileOrString.map((fos) => {
+      if (typeof fos === "string") {
+        return {
+          type: "string",
+          value: fos,
+        };
+      } else {
+        return {
+          type: "file-slug",
+          value: "/" + fos.slug,
+        };
+      }
+    });
+
+    insertItems(items, editor);
   };
 
 
   const uploadFiles = async (
     notesProvider: NotesProvider,
     files: File[],
-  ) => {
+  ): Promise<FileInfo[]> => {
     setUploadInProgress(true);
 
-    const responses: FileInfo[]
-      = await Promise.all(
-        files.map(
-          (file) => {
-            return notesProvider.addFile(
-              file.stream(),
-              file.name,
-            );
-          },
-        ),
-      );
-
-    insertFileSlugsToNote(responses);
+    const fileInfos = await Promise.all(
+      files.map(
+        (file) => {
+          return notesProvider.addFile(
+            file.stream(),
+            file.name,
+          );
+        },
+      ),
+    );
 
     setUploadInProgress(false);
+    addFilesToNoteObject(fileInfos);
+    return fileInfos;
+  };
+
+
+  const uploadFilesAndInsertFileSlugsToNote = async (
+    notesProvider: NotesProvider,
+    files: File[],
+  ): Promise<void> => {
+    const fileInfos = await uploadFiles(notesProvider, files);
+    insertFilesAndStringsToNote(fileInfos);
   };
 
 
@@ -139,33 +165,42 @@ const Note = ({
       true,
     );
 
-    return uploadFiles(notesProvider, files);
+    return uploadFilesAndInsertFileSlugsToNote(notesProvider, files);
   };
 
 
-  const handleFileDrop: DragEventHandler = (e: DragEvent<HTMLElement>) => {
+  const handleDrop: DragEventHandler = async (
+    e: DragEvent<HTMLElement>,
+  ): Promise<void> => {
     e.preventDefault();
+    const promisesToWaitFor: Promise<FileInfo | string>[] = [];
 
-    if (!e.dataTransfer) return;
+    [...e.dataTransfer.items]
+      .forEach((item: DataTransferItem): void => {
+        if (item.kind === "file") {
+          const file = item.getAsFile();
+          if (file) {
+            setUploadInProgress(true);
+            const fileUploadPromise = notesProvider.addFile(
+              file.stream(),
+              file.name,
+            );
+            promisesToWaitFor.push(fileUploadPromise);
+          }
+        } else {
+          const stringTransformPromise = new Promise<string>((resolve) => {
+            item.getAsString((val) => {
+              resolve(val);
+            });
+          });
 
-    if (e.dataTransfer.items) {
-      // Use DataTransferItemList interface to access the file(s)
-      const files = [...e.dataTransfer.items]
-        .filter((item: DataTransferItem): boolean => {
-          // If dropped items aren't files, reject them
-          return item.kind === "file";
-        })
-        .map((item: DataTransferItem): File | null => {
-          return item.getAsFile();
-        })
-        .filter((file: File | null): file is File => file !== null);
+          promisesToWaitFor.push(stringTransformPromise);
+        }
+      });
 
-      uploadFiles(notesProvider, files);
-    } else {
-      // Use DataTransfer interface to access the file(s)
-      const files = [...e.dataTransfer.files];
-      uploadFiles(notesProvider, files);
-    }
+    const items = await Promise.all(promisesToWaitFor);
+    setUploadInProgress(false);
+    insertFilesAndStringsToNote(items);
   };
 
 
@@ -226,13 +261,13 @@ const Note = ({
         : <section
           className="note"
           ref={noteElement}
-          onDrop={handleFileDrop}
+          onDrop={handleDrop}
           onPaste={(e) => {
             if (!notesProvider) return;
 
             const files = Array.from(e.clipboardData.files);
             if (files.length > 0) {
-              uploadFiles(notesProvider, files);
+              uploadFilesAndInsertFileSlugsToNote(notesProvider, files);
               e.preventDefault();
             }
           }}

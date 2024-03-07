@@ -1241,6 +1241,208 @@ describe("Notes module", () => {
     },
   );
 
+  it(
+    "should correctly decrease pin position",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest1: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n1",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest1);
+      await notesProvider.pin("n1");
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 2",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n2",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+      await notesProvider.pin("n2");
+
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "Note 3",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n3",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest3);
+      await notesProvider.pin("n3");
+
+      await notesProvider.movePinPosition("n3", -1);
+
+      const pins = await notesProvider.getPins();
+      const pinSlugs = pins.map((pin) => pin.meta.slug);
+
+      expect(pinSlugs).toEqual(["n1", "n3", "n2"]);
+    },
+  );
+
+
+  it(
+    "should correctly increase pin position",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest1: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n1",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest1);
+      await notesProvider.pin("n1");
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 2",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n2",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+      await notesProvider.pin("n2");
+
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "Note 3",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n3",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest3);
+      await notesProvider.pin("n3");
+
+      await notesProvider.movePinPosition("n1", 2);
+
+      const pins = await notesProvider.getPins();
+      const pinSlugs = pins.map((pin) => pin.meta.slug);
+
+      expect(pinSlugs).toEqual(["n2", "n3", "n1"]);
+    },
+  );
+
+
+  it(
+    "should not adjust pin positions when moving with offset=0",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest1: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n1",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest1);
+      await notesProvider.pin("n1");
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 2",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n2",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+      await notesProvider.pin("n2");
+
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "Note 3",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "n3",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest3);
+      await notesProvider.pin("n3");
+
+      await notesProvider.movePinPosition("n1", 0);
+      await notesProvider.movePinPosition("n2", 0);
+      await notesProvider.movePinPosition("n3", 0);
+
+      const pins = await notesProvider.getPins();
+      const pinSlugs = pins.map((pin) => pin.meta.slug);
+
+      expect(pinSlugs).toEqual(["n1", "n2", "n3"]);
+    },
+  );
+
   /*
     ALIASES
   */

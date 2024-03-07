@@ -25,6 +25,11 @@ export default (
     setPinnedNotes(newPinnedNotes);
   };
 
+  const move = async (slug: Slug, offset: number) => {
+    const newPinnedNotes = await notesProvider.movePinPosition(slug, offset);
+    setPinnedNotes(newPinnedNotes);
+  };
+
   const refreshPinnedNotes = async () => {
     const pinnedNotes = await notesProvider.getPins();
     setPinnedNotes(pinnedNotes);
@@ -34,5 +39,6 @@ export default (
     pinnedNotes,
     pinOrUnpinNote,
     refreshPinnedNotes,
+    move,
   };
 };

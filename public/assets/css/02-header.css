@@ -163,3 +163,10 @@
 .pinned-note p {
   white-space: pre;
 }
+
+.pin-insert-indicator {
+  height: 100%;
+  background-color: var(--main-content-color);
+  width: 3px;
+  flex-shrink: 0;
+}
