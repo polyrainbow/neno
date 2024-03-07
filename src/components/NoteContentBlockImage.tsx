@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import { PathTemplate } from "../types/PathTemplate";
 import {
-  getAppPath,
   getUrl,
 } from "../lib/utils";
 import NotesProvider from "../lib/notes";
-import { LOCAL_GRAPH_ID } from "../config";
 
 interface NoteContentBlockImageProps {
   file: FileInfo,

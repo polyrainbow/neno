@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
 import { test, expect } from "@playwright/test";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { setDefaultDate } from "../utils";
 
 const TEST_NOTE = `# Heading
@@ -22,7 +24,7 @@ paragraph`;
 
 test.beforeEach(async ({ page }) => {
   await setDefaultDate(page); // needs to be added before page.goto
-  await page.goto("/", {"waitUntil": "networkidle"});
+  await page.goto("/", { "waitUntil": "networkidle" });
   await page.waitForSelector("img[alt='NENO logo']");
   await page.keyboard.press("Control+.");
   await page.waitForSelector("#memory-storage-load-button");
@@ -106,5 +108,139 @@ test.describe("Editor", () => {
     await page.locator("#search-input").click();
     await page.keyboard.type("1", { delay: 20 });
     expect(await page.screenshot()).toMatchSnapshot("editor-search-results-disclaimer-dark.png");
+  });
+
+  test("note with image - light", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "light" });
+
+    const buffer = await readFile(
+      join(import.meta.dirname, "..", "resources", "beach.jpg"),
+    );
+
+    const dataTransfer = await page.evaluateHandle((dataBase64) => {
+      // @ts-ignore string is ArrayLike<string>
+      const data = Uint8Array.from(
+        atob(dataBase64),
+        (m) => m.codePointAt(0),
+      );
+      const dt = new DataTransfer();
+      const file = new File([data], "beach.jpg", { type: "image/jpg" });
+      dt.items.add(file);
+      return dt;
+    }, buffer.toString("base64"));
+
+    await page.dispatchEvent("section.note", "drop", { dataTransfer });
+    await page.click("#button_upload");
+    await page.locator(".preview-block-image-wrapper img").waitFor();
+    expect(await page.locator(".note").screenshot()).toMatchSnapshot("editor-note-with-image-light.png");
+  });
+
+  test("note with image - dark", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+
+    const buffer = await readFile(
+      join(import.meta.dirname, "..", "resources", "beach.jpg"),
+    );
+
+    const dataTransfer = await page.evaluateHandle((dataBase64) => {
+      // https://stackoverflow.com/a/77532367/3890888
+      // @ts-ignore string is ArrayLike<string>
+      const data = Uint8Array.from(
+        atob(dataBase64),
+        (m) => m.codePointAt(0),
+      );
+      const dt = new DataTransfer();
+      const file = new File([data], "beach.jpg", { type: "image/jpg" });
+      dt.items.add(file);
+      return dt;
+    }, buffer.toString("base64"));
+
+    await page.dispatchEvent("section.note", "drop", { dataTransfer });
+    await page.click("#button_upload");
+    await page.locator(".preview-block-image-wrapper img").waitFor();
+    expect(await page.locator(".note").screenshot()).toMatchSnapshot("editor-note-with-image-dark.png");
+  });
+
+  test("note with plain text file - light", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "light" });
+
+    const buffer = await readFile(
+      join(import.meta.dirname, "..", "resources", "beach.jpg"),
+    );
+
+    const dataTransfer = await page.evaluateHandle((data) => {
+      const dt = new DataTransfer();
+      const file = new File(
+        ["This is the content\nof the plain text file."],
+        "test.txt",
+        { type: "text/plain" },
+      );
+      dt.items.add(file);
+      return dt;
+    }, buffer);
+
+    await page.dispatchEvent("section.note", "drop", { dataTransfer });
+    await page.click("#button_upload");
+    expect(await page.locator(".note").screenshot()).toMatchSnapshot("editor-note-with-plain-text-file-light.png");
+  });
+
+  test("note with plain text file - dark", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+
+    const buffer = await readFile(
+      join(import.meta.dirname, "..", "resources", "beach.jpg"),
+    );
+
+    const dataTransfer = await page.evaluateHandle((data) => {
+      const dt = new DataTransfer();
+      const file = new File(
+        ["This is the content\nof the plain text file."],
+        "test.txt",
+        { type: "text/plain" },
+      );
+      dt.items.add(file);
+      return dt;
+    }, buffer);
+
+    await page.dispatchEvent("section.note", "drop", { dataTransfer });
+    await page.click("#button_upload");
+    expect(await page.locator(".note").screenshot()).toMatchSnapshot("editor-note-with-plain-text-file-dark.png");
+  });
+
+  test("note stats with files - light", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "light" });
+
+    const dataTransfer1 = await page.evaluateHandle(() => {
+      const dt = new DataTransfer();
+      const file = new File(
+        ["This is the content\nof the plain text file."],
+        "test.txt",
+        { type: "text/plain" },
+      );
+      dt.items.add(file);
+      return dt;
+    });
+
+    await page.dispatchEvent("section.note", "drop", { dataTransfer: dataTransfer1 });
+
+    const dataTransfer2 = await page.evaluateHandle(() => {
+      const dt = new DataTransfer();
+      const file = new File(
+        ["This is the content\nof the plain text file."],
+        "test.txt",
+        { type: "text/plain" },
+      );
+      dt.items.add(file);
+      return dt;
+    });
+
+    await page.dispatchEvent("section.note", "drop", { dataTransfer: dataTransfer2 });
+  
+    await page.click("#button_upload");
+    await page.evaluate(() => {
+      const note = document.querySelector(".note")!;
+      note.scrollTo(0, note.scrollHeight);
+    });
+    expect(await page.locator(".note").screenshot()).toMatchSnapshot("editor-note-stats-with-files-light.png");
   });
 });
