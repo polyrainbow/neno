@@ -379,6 +379,35 @@ export default class NotesProvider {
   }
 
 
+  async movePinPosition(
+    slug: Slug,
+    offset: number,
+  ): Promise<NoteToTransmit[]> {
+    const graph = await this.#io.getGraph();
+
+    const oldPins = graph.metadata.pinnedNotes;
+
+    if (!oldPins.includes(slug)) {
+      throw new Error(ErrorMessage.PINNED_NOTE_NOT_FOUND);
+    }
+
+    const oldIndex = oldPins.indexOf(slug);
+    const newIndex = oldIndex + offset;
+
+    const newPins: Slug[] = oldPins
+      .toSpliced(oldIndex, 1)
+      .toSpliced(newIndex, 0, slug);
+
+    graph.metadata.pinnedNotes = newPins;
+
+    const updateMetadata = offset !== 0
+      ? WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
+      : WriteGraphMetadataAction.NONE;
+    await this.#io.flushChanges(graph, updateMetadata, [], []);
+
+    return this.getPins();
+  }
+
   async unpin(
     slugToRemove: Slug,
   ): Promise<NoteToTransmit[]> {

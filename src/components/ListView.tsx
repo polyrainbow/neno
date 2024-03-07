@@ -26,6 +26,7 @@ const ListView = () => {
   const {
     pinnedNotes,
     refreshPinnedNotes,
+    move,
   } = usePinnedNotes(notesProvider);
 
   useEffect(() => {
@@ -37,6 +38,7 @@ const ListView = () => {
       stats={headerStats}
       pinnedNotes={pinnedNotes}
       activeNote={null} /* in list view, no note is active */
+      movePin={move}
     />
     <NoteListWithControls
       handleSearchInputChange={controlledNoteList.setSearchQuery}
