@@ -75,7 +75,9 @@ const NoteStats = ({
                   >
                     <NoteStatsFileLink
                       file={file}
-                    /> ({fileType}, {humanFileSize(file.size)})
+                    />
+                    <span> </span>
+                    ({fileType}, {humanFileSize(file.size)})
                     {
                       i < array.length - 1
                         ? <br />
