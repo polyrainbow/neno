@@ -5,10 +5,7 @@ import NoteListStatusIndicator, {
 import NoteListItem from "./NoteListItem";
 import Pagination from "./Pagination";
 import NoteSearchDisclaimer from "./NoteSearchDisclaimer";
-import useGoToNote from "../hooks/useGoToNote";
 import { SEARCH_RESULTS_PER_PAGE } from "../config";
-import useConfirmDiscardingUnsavedChangesDialog
-  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import ActiveNote from "../types/ActiveNote";
 import {
   NoteListSortMode,
@@ -35,6 +32,7 @@ interface NoteListProps {
   setUnsavedChanges: (unsavedChanges: boolean) => void,
   onLinkIndicatorClick: (slug: Slug, title: string) => void,
   selectedIndex: number,
+  onSelect: (slug: Slug) => void,
 }
 
 const NoteList = ({
@@ -50,15 +48,11 @@ const NoteList = ({
   setPage,
   numberOfAllNotes,
   itemsAreLinkable,
-  unsavedChanges,
-  setUnsavedChanges,
   onLinkIndicatorClick,
   selectedIndex,
+  onSelect,
 }: NoteListProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const goToNote = useGoToNote();
-  const confirmDiscardingUnsavedChanges
-    = useConfirmDiscardingUnsavedChangesDialog();
   const isSmallScreen = useIsSmallScreen();
 
   let status = NoteListStatus.DEFAULT;
@@ -154,22 +148,7 @@ const NoteList = ({
             isActive={isActive}
             isLinked={isLinked}
             key={`main-notes-list-item-${note.slug}`}
-            onSelect={async () => {
-              if (
-                activeNote
-                && "slug" in activeNote
-                && activeNote.slug === note.slug
-              ) {
-                return;
-              }
-
-              if (unsavedChanges) {
-                await confirmDiscardingUnsavedChanges();
-                setUnsavedChanges(false);
-              }
-
-              goToNote(note.slug);
-            }}
+            onSelect={() => onSelect(note.slug)}
             isLinkable={itemsAreLinkable}
             onLinkIndicatorClick={() => {
               if (isActive) return;

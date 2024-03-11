@@ -11,6 +11,8 @@ import NoteListItemType from "../lib/notes/types/NoteListItem";
 import ActiveNote from "../types/ActiveNote";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import useGoToNote from "../hooks/useGoToNote";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 export enum NoteListView {
   DEFAULT = "default",
@@ -60,6 +62,24 @@ const NoteListWithControls = ({
   const noteListWithControlsRef = useRef<HTMLElement | null>(null);
   const [unsavedChanges, setUnsavedChanges] = useContext(UnsavedChangesContext);
   const goToNote = useGoToNote();
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
+
+  const handleNoteSelection = async (slug: Slug) => {
+    if (
+      activeNote
+      && "slug" in activeNote
+      && activeNote.slug === slug
+    ) {
+      return;
+    }
+
+    if (unsavedChanges) {
+      await confirmDiscardingUnsavedChanges();
+      setUnsavedChanges(false);
+    }
+    goToNote(slug);
+  };
 
   useKeyboardShortcuts(
     {
@@ -75,11 +95,11 @@ const NoteListWithControls = ({
           : selectedIndex;
         setSelectedIndex(newIndex);
       },
-      onEnter: () => {
+      onEnter: async () => {
         if (selectedIndex > -1) {
           const note = noteListItems[selectedIndex];
           if (note) {
-            goToNote(note.slug);
+            handleNoteSelection(note.slug);
           }
         }
       },
@@ -110,6 +130,7 @@ const NoteListWithControls = ({
           setScrollTop={setNoteListScrollTop}
           sortMode={sortMode}
           page={page}
+          onSelect={(slug: Slug) => handleNoteSelection(slug)}
           setPage={(page) => {
             setPage(page);
             setNoteListScrollTop(0);
