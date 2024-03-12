@@ -145,6 +145,14 @@
     </blockquote>
   </p>
 
+  <p>
+    Instead of offering several modes or a
+    <a href="https://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG</a> editor with
+    rich markup, we want to keep it simple and provide a plain text editor and
+    a text format with minimal markup features, optimized for efficient
+    note-taking.
+  </p>
+
   <h2>Getting started</h2>
   <p>
     To get started with NENO, you do not need to create an account or
@@ -163,6 +171,22 @@
     NENO as a PWA (Progressive Web App). This way, you can start NENO from
     your device like any other app.
   </p>
+
+  <figure>
+    <img
+      alt="Installation dialog for NENO in the browser"
+      src="./img/install-app-dialog.png"
+    >
+    <figcaption>Installation dialog for NENO in the browser</figcaption>
+  </figure>
+
+  <figure>
+    <img
+      alt="NENO app icon in macOS dock"
+      src="./img/dock.png"
+    >
+    <figcaption>NENO app icon in macOS dock</figcaption>
+  </figure>
 
   <h3>Opening a folder</h3>
   
@@ -189,8 +213,9 @@
   <h2>Taking notes</h2>
   <p>
     Taking notes in NENO is quite straight-forward. Just start writing your note
-    in the editor and save it. You will see that the note list on the left now
-    contains your first note:
+    in the editor and save it, either via the save button or via
+    <code>CTRL</code>/<code>CMD</code> + <code>S</code>.
+    You will see that the note list on the left now contains your first note:
   </p>
 
   <figure>
@@ -198,7 +223,11 @@
     <figcaption>My first note</figcaption>
   </figure>
   
-  
+  <p>
+    The note is now stored in the selected folder and you can open it with any
+    text editor.
+  </p>
+
   <p>
     Notes are written in
     <a href="https://github.com/subconsciousnetwork/subtext">Subtext</a>,
@@ -217,7 +246,7 @@
   <p>
     You can link to other notes either via <code>[[Wikilinks]]</code> or
     <code>/slashlinks</code>.
-    When using Slashlinks, the editor will show a transclusion of the linked note.
+    When using slashlinks, the editor will show a transclusion of the linked note.
     <br>
     When you create another note, you can add a link to the first note
     by clicking on the
@@ -229,6 +258,21 @@
     <img alt="Link to another note" src="./img/link-to-this-note.png">
     <figcaption>Link to another note</figcaption>
   </figure>
+
+  <p>
+    Since NENO also displays the backlinks of a note, you might want to
+    create notes for tags. For example, create a note called "quotes",
+    and create another note with the following text:
+  </p>
+
+  <pre class="note-content">
+> If you try and take a cat apart to see how it works, the first thing you have on your hands is a non-working cat. - Douglas Adams
+[[quotes]]</pre>
+
+  <p>
+    If you now want to see all the quotes in your note graph, open the "quotes" note
+    and look at the backlinks.
+  </p>
 
   <h3>Slugs</h3>
   <p>
@@ -261,8 +305,8 @@
     Slugs of already saved notes can be updated any time. When editing the
     slug of an already saved note in the slug input, a toggle with the label
     "Update references" is displayed. When you save the new slug with the toggle
-    activated, all wikilink and slashlink references to the current note
-    will also be updated, throughout the whole note graph.
+    activated, all wikilinks and slashlinks throughout the whole graph, that
+    reference the current note, will also be updated.
   </p>
 
   <figure>
@@ -304,8 +348,8 @@
   <p>
     You can add aliases to a note. Aliases are alternative slugs that
     can be used to find the note.
-    Click on the plus icon in the to create a note alias, and enter the alias
-    in the new alias field.
+    Click on the plus icon in the right corner of the slug bar to create a
+    note alias, and then enter the alias in the new alias field.
   </p>
 
   <figure>
@@ -316,17 +360,28 @@
   <p>
     Aliases are a useful feature when writing notes in multiple languages.
     For example, you can create a note with the slug "entropy" and assign it the
-    German word "entropie" as note alias.
+    German word "entropie" as note alias. Or you could add the alias
+    "complex" to the note "complexity" and reference
+    that note in a sentence like <code>This algorithm is [[complex]]</code>.
   </p>
 
   <h3>Pins</h3>
-  You can pin notes to the topbar by clicking on the pin icon. Click it again
-  to unpin the note.
+
+  <p>
+    You can pin notes to the topbar by clicking on the pin icon. Click it again
+    to unpin the note.
+  </p>
 
   <figure>
     <img alt="Pinned notes on the top bar" src="./img/pins.png">
     <figcaption>Pinned notes on the top bar</figcaption>
   </figure>
+
+  <p>
+    Drag and drop pins within the title bar to move them to another position.
+    Drag and drop pins to the editor section to insert a wikilink to the
+    pinned note.
+  </p>
 
   <h2>Search</h2>
   <p>
