@@ -96,7 +96,7 @@ const StartView = () => {
           >
             {l("start.links.user-manual")}
           </a>
-          <a href="https://github.com/SebastianZimmer/neno/">
+          <a href="https://github.com/polyrainbow/neno/">
             {l("start.links.source-code")}
           </a>
         </div>

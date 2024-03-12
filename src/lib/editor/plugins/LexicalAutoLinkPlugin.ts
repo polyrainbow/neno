@@ -133,7 +133,7 @@ function isNextNodeValid(node: LexicalNode): boolean {
     nextNode === null
     || $isLineBreakNode(nextNode)
     || ($isTextNode(nextNode) && startsWithSeparator(nextNode.getTextContent()))
-    /* Transclusion note check added by @SebastianZimmer to original code to
+    /* Transclusion note check added by @polyrainbow to original code to
     also consider text nodes followed by transclusions. Fixes a bug where
     autolinks were not created before transclusions. */
     || $isTransclusionNode(nextNode)
