@@ -1,12 +1,11 @@
 import { readFile, writeFile } from "node:fs/promises";
 import * as path from "node:path";
-import { fileURLToPath } from "node:url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dirname = import.meta.dirname;
 
 const iconIds = process.argv[2]
   ? process.argv[2].split(",")
-  : (await readFile(path.join(__dirname, "icons.txt"), "utf8")).split("\n");
+  : (await readFile(path.join(dirname, "icons.txt"), "utf8")).split("\n");
 
 for (let i = 0; i < iconIds.length; i++) {
   const iconId = iconIds[i];
@@ -22,7 +21,7 @@ for (let i = 0; i < iconIds.length; i++) {
   const buffer = Buffer.from(arrayBuffer, "binary");
   const targetFilename = `${iconId}.svg`;
   const targetPath = path.join(
-    __dirname, "..", "public", "assets", "icons",
+    dirname, "..", "public", "assets", "icons",
     targetFilename,
   );
   console.log("Writing " + targetFilename);
