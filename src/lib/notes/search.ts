@@ -35,6 +35,7 @@ export const isWhiteSpace = (string: string): boolean => {
 type SearchToken = [string, string];
 
 const parseToken = (token: string): SearchToken => {
+  // Handle key with value in quotation marks. Example:
   // key:"some value"
   if (
     token.length > 1
@@ -46,6 +47,7 @@ const parseToken = (token: string): SearchToken => {
       token.substring(token.indexOf(":\"") + 2, token.length - 1),
     ];
 
+  // Handle single value in quotation marks. Example:
   // "just one value"
   } else if (token[0] === "\"" && token[token.length - 1] === "\"") {
     return [
@@ -53,6 +55,7 @@ const parseToken = (token: string): SearchToken => {
       token.substring(1, token.length - 1),
     ];
 
+  // Handle key with value. Example:
   // key:value
   } else if (token.includes(":")) {
     const pos = token.indexOf(":");
@@ -61,6 +64,7 @@ const parseToken = (token: string): SearchToken => {
       token.substring(pos + 1),
     ];
 
+  // Handle single value. Example:
   // just-one-value
   } else {
     return ["", token];
