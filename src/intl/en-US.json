@@ -172,7 +172,6 @@
   "stats.analysis.meshedness": "Meshedness (edges / max. possible edges)",
   "stats.analysis.no-notes-yet": "There are no nodes yet.",
   "stats.analysis.nodes-notes": "Notes/Nodes",
-  "stats.analysis.nodes-with-most-links": "Nodes with highest number of links",
   "stats.fetching": "Fetching stats…",
   "stats.graph-stats": "Graph Stats",
   "stats.loading-stats": "Loading stats…",

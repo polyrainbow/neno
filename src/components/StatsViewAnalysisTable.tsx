@@ -1,9 +1,3 @@
-import { LOCAL_GRAPH_ID } from "../config";
-import {
-  getAppPath,
-} from "../lib/utils";
-import { Link } from "react-router-dom";
-import { PathTemplate } from "../types/PathTemplate";
 import { l, lf } from "../lib/intl";
 import GraphStats from "../lib/notes/types/GraphStats";
 
@@ -65,37 +59,6 @@ const StatsViewAnalysisTable = ({
           (numberOfLinks - numberOfAllNotes + analysis.numberOfComponents)
             .toLocaleString()
         }</td>
-      </tr>
-      <tr>
-        <td>🔥 {l("stats.analysis.nodes-with-most-links")}</td>
-        <td>
-          {
-            numberOfAllNotes > 0
-              ? analysis.nodesWithHighestNumberOfLinks.map((note) => {
-                return <p
-                  key={
-                    `stats_nodesWithHighesNumberOfLinks_${note.slug}`
-                  }
-                  className="no-margin"
-                >
-                  <Link to={
-                    getAppPath(
-                      PathTemplate.EXISTING_NOTE,
-                      new Map([
-                        ["GRAPH_ID", LOCAL_GRAPH_ID],
-                        ["SLUG", note.slug],
-                      ]),
-                    )
-                  }>
-                    {note.title}
-                  </Link>
-                  <span> </span>
-                  ({note.linkCount.sum.toLocaleString()})
-                </p>;
-              })
-              : l("stats.analysis.no-notes-yet")
-          }
-        </td>
       </tr>
     </tbody>
   </table>;

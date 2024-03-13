@@ -1,7 +1,6 @@
 import DatabaseIO from "./DatabaseIO.js";
 import {
   createNoteToTransmit,
-  createNoteListItems,
   getNumberOfUnlinkedNotes,
   parseSerializedNewNote,
   serializeNewNote,
@@ -12,7 +11,6 @@ import {
   handleNewNoteSaveRequest,
 } from "./noteUtils.js";
 import {
-  getSortFunction,
   getNumberOfComponents,
   getGraphLinks,
   getGraphUpdateTimestamp,
@@ -20,7 +18,6 @@ import {
 } from "./graphUtils.js";
 import NoteToTransmit from "./types/NoteToTransmit.js";
 import GraphStats from "./types/GraphStats.js";
-import { NoteListSortMode } from "./types/NoteListSortMode.js";
 import GraphObject from "./types/Graph.js";
 import { ErrorMessage } from "./types/ErrorMessage.js";
 import GraphStatsRetrievalOptions
@@ -157,12 +154,6 @@ export default class NotesProvider {
         numberOfComponents,
         numberOfComponentsWithMoreThanOneNode:
           numberOfComponents - numberOfUnlinkedNotes,
-        nodesWithHighestNumberOfLinks: createNoteListItems(
-          Array.from(graph.notes.values()),
-          graph,
-        )
-          .sort(getSortFunction(NoteListSortMode.NUMBER_OF_LINKS_DESCENDING))
-          .slice(0, 3),
       };
     }
 

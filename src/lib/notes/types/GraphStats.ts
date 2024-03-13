@@ -1,5 +1,3 @@
-import NoteListItem from "./NoteListItem";
-
 export interface GraphSize {
   graph: number,
   files: number,
@@ -16,7 +14,6 @@ interface GraphStatsMetadata {
 interface GraphStatsAnalysis {
   readonly numberOfComponents: number,
   readonly numberOfComponentsWithMoreThanOneNode: number,
-  readonly nodesWithHighestNumberOfLinks: NoteListItem[],
 }
 export default interface GraphStats {
   readonly numberOfAllNotes: number,

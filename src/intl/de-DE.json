@@ -172,7 +172,6 @@
   "stats.analysis.meshedness": "Meshedness (Anzahl Verbindungen / maximal mögliche Anzahl an Verbindungen)",
   "stats.analysis.no-notes-yet": "Es sind noch keine Notizen vorhanden.",
   "stats.analysis.nodes-notes": "Notizen/Knoten",
-  "stats.analysis.nodes-with-most-links": "Notizen mit den meisten Verbindungen",
   "stats.fetching": "Statistiken werden erstellt …",
   "stats.graph-stats": "Graph-Statistiken",
   "stats.loading-stats": "Statistiken werden geladen …",
