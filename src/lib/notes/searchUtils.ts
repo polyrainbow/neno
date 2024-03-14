@@ -134,13 +134,28 @@ const getNotesWithFlag = (
 };
 
 
-const getNotesWithTitleOrSlugContainingToken = (
+const getNotesWithTitleSlugOrAliasContainingToken = (
   notes: ExistingNote[],
   token: string,
   caseSensitive: boolean,
+  aliases: Map<Slug, Slug>,
 ): ExistingNote[] => {
-  return notes.filter((note: ExistingNote) => {
+  const fittingNoteSlugs: Set<Slug> = new Set();
+  for (const [alias, target] of aliases.entries()) {
+    if (
+      (caseSensitive && alias.includes(token))
+      || alias.includes(token.toLowerCase())
+    ) {
+      fittingNoteSlugs.add(target);
+    }
+  }
+
+  return Array.from(notes).filter((note: ExistingNote) => {
     if (token.length === 0) {
+      return true;
+    }
+
+    if (fittingNoteSlugs.has(note.meta.slug)) {
       return true;
     }
 
@@ -249,7 +264,7 @@ export {
   getNotesByTitle,
   getNotesWithUrl,
   getNotesWithFile,
-  getNotesWithTitleOrSlugContainingToken,
+  getNotesWithTitleSlugOrAliasContainingToken,
   getNotesWithBlocksOfTypes,
   getNotesWithDuplicateTitles,
   getNotesWithMediaTypes,

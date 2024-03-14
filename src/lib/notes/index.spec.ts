@@ -943,7 +943,7 @@ describe("Notes module", () => {
   );
 
   it(
-    "should recognize notes created via another tool",
+    "should recognize notes created with another app",
     async () => {
       const storageProvider = new MockStorageProvider();
       await storageProvider.writeObject("note.subtext", "Test note");
@@ -1890,6 +1890,38 @@ describe("Notes module", () => {
       });
 
       expect(stats.numberOfLinks).toBe(1);
+    },
+  );
+
+
+  it(
+    "should find note when searching for alias",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "a",
+        aliases: new Set(["alias"]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const notes = await notesProvider.getNotesList({
+        searchString: "alias",
+      });
+
+      expect(notes.numberOfResults).toBe(1);
+      expect(notes.results[0].slug).toBe("a");
     },
   );
 });

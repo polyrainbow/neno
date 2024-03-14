@@ -12,7 +12,7 @@ import {
   getNotesByTitle,
   getNotesWithUrl,
   getNotesWithFile,
-  getNotesWithTitleOrSlugContainingToken,
+  getNotesWithTitleSlugOrAliasContainingToken,
   getNotesWithBlocksOfTypes,
   getNotesWithDuplicateTitles,
   getNotesWithMediaTypes,
@@ -226,10 +226,11 @@ export const search = async (
 
     // default mode: check if all query tokens are included in note title
     } else {
-      matchingNotes = getNotesWithTitleOrSlugContainingToken(
+      matchingNotes = getNotesWithTitleSlugOrAliasContainingToken(
         matchingNotes,
         value,
         caseSensitive,
+        graph.aliases,
       );
     }
   }
