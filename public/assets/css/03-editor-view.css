@@ -619,3 +619,8 @@ div[data-lexical-editor] .transclusion span.transclusion-note-title {
 :not(.list-item):has(+ .list-item) {
   margin-bottom: 10px;
 }
+
+
+::highlight(heading-block-sigil) {
+  color: var(--alt-content-color)
+}

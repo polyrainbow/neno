@@ -76,7 +76,22 @@ export const Editor = ({
     <OnChangePlugin onChange={
       (editorState: EditorState) => {
         editorState.read(() => {
-          // Read the contents of the EditorState here.
+          const headingElements = document.querySelectorAll(".s-heading");
+          const ranges: Range[] = [];
+          Array.from(headingElements).forEach((element) => {
+            const span = element.children[0];
+            const textNode = span.childNodes[0];
+            const range = new Range();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, 1);
+            ranges.push(range);
+          });
+
+          // @ts-ignore
+          const highlight = new Highlight(...ranges);
+          // @ts-ignore
+          CSS.highlights.set("heading-block-sigil", highlight);
+
           const root = $getRoot();
           onChange(getSubtextFromEditor(root));
         });
