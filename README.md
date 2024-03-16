@@ -35,7 +35,7 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
 
 ## Getting started
 
-Read the [user manual](./docs/index.md) or just [go to the app](https://polyrainbow.github.io/neno). Please note that your browser
+Read the [user manual](https://polyrainbow.github.io/neno/docs/index.html) or just [go to the app](https://polyrainbow.github.io/neno). Please note that your browser
 must support File System Access (Chrome, Edge, ...).
 
 ## Further reading
