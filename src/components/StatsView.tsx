@@ -5,7 +5,6 @@ import GraphStats from "../lib/notes/types/GraphStats";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import BusyIndicator from "./BusyIndicator";
-import StatsViewMetadataTable from "./StatsViewMetadataTable";
 
 const StatsView = () => {
   const notesProvider = useNotesProvider();
@@ -29,17 +28,10 @@ const StatsView = () => {
       <h1>{l("stats.graph-stats")}</h1>
       {
         stats !== null
-          ? <>
-            <h2>{l("stats.metadata")}</h2>
-            <StatsViewMetadataTable
-              stats={stats}
-              databaseType="local"
-            />
-            <h2>{l("stats.analysis")}</h2>
-            <StatsViewAnalysisTable
-              stats={stats}
-            />
-          </>
+          ? <StatsViewAnalysisTable
+            stats={stats}
+            databaseType="local"
+          />
           : <BusyIndicator
             alt={l("stats.fetching")}
             height={64}
