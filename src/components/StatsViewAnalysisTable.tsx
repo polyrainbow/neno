@@ -4,12 +4,10 @@ import { humanFileSize, makeTimestampHumanReadable } from "../lib/utils";
 
 interface StatsViewAnalysisTableProps {
   stats: Required<GraphStats>;
-  databaseType: string;
 }
 
 const StatsViewAnalysisTable = ({
   stats,
-  databaseType,
 }: StatsViewAnalysisTableProps) => {
   const {
     numberOfAllNotes,
@@ -28,10 +26,6 @@ const StatsViewAnalysisTable = ({
 
   return <table className="data-table">
     <tbody>
-      <tr>
-        <td>{l("stats.metadata.type")}</td>
-        <td>{databaseType}</td>
-      </tr>
       <tr>
         <td>{l("stats.metadata.created-at")}</td>
         <td>{makeTimestampHumanReadable(stats.metadata.createdAt)}</td>

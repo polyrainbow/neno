@@ -30,7 +30,6 @@ const StatsView = () => {
         stats !== null
           ? <StatsViewAnalysisTable
             stats={stats}
-            databaseType="local"
           />
           : <BusyIndicator
             alt={l("stats.fetching")}
