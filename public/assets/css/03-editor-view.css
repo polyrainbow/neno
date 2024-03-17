@@ -576,7 +576,7 @@ div[data-lexical-editor] {
     Only p.s-heading already have a margin-bottom by default that should not be
     overridden.
   */
-  :not(.quote-block):not(p.s-heading):has(+ .quote-block) {
+  :not(.quote-block, p.s-heading):has(+ .quote-block) {
     margin-bottom: 10px;
   }
 
@@ -594,7 +594,7 @@ div[data-lexical-editor] {
     Only p.s-heading already have a margin-bottom by default that should not be
     overridden.
   */
-  :not(.code-block):not(p.s-heading):has(+ .code-block) {
+  :not(.code-block, p.s-heading):has(+ .code-block) {
     margin-bottom: 10px;
   }
 
@@ -612,7 +612,7 @@ div[data-lexical-editor] {
     Only p.s-heading already have a margin-bottom by default that should not be
     overridden.
   */
-  :not(.list-item):not(p.s-heading):has(+ .list-item) {
+  :not(.list-item, p.s-heading):has(+ .list-item) {
     margin-bottom: 10px;
   }
 }
