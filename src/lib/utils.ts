@@ -18,16 +18,6 @@ const shortenText = (text: string, maxLength: number): string => {
 };
 
 
-const yyyymmdd = (date = new Date()): string => {
-  const yyyy = date.getFullYear().toString();
-  const mm = (date.getMonth() + 1).toString(); // getMonth() is zero-based
-  const dd = date.getDate().toString();
-  return (
-    yyyy + "-" + (mm[1] ? mm : "0" + mm[0]) + "-" + (dd[1] ? dd : "0" + dd[0])
-  );
-};
-
-
 const getParameterByName = (name: string, url: string): string | null => {
   if (!url) url = window.location.href;
   name = name.replace(/[[\]]/g, "\\$&");
@@ -283,7 +273,6 @@ const getWikilinkForNote = (slug: Slug, title: string): string => {
 
 
 export {
-  yyyymmdd,
   isNotEmpty,
   isNotFalse,
   getPagedMatches,
