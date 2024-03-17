@@ -100,7 +100,6 @@
   --table-row-background-color-even: var(--accent-color-interactible);
   --main-font: "Mona Sans", sans-serif;
   --code-font: "IBM Plex Mono", monospace;
-  --input-border-width: 1px;
   --border-radius: 9px;
   --default-gap: 15px;
   --small-gap: 10px;
@@ -118,8 +117,6 @@
     0 4px 4px hsl(0deg 0% 0% / 7.5%),
     0 8px 8px hsl(0deg 0% 0% / 7.5%),
     0 16px 16px hsl(0deg 0% 0% / 7.5%);
-  --content-element-border: var(--input-border-width) solid var(--main-content-color) !important;
-  --content-element-border-radius: 0;
   --input-padding: 8px;
   --bold: 765;
 }
@@ -382,6 +379,7 @@ button {
   cursor: pointer;
   background-color: var(--buton-background-color);
   color: var(--font-color);
+  font-size: var(--default-font-size);
 
   &[disabled] {
     cursor: inherit;

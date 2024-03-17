@@ -211,10 +211,6 @@
   padding: var(--default-padding);
 }
 
-.note-content-view-mode {
-  padding: var(--default-padding);
-}
-
 .note-backlinks {
   display: flex;
   flex-direction: column;
