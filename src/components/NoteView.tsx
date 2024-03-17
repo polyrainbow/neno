@@ -6,6 +6,7 @@ import Note from "./Note";
 import * as Utils from "../lib/utils";
 import * as Config from "../config";
 import {
+  useLocation,
   useNavigate, useParams, useSearchParams,
 } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
@@ -56,6 +57,7 @@ const NoteView = () => {
   const navigate = useNavigate();
   const confirm = useConfirm();
   const { slug } = useParams();
+  const location = useLocation();
   const [urlSearchParams] = useSearchParams();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
   const goToNote = useGoToNote();
@@ -65,8 +67,6 @@ const NoteView = () => {
     isBusy,
     activeNote,
     saveActiveNote,
-    createNewNote,
-    createNewLinkedNote,
     removeActiveNote,
     duplicateNote,
     loadNote,
@@ -117,7 +117,9 @@ const NoteView = () => {
     requestIdleCallback(() => {
       goToNote(
         noteFromDatabase.meta.slug,
-        true,
+        {
+          replace: true,
+        },
       );
     });
 
@@ -181,8 +183,7 @@ const NoteView = () => {
       handleNoteSaveRequest();
     },
     onCmdB: () => {
-      createNewNote({});
-      setCanonicalNewNotePath();
+      goToNote("new");
     },
     onCmdE: () => {
       document.getElementById("search-input")?.focus();
@@ -229,17 +230,26 @@ const NoteView = () => {
         ? (urlSearchParams.get("referenceSlugs") as string).split(",")
         : [];
 
-      createNewNote({
-        content: Utils.createContentFromSlugs(slugs),
+      goToNote("new", {
+        contentIfNewNote: Utils.createContentFromSlugs(slugs),
       });
+
       setCanonicalNewNotePath();
     }
   }, []);
 
 
   useEffect(() => {
-    const loadNoteAndRefreshURL = async () => {
+    const loadNoteAndRefreshURL = async (slug?: Slug) => {
+      if (slug === "new") {
+        await loadNote(
+          slug,
+          location?.state?.contentIfNewNote || "",
+        );
+      }
+
       const validNoteSlug = getValidNoteSlug(slug);
+
       if (
         validNoteSlug !== null
         /*
@@ -255,7 +265,10 @@ const NoteView = () => {
           && validNoteSlug === activeNote.slug
         ))
       ) {
-        const receivedNoteSlug = await loadNote(validNoteSlug);
+        const receivedNoteSlug = await loadNote(
+          validNoteSlug,
+          location.state.contentIfNewNote,
+        );
         if (
           typeof receivedNoteSlug === "string"
           && validNoteSlug !== receivedNoteSlug
@@ -275,8 +288,8 @@ const NoteView = () => {
       }
     };
 
-    loadNoteAndRefreshURL();
-  }, [slug]);
+    loadNoteAndRefreshURL(slug);
+  }, [slug, location.state]);
 
   return <>
     <NoteViewHeader
@@ -334,14 +347,6 @@ const NoteView = () => {
             });
           }}
           setUnsavedChanges={setUnsavedChanges}
-          createNewNote={(params) => {
-            createNewNote(params);
-            setCanonicalNewNotePath();
-          }}
-          createNewLinkedNote={() => {
-            createNewLinkedNote();
-            setCanonicalNewNotePath();
-          }}
           handleNoteSaveRequest={handleNoteSaveRequest}
           removeActiveNote={async () => {
             await removeActiveNote();

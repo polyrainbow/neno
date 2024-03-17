@@ -6,12 +6,17 @@ import { getAppPath } from "../lib/utils";
 import { Slug } from "../lib/notes/types/Slug";
 import { LOCAL_GRAPH_ID } from "../config";
 
+interface Params {
+  replace?: boolean,
+  contentIfNewNote?: string,
+}
+
 const useGoToNote = () => {
   const navigate = useNavigate();
 
   const goToNote = (
     slug: Slug,
-    replace = false,
+    params?: Params,
   ) => {
     const path = getAppPath(
       PathTemplate.EXISTING_NOTE,
@@ -21,7 +26,12 @@ const useGoToNote = () => {
       ]),
     );
 
-    return navigate(path, { replace });
+    return navigate(path, {
+      replace: params?.replace,
+      state: {
+        contentIfNewNote: params?.contentIfNewNote,
+      },
+    });
   };
 
   return goToNote;

@@ -10,8 +10,6 @@ import { useContext, useRef, useState } from "react";
 import {
   getFilesFromUserSelection,
   getNewNoteObject,
-  getNoteTitleFromActiveNote,
-  getWikilinkForNote,
   readFileAsString,
 } from "../lib/utils";
 import useConfirmDiscardingUnsavedChangesDialog
@@ -210,22 +208,6 @@ export default (
   };
 
 
-  const createNewLinkedNote = () => {
-    if (activeNote.isUnsaved) {
-      throw new Error("Cannot create linked note of unsaved note");
-    }
-
-    const wikilink = getWikilinkForNote(
-      activeNote.slug,
-      getNoteTitleFromActiveNote(activeNote),
-    );
-
-    createNewNote({
-      content: `${wikilink}\n`,
-    });
-  };
-
-
   const importNote = async (): Promise<void> => {
     if (unsavedChanges) {
       await confirmDiscardingUnsavedChanges();
@@ -306,7 +288,19 @@ export default (
   };
 
 
-  const loadNote = async (slug: Slug | "random"): Promise<Slug | null> => {
+  const loadNote = async (
+    slug: Slug | "random" | "new",
+    contentForNewNote?: string,
+  ): Promise<Slug | null> => {
+    if (slug === "new") {
+      createNewNote({
+        slug: undefined,
+        content: contentForNewNote ?? "",
+      });
+
+      return Promise.resolve(null);
+    }
+
     let receivedNoteSlug: Slug | null = null;
     setIsBusy(true);
     try {
@@ -321,7 +315,7 @@ export default (
       if (e instanceof Error && e.message === "NOTE_NOT_FOUND") {
         createNewNote({
           slug,
-          content: "",
+          content: contentForNewNote ?? "",
         });
       } else {
         throw e;
@@ -338,8 +332,6 @@ export default (
     handleEditorContentChange,
     saveActiveNote,
     setActiveNote,
-    createNewNote,
-    createNewLinkedNote,
     importNote,
     removeActiveNote,
     duplicateNote,
