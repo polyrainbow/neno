@@ -1,7 +1,3 @@
-/******************************
-  App header
-******************************/
-
 .app-header {
   background: var(--header-background-color);
   margin: 0;
@@ -31,52 +27,79 @@
     align-items: center;
   }
 
-}
+  &.no-background {
+    background: none;
+  }
 
-.app-header.no-background {
-  background: none;
-}
-
-
-.header-right input {
-  width: 240px;
-}
-
-.app-title {
-  margin: 0;
-  margin-right: 5px;
-  padding: 5px 10px;
-  white-space: pre;
-  background: none;
-  height: 50px;
-  border-radius: 0;
-}
-
-.app-title:hover {
-  background-color: var(--nli-color-hover);
-}
-
-.header-stats {
-  white-space: pre;
-  display: flex;
-  gap: 15px;
-}
-
-.app-header-stats-item {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-@media only screen and (max-width: 1280px) {
   .header-stats {
-    display: none;
+    white-space: pre;
+    display: flex;
+    gap: 15px;
+
+    .app-header-stats-item {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+  }
+
+  @media only screen and (max-width: 1280px) {
+    .header-stats {
+      display: none;
+    }
+  }
+
+  .pinned-notes {
+    align-items: center;
+    gap: 5px;
+    height: 100%;
+    overflow: auto;
+    justify-content: flex-start;
+    width: 100vw;
+  
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  
+    .pinned-notes-placeholder {
+      padding: 0 10px;
+    }
+  
+    .pinned-note {
+      padding: 0 10px;
+      padding-left: 5px; /* because of intrinsic icon padding */
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      height: 35px;
+      background: var(--accent-color-1);
+      border-radius: var(--border-radius);
+  
+      &:hover {
+        background-color: var(--nli-color-hover);
+      }
+  
+      &.active {
+        background-color: var(--accent-color-1-light);
+      }
+  
+      .svg-icon {
+        margin-right: 3px;
+      }
+  
+      p {
+        white-space: pre;
+      }
+    }
+  
+    .pin-insert-indicator {
+      height: 100%;
+      background-color: var(--main-content-color);
+      width: 3px;
+      flex-shrink: 0;
+    }
   }
 }
-
-/******************************
-  App menu
-******************************/
 
 .app-menu {
   background-color: var(--header-background-color);
@@ -84,88 +107,33 @@
   position: fixed;
   top: 50px;
   left: 0;
-}
 
-.app-menu-item {
-  display: flex;
-  padding: 15px 10px;
-  align-items: center;
-  cursor: pointer;
-}
+  .app-menu-item {
+    display: flex;
+    padding: 15px 10px;
+    align-items: center;
+    cursor: pointer;
 
-.app-menu-item.disabled {
-  cursor: default;
-}
+    .label {
+      margin: 0;
+      margin-left: 15px;
+      color: inherit;
+    }
 
-.app-menu-item:not(.disabled):hover {
-  background-color: var(--accent-color-1-light);
-}
+    &.disabled {
+      cursor: default;
 
-.app-menu-item.disabled img.svg-icon {
-  filter: opacity(0.5);
-}
+      img.svg-icon {
+        filter: opacity(0.5);
+      }
 
-.app-menu-item .label {
-  margin: 0;
-  margin-left: 15px;
-  color: inherit;
-}
+      .label {
+        color: var(--neno-gray-4);
+      }
+    }
 
-.app-menu-item.disabled .label {
-  color: var(--neno-gray-4);
-}
-
-/******************************
-  Pinned notes
-******************************/
-
-.pinned-notes {
-  align-items: center;
-  gap: 5px;
-  height: 100%;
-  overflow: auto;
-  justify-content: flex-start;
-  width: 100vw;
-}
-
-.pinned-notes::-webkit-scrollbar {
-  display: none;
-}
-
-.pinned-notes-placeholder {
-  padding: 0 10px;
-}
-
-.pinned-note {
-  padding: 0 10px;
-  padding-left: 5px; /* because of intrinsic icon padding */
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  height: 35px;
-  background: var(--accent-color-1);
-  border-radius: var(--border-radius);
-}
-
-.pinned-note:hover {
-  background-color: var(--nli-color-hover);
-}
-
-.pinned-note.active {
-  background-color: var(--accent-color-1-light);
-}
-
-.pinned-note .svg-icon {
-  margin-right: 3px;
-}
-
-.pinned-note p {
-  white-space: pre;
-}
-
-.pin-insert-indicator {
-  height: 100%;
-  background-color: var(--main-content-color);
-  width: 3px;
-  flex-shrink: 0;
+    &:not(.disabled):hover {
+      background-color: var(--accent-color-1-light);
+    }
+  }
 }

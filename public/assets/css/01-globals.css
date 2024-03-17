@@ -139,10 +139,6 @@
   font-weight: 400;
 }
 
-html {
-  font-size: var(--default-font-size);
-}
-
 hr {
   border: none;
   background: var(--main-content-color);
@@ -269,10 +265,10 @@ main {
   font-size: var(--large-font-size);
   text-align: center;
   margin: 30px auto;
-}
 
-.splash-message .svg-icon {
-  width: 100px;
+  .svg-icon {
+    width: 100px;
+  }
 }
 
 .error-text {
@@ -294,6 +290,10 @@ main {
 @media (prefers-color-scheme: dark) {
   img.svg-icon {
     filter: invert(1);
+  }
+
+  .disabled img.svg-icon {
+    filter: invert(1) opacity(0.5);
   }
 }
 
@@ -334,40 +334,27 @@ main {
   box-shadow: var(--default-box-shadow);
   max-height: calc(100vh - (2 * var(--default-gap)));
   overflow: auto;
-}
 
-.dialog-box h1 {
-  margin-top: 0;
-  margin-bottom: var(--default-gap);
-}
+  h1 {
+    margin-top: 0;
+    margin-bottom: var(--default-gap);
+  }
 
-.dialog-box select {
-  width: 100%;
-  margin-top: 0;
-}
+  select {
+    width: 100%;
+    margin-top: 0;
+  }
 
-.dialog-text {
-  margin-top: 0;
-  font-size: var(--large-font-size);
-}
+  .dialog-text {
+    margin-top: 0;
+    font-size: var(--large-font-size);
+  }
 
-.dialog-action-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--default-gap);
-}
-
-.create-one-note-per-line-dialog textarea {
-  background-color: var(--background-color);
-  color: var(--font-color);
-  margin: var(--default-gap) 0;
-  width: calc(100% - 6px);
-  display: block;
-  height: 200px;
-}
-
-.search-presets-dialog p {
-  margin: 0;
+  .dialog-action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--default-gap);
+  }
 }
 
 /******************************
@@ -385,15 +372,14 @@ button {
     cursor: inherit;
     color: var(--alt-content-color);
   }
-}
 
+  &.default-action {
+    background-color: var(--accent-color-1);
+  }
 
-button.default-action {
-  background-color: var(--accent-color-1);
-}
-
-button.dangerous-action {
-  background-color: var(--error-and-danger-background-color);
+  &.dangerous-action {
+    background-color: var(--error-and-danger-background-color);
+  }
 }
 
 /******************************
@@ -405,21 +391,21 @@ button.dangerous-action {
   font-size: var(--large-font-size);
   padding: 10px 20px;
   user-select: none;
+
+  &:disabled {
+    cursor: inherit;
+    color: var(--alt-content-color);
+  }
+
+  &:disabled img {
+    filter: var(--icon-button-disabled-filter);
+  }
 }
 
 .default-button-with-icon {
   display: inline-flex;
   gap: 5px;
   align-items: center;
-}
-
-.default-button:disabled {
-  cursor: inherit;
-  color: var(--alt-content-color);
-}
-
-.default-button:disabled img {
-  filter: var(--icon-button-disabled-filter);
 }
 
 /******************************
@@ -446,19 +432,19 @@ button.dangerous-action {
   padding: 0;
   background: none;
   text-align: center;
-}
 
-.icon-button[disabled] {
-  cursor: inherit;
-  border: none;
-}
+  &[disabled] {
+    cursor: inherit;
+    border: none;
+  }
 
-.icon-button img {
-  vertical-align: middle;
-}
+  img {
+    vertical-align: middle;
+  }
 
-.icon-button[disabled] img {
-  filter: var(--icon-button-disabled-filter);
+  &[disabled] img {
+    filter: var(--icon-button-disabled-filter);
+  }
 }
 
 .icon-button-floating {
@@ -486,25 +472,25 @@ button.dangerous-action {
   border-collapse: collapse;
   margin: var(--default-gap) 0;
   width: 100%;
-}
 
-.data-table tr:nth-child(odd) {
-  background-color: var(--table-row-background-color-odd);
-}
+  tr:nth-child(odd) {
+    background-color: var(--table-row-background-color-odd);
+  }
 
-.data-table tr:nth-child(even) {
-  background-color: var(--table-row-background-color-even);
-}
+  tr:nth-child(even) {
+    background-color: var(--table-row-background-color-even);
+  }
 
-.data-table th,
-.data-table td {
-  text-align: left;
-  padding: 5px;
-}
+  th,
+  td {
+    text-align: left;
+    padding: 5px;
+  }
 
-.data-table tr td:nth-of-type(2) {
-  word-break: break-word;
-  text-align: right;
+  tr td:nth-of-type(2) {
+    word-break: break-word;
+    text-align: right;
+  }
 }
 
 
@@ -539,13 +525,13 @@ button.dangerous-action {
   width: var(--toggle-width);
   height: var(--toggle-height);
   font-size: 19px;
-}
 
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+  /* Hide default HTML checkbox */
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 }
 
 /* The slider */
@@ -558,17 +544,17 @@ button.dangerous-action {
   bottom: 0;
   background-color: var(--alt-content-color);
   transition: .3s;
-}
 
-.slider::before {
-  position: absolute;
-  content: "";
-  height: var(--toggle-slider-size);
-  width: var(--toggle-slider-size);
-  left: var(--toggle-slider-gap);
-  bottom: var(--toggle-slider-gap);
-  background-color: white;
-  transition: .3s;
+  &::before {
+    position: absolute;
+    content: "";
+    height: var(--toggle-slider-size);
+    width: var(--toggle-slider-size);
+    left: var(--toggle-slider-gap);
+    bottom: var(--toggle-slider-gap);
+    background-color: white;
+    transition: .3s;
+  }
 }
 
 input:checked + .slider {

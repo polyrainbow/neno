@@ -232,45 +232,49 @@
   Search presets
 ******************************/
 
-.search-preset {
+.search-presets {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: var(--default-gap);
+  padding: var(--default-gap);
 }
 
 .search-presets-heading-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  h1 {
+    margin: 0;
+  }
 }
 
-.search-presets-heading-row h1 {
-  margin: 0;
-}
-
-.search-preset-buttons {
+.search-preset {
   display: flex;
-  flex-shrink: 0;
-  gap: var(--small-gap);
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--default-font-size);
+
+  .search-preset-buttons {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--small-gap);
+  }
 }
 
 .save-current-query {
   display: flex;
   flex-direction: column;
   gap: var(--default-gap);
-}
 
-.save-current-query > h2{
-  margin: 0;
+  & > h2{
+    margin: 0;
+  }
 }
 
 #search-preset-name-input {
   margin: 0;
 }
-
-/******************************
-  Pagination
-******************************/
 
 .pagination {
   text-align: center;
@@ -283,22 +287,22 @@
   &.bottom {
     padding-bottom: var(--default-padding);
   }
-}
 
-.pagination ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: var(--small-gap);
-}
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--small-gap);
+  }
 
-.pagination-button-selected {
-  background-color: var(--button-background-color-active);
-  font-weight: var(--bold);
+  .pagination-button-selected {
+    background-color: var(--button-background-color-active);
+    font-weight: var(--bold);
+  }
 }
 
 /******************************
@@ -309,21 +313,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--default-gap);
-}
 
-.search-presets {
-  display: flex;
-  flex-direction: column;
-  gap: var(--default-gap);
-  padding: var(--default-gap);
-}
+  h1 {
+    margin-top: 0;
+  }
 
-.list-section h1 {
-  margin-top: 0;
-}
+  input {
+    margin-right: var(--default-gap);
+  }
 
-.list-section input {
-  margin-right: var(--default-gap);
+  & > *:first-child:not(.note-list) {
+    padding-top: var(--default-gap);
+  }
 }
 
 .note-list-controls {
@@ -334,10 +335,6 @@
   font-size: var(--default-font-size);
   margin: 0;
   text-align: center;
-}
-
-.list-section > *:first-child:not(.note-list) {
-  padding-top: var(--default-gap);
 }
 
 .note-list {
@@ -424,32 +421,32 @@
   flex-wrap: nowrap;
   align-items: center;
   background: var(--accent-color-interactible);
-}
 
-.note-slug {
-  margin: 0;
-  color: var(--font-color);
-  font-family: var(--main-font);
-  background: var(--accent-color-interactible);
-  border: none;
-  outline: none;
-  padding: 5px;
-  border-radius: 0;
-  flex-grow: 1;
-}
+  .note-slug {
+    margin: 0;
+    color: var(--font-color);
+    font-family: var(--main-font);
+    background: var(--accent-color-interactible);
+    border: none;
+    outline: none;
+    padding: 5px;
+    border-radius: 0;
+    flex-grow: 1;
 
-.note-slug.invalid {
-  color: var(--error-and-danger-text-color);
-}
+    &.invalid {
+      color: var(--error-and-danger-text-color);
+    }
+  }
 
-.note-slug-validation-error {
-  color: var(--error-and-danger-text-color);
-  margin: 0 5px;
-}
+  .note-slug-validation-error {
+    color: var(--error-and-danger-text-color);
+    margin: 0 5px;
+  }
 
-.alias-control-button {
-  display: flex;
-  padding: 4px;
+  .alias-control-button {
+    display: flex;
+    padding: 4px;
+  }
 }
 
 div[data-lexical-editor] {
@@ -462,156 +459,160 @@ div[data-lexical-editor] {
   outline: none;
   text-align: start;
   max-width: var(--max-content-width);
-}
 
+  & > p {
+    margin: 0;
+    line-height: var(--default-line-height);
+  }
 
-div[data-lexical-editor] > p {
-  margin: 0;
-  line-height: var(--default-line-height);
-}
+  .link {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--link-color);
+  }
 
-.link {
-  cursor: pointer;
-  text-decoration: none;
-  color: var(--link-color);
-}
+  & > p.s-heading {
+    line-height: normal;
+    font-weight: bold;
+    font-size: 1.5em;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    display: block;
 
-div[data-lexical-editor] > p.s-heading {
-  line-height: normal;
-  font-weight: bold;
-  font-size: 1.5em;
-  margin-block-start: 0.83em;
-  margin-block-end: 0.83em;
-  display: block;
-}
+    &:first-child {
+      margin-top: 0;
+    }
+  }
 
-div[data-lexical-editor] > p.s-heading:first-child {
-  margin-top: 0;
-}
+  & > p.list-item {
+    margin-inline-start: 20px;
+  }
 
-div[data-lexical-editor] > p.list-item {
-  margin-inline-start: 20px;
-}
+  .wikilink-content {
+    cursor: pointer;
 
-.wikilink-content {
-  cursor: pointer;
-}
+    &.available {
+      color: var(--link-color);
+    }
 
-.wikilink-content.available {
-  color: var(--link-color);
-}
+    &.unavailable {
+      color: var(--error-and-danger-text-color);
+    }
+  }
 
-.wikilink-content.unavailable {
-  color: var(--error-and-danger-text-color);
-}
+  .wikilink-punctuation {
+    color: var(--alt-content-color);
+  }
 
-.wikilink-punctuation {
-  color: var(--alt-content-color);
-}
+  .bold {
+    font-weight: bold;
+  }
 
-.bold {
-  font-weight: bold;
-}
+  .transclusion-wrapper {
+    user-select: none;
+    font-size: var(--default-font-size);
+    font-weight: normal;
+    line-height: var(--default-line-height);
+  }
 
-div[data-lexical-editor] .transclusion-wrapper {
-  user-select: none;
-  font-size: var(--default-font-size);
-  font-weight: normal;
-  line-height: var(--default-line-height);
-}
+  .transclusion {
+    background: var(--accent-color-interactible);
+    border-radius: var(--border-radius);
+    padding: 10px;
+    margin: 10px 0;
+    cursor: pointer;
 
-div[data-lexical-editor] .transclusion {
-  background: var(--accent-color-interactible);
-  border-radius: var(--border-radius);
-  padding: 10px;
-  margin: 10px 0;
-  cursor: pointer;
-}
+    &.unavailable {
+      background: var(--error-and-danger-background-color);
 
-div[data-lexical-editor] .transclusion.unavailable {
-  background: var(--error-and-danger-background-color);
-}
+      .not-available-disclaimer {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: var(--default-gap);
+      }
+    }
 
-div[data-lexical-editor] .transclusion.unavailable .not-available-disclaimer {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: var(--default-gap);
-}
+    p {
+      margin: 0;
+    }
 
-div[data-lexical-editor] .transclusion p {
-  margin: 0;
-}
+    p.slug {
+      color: var(--alt-content-color);
+      font-size: var(--default-font-size);
+      margin-bottom: 5px;
+    }
 
-div[data-lexical-editor] .transclusion p.slug {
-  color: var(--alt-content-color);
-  font-size: var(--default-font-size);
-  margin-bottom: 5px;
-}
+    span.transclusion-note-title {
+      display: block;
+      font-weight: bold;
+    }
+  }
 
-div[data-lexical-editor] .transclusion span.transclusion-note-title {
-  display: block;
-  font-weight: bold;
-}
+  .inline-code, .code-block {
+    font-family: var(--code-font);
+    background-color: var(--accent-color-interactible);
+  }
 
-.inline-code, .code-block {
-  font-family: var(--code-font);
-  background-color: var(--accent-color-interactible);
-}
+  .quote-block {
+    border-left: 6px solid var(--alt-content-color);
+    padding: 3px var(--default-gap);
+    font-style: italic;
+    background: var(--accent-color-interactible);
+    margin-inline: 0;
+  }
 
-.quote-block {
-  border-left: 6px solid var(--alt-content-color);
-  padding: 3px var(--default-gap);
-  font-style: italic;
-  background: var(--accent-color-interactible);
-  margin-inline: 0;
-}
+  /*
+    If a quote block is not followed by another, show gap
+    Goal: Gap between quote blocks and different kinds of blocks
+  */
+  .quote-block:not(:has(+ .quote-block)) {
+    margin-bottom: 10px;
+  }
 
-/*
-  If a quote block is not followed by another, show gap
-  Goal: Gap between quote blocks and different kinds of blocks
-*/
-.quote-block:not(:has(+ .quote-block)) {
-  margin-bottom: 10px;
-}
+  /*
+    Elements that are not a quote block but followed by one should have a margin
+    Goal: Gap between quote blocks and different kinds of blocks
+    Only p.s-heading already have a margin-bottom by default that should not be
+    overridden.
+  */
+  :not(.quote-block):not(p.s-heading):has(+ .quote-block) {
+    margin-bottom: 10px;
+  }
 
-/*
-  Elements that are not a quote block but followed by one should have a margin
-  Goal: Gap between quote blocks and different kinds of blocks
-*/
-:not(.quote-block):has(+ .quote-block) {
-  margin-bottom: 10px;
-}
+  /*
+    If a code block is not followed by another, show gap
+    Goal: Gap between code blocks and different kinds of blocks
+  */
+  .code-block:not(:has(+ .code-block)) {
+    margin-bottom: 10px;
+  }
 
+  /*
+    Elements that are not a code block but followed by one should have a margin
+    Goal: Gap between code blocks and different kinds of blocks
+    Only p.s-heading already have a margin-bottom by default that should not be
+    overridden.
+  */
+  :not(.code-block):not(p.s-heading):has(+ .code-block) {
+    margin-bottom: 10px;
+  }
 
-/*
-  If a code block is not followed by another, show gap
-  Goal: Gap between code blocks and different kinds of blocks
-*/
-.code-block:not(:has(+ .code-block)) {
-  margin-bottom: 10px;
-}
+  /*
+    If a list item block is not followed by another, show gap
+    Goal: Gap between list item sections and different kinds of blocks
+  */
+  .list-item:not(:has(+ .list-item)) {
+    margin-bottom: 10px;
+  }
 
-/*
-  Elements that are not a code block but followed by one should have a margin
-  Goal: Gap between code blocks and different kinds of blocks
-*/
-:not(.code-block):has(+ .code-block) {
-  margin-bottom: 10px;
-}
-
-/*
-  If a list item block is not followed by another, show gap
-  Goal: Gap between list item sections and different kinds of blocks
-*/
-.list-item:not(:has(+ .list-item)) {
-  margin-bottom: 10px;
-}
-
-/*
-  Elements that are not a list item but followed by one should have a margin
-  Goal: Gap between list item sections and different kinds of blocks
-*/
-:not(.list-item):has(+ .list-item) {
-  margin-bottom: 10px;
+  /*
+    Elements that are not a list item but followed by one should have a margin
+    Goal: Gap between list item sections and different kinds of blocks
+    Only p.s-heading already have a margin-bottom by default that should not be
+    overridden.
+  */
+  :not(.list-item):not(p.s-heading):has(+ .list-item) {
+    margin-bottom: 10px;
+  }
 }

@@ -12,63 +12,57 @@
   margin: auto;
   height: calc(100vh - var(--header-bar-height));
   overflow: auto;
-}
 
-.section-start .start-welcome {
-  margin: 0 auto;
-}
+  .start-welcome {
+    margin: 0 auto;
 
-.section-start .start-welcome #start-logo {
-  margin: auto;
-  width: 200px;
-  height: 200px;
-  display: block;
-  margin-bottom: 10px;
-}
+    #start-logo {
+      margin: auto;
+      width: 200px;
+      height: 200px;
+      display: block;
+      margin-bottom: 10px;
+    }
 
-.section-start .start-welcome div {
-  margin: auto;
-  text-align: center;
-  display: block;
-}
+    div {
+      margin: auto;
+      text-align: center;
+      display: block;
+    }
 
-.start-welcome-app-title {
-  font-size: var(--h1-font-size);
-  font-weight: var(--bold);
-}
+    .start-welcome-app-title {
+      font-size: var(--h1-font-size);
+      font-weight: var(--bold);
+    }
+  }
 
-.section-start input {
-  font-size: var(--large-font-size);
-  color: var(--font-color);
-  margin: 0;
-}
+  footer {
+    color: var(--font-color);
+    margin: 0;
+    text-align: center;
 
-.section-start footer {
-  color: var(--font-color);
-  margin: 0;
-  text-align: center;
-}
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: var(--default-gap);
+    }
 
-.section-start footer .links {
-  display: flex;
-  justify-content: center;
-  gap: var(--default-gap);
-}
+    .version {
+      font-size: var(--small-font-size);
+    }
+  }
 
-.section-start footer .version {
-  font-size: var(--small-font-size);
-}
+  #start-view-local {
+    text-align: center;
+  }
 
-#start-view-local {
-  text-align: center;
-}
+  .memory-storage-providers {
+    display: flex;
+    justify-content: center;
+    gap: var(--default-gap);
 
-.memory-storage-providers {
-  display: flex;
-  justify-content: center;
-  gap: var(--default-gap);
-
-  button {
-    height: fit-content;
+    button {
+      height: fit-content;
+    }
   }
 }
