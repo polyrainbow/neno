@@ -245,7 +245,11 @@ const FileView = () => {
             ) return;
             const newSlug = "files/" + slugRenameInput + "." + extension;
             try {
-              const newFileInfo = await notesProvider.renameFile(slug, newSlug);
+              const newFileInfo = await notesProvider.renameFile(
+                slug,
+                newSlug,
+                updateReferences,
+              );
               const src = await getUrl(newFileInfo);
               setFileInfo(newFileInfo);
               setSrc(src);

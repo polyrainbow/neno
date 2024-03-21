@@ -29,6 +29,8 @@ const trimSlug = (slug: string): string => {
   We will replace slashes and dots with dashes, as we do not allow
   these chars in note slugs (even though they are generally allowed
   in slugs).
+  As a consequence, this means that uploaded files with slashes in slugs
+  (like `files/image.png`) cannot be referenced via a Wikilink.
 */
 const sluggify = (text: string): string => {
   const slug = text

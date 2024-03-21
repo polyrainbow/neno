@@ -9,6 +9,7 @@ import {
   handleExistingNoteUpdate,
   isExistingNoteSaveRequest,
   handleNewNoteSaveRequest,
+  changeSlugReferencesInNote,
 } from "./noteUtils.js";
 import {
   getNumberOfComponents,
@@ -42,7 +43,8 @@ import {
   isValidSlugOrEmpty,
   isFileSlug,
 } from "./slugUtils.js";
-import { removeSlugFromIndexes } from "./indexUtils.js";
+import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
+import serialize from "../subwaytext/serialize.js";
 
 
 export default class NotesProvider {
@@ -260,12 +262,13 @@ export default class NotesProvider {
 
 
   async renameFile(
-    slug: Slug,
+    oldSlug: Slug,
     newSlug: Slug,
+    updateReferences: boolean,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
     const fileInfo = graph.metadata.files.find((file: FileInfo) => {
-      return file.slug === slug;
+      return file.slug === oldSlug;
     });
 
     if (!fileInfo) {
@@ -277,16 +280,48 @@ export default class NotesProvider {
     }
 
     await this.#io.renameFile(
-      slug,
+      oldSlug,
       newSlug,
     );
 
     fileInfo.slug = newSlug;
 
+    const notesThatNeedUpdate = new Set<Slug>;
+
+    if (updateReferences) {
+      for (const [noteSlug, outgoingLinks] of graph.indexes.outgoingLinks) {
+        if (outgoingLinks.has(oldSlug)) {
+          notesThatNeedUpdate.add(noteSlug);
+          const note = graph.notes.get(noteSlug);
+
+          if (!note) {
+            throw new Error(
+              "Note from index is undefined. This should not happen.",
+            );
+          }
+
+          const blocks = graph.indexes.blocks.get(
+            noteSlug,
+          ) as Block[];
+
+          const newBlocks = changeSlugReferencesInNote(
+            blocks,
+            oldSlug,
+            newSlug,
+            newSlug,
+          );
+
+          note.content = serialize(newBlocks);
+          graph.indexes.blocks.set(note.meta.slug, newBlocks);
+          updateIndexes(graph, note);
+        }
+      }
+    }
+
     await this.#io.flushChanges(
       graph,
       WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
-      [],
+      Array.from(notesThatNeedUpdate),
       [],
     );
 

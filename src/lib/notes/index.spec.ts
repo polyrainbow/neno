@@ -1952,6 +1952,7 @@ describe("Notes module", () => {
       const fileInfoUpdated = await notesProvider.renameFile(
         "files/a.txt",
         "files/a-renamed.txt",
+        false,
       );
 
       expect(fileInfoUpdated.slug).toBe("files/a-renamed.txt");
@@ -1961,6 +1962,141 @@ describe("Notes module", () => {
       );
 
       expect(readable2 instanceof ReadableStream).toBe(true);
+    },
+  );
+
+  it(
+    "should update file references when renaming",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo = await notesProvider.addFile(
+        readable,
+        "a.txt",
+      );
+
+      expect(fileInfo.slug).toBe("files/a.txt");
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1 with slashlink to /files/a.txt",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set(),
+        changeSlugTo: "note-1",
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      /*
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note 2 with wikilink to [[files/a.txt]]",
+          meta: {
+            custom: {},
+            flags: [],
+            contentType: "",
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set(),
+        changeSlugTo: "note-2",
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+      */
+
+      const fileInfoUpdated = await notesProvider.renameFile(
+        "files/a.txt",
+        "files/a-renamed.txt",
+        true,
+      );
+
+      expect(fileInfoUpdated.slug).toBe("files/a-renamed.txt");
+
+      const note1 = await notesProvider.get("note-1");
+      expect(note1.content).toBe(
+        "Note 1 with slashlink to /files/a-renamed.txt",
+      );
+
+      expect(note1.files.length).toBe(1);
+      expect(note1.files[0].slug).toBe("files/a-renamed.txt");
+
+      // It is currently not possible that files are referenced via Wikilinks
+      // because Wikilink-to-slug normalization normalizes the slashes to
+      // dashes.
+      /*
+      const note2 = await notesProvider.get("note-2");
+      expect(note2.content).toBe(
+        "Note 2 with wikilink to [[files/a-renamed.txt]]",
+      );
+
+      expect(note2.files.length).toBe(1);
+      expect(note2.files[0].slug).toBe("files/a-renamed.txt");
+      */
+    },
+  );
+
+
+  it(
+    "should update file references when renaming file, data loaded from disk",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+
+      await mockStorageProvider.writeObject(
+        "note-1.subtext",
+        "Note 1 with slashlink to /files/a.txt",
+      );
+
+      await mockStorageProvider.writeObject(
+        "files/a.txt",
+        "Some text",
+      );
+
+      await mockStorageProvider.writeObject(
+        ".graph.json",
+        `{
+          "files": [
+            {
+              "slug": "files/a.txt",
+              "size": 5,
+              "createdAt": 1234
+            }
+          ]
+        }`,
+      );
+
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      await notesProvider.renameFile(
+        "files/a.txt",
+        "files/a-renamed.txt",
+        true,
+      );
+
+      const note1 = await notesProvider.get("note-1");
+      expect(note1.content).toBe(
+        "Note 1 with slashlink to /files/a-renamed.txt",
+      );
+
+      expect(note1.files.length).toBe(1);
+      expect(note1.files[0].slug).toBe("files/a-renamed.txt");
     },
   );
 });

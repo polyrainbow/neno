@@ -1,6 +1,9 @@
+import { InlineText } from "../subwaytext/types/Block.js";
+import { SpanType } from "../subwaytext/types/SpanType.js";
 import {
   createSlug,
   getSlugFromFilename,
+  getSlugsFromInlineText,
   sluggify,
 } from "./slugUtils.js";
 import { describe, it, expect } from "vitest";
@@ -70,6 +73,33 @@ describe("sluggify", () => {
 
         const noteContent2 = "content-2";
         expect(createSlug(noteContent2, ["content-2"])).toBe("content-2-2");
+      },
+    );
+  });
+
+
+  describe("getSlugsFromInlineText", () => {
+    it(
+      "should return file slugs from slashlinks",
+      async () => {
+        const inlineText: InlineText = [
+          {
+            text: "This is a text with a ",
+            type: SpanType.NORMAL_TEXT
+          },
+          {
+            text: "/files/slashlink-to-file",
+            type: SpanType.SLASHLINK,
+          },
+          {
+            text: " in between.",
+            type: SpanType.NORMAL_TEXT
+          },
+        ];
+
+        expect(getSlugsFromInlineText(inlineText)).toStrictEqual(
+          ["files/slashlink-to-file"],
+        );
       },
     );
   });

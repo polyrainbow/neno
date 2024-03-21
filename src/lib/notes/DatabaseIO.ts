@@ -185,7 +185,7 @@ export default class DatabaseIO {
 
   /*
     The outgoing link index contains all links that are referenced in a note,
-    no matter if the link target exists or not.
+    including links to files, no matter if the link target exists or not.
   */
   private static createOutgoingLinkIndex(
     blockIndex: Map<Slug, Block[]>,
@@ -193,10 +193,7 @@ export default class DatabaseIO {
     const outgoingLinkIndex = new Map<Slug, Set<Slug>>();
 
     for (const [slug, blocks] of blockIndex) {
-      const outgoingLinks = getSlugsFromParsedNote(blocks)
-        .filter((link: Slug): boolean => {
-          return !link.startsWith(FILE_SLUG_PREFIX);
-        });
+      const outgoingLinks = getSlugsFromParsedNote(blocks);
       outgoingLinkIndex.set(slug, new Set(outgoingLinks));
     }
     return outgoingLinkIndex;
