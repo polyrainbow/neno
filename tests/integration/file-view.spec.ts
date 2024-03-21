@@ -36,9 +36,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe("File view", () => {
-  test("should look fine - light", async ({ page }) => {
-    expect(await page.screenshot()).toMatchSnapshot("file-view-light.png", {
-      maxDiffPixels: 200,
-    });
+  test("should forward to 'used in' note", async ({ page }) => {
+    await page.getByText("Note with a file").click();
+    const textInEditor
+      = await page.locator("div[data-lexical-editor]").innerText();
+
+    expect(textInEditor.startsWith("Note with a file"))
+      .toBe(true);
   });
 });

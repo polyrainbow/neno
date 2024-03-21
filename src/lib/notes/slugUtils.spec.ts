@@ -85,7 +85,7 @@ describe("sluggify", () => {
         const inlineText: InlineText = [
           {
             text: "This is a text with a ",
-            type: SpanType.NORMAL_TEXT
+            type: SpanType.NORMAL_TEXT,
           },
           {
             text: "/files/slashlink-to-file",
@@ -93,7 +93,7 @@ describe("sluggify", () => {
           },
           {
             text: " in between.",
-            type: SpanType.NORMAL_TEXT
+            type: SpanType.NORMAL_TEXT,
           },
         ];
 
