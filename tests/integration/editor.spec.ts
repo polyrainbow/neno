@@ -622,6 +622,20 @@ test.describe("Editor view", () => {
   );
 
 
+  test(
+    "Cancel discarding changes should not overwrite current location",
+    async ({ page }) => {
+      await page.keyboard.type("A note");
+      await page.click("#button_upload");
+      await page.getByRole('textbox').nth(1).focus();
+      await page.keyboard.type(" edited");
+      await page.click("#button_new");
+      await page.getByRole('button', { name: 'Cancel' }).click();
+      expect(page.url().endsWith("a-note")).toBe(true);
+    },
+  );
+
+
   /*
 
   The following test fails in headless mode but succeeds in headful mode.
