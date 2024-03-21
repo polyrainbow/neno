@@ -76,6 +76,10 @@
     max-width: 95vw;
   }
 
+  .preview-block-file-text {
+    margin: 0;
+  }
+
   .action-bar {
     display: flex;
     flex-wrap: wrap;

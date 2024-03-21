@@ -275,7 +275,7 @@ const NoteView = () => {
       ) {
         const receivedNoteSlug = await loadNote(
           validNoteSlug,
-          location.state.contentIfNewNote,
+          location.state?.contentIfNewNote,
         );
         if (
           typeof receivedNoteSlug === "string"
