@@ -126,11 +126,11 @@ implements StorageProvider {
 
   async renameFile(
     requestPath: string,
-    newName: string,
+    newEntryName: string,
   ): Promise<void> {
     const fileHandle = await this.#getFileHandle(requestPath, true);
     // @ts-ignore not correctly typed
-    await fileHandle.move(newName);
+    await fileHandle.move(newEntryName);
   }
 
   async writeObjectFromReadable(

@@ -18,16 +18,21 @@ import { LOCAL_GRAPH_ID, SPAN_SEPARATOR } from "../config";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import {
+  getExtensionFromFilename,
   getMediaTypeFromFilename,
+  removeExtensionFromFilename,
 } from "../lib/notes/utils";
 import {
-  getFilenameFromFileSlug,
+  getFilenameFromFileSlug, isValidSlug,
 } from "../lib/notes/slugUtils";
-import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
-import { isInitialized, saveFile } from "../lib/LocalDataStorage";
+import { saveFile } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
 import FileViewPreview from "./FileViewPreview";
+import { Slug } from "../lib/notes/types/Slug";
 
+const getRenameInput = (slug: Slug): string => {
+  return removeExtensionFromFilename(getFilenameFromFileSlug(slug));
+};
 
 const FileView = () => {
   const notesProvider = useNotesProvider();
@@ -37,14 +42,17 @@ const FileView = () => {
   const [notes, setNotes] = useState<NoteListItem[] | null>(null);
   const [text, setText] = useState<string>("");
   const { slug } = useParams();
+  const [slugRenameInput, setSlugRenameInput] = useState<string>(
+    slug ? getRenameInput(slug) : "",
+  );
+  const extension = slug ? getExtensionFromFilename(slug) : "";
+  const [updateReferences, setUpdateReferences] = useState(true);
 
   const navigate = useNavigate();
   const type = slug
     ? getMediaTypeFromFilename(slug)
     : null;
   const confirm = useConfirm();
-
-  useGraphAccessCheck();
 
   useEffect(() => {
     if (typeof slug !== "string") return;
@@ -73,10 +81,6 @@ const FileView = () => {
     getNotes();
   }, [notesProvider, slug]);
 
-  if (!isInitialized()) {
-    return <BusyIndicator height={80} alt={l("app.loading")} />;
-  }
-
   const canShowPreview = type !== MediaType.OTHER;
 
   return <>
@@ -88,15 +92,6 @@ const FileView = () => {
         )}
       >{l("files.show-all-files")}</Link></p>
       <h1>{fileInfo ? getFilenameFromFileSlug(fileInfo.slug) : ""}</h1>
-      <p>{
-        fileInfo ? humanFileSize(fileInfo.size) : ""
-      }{SPAN_SEPARATOR}{
-        fileInfo
-          ? l("stats.metadata.created-at")
-            + ": "
-            + makeTimestampHumanReadable(fileInfo.createdAt)
-          : ""
-      }</p>
       {
         canShowPreview && type
           ? <FileViewPreview
@@ -106,33 +101,15 @@ const FileView = () => {
           />
           : ""
       }
-      <h2>{l("files.used-in")}</h2>
-      {
-        notes
-          ? (
-            notes.length > 0
-              ? notes.map((note) => {
-                return <p key={"notelink-" + note.slug}>
-                  <Link
-                    to={
-                      getAppPath(
-                        PathTemplate.EXISTING_NOTE,
-                        new Map([
-                          ["GRAPH_ID", LOCAL_GRAPH_ID],
-                          ["SLUG", note.slug],
-                        ]),
-                      )
-                    }
-                  >{note.title}</Link>
-                </p>;
-              })
-              : <p>{l("files.used-in.none")}</p>
-          )
-          : <BusyIndicator
-            alt={l("app.loading")}
-            height={30}
-          />
-      }
+      <p>{
+        fileInfo ? humanFileSize(fileInfo.size) : ""
+      }{SPAN_SEPARATOR}{
+        fileInfo
+          ? l("stats.metadata.created-at")
+            + ": "
+            + makeTimestampHumanReadable(fileInfo.createdAt)
+          : ""
+      }</p>
       <div
         className="action-bar"
       >
@@ -180,6 +157,116 @@ const FileView = () => {
           }}
           className="default-button dangerous-action"
         >{l("files.delete")}</button>
+      </div>
+      <h2>{l("files.used-in")}</h2>
+      {
+        notes
+          ? (
+            notes.length > 0
+              ? <ul>{
+                notes.map((note) => {
+                  return <li key={"notelink-" + note.slug}>
+                    <Link
+                      to={
+                        getAppPath(
+                          PathTemplate.EXISTING_NOTE,
+                          new Map([
+                            ["GRAPH_ID", LOCAL_GRAPH_ID],
+                            ["SLUG", note.slug],
+                          ]),
+                        )
+                      }
+                    >{note.title}</Link>
+                  </li>;
+                })
+              }</ul>
+              : <p>{l("files.used-in.none")}</p>
+          )
+          : <BusyIndicator
+            alt={l("app.loading")}
+            height={30}
+          />
+      }
+      <h2>Rename</h2>
+      <div className="rename">
+        <div className="rename-section-input-line">
+          <label htmlFor="file-slug-rename-input">New slug:</label>
+          <div>
+            <input
+              id="file-slug-rename-input"
+              type="text"
+              value={slugRenameInput}
+              onInput={(e) => {
+                const element = e.currentTarget;
+                const newValue = element.value.replace(
+                  // In the input field, we also allow \p{SK} modifiers, as
+                  // they are used to create a full letter with modifier in a
+                  // second step. They are not valid slug characters on
+                  // their own, though.
+                  // We also allow apostrophes ('), as they might be used as a
+                  // dead key for letters like é.
+                  // Unfortunately, it seems like we cannot simulate pressing
+                  // dead keys in Playwright currently, so we cannot
+                  // add a meaningful test for this.
+                  /[^\p{L}\p{Sk}\d\-/._']/gu,
+                  "",
+                ).toLowerCase();
+                setSlugRenameInput(newValue);
+              }}
+            />.{extension}
+          </div>
+        </div>
+        <div className="update-references">
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={updateReferences}
+              onChange={(e) => {
+                setUpdateReferences(e.target.checked);
+              }}
+            />
+            <span className="slider round"></span>
+          </label>
+          <span className="update-references-toggle-text">
+            {l("note.slug.update-references")}
+          </span>
+        </div>
+        <button
+          disabled={
+            slugRenameInput === getRenameInput(slug || "")
+            || !isValidSlug(slugRenameInput)
+          }
+          className="default-button-small dangerous-action"
+          onClick={async () => {
+            if (
+              !slug
+              || slugRenameInput === getRenameInput(slug || "")
+              || !isValidSlug(slugRenameInput)
+            ) return;
+            const newSlug = "files/" + slugRenameInput + "." + extension;
+            try {
+              const newFileInfo = await notesProvider.renameFile(slug, newSlug);
+              const src = await getUrl(newFileInfo);
+              setFileInfo(newFileInfo);
+              setSrc(src);
+
+              navigate(getAppPath(
+                PathTemplate.FILE,
+                new Map([
+                  ["GRAPH_ID", LOCAL_GRAPH_ID],
+                  ["FILE_SLUG", newSlug],
+                ]),
+              ), {
+                replace: true,
+              });
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error(e);
+            }
+          }}
+        >
+          Rename
+        </button>
       </div>
     </section>
   </>;

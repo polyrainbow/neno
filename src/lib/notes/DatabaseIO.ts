@@ -503,6 +503,32 @@ export default class DatabaseIO {
   }
 
 
+  async renameFile(
+    slug: Slug,
+    newSlug: Slug,
+  ): Promise<void> {
+    if (!isFileSlug(slug)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
+    if (!isFileSlug(newSlug)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
+    const filepath = this.#storageProvider.joinPath(
+      this.#NAME_OF_FILES_SUBDIRECTORY,
+      slug.substring(FILE_SLUG_PREFIX.length),
+    );
+
+    const newFilename = newSlug.substring(FILE_SLUG_PREFIX.length);
+
+    await this.#storageProvider.renameFile(
+      filepath,
+      newFilename,
+    );
+  }
+
+
   async deleteFile(
     slug: Slug,
   ): Promise<void> {

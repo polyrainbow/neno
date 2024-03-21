@@ -1924,4 +1924,43 @@ describe("Notes module", () => {
       expect(notes.results[0].slug).toBe("a");
     },
   );
+
+
+  it(
+    "should find file after rename",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      const fileInfo = await notesProvider.addFile(
+        readable,
+        "a.txt",
+      );
+
+      expect(fileInfo.slug).toBe("files/a.txt");
+
+      const fileInfoUpdated = await notesProvider.renameFile(
+        "files/a.txt",
+        "files/a-renamed.txt",
+      );
+
+      expect(fileInfoUpdated.slug).toBe("files/a-renamed.txt");
+
+      const readable2 = await notesProvider.getReadableFileStream(
+        "files/a-renamed.txt",
+      );
+
+      expect(readable2 instanceof ReadableStream).toBe(true);
+    },
+  );
 });

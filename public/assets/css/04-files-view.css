@@ -45,6 +45,7 @@
 .file-section {
   .file-container {
     justify-content: center;
+    background-color: var(--accent-color-interactible);
   }
 
   img,
@@ -79,5 +80,35 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--default-gap);
+  }
+
+  .rename {
+    display: flex;
+    flex-direction: column;
+    gap: var(--default-gap);
+
+    .rename-section-input-line {
+      display: flex;
+      gap: var(--default-gap);
+      align-items: center;
+
+      & input {
+        margin: 0;
+      }
+    }
+
+    .update-references {
+      display: flex;
+      align-items: center;
+      gap: var(--default-gap);
+
+      .switch {
+        font-size: 1.75rem;
+      }
+    }
+
+    button {
+      width: fit-content;
+    }
   }
 }

@@ -259,6 +259,41 @@ export default class NotesProvider {
   }
 
 
+  async renameFile(
+    slug: Slug,
+    newSlug: Slug,
+  ): Promise<FileInfo> {
+    const graph = await this.#io.getGraph();
+    const fileInfo = graph.metadata.files.find((file: FileInfo) => {
+      return file.slug === slug;
+    });
+
+    if (!fileInfo) {
+      throw new Error(ErrorMessage.FILE_NOT_FOUND);
+    }
+
+    if ((!isValidSlug(newSlug)) || (!isFileSlug(newSlug))) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
+    await this.#io.renameFile(
+      slug,
+      newSlug,
+    );
+
+    fileInfo.slug = newSlug;
+
+    await this.#io.flushChanges(
+      graph,
+      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      [],
+      [],
+    );
+
+    return fileInfo;
+  }
+
+
   async deleteFile(
     slug: Slug,
   ): Promise<void> {

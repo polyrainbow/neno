@@ -73,7 +73,7 @@ export default class MockStorageProvider implements StorageProvider {
       const newRequestPath = requestPath.substring(
         0,
         requestPath.lastIndexOf("/"),
-      ) + newName;
+      ) + "/" + newName;
       this.#files.set(newRequestPath, value);
       this.#files.delete(requestPath);
       return Promise.resolve();
