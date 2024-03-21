@@ -16,9 +16,7 @@ import { FileInfo } from "../lib/notes/types/FileInfo";
 import BusyIndicator from "./BusyIndicator";
 import { LOCAL_GRAPH_ID, SPAN_SEPARATOR } from "../config";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
-import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
-import DialogActionBar from "./DialogActionBar";
 import {
   getMediaTypeFromFilename,
 } from "../lib/notes/utils";
@@ -28,6 +26,7 @@ import {
 import useGraphAccessCheck from "../hooks/useGraphAccessCheck";
 import { isInitialized, saveFile } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
+import FileViewPreview from "./FileViewPreview";
 
 
 const FileView = () => {
@@ -40,7 +39,9 @@ const FileView = () => {
   const { slug } = useParams();
 
   const navigate = useNavigate();
-  const type = slug && getMediaTypeFromFilename(slug);
+  const type = slug
+    ? getMediaTypeFromFilename(slug)
+    : null;
   const confirm = useConfirm();
 
   useGraphAccessCheck();
@@ -97,50 +98,12 @@ const FileView = () => {
           : ""
       }</p>
       {
-        canShowPreview
-          ? <FlexContainer
-            className="file-container"
-          >
-            {
-              type === MediaType.IMAGE
-                ? <img
-                  className="checkerboard-background"
-                  src={src}
-                  loading="lazy"
-                />
-                : ""
-            }
-            {
-              type === MediaType.AUDIO
-                ? <audio
-                  src={src}
-                  controls
-                />
-                : ""
-            }
-            {
-              type === MediaType.VIDEO
-                ? <video
-                  src={src}
-                  controls
-                />
-                : ""
-            }
-            {
-              type === MediaType.PDF
-                ? <iframe
-                  src={src}
-                />
-                : ""
-            }
-            {
-              type === MediaType.TEXT
-                ? <pre
-                  className="preview-block-file-text"
-                >{text}</pre>
-                : ""
-            }
-          </FlexContainer>
+        canShowPreview && type
+          ? <FileViewPreview
+            type={type}
+            src={src}
+            text={text}
+          />
           : ""
       }
       <h2>{l("files.used-in")}</h2>
@@ -170,7 +133,9 @@ const FileView = () => {
             height={30}
           />
       }
-      <DialogActionBar>
+      <div
+        className="action-bar"
+      >
         <button
           disabled={!fileInfo}
           onClick={async () => {
@@ -215,7 +180,7 @@ const FileView = () => {
           }}
           className="default-button dangerous-action"
         >{l("files.delete")}</button>
-      </DialogActionBar>
+      </div>
     </section>
   </>;
 };

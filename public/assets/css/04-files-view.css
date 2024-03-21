@@ -74,4 +74,10 @@
   img {
     max-width: 95vw;
   }
+
+  .action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--default-gap);
+  }
 }
