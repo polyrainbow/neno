@@ -1,5 +1,5 @@
 import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
-import { getIconSrc, shortenText } from "../lib/utils";
+import { getIconSrc, getWikilinkForNote, shortenText } from "../lib/utils";
 import { getNoteTitle } from "../lib/notes/noteUtils";
 
 interface NoteViewHeaderPinnedNoteProps {
@@ -20,16 +20,20 @@ const NoteViewHeaderPinnedNote = ({
   onDragEnd,
   onDragOver,
 }: NoteViewHeaderPinnedNoteProps) => {
+  const noteTitle = getNoteTitle(note);
+
   return <button
     className={"pinned-note " + (isActive ? "active" : "")}
     onClick={() => onClick()}
     draggable
     onDragStart={(e) => {
+      const wikilink = getWikilinkForNote(note.meta.slug, noteTitle);
+
       // element can either be linked (in editor) or moved
       // (to different position in header pin list)
       e.dataTransfer.effectAllowed = "linkMove";
       e.dataTransfer.dropEffect = "move";
-      e.dataTransfer.setData("text/plain", "[[" + note.meta.slug + "]]");
+      e.dataTransfer.setData("text/plain", wikilink);
       onDragStart();
     }}
     onDragEnd={(e) => onDragEnd(e.nativeEvent)}
@@ -49,7 +53,7 @@ const NoteViewHeaderPinnedNote = ({
     />
     <p>{
       shortenText(
-        getNoteTitle(note) || note.meta.slug,
+        noteTitle || note.meta.slug,
         35,
       )
     }</p>

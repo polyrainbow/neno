@@ -636,6 +636,23 @@ test.describe("Editor view", () => {
   );
 
 
+  test(
+    "Dragging & dropping pin to editor should insert Wikilink with note title",
+    async ({ page }) => {
+      await page.keyboard.type("A note");
+      await page.click("#button_upload");
+      await page.click("#button_pin");
+      await page.click("#button_new");
+      await page.locator(".pinned-note").hover();
+      await page.mouse.down();
+      const editor = page.getByRole('textbox').nth(1);
+      await editor.hover();
+      await page.mouse.up();
+      expect(await editor.textContent()).toBe("[[A note]]");
+    },
+  );
+
+
   /*
 
   The following test fails in headless mode but succeeds in headful mode.
