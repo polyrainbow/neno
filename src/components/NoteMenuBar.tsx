@@ -1,13 +1,10 @@
 import { Slug } from "../lib/notes/types/Slug";
 import ActiveNote from "../types/ActiveNote";
-import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import NoteControls from "./NoteControls";
 import StatusIndicator from "./StatusIndicator";
 
 interface NoteMenuBarProps {
   activeNote: ActiveNote,
-  createNewNote: (params: CreateNewNoteParams) => void,
-  createNewLinkedNote: () => void,
   handleNoteSaveRequest: () => void,
   removeActiveNote: () => void,
   unsavedChanges: boolean,
@@ -23,8 +20,6 @@ interface NoteMenuBarProps {
 
 const NoteMenuBar = ({
   activeNote,
-  createNewNote,
-  createNewLinkedNote,
   handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges,
@@ -41,8 +36,6 @@ const NoteMenuBar = ({
     <div className="note-controls-left">
       <NoteControls
         activeNote={activeNote}
-        createNewNote={createNewNote}
-        createNewLinkedNote={createNewLinkedNote}
         handleNoteSaveRequest={handleNoteSaveRequest}
         removeActiveNote={removeActiveNote}
         unsavedChanges={unsavedChanges}

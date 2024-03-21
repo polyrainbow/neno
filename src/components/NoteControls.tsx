@@ -4,20 +4,18 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import {
-  getAppPath,
+  getAppPath, getNoteTitleFromActiveNote, getWikilinkForNote,
 } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
 import { Slug } from "../lib/notes/types/Slug";
-import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { LOCAL_GRAPH_ID } from "../config";
 import useConfirm from "../hooks/useConfirm";
+import useGoToNote from "../hooks/useGoToNote";
 
 interface NoteControlsProps {
   activeNote: ActiveNote,
-  createNewNote: (params: CreateNewNoteParams) => void,
-  createNewLinkedNote: () => void,
   handleNoteSaveRequest: () => void,
   removeActiveNote: () => void,
   unsavedChanges: boolean,
@@ -32,8 +30,6 @@ interface NoteControlsProps {
 
 const NoteControls = ({
   activeNote,
-  createNewNote,
-  createNewLinkedNote,
   handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges,
@@ -50,6 +46,7 @@ const NoteControls = ({
   const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
   const confirm = useConfirm();
+  const goToNote = useGoToNote();
 
   return <>
     {
@@ -78,14 +75,35 @@ const NoteControls = ({
             id="button_new"
             title={l("editor.new-note")}
             icon="add"
-            onClick={() => createNewNote({})}
+            onClick={async () => {
+              if (unsavedChanges) {
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
+              }
+
+              goToNote("new");
+            }}
           />
           <IconButton
             id="button_create-linked-note"
             disabled={activeNote.isUnsaved}
             title={l("editor.create-linked-note")}
             icon="add_circle"
-            onClick={() => createNewLinkedNote()}
+            onClick={async () => {
+              if (activeNote.isUnsaved) return;
+
+              if (unsavedChanges) {
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
+              }
+
+              goToNote("new", {
+                contentIfNewNote: getWikilinkForNote(
+                  activeNote.slug,
+                  getNoteTitleFromActiveNote(activeNote),
+                ),
+              });
+            }}
           />
         </>
         : null
@@ -135,7 +153,13 @@ const NoteControls = ({
       disabled={!activeNote.isUnsaved}
       title={l("editor.import-note")}
       icon="file_upload"
-      onClick={() => importNote()}
+      onClick={async () => {
+        if (unsavedChanges) {
+          await confirmDiscardingUnsavedChanges();
+        }
+
+        importNote();
+      }}
     />
     <IconButton
       id="button_export-note"
@@ -161,13 +185,7 @@ const NoteControls = ({
           await confirmDiscardingUnsavedChanges();
           setUnsavedChanges(false);
         }
-        navigate(getAppPath(
-          PathTemplate.EXISTING_NOTE,
-          new Map([
-            ["GRAPH_ID", LOCAL_GRAPH_ID],
-            ["SLUG", "random"],
-          ]),
-        ));
+        goToNote("random");
       }}
     />
   </>;

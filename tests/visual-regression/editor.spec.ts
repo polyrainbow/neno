@@ -30,6 +30,7 @@ test.beforeEach(async ({ page }) => {
   await page.waitForSelector("#memory-storage-load-button");
   await page.click("#memory-storage-load-button");
   await page.getByText("No notes found").waitFor();
+  await page.getByAltText("No notes found").waitFor();
 });
 
 test.describe("Editor", () => {

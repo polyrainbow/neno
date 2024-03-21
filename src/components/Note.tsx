@@ -20,7 +20,6 @@ import NoteMenuBar from "./NoteMenuBar";
 import BusyIndicator from "./BusyIndicator";
 import NoteBacklinks from "./NoteBacklinks";
 import { Slug } from "../lib/notes/types/Slug";
-import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import NotesProvider from "../lib/notes";
 import NoteSlug from "./NoteSlug";
 import { UserRequestType } from "../lib/editor/types/UserRequestType";
@@ -50,8 +49,6 @@ interface NoteComponentProps {
   handleEditorContentChange: (title: string) => void,
   addFilesToNoteObject: (responses: FileInfo[]) => void,
   setUnsavedChanges: (val: boolean) => void,
-  createNewNote: (params: CreateNewNoteParams) => void,
-  createNewLinkedNote: () => void,
   handleNoteSaveRequest: () => void,
   removeActiveNote: () => void,
   unsavedChanges: boolean,
@@ -79,8 +76,6 @@ const Note = ({
   handleEditorContentChange,
   addFilesToNoteObject,
   setUnsavedChanges,
-  createNewNote,
-  createNewLinkedNote,
   handleNoteSaveRequest,
   removeActiveNote,
   unsavedChanges,
@@ -240,8 +235,6 @@ const Note = ({
     <NoteMenuBar
       activeNote={note}
       disableNoteSaving={!NotesProvider.isValidSlugOrEmpty(slugInput)}
-      createNewNote={createNewNote}
-      createNewLinkedNote={createNewLinkedNote}
       handleNoteSaveRequest={handleNoteSaveRequest}
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}
@@ -313,7 +306,11 @@ const Note = ({
                       ])),
                     );
                   } else {
-                    goToNote(slug);
+                    goToNote(slug, {
+                      contentIfNewNote: type === UserRequestType.WIKILINK
+                        ? value
+                        : "",
+                    });
                   }
                 } else {
                   window.open(value, "_blank", "noopener,noreferrer");

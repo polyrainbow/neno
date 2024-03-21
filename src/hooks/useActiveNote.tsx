@@ -10,12 +10,8 @@ import { useContext, useRef, useState } from "react";
 import {
   getFilesFromUserSelection,
   getNewNoteObject,
-  getNoteTitleFromActiveNote,
-  getWikilinkForNote,
   readFileAsString,
 } from "../lib/utils";
-import useConfirmDiscardingUnsavedChangesDialog
-  from "./useConfirmDiscardingUnsavedChangesDialog";
 import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import { Slug } from "../lib/notes/types/Slug";
@@ -47,8 +43,6 @@ export default (
     displayedSlugAliases,
     setDisplayedSlugAliases,
   ] = useState<string[]>([]);
-  const confirmDiscardingUnsavedChanges
-    = useConfirmDiscardingUnsavedChangesDialog();
   const [editorInstanceId, setEditorInstanceId] = useState<number>(
     Math.random(),
   );
@@ -80,11 +74,6 @@ export default (
 
 
   const createNewNote = async (params: CreateNewNoteParams) => {
-    if (unsavedChanges && (!params.useForce)) {
-      await confirmDiscardingUnsavedChanges();
-      setUnsavedChanges(false);
-    }
-
     setNewNote(params);
 
     if (params.content) {
@@ -210,27 +199,7 @@ export default (
   };
 
 
-  const createNewLinkedNote = () => {
-    if (activeNote.isUnsaved) {
-      throw new Error("Cannot create linked note of unsaved note");
-    }
-
-    const wikilink = getWikilinkForNote(
-      activeNote.slug,
-      getNoteTitleFromActiveNote(activeNote),
-    );
-
-    createNewNote({
-      content: `${wikilink}\n`,
-    });
-  };
-
-
   const importNote = async (): Promise<void> => {
-    if (unsavedChanges) {
-      await confirmDiscardingUnsavedChanges();
-    }
-
     const types = [{
       description: NOTE_FILE_DESCRIPTION,
       accept: { [NOTE_MIME_TYPE]: [NOTE_FILE_EXTENSION] },
@@ -265,10 +234,7 @@ export default (
 
     await notesProvider.remove(activeNote.slug);
 
-    // using force here because a delete prompt dialog has already been shown
-    createNewNote({
-      useForce: true,
-    });
+    createNewNote({});
     setUnsavedChanges(false);
   };
 
@@ -276,11 +242,6 @@ export default (
   const duplicateNote = async (): Promise<NoteToTransmit> => {
     if (activeNote.isUnsaved) {
       throw new Error("Cannot duplicate an unsaved note");
-    }
-
-    if (unsavedChanges) {
-      await confirmDiscardingUnsavedChanges();
-      setUnsavedChanges(false);
     }
 
     const noteSaveRequest: NewNoteSaveRequest = {
@@ -296,7 +257,8 @@ export default (
       aliases: new Set(),
     };
     const noteFromServer = await notesProvider.put(noteSaveRequest);
-
+    setActiveNoteFromServer(noteFromServer);
+    updateEditorInstance();
     return noteFromServer;
   };
 
@@ -306,7 +268,19 @@ export default (
   };
 
 
-  const loadNote = async (slug: Slug | "random"): Promise<Slug | null> => {
+  const loadNote = async (
+    slug: Slug | "random" | "new",
+    contentForNewNote?: string,
+  ): Promise<Slug | null> => {
+    if (slug === "new") {
+      createNewNote({
+        slug: undefined,
+        content: contentForNewNote ?? "",
+      });
+
+      return Promise.resolve(null);
+    }
+
     let receivedNoteSlug: Slug | null = null;
     setIsBusy(true);
     try {
@@ -321,7 +295,7 @@ export default (
       if (e instanceof Error && e.message === "NOTE_NOT_FOUND") {
         createNewNote({
           slug,
-          content: "",
+          content: contentForNewNote ?? "",
         });
       } else {
         throw e;
@@ -338,8 +312,6 @@ export default (
     handleEditorContentChange,
     saveActiveNote,
     setActiveNote,
-    createNewNote,
-    createNewLinkedNote,
     importNote,
     removeActiveNote,
     duplicateNote,

@@ -19,6 +19,7 @@ test.beforeEach(async ({ page }) => {
   await page.waitForSelector("#memory-storage-load-button");
   await page.click("#memory-storage-load-button");
   await page.getByText("No notes found").waitFor();
+  await page.getByAltText("No notes found").waitFor();
 });
 
 test.describe("Editor view", () => {
@@ -592,6 +593,31 @@ test.describe("Editor view", () => {
       expect(paragraphs.length).toBe(2);
       expect((await paragraphs[0].innerText()).trim()).toBe("- http://example.com");
       expect((await paragraphs[1].innerText()).trim()).toBe("");
+    },
+  );
+
+
+  test(
+    "Click on red wikilink should create new note with content of wikilink",
+    async ({ page }) => {
+      await page.keyboard.type("A note with a [[Link to a non-existing note]]");
+      await page.click("#button_upload");
+      await page.locator('span')
+        .filter({ hasText: 'Link to a non-existing note' })
+        .click();
+
+      const slugElement = await page.$(".slug-line .note-slug");
+      const slug = await slugElement?.inputValue();
+      expect(slug).toBe("link-to-a-non-existing-note");
+
+      const paragraphs = (
+        await page.$$("div[data-lexical-editor] .editor-paragraph")
+      ) as ElementHandle<HTMLElement>[];
+
+      expect(paragraphs.length).toBe(1);
+      expect((await paragraphs[0].innerText()).trim()).toBe(
+        "Link to a non-existing note",
+      );
     },
   );
 
