@@ -64,8 +64,9 @@ export const insertItems = (items: InsertItem[], editor: LexicalEditor) => {
         let charAfterCursor = anchorNode
           .getTextContent()[selection.anchor.offset];
 
-        if (!charAfterCursor && anchorNode.getNextSibling()) {
-          charAfterCursor = anchorNode.getNextSibling().getTextContent()[0];
+        const nextSibling = anchorNode.getNextSibling();
+        if (!charAfterCursor && nextSibling) {
+          charAfterCursor = nextSibling.getTextContent()[0];
         }
 
         if (charAfterCursor && !isWhiteSpace(charAfterCursor)) {

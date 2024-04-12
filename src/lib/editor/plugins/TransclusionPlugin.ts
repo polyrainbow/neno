@@ -31,11 +31,12 @@ const registerBlockNodeTransform = (
   });
 
   editor.registerNodeTransform(AutoLinkNode, (node: AutoLinkNode) => {
-    let block = node.getParent();
-    while (!$isParagraphNode(block)) {
-      block = block.getParent();
+    let currentNode = node.getParent();
+    while (currentNode && !$isParagraphNode(currentNode)) {
+      currentNode = currentNode.getParent();
     }
-    refreshTransclusionsForBlock(block, getTransclusionContent);
+    currentNode
+      && refreshTransclusionsForBlock(currentNode, getTransclusionContent);
   });
 };
 
