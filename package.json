@@ -49,7 +49,10 @@
     "lint": "npx eslint src --report-unused-disable-directives",
     "all-checks": "npm run stylelint && npm run lint && npm run test && npm run integration-test && npm run build",
     "all-checks-visual": "npm run all-checks && npm run visual-regression-test",
-    "lint-fix": "npx eslint src --report-unused-disable-directives --fix"
+    "lint-fix": "npx eslint src --report-unused-disable-directives --fix",
+    "version:major": "npm version major",
+    "version:minor": "npm version minor",
+    "version:patch": "npm version patch"
   },
   "author": "Sebastian Zimmer",
   "license": "Apache License 2.0"

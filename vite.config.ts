@@ -58,4 +58,7 @@ export default defineConfig({
     minify: false,
   },
   base: BASEPATH,
+  define: {
+    APP_VERSION: `"${process.env.npm_package_version}"`,
+  }
 });
