@@ -469,6 +469,11 @@ div[data-lexical-editor] {
     cursor: pointer;
     text-decoration: none;
     color: var(--link-color);
+
+    /* Long external links should wrap after each char */
+    &[rel="noopener noreferrer"] {
+      word-break: break-all;
+    }
   }
 
   & > p.s-heading {
