@@ -596,6 +596,27 @@ test.describe("Editor view", () => {
     },
   );
 
+  /*
+  Fails. https://github.com/facebook/lexical/issues/5882
+
+  test(
+    "newline should be correctly created when pressing enter within URL",
+    async ({ page }) => {
+      await page.keyboard.type("http://example.com");
+      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.press("Enter");
+
+      const paragraphs = (
+        await page.$$("div[data-lexical-editor] .editor-paragraph")
+      ) as ElementHandle<HTMLElement>[];
+
+      expect(paragraphs.length).toBe(2);
+      expect((await paragraphs[0].innerText()).trim()).toBe("http://example.co");
+      expect((await paragraphs[1].innerText()).trim()).toBe("m");
+    },
+  );
+  */
+
 
   test(
     "Click on red wikilink should create new note with content of wikilink",
