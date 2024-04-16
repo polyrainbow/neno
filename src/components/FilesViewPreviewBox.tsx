@@ -72,7 +72,7 @@ const FilesViewPreviewBox = ({
           isDangling
             ? <div
               title={l("files.dangling")}
-              className="dangling-indicator"
+              className="dangling-file-indicator"
             />
             : ""
         }

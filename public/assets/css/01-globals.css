@@ -84,6 +84,8 @@
 }
 
 :root {
+  color-scheme: light dark;
+
   --max-small-screen-viewport-width: 1280px;
   --font-color: var(--main-content-color);
   --header-background-color: var(--accent-color-1);
