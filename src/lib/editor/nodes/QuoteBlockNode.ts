@@ -9,7 +9,7 @@
 import type {
   EditorConfig,
   LexicalNode,
-  SerializedElementNode,
+  SerializedParagraphNode,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
 import { $applyNodeReplacement, ParagraphNode } from "lexical";
@@ -41,7 +41,7 @@ export class QuoteBlockNode extends ParagraphNode {
   }
 
 
-  exportJSON(): SerializedElementNode {
+  exportJSON(): SerializedParagraphNode {
     return {
       ...super.exportJSON(),
       type: ElementNodeType.QUOTE,
