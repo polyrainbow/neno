@@ -22,6 +22,7 @@ export interface SavedActiveNote extends BaseActiveNote {
   createdAt?: number,
   updatedAt?: number,
   numberOfCharacters: number,
+  numberOfBlocks: number,
   outgoingLinks: NotePreview[],
   backlinks: SparseNoteInfo[],
 }
