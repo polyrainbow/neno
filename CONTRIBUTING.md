@@ -1,27 +1,29 @@
 # Contributing
 
-Contributions are always welcome, no matter how large or small! Before contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).
+Contributions are always welcome, no matter how large or small! Before
+contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).
 
 ## Concepts
 
-If you want to contribute, here are some links that offer some basic insights on how NENO works:
+If you want to contribute, here are some links that offer some basic
+insights on how NENO works:
 
 * [README](./README.md)
-* [Developer Notes](./docs/DeveloperNotes.md)
-* [Lexical Editor Framework](https://lexical.dev)
+* [User Manual](https://polyrainbow.github.io/neno/docs/index.html)
+
+NENO makes heavy use of the [Lexical Editor Framework](https://lexical.dev).
+It is probably beneficial to get familiar with it.
 
 ## Development setup
 
-Make sure, you have Node.js v20 or newer installed. Clone this repo and run
+Make sure you have Node.js v20 or newer installed. Clone this repo and run
 `npm i`. To start a development instance, run `npm run dev`.
 
 ## Publishing a release
 
-1. Run `node tools/updateVersion.js {major,minor,patch}`
-2. Commit this with the commit message `release: vX.Y.Z` (replace X.Y.Z with actual version number)
-3. Add a tag to this commit: `git tag vX.Y.Z`
-4. Push commit to remote (if required via PR)
-5. Push tag to remote: `git push origin vX.Y.Z`
+1. Run `npm run version:{major,minor,patch}`
+2. Push commit to remote
+3. Push tag to remote: `git push origin vX.Y.Z`
 
 The release package will now be built remotely with the script 
 `tools/buildReleasePackage.sh`
