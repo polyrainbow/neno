@@ -497,6 +497,10 @@ div[data-lexical-editor] {
     &:first-child {
       margin-top: 0;
     }
+
+    ::highlight(heading-block-sigil) {
+      color: var(--alt-content-color)
+    }
   }
 
   & > p.list-item {

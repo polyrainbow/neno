@@ -33,6 +33,7 @@ import PlainTextStateExchangePlugin
 import theme from "./theme";
 import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
 import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
+import { highlightHeadingSigils } from "./utils/highlight";
 
 /*
   Convention:
@@ -76,7 +77,7 @@ export const Editor = ({
     <OnChangePlugin onChange={
       (editorState: EditorState) => {
         editorState.read(() => {
-          // Read the contents of the EditorState here.
+          highlightHeadingSigils();
           const root = $getRoot();
           onChange(getSubtextFromEditor(root));
         });
