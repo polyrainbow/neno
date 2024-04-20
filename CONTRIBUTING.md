@@ -11,9 +11,6 @@ insights on how NENO works:
 * [README](./README.md)
 * [User Manual](https://polyrainbow.github.io/neno/docs/index.html)
 
-NENO makes heavy use of the [Lexical Editor Framework](https://lexical.dev).
-It is probably beneficial to get familiar with it.
-
 ## Development setup
 
 Make sure you have Node.js v20 or newer installed. Clone this repo and run
@@ -27,6 +24,40 @@ Make sure you have Node.js v20 or newer installed. Clone this repo and run
 
 The release package will now be built remotely with the script 
 `tools/buildReleasePackage.sh`
+
+## High-level architecture
+
+![High-level architecture](./high-level-modules.png)
+
+### Core application
+- Technology: React
+- Entry point: `/src/main.tsx`
+
+### Editor
+- Technology: Lexical
+- Entry point: `/src/lib/editor`
+
+### Notes
+- Entry point: `/src/lib/notes`
+
+NENO highly depends on the heart of the application, the "Notes" module.
+It contains all the core logic to create/read/update/delete notes and files.
+It manages the note graph, including indexes.
+
+### FileSystemAccessAPIStorageProvider
+- Entry point: `/src/lib/FileSystemAccessAPIStorageProvider.tsx`
+
+A class that provides methods to manage a
+[FileSystemDirectoryHandle](https://developer.mozilla.org/en-US/docs/Web/API/FileSystemDirectoryHandle). The class is initialized with such a handle.
+The "Notes" module uses an instance of this class to read and update the graph
+that is saved in the file system of the user's device.
+
+### Subwaytext parser
+- Entry point: `/src/lib/subwaytext`
+
+NENO's Subtext parser parses a Subtext string to an array of blocks.
+It can also serialize blocks to a Subtext string. The "Notes" module depends
+on it.
 
 ## Commit convention
 See https://www.conventionalcommits.org/en/v1.0.0/
