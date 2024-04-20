@@ -109,6 +109,7 @@ export default (
       outgoingLinks: noteFromServer.outgoingLinks,
       backlinks: noteFromServer.backlinks,
       numberOfCharacters: noteFromServer.numberOfCharacters,
+      numberOfBlocks: noteFromServer.numberOfBlocks,
       isUnsaved: false,
       initialContent: noteFromServer.content,
       files: noteFromServer.files,

@@ -438,6 +438,21 @@ const getFileInfos = (
 };
 
 
+const getBlocks = (
+  note: ExistingNote,
+  blockIndex: Map<string, Block[]>,
+): Block[] => {
+  const slug = note.meta.slug;
+  let parsedContent = blockIndex.get(slug);
+  if (!parsedContent) {
+    parsedContent = subwaytext(note.content);
+    blockIndex.set(slug, parsedContent);
+  }
+
+  return parsedContent;
+};
+
+
 const createNoteToTransmit = async (
   existingNote: ExistingNote,
   graph: Graph,
@@ -454,26 +469,12 @@ const createNoteToTransmit = async (
       }),
     backlinks: getBacklinks(graph, existingNote.meta.slug),
     numberOfCharacters: getNumberOfCharacters(existingNote),
+    numberOfBlocks: getBlocks(existingNote, graph.indexes.blocks).length,
     files: getFileInfos(graph, existingNote.meta.slug),
     aliases: getAliasesOfSlug(graph, existingNote.meta.slug),
   };
 
   return noteToTransmit;
-};
-
-
-const getBlocks = (
-  note: ExistingNote,
-  blockIndex: Map<string, Block[]>,
-): Block[] => {
-  const slug = note.meta.slug;
-  let parsedContent = blockIndex.get(slug);
-  if (!parsedContent) {
-    parsedContent = subwaytext(note.content);
-    blockIndex.set(slug, parsedContent);
-  }
-
-  return parsedContent;
 };
 
 

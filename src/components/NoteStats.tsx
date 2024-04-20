@@ -1,4 +1,3 @@
-import subwaytext from "../lib/subwaytext/index";
 import { SavedActiveNote } from "../types/ActiveNote";
 import { l } from "../lib/intl";
 import {
@@ -44,7 +43,7 @@ const NoteStats = ({
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-blocks")}</td>
-          <td>{subwaytext(note.initialContent).length}</td>
+          <td>{note.numberOfBlocks}</td>
         </tr>
         <tr>
           <td>{l("editor.stats.number-of-lines")}</td>
