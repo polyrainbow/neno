@@ -3,6 +3,7 @@ import GraphObject from "./types/Graph";
 import subwaytext from "../subwaytext/index.js";
 import { Slug } from "./types/Slug";
 import { getAliasesOfSlug, getSlugsFromParsedNote } from "./noteUtils";
+import { Block } from "../subwaytext/types/Block";
 
 const removeSlugFromIndexes = (
   graph: GraphObject,
@@ -83,12 +84,10 @@ const updateBacklinksIndex = (
   }
 };
 
-
-const updateIndexes = (
+const updateBlockIndex = (
   graph: GraphObject,
   existingNote: ExistingNote,
-): void => {
-  // Block index
+): Block[] => {
   const blocks = subwaytext(existingNote.content);
 
   graph.indexes.blocks.set(
@@ -96,14 +95,33 @@ const updateIndexes = (
     blocks,
   );
 
-  const ourSlug = existingNote.meta.slug;
-  graph.indexes.blocks.set(ourSlug, blocks);
+  return blocks;
+};
 
-  // Outgoing links index
+
+const updateOutgoingLinksIndex = (
+  graph: GraphObject,
+  existingNote: ExistingNote,
+  blocks: Block[],
+): string[] => {
+  const ourSlug = existingNote.meta.slug;
   const ourOutgoingLinks = getSlugsFromParsedNote(blocks);
   graph.indexes.outgoingLinks.set(ourSlug, new Set(ourOutgoingLinks));
+  return ourOutgoingLinks;
+};
 
-  updateBacklinksIndex(graph, ourSlug, ourOutgoingLinks);
+
+const updateIndexes = (
+  graph: GraphObject,
+  existingNote: ExistingNote,
+): void => {
+  const blocks = updateBlockIndex(graph, existingNote);
+  const ourOutgoingLinks = updateOutgoingLinksIndex(
+    graph,
+    existingNote,
+    blocks,
+  );
+  updateBacklinksIndex(graph, existingNote.meta.slug, ourOutgoingLinks);
 };
 
 export {
