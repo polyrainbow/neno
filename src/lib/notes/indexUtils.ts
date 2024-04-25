@@ -126,6 +126,5 @@ const updateIndexes = (
 
 export {
   removeSlugFromIndexes,
-  updateBacklinksIndex,
   updateIndexes,
 };
