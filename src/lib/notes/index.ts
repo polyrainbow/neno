@@ -10,6 +10,7 @@ import {
   isExistingNoteSaveRequest,
   handleNewNoteSaveRequest,
   changeSlugReferencesInNote,
+  getNoteTitle,
 } from "./noteUtils.js";
 import {
   getNumberOfComponents,
@@ -488,4 +489,24 @@ export default class NotesProvider {
 
     return this.getPins();
   }
+
+  async getGraph(): Promise<GraphObject> {
+    const graph = await this.#io.getGraph();
+    return graph;
+  }
 }
+
+// exporting utils to be used in custom scripts
+export {
+  createNoteToTransmit,
+  getNumberOfUnlinkedNotes,
+  parseSerializedNewNote,
+  serializeNewNote,
+  getSlugsFromInlineText,
+  getAllInlineSpans,
+  handleExistingNoteUpdate,
+  isExistingNoteSaveRequest,
+  handleNewNoteSaveRequest,
+  changeSlugReferencesInNote,
+  getNoteTitle,
+};

@@ -643,7 +643,9 @@ const handleExistingNoteUpdate = async (
   }
 
   existingNote.content = noteFromUser.content;
-  existingNote.meta.updatedAt = Date.now();
+  existingNote.meta.updatedAt = noteSaveRequest.disableTimestampUpdate
+    ? noteFromUser.meta.updatedAt
+    : Date.now();
   existingNote.meta.flags = noteFromUser.meta.flags;
   existingNote.meta.contentType = noteFromUser.meta.contentType;
   existingNote.meta.custom = removeCustomMetadataWithEmptyKeys(
@@ -659,7 +661,7 @@ const handleExistingNoteUpdate = async (
     }
   }
 
-  noteSaveRequest.aliases.forEach((alias) => {
+  noteSaveRequest.aliases?.forEach((alias) => {
     if (!isValidSlug(alias)) {
       throw new Error(ErrorMessage.INVALID_ALIAS);
     }
@@ -822,7 +824,7 @@ const handleNewNoteSaveRequest = async (
   }
 
   const aliasesToUpdate: Slug[] = [];
-  noteSaveRequest.aliases.forEach((alias) => {
+  noteSaveRequest.aliases?.forEach((alias) => {
     if (!isValidSlug(alias)) {
       throw new Error(ErrorMessage.INVALID_ALIAS);
     }

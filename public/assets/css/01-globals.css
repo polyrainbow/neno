@@ -598,3 +598,28 @@ input:checked + .slider::before {
   padding: 10px;
   border-radius: var(--border-radius);
 }
+
+.script-view-main {
+  display: flex;
+  height: calc(100vh - 50px);
+
+  .active-script-input {
+    font-size: 20px;
+    height: 100%;
+    width: 45vw;
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    border-right: 1px solid var(--main-content-color);
+    overflow: auto;
+  }
+
+  .script-output {
+    font-family: var(--code-font);
+    white-space: pre;
+    overflow: auto;
+    padding: 5px;
+    margin: 0;
+    width: 100%;
+  }
+}

@@ -120,6 +120,26 @@ const AppMenu = () => {
         }}
       />
       <AppMenuItem
+        disabled={!isInitialized()}
+        label={l("menu.scripts")}
+        icon="component_exchange"
+        onClick={async () => {
+          const target = getAppPath(
+            PathTemplate.SCRIPTS,
+            new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+          );
+          if (pathname === target) return;
+
+          if (unsavedChanges) {
+            await confirmDiscardingUnsavedChanges();
+            setUnsavedChanges(false);
+          }
+
+          navigate(target);
+          setIsAppMenuOpen(false);
+        }}
+      />
+      <AppMenuItem
         disabled={false}
         label={l("menu.settings")}
         icon="settings"

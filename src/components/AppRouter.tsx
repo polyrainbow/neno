@@ -14,6 +14,7 @@ import FileView from "./FileView";
 import StatsView from "./StatsView";
 import SettingsView from "./SettingsView";
 import NoteAccessProvider from "./NoteAccessProvider";
+import ScriptsView from "./ScriptsView";
 
 const AppRouter = () => {
   const router = createBrowserRouter(
@@ -97,6 +98,19 @@ const AppRouter = () => {
         ),
         element: <NoteAccessProvider>
           <FileView />
+        </NoteAccessProvider>,
+      },
+      {
+        path: getAppPath(
+          PathTemplate.SCRIPTS,
+          new Map([
+            ["GRAPH_ID", ":graphId"],
+          ]),
+          undefined,
+          true,
+        ),
+        element: <NoteAccessProvider>
+          <ScriptsView />
         </NoteAccessProvider>,
       },
       {

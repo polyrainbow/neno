@@ -16,6 +16,7 @@ center_focus_strong
 clear
 close
 code
+component_exchange
 content_copy
 create
 crop_free

@@ -59,6 +59,10 @@ export const getFolderHandleName = async (): Promise<string | null> => {
 };
 
 
+export const getFolderHandle = (): FileSystemDirectoryHandle | null => {
+  return folderHandle;
+};
+
 export const getSavedFolderHandle = async (
 ): Promise<FileSystemDirectoryHandle> => {
   const folderHandle = await IDB.get(FOLDER_HANDLE_STORAGE_KEY);
@@ -117,6 +121,15 @@ export const isInitialized = (): boolean => {
 };
 
 export const getNotesProvider = (): NotesProvider | null => {
+  return notesProvider;
+};
+
+
+export const invalidateNotesProvider = async (): Promise<NotesProvider> => {
+  if (!folderHandle) {
+    throw new Error("No folder handle available");
+  }
+  const notesProvider = await initializeNotesProvider(folderHandle);
   return notesProvider;
 };
 
