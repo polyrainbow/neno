@@ -7,113 +7,26 @@ import {
   invalidateNotesProvider,
 } from "../lib/LocalDataStorage";
 import useRunOnce from "../hooks/useRunOnce";
+import useNotesProvider from "../hooks/useNotesProvider";
+import { FileInfo } from "../lib/notes/types/FileInfo";
 
 interface CustomScript {
-  name: string;
-  id: string;
+  slug: string;
   value: string;
 }
 
-const EXAMPLE_SCRIPTS: CustomScript[] = [
-  {
-    id: "0",
-    name: "Remove neno-id param",
-    value: `let i = 0;
-
-for (const [slug, note] of graph.notes.entries()) {
-  if (!note.meta.custom["neno-id"]) {
-    continue;
-  }
-
-  const newCustom = note.meta.custom;
-  delete newCustom["neno-id"];
-  note.meta.custom = newCustom;
-
-  notesProvider.put({
-    note,
-    disableTimestampUpdate: true,
-  })
-
-  println(slug);
-  i++;
-  if (i >= 10) break;
-}
-println("Done");
-`,
-  },
-  {
-    id: "1",
-    name: "Show notes with neno-id param",
-    value: `let i = 0;
-for (const [slug, note] of graph.notes.entries()) {
-  if (!note.meta.custom["neno-id"]) {
-    continue;
-  }
-  println(slug);
-  i++;
-}
-
-println(i);
-`,
-  },
-  {
-    id: "2",
-    name: "Show events",
-    value: `function getEventsOfNote(slug, note) {
-  const events = [];
-
-  if (slug.match(/\\d{4}-\\d{2}-\\d{2}/)) {
-    events.push({
-      title: getNoteTitle(note),
-      start: slug.match(/\\d{4}-\\d{2}-\\d{2}/)[0],
-    });
-  }
-  const dateMatches = note.content.matchAll(
-    /\\[\\[(\\d{4}-\\d{2}-\\d{2})\\]\\]/g,
-  );
-  for (const match of dateMatches) {
-    events.push({
-      title: getNoteTitle(note),
-      start: match[1],
-    });
-  }
-
-  return events;
-}
-
-let events = [];
-for (const [slug, note] of graph.notes.entries()) {
-  events.push(...getEventsOfNote(slug, note));
-}
-println("Done");
-
-events.sort((a,b) => {
-  if (a.start > b.start) return 1;
-  if (a.start < b.start) return -1;
-  return 0;
-});
-
-println(JSON.stringify(events, null, "  "));`,
-  },
-  {
-    id: "3",
-    name: "Show stats",
-    value: `const stats = await notesProvider.getStats({
-  includeMetadata: true,
-});
-
-println(JSON.stringify(stats, null, "  "));`,
-  },
-];
 
 const ScriptsView = () => {
+  const [scriptList, setScriptList] = useState<FileInfo[] | null>(null);
   const [activeScript, setActiveScript] = useState<CustomScript | null>(null);
   const [scriptInput, setScriptInput] = useState<string | null>(null);
   const [output, setOutput] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState<boolean>(false);
   const [worker, setWorker] = useState<Worker | null>(null);
 
-  useRunOnce(() => {
+  const notesProvider = useNotesProvider();
+
+  useRunOnce(async () => {
     const notesWorker = new Worker(noteWorkerUrl, { type: "module" });
     notesWorker.postMessage({
       action: "initialize",
@@ -126,6 +39,14 @@ const ScriptsView = () => {
       }
     };
     setWorker(notesWorker);
+
+
+    const scripts = (await notesProvider.getFiles())
+      .filter((file: FileInfo) => {
+        return file.slug.endsWith(".neno.js");
+      });
+
+    setScriptList(scripts);
   });
 
   useEffect(() => {
@@ -166,7 +87,7 @@ const ScriptsView = () => {
       activeScript
         ? <div className="script-view-main active-script">
           <div className="editor-section">
-            <h2>{activeScript.name}</h2>
+            <h2>{activeScript.slug}</h2>
             <textarea
               className="active-script-input"
               onChange={(e) => setScriptInput(e.target.value)}
@@ -191,15 +112,22 @@ const ScriptsView = () => {
           </p>
           <h2>Scripts</h2>
           {
-            EXAMPLE_SCRIPTS.map((s: CustomScript) => {
+            scriptList?.map((s: FileInfo) => {
               return <button
-                key={"button-" + s.id}
+                key={"button-" + s.slug}
                 className="script-selection-button"
-                onClick={() => {
-                  setActiveScript(s);
-                  setScriptInput(s.value);
+                onClick={async () => {
+                  const readable = await notesProvider.getReadableFileStream(
+                    s.slug,
+                  );
+                  const value = await new Response(readable).text();
+                  setActiveScript({
+                    slug: s.slug,
+                    value,
+                  });
+                  setScriptInput(value);
                 }}
-              >{s.name}</button>;
+              >{s.slug}</button>;
             })
           }
         </div>
