@@ -666,13 +666,16 @@ input:checked + .slider::before {
       font-family: var(--code-font);
     }
 
-    .script-output {
-      font-family: var(--code-font);
-      white-space: pre;
-      overflow: auto;
-      padding: 5px;
-      margin: 0;
-      width: 100%;
+    .output-section {
+      padding: var(--default-padding);
+
+      .script-output {
+        font-family: var(--code-font);
+        white-space: pre;
+        overflow: auto;
+        margin: 0;
+        width: 100%;
+      }
     }
   }
 }
