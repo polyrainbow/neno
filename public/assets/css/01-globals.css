@@ -612,6 +612,14 @@ input:checked + .slider::before {
   &:hover {
     background-color: var(--accent-color-1-intense);
   }
+
+  &.with-icon {
+    padding-left: 5px;
+
+    img {
+      margin-right: 3px;
+    }
+  }
 }
 
 .header-controls {

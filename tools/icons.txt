@@ -69,6 +69,7 @@ pending
 people
 people_outline
 photo_library
+play_arrow
 post_add
 preview
 public

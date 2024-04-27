@@ -12,6 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
+import HeaderButton from "./HeaderButton";
 
 interface CustomScript {
   slug: string;
@@ -23,7 +24,9 @@ const ScriptView = () => {
   const [activeScript, setActiveScript] = useState<CustomScript | null>(null);
   const [scriptInput, setScriptInput] = useState<string | null>(null);
   const [output, setOutput] = useState<string | null>(null);
-  const [isBusy, setIsBusy] = useState<boolean>(false);
+  const [isBusyComputingOutput, setIsBusyComputingOutput] = useState<boolean>(
+    false,
+  );
   const [worker, setWorker] = useState<Worker | null>(null);
 
   const notesProvider = useNotesProvider();
@@ -40,7 +43,7 @@ const ScriptView = () => {
     });
     notesWorker.onmessage = (e) => {
       if (e.data.type === "EVALUATION_COMPLETED") {
-        setIsBusy(false);
+        setIsBusyComputingOutput(false);
         setOutput(e.data.output);
       }
     };
@@ -68,8 +71,8 @@ const ScriptView = () => {
     <HeaderContainerLeftRight
       leftContent={
         <div className="header-controls">
-          <button
-            className="header-button"
+          <HeaderButton
+            icon="list"
             onClick={() => {
               navigate(
                 getAppPath(
@@ -78,18 +81,35 @@ const ScriptView = () => {
                 ),
               );
             }}
-          >Back to list</button>
-          <button
-            className="header-button"
+          >Back to list</HeaderButton>
+          <HeaderButton
+            icon="play_arrow"
             disabled={!activeScript}
             onClick={async () => {
-              setIsBusy(true);
+              setIsBusyComputingOutput(true);
               worker?.postMessage({
                 action: "evaluate",
                 script: scriptInput,
               });
             }}
-          >Run</button>
+          >Run</HeaderButton>
+          <HeaderButton
+            icon="save"
+            disabled={!activeScript}
+            onClick={async () => {
+              if (!slug || !scriptInput) return;
+
+              const readable = new Blob(
+                [scriptInput],
+                { type: "text/plain" },
+              ).stream();
+
+              await notesProvider.updateFile(
+                readable,
+                slug,
+              );
+            }}
+          >Save</HeaderButton>
         </div>
       }
     />
@@ -106,7 +126,7 @@ const ScriptView = () => {
           </div>
           <div className="output-section">
             {
-              isBusy
+              isBusyComputingOutput
                 ? <BusyIndicator
                   alt="Busy"
                   height={100}
@@ -115,7 +135,7 @@ const ScriptView = () => {
             }
           </div>
         </div>
-        : ""
+        : <BusyIndicator height={100} alt="Loading script" />
     }
   </>;
 };

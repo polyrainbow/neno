@@ -265,6 +265,33 @@ export default class NotesProvider {
   }
 
 
+  async updateFile(
+    readable: ReadableStream,
+    slug: Slug,
+  ): Promise<FileInfo> {
+    const graph = await this.#io.getGraph();
+    const fileInfo = graph.metadata.files.find((file: FileInfo) => {
+      return file.slug === slug;
+    });
+
+    if (!fileInfo) {
+      throw new Error(ErrorMessage.FILE_NOT_FOUND);
+    }
+
+    const size = await this.#io.addFile(slug, readable);
+    fileInfo.size = size;
+
+    await this.#io.flushChanges(
+      graph,
+      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      [],
+      [],
+    );
+
+    return fileInfo;
+  }
+
+
   async renameFile(
     oldSlug: Slug,
     newSlug: Slug,

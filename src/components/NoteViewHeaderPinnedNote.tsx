@@ -1,6 +1,7 @@
 import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
-import { getIconSrc, getWikilinkForNote, shortenText } from "../lib/utils";
+import { getWikilinkForNote, shortenText } from "../lib/utils";
 import { getNoteTitle } from "../lib/notes/noteUtils";
+import HeaderButton from "./HeaderButton";
 
 interface NoteViewHeaderPinnedNoteProps {
   key: string,
@@ -22,7 +23,7 @@ const NoteViewHeaderPinnedNote = ({
 }: NoteViewHeaderPinnedNoteProps) => {
   const noteTitle = getNoteTitle(note);
 
-  return <button
+  return <HeaderButton
     className={"pinned-note " + (isActive ? "active" : "")}
     onClick={() => onClick()}
     draggable
@@ -42,22 +43,15 @@ const NoteViewHeaderPinnedNote = ({
       onDragOver(e.nativeEvent);
       e.preventDefault(); // important to remove ghost return effect
     }}
+    icon="push_pin"
   >
-    <img
-      src={getIconSrc("push_pin")}
-      alt={"Pinned note"}
-      width="24"
-      height="24"
-      className="svg-icon"
-      draggable={false}
-    />
-    <p>{
+    {
       shortenText(
         noteTitle || note.meta.slug,
         35,
       )
-    }</p>
-  </button>;
+    }
+  </HeaderButton>;
 };
 
 
