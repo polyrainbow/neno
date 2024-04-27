@@ -29,7 +29,7 @@ import { getMediaTypeFromFilename, shortenText } from "./utils.js";
 import {
   createSlug,
   getSlugsFromInlineText,
-  isFileSlug,
+  isValidFileSlug,
   isValidSlug,
   sluggify,
 } from "./slugUtils.js";
@@ -423,7 +423,7 @@ const getFileSlugsInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
     = graph.indexes.blocks.get(noteSlug) as Block[];
   const allInlineSpans = getAllInlineSpans(blocks);
   const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-  return allUsedSlugs.filter(isFileSlug);
+  return allUsedSlugs.filter(isValidFileSlug);
 };
 
 

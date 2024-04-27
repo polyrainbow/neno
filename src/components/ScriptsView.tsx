@@ -137,60 +137,73 @@ const ScriptsView = () => {
   return <>
     <HeaderContainerLeftRight
       leftContent={
-        <button
-          className="default-button default-action"
-          disabled={!activeScript}
-          onClick={async () => {
-            setIsBusy(true);
-            worker?.postMessage({
-              action: "evaluate",
-              script: scriptInput,
-            });
-          }}
-        >Run</button>
+        activeScript
+          ? <div className="header-controls">
+            <button
+              className="header-button"
+              onClick={() => {
+                setScriptInput("");
+                setActiveScript(null);
+                setOutput("");
+              }}
+            >Back to list</button>
+            <button
+              className="header-button"
+              disabled={!activeScript}
+              onClick={async () => {
+                setIsBusy(true);
+                worker?.postMessage({
+                  action: "evaluate",
+                  script: scriptInput,
+                });
+              }}
+            >Run</button>
+          </div>
+          : ""
       }
     />
-    <div className="script-view-main">
-      <div>
-        {
-          activeScript
-            ? <>
-              <button
-                className="default-button default-action"
-                onClick={() => {
-                  setScriptInput("");
-                  setActiveScript(null);
-                  setOutput("");
-                }}
-              >Back to list</button>
-              <h2>{activeScript.name}</h2>
-              <textarea
-                className="active-script-input"
-                onChange={(e) => setScriptInput(e.target.value)}
-                value={scriptInput || ""}
-              ></textarea>
-            </>
-            : EXAMPLE_SCRIPTS.map((s: CustomScript) => {
+    {
+      activeScript
+        ? <div className="script-view-main active-script">
+          <div className="editor-section">
+            <h2>{activeScript.name}</h2>
+            <textarea
+              className="active-script-input"
+              onChange={(e) => setScriptInput(e.target.value)}
+              value={scriptInput || ""}
+            ></textarea>
+          </div>
+          {
+            isBusy
+              ? <BusyIndicator
+                alt="Busy"
+                height={200}
+              />
+              : <p className="script-output">{output ?? ""}</p>
+          }
+        </div>
+        : <div className="script-view-main script-selection">
+          <p className="warning">
+            Warning: The scripting feature is very powerful and with it,
+            you can easily mess up your whole knowledge garden.
+            Make sure you have backups in place or versioning set up and
+            proceed with caution.
+          </p>
+          <h2>Scripts</h2>
+          {
+            EXAMPLE_SCRIPTS.map((s: CustomScript) => {
               return <button
                 key={"button-" + s.id}
-                className="default-button default-action"
+                className="script-selection-button"
                 onClick={() => {
                   setActiveScript(s);
                   setScriptInput(s.value);
                 }}
               >{s.name}</button>;
             })
-        }
-      </div>
-      {
-        isBusy
-          ? <BusyIndicator
-            alt="Busy"
-            height={200}
-          />
-          : <p className="script-output">{output ?? ""}</p>
-      }
-    </div>
+          }
+        </div>
+    }
   </>;
 };
 

@@ -11,7 +11,11 @@ import {
   getFilesFromUserSelection,
 } from "../lib/utils";
 import ActiveNote from "../types/ActiveNote";
-import { FILE_PICKER_ACCEPT_TYPES, LOCAL_GRAPH_ID } from "../config";
+import {
+  DEFAULT_FILE_SLUG_FOLDER,
+  FILE_PICKER_ACCEPT_TYPES,
+  LOCAL_GRAPH_ID,
+} from "../config";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import NoteKeyValues from "./NoteKeyValues";
 import { l } from "../lib/intl";
@@ -25,7 +29,7 @@ import NoteSlug from "./NoteSlug";
 import { UserRequestType } from "../lib/editor/types/UserRequestType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import { isFileSlug, sluggify } from "../lib/notes/slugUtils";
+import { isValidFileSlug, sluggify } from "../lib/notes/slugUtils";
 import { LinkType } from "../types/LinkType";
 import useGoToNote from "../hooks/useGoToNote";
 import { getTransclusionContent } from "../lib/Transclusion";
@@ -132,6 +136,7 @@ const Note = ({
         (file) => {
           return notesProvider.addFile(
             file.stream(),
+            DEFAULT_FILE_SLUG_FOLDER,
             file.name,
           );
         },
@@ -178,6 +183,7 @@ const Note = ({
             setUploadInProgress(true);
             const fileUploadPromise = notesProvider.addFile(
               file.stream(),
+              DEFAULT_FILE_SLUG_FOLDER,
               file.name,
             );
             promisesToWaitFor.push(fileUploadPromise);
@@ -207,7 +213,7 @@ const Note = ({
       ? sluggify(linkText)
       : linkText;
 
-    if (isFileSlug(slug)) {
+    if (isValidFileSlug(slug)) {
       try {
         await notesProvider.getFileInfo(slug);
         return true;
@@ -298,7 +304,7 @@ const Note = ({
                     ? sluggify(value)
                     : value;
 
-                  if (isFileSlug(slug)) {
+                  if (isValidFileSlug(slug)) {
                     navigate(
                       getAppPath(PathTemplate.FILE, new Map([
                         ["GRAPH_ID", LOCAL_GRAPH_ID],

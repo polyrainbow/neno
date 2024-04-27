@@ -42,7 +42,7 @@ import {
   getSlugFromFilename,
   isValidSlug,
   isValidSlugOrEmpty,
-  isFileSlug,
+  isValidFileSlug,
 } from "./slugUtils.js";
 import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 import serialize from "../subwaytext/serialize.js";
@@ -141,7 +141,9 @@ export default class NotesProvider {
         updatedAt: getGraphUpdateTimestamp(graph),
         size: {
           graph: await this.#io.getSizeOfGraph(),
-          files: await this.#io.getSizeOfGraphFiles(),
+          files: graph.metadata.files.reduce((a, b) => {
+            return a + b.size;
+          }, 0),
         },
       };
     }
@@ -239,10 +241,11 @@ export default class NotesProvider {
 
   async addFile(
     readable: ReadableStream,
+    folder: string,
     filename: string,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
-    const slug = getSlugFromFilename(filename, graph.metadata.files);
+    const slug = getSlugFromFilename(folder, filename, graph.metadata.files);
     const size = await this.#io.addFile(slug, readable);
 
     const fileInfo: FileInfo = {
@@ -276,7 +279,7 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
 
-    if ((!isValidSlug(newSlug)) || (!isFileSlug(newSlug))) {
+    if ((!isValidSlug(newSlug)) || (!isValidFileSlug(newSlug))) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
@@ -359,7 +362,7 @@ export default class NotesProvider {
       = Array.from(graph.indexes.blocks.values()).flat();
     const allInlineSpans = getAllInlineSpans(allBlocks);
     const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-    const allUsedFileSlugs = allUsedSlugs.filter(isFileSlug);
+    const allUsedFileSlugs = allUsedSlugs.filter(isValidFileSlug);
     const danglingFiles = graph.metadata.files.filter((file) => {
       return !allUsedFileSlugs.includes(file.slug);
     });

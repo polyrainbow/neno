@@ -645,6 +645,7 @@ describe("Notes module", () => {
 
       const fileInfo = await notesProvider.addFile(
         readable,
+        "files",
         "test.txt",
       );
 
@@ -671,6 +672,7 @@ describe("Notes module", () => {
 
       const fileInfo = await notesProvider.addFile(
         readable,
+        "files",
         "test.test.test+.txt",
       );
 
@@ -696,6 +698,7 @@ describe("Notes module", () => {
 
       const fileInfo = await notesProvider.addFile(
         readable,
+        "files",
         ".graph.json",
       );
 
@@ -714,6 +717,7 @@ describe("Notes module", () => {
 
       const fileInfo2 = await notesProvider.addFile(
         readable2,
+        "files",
         ".htaccess",
       );
 
@@ -739,6 +743,7 @@ describe("Notes module", () => {
 
       await notesProvider.addFile(
         readable1,
+        "files",
         "test.txt",
       );
 
@@ -755,6 +760,7 @@ describe("Notes module", () => {
 
       const fileInfo2 = await notesProvider.addFile(
         readable2,
+        "files",
         "test.txt",
       );
 
@@ -773,6 +779,7 @@ describe("Notes module", () => {
 
       const fileInfo3 = await notesProvider.addFile(
         readable3,
+        "files",
         "test.txt",
       );
 
@@ -798,6 +805,7 @@ describe("Notes module", () => {
 
       const fileInfo = await notesProvider.addFile(
         readable1,
+        "files",
         "ö.txt", // <-- ö with combining diacritical mark
       );
 
@@ -823,6 +831,7 @@ describe("Notes module", () => {
 
       const fileInfo = await notesProvider.addFile(
         readable,
+        "files",
         "test.txt",
       );
 
@@ -851,6 +860,7 @@ describe("Notes module", () => {
 
       const fileInfo = await notesProvider.addFile(
         readable,
+        "files",
         "test.txt",
       );
 
@@ -1944,6 +1954,7 @@ describe("Notes module", () => {
 
       const fileInfo = await notesProvider.addFile(
         readable,
+        "files",
         "a.txt",
       );
 
@@ -1983,6 +1994,7 @@ describe("Notes module", () => {
 
       const fileInfo = await notesProvider.addFile(
         readable,
+        "files",
         "a.txt",
       );
 

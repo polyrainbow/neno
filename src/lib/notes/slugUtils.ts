@@ -1,4 +1,3 @@
-import { FILE_SLUG_PREFIX } from "./config.js";
 import {
   InlineText,
   Span,
@@ -13,8 +12,13 @@ import {
 } from "./utils.js";
 
 
-const isFileSlug = (slug: Slug): boolean => {
-  return slug.startsWith(FILE_SLUG_PREFIX);
+const isValidFileSlug = (slug: Slug): boolean => {
+  /*
+    A file slug is a slug that is saved in a subfolder of the root graph
+    directory.
+  */
+  return slug.match(/\//gi)?.length === 1
+    && !slug.startsWith("/");
 };
 
 
@@ -123,6 +127,7 @@ const createSlug = (
 
 
 const getSlugFromFilename = (
+  folder: string,
   filename: string,
   existingFiles: FileInfo[],
 ): Slug => {
@@ -144,7 +149,7 @@ const getSlugFromFilename = (
       ? `${sluggifiedFileStem}-${n}`
       : sluggifiedFileStem;
 
-    const slug: Slug = FILE_SLUG_PREFIX
+    const slug: Slug = folder + "/"
       + stemWithOptionalIntegerSuffix
       + (
         extension
@@ -167,10 +172,10 @@ const getSlugFromFilename = (
 const getFilenameFromFileSlug = (
   fileSlug: Slug,
 ) => {
-  if (!isFileSlug(fileSlug)) {
+  if (!isValidFileSlug(fileSlug)) {
     throw new Error("Not a file slug: " + fileSlug);
   }
-  return fileSlug.substring(FILE_SLUG_PREFIX.length);
+  return fileSlug.substring(fileSlug.indexOf("/"));
 };
 
 
@@ -179,7 +184,7 @@ export {
   getFilenameFromFileSlug,
   getSlugFromFilename,
   getSlugsFromInlineText,
-  isFileSlug,
+  isValidFileSlug,
   isValidSlug,
   sluggify,
   sluggifyNoteText,

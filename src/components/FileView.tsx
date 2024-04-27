@@ -23,7 +23,7 @@ import {
   removeExtensionFromFilename,
 } from "../lib/notes/utils";
 import {
-  getFilenameFromFileSlug, isValidSlug,
+  isValidSlug,
 } from "../lib/notes/slugUtils";
 import { saveFile } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
@@ -31,7 +31,7 @@ import FileViewPreview from "./FileViewPreview";
 import { Slug } from "../lib/notes/types/Slug";
 
 const getRenameInput = (slug: Slug): string => {
-  return removeExtensionFromFilename(getFilenameFromFileSlug(slug));
+  return removeExtensionFromFilename(slug);
 };
 
 const FileView = () => {
@@ -84,14 +84,25 @@ const FileView = () => {
   const canShowPreview = type !== MediaType.OTHER;
 
   return <>
-    <HeaderContainerLeftRight />
+    <HeaderContainerLeftRight
+      leftContent={
+        <div className="header-controls">
+          <button
+            className="header-button"
+            onClick={() => {
+              navigate(
+                getAppPath(
+                  PathTemplate.FILES,
+                  new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+                ),
+              );
+            }}
+          >{l("files.show-all-files")}</button>
+        </div>
+      }
+    />
     <section className="content-section-wide file-section">
-      <p><Link
-        to={getAppPath(
-          PathTemplate.FILES, new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-        )}
-      >{l("files.show-all-files")}</Link></p>
-      <h1>{fileInfo ? getFilenameFromFileSlug(fileInfo.slug) : ""}</h1>
+      <h1>{fileInfo ? fileInfo.slug : ""}</h1>
       {
         canShowPreview && type
           ? <FileViewPreview
@@ -243,7 +254,7 @@ const FileView = () => {
               || slugRenameInput === getRenameInput(slug || "")
               || !isValidSlug(slugRenameInput)
             ) return;
-            const newSlug = "files/" + slugRenameInput + "." + extension;
+            const newSlug = slugRenameInput + "." + extension;
             try {
               const newFileInfo = await notesProvider.renameFile(
                 slug,
