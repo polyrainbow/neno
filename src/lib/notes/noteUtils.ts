@@ -654,32 +654,34 @@ const handleExistingNoteUpdate = async (
 
   const aliasesToUpdate: Slug[] = [];
 
-  for (const [alias, canonicalSlug] of graph.aliases.entries()) {
-    if (canonicalSlug === existingNote.meta.slug) {
-      graph.aliases.delete(alias);
-      aliasesToUpdate.push(alias);
+  if (noteSaveRequest.aliases) {
+    for (const [alias, canonicalSlug] of graph.aliases.entries()) {
+      if (canonicalSlug === existingNote.meta.slug) {
+        graph.aliases.delete(alias);
+        aliasesToUpdate.push(alias);
+      }
     }
-  }
 
-  noteSaveRequest.aliases?.forEach((alias) => {
-    if (!isValidSlug(alias)) {
-      throw new Error(ErrorMessage.INVALID_ALIAS);
-    }
-    if (alias === existingNote.meta.slug) {
-      throw new Error(ErrorMessage.ALIAS_EXISTS);
-    }
-    if (
-      graph.aliases.has(alias)
-      && graph.aliases.get(alias) !== existingNote.meta.slug
-    ) {
-      throw new Error(ErrorMessage.ALIAS_EXISTS);
-    }
-    if (graph.notes.has(alias)) {
-      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
-    }
-    graph.aliases.set(alias, existingNote.meta.slug);
-    aliasesToUpdate.push(alias);
-  });
+    noteSaveRequest.aliases.forEach((alias) => {
+      if (!isValidSlug(alias)) {
+        throw new Error(ErrorMessage.INVALID_ALIAS);
+      }
+      if (alias === existingNote.meta.slug) {
+        throw new Error(ErrorMessage.ALIAS_EXISTS);
+      }
+      if (
+        graph.aliases.has(alias)
+        && graph.aliases.get(alias) !== existingNote.meta.slug
+      ) {
+        throw new Error(ErrorMessage.ALIAS_EXISTS);
+      }
+      if (graph.notes.has(alias)) {
+        throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+      }
+      graph.aliases.set(alias, existingNote.meta.slug);
+      aliasesToUpdate.push(alias);
+    });
+  }
 
   if (
     "changeSlugTo" in noteSaveRequest

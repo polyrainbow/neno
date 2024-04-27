@@ -11,6 +11,7 @@ import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import BusyIndicator from "./BusyIndicator";
 import { LOCAL_GRAPH_ID } from "../config";
+import IconButton from "./IconButton";
 
 const ScriptsView = () => {
   const [scriptList, setScriptList] = useState<FileInfo[] | null>(null);
@@ -18,13 +19,17 @@ const ScriptsView = () => {
   const navigate = useNavigate();
   const notesProvider = useNotesProvider();
 
-  useRunOnce(async () => {
+  const refreshScriptsList = async () => {
     const scripts = (await notesProvider.getFiles())
       .filter((file: FileInfo) => {
         return file.slug.endsWith(".neno.js");
       });
 
     setScriptList(scripts);
+  };
+
+  useRunOnce(async () => {
+    await refreshScriptsList();
     setIsBusy(false);
   });
 
@@ -36,7 +41,7 @@ const ScriptsView = () => {
 
   return <>
     <HeaderContainerLeftRight />
-    <div className="script-view-main script-selection">
+    <div className="script-selection-main">
       <p className="warning">
         Warning: The scripting feature is very powerful and with it,
         you can easily mess up your whole knowledge garden.
@@ -48,21 +53,33 @@ const ScriptsView = () => {
         isBusy
           ? <BusyIndicator height={120} alt="Loading" />
           : scriptList?.map((s: FileInfo) => {
-            return <button
-              key={"button-" + s.slug}
-              className="script-selection-button"
-              onClick={() => {
-                navigate(
-                  getAppPath(
-                    PathTemplate.SCRIPT,
-                    new Map([
-                      ["GRAPH_ID", LOCAL_GRAPH_ID],
-                      ["SCRIPT_SLUG", s.slug],
-                    ]),
-                  ),
-                );
-              }}
-            >{s.slug}</button>;
+            return <div
+              className="script-list-item"
+              key={"sli-" + s.slug}
+            >
+              <button
+                className="script-selection-button"
+                onClick={() => {
+                  navigate(
+                    getAppPath(
+                      PathTemplate.SCRIPT,
+                      new Map([
+                        ["GRAPH_ID", LOCAL_GRAPH_ID],
+                        ["SCRIPT_SLUG", s.slug],
+                      ]),
+                    ),
+                  );
+                }}
+              >{s.slug}</button>
+              <IconButton
+                icon="delete"
+                title="Delete"
+                onClick={async() => {
+                  await notesProvider.deleteFile(s.slug);
+                  await refreshScriptsList();
+                }}
+              />
+            </div>;
           })
       }
     </div>

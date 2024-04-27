@@ -135,7 +135,9 @@ const ScriptView = () => {
             }
           </div>
         </div>
-        : <BusyIndicator height={100} alt="Loading script" />
+        : <div className="script-view-main-busy">
+          <BusyIndicator height={100} alt="Loading script" />
+        </div>
     }
   </>;
 };

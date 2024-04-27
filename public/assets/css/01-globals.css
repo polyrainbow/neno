@@ -614,7 +614,7 @@ input:checked + .slider::before {
   }
 
   &.with-icon {
-    padding-left: 5px;
+    padding-left: 7px;
 
     img {
       margin-right: 3px;
@@ -627,30 +627,31 @@ input:checked + .slider::before {
   display: flex;
 }
 
+
+.script-selection-main {
+  flex-direction: column;
+  gap: var(--default-gap);
+  padding: var(--default-padding);
+
+  .warning {
+    color: var(--error-and-danger-text-color);
+    max-width: 500px;
+  }
+
+  .script-selection-button {
+    width: 30em;
+    min-height: 3em;
+    text-align: left;
+
+    &:hover {
+      background-color: var(--nli-color-hover);
+    }
+  }
+}
+
 .script-view-main {
   display: flex;
   height: calc(100vh - 50px);
-
-  &.script-selection {
-    flex-direction: column;
-    gap: var(--default-gap);
-    padding: var(--default-padding);
-
-    .warning {
-      color: var(--error-and-danger-text-color);
-      max-width: 500px;
-    }
-
-    .script-selection-button {
-      width: 30em;
-      min-height: 3em;
-      text-align: left;
-
-      &:hover {
-        background-color: var(--nli-color-hover);
-      }
-    }
-  }
 
   &.active-script {
     .editor-section {
@@ -676,6 +677,8 @@ input:checked + .slider::before {
 
     .output-section {
       padding: var(--default-padding);
+      width: 100%;
+      overflow: auto;
 
       .script-output {
         font-family: var(--code-font);
@@ -686,4 +689,8 @@ input:checked + .slider::before {
       }
     }
   }
+}
+
+.script-view-main-busy {
+  padding: var(--default-padding);
 }
