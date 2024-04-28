@@ -28,6 +28,7 @@ const ScriptView = () => {
     false,
   );
   const [worker, setWorker] = useState<Worker | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const notesProvider = useNotesProvider();
   const { slug } = useParams();
@@ -50,15 +51,19 @@ const ScriptView = () => {
     setWorker(notesWorker);
 
 
-    const readable = await notesProvider.getReadableFileStream(
-      slug,
-    );
-    const value = await new Response(readable).text();
-    setActiveScript({
-      slug: slug,
-      value,
-    });
-    setScriptInput(value);
+    try {
+      const readable = await notesProvider.getReadableFileStream(
+        slug,
+      );
+      const value = await new Response(readable).text();
+      setActiveScript({
+        slug: slug,
+        value,
+      });
+      setScriptInput(value);
+    } catch (e) {
+      setError("SCRIPT_NOT_FOUND");
+    }
   });
 
   useEffect(() => {
@@ -135,9 +140,11 @@ const ScriptView = () => {
             }
           </div>
         </div>
-        : <div className="script-view-main-busy">
-          <BusyIndicator height={100} alt="Loading script" />
-        </div>
+        : error === "SCRIPT_NOT_FOUND"
+          ? <p>Script not found.</p>
+          : <div className="script-view-main-busy">
+            <BusyIndicator height={100} alt="Loading script" />
+          </div>
     }
   </>;
 };
