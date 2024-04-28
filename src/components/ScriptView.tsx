@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import BusyIndicator from "./BusyIndicator";
 import noteWorkerUrl from "../lib/note-worker/index.js?worker&url";
@@ -13,6 +13,9 @@ import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
 import HeaderButton from "./HeaderButton";
+import * as monaco from "monaco-editor";
+import jsWorker
+  from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 
 interface CustomScript {
   slug: string;
@@ -33,23 +36,10 @@ const ScriptView = () => {
   const notesProvider = useNotesProvider();
   const { slug } = useParams();
   const navigate = useNavigate();
+  const editorContainerRef = useRef(null);
 
   useRunOnce(async () => {
     if (typeof slug !== "string") return;
-
-    const notesWorker = new Worker(noteWorkerUrl, { type: "module" });
-    notesWorker.postMessage({
-      action: "initialize",
-      folderHandle: getFolderHandle(),
-    });
-    notesWorker.onmessage = (e) => {
-      if (e.data.type === "EVALUATION_COMPLETED") {
-        setIsBusyComputingOutput(false);
-        setOutput(e.data.output);
-      }
-    };
-    setWorker(notesWorker);
-
 
     try {
       const readable = await notesProvider.getReadableFileStream(
@@ -65,6 +55,55 @@ const ScriptView = () => {
       setError("SCRIPT_NOT_FOUND");
     }
   });
+
+  useRunOnce(() => {
+    const notesWorker = new Worker(noteWorkerUrl, { type: "module" });
+    notesWorker.postMessage({
+      action: "initialize",
+      folderHandle: getFolderHandle(),
+    });
+    notesWorker.onmessage = (e) => {
+      if (e.data.type === "EVALUATION_COMPLETED") {
+        setIsBusyComputingOutput(false);
+        setOutput(e.data.output);
+      }
+    };
+    setWorker(notesWorker);
+  });
+
+  useEffect(() => {
+    if (!activeScript) return;
+
+    // @ts-ignore
+    globalThis.MonacoEnvironment = {
+      getWorker: function () {
+        return new jsWorker();
+      },
+    };
+
+    const containerElement = editorContainerRef.current;
+
+    if (!containerElement) {
+      throw new Error("Code editor container not ready!");
+    }
+
+    const editor = monaco.editor.create(containerElement, {
+      value: scriptInput || "",
+      language: "javascript",
+      minimap: {
+        enabled: false,
+      },
+      fontSize: 16,
+      fontFamily: "IBM Plex Mono",
+      theme: "vs-dark",
+    });
+
+    editor.onDidChangeModelContent(() => {
+      const newValue = editor.getValue();
+      setScriptInput(newValue);
+    });
+  }, [activeScript]);
+
 
   useEffect(() => {
     return () => {
@@ -123,11 +162,10 @@ const ScriptView = () => {
         ? <div className="script-view-main active-script">
           <div className="editor-section">
             <h2>{activeScript.slug}</h2>
-            <textarea
-              className="active-script-input"
-              onChange={(e) => setScriptInput(e.target.value)}
-              value={scriptInput || ""}
-            ></textarea>
+            <div
+              id="editor-container"
+              ref={editorContainerRef}
+            />
           </div>
           <div className="output-section">
             {

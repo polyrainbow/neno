@@ -125,6 +125,7 @@
   "note.download-file": "Datei herunterladen",
   "note.slug.invalid-slug": "Ungültiger Slug",
   "note.slug.update-references": "Links aktualisieren",
+  "scripting.warning": "Warnung: Dieses Feature ist sehr mächtig. Mit ihm kannst du deinen kompletten Wissensgarten zerstören. Stelle sicher, dass du Backups gemacht hast und eine Versionierung vorhanden ist bevor du fortfährst. Sei vorsichtig.",
   "settings": "Einstellungen",
   "start.introduction": "Dein persönlicher Wissens-Graph",
   "start.links.source-code": "Quellcode",

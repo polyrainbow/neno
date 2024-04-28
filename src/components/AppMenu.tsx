@@ -122,7 +122,7 @@ const AppMenu = () => {
       <AppMenuItem
         disabled={!isInitialized()}
         label={l("menu.scripts")}
-        icon="component_exchange"
+        icon="code"
         onClick={async () => {
           const target = getAppPath(
             PathTemplate.SCRIPTS,

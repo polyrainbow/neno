@@ -7,6 +7,7 @@
     "@lexical/link": "^0.14.5",
     "@lexical/react": "^0.14.5",
     "lexical": "^0.14.5",
+    "monaco-editor": "^0.48.0",
     "vite-plugin-pwa": "^0.19.8"
   },
   "devDependencies": {

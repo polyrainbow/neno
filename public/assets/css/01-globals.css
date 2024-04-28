@@ -656,23 +656,17 @@ input:checked + .slider::before {
   &.active-script {
     .editor-section {
       border-right: 1px solid var(--main-content-color);
-      padding: var(--default-padding);
+      flex-shrink: 0;
+      width: 45vw;
 
       h2 {
-        margin-top: 0;
+        margin: 0;
+        padding: 15px;
       }
-    }
 
-    .active-script-input {
-      font-size: 20px;
-      height: calc(100vh - 133px);
-      width: 45vw;
-      flex-shrink: 0;
-      background: none;
-      border: none;
-      overflow: auto;
-      background-color: var(--accent-color-interactible);
-      font-family: var(--code-font);
+      #editor-container {
+        height: 100%;
+      }
     }
 
     .output-section {

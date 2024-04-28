@@ -12,6 +12,7 @@ import { PathTemplate } from "../types/PathTemplate";
 import BusyIndicator from "./BusyIndicator";
 import { LOCAL_GRAPH_ID } from "../config";
 import IconButton from "./IconButton";
+import { l } from "../lib/intl";
 
 const ScriptsView = () => {
   const [scriptList, setScriptList] = useState<FileInfo[] | null>(null);
@@ -43,12 +44,9 @@ const ScriptsView = () => {
     <HeaderContainerLeftRight />
     <div className="script-selection-main">
       <p className="warning">
-        Warning: The scripting feature is very powerful and with it,
-        you can easily mess up your whole knowledge garden.
-        Make sure you have backups in place or versioning set up and
-        proceed with caution.
+        {l("scripting.warning")}
       </p>
-      <h2>Scripts</h2>
+      <h2>{l("menu.scripts")}</h2>
       {
         isBusy
           ? <BusyIndicator height={120} alt="Loading" />
