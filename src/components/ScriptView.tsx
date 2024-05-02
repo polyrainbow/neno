@@ -15,6 +15,8 @@ import { LOCAL_GRAPH_ID } from "../config";
 import HeaderButton from "./HeaderButton";
 import jsWorker
   from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
+import StatusIndicator from "./StatusIndicator";
 
 interface CustomScript {
   slug: string;
@@ -31,6 +33,8 @@ const ScriptView = () => {
   );
   const [worker, setWorker] = useState<Worker | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [saveInProgress, setSaveInProgress] = useState(false);
 
   const notesProvider = useNotesProvider();
   const { slug } = useParams();
@@ -104,6 +108,7 @@ const ScriptView = () => {
         editor.onDidChangeModelContent(() => {
           const newValue = editor.getValue();
           setScriptInput(newValue);
+          setUnsavedChanges(true);
         });
       });
   }, [activeScript]);
@@ -114,6 +119,30 @@ const ScriptView = () => {
       invalidateNotesProvider();
     };
   }, []);
+
+  const handleSaveRequest = async () => {
+    if (!slug || !scriptInput) return;
+
+    setSaveInProgress(true);
+
+    const readable = new Blob(
+      [scriptInput],
+      { type: "text/plain" },
+    ).stream();
+
+    await notesProvider.updateFile(
+      readable,
+      slug,
+    );
+    setUnsavedChanges(false);
+    setSaveInProgress(false);
+  };
+
+  useKeyboardShortcuts({
+    onSave: () => {
+      handleSaveRequest();
+    },
+  });
 
   return <>
     <HeaderContainerLeftRight
@@ -144,18 +173,8 @@ const ScriptView = () => {
           <HeaderButton
             icon="save"
             disabled={!activeScript}
-            onClick={async () => {
-              if (!slug || !scriptInput) return;
-
-              const readable = new Blob(
-                [scriptInput],
-                { type: "text/plain" },
-              ).stream();
-
-              await notesProvider.updateFile(
-                readable,
-                slug,
-              );
+            onClick={() => {
+              handleSaveRequest();
             }}
           >Save</HeaderButton>
         </div>
@@ -165,7 +184,15 @@ const ScriptView = () => {
       activeScript
         ? <div className="script-view-main active-script">
           <div className="editor-section">
-            <h2>{activeScript.slug}</h2>
+            <div className="title-bar">
+              <h2>{activeScript.slug}</h2>
+              <StatusIndicator
+                isNew={false}
+                hasUnsavedChanges={unsavedChanges}
+                isEverythingSaved={!unsavedChanges}
+                isUploading={saveInProgress}
+              />
+            </div>
             <div
               id="editor-container"
               ref={editorContainerRef}

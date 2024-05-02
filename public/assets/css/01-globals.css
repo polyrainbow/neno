@@ -659,9 +659,16 @@ input:checked + .slider::before {
       flex-shrink: 0;
       width: 45vw;
 
-      h2 {
-        margin: 0;
-        padding: 15px;
+      .title-bar {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: var(--default-padding);
+
+        h2 {
+          margin: 0;
+        }
       }
 
       #editor-container {
