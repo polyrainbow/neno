@@ -13,7 +13,6 @@ import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
 import HeaderButton from "./HeaderButton";
-import * as monaco from "monaco-editor";
 import jsWorker
   from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 
@@ -87,21 +86,26 @@ const ScriptView = () => {
       throw new Error("Code editor container not ready!");
     }
 
-    const editor = monaco.editor.create(containerElement, {
-      value: scriptInput || "",
-      language: "javascript",
-      minimap: {
-        enabled: false,
-      },
-      fontSize: 16,
-      fontFamily: "IBM Plex Mono",
-      theme: "vs-dark",
-    });
+    import("monaco-editor")
+      .then((module) => {
+        const monacoEditor = module.editor;
 
-    editor.onDidChangeModelContent(() => {
-      const newValue = editor.getValue();
-      setScriptInput(newValue);
-    });
+        const editor = monacoEditor.create(containerElement, {
+          value: scriptInput || "",
+          language: "javascript",
+          minimap: {
+            enabled: false,
+          },
+          fontSize: 16,
+          fontFamily: "IBM Plex Mono",
+          theme: "vs-dark",
+        });
+
+        editor.onDidChangeModelContent(() => {
+          const newValue = editor.getValue();
+          setScriptInput(newValue);
+        });
+      });
   }, [activeScript]);
 
 
