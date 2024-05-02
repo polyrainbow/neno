@@ -13,10 +13,12 @@ import BusyIndicator from "./BusyIndicator";
 import { LOCAL_GRAPH_ID } from "../config";
 import IconButton from "./IconButton";
 import { l } from "../lib/intl";
+import { isValidFileSlug } from "../lib/notes/slugUtils";
 
 const ScriptsView = () => {
   const [scriptList, setScriptList] = useState<FileInfo[] | null>(null);
   const [isBusy, setIsBusy] = useState<boolean>(true);
+  const [newScriptName, setNewScriptName] = useState("");
   const navigate = useNavigate();
   const notesProvider = useNotesProvider();
 
@@ -80,6 +82,41 @@ const ScriptsView = () => {
             </div>;
           })
       }
+      <h3>Create new script</h3>
+      /scripts/<input
+        type="text"
+        value={newScriptName}
+        onChange={(e) => setNewScriptName(e.target.value)}
+      />.neno.js
+      <br/>
+      {
+        scriptList?.map(s => s.slug).includes(
+          `scripts/${newScriptName}.neno.js`,
+        )
+          ? <p className="error">
+            Script already exists. Please choose another name.
+          </p>
+          : ""
+      }
+      <button
+        className="default-button default-action"
+        disabled={
+          scriptList?.map(s => s.slug).includes(
+            `scripts/${newScriptName}.neno.js`,
+          )
+            || !isValidFileSlug(`scripts/${newScriptName}.neno.js`)
+            || newScriptName.length === 0
+        }
+        onClick={async () => {
+          const filename = `${newScriptName}.neno.js`;
+          const readable = new Blob(
+            [],
+            { type: "text/plain" },
+          ).stream();
+          await notesProvider.addFile(readable, "scripts", filename);
+          await refreshScriptsList();
+        }}
+      >Create</button>
     </div>
   </>;
 };

@@ -52,6 +52,26 @@ const sluggify = (text: string): string => {
 };
 
 
+// same as above, but leaves dots in place
+// should be used for uploaded files, but not for note content or note slugs.
+const sluggifyFilename = (text: string): string => {
+  const slug = text
+    // Trim leading/trailing whitespace
+    .trim()
+    // remove invalid chars
+    .replace(/['’]+/g, "")
+    // Replace invalid chars with dashes.
+    .replace(/[^\p{L}\p{M}\d\-._]+/gu, "-")
+    // Replace runs of one or more dashes with a single dash
+    .replace(/-+/g, "-")
+    // we do not allow dotfiles for now
+    .replace(/^\./g, "")
+    .toLowerCase();
+
+  return trimSlug(slug);
+};
+
+
 /*
   Transforms note text like into a slug and truncates it.
   We will replace slashes and dots with dashes, as these are not allowed for
@@ -134,7 +154,7 @@ const getSlugFromFilename = (
   const existingFileSlugs = existingFiles.map((file) => file.slug);
   const extension = getExtensionFromFilename(filename);
   const filenameWithoutExtension = removeExtensionFromFilename(filename);
-  const sluggifiedFileStem = sluggify(filenameWithoutExtension);
+  const sluggifiedFileStem = sluggifyFilename(filenameWithoutExtension);
 
   let n = 1;
 
@@ -190,4 +210,5 @@ export {
   sluggifyNoteText,
   trimSlug,
   isValidSlugOrEmpty,
+  sluggifyFilename,
 };

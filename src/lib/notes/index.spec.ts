@@ -676,7 +676,7 @@ describe("Notes module", () => {
         "test.test.test+.txt",
       );
 
-      expect(fileInfo.slug).toBe("files/test-test-test.txt");
+      expect(fileInfo.slug).toBe("files/test.test.test.txt");
     },
   );
 
