@@ -45,10 +45,10 @@ const ScriptsView = () => {
   return <>
     <HeaderContainerLeftRight />
     <div className="script-selection-main">
+      <h1>{l("menu.scripts")}</h1>
       <p className="warning">
         {l("scripting.warning")}
       </p>
-      <h2>{l("menu.scripts")}</h2>
       {
         isBusy
           ? <BusyIndicator height={120} alt="Loading" />
@@ -82,7 +82,7 @@ const ScriptsView = () => {
             </div>;
           })
       }
-      <h3>Create new script</h3>
+      <h2>Create new script</h2>
       /scripts/<input
         type="text"
         value={newScriptName}
