@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import BusyIndicator from "./BusyIndicator";
 import noteWorkerUrl from "../lib/note-worker/index.js?worker&url";
@@ -17,6 +17,9 @@ import jsWorker
   from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import StatusIndicator from "./StatusIndicator";
+import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
+import useConfirmDiscardingUnsavedChangesDialog
+  from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 
 interface CustomScript {
   slug: string;
@@ -33,7 +36,8 @@ const ScriptView = () => {
   );
   const [worker, setWorker] = useState<Worker | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [unsavedChanges, setUnsavedChanges]
+    = useContext(UnsavedChangesContext);
   const [saveInProgress, setSaveInProgress] = useState(false);
 
   const notesProvider = useNotesProvider();
@@ -144,13 +148,20 @@ const ScriptView = () => {
     },
   });
 
+  const confirmDiscardingUnsavedChanges
+    = useConfirmDiscardingUnsavedChangesDialog();
+
   return <>
     <HeaderContainerLeftRight
       leftContent={
         <div className="header-controls">
           <HeaderButton
             icon="list"
-            onClick={() => {
+            onClick={async () => {
+              if (unsavedChanges) {
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
+              }
               navigate(
                 getAppPath(
                   PathTemplate.SCRIPTS,
