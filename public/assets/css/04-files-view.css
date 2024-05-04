@@ -28,6 +28,8 @@
       }
     
       img {
+        display: block;
+
         &.file-type-icon {
           width: 150px;
           height: 150px;
