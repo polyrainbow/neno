@@ -66,25 +66,14 @@
     }
   
     .pinned-note {
-      padding: 0 10px;
-      padding-left: 5px; /* because of intrinsic icon padding */
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      height: 35px;
-      background: var(--accent-color-1);
-      border-radius: var(--border-radius);
-  
+      background: transparent;
+
       &:hover {
         background-color: var(--nli-color-hover);
       }
   
       &.active {
         background-color: var(--accent-color-1-light);
-      }
-  
-      .svg-icon {
-        margin-right: 3px;
       }
   
       p {
@@ -103,7 +92,7 @@
 
 .app-menu {
   background-color: var(--header-background-color);
-  z-index: 1;
+  z-index: 10;
   position: fixed;
   top: 50px;
   left: 0;

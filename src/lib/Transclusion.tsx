@@ -4,7 +4,7 @@ import { getNoteTitle, removeWikilinkPunctuation } from "./notes/noteUtils";
 import ActiveNote from "../types/ActiveNote";
 import NotesProvider from "./notes";
 import { Slug } from "./notes/types/Slug";
-import { isFileSlug } from "./notes/slugUtils";
+import { isValidFileSlug } from "./notes/slugUtils";
 import { getMediaTypeFromFilename } from "./notes/utils";
 import { MediaType } from "./notes/types/MediaType";
 import NoteContentBlockAudio from "../components/NoteContentBlockAudio";
@@ -67,7 +67,7 @@ export const getTransclusionContent = async (
     throw new Error("INVALID_FILE_SLUG");
   }
 
-  if (isFileSlug(slug)) {
+  if (isValidFileSlug(slug)) {
     const availableFileInfos = [
       ...note.files,
     ];

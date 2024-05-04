@@ -455,7 +455,7 @@ button {
 
 .icon-button-floating {
   display: block;
-  position: fixed;
+  position: absolute;
   bottom: 20px;
   right: 20px;
   border: none;
@@ -597,4 +597,80 @@ input:checked + .slider::before {
   font-size: var(--small-font-size);
   padding: 10px;
   border-radius: var(--border-radius);
+}
+
+
+.header-button {
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  height: 35px;
+  background: var(--accent-color-1-light);
+  border-radius: var(--border-radius);
+
+  &:hover {
+    background-color: var(--accent-color-1-intense);
+  }
+
+  &.with-icon {
+    padding-left: 7px;
+
+    img {
+      margin-right: 3px;
+    }
+  }
+}
+
+.header-controls {
+  gap: var(--small-gap);
+  display: flex;
+}
+
+
+.script-view-main {
+  display: flex;
+  height: calc(100vh - 50px);
+
+  &.active-script {
+    .editor-section {
+      border-right: 1px solid var(--main-content-color);
+      flex-shrink: 0;
+      width: 45vw;
+
+      .title-bar {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: var(--default-padding);
+
+        h2 {
+          margin: 0;
+        }
+      }
+
+      #editor-container {
+        height: 100%;
+      }
+    }
+
+    .output-section {
+      padding: var(--default-padding);
+      width: 100%;
+      overflow: auto;
+
+      .script-output {
+        font-family: var(--code-font);
+        white-space: pre;
+        overflow: auto;
+        margin: 0;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.script-view-main-busy {
+  padding: var(--default-padding);
 }

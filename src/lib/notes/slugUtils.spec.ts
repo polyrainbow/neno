@@ -12,8 +12,12 @@ describe("getSlugFromFilename", () => {
   it(
     "should correctly create slugs for dotfiles",
     async () => {
-      expect(getSlugFromFilename(".graph.json", [])).toBe("files/graph.json");
-      expect(getSlugFromFilename(".htaccess", [])).toBe("files/htaccess");
+      expect(
+        getSlugFromFilename("files", ".graph.json", []),
+      ).toBe("files/graph.json");
+      expect(
+        getSlugFromFilename("files", ".htaccess", []),
+      ).toBe("files/htaccess");
     },
   );
 });

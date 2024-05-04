@@ -10,6 +10,7 @@ import {
   isExistingNoteSaveRequest,
   handleNewNoteSaveRequest,
   changeSlugReferencesInNote,
+  getNoteTitle,
 } from "./noteUtils.js";
 import {
   getNumberOfComponents,
@@ -41,7 +42,7 @@ import {
   getSlugFromFilename,
   isValidSlug,
   isValidSlugOrEmpty,
-  isFileSlug,
+  isValidFileSlug,
 } from "./slugUtils.js";
 import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 import serialize from "../subwaytext/serialize.js";
@@ -140,7 +141,9 @@ export default class NotesProvider {
         updatedAt: getGraphUpdateTimestamp(graph),
         size: {
           graph: await this.#io.getSizeOfGraph(),
-          files: await this.#io.getSizeOfGraphFiles(),
+          files: graph.metadata.files.reduce((a, b) => {
+            return a + b.size;
+          }, 0),
         },
       };
     }
@@ -238,10 +241,11 @@ export default class NotesProvider {
 
   async addFile(
     readable: ReadableStream,
+    folder: string,
     filename: string,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
-    const slug = getSlugFromFilename(filename, graph.metadata.files);
+    const slug = getSlugFromFilename(folder, filename, graph.metadata.files);
     const size = await this.#io.addFile(slug, readable);
 
     const fileInfo: FileInfo = {
@@ -250,6 +254,33 @@ export default class NotesProvider {
       createdAt: Date.now(),
     };
     graph.metadata.files.push(fileInfo);
+    await this.#io.flushChanges(
+      graph,
+      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      [],
+      [],
+    );
+
+    return fileInfo;
+  }
+
+
+  async updateFile(
+    readable: ReadableStream,
+    slug: Slug,
+  ): Promise<FileInfo> {
+    const graph = await this.#io.getGraph();
+    const fileInfo = graph.metadata.files.find((file: FileInfo) => {
+      return file.slug === slug;
+    });
+
+    if (!fileInfo) {
+      throw new Error(ErrorMessage.FILE_NOT_FOUND);
+    }
+
+    const size = await this.#io.addFile(slug, readable);
+    fileInfo.size = size;
+
     await this.#io.flushChanges(
       graph,
       WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
@@ -275,7 +306,7 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
 
-    if ((!isValidSlug(newSlug)) || (!isFileSlug(newSlug))) {
+    if ((!isValidSlug(newSlug)) || (!isValidFileSlug(newSlug))) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
@@ -358,7 +389,7 @@ export default class NotesProvider {
       = Array.from(graph.indexes.blocks.values()).flat();
     const allInlineSpans = getAllInlineSpans(allBlocks);
     const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-    const allUsedFileSlugs = allUsedSlugs.filter(isFileSlug);
+    const allUsedFileSlugs = allUsedSlugs.filter(isValidFileSlug);
     const danglingFiles = graph.metadata.files.filter((file) => {
       return !allUsedFileSlugs.includes(file.slug);
     });
@@ -488,4 +519,24 @@ export default class NotesProvider {
 
     return this.getPins();
   }
+
+  async getGraph(): Promise<GraphObject> {
+    const graph = await this.#io.getGraph();
+    return graph;
+  }
 }
+
+// exporting utils to be used in custom scripts
+export {
+  createNoteToTransmit,
+  getNumberOfUnlinkedNotes,
+  parseSerializedNewNote,
+  serializeNewNote,
+  getSlugsFromInlineText,
+  getAllInlineSpans,
+  handleExistingNoteUpdate,
+  isExistingNoteSaveRequest,
+  handleNewNoteSaveRequest,
+  changeSlugReferencesInNote,
+  getNoteTitle,
+};

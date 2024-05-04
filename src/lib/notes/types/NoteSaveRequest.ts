@@ -4,7 +4,7 @@ import { Slug } from "./Slug.js";
 
 interface BaseNoteSaveRequest {
   ignoreDuplicateTitles: boolean,
-  aliases: Set<Slug>,
+  aliases?: Set<Slug>,
   changeSlugTo?: Slug,
 }
 
@@ -15,6 +15,7 @@ export interface NewNoteSaveRequest extends BaseNoteSaveRequest {
 export interface ExistingNoteSaveRequest extends BaseNoteSaveRequest {
   note: ExistingNote,
   updateReferences?: boolean,
+  disableTimestampUpdate?: boolean,
 }
 
 export type NoteSaveRequest = NewNoteSaveRequest | ExistingNoteSaveRequest;

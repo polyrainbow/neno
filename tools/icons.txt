@@ -16,6 +16,7 @@ center_focus_strong
 clear
 close
 code
+component_exchange
 content_copy
 create
 crop_free
@@ -68,6 +69,7 @@ pending
 people
 people_outline
 photo_library
+play_arrow
 post_add
 preview
 public

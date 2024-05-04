@@ -14,7 +14,11 @@ import { l } from "../lib/intl";
 import { MediaType } from "../lib/notes/types/MediaType";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import BusyIndicator from "./BusyIndicator";
-import { LOCAL_GRAPH_ID, SPAN_SEPARATOR } from "../config";
+import {
+  LOCAL_GRAPH_ID,
+  NENO_SCRIPT_FILE_SUFFIX,
+  SPAN_SEPARATOR,
+} from "../config";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import {
@@ -23,15 +27,16 @@ import {
   removeExtensionFromFilename,
 } from "../lib/notes/utils";
 import {
-  getFilenameFromFileSlug, isValidSlug,
+  isValidSlug,
 } from "../lib/notes/slugUtils";
 import { saveFile } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
 import FileViewPreview from "./FileViewPreview";
 import { Slug } from "../lib/notes/types/Slug";
+import HeaderButton from "./HeaderButton";
 
 const getRenameInput = (slug: Slug): string => {
-  return removeExtensionFromFilename(getFilenameFromFileSlug(slug));
+  return removeExtensionFromFilename(slug);
 };
 
 const FileView = () => {
@@ -49,10 +54,15 @@ const FileView = () => {
   const [updateReferences, setUpdateReferences] = useState(true);
 
   const navigate = useNavigate();
+
   const type = slug
     ? getMediaTypeFromFilename(slug)
     : null;
+
   const confirm = useConfirm();
+
+  const canShowTextPreview = type === MediaType.TEXT;
+  const isNenoScript = slug?.endsWith(NENO_SCRIPT_FILE_SUFFIX) ?? false;
 
   useEffect(() => {
     if (typeof slug !== "string") return;
@@ -63,7 +73,7 @@ const FileView = () => {
       const src = await getUrl(fileInfo);
       setSrc(src);
 
-      if (type === MediaType.TEXT) {
+      if (canShowTextPreview) {
         fetch(src)
           .then((response) => response.text())
           .then((text) => setText(text));
@@ -84,14 +94,93 @@ const FileView = () => {
   const canShowPreview = type !== MediaType.OTHER;
 
   return <>
-    <HeaderContainerLeftRight />
+    <HeaderContainerLeftRight
+      leftContent={
+        <div className="header-controls">
+          <HeaderButton
+            icon="list"
+            onClick={() => {
+              navigate(
+                getAppPath(
+                  PathTemplate.FILES,
+                  new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+                ),
+              );
+            }}
+          >
+            {l("files.show-all-files")}
+          </HeaderButton>
+          <HeaderButton
+            icon="add"
+            disabled={!fileInfo}
+            onClick={async () => {
+              if (!fileInfo) return;
+
+              navigate(getAppPath(
+                PathTemplate.NEW_NOTE,
+                new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+                new URLSearchParams({
+                  referenceSlugs: fileInfo.slug,
+                }),
+              ));
+            }}
+          >
+            {l("files.create-note-with-file")}
+          </HeaderButton>
+          <HeaderButton
+            icon="file_download"
+            onClick={async () => {
+              if (!fileInfo) return;
+              await saveFile(fileInfo.slug);
+            }}
+          >
+            {l("files.save-duplicate")}
+          </HeaderButton>
+          {
+            isNenoScript
+              ? <HeaderButton
+                icon="create"
+                onClick={async () => {
+                  if (!fileInfo) return;
+
+                  navigate(getAppPath(
+                    PathTemplate.SCRIPT,
+                    new Map([
+                      ["GRAPH_ID", LOCAL_GRAPH_ID],
+                      ["SCRIPT_SLUG", fileInfo.slug],
+                    ]),
+                  ));
+                }}
+              >
+                {l("files.open-in-script-editor")}
+              </HeaderButton>
+              : ""
+          }
+          <HeaderButton
+            icon="delete"
+            disabled={!fileInfo}
+            onClick={async () => {
+              if (!fileInfo) return;
+
+              await confirm({
+                text: l("files.confirm-delete"),
+                confirmText: l("files.confirm-delete.confirm"),
+                cancelText: l("dialog.cancel"),
+                encourageConfirmation: false,
+              });
+
+              await notesProvider.deleteFile(fileInfo.slug);
+              navigate(getAppPath(
+                PathTemplate.FILES,
+                new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+              ));
+            }}
+          >{l("files.delete")}</HeaderButton>
+        </div>
+      }
+    />
     <section className="content-section-wide file-section">
-      <p><Link
-        to={getAppPath(
-          PathTemplate.FILES, new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-        )}
-      >{l("files.show-all-files")}</Link></p>
-      <h1>{fileInfo ? getFilenameFromFileSlug(fileInfo.slug) : ""}</h1>
+      <h1>{fileInfo ? fileInfo.slug : ""}</h1>
       {
         canShowPreview && type
           ? <FileViewPreview
@@ -110,54 +199,6 @@ const FileView = () => {
             + makeTimestampHumanReadable(fileInfo.createdAt)
           : ""
       }</p>
-      <div
-        className="action-bar"
-      >
-        <button
-          disabled={!fileInfo}
-          onClick={async () => {
-            if (!fileInfo) return;
-
-            navigate(getAppPath(
-              PathTemplate.NEW_NOTE,
-              new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-              new URLSearchParams({
-                referenceSlugs: fileInfo.slug,
-              }),
-            ));
-          }}
-          className="default-button default-action"
-        >{l("files.create-note-with-file")}</button>
-        <button
-          className="default-button default-action"
-          onClick={async () => {
-            if (!fileInfo) return;
-            await saveFile(fileInfo.slug);
-          }}
-        >
-          {l("files.save-duplicate")}
-        </button>
-        <button
-          disabled={!fileInfo}
-          onClick={async () => {
-            if (!fileInfo) return;
-
-            await confirm({
-              text: l("files.confirm-delete"),
-              confirmText: l("files.confirm-delete.confirm"),
-              cancelText: l("dialog.cancel"),
-              encourageConfirmation: false,
-            });
-
-            await notesProvider.deleteFile(fileInfo.slug);
-            navigate(getAppPath(
-              PathTemplate.FILES,
-              new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-            ));
-          }}
-          className="default-button dangerous-action"
-        >{l("files.delete")}</button>
-      </div>
       <h2>{l("files.used-in")}</h2>
       {
         notes
@@ -243,7 +284,7 @@ const FileView = () => {
               || slugRenameInput === getRenameInput(slug || "")
               || !isValidSlug(slugRenameInput)
             ) return;
-            const newSlug = "files/" + slugRenameInput + "." + extension;
+            const newSlug = slugRenameInput + "." + extension;
             try {
               const newFileInfo = await notesProvider.renameFile(
                 slug,

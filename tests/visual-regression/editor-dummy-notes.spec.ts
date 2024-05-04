@@ -10,6 +10,7 @@ test.beforeEach(async ({ page }) => {
   await page.waitForSelector("#memory-storage-dummy-notes-load-button");
   await page.click("#memory-storage-dummy-notes-load-button");
   await page.getByText("Test note 1").nth(0).waitFor();
+  await page.getByAltText("Link to this note").nth(0).waitFor();
 });
 
 test.describe("Editor", () => {

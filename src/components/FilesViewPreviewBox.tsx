@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Link,
+  useNavigate,
 } from "react-router-dom";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import { MediaType } from "../lib/notes/types/MediaType";
@@ -10,11 +11,9 @@ import { getAppPath, getIconSrc } from "../lib/utils";
 import {
   getMediaTypeFromFilename,
 } from "../lib/notes/utils";
-import {
-  getFilenameFromFileSlug,
-} from "../lib/notes/slugUtils";
 import { getUrlForSlug } from "../lib/LocalDataStorage";
-import { LOCAL_GRAPH_ID } from "../config";
+import { LOCAL_GRAPH_ID, NENO_SCRIPT_FILE_SUFFIX } from "../config";
+import FloatingActionButton from "./FloatingActionButton";
 
 interface FilesViewPreviewBoxProps {
   key: string,
@@ -26,7 +25,9 @@ const FilesViewPreviewBox = ({
   file,
   isDangling,
 }: FilesViewPreviewBoxProps) => {
+  const navigate = useNavigate();
   const type = getMediaTypeFromFilename(file.slug) || "unknown";
+  const isNenoScript = file.slug.endsWith(NENO_SCRIPT_FILE_SUFFIX);
   const [thumbnailImageSrc, setThumbnailImageSrc]
     = useState<string | null>(null);
 
@@ -34,6 +35,11 @@ const FilesViewPreviewBox = ({
   useEffect(() => {
     getUrlForSlug(file.slug)
       .then((src) => {
+        if (isNenoScript) {
+          setThumbnailImageSrc(getIconSrc("neno"));
+          return;
+        }
+
         const thumbnailImageSrcMap = {
           [MediaType.IMAGE]: src,
           [MediaType.AUDIO]: getIconSrc("audio_file"),
@@ -60,14 +66,18 @@ const FilesViewPreviewBox = ({
       <img
         src={thumbnailImageSrc || ""}
         loading="lazy"
-        className={type === MediaType.IMAGE ? "checkerboard-background" : ""}
+        className={
+          type === MediaType.IMAGE
+            ? "checkerboard-background preview-image"
+            : "file-type-icon"
+        }
       />
       <div
         className="file-info"
       >
         <div
           className="filename"
-        >{getFilenameFromFileSlug(file.slug)}</div>
+        >{file.slug}</div>
         {
           isDangling
             ? <div
@@ -77,6 +87,26 @@ const FilesViewPreviewBox = ({
             : ""
         }
       </div>
+      {
+        isNenoScript
+          ? <FloatingActionButton
+            title={l("files.open-in-script-editor")}
+            icon="create"
+            onClick={(e) => {
+              navigate(getAppPath(
+                PathTemplate.SCRIPT,
+                new Map([
+                  ["GRAPH_ID", LOCAL_GRAPH_ID],
+                  ["SCRIPT_SLUG", file.slug],
+                ]),
+              ));
+
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          />
+          : ""
+      }
     </Link>
   </div>;
 };

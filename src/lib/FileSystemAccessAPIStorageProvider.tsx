@@ -125,12 +125,26 @@ implements StorageProvider {
   }
 
   async renameFile(
-    requestPath: string,
-    newEntryName: string,
+    oldRequestPath: string,
+    newRequestPath: string,
   ): Promise<void> {
-    const fileHandle = await this.#getFileHandle(requestPath, true);
-    // @ts-ignore not correctly typed
-    await fileHandle.move(newEntryName);
+    const oldFolder = oldRequestPath.substring(0, oldRequestPath.indexOf("/"));
+    const newFolder = newRequestPath.substring(0, newRequestPath.indexOf("/"));
+
+    if (oldFolder === newFolder) {
+      const fileHandle = await this.#getFileHandle(oldRequestPath, true);
+      const newEntryName = newRequestPath.substring(
+        newRequestPath.indexOf("/") + 1,
+      );
+      // @ts-ignore not correctly typed
+      await fileHandle.move(newEntryName);
+    } else {
+      await this.writeObjectFromReadable(
+        newRequestPath,
+        await this.getReadableStream(oldRequestPath),
+      );
+      await this.removeObject(oldRequestPath);
+    }
   }
 
   async writeObjectFromReadable(

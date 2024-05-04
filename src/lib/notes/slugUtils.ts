@@ -1,4 +1,3 @@
-import { FILE_SLUG_PREFIX } from "./config.js";
 import {
   InlineText,
   Span,
@@ -13,8 +12,13 @@ import {
 } from "./utils.js";
 
 
-const isFileSlug = (slug: Slug): boolean => {
-  return slug.startsWith(FILE_SLUG_PREFIX);
+const isValidFileSlug = (slug: Slug): boolean => {
+  /*
+    A file slug is a slug that is saved in a subfolder of the root graph
+    directory.
+  */
+  return slug.match(/\//gi)?.length === 1
+    && !slug.startsWith("/");
 };
 
 
@@ -42,6 +46,26 @@ const sluggify = (text: string): string => {
     .replace(/[^\p{L}\p{M}\d\-_]+/gu, "-")
     // Replace runs of one or more dashes with a single dash
     .replace(/-+/g, "-")
+    .toLowerCase();
+
+  return trimSlug(slug);
+};
+
+
+// same as above, but leaves dots in place
+// should be used for uploaded files, but not for note content or note slugs.
+const sluggifyFilename = (text: string): string => {
+  const slug = text
+    // Trim leading/trailing whitespace
+    .trim()
+    // remove invalid chars
+    .replace(/['’]+/g, "")
+    // Replace invalid chars with dashes.
+    .replace(/[^\p{L}\p{M}\d\-._]+/gu, "-")
+    // Replace runs of one or more dashes with a single dash
+    .replace(/-+/g, "-")
+    // we do not allow dotfiles for now
+    .replace(/^\./g, "")
     .toLowerCase();
 
   return trimSlug(slug);
@@ -123,13 +147,14 @@ const createSlug = (
 
 
 const getSlugFromFilename = (
+  folder: string,
   filename: string,
   existingFiles: FileInfo[],
 ): Slug => {
   const existingFileSlugs = existingFiles.map((file) => file.slug);
   const extension = getExtensionFromFilename(filename);
   const filenameWithoutExtension = removeExtensionFromFilename(filename);
-  const sluggifiedFileStem = sluggify(filenameWithoutExtension);
+  const sluggifiedFileStem = sluggifyFilename(filenameWithoutExtension);
 
   let n = 1;
 
@@ -144,7 +169,7 @@ const getSlugFromFilename = (
       ? `${sluggifiedFileStem}-${n}`
       : sluggifiedFileStem;
 
-    const slug: Slug = FILE_SLUG_PREFIX
+    const slug: Slug = folder + "/"
       + stemWithOptionalIntegerSuffix
       + (
         extension
@@ -167,10 +192,10 @@ const getSlugFromFilename = (
 const getFilenameFromFileSlug = (
   fileSlug: Slug,
 ) => {
-  if (!isFileSlug(fileSlug)) {
+  if (!isValidFileSlug(fileSlug)) {
     throw new Error("Not a file slug: " + fileSlug);
   }
-  return fileSlug.substring(FILE_SLUG_PREFIX.length);
+  return fileSlug.substring(fileSlug.indexOf("/") + 1);
 };
 
 
@@ -179,10 +204,11 @@ export {
   getFilenameFromFileSlug,
   getSlugFromFilename,
   getSlugsFromInlineText,
-  isFileSlug,
+  isValidFileSlug,
   isValidSlug,
   sluggify,
   sluggifyNoteText,
   trimSlug,
   isValidSlugOrEmpty,
+  sluggifyFilename,
 };

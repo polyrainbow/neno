@@ -29,7 +29,7 @@ import { getMediaTypeFromFilename, shortenText } from "./utils.js";
 import {
   createSlug,
   getSlugsFromInlineText,
-  isFileSlug,
+  isValidFileSlug,
   isValidSlug,
   sluggify,
 } from "./slugUtils.js";
@@ -423,7 +423,7 @@ const getFileSlugsInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
     = graph.indexes.blocks.get(noteSlug) as Block[];
   const allInlineSpans = getAllInlineSpans(blocks);
   const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-  return allUsedSlugs.filter(isFileSlug);
+  return allUsedSlugs.filter(isValidFileSlug);
 };
 
 
@@ -643,7 +643,9 @@ const handleExistingNoteUpdate = async (
   }
 
   existingNote.content = noteFromUser.content;
-  existingNote.meta.updatedAt = Date.now();
+  existingNote.meta.updatedAt = noteSaveRequest.disableTimestampUpdate
+    ? noteFromUser.meta.updatedAt
+    : Date.now();
   existingNote.meta.flags = noteFromUser.meta.flags;
   existingNote.meta.contentType = noteFromUser.meta.contentType;
   existingNote.meta.custom = removeCustomMetadataWithEmptyKeys(
@@ -652,32 +654,34 @@ const handleExistingNoteUpdate = async (
 
   const aliasesToUpdate: Slug[] = [];
 
-  for (const [alias, canonicalSlug] of graph.aliases.entries()) {
-    if (canonicalSlug === existingNote.meta.slug) {
-      graph.aliases.delete(alias);
-      aliasesToUpdate.push(alias);
+  if (noteSaveRequest.aliases) {
+    for (const [alias, canonicalSlug] of graph.aliases.entries()) {
+      if (canonicalSlug === existingNote.meta.slug) {
+        graph.aliases.delete(alias);
+        aliasesToUpdate.push(alias);
+      }
     }
-  }
 
-  noteSaveRequest.aliases.forEach((alias) => {
-    if (!isValidSlug(alias)) {
-      throw new Error(ErrorMessage.INVALID_ALIAS);
-    }
-    if (alias === existingNote.meta.slug) {
-      throw new Error(ErrorMessage.ALIAS_EXISTS);
-    }
-    if (
-      graph.aliases.has(alias)
-      && graph.aliases.get(alias) !== existingNote.meta.slug
-    ) {
-      throw new Error(ErrorMessage.ALIAS_EXISTS);
-    }
-    if (graph.notes.has(alias)) {
-      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
-    }
-    graph.aliases.set(alias, existingNote.meta.slug);
-    aliasesToUpdate.push(alias);
-  });
+    noteSaveRequest.aliases.forEach((alias) => {
+      if (!isValidSlug(alias)) {
+        throw new Error(ErrorMessage.INVALID_ALIAS);
+      }
+      if (alias === existingNote.meta.slug) {
+        throw new Error(ErrorMessage.ALIAS_EXISTS);
+      }
+      if (
+        graph.aliases.has(alias)
+        && graph.aliases.get(alias) !== existingNote.meta.slug
+      ) {
+        throw new Error(ErrorMessage.ALIAS_EXISTS);
+      }
+      if (graph.notes.has(alias)) {
+        throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+      }
+      graph.aliases.set(alias, existingNote.meta.slug);
+      aliasesToUpdate.push(alias);
+    });
+  }
 
   if (
     "changeSlugTo" in noteSaveRequest
@@ -822,7 +826,7 @@ const handleNewNoteSaveRequest = async (
   }
 
   const aliasesToUpdate: Slug[] = [];
-  noteSaveRequest.aliases.forEach((alias) => {
+  noteSaveRequest.aliases?.forEach((alias) => {
     if (!isValidSlug(alias)) {
       throw new Error(ErrorMessage.INVALID_ALIAS);
     }
