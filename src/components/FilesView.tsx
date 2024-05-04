@@ -118,7 +118,7 @@ const FilesView = () => {
                 className="default-button-small"
                 onClick={() => setFilterInput("scripts/")}
               >
-                Show scripts
+                Show NENO scripts
               </button>
             </div>
             <FlexContainer

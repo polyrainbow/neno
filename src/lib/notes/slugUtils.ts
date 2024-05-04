@@ -195,7 +195,7 @@ const getFilenameFromFileSlug = (
   if (!isValidFileSlug(fileSlug)) {
     throw new Error("Not a file slug: " + fileSlug);
   }
-  return fileSlug.substring(fileSlug.indexOf("/"));
+  return fileSlug.substring(fileSlug.indexOf("/") + 1);
 };
 
 
