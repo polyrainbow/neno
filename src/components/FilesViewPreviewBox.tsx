@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Link,
+  useNavigate,
 } from "react-router-dom";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import { MediaType } from "../lib/notes/types/MediaType";
@@ -12,6 +13,7 @@ import {
 } from "../lib/notes/utils";
 import { getUrlForSlug } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
+import FloatingActionButton from "./FloatingActionButton";
 
 interface FilesViewPreviewBoxProps {
   key: string,
@@ -23,6 +25,7 @@ const FilesViewPreviewBox = ({
   file,
   isDangling,
 }: FilesViewPreviewBoxProps) => {
+  const navigate = useNavigate();
   const type = file.slug.endsWith(".neno.js")
     ? MediaType.NENO_SCRIPT
     : (getMediaTypeFromFilename(file.slug) || "unknown");
@@ -63,7 +66,7 @@ const FilesViewPreviewBox = ({
         className={
           type === MediaType.IMAGE
             ? "checkerboard-background preview-image"
-            : ""
+            : "file-type-icon"
         }
       />
       <div
@@ -81,6 +84,26 @@ const FilesViewPreviewBox = ({
             : ""
         }
       </div>
+      {
+        type === MediaType.NENO_SCRIPT
+          ? <FloatingActionButton
+            title="Open in script editor"
+            icon="create"
+            onClick={(e) => {
+              navigate(getAppPath(
+                PathTemplate.SCRIPT,
+                new Map([
+                  ["GRAPH_ID", LOCAL_GRAPH_ID],
+                  ["SCRIPT_SLUG", file.slug],
+                ]),
+              ));
+
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          />
+          : ""
+      }
     </Link>
   </div>;
 };

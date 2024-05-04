@@ -1,9 +1,10 @@
+import { MouseEvent } from "react";
 import { getIconSrc } from "../lib/utils";
 
 interface FloatingActionButtonProps {
   title: string;
   icon: string;
-  onClick: () => void;
+  onClick: (e: MouseEvent) => void;
   disabled?: boolean;
 }
 

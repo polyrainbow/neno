@@ -455,7 +455,7 @@ button {
 
 .icon-button-floating {
   display: block;
-  position: fixed;
+  position: absolute;
   bottom: 20px;
   right: 20px;
   border: none;

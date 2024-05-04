@@ -21,16 +21,19 @@
       background: var(--accent-color-interactible);
       border-radius: var(--border-radius);
       overflow: hidden;
+      position: relative;
     
       a {
         text-decoration: none;
       }
     
       img {
-        width: 150px;
-        height: 150px;
-        padding: 25px;
-        display: block;
+        &.file-type-icon {
+          width: 150px;
+          height: 150px;
+          padding: 25px;
+          display: block;
+        }
     
         &.preview-image {
           width: 200px;
@@ -50,6 +53,16 @@
         justify-content: space-between;
         word-break: break-word;
         height: 46px;
+      }
+
+      .icon-button-floating {
+        bottom: 67px;
+        right: 9px;
+        min-width: 25px;
+        padding: 6px;
+        background: var(--accent-color-2);
+        width: 35px;
+        height: 35px;
       }
     }
   }
