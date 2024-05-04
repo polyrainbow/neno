@@ -87,7 +87,7 @@ const FilesViewPreviewBox = ({
       {
         type === MediaType.NENO_SCRIPT
           ? <FloatingActionButton
-            title="Open in script editor"
+            title={l("files.open-in-script-editor")}
             icon="create"
             onClick={(e) => {
               navigate(getAppPath(

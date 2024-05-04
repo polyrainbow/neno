@@ -151,7 +151,7 @@ const FileView = () => {
                   ));
                 }}
               >
-                Open in script editor
+                {l("files.open-in-script-editor")}
               </HeaderButton>
               : ""
           }

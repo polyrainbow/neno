@@ -20,6 +20,7 @@ import StatusIndicator from "./StatusIndicator";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import { l } from "../lib/intl";
 
 interface CustomScript {
   slug: string;
@@ -169,7 +170,7 @@ const ScriptView = () => {
                 ),
               );
             }}
-          >Show all files</HeaderButton>
+          >{l("files.all-files")}</HeaderButton>
           <HeaderButton
             icon="play_arrow"
             disabled={!activeScript}
@@ -180,14 +181,14 @@ const ScriptView = () => {
                 script: scriptInput,
               });
             }}
-          >Run</HeaderButton>
+          >{l("scripts.run")}</HeaderButton>
           <HeaderButton
             icon="save"
             disabled={!activeScript}
             onClick={() => {
               handleSaveRequest();
             }}
-          >Save</HeaderButton>
+          >{l("scripts.save")}</HeaderButton>
           <HeaderButton
             icon="description"
             onClick={async () => {
@@ -205,7 +206,7 @@ const ScriptView = () => {
                 ),
               );
             }}
-          >Show file properties</HeaderButton>
+          >{l("scripts.show-file-properties")}</HeaderButton>
         </div>
       }
     />

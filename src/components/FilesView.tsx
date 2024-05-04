@@ -111,6 +111,7 @@ const FilesView = () => {
               <input
                 className="filter"
                 type="search"
+                placeholder={l("files.filter")}
                 value={filterInput}
                 onChange={(e) => setFilterInput(e.target.value)}
               />
@@ -118,7 +119,7 @@ const FilesView = () => {
                 className="default-button-small"
                 onClick={() => setFilterInput("scripts/")}
               >
-                Show NENO scripts
+                {l("files.show-neno-scripts")}
               </button>
             </div>
             <FlexContainer

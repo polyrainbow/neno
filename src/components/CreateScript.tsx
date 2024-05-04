@@ -2,6 +2,7 @@ import { useState } from "react";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import { isValidFileSlug } from "../lib/notes/slugUtils";
+import { l } from "../lib/intl";
 
 interface CreateScriptProps {
   existingFiles: FileInfo[],
@@ -16,7 +17,7 @@ const CreateScript = ({
   const notesProvider = useNotesProvider();
 
   return <div className="create-script">
-    <h2>Create script</h2>
+    <h2>{l("files.create-script")}</h2>
     <div className="controls">
       <span>
       /scripts/<input
@@ -43,14 +44,14 @@ const CreateScript = ({
           await notesProvider.addFile(readable, "scripts", filename);
           onCreated();
         }}
-      >Create</button>
+      >{l("files.create-script.create")}</button>
     </div>
     {
       existingFiles.map(s => s.slug).includes(
         `scripts/${newScriptName}.neno.js`,
       )
         ? <p className="error">
-          Script already exists. Please choose another name.
+          {l("files.create-script.script-already-exists")}
         </p>
         : ""
     }
