@@ -29,6 +29,7 @@ import { saveFile } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
 import FileViewPreview from "./FileViewPreview";
 import { Slug } from "../lib/notes/types/Slug";
+import HeaderButton from "./HeaderButton";
 
 const getRenameInput = (slug: Slug): string => {
   return removeExtensionFromFilename(slug);
@@ -87,8 +88,8 @@ const FileView = () => {
     <HeaderContainerLeftRight
       leftContent={
         <div className="header-controls">
-          <button
-            className="header-button"
+          <HeaderButton
+            icon="list"
             onClick={() => {
               navigate(
                 getAppPath(
@@ -97,7 +98,9 @@ const FileView = () => {
                 ),
               );
             }}
-          >{l("files.show-all-files")}</button>
+          >
+            {l("files.show-all-files")}
+          </HeaderButton>
         </div>
       }
     />
@@ -147,6 +150,22 @@ const FileView = () => {
           }}
         >
           {l("files.save-duplicate")}
+        </button>
+        <button
+          className="default-button default-action"
+          onClick={async () => {
+            if (!fileInfo) return;
+
+            navigate(getAppPath(
+              PathTemplate.SCRIPT,
+              new Map([
+                ["GRAPH_ID", LOCAL_GRAPH_ID],
+                ["SCRIPT_SLUG", fileInfo.slug],
+              ]),
+            ));
+          }}
+        >
+          Open in script editor
         </button>
         <button
           disabled={!fileInfo}

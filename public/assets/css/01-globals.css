@@ -628,51 +628,6 @@ input:checked + .slider::before {
 }
 
 
-.script-selection-main {
-  flex-direction: column;
-  gap: var(--default-gap);
-  padding: var(--default-padding);
-  height: calc(100vh - 80px);
-  overflow: auto;
-
-  .warning {
-    color: var(--error-and-danger-text-color);
-    max-width: 500px;
-  }
-
-  .list {
-    width: 480px;
-    gap: 2px;
-    display: flex;
-    flex-direction: column;
-
-    .script-selection-button {
-      width: 30em;
-      min-height: 3em;
-      text-align: left;
-
-      &:hover {
-        background-color: var(--nli-color-hover);
-      }
-    }
-
-    .create-script {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-
-      input {
-        margin: 0 5px;
-      }
-    }
-
-    .error {
-      color: var(--error-and-danger-text-color);
-    }
-  }
-}
-
 .script-view-main {
   display: flex;
   height: calc(100vh - 50px);

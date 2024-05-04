@@ -146,6 +146,9 @@ const getAppPath = (
 
 
 const getIconSrc = (iconName: string): string => {
+  if (iconName === "neno") {
+    return Config.ASSETS_PATH + "app-icon/logo.svg";
+  }
   return Config.ICON_PATH + iconName + ".svg";
 };
 

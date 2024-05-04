@@ -164,12 +164,12 @@ const ScriptView = () => {
               }
               navigate(
                 getAppPath(
-                  PathTemplate.SCRIPTS,
+                  PathTemplate.FILES,
                   new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
                 ),
               );
             }}
-          >Back to list</HeaderButton>
+          >Show all files</HeaderButton>
           <HeaderButton
             icon="play_arrow"
             disabled={!activeScript}
@@ -188,6 +188,24 @@ const ScriptView = () => {
               handleSaveRequest();
             }}
           >Save</HeaderButton>
+          <HeaderButton
+            icon="description"
+            onClick={async () => {
+              if (unsavedChanges) {
+                await confirmDiscardingUnsavedChanges();
+                setUnsavedChanges(false);
+              }
+              navigate(
+                getAppPath(
+                  PathTemplate.FILE,
+                  new Map([
+                    ["GRAPH_ID", LOCAL_GRAPH_ID],
+                    ["FILE_SLUG", slug || ""],
+                  ]),
+                ),
+              );
+            }}
+          >Show file properties</HeaderButton>
         </div>
       }
     />

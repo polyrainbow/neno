@@ -23,7 +23,9 @@ const FilesViewPreviewBox = ({
   file,
   isDangling,
 }: FilesViewPreviewBoxProps) => {
-  const type = getMediaTypeFromFilename(file.slug) || "unknown";
+  const type = file.slug.endsWith(".neno.js")
+    ? MediaType.NENO_SCRIPT
+    : (getMediaTypeFromFilename(file.slug) || "unknown");
   const [thumbnailImageSrc, setThumbnailImageSrc]
     = useState<string | null>(null);
 
@@ -37,6 +39,7 @@ const FilesViewPreviewBox = ({
           [MediaType.VIDEO]: getIconSrc("video_file"),
           [MediaType.PDF]: getIconSrc("description"),
           [MediaType.TEXT]: getIconSrc("description"),
+          [MediaType.NENO_SCRIPT]: getIconSrc("neno"),
           [MediaType.OTHER]: getIconSrc("draft"),
         };
 
@@ -57,7 +60,11 @@ const FilesViewPreviewBox = ({
       <img
         src={thumbnailImageSrc || ""}
         loading="lazy"
-        className={type === MediaType.IMAGE ? "checkerboard-background" : ""}
+        className={
+          type === MediaType.IMAGE
+            ? "checkerboard-background preview-image"
+            : ""
+        }
       />
       <div
         className="file-info"

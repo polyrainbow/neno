@@ -4,5 +4,6 @@ export enum MediaType {
   AUDIO = "audio",
   VIDEO = "video",
   TEXT = "text",
+  NENO_SCRIPT = "neno-sscript",
   OTHER = "other",
 }

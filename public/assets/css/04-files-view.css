@@ -1,40 +1,73 @@
-/******************************
-  Files view
-******************************/
-
-.files-view .files {
-  flex-wrap: wrap;
-  gap: var(--default-gap);
-}
-
-.files-view-preview-box {
-  width: 200px;
-  min-height: 241px;
-  background: var(--accent-color-interactible);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-
-  a {
-    text-decoration: none;
+.files-view {
+  h1 {
+    margin: 10px 0;
   }
 
-  img {
-    width: 200px;
-    height: 200px;
-    object-fit: cover;
-    display: block;
-  }
-
-  .file-info {
-    color: var(--main-content-color);
-    text-decoration: none;
-    padding: 5px;
-    font-size: var(--small-font-size);
-    min-height: 31px;
+  .controls {
     display: flex;
-    justify-content: space-between;
-    word-break: break-word;
-    height: 46px;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--default-gap);
+  }
+
+  .files {
+    flex-wrap: wrap;
+    gap: var(--default-gap);
+
+    .files-view-preview-box {
+      width: 200px;
+      min-height: 241px;
+      background: var(--accent-color-interactible);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    
+      a {
+        text-decoration: none;
+      }
+    
+      img {
+        width: 150px;
+        height: 150px;
+        padding: 25px;
+        display: block;
+    
+        &.preview-image {
+          width: 200px;
+          height: 200px;
+          padding: 0px;
+          object-fit: cover;
+        }
+      }
+    
+      .file-info {
+        color: var(--main-content-color);
+        text-decoration: none;
+        padding: 5px;
+        font-size: var(--small-font-size);
+        min-height: 31px;
+        display: flex;
+        justify-content: space-between;
+        word-break: break-word;
+        height: 46px;
+      }
+    }
+  }
+
+  .create-script {
+    .controls {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      input {
+        margin: 0 5px;
+      }
+    }
+
+    .error {
+      color: var(--error-and-danger-text-color);
+    }
   }
 }
 
@@ -43,6 +76,10 @@
 ******************************/
 
 .file-section {
+  h1 {
+    margin-top: 10px;
+  }
+
   .file-container {
     justify-content: center;
     background-color: var(--accent-color-interactible);
