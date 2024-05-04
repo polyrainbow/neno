@@ -48,7 +48,7 @@ const FileViewPreview = ({
         : ""
     }
     {
-      type === MediaType.TEXT || type === MediaType.NENO_SCRIPT
+      type === MediaType.TEXT
         ? <pre
           className="preview-block-file-text"
         >{text}</pre>

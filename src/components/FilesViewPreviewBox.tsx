@@ -12,7 +12,7 @@ import {
   getMediaTypeFromFilename,
 } from "../lib/notes/utils";
 import { getUrlForSlug } from "../lib/LocalDataStorage";
-import { LOCAL_GRAPH_ID } from "../config";
+import { LOCAL_GRAPH_ID, NENO_SCRIPT_FILE_SUFFIX } from "../config";
 import FloatingActionButton from "./FloatingActionButton";
 
 interface FilesViewPreviewBoxProps {
@@ -26,9 +26,8 @@ const FilesViewPreviewBox = ({
   isDangling,
 }: FilesViewPreviewBoxProps) => {
   const navigate = useNavigate();
-  const type = file.slug.endsWith(".neno.js")
-    ? MediaType.NENO_SCRIPT
-    : (getMediaTypeFromFilename(file.slug) || "unknown");
+  const type = getMediaTypeFromFilename(file.slug) || "unknown";
+  const isNenoScript = file.slug.endsWith(NENO_SCRIPT_FILE_SUFFIX);
   const [thumbnailImageSrc, setThumbnailImageSrc]
     = useState<string | null>(null);
 
@@ -36,13 +35,17 @@ const FilesViewPreviewBox = ({
   useEffect(() => {
     getUrlForSlug(file.slug)
       .then((src) => {
+        if (isNenoScript) {
+          setThumbnailImageSrc(getIconSrc("neno"));
+          return;
+        }
+
         const thumbnailImageSrcMap = {
           [MediaType.IMAGE]: src,
           [MediaType.AUDIO]: getIconSrc("audio_file"),
           [MediaType.VIDEO]: getIconSrc("video_file"),
           [MediaType.PDF]: getIconSrc("description"),
           [MediaType.TEXT]: getIconSrc("description"),
-          [MediaType.NENO_SCRIPT]: getIconSrc("neno"),
           [MediaType.OTHER]: getIconSrc("draft"),
         };
 
@@ -85,7 +88,7 @@ const FilesViewPreviewBox = ({
         }
       </div>
       {
-        type === MediaType.NENO_SCRIPT
+        isNenoScript
           ? <FloatingActionButton
             title={l("files.open-in-script-editor")}
             icon="create"

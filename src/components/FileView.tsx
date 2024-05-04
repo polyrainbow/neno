@@ -14,7 +14,11 @@ import { l } from "../lib/intl";
 import { MediaType } from "../lib/notes/types/MediaType";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import BusyIndicator from "./BusyIndicator";
-import { LOCAL_GRAPH_ID, SPAN_SEPARATOR } from "../config";
+import {
+  LOCAL_GRAPH_ID,
+  NENO_SCRIPT_FILE_SUFFIX,
+  SPAN_SEPARATOR,
+} from "../config";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import {
@@ -52,16 +56,13 @@ const FileView = () => {
   const navigate = useNavigate();
 
   const type = slug
-    ? (slug.endsWith(".neno.js")
-      ? MediaType.NENO_SCRIPT
-      : getMediaTypeFromFilename(slug)
-    )
+    ? getMediaTypeFromFilename(slug)
     : null;
 
   const confirm = useConfirm();
 
-  const canShowTextPreview = type === MediaType.NENO_SCRIPT
-    || type === MediaType.TEXT;
+  const canShowTextPreview = type === MediaType.TEXT;
+  const isNenoScript = slug?.endsWith(NENO_SCRIPT_FILE_SUFFIX) ?? false;
 
   useEffect(() => {
     if (typeof slug !== "string") return;
@@ -136,7 +137,7 @@ const FileView = () => {
             {l("files.save-duplicate")}
           </HeaderButton>
           {
-            type === MediaType.NENO_SCRIPT
+            isNenoScript
               ? <HeaderButton
                 icon="create"
                 onClick={async () => {
