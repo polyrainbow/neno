@@ -108,6 +108,7 @@ const NoteListWithControls = ({
   );
 
   return <section
+    className="note-list-with-controls-wrapper"
     ref={noteListWithControlsRef}
   >
     <NoteListControls

@@ -111,21 +111,23 @@ const SearchPresets = ({
       currentQuery.trim().length > 2
         ? <div className="save-current-query">
           <h2>{l("list.search.presets.save-current-query")}</h2>
-          <input
-            id="search-preset-name-input"
-            type="text"
-            placeholder={l("list.search.presets.preset-name")}
-            onInput={(e) => {
-              setCurrentQueryLabel((e.target as HTMLInputElement).value);
-            }}
-          ></input>
-          <button
-            onClick={() => setSearchPresetsPersistently([...searchPresets, {
-              query: currentQuery,
-              label: currentQueryLabel,
-            }])}
-            className="default-button-small default-action"
-          >{l("list.search.presets.save")}</button>
+          <div className="save-current-query-controls">
+            <input
+              id="search-preset-name-input"
+              type="text"
+              placeholder={l("list.search.presets.preset-name")}
+              onInput={(e) => {
+                setCurrentQueryLabel((e.target as HTMLInputElement).value);
+              }}
+            ></input>
+            <button
+              onClick={() => setSearchPresetsPersistently([...searchPresets, {
+                query: currentQuery,
+                label: currentQueryLabel,
+              }])}
+              className="default-button-small default-action"
+            >{l("list.search.presets.save")}</button>
+          </div>
         </div>
         : ""
     }

@@ -1,22 +1,37 @@
-.note-list-controls input,
-.note-list-controls select {
-  margin: 6.5px 0;
+.note-list-controls {
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100vw;
+  overflow: hidden;
+  border-bottom: var(--default-border);
+
+  input, select {
+    /*
+      In the mobile view, we don't set a fixed height of the
+      note-list-controls bar, so the margin
+      of these elements must be set so that it matches a total height of 50px.
+    */
+    margin: 6.5px 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 30px;
+    width: 265px;
+    padding: 8px;
+  }
 
   /*
-    In the mobile view, we don't set a fixed height of the
-    note-list-controls bar, so the margin
-    of these elements must be set so that it matches a total height of 50px.
+    Explicitly setting height for select to match input[type=text]
+    https://stackoverflow.com/a/8189977/3890888
   */
+  select {
+    height: 35.5px;
+  }
 
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-width: 30px;
-  height: 36px;
-  width: 265px;
-}
-
-.note-list-sort-mode-select {
-  width: 265px;
+  .note-list-sort-mode-select {
+    width: 265px;
+  }
 }
 
 .note-list-item {
@@ -173,32 +188,24 @@
   Note
 ******************************/
 
-.note-controls,
-.note-list-controls {
+.note-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   max-width: 100vw;
   overflow: hidden;
-}
-
-.note-list-controls {
-  padding: 0 10px;
-}
-
-.note-controls {
   border-bottom: var(--default-border);
   user-select: none;
-}
 
-.note-controls-left,
-.note-controls-right {
-  display: flex;
-  flex-wrap: wrap;
-}
+  .note-controls-left,
+  .note-controls-right {
+    display: flex;
+    flex-wrap: wrap;
+  }
 
-.note-controls-right img[width="24"][height="24"] {
-  padding: 13px; /* (50px - 24px) / 2 */
+  .note-controls-right img[width="24"][height="24"] {
+    padding: 13px; /* (50px - 24px) / 2 */
+  }
 }
 
 .note-busy-container {
@@ -208,82 +215,84 @@
 
 .note {
   max-width: 100vw;
-}
 
-.note-content {
-  max-width: var(--max-content-width);
-  margin: auto;
-  padding: var(--default-padding);
-}
+  .note-props {
+    max-width: var(--max-content-width);
+    margin: auto;
+    padding: var(--default-padding);
 
-.note-backlinks {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.note-actions {
-  gap: var(--default-gap);
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: var(--default-gap);
+    .note-backlinks {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    
+    .note-actions {
+      gap: var(--default-gap);
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: var(--default-gap);
+    }
+  }
 }
 
 .note-meta-paragraph {
   font-size: var(--default-font-size);
 }
 
-/******************************
-  Search presets
-******************************/
-
 .search-presets {
   display: flex;
   flex-direction: column;
   gap: var(--default-gap);
   padding: var(--default-gap);
-}
 
-.search-presets-heading-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  h1 {
-    margin: 0;
-  }
-}
-
-.search-preset {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: var(--default-font-size);
-
-  .search-preset-buttons {
+  .search-presets-heading-row {
     display: flex;
-    flex-shrink: 0;
-    gap: var(--small-gap);
+    justify-content: space-between;
+    align-items: center;
+
+    h1 {
+      margin: 0;
+    }
   }
 
-  code {
-    color: var(--alt-content-color);
-    font-size: var(--small-font-size);
+  .search-preset {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--default-font-size);
+
+    .search-preset-buttons {
+      display: flex;
+      flex-shrink: 0;
+      gap: var(--small-gap);
+    }
+
+    code {
+      color: var(--alt-content-color);
+      font-size: var(--small-font-size);
+    }
   }
-}
 
-.save-current-query {
-  display: flex;
-  flex-direction: column;
-  gap: var(--default-gap);
+  .save-current-query {
+    display: flex;
+    flex-direction: column;
+    gap: var(--default-gap);
 
-  & > h2{
-    margin: 0;
+    h2{
+      margin: 0;
+    }
+
+    .save-current-query-controls {
+      display: flex;
+      gap: var(--default-gap);
+
+      #search-preset-name-input {
+        margin: 0;
+        width: 100%;
+      }
+    }
   }
-}
-
-#search-preset-name-input {
-  margin: 0;
 }
 
 .pagination {
@@ -315,10 +324,6 @@
   }
 }
 
-/******************************
-  Misc
-******************************/
-
 .list-section {
   display: flex;
   flex-direction: column;
@@ -335,10 +340,6 @@
   & > *:first-child:not(.note-list) {
     padding-top: var(--default-gap);
   }
-}
-
-.note-list-controls {
-  border-bottom: var(--default-border);
 }
 
 .note-search-disclaimer {
@@ -417,7 +418,7 @@
     grid-area: 1 / 1 / 2 / 2;
   }
 
-  .note-content {
+  .note-props {
     padding: 0 var(--default-gap);
   }
 }

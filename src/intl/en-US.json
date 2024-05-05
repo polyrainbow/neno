@@ -60,6 +60,8 @@
   "files.files-heading": "Files ({numberOfFiles})",
   "files.filter": "Filter",
   "files.open-in-script-editor": "Open in script editor",
+  "files.rename": "Rename",
+  "files.rename.new-slug": "New slug",
   "files.save-duplicate": "Save duplicate",
   "files.show-all-files": "Show all files",
   "files.show-neno-scripts": "Show NENO scripts",

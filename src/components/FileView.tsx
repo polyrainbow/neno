@@ -228,10 +228,12 @@ const FileView = () => {
             height={30}
           />
       }
-      <h2>Rename</h2>
+      <h2>{l("files.rename")}</h2>
       <div className="rename">
         <div className="rename-section-input-line">
-          <label htmlFor="file-slug-rename-input">New slug:</label>
+          <label htmlFor="file-slug-rename-input">
+            {l("files.rename.new-slug")}:
+          </label>
           <div>
             <input
               id="file-slug-rename-input"
@@ -310,7 +312,7 @@ const FileView = () => {
             }
           }}
         >
-          Rename
+          {l("files.rename")}
         </button>
       </div>
     </section>

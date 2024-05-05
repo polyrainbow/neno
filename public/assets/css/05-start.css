@@ -1,7 +1,3 @@
-/******************************
-  Start
-******************************/
-
 .section-start {
   display: flex;
   gap: calc(4 * var(--default-gap));

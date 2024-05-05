@@ -57,7 +57,7 @@
         height: 46px;
       }
 
-      .icon-button-floating {
+      .floating-action-button {
         bottom: 67px;
         right: 9px;
         min-width: 25px;
@@ -85,10 +85,6 @@
     }
   }
 }
-
-/******************************
-  File view
-******************************/
 
 .file-section {
   h1 {

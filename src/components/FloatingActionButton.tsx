@@ -15,7 +15,7 @@ const FloatingActionButton = ({
   disabled = false,
 }: FloatingActionButtonProps) => {
   return <button
-    className="icon-button-floating"
+    className="floating-action-button"
     onClick={onClick}
     disabled={disabled}
     title={title}
