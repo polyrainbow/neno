@@ -44,4 +44,13 @@ test.describe("File view", () => {
     expect(textInEditor.startsWith("Note with a file"))
       .toBe(true);
   });
+
+  test("should create new note with file as reference", async ({ page }) => {
+    await page.getByText("Create note with file").click();
+    const textInEditor
+      = await page.locator("div[data-lexical-editor]").innerText();
+
+    expect(textInEditor.startsWith("/files/test.txt"))
+      .toBe(true);
+  });
 });

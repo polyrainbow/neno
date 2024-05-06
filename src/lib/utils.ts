@@ -137,7 +137,7 @@ const getAppPath = (
     );
   });
 
-  if (urlParams) {
+  if (urlParams && urlParams.size > 0) {
     path += "?" + urlParams;
   }
 

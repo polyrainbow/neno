@@ -1,9 +1,9 @@
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRecommended from "eslint-plugin-react/configs/recommended.js";
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import stylisticTs from '@stylistic/eslint-plugin-ts';
-import stylistic from '@stylistic/eslint-plugin'
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
+import stylisticTs from "@stylistic/eslint-plugin-ts";
+import stylistic from "@stylistic/eslint-plugin";
 
 export default [
   eslint.configs.recommended,
@@ -12,13 +12,13 @@ export default [
   {
     "plugins": {
       "react-hooks": reactHooks,
-      '@stylistic': stylistic,
+      "@stylistic": stylistic,
       "@stylistic/ts": stylisticTs,
     },
     "settings": {
       "react": {
-        "version": "18.2"
-      }
+        "version": "18.2",
+      },
     },
     "rules": {
       // eslint - https://eslint.org/docs/latest/rules/
@@ -48,13 +48,13 @@ export default [
       "@typescript-eslint/no-use-before-define": ["error"],
       "@typescript-eslint/indent": [
         "error",
-        2
+        2,
       ],
 
       // @stylistic - https://eslint.style/packages/default#rules
       "@stylistic/linebreak-style": [
         "error",
-        "unix"
+        "unix",
       ],
       "@stylistic/no-mixed-spaces-and-tabs": ["error"],
       "@stylistic/operator-linebreak": ["error", "before"],
@@ -69,7 +69,7 @@ export default [
       "@stylistic/ts/space-before-blocks": ["error", "always"],
       "@stylistic/ts/quotes": [
         "error",
-        "double"
+        "double",
       ],
       "@stylistic/ts/key-spacing": ["error", { "beforeColon": false }],
       "@stylistic/ts/keyword-spacing": ["error"],
