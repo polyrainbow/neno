@@ -26,7 +26,6 @@ interface PaginationProps {
   searchResultsPerPage: number;
   page: number;
   onChange: (newPage: number) => void;
-  placement?: "top" | "bottom";
 }
 
 const Pagination = ({
@@ -34,7 +33,6 @@ const Pagination = ({
   searchResultsPerPage,
   page,
   onChange,
-  placement,
 }: PaginationProps) => {
   const doRenderPagination = numberOfResults > searchResultsPerPage;
 
@@ -52,7 +50,7 @@ const Pagination = ({
   if (!doRenderPagination) return null;
 
   return (
-    <div className={"pagination " + (placement || "")}>
+    <div className="pagination">
       <nav>
         <ul>
           {items.map(({ page, type, selected, ...item }, index) => {

@@ -111,7 +111,6 @@ const NoteList = ({
           page={page}
           searchResultsPerPage={SEARCH_RESULTS_PER_PAGE}
           onChange={(newPage) => setPage(newPage)}
-          placement="top"
         />
         : ""
     }
@@ -165,7 +164,6 @@ const NoteList = ({
           page={page}
           searchResultsPerPage={SEARCH_RESULTS_PER_PAGE}
           onChange={(newPage) => setPage(newPage)}
-          placement="bottom"
         />
         : ""
     }

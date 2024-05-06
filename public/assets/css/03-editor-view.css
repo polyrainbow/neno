@@ -299,14 +299,6 @@
   text-align: center;
   word-break: break-all;
 
-  &.top {
-    padding-top: var(--default-padding);
-  }
-
-  &.bottom {
-    padding-bottom: var(--default-padding);
-  }
-
   ul {
     list-style: none;
     padding: 0;
@@ -339,6 +331,10 @@
 
   & > *:first-child:not(.note-list) {
     padding-top: var(--default-gap);
+  }
+
+  & > *:last-child:not(.note-list) {
+    padding-bottom: var(--default-gap);
   }
 }
 
