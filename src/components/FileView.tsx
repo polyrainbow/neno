@@ -4,6 +4,7 @@ import {
 } from "react-router-dom";
 import NoteListItem from "../lib/notes/types/NoteListItem";
 import {
+  createContentFromSlugs,
   getAppPath,
   getUrl,
   humanFileSize,
@@ -119,10 +120,13 @@ const FileView = () => {
               navigate(getAppPath(
                 PathTemplate.NEW_NOTE,
                 new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-                new URLSearchParams({
-                  referenceSlugs: fileInfo.slug,
-                }),
-              ));
+              ), {
+                state: {
+                  contentIfNewNote: createContentFromSlugs([
+                    fileInfo.slug,
+                  ]),
+                },
+              });
             }}
           >
             {l("files.create-note-with-file")}

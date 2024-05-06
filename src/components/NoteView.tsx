@@ -7,7 +7,7 @@ import * as Utils from "../lib/utils";
 import * as Config from "../config";
 import {
   useLocation,
-  useNavigate, useParams, useSearchParams,
+  useNavigate, useParams,
 } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
@@ -60,7 +60,6 @@ const NoteView = () => {
   const confirm = useConfirm();
   const { slug } = useParams();
   const location = useLocation();
-  const [urlSearchParams] = useSearchParams();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
   const goToNote = useGoToNote();
   const [editor] = useLexicalComposerContext();
@@ -111,21 +110,12 @@ const NoteView = () => {
   ) => {
     const noteFromDatabase = await saveActiveNote(ignoreDuplicateTitles);
 
-    /*
-      When saving a new note for the first time, we get its id from the
-      notesProvider. Then we update the address bar to include the new id.
-      We're using requestIdleCallback because we first want to let React
-      update all the states, so that when this goToNote function triggers an
-      effect, we then can work with the updated changes.
-    */
-    requestIdleCallback(() => {
-      goToNote(
-        noteFromDatabase.meta.slug,
-        {
-          replace: true,
-        },
-      );
-    });
+    goToNote(
+      noteFromDatabase.meta.slug,
+      {
+        replace: true,
+      },
+    );
 
     /*
       Order matters here: We want to goToNote before refreshing content views
@@ -166,16 +156,22 @@ const NoteView = () => {
 
 
   const setCanonicalNewNotePath = () => {
-    /* whatever has been written to the address bar, let's replace it with
-    the canonical path for a new note */
-    navigate(
-      Utils.getAppPath(
-        PathTemplate.NEW_NOTE,
-        new Map([["GRAPH_ID", Config.LOCAL_GRAPH_ID]]),
-        new URLSearchParams(location.search),
-      ),
-      { replace: true },
+    const targetPath = Utils.getAppPath(
+      PathTemplate.NEW_NOTE,
+      new Map([["GRAPH_ID", Config.LOCAL_GRAPH_ID]]),
+      new URLSearchParams(location.search),
     );
+
+    if (location.pathname !== targetPath) {
+      /* whatever has been written to the address bar, let's replace it with
+      the canonical path for a new note */
+      navigate(
+        targetPath,
+        {
+          replace: true,
+        },
+      );
+    }
   };
 
 
@@ -234,69 +230,67 @@ const NoteView = () => {
     refreshContentViews();
 
     if (getValidNoteSlug(slug) === null) {
-      const slugs = urlSearchParams.has("referenceSlugs")
-        ? (urlSearchParams.get("referenceSlugs") as string).split(",")
-        : [];
-
       goToNote("new", {
-        contentIfNewNote: Utils.createContentFromSlugs(slugs),
+        contentIfNewNote: location.state?.contentIfNewNote || "",
       });
-
       setCanonicalNewNotePath();
     }
   }, []);
 
 
-  useEffect(() => {
-    const loadNoteAndRefreshURL = async (slug?: Slug) => {
-      if (slug === "new") {
-        await loadNote(
-          slug,
-          location?.state?.contentIfNewNote || "",
-        );
-      }
+  const loadNoteAndRefreshURL = async (
+    slug?: Slug,
+    contentIfNewNote?: string,
+  ) => {
+    if (slug === "new") {
+      await loadNote(
+        slug,
+        contentIfNewNote || "",
+      );
+    }
 
-      const validNoteSlug = getValidNoteSlug(slug);
-
+    const validNoteSlug = getValidNoteSlug(slug);
+    if (
+      validNoteSlug !== null
+      /*
+        We don't want to react on a note id change in the url if that
+        note is already loaded. This might happen when saving a new note for
+        the first time:
+        The note id changes from "new" to "123", which triggers this effect.
+        But we got the content already from the call to saveActiveNote().
+        So if we already have a noteId and it is the same one, don't reload!
+      */
+      && (!(
+        "slug" in activeNote
+        && validNoteSlug === activeNote.slug
+      ))
+    ) {
+      const receivedNoteSlug = await loadNote(
+        validNoteSlug,
+        contentIfNewNote,
+      );
       if (
-        validNoteSlug !== null
-        /*
-          We don't want to react on a note id change in the url if that
-          note is already loaded. This might happen when saving a new note for
-          the first time:
-          The note id changes from "new" to "123", which triggers this effect.
-          But we got the content already from the call to saveActiveNote().
-          So if we already have a noteId and it is the same one, don't reload!
-        */
-        && (!(
-          "slug" in activeNote
-          && validNoteSlug === activeNote.slug
-        ))
+        typeof receivedNoteSlug === "string"
+        && validNoteSlug !== receivedNoteSlug
       ) {
-        const receivedNoteSlug = await loadNote(
-          validNoteSlug,
-          location.state?.contentIfNewNote,
+        navigate(
+          Utils.getAppPath(
+            PathTemplate.EXISTING_NOTE,
+            new Map([
+              ["GRAPH_ID", Config.LOCAL_GRAPH_ID],
+              ["SLUG", receivedNoteSlug],
+            ]),
+            new URLSearchParams(location.search),
+          ),
+          { replace: true },
         );
-        if (
-          typeof receivedNoteSlug === "string"
-          && validNoteSlug !== receivedNoteSlug
-        ) {
-          navigate(
-            Utils.getAppPath(
-              PathTemplate.EXISTING_NOTE,
-              new Map([
-                ["GRAPH_ID", Config.LOCAL_GRAPH_ID],
-                ["SLUG", receivedNoteSlug],
-              ]),
-              new URLSearchParams(location.search),
-            ),
-            { replace: true },
-          );
-        }
       }
-    };
+    }
+  };
 
-    loadNoteAndRefreshURL(slug);
+
+  useEffect(() => {
+    loadNoteAndRefreshURL(slug, location?.state?.contentIfNewNote);
   }, [slug, location.state]);
 
   return <>

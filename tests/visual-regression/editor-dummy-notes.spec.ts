@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { test, expect } from "@playwright/test";
 import { setDefaultDate } from "../utils";
 
@@ -17,13 +16,17 @@ test.describe("Editor", () => {
   test("should look fine empty - light", async ({ page }) => {
     await page.locator("#search-input").click();
     await page.keyboard.type("1", { delay: 20 });
-    expect(await page.screenshot()).toMatchSnapshot("editor-dummy-notes-pagination-search-results-light.png");
+    expect(await page.screenshot())
+      .toMatchSnapshot(
+        "editor-dummy-notes-pagination-search-results-light.png",
+      );
   });
 
   test("should look fine empty - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.locator("#search-input").click();
     await page.keyboard.type("1", { delay: 20 });
-    expect(await page.screenshot()).toMatchSnapshot("editor-dummy-notes-pagination-search-results-dark.png");
+    expect(await page.screenshot())
+      .toMatchSnapshot("editor-dummy-notes-pagination-search-results-dark.png");
   });
 });

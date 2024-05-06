@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -177,7 +176,7 @@ test.describe("Editor", () => {
       join(import.meta.dirname, "..", "resources", "beach.jpg"),
     );
 
-    const dataTransfer = await page.evaluateHandle((data) => {
+    const dataTransfer = await page.evaluateHandle(() => {
       const dt = new DataTransfer();
       const file = new File(
         ["This is the content\nof the plain text file."],
@@ -201,7 +200,7 @@ test.describe("Editor", () => {
       join(import.meta.dirname, "..", "resources", "beach.jpg"),
     );
 
-    const dataTransfer = await page.evaluateHandle((data) => {
+    const dataTransfer = await page.evaluateHandle(() => {
       const dt = new DataTransfer();
       const file = new File(
         ["This is the content\nof the plain text file."],
@@ -250,7 +249,7 @@ test.describe("Editor", () => {
     await page.dispatchEvent("section.note", "drop", {
       dataTransfer: dataTransfer2,
     });
-  
+
     await page.click("#button_upload");
     await page.evaluate(() => {
       const note = document.querySelector(".note")!;

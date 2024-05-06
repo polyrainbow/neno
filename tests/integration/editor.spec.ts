@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+/* eslint-disable @stylistic/max-len */
 import { test, expect, ElementHandle } from "@playwright/test";
 
 const DEMO_NOTE = `# Welcome to NENO
@@ -39,7 +39,9 @@ test.describe("Editor view", () => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_upload");
-    const editorParagraphs = await page.$$("div[data-lexical-editor] .editor-paragraph");
+    const editorParagraphs = await page.$$(
+      "div[data-lexical-editor] .editor-paragraph",
+    );
     expect(editorParagraphs.length).toBe(10);
   });
 
@@ -55,7 +57,9 @@ test.describe("Editor view", () => {
   test("editor paragraphs should have correct types", async ({ page }) => {
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_upload");
-    const editorParagraphs = await page.$$("div[data-lexical-editor] .editor-paragraph");
+    const editorParagraphs = await page.$$(
+      "div[data-lexical-editor] .editor-paragraph",
+    );
     const classes = await Promise.all(
       editorParagraphs.map((p) => p.getAttribute("class")),
     );
@@ -76,7 +80,6 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("Two /link-1 and /link-2");
       await page.click("#button_upload");
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
       ))!;
@@ -98,7 +101,6 @@ test.describe("Editor view", () => {
     "slashlink with combining diacritic mark should be correctly linked",
     async ({ page }) => {
       await page.keyboard.type("/ö.txt"); // ö with combining diacritic mark
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
       ))!;
@@ -122,7 +124,6 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Backspace");
       await page.keyboard.press("Space");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraph = (
         await page.$("div[data-lexical-editor] .editor-paragraph")
       ) as ElementHandle<HTMLElement>;
@@ -130,7 +131,8 @@ test.describe("Editor view", () => {
 
       expect(await paragraph.innerText()).toBe("test # heading");
       expect(nodeName).toBe("P");
-      expect(await paragraph.getAttribute("class")).toBe("editor-paragraph ltr");
+      expect(await paragraph.getAttribute("class"))
+        .toBe("editor-paragraph ltr");
     },
   );
 
@@ -164,27 +166,33 @@ test.describe("Editor view", () => {
 
       await page.click(".note-list-item-linked-notes-indicator");
 
-      const paragraph = page.locator("div[data-lexical-editor] .editor-paragraph", {
-        hasText: "Foo [[Note 1]] baz",
-      });
+      const paragraph = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+        {
+          hasText: "Foo [[Note 1]] baz",
+        },
+      );
 
       await paragraph.waitFor();
 
       expect(await paragraph.innerText()).toBe("Foo [[Note 1]] baz");
-      expect(await paragraph.getAttribute("class")).toBe("editor-paragraph ltr");
+      expect(await paragraph.getAttribute("class"))
+        .toBe("editor-paragraph ltr");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
       ))!;
 
       expect(await paragraphChildren[0].innerText()).toBe("Foo ");
       expect(await paragraphChildren[1].innerText()).toBe("[[");
-      expect(await paragraphChildren[1].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[1].getAttribute("class"))
+        .toBe("wikilink-punctuation");
       expect(await paragraphChildren[2].innerText()).toBe("Note 1");
-      expect(await paragraphChildren[2].getAttribute("class")).toBe("wikilink-content available");
+      expect(await paragraphChildren[2].getAttribute("class"))
+        .toBe("wikilink-content available");
       expect(await paragraphChildren[3].innerText()).toBe("]]");
-      expect(await paragraphChildren[3].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[3].getAttribute("class"))
+        .toBe("wikilink-punctuation");
       expect(await paragraphChildren[4].innerText()).toBe(" baz");
     },
   );
@@ -194,31 +202,39 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("[[Link 1]][[Link 2]][[Link 3]]");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
       ))!;
 
       expect(await paragraphChildren[0].innerText()).toBe("[[");
-      expect(await paragraphChildren[0].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[0].getAttribute("class"))
+        .toBe("wikilink-punctuation");
       expect(await paragraphChildren[1].innerText()).toBe("Link 1");
-      expect(await paragraphChildren[1].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[1].getAttribute("class"))
+        .toBe("wikilink-content unavailable");
       expect(await paragraphChildren[2].innerText()).toBe("]]");
-      expect(await paragraphChildren[2].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[2].getAttribute("class"))
+        .toBe("wikilink-punctuation");
 
       expect(await paragraphChildren[3].innerText()).toBe("[[");
-      expect(await paragraphChildren[3].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[3].getAttribute("class"))
+        .toBe("wikilink-punctuation");
       expect(await paragraphChildren[4].innerText()).toBe("Link 2");
-      expect(await paragraphChildren[4].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[4].getAttribute("class"))
+        .toBe("wikilink-content unavailable");
       expect(await paragraphChildren[5].innerText()).toBe("]]");
-      expect(await paragraphChildren[5].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[5].getAttribute("class"))
+        .toBe("wikilink-punctuation");
 
       expect(await paragraphChildren[6].innerText()).toBe("[[");
-      expect(await paragraphChildren[6].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[6].getAttribute("class"))
+        .toBe("wikilink-punctuation");
       expect(await paragraphChildren[7].innerText()).toBe("Link 3");
-      expect(await paragraphChildren[7].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[7].getAttribute("class"))
+        .toBe("wikilink-content unavailable");
       expect(await paragraphChildren[8].innerText()).toBe("]]");
-      expect(await paragraphChildren[8].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[8].getAttribute("class"))
+        .toBe("wikilink-punctuation");
     },
   );
 
@@ -231,31 +247,39 @@ test.describe("Editor view", () => {
       await page.click("#button_new");
       await page.click(".note-list .note-list-item");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
       ))!;
 
       expect(await paragraphChildren[0].innerText()).toBe("[[");
-      expect(await paragraphChildren[0].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[0].getAttribute("class"))
+        .toBe("wikilink-punctuation");
       expect(await paragraphChildren[1].innerText()).toBe("Link 1");
-      expect(await paragraphChildren[1].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[1].getAttribute("class"))
+        .toBe("wikilink-content unavailable");
       expect(await paragraphChildren[2].innerText()).toBe("]]");
-      expect(await paragraphChildren[2].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[2].getAttribute("class"))
+        .toBe("wikilink-punctuation");
 
       expect(await paragraphChildren[3].innerText()).toBe("[[");
-      expect(await paragraphChildren[3].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[3].getAttribute("class"))
+        .toBe("wikilink-punctuation");
       expect(await paragraphChildren[4].innerText()).toBe("Link 2");
-      expect(await paragraphChildren[4].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[4].getAttribute("class"))
+        .toBe("wikilink-content unavailable");
       expect(await paragraphChildren[5].innerText()).toBe("]]");
-      expect(await paragraphChildren[5].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[5].getAttribute("class"))
+        .toBe("wikilink-punctuation");
 
       expect(await paragraphChildren[6].innerText()).toBe("[[");
-      expect(await paragraphChildren[6].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[6].getAttribute("class"))
+        .toBe("wikilink-punctuation");
       expect(await paragraphChildren[7].innerText()).toBe("Link 3");
-      expect(await paragraphChildren[7].getAttribute("class")).toBe("wikilink-content unavailable");
+      expect(await paragraphChildren[7].getAttribute("class"))
+        .toBe("wikilink-content unavailable");
       expect(await paragraphChildren[8].innerText()).toBe("]]");
-      expect(await paragraphChildren[8].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await paragraphChildren[8].getAttribute("class"))
+        .toBe("wikilink-punctuation");
     },
   );
 
@@ -265,7 +289,6 @@ test.describe("Editor view", () => {
       await page.keyboard.type("test /link");
 
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const transclusionSlug = (await page.$(
         "div[data-lexical-editor] .transclusion .slug",
       ))!;
@@ -291,7 +314,6 @@ test.describe("Editor view", () => {
       await page.keyboard.type("- test /link");
 
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const transclusionSlug = (await page.$(
         "div[data-lexical-editor] .transclusion .slug",
       ))!;
@@ -316,7 +338,6 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("# test /link");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const transclusionSlug = (await page.$(
         "div[data-lexical-editor] .transclusion .slug",
       ))!;
@@ -352,7 +373,6 @@ test.describe("Editor view", () => {
       // make sure "/1/2" is one slashlink node
       expect(await paragraphChildren[0].innerText()).toBe("/1/2");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const transclusionSlug = (await page.$(
         "div[data-lexical-editor] .transclusion .slug",
       ))!;
@@ -370,7 +390,6 @@ test.describe("Editor view", () => {
       await page.keyboard.type("more text");
       await page.click(".note-list .note-list-item");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const dialog = await page.$("dialog");
       expect(dialog).toBeNull();
     },
@@ -386,7 +405,6 @@ test.describe("Editor view", () => {
       await page.keyboard.type("more text");
       await page.click(".pinned-note");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const dialog = await page.$("dialog");
       expect(dialog).toBeNull();
     },
@@ -403,7 +421,6 @@ test.describe("Editor view", () => {
 
       await page.click(".note-backlinks .note-list-item-linked-notes-indicator");
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const paragraph = (
         await page.$("div[data-lexical-editor] .editor-paragraph:nth-child(2)")
       ) as ElementHandle<HTMLElement>;
@@ -591,7 +608,8 @@ test.describe("Editor view", () => {
       ) as ElementHandle<HTMLElement>[];
 
       expect(paragraphs.length).toBe(2);
-      expect((await paragraphs[0].innerText()).trim()).toBe("- http://example.com");
+      expect((await paragraphs[0].innerText()).trim())
+        .toBe("- http://example.com");
       expect((await paragraphs[1].innerText()).trim()).toBe("");
     },
   );
@@ -611,7 +629,8 @@ test.describe("Editor view", () => {
       ) as ElementHandle<HTMLElement>[];
 
       expect(paragraphs.length).toBe(2);
-      expect((await paragraphs[0].innerText()).trim()).toBe("http://example.co");
+      expect((await paragraphs[0].innerText()).trim())
+        .toBe("http://example.co");
       expect((await paragraphs[1].innerText()).trim()).toBe("m");
     },
   );
@@ -623,8 +642,8 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("A note with a [[Link to a non-existing note]]");
       await page.click("#button_upload");
-      await page.locator('span')
-        .filter({ hasText: 'Link to a non-existing note' })
+      await page.locator("span")
+        .filter({ hasText: "Link to a non-existing note" })
         .click();
 
       const slugElement = await page.$(".slug-line .note-slug");
@@ -648,10 +667,10 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("A note");
       await page.click("#button_upload");
-      await page.getByRole('textbox').nth(1).focus();
+      await page.getByRole("textbox").nth(1).focus();
       await page.keyboard.type(" edited");
       await page.click("#button_new");
-      await page.getByRole('button', { name: 'Cancel' }).click();
+      await page.getByRole("button", { name: "Cancel" }).click();
       expect(page.url().endsWith("a-note")).toBe(true);
     },
   );
@@ -666,7 +685,7 @@ test.describe("Editor view", () => {
       await page.click("#button_new");
       await page.locator(".pinned-note").hover();
       await page.mouse.down();
-      const editor = page.getByRole('textbox').nth(1);
+      const editor = page.getByRole("textbox").nth(1);
       await editor.hover();
       await page.mouse.up();
       expect(await editor.textContent()).toBe("[[A note]]");
@@ -701,9 +720,13 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Shift+ArrowUp", { delay: 20 });
 
       // copy
-      await page.keyboard.press(isMac ? "Meta+KeyC" : "Control+KeyC", { delay: 20 });
+      await page.keyboard.press(
+        isMac ? "Meta+KeyC" : "Control+KeyC", { delay: 20 }
+      );
 
-      const clipboardText1 = await page.evaluate("navigator.clipboard.readText()");
+      const clipboardText1 = await page.evaluate(
+        "navigator.clipboard.readText()"
+      );
       expect(clipboardText1).toBe("3\n4");
 
       // move cursor to end of line 2
@@ -715,7 +738,9 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Shift+ArrowUp", { delay: 20 });
 
       // paste
-      await page.keyboard.press(isMac ? "Meta+KeyV" : "Control+KeyV", { delay: 20 });
+      await page.keyboard.press(
+        isMac ? "Meta+KeyV" : "Control+KeyV", { delay: 20 }
+      );
 
       await page.waitForTimeout(100);
 
