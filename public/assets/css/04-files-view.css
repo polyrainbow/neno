@@ -1,4 +1,8 @@
 .files-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--default-gap);
+
   h1 {
     margin: 10px 0;
   }

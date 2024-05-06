@@ -149,7 +149,6 @@ select {
   font-size: var(--default-font-size);
   background: var(--accent-color-interactible);
   color: var(--font-color);
-  margin: 15px 0;
   padding: var(--small-interactive-element-padding);
   border-radius: var(--border-radius);
 }

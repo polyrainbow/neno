@@ -7,6 +7,9 @@ import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { Slug } from "../lib/notes/types/Slug";
 import CreateScript from "./CreateScript";
+import Pagination from "./Pagination";
+import { SEARCH_RESULTS_PER_PAGE } from "../config";
+import { getPagedMatches } from "../lib/utils";
 
 enum FileSortMode {
   CREATED_AT_DESCENDING = "CREATED_AT_DESCENDING",
@@ -27,6 +30,7 @@ const FilesView = () => {
   );
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
+  const [page, setPage] = useState(1);
 
   const updateDanglingFiles = async () => {
     const danglingFiles: FileInfo[]
@@ -35,7 +39,7 @@ const FilesView = () => {
     setDanglingFileSlugs(danglingFiles.map((file) => file.slug));
   };
 
-  const displayedFiles = files
+  const filteredFiles = files
     .filter((file) => file.slug.toLowerCase().startsWith(
       filterInput.toLowerCase(),
     ))
@@ -60,6 +64,10 @@ const FilesView = () => {
         return 0;
       }
     });
+
+  const displayedFiles = getPagedMatches(
+    filteredFiles, page, SEARCH_RESULTS_PER_PAGE,
+  );
 
   const updateFiles = async () => {
     const files: FileInfo[] = await notesProvider.getFiles();
@@ -122,6 +130,12 @@ const FilesView = () => {
                 {l("files.show-neno-scripts")}
               </button>
             </div>
+            <Pagination
+              numberOfResults={filteredFiles.length}
+              page={page}
+              searchResultsPerPage={SEARCH_RESULTS_PER_PAGE}
+              onChange={(newPage) => setPage(newPage)}
+            />
             <FlexContainer
               className="files"
             >

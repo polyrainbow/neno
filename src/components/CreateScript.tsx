@@ -42,6 +42,7 @@ const CreateScript = ({
             { type: "text/plain" },
           ).stream();
           await notesProvider.addFile(readable, "scripts", newFilename);
+          setNewScriptName("");
           onCreated();
         }}
       >{l("files.create-script.create")}</button>

@@ -26,7 +26,7 @@ interface PaginationProps {
   searchResultsPerPage: number;
   page: number;
   onChange: (newPage: number) => void;
-  placement: "top" | "bottom";
+  placement?: "top" | "bottom";
 }
 
 const Pagination = ({
@@ -36,7 +36,7 @@ const Pagination = ({
   onChange,
   placement,
 }: PaginationProps) => {
-  const doRenderPageButtons = numberOfResults > searchResultsPerPage;
+  const doRenderPagination = numberOfResults > searchResultsPerPage;
 
   const numberOfPages = getNumberOfPages(
     numberOfResults,
@@ -49,10 +49,10 @@ const Pagination = ({
     onChange: (_event, newPage) => onChange(newPage),
   });
 
-  if (!doRenderPageButtons) return null;
+  if (!doRenderPagination) return null;
 
   return (
-    <div className={"pagination " + placement}>
+    <div className={"pagination " + (placement || "")}>
       <nav>
         <ul>
           {items.map(({ page, type, selected, ...item }, index) => {
