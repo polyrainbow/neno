@@ -7,7 +7,7 @@ const ChangeLanguageSetting = () => {
 
   const [selectedLanguage, setSelectedLanguage] = useState(activeLanguage);
 
-  return <section>
+  return <section className="setting">
     <h2>{l("change-language.heading")}</h2>
     <select
       value={selectedLanguage}
