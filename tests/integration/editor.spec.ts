@@ -716,6 +716,22 @@ test.describe("Editor view", () => {
   */
 
   /*
+    Test disabled because dead keys are not testable:
+    https://github.com/microsoft/playwright/issues/7396#issuecomment-2098305274
+  test(
+    "Pressing dead key and letter to create umlaut should work inside Wikilink",
+    async ({ page }) => {
+      await page.keyboard.type("[[Wikilink]]", { delay: 20 });
+      await page.keyboard.press("Alt+u", { delay: 20 });
+      await page.keyboard.press("u", { delay: 20 });
+
+      const editor = page.getByRole("textbox").nth(1);
+      expect(await editor.textContent()).toBe("[[Wikilink]]ü");
+    },
+  );
+  */
+
+  /*
   The following test fails in headless mode but succeeds in headful mode.
   Likely reason: Playwright does not have clipboard isolation.
   See also:

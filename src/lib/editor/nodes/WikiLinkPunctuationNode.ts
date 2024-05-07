@@ -58,6 +58,13 @@ export class WikiLinkPunctuationNode extends TextNode {
     return false;
   }
 
+  // This is important so that no unnecessary transformation loop is triggered.
+  // Text inserted after this node (no matter if opening of closing) should be
+  // put in a normal text node
+  canInsertTextAfter(): boolean {
+    return false;
+  }
+
   isTextEntity(): true {
     return true;
   }

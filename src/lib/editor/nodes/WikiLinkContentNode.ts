@@ -54,6 +54,7 @@ export class WikiLinkContentNode extends TextNode {
     element: HTMLElement,
     config: EditorConfig,
   ): boolean {
+    // We have to call the parent method so that text editing properly works
     super.updateDOM(prevNode, element, config);
     this.getLinkAvailability(this.__text)
       .then((isAvailable) => {
@@ -64,6 +65,8 @@ export class WikiLinkContentNode extends TextNode {
         }
       });
 
+    // We have to return false so that the node is not re-created all the time
+    // which prevents the usage of dead keys.
     return false;
   }
 
