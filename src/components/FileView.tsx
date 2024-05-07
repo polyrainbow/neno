@@ -28,7 +28,7 @@ import {
   removeExtensionFromFilename,
 } from "../lib/notes/utils";
 import {
-  isValidSlug,
+  isValidFileSlug,
 } from "../lib/notes/slugUtils";
 import { saveFile } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
@@ -281,14 +281,14 @@ const FileView = () => {
         <button
           disabled={
             slugRenameInput === getRenameInput(slug || "")
-            || !isValidSlug(slugRenameInput)
+            || !isValidFileSlug(slugRenameInput)
           }
           className="default-button-small dangerous-action"
           onClick={async () => {
             if (
               !slug
               || slugRenameInput === getRenameInput(slug || "")
-              || !isValidSlug(slugRenameInput)
+              || !isValidFileSlug(slugRenameInput)
             ) return;
             const newSlug = slugRenameInput + "." + extension;
             try {
