@@ -48,7 +48,13 @@ export class WikiLinkContentNode extends TextNode {
     return element;
   }
 
-  updateDOM(_prevNode: TextNode, element: HTMLElement): boolean {
+
+  updateDOM(
+    prevNode: TextNode,
+    element: HTMLElement,
+    config: EditorConfig,
+  ): boolean {
+    super.updateDOM(prevNode, element, config);
     this.getLinkAvailability(this.__text)
       .then((isAvailable) => {
         if (isAvailable) {
@@ -58,7 +64,7 @@ export class WikiLinkContentNode extends TextNode {
         }
       });
 
-    return true;
+    return false;
   }
 
   // Dummy function. This will never happen.
