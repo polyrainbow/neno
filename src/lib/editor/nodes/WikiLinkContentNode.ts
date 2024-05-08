@@ -60,8 +60,10 @@ export class WikiLinkContentNode extends TextNode {
       .then((isAvailable) => {
         if (isAvailable) {
           element?.classList.add("available");
+          element?.classList.remove("unavailable");
         } else {
           element?.classList.add("unavailable");
+          element?.classList.remove("available");
         }
       });
 

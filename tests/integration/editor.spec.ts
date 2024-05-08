@@ -693,6 +693,38 @@ test.describe("Editor view", () => {
   );
 
 
+  test(
+    "Wikilink availability should update on linktext change",
+    async ({ page }) => {
+      await page.keyboard.type("A note");
+      await page.click("#button_upload");
+      await page.click("#button_new");
+
+      await page.keyboard.type("[[A not]]");
+
+      const wikilinkContentNode = await page.locator(
+        "div[data-lexical-editor] .editor-paragraph > *",
+      ).nth(1);
+
+      expect(await wikilinkContentNode.getAttribute("class")).toBe(
+        "wikilink-content unavailable",
+      );
+
+      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.press("ArrowLeft");
+      await page.keyboard.type("e");
+      expect(await wikilinkContentNode.getAttribute("class")).toBe(
+        "wikilink-content available",
+      );
+
+      await page.keyboard.press("Backspace");
+      expect(await wikilinkContentNode.getAttribute("class")).toBe(
+        "wikilink-content unavailable",
+      );
+    },
+  );
+
+
   /*
     Test disabled because dead keys are not testable:
     https://github.com/microsoft/playwright/issues/7396#issuecomment-2098305274
