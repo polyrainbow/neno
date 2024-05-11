@@ -4,9 +4,9 @@
   "description": "NENO is a note-taking app that helps you manage your personal knowledge garden.",
   "type": "module",
   "dependencies": {
-    "@lexical/link": "^0.14.5",
-    "@lexical/react": "^0.14.5",
-    "lexical": "^0.14.5",
+    "@lexical/link": "^0.15.0",
+    "@lexical/react": "^0.15.0",
+    "lexical": "^0.15.0",
     "monaco-editor": "^0.48.0",
     "vite-plugin-pwa": "^0.20.0"
   },
