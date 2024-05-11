@@ -3,6 +3,7 @@ import NotesProvider from "../lib/notes";
 import NoteSlugUpdateReferencesToggle from "./NoteSlugUpdateReferencesToggle";
 import { l } from "../lib/intl";
 import Icon from "./Icon";
+import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 
 interface NoteSlugProps {
   note: ActiveNote,
@@ -26,6 +27,17 @@ const NoteSlug = ({
   updateReferences,
   setUpdateReferences,
 }: NoteSlugProps) => {
+
+  const handleNewAliasRequest = () => {
+    const newDisplayedSlugAliases = [...displayedSlugAliases];
+    newDisplayedSlugAliases.push("");
+    setDisplayedSlugAliases(newDisplayedSlugAliases);
+  };
+
+  useKeyboardShortcuts({
+    onCmdU: handleNewAliasRequest,
+  });
+
   return <div className="slug-lines">
     <div className="slug-line canonical">
       <input
@@ -95,11 +107,7 @@ const NoteSlug = ({
       }
       <button
         className="alias-control-button"
-        onClick={() => {
-          const newDisplayedSlugAliases = [...displayedSlugAliases];
-          newDisplayedSlugAliases.push("");
-          setDisplayedSlugAliases(newDisplayedSlugAliases);
-        }}
+        onClick={handleNewAliasRequest}
       >
         <Icon
           icon={"add"}
@@ -109,7 +117,7 @@ const NoteSlug = ({
       </button>
     </div>
     {
-      displayedSlugAliases.map((slugAlias, index) => {
+      displayedSlugAliases.map((slugAlias, index, aliases) => {
         return <div
           className="slug-line canonical"
           key={"sla-" + index}
@@ -146,6 +154,14 @@ const NoteSlug = ({
               setUnsavedChanges(true);
             }}
             value={slugAlias}
+            autoFocus={
+              /*
+                If this input field is the result of a user request to create
+                a new alias (field is empty and the last one), focus it.
+              */
+              slugAlias === ""
+              && index === aliases.length - 1
+            }
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();

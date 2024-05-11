@@ -18,7 +18,7 @@ CMD+
   R - Reload
   S - Save > NENO: Save
   T - New tab
-  U -
+  U - NENO: New alias
   V - Paste
   W - Close tab
   X - Cut
@@ -31,6 +31,7 @@ interface KeyboardShortCutHandlers {
   onCmdB?: () => void,
   onCmdE?: () => void,
   onCmdI?: () => void,
+  onCmdU?: () => void,
   onArrowUp?: () => void,
   onArrowDown?: () => void,
   onEnter?: () => void,
@@ -89,6 +90,16 @@ export default (
       && e.key === "i"
     ) {
       handlers.onCmdI();
+      e.preventDefault();
+    }
+
+    if (
+      handlers.onCmdU
+      // @ts-ignore
+      && (navigator.userAgentData.platform === "macOS" ? e.metaKey : e.ctrlKey)
+      && e.key === "u"
+    ) {
+      handlers.onCmdU();
       e.preventDefault();
     }
 
