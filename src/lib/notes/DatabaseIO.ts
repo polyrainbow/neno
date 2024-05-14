@@ -381,8 +381,8 @@ export default class DatabaseIO {
     await this.flushChanges(
       graphFromDisk,
       WriteGraphMetadataAction.WRITE,
-      [],
-      [],
+      new Set(),
+      new Set(),
     );
     this.#finishedObtainingGraph();
     return graphFromDisk;
@@ -396,8 +396,8 @@ export default class DatabaseIO {
   async flushChanges(
     graph: Graph,
     writeGraphMetadata: WriteGraphMetadataAction,
-    canonicalSlugsToFlush: Slug[] | "all",
-    aliasesToFlush: Slug[] | "all",
+    canonicalSlugsToFlush: Set<Slug> | "all",
+    aliasesToFlush: Set<Slug> | "all",
   ): Promise<void> {
     if (
       writeGraphMetadata === WriteGraphMetadataAction.WRITE
@@ -415,8 +415,8 @@ export default class DatabaseIO {
 
     this.#loadedGraph = graph;
 
-    if (Array.isArray(canonicalSlugsToFlush)) {
-      await Promise.all(canonicalSlugsToFlush.map(async (slug) => {
+    if (canonicalSlugsToFlush instanceof Set) {
+      await Promise.all(Array.from(canonicalSlugsToFlush).map(async (slug) => {
         const filename = DatabaseIO.getFilenameForNoteSlug(slug);
         if (!graph.notes.has(slug)) {
           await this.#storageProvider.removeObject(filename);
@@ -442,8 +442,8 @@ export default class DatabaseIO {
     }
 
 
-    if (Array.isArray(aliasesToFlush)) {
-      await Promise.all(aliasesToFlush.map(async (alias) => {
+    if (aliasesToFlush instanceof Set) {
+      await Promise.all(Array.from(aliasesToFlush).map(async (alias) => {
         const filename = DatabaseIO.getFilenameForNoteSlug(alias);
         if (!graph.aliases.has(alias)) {
           await this.#storageProvider.removeObject(filename);
