@@ -652,7 +652,7 @@ const handleExistingNoteUpdate = async (
     noteFromUser.meta.custom,
   );
 
-  const aliasesToUpdate: Slug[] = [];
+  const aliasesToUpdate: Set<Slug> = new Set();
 
   if (noteSaveRequest.aliases) {
     for (const [alias, canonicalSlug] of graph.aliases.entries()) {
@@ -661,7 +661,7 @@ const handleExistingNoteUpdate = async (
         && !noteSaveRequest.aliases.has(alias)
       ) {
         graph.aliases.delete(alias);
-        aliasesToUpdate.push(alias);
+        aliasesToUpdate.add(alias);
       }
     }
 
@@ -689,7 +689,7 @@ const handleExistingNoteUpdate = async (
         return;
       }
       graph.aliases.set(alias, existingNote.meta.slug);
-      aliasesToUpdate.push(alias);
+      aliasesToUpdate.add(alias);
     });
   }
 
@@ -727,17 +727,17 @@ const handleExistingNoteUpdate = async (
       }
     }
 
-    const aliasesToUpdate: Slug[] = [];
+    const aliasesToUpdate: Set<Slug> = new Set();
     for (const [alias, canonicalSlug] of graph.aliases.entries()) {
       if (canonicalSlug === oldSlug) {
         graph.aliases.delete(alias);
         graph.aliases.set(alias, newSlug);
-        aliasesToUpdate.push(alias);
+        aliasesToUpdate.add(alias);
       }
     }
 
     await io.flushChanges(
-      graph, flushMetadata, [oldSlug], aliasesToUpdate,
+      graph, flushMetadata, new Set([oldSlug]), aliasesToUpdate,
     );
 
     existingNote.meta.slug = newSlug;
@@ -771,8 +771,8 @@ const handleExistingNoteUpdate = async (
         await io.flushChanges(
           graph,
           WriteGraphMetadataAction.NONE,
-          [thatNote.meta.slug],
-          [],
+          new Set([thatNote.meta.slug]),
+          new Set(),
         );
       }
     }
@@ -784,7 +784,7 @@ const handleExistingNoteUpdate = async (
   await io.flushChanges(
     graph,
     WriteGraphMetadataAction.NONE,
-    [existingNote.meta.slug],
+    new Set([existingNote.meta.slug]),
     aliasesToUpdate,
   );
 
@@ -835,7 +835,7 @@ const handleNewNoteSaveRequest = async (
     );
   }
 
-  const aliasesToUpdate: Slug[] = [];
+  const aliasesToUpdate: Set<Slug> = new Set();
   noteSaveRequest.aliases?.forEach((alias) => {
     if (!isValidSlug(alias)) {
       throw new Error(ErrorMessage.INVALID_ALIAS);
@@ -850,7 +850,7 @@ const handleNewNoteSaveRequest = async (
       throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
     }
     graph.aliases.set(alias, slug);
-    aliasesToUpdate.push(alias);
+    aliasesToUpdate.add(alias);
   });
 
   // the new note becomes an existing note, that's why the funny typing here
@@ -873,7 +873,7 @@ const handleNewNoteSaveRequest = async (
   await io.flushChanges(
     graph,
     WriteGraphMetadataAction.NONE,
-    [newNote.meta.slug],
+    new Set([newNote.meta.slug]),
     aliasesToUpdate,
   );
 

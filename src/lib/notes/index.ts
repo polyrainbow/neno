@@ -216,11 +216,11 @@ export default class NotesProvider {
     }
 
     graph.notes.delete(slug);
-    const aliasesToRemove: Slug[] = [];
+    const aliasesToRemove: Set<Slug> = new Set();
     for (const [alias, canonicalSlug] of graph.aliases.entries()) {
       if (canonicalSlug === slug) {
         graph.aliases.delete(alias);
-        aliasesToRemove.push(alias);
+        aliasesToRemove.add(alias);
       }
     }
 
@@ -235,7 +235,12 @@ export default class NotesProvider {
 
     removeSlugFromIndexes(graph, slug);
 
-    await this.#io.flushChanges(graph, flushMetadata, [slug], aliasesToRemove);
+    await this.#io.flushChanges(
+      graph,
+      flushMetadata,
+      new Set([slug]),
+      aliasesToRemove,
+    );
   }
 
 
@@ -257,8 +262,8 @@ export default class NotesProvider {
     await this.#io.flushChanges(
       graph,
       WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
-      [],
-      [],
+      new Set(),
+      new Set(),
     );
 
     return fileInfo;
@@ -284,8 +289,8 @@ export default class NotesProvider {
     await this.#io.flushChanges(
       graph,
       WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
-      [],
-      [],
+      new Set(),
+      new Set(),
     );
 
     return fileInfo;
@@ -352,8 +357,8 @@ export default class NotesProvider {
     await this.#io.flushChanges(
       graph,
       WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
-      Array.from(notesThatNeedUpdate),
-      [],
+      notesThatNeedUpdate,
+      new Set(),
     );
 
     return fileInfo;
@@ -371,8 +376,8 @@ export default class NotesProvider {
     await this.#io.flushChanges(
       graph,
       WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
-      [],
-      [],
+      new Set(),
+      new Set(),
     );
   }
 
@@ -465,7 +470,7 @@ export default class NotesProvider {
     const updateMetadata = oldLength !== newLength
       ? WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
       : WriteGraphMetadataAction.NONE;
-    await this.#io.flushChanges(graph, updateMetadata, [], []);
+    await this.#io.flushChanges(graph, updateMetadata, new Set(), new Set());
 
     return this.getPins();
   }
@@ -495,7 +500,7 @@ export default class NotesProvider {
     const updateMetadata = offset !== 0
       ? WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
       : WriteGraphMetadataAction.NONE;
-    await this.#io.flushChanges(graph, updateMetadata, [], []);
+    await this.#io.flushChanges(graph, updateMetadata, new Set(), new Set());
 
     return this.getPins();
   }
@@ -515,7 +520,7 @@ export default class NotesProvider {
         return s !== slugToRemove;
       });
 
-    await this.#io.flushChanges(graph, updateMetadata, [], []);
+    await this.#io.flushChanges(graph, updateMetadata, new Set(), new Set());
 
     return this.getPins();
   }
