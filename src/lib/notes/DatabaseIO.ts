@@ -415,13 +415,6 @@ export default class DatabaseIO {
 
     this.#loadedGraph = graph;
 
-    graph.aliases.forEach(async (slug: Slug, alias: Slug) => {
-      await this.#storageProvider.writeObject(
-        `${alias}${DatabaseIO.#NOTE_FILE_EXTENSION}`,
-        this.#ALIAS_HEADER + slug,
-      );
-    });
-
     if (Array.isArray(canonicalSlugsToFlush)) {
       await Promise.all(canonicalSlugsToFlush.map(async (slug) => {
         const filename = DatabaseIO.getFilenameForNoteSlug(slug);
