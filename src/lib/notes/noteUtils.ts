@@ -656,7 +656,10 @@ const handleExistingNoteUpdate = async (
 
   if (noteSaveRequest.aliases) {
     for (const [alias, canonicalSlug] of graph.aliases.entries()) {
-      if (canonicalSlug === existingNote.meta.slug) {
+      if (
+        canonicalSlug === existingNote.meta.slug
+        && !noteSaveRequest.aliases.has(alias)
+      ) {
         graph.aliases.delete(alias);
         aliasesToUpdate.push(alias);
       }
@@ -677,6 +680,13 @@ const handleExistingNoteUpdate = async (
       }
       if (graph.notes.has(alias)) {
         throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+      }
+      if (
+        graph.aliases.has(alias)
+        && graph.aliases.get(alias) === existingNote.meta.slug
+      ) {
+        // No need to update
+        return;
       }
       graph.aliases.set(alias, existingNote.meta.slug);
       aliasesToUpdate.push(alias);
