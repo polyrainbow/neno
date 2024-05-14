@@ -16,8 +16,7 @@ export default class MockStorageProvider implements StorageProvider {
     }
   }
 
-  /* in this mock provider, we just return the string as such when requesting
-  a stream */
+
   getReadableStream(
     requestPath: string,
   ): Promise<ReadableStream> {

@@ -74,7 +74,8 @@ globalThis.Worker = subwaytextWorkerMock;
 
 describe("Notes module", () => {
   it("should create and output notes", async () => {
-    const notesProvider = new NotesProvider(new MockStorageProvider());
+    const mockStorageProvider = new MockStorageProvider();
+    const notesProvider = new NotesProvider(mockStorageProvider);
 
     const noteSaveRequest1: NewNoteSaveRequest = {
       note: {
@@ -104,6 +105,20 @@ describe("Notes module", () => {
     await notesProvider.put(noteSaveRequest2);
     const page = await notesProvider.getNotesList({});
     expect(page.numberOfResults).toBe(2);
+
+    const note1FromStorageProvider = await mockStorageProvider
+      .readObjectAsString(
+        "new-1.subtext",
+      );
+
+    expect(typeof note1FromStorageProvider).toBe("string");
+
+    const note2FromStorageProvider = await mockStorageProvider
+      .readObjectAsString(
+        "new-2.subtext",
+      );
+
+    expect(typeof note2FromStorageProvider).toBe("string");
   });
 
   it("should output correct graph stats", async () => {
@@ -214,7 +229,8 @@ describe("Notes module", () => {
   );
 
   it("should correctly update key-value pairs", async () => {
-    const notesProvider = new NotesProvider(new MockStorageProvider());
+    const mockStorageProvider = new MockStorageProvider();
+    const notesProvider = new NotesProvider(mockStorageProvider);
 
     const noteSaveRequest: NoteSaveRequest = {
       note: {
@@ -252,6 +268,13 @@ describe("Notes module", () => {
     const updatedNote = await notesProvider.put(noteSaveRequest2);
 
     expect(updatedNote.meta.custom.test).toBe("12");
+
+    const noteFromStorageProvider = await mockStorageProvider
+      .readObjectAsString(
+        `${note.meta.slug}.subtext`,
+      );
+
+    expect(noteFromStorageProvider.includes("\n:test:12\n")).toBe(true);
   });
 
   it("should show correct backlinks for new created notes", async () => {
@@ -296,7 +319,8 @@ describe("Notes module", () => {
   });
 
   it("should update existing slugs", async () => {
-    const notesProvider = new NotesProvider(new MockStorageProvider());
+    const mockStorageProvider = new MockStorageProvider();
+    const notesProvider = new NotesProvider(mockStorageProvider);
 
     const noteSaveRequest: NoteSaveRequest = {
       note: {
@@ -335,6 +359,17 @@ describe("Notes module", () => {
 
     expect(notes.numberOfResults).toBe(1);
     expect(notes.results[0].slug).toBe("note-1a");
+
+    expect(
+      mockStorageProvider.readObjectAsString("note-1.subtext"),
+    ).rejects.toThrow();
+
+    const noteFromStorageProvider = await mockStorageProvider
+      .readObjectAsString(
+        "note-1a.subtext",
+      );
+
+    expect(typeof noteFromStorageProvider).toBe("string");
   });
 
   it(
