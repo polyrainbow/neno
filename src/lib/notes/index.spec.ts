@@ -2146,4 +2146,30 @@ describe("Notes module", () => {
       expect(note1.files[0].slug).toBe("files/a-renamed.txt");
     },
   );
+
+  it(
+    "existing metadata file should not be overwritten on startup",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+
+      await mockStorageProvider.writeObject(
+        ".graph.json",
+        `{
+          "files": []
+        }`,
+      );
+
+      mockStorageProvider.clearJournal();
+
+      const notesProvider = new NotesProvider(mockStorageProvider);
+      await notesProvider.getNotesList({});
+      const metadataFileWrites = mockStorageProvider.journal
+        .filter((entry) => {
+          return entry.type === "WRITE"
+            && entry.requestPath === ".graph.json";
+        });
+
+      expect(metadataFileWrites.length).toBe(0);
+    },
+  );
 });
