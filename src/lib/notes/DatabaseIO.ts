@@ -24,7 +24,6 @@ import ExistingNote from "./types/ExistingNote.js";
 import { Slug } from "./types/Slug.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
-import { GraphMetadataV3, migrateToV4 } from "./migrations/v4.js";
 import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
 import { isValidFileSlug } from "./slugUtils.js";
 
@@ -69,7 +68,6 @@ export default class DatabaseIO {
     serializedNotesAndAliases: Map<Slug, string>,
     metadataSerialized?: string,
   ): Promise<Graph> {
-    let migrationPerformed = false;
     const parsedNotes = new Map<Slug, ExistingNote>();
     const aliases = new Map<Slug, Slug>();
 
@@ -88,19 +86,15 @@ export default class DatabaseIO {
       }
     }
 
-    let graphMetadata = typeof metadataSerialized === "string"
-      ? JSON.parse(
-        metadataSerialized,
-      ) as GraphMetadata | GraphMetadataV3
-      : this.createEmptyGraphMetadata();
+    let graphMetadata;
 
-    if (graphMetadata.version === "3") {
-      const v4 = await migrateToV4(
-        graphMetadata,
-        this.#storageProvider,
-      );
-      graphMetadata = v4.metadata;
-      migrationPerformed = true;
+    if (typeof metadataSerialized === "string") {
+      graphMetadata = JSON.parse(
+        metadataSerialized,
+      ) as GraphMetadata;
+    } else {
+      graphMetadata = this.createEmptyGraphMetadata();
+      await this.writeGraphMetadataFile(graphMetadata);
     }
 
     const blockIndex = await DatabaseIO.createBlockIndex(
@@ -124,15 +118,6 @@ export default class DatabaseIO {
       metadata: graphMetadata,
     };
 
-    if (migrationPerformed) {
-      await this.flushChanges(
-        parsedGraphObject,
-        WriteGraphMetadataAction.WRITE,
-        "all",
-        "all",
-      );
-    }
-
     return parsedGraphObject;
   }
 
@@ -149,7 +134,6 @@ export default class DatabaseIO {
           this.#GRAPH_METADATA_FILENAME,
         );
     } catch (e) {
-      // if the file does not exist, we just create a new one later
       graphMetadataSerialized = undefined;
     }
 
@@ -303,11 +287,11 @@ export default class DatabaseIO {
   }
 
 
-  private async writeGraphMetadataFile(graph: Graph) {
+  private async writeGraphMetadataFile(graphMetadata: GraphMetadata) {
     await this.#storageProvider.writeObject(
       this.#GRAPH_METADATA_FILENAME,
       // we pretty print the JSON for Git to be able to show better diffs
-      JSON.stringify(graph.metadata, null, 2),
+      JSON.stringify(graphMetadata, null, 2),
     );
   }
 
@@ -375,15 +359,9 @@ export default class DatabaseIO {
     const graphFromDisk: Graph
       = await this.readAndParseGraphFromDisk();
 
-    // Flushing the graph will save it in memory for
-    // faster access the next time. Also, if no graph metadata file is present
-    // in the directory, we create a new one.
-    await this.flushChanges(
-      graphFromDisk,
-      WriteGraphMetadataAction.WRITE,
-      new Set(),
-      new Set(),
-    );
+    // Save the graph in memory for faster access the next time.
+    this.#loadedGraph = graphFromDisk;
+
     this.#finishedObtainingGraph();
     return graphFromDisk;
   }
@@ -410,7 +388,7 @@ export default class DatabaseIO {
       ) {
         graph.metadata.updatedAt = Date.now();
       }
-      await this.writeGraphMetadataFile(graph);
+      await this.writeGraphMetadataFile(graph.metadata);
     }
 
     this.#loadedGraph = graph;
