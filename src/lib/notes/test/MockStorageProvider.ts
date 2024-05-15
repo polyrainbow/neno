@@ -1,7 +1,23 @@
 import StorageProvider from "../types/StorageProvider";
 
+enum JournalEntryType {
+  WRITE = "WRITE",
+  READ = "READ",
+  DELETE = "DELETE",
+  RENAME = "RENAME",
+  LIST_DIRECTORY = "LIST_DIRECTORY",
+}
+interface JournalEntry {
+  type: JournalEntryType,
+  requestPath: string,
+  newRequestPath?: string,
+  data?: string,
+  success: boolean,
+}
+
 export default class MockStorageProvider implements StorageProvider {
   #files = new Map<string, Uint8Array>();
+  journal: JournalEntry[] = [];
 
   readObjectAsString(
     requestPath: string,
@@ -10,8 +26,18 @@ export default class MockStorageProvider implements StorageProvider {
       const bytes = this.#files.get(requestPath) as Uint8Array;
       const decoder = new TextDecoder();
       const string = decoder.decode(bytes);
+      this.journal.push({
+        type: JournalEntryType.READ,
+        requestPath,
+        success: true,
+      });
       return Promise.resolve(string);
     } else {
+      this.journal.push({
+        type: JournalEntryType.READ,
+        requestPath,
+        success: false,
+      });
       return Promise.reject(new Error("File not found."));
     }
   }
@@ -28,8 +54,18 @@ export default class MockStorageProvider implements StorageProvider {
           controller.close();
         },
       });
+      this.journal.push({
+        type: JournalEntryType.READ,
+        requestPath,
+        success: true,
+      });
       return Promise.resolve(readableStream);
     } else {
+      this.journal.push({
+        type: JournalEntryType.READ,
+        requestPath,
+        success: false,
+      });
       throw new Error("File not found.");
     }
   }
@@ -37,6 +73,11 @@ export default class MockStorageProvider implements StorageProvider {
 
   removeObject(requestPath: string): Promise<void> {
     this.#files.delete(requestPath);
+    this.journal.push({
+      type: JournalEntryType.DELETE,
+      requestPath,
+      success: true,
+    });
     return Promise.resolve();
   }
 
@@ -49,6 +90,12 @@ export default class MockStorageProvider implements StorageProvider {
       const encoder = new TextEncoder();
       return encoder.encode(string);
     };
+    this.journal.push({
+      type: JournalEntryType.WRITE,
+      requestPath,
+      data,
+      success: true,
+    });
     this.#files.set(requestPath, strToUTF8(data));
     return Promise.resolve();
   }
@@ -62,6 +109,11 @@ export default class MockStorageProvider implements StorageProvider {
     );
     this.#files.set(requestPath, blob);
     const size = blob.length;
+    this.journal.push({
+      type: JournalEntryType.WRITE,
+      requestPath,
+      success: true,
+    });
     return Promise.resolve(size);
   }
 
@@ -74,8 +126,20 @@ export default class MockStorageProvider implements StorageProvider {
       const value = this.#files.get(oldRequestPath) as Uint8Array;
       this.#files.set(newRequestPath, value);
       this.#files.delete(oldRequestPath);
+      this.journal.push({
+        type: JournalEntryType.RENAME,
+        requestPath: oldRequestPath,
+        newRequestPath,
+        success: true,
+      });
       return Promise.resolve();
     } else {
+      this.journal.push({
+        type: JournalEntryType.RENAME,
+        requestPath: oldRequestPath,
+        newRequestPath,
+        success: false,
+      });
       throw new Error("File not found.");
     }
   }
@@ -98,11 +162,20 @@ export default class MockStorageProvider implements StorageProvider {
 
 
   listDirectory(): Promise<string[]> {
+    this.journal.push({
+      type: JournalEntryType.LIST_DIRECTORY,
+      requestPath: "/",
+      success: true,
+    });
     return Promise.resolve(Array.from(this.#files.keys()));
   }
 
 
   getFolderSize(): Promise<number> {
     return Promise.resolve(0);
+  }
+
+  clearJournal(): void {
+    this.journal = [];
   }
 }
