@@ -11,6 +11,7 @@ import {
   handleNewNoteSaveRequest,
   changeSlugReferencesInNote,
   getNoteTitle,
+  inferNoteTitle,
 } from "./noteUtils.js";
 import {
   getNumberOfComponents,
@@ -544,4 +545,5 @@ export {
   handleNewNoteSaveRequest,
   changeSlugReferencesInNote,
   getNoteTitle,
+  inferNoteTitle,
 };
