@@ -27,7 +27,6 @@
   "editor.remove-note.confirm.text": "Möchtest du diese Notiz wirklich löschen?",
   "editor.save-anyway": "Speichern",
   "editor.save-note": "Notiz speichern",
-  "editor.stats.content-type": "Content-Type",
   "editor.stats.created-at": "Erstellt am",
   "editor.stats.files": "Dateien",
   "editor.stats.files.none": "Keine",

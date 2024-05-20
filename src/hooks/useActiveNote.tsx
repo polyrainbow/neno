@@ -115,7 +115,6 @@ export default (
       files: noteFromServer.files,
       keyValues: Object.entries(noteFromServer.meta.custom),
       flags: noteFromServer.meta.flags,
-      contentType: noteFromServer.meta.contentType,
     });
     setSlugInput(noteFromServer.meta.slug);
     setDisplayedSlugAliases([...noteFromServer.aliases]);
@@ -132,7 +131,6 @@ export default (
           meta: {
             custom: Object.fromEntries(activeNote.keyValues),
             flags: activeNote.flags,
-            contentType: activeNote.contentType,
           },
         },
         ignoreDuplicateTitles,
@@ -157,7 +155,6 @@ export default (
             createdAt: activeNote.createdAt,
             updatedAt: activeNote.updatedAt,
             flags: activeNote.flags,
-            contentType: activeNote.contentType,
           },
         },
         ignoreDuplicateTitles,
@@ -215,7 +212,6 @@ export default (
       initialContent: parsedNote.content,
       keyValues: Object.entries(parsedNote.meta.custom),
       flags: [...parsedNote.meta.flags, "IMPORTED"],
-      contentType: parsedNote.meta.contentType,
       files: [],
     };
     setActiveNote(newActiveNote);
@@ -250,7 +246,6 @@ export default (
         meta: {
           custom: Object.fromEntries(activeNote.keyValues),
           flags: [...activeNote.flags, `DUPLICATE_OF(${activeNote.slug})`],
-          contentType: activeNote.contentType,
         },
         content: noteContentRef.current,
       },

@@ -23,7 +23,6 @@ import { Slug } from "./types/Slug.js";
 import SparseNoteInfo from "./types/SparseNoteInfo.js";
 import LinkCount from "./types/LinkCount.js";
 import NotePreview from "./types/NotePreview.js";
-import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
 import { getMediaTypeFromFilename, shortenText } from "./utils.js";
 import {
@@ -88,12 +87,6 @@ const canonicalHeaderKeys = new Map<CanonicalNoteHeader, MetaModifier>([
         : [];
     },
   ],
-  [
-    CanonicalNoteHeader.CONTENT_TYPE,
-    (meta, val) => {
-      meta.contentType = val.trim();
-    },
-  ],
 ]);
 
 
@@ -126,7 +119,6 @@ const parseSerializedExistingNote = (
     createdAt: partialMeta.createdAt,
     updatedAt: partialMeta.updatedAt,
     flags: partialMeta.flags ?? [],
-    contentType: partialMeta.contentType ?? DEFAULT_CONTENT_TYPE,
     custom,
   };
 
@@ -160,7 +152,6 @@ const parseSerializedNewNote = (serializedNote: string): NewNote => {
 
   const meta: NewNoteMetadata = {
     flags: partialMeta.flags ?? [],
-    contentType: partialMeta.contentType ?? DEFAULT_CONTENT_TYPE,
     custom,
   };
 
@@ -198,11 +189,6 @@ const serializeNote = (note: ExistingNote): string => {
     note.meta.flags.join(","),
   );
 
-  headersToSerialize.set(
-    CanonicalNoteHeader.CONTENT_TYPE,
-    note.meta.contentType,
-  );
-
   for (const key in note.meta.custom) {
     if (Object.hasOwn(note.meta.custom, key)) {
       headersToSerialize.set(key, note.meta.custom[key]);
@@ -218,10 +204,6 @@ const serializeNewNote = (note: NewNote): string => {
     [
       CanonicalNoteHeader.FLAGS,
       note.meta.flags.join(","),
-    ],
-    [
-      CanonicalNoteHeader.CONTENT_TYPE,
-      note.meta.contentType,
     ],
   ]);
 
@@ -647,7 +629,6 @@ const handleExistingNoteUpdate = async (
     ? noteFromUser.meta.updatedAt
     : Date.now();
   existingNote.meta.flags = noteFromUser.meta.flags;
-  existingNote.meta.contentType = noteFromUser.meta.contentType;
   existingNote.meta.custom = removeCustomMetadataWithEmptyKeys(
     noteFromUser.meta.custom,
   );
@@ -863,7 +844,6 @@ const handleNewNoteSaveRequest = async (
         noteFromUser.meta.custom,
       ),
       flags: noteFromUser.meta.flags,
-      contentType: noteFromUser.meta.contentType,
     },
     content: noteFromUser.content,
   };
