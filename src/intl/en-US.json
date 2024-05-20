@@ -27,7 +27,6 @@
   "editor.remove-note.confirm.text": "Do you really want to remove this note?",
   "editor.save-anyway": "Save anyway",
   "editor.save-note": "Save note",
-  "editor.stats.content-type": "Content-Type",
   "editor.stats.created-at": "Created at",
   "editor.stats.files": "Files",
   "editor.stats.files.none": "None",

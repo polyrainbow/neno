@@ -95,10 +95,6 @@ const NoteStats = ({
               : l("editor.stats.flags.none")
           }</td>
         </tr>
-        <tr>
-          <td>{l("editor.stats.content-type")}</td>
-          <td>{note.contentType}</td>
-        </tr>
       </tbody>
     </table>
   </div>;

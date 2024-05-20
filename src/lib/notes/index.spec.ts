@@ -83,7 +83,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -96,7 +95,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -130,7 +128,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -143,7 +140,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -177,7 +173,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -192,7 +187,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -207,7 +201,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -240,7 +233,6 @@ describe("Notes module", () => {
             "test": "1",
           },
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -258,7 +250,6 @@ describe("Notes module", () => {
             "test": "12",
           },
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -286,7 +277,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -304,7 +294,6 @@ describe("Notes module", () => {
             "test": "12",
           },
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -328,7 +317,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -345,7 +333,6 @@ describe("Notes module", () => {
           slug: "note-1",
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -383,7 +370,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -399,7 +385,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -423,7 +408,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -439,7 +423,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -462,7 +445,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -478,7 +460,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -494,7 +475,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -512,7 +492,6 @@ describe("Notes module", () => {
           slug: "note-1",
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -551,7 +530,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -567,7 +545,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -585,7 +562,6 @@ describe("Notes module", () => {
           slug: "n1",
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -606,7 +582,6 @@ describe("Notes module", () => {
           slug: "n1a",
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -631,7 +606,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -647,7 +621,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -925,7 +898,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -940,7 +912,6 @@ describe("Notes module", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: "",
         },
       },
       ignoreDuplicateTitles: false,
@@ -968,7 +939,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1028,7 +998,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1047,7 +1016,6 @@ describe("Notes module", () => {
             slug: "n1",
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1077,7 +1045,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1101,7 +1068,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1117,7 +1083,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1155,7 +1120,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1198,7 +1162,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1232,7 +1195,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1249,7 +1211,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1266,7 +1227,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1298,7 +1258,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1315,7 +1274,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1332,7 +1290,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1365,7 +1322,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1382,7 +1338,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1399,7 +1354,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1432,7 +1386,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1449,7 +1402,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1466,7 +1418,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1551,7 +1502,6 @@ describe("Notes module", () => {
             slug: "note",
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
       };
@@ -1576,7 +1526,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1607,7 +1556,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1632,7 +1580,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1649,7 +1596,6 @@ describe("Notes module", () => {
             slug: "note-1",
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1674,7 +1620,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1704,7 +1649,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1720,7 +1664,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1763,7 +1706,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1779,7 +1721,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1804,7 +1745,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1820,7 +1760,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1845,7 +1784,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1862,7 +1800,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1880,7 +1817,6 @@ describe("Notes module", () => {
             slug: "x",
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1903,7 +1839,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1919,7 +1854,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -1951,7 +1885,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -2041,7 +1974,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,
@@ -2058,7 +1990,6 @@ describe("Notes module", () => {
           meta: {
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         ignoreDuplicateTitles: false,

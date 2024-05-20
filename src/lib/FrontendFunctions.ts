@@ -4,7 +4,6 @@ import { serializeNewNote } from "../lib/notes/noteUtils";
 import { l } from "./intl";
 import NotesProvider from "./notes";
 import {
-  DEFAULT_CONTENT_TYPE,
   NOTE_FILE_DESCRIPTION,
   NOTE_FILE_EXTENSION,
   NOTE_MIME_TYPE,
@@ -23,7 +22,6 @@ export const exportNote = async (
         createdAt: Date.now(),
         updatedAt: Date.now(),
         custom: Object.fromEntries(activeNote.keyValues),
-        contentType: DEFAULT_CONTENT_TYPE,
         flags: ["EXPORT_FROM_DRAFT"],
       },
       content: noteContent,

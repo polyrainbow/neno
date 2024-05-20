@@ -2,7 +2,6 @@ import { Slug } from "./Slug";
 
 interface BaseNoteMetadata {
   flags: string[],
-  contentType: string,
   custom: {
     [key: string]: string,
   }

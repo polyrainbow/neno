@@ -53,7 +53,6 @@ graph.notes = graph.notes.map((originalNoteSerialized) => {
       updatedAt: NEW_UPDATED_AT,
       position: originalNote.meta.position,
       flags: [],
-      contentType: "text/subtext",
       custom: {},
     },
   });

@@ -54,7 +54,6 @@ const getNewNoteObject = (params: CreateNewNoteParams): UnsavedActiveNote => {
     files: [],
     keyValues: [],
     flags: [],
-    contentType: Config.DEFAULT_CONTENT_TYPE,
   };
 
   Object.seal(note);

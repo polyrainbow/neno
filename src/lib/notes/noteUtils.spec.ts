@@ -1,4 +1,3 @@
-import { DEFAULT_CONTENT_TYPE } from "../../config.js";
 import ExistingNote from "./types/ExistingNote.js";
 import NewNote from "./types/NewNote.js";
 import {
@@ -57,14 +56,12 @@ describe("serializeNote", () => {
             "flag1",
             "flag2",
           ],
-          contentType: "text/plain",
         },
       };
 
       const expectedResult = `:created-at:1000
 :updated-at:2000
 :neno-flags:flag1,flag2
-:content-type:text/plain
 :custom-header-1:custom-value-1
 :custom-header-2:custom-value-2
 
@@ -85,7 +82,6 @@ describe("parseSerializedExistingNote", () => {
       const serializedNote = `:created-at:1000
 :updated-at:2000
 :neno-flags:flag1,flag2
-:content-type:text/plain
 :custom-header-1:custom-value-1
 :custom-header-2:custom-value-2
 
@@ -105,7 +101,6 @@ This is a note`;
             "flag1",
             "flag2",
           ],
-          contentType: "text/plain",
         },
       };
 
@@ -128,7 +123,6 @@ This is a note`;
           updatedAt: undefined,
           custom: {},
           flags: [],
-          contentType: "text/subtext",
         },
       };
 
@@ -144,7 +138,6 @@ This is a note`;
       const serializedNote = `:created-at:1000\r
 :updated-at:2000\r
 :neno-flags:flag1,flag2\r
-:content-type:text/plain\r
 :custom-header-1:custom-value-1\r
 :custom-header-2:custom-value-2\r
 \r
@@ -166,7 +159,6 @@ blocks`;
             "flag1",
             "flag2",
           ],
-          contentType: "text/plain",
         },
       };
 
@@ -189,7 +181,6 @@ describe("parseSerializedNewNote", () => {
         meta: {
           custom: {},
           flags: [],
-          contentType: DEFAULT_CONTENT_TYPE,
         },
       };
 

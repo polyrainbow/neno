@@ -18,7 +18,6 @@ describe("getNotesWithUrl", () => {
             updatedAt: 0,
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         {
@@ -29,7 +28,6 @@ describe("getNotesWithUrl", () => {
             updatedAt: 0,
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         {
@@ -40,7 +38,6 @@ describe("getNotesWithUrl", () => {
             updatedAt: 0,
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         {
@@ -51,7 +48,6 @@ describe("getNotesWithUrl", () => {
             updatedAt: 0,
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
         {
@@ -62,7 +58,6 @@ describe("getNotesWithUrl", () => {
             updatedAt: 0,
             custom: {},
             flags: [],
-            contentType: "",
           },
         },
       ];
@@ -90,7 +85,6 @@ describe("getNotesWithFlag", () => {
             updatedAt: 0,
             custom: {},
             flags: ["CREATED_WITH_BROWSER_EXTENSION"],
-            contentType: "",
           },
         },
         {
@@ -101,7 +95,6 @@ describe("getNotesWithFlag", () => {
             updatedAt: 0,
             custom: {},
             flags: ["DUPLICATE_OF(232)"],
-            contentType: "",
           },
         },
       ];
