@@ -11,7 +11,6 @@ import {
   handleNewNoteSaveRequest,
   changeSlugReferencesInNote,
   getNoteTitle,
-  inferNoteTitle,
 } from "./noteUtils.js";
 import {
   getNumberOfComponents,
@@ -190,21 +189,6 @@ export default class NotesProvider {
         this.#io,
       );
     }
-  }
-
-
-  putRawNote(
-    rawNote: string,
-  ): Promise<NoteToTransmit> {
-    const note = parseSerializedNewNote(rawNote);
-
-    const noteSaveRequest: NoteSaveRequest = {
-      note,
-      aliases: new Set(),
-      ignoreDuplicateTitles: true,
-    };
-
-    return this.put(noteSaveRequest);
   }
 
 
@@ -545,5 +529,4 @@ export {
   handleNewNoteSaveRequest,
   changeSlugReferencesInNote,
   getNoteTitle,
-  inferNoteTitle,
 };

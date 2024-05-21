@@ -1,11 +1,10 @@
 import { PathTemplate } from "../types/PathTemplate";
-import ActiveNote, { UnsavedActiveNote } from "../types/ActiveNote";
+import { UnsavedActiveNote } from "../types/ActiveNote";
 import * as Config from "../config";
 import { FileInfo } from "./notes/types/FileInfo";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { getUrlForSlug } from "./LocalDataStorage";
 import { Slug } from "./notes/types/Slug";
-import { inferNoteTitle } from "./notes/noteUtils";
 import { sluggify } from "./notes/slugUtils";
 
 
@@ -52,7 +51,6 @@ const getNewNoteObject = (params: CreateNewNoteParams): UnsavedActiveNote => {
     // Note may already have files, but the files list will be populated by
     // notesProvider
     files: [],
-    keyValues: [],
     flags: [],
   };
 
@@ -256,12 +254,6 @@ const getLines = (
 };
 
 
-const getNoteTitleFromActiveNote = (activeNote: ActiveNote): string => {
-  return activeNote.keyValues.find((kv) => kv[0] === "title")?.[1]
-    ?? inferNoteTitle(activeNote.initialContent);
-};
-
-
 const getWikilinkForNote = (slug: Slug, title: string): string => {
   // If the title can be sluggified to the note's slug, use the
   // title as link text, because it looks much nicer.
@@ -294,6 +286,5 @@ export {
   createContentFromSlugs,
   getLines,
   getWikilinkForNote,
-  getNoteTitleFromActiveNote,
   getUrl,
 };

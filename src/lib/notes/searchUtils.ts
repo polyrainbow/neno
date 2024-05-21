@@ -1,3 +1,4 @@
+import { serializeInlineText } from "../subwaytext/serialize";
 import { BlockType } from "../subwaytext/types/Block";
 import {
   getBlocks,
@@ -45,7 +46,7 @@ const getNotesWithDuplicateTitles = (notes: ExistingNote[]): ExistingNote[] => {
   const titleIndex = new Map<string, Set<ExistingNote>>();
 
   notes.forEach((note: ExistingNote): void => {
-    const noteTitle = getNoteTitle(note);
+    const noteTitle = getNoteTitle(note.content);
 
     if (titleIndex.has(noteTitle)) {
       (titleIndex.get(noteTitle) as Set<ExistingNote>).add(note);
@@ -74,7 +75,7 @@ const getNotesByTitle = (
   caseSensitive: boolean,
 ): ExistingNote[] => {
   return notes.filter((note: ExistingNote) => {
-    const title = getNoteTitle(note);
+    const title = getNoteTitle(note.content);
 
     return caseSensitive
       ? title === query
@@ -98,17 +99,20 @@ const getNotesWithUrl = (
 
 const getNotesWithKeyValue = (
   notes: ExistingNote[],
+  graph: Graph,
   key: string,
   value: string,
 ) => {
   return notes.filter((note: ExistingNote) => {
-    return (
-      key in note.meta.custom
-      && (
-        value.length === 0
-        || note.meta.custom[key].includes(value)
-      )
-    );
+    return getBlocks(note, graph.indexes.blocks)
+      .some((block) => {
+        return block.type === BlockType.KEY_VALUE_PAIR
+          && block.data.key === key
+          && (
+            value.length === 0
+            || serializeInlineText(block.data.value).includes(value)
+          );
+      });
   });
 };
 
@@ -160,10 +164,12 @@ const getNotesWithTitleSlugOrAliasContainingToken = (
     }
 
     if (caseSensitive) {
-      return getNoteTitle(note).includes(token)
+      return getNoteTitle(note.content).includes(token)
        || note.meta.slug.includes(token);
     } else {
-      return getNoteTitle(note).toLowerCase().includes(token.toLowerCase())
+      return getNoteTitle(note.content).toLowerCase().includes(
+        token.toLowerCase(),
+      )
         || note.meta.slug.toLowerCase().includes(token.toLowerCase());
     }
   });
@@ -249,15 +255,6 @@ const getNotesWithMediaTypes = (
 };
 
 
-const getNotesWithCustomMetadata = (
-  notes: ExistingNote[],
-) => {
-  return notes.filter((note: ExistingNote) => {
-    return Object.entries(note.meta.custom).length > 0;
-  });
-};
-
-
 export {
   getNotesWithDuplicateUrls,
   getNotesThatContainTokens,
@@ -269,6 +266,5 @@ export {
   getNotesWithDuplicateTitles,
   getNotesWithMediaTypes,
   getNotesWithKeyValue,
-  getNotesWithCustomMetadata,
   getNotesWithFlag,
 };

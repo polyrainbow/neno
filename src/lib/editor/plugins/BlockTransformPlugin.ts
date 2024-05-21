@@ -26,12 +26,14 @@ import { $createQuoteBlockNode, QuoteBlockNode } from "../nodes/QuoteBlockNode";
 import { ElementNodeType } from "../types/ElementNodeType";
 import { $createHeadingNode, HeadingNode } from "../nodes/HeadingNode";
 import { $createListItemNode, ListItemNode } from "../nodes/ListItemNode";
+import { $createKeyValueNode, KeyValueNode } from "../nodes/KeyValueNode";
 
 type BlockNode = ParagraphNode
 | CodeBlockNode
 | QuoteBlockNode
 | HeadingNode
-| ListItemNode;
+| ListItemNode
+| KeyValueNode;
 
 const assignCorrectElementNodes = (
   elementNodes: BlockNode[],
@@ -53,6 +55,10 @@ const assignCorrectElementNodes = (
         typeNodeShouldHaveMap.set(node, ElementNodeType.HEADING);
       } else if (nodeText.startsWith("-")) {
         typeNodeShouldHaveMap.set(node, ElementNodeType.LIST_ITEM);
+      } else if (
+        /\$[\p{L}\p{M}\d\-_]+(\s(.*)?)?$/gu.test(nodeText)
+      ) {
+        typeNodeShouldHaveMap.set(node, ElementNodeType.KEY_VALUE_NODE);
       } else {
         typeNodeShouldHaveMap.set(node, ElementNodeType.PARAGRAPH);
       }
@@ -82,6 +88,8 @@ const assignCorrectElementNodes = (
         elementNode.replace($createHeadingNode(), true);
       } else if (typeNodeShouldHave === ElementNodeType.LIST_ITEM) {
         elementNode.replace($createListItemNode(), true);
+      } else if (typeNodeShouldHave === ElementNodeType.KEY_VALUE_NODE) {
+        elementNode.replace($createKeyValueNode(), true);
       } else {
         throw new Error("Unknown node type: " + typeNodeShouldHave);
       }

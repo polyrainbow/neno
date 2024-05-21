@@ -444,6 +444,7 @@
       <li>quote</li>
       <li>unordered-list-item</li>
       <li>ordered-list-item</li>
+      <li>key-value-pair</li>
     </ul>
   </p>
 
@@ -467,22 +468,18 @@
   </p>
 
   <p>
-    <code>has:custom-metadata</code> - Search for notes with any custom metadata fields
-  </p>
-
-  <p>
-    <code>$[KEY]:</code> - Search for notes with custom metadata fields with
+    <code>$[KEY]:</code> - Search for notes with key-value pair with
     the key <code>[KEY]</code>.
     For example <code>$check-back:</code> will find
-    all notes that have a custom metadata field with the key <code>check-back</code>.
+    all notes that have a key-value pair with the key <code>check-back</code>.
   </p>
 
   <p>
-    <code>$[KEY]:[VALUE]</code> - Search for notes with custom metadata fields with
+    <code>$[KEY]:[VALUE]</code> - Search for notes with key-value pair with
     the key <code>[KEY]</code> and the value <code>[VALUE]</code>.
     For example <code>$check-back:2040-01-01</code> will find
-    all notes that have a custom metadata field with the key <code>check-back</code>
-    and the value <code>2040-01-01</code>.
+    all notes that have a key-value pair with the key <code>check-back</code>
+    and a value that includes <code>2040-01-01</code>.
   </p>
 
   <h3>Search presets</h3>

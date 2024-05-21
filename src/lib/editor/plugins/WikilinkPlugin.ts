@@ -45,6 +45,7 @@ import {
   $isWikiLinkPunctuationNode,
   WikiLinkPunctuationNode,
 } from "../nodes/WikiLinkPunctuationNode";
+import { $isKeyValuePairKeyNode } from "../nodes/KeyValuePairKeyNode";
 
 const REGEX = /\[\[[^[\]]+\]\]/;
 
@@ -79,6 +80,8 @@ function registerWikilinkTransforms(
     if (!node.isSimpleText()) {
       return;
     }
+
+    if ($isKeyValuePairKeyNode(node)) return;
 
     let text = node.getTextContent();
     let currentNode = node;
@@ -156,6 +159,8 @@ function registerWikilinkTransforms(
     node: WikiLinkContentNode,
   ) => {
     if (!node.getParent()) return;
+    if ($isKeyValuePairKeyNode(node)) return;
+
     // check if punctuation and content is still intact
     // if not: transform all three into simple text nodes
     const prevSibling = node.getPreviousSibling();
@@ -185,6 +190,8 @@ function registerWikilinkTransforms(
     // check if punctuation and content is still intact
     // if not: transform back to simple text node
     if (!node.getParent()) return;
+
+    if ($isKeyValuePairKeyNode(node)) return;
 
     const hasAccompanyingContentNode = node.__isClosing
       ? $isWikiLinkContentNode(node.getPreviousSibling())

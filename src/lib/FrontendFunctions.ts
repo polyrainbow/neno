@@ -21,7 +21,7 @@ export const exportNote = async (
       meta: {
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        custom: Object.fromEntries(activeNote.keyValues),
+        additionalHeaders: {},
         flags: ["EXPORT_FROM_DRAFT"],
       },
       content: noteContent,

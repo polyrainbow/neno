@@ -6,7 +6,6 @@ import SparseNoteInfo from "../lib/notes/types/SparseNoteInfo";
 interface BaseActiveNote {
   initialContent: string,
   files: FileInfo[],
-  keyValues: [string, string][],
   flags: string[],
 }
 
@@ -24,6 +23,7 @@ export interface SavedActiveNote extends BaseActiveNote {
   numberOfBlocks: number,
   outgoingLinks: NotePreview[],
   backlinks: SparseNoteInfo[],
+  additionalHeaders: [string, string][],
 }
 
 type ActiveNote = UnsavedActiveNote | SavedActiveNote;

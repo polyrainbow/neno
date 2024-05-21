@@ -310,6 +310,66 @@ code
     },
   );
 
+  it(
+    "should recognize key-value blocks",
+    () => {
+      const input = `$Q What is Subtext?
+$check-back-on       2030-01-01
+$like
+$ no-kv`;
+
+      const result = [
+        {
+          type: BlockType.KEY_VALUE_PAIR,
+          data: {
+            key: "Q",
+            value: [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "What is Subtext?",
+              },
+            ],
+            whitespace: " ",
+          },
+        },
+        {
+          type: BlockType.KEY_VALUE_PAIR,
+          data: {
+            key: "check-back-on",
+            value: [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "2030-01-01",
+              },
+            ],
+            whitespace: "       ",
+          },
+        },
+        {
+          type: BlockType.KEY_VALUE_PAIR,
+          data: {
+            key: "like",
+            value: [],
+            whitespace: "",
+          },
+        },
+        {
+          type: BlockType.PARAGRAPH,
+          data: {
+            text: [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "$ no-kv",
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(subwaytext(input)).toStrictEqual(result);
+    },
+  );
+
   it("should recognize a code block after a paragraph block", () => {
     const input = `\`\`\`
 code
@@ -352,6 +412,26 @@ code
     expect(subwaytext(input)).toStrictEqual(result);
   });
 
+
+  it("should not recognize paragraph blocks with $ as key value blocks", () => {
+    const input = "A paragraph with $dollarsign somewhere.";
+
+    const result = [
+      {
+        data: {
+          text: [
+            {
+              text: "A paragraph with $dollarsign somewhere.",
+              type: "NORMAL_TEXT",
+            },
+          ],
+        },
+        type: BlockType.PARAGRAPH,
+      },
+    ];
+
+    expect(subwaytext(input)).toStrictEqual(result);
+  });
 
   it("should recognize single-line quote blocks", () => {
     const input = ">   This is a single-line quote block.";
@@ -613,6 +693,18 @@ const x = [{}];
 
 https://example.com Link to example.com
 A paragraph with a https://link.com and a /slashlink`;
+
+    const result = subwaytext(input);
+    const output = serialize(result);
+    expect(output).toStrictEqual(input);
+  });
+
+
+  it("should round-trip key-value pairs correctly", () => {
+    const input = `$Q What is Subtext?
+$check-back-on       2030-01-01
+$like
+$ no-kv`;
 
     const result = subwaytext(input);
     const output = serialize(result);

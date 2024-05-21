@@ -34,6 +34,9 @@ import theme from "./theme";
 import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
 import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
 import { highlightHeadingSigils } from "./utils/highlight";
+import { KeyValueNode } from "./nodes/KeyValueNode";
+import { KeyValuePairKeyNode } from "./nodes/KeyValuePairKeyNode";
+import { KeyValuePlugin } from "./plugins/KeyValuePlugin";
 
 /*
   Convention:
@@ -87,6 +90,7 @@ export const Editor = ({
     <AutoFocusPlugin />
     <BoldPlugin />
     <InlineCodePlugin />
+    <KeyValuePlugin />
     <LinkPlugin />
     <WikiLinkPlugin getLinkAvailability={(linkText: string) => {
       return getLinkAvailability(linkText, LinkType.WIKILINK);
@@ -165,6 +169,8 @@ const Context = ({
       CodeBlockNode,
       QuoteBlockNode,
       ListItemNode,
+      KeyValueNode,
+      KeyValuePairKeyNode,
     ],
   };
 

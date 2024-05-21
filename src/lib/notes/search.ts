@@ -17,7 +17,6 @@ import {
   getNotesWithDuplicateTitles,
   getNotesWithMediaTypes,
   getNotesWithKeyValue,
-  getNotesWithCustomMetadata,
   getNotesWithFlag,
 } from "./searchUtils.js";
 import { NoteListSortMode } from "./types/NoteListSortMode.js";
@@ -163,14 +162,6 @@ export const search = async (
       matchingNotes = getNotesByTitle(matchingNotes, value, false);
 
     // search for notes with specific urls
-    } else if (key === "has") {
-      if (value === "custom-metadata") {
-        matchingNotes = getNotesWithCustomMetadata(matchingNotes);
-      } else {
-        matchingNotes = [];
-      }
-
-    // search for notes with specific urls
     } else if (key === "has-url") {
       matchingNotes = getNotesWithUrl(matchingNotes, value);
 
@@ -220,6 +211,7 @@ export const search = async (
     } else if (key.startsWith("$")) {
       matchingNotes = getNotesWithKeyValue(
         matchingNotes,
+        graph,
         key.substring(1),
         value,
       );

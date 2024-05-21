@@ -126,7 +126,7 @@ export const getTransclusionContent = async (
   const linkedNote = await notesProvider.get(slug);
   return getNoteTransclusionContent(
     linkedNote.content,
-    getNoteTitle(linkedNote),
+    getNoteTitle(linkedNote.content),
   );
 };
 

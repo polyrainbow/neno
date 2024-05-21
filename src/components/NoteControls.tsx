@@ -4,7 +4,7 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import {
-  getAppPath, getNoteTitleFromActiveNote, getWikilinkForNote,
+  getAppPath, getWikilinkForNote,
 } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
@@ -13,6 +13,7 @@ import { Slug } from "../lib/notes/types/Slug";
 import { LOCAL_GRAPH_ID } from "../config";
 import useConfirm from "../hooks/useConfirm";
 import useGoToNote from "../hooks/useGoToNote";
+import { getNoteTitle } from "../lib/notes";
 
 interface NoteControlsProps {
   activeNote: ActiveNote,
@@ -100,7 +101,7 @@ const NoteControls = ({
               goToNote("new", {
                 contentIfNewNote: getWikilinkForNote(
                   activeNote.slug,
-                  getNoteTitleFromActiveNote(activeNote),
+                  getNoteTitle(activeNote.initialContent),
                 ),
               });
             }}

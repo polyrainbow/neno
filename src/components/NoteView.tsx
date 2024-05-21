@@ -21,7 +21,7 @@ import useHeaderStats from "../hooks/useHeaderStats";
 import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { Slug } from "../lib/notes/types/Slug";
-import NotesProvider from "../lib/notes";
+import NotesProvider, { getNoteTitle } from "../lib/notes";
 import useConfirm from "../hooks/useConfirm";
 import { Context } from "../lib/editor";
 import useGoToNote from "../hooks/useGoToNote";
@@ -199,7 +199,7 @@ const NoteView = () => {
 
 
   useEffect(() => {
-    const title = Utils.getNoteTitleFromActiveNote(activeNote);
+    const title = getNoteTitle(activeNote.initialContent);
 
     const documentTitle = title.length > 0
       ? title
@@ -334,7 +334,6 @@ const NoteView = () => {
           editorInstanceId={editorInstanceId}
           isBusy={isBusy}
           note={activeNote}
-          setNote={setActiveNote}
           setSlugInput={setSlugInput}
           slugInput={slugInput}
           displayedSlugAliases={displayedSlugAliases}
