@@ -14,4 +14,6 @@ export default {
   codeBlock: "code-block",
   quoteBlock: "quote-block",
   listItem: "list-item",
+  keyValue: "key-value",
+  keyValuePairKey: "key-value-key",
 };

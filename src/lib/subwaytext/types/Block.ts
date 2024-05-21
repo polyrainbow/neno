@@ -7,6 +7,7 @@ export enum BlockType {
   ORDERED_LIST_ITEM = "ordered-list-item",
   CODE = "code",
   QUOTE = "quote",
+  KEY_VALUE_PAIR = "key-value-pair",
   EMPTY = "empty",
 }
 
@@ -35,6 +36,17 @@ interface InlineTextWithWhitespace {
 export interface BlockHeading {
   readonly type: BlockType.HEADING,
   data: InlineTextWithWhitespace,
+}
+
+interface KeyValuePairBlockData {
+  key: string,
+  value: InlineText,
+  whitespace: string,
+}
+
+export interface BlockKeyValuePair {
+  readonly type: BlockType.KEY_VALUE_PAIR,
+  data: KeyValuePairBlockData,
 }
 
 export interface UnorderedListItemBlock {
@@ -83,6 +95,7 @@ export type Block = (
   | BlockHeading
   | BlockCode
   | BlockQuote
+  | BlockKeyValuePair
   | BlockEmpty
 );
 

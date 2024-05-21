@@ -17,7 +17,6 @@ import {
   LOCAL_GRAPH_ID,
 } from "../config";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import NoteKeyValues from "./NoteKeyValues";
 import { l } from "../lib/intl";
 import useNotesProvider from "../hooks/useNotesProvider";
 import NoteMenuBar from "./NoteMenuBar";
@@ -49,7 +48,6 @@ interface NoteComponentProps {
   setSlugInput: (val: string) => void,
   displayedSlugAliases: string[],
   setDisplayedSlugAliases: (val: string[]) => void,
-  setNote: (note: ActiveNote) => void,
   handleEditorContentChange: (title: string) => void,
   addFilesToNoteObject: (responses: FileInfo[]) => void,
   setUnsavedChanges: (val: boolean) => void,
@@ -72,7 +70,6 @@ const Note = ({
   editorInstanceId,
   isBusy,
   note,
-  setNote,
   slugInput,
   setSlugInput,
   displayedSlugAliases,
@@ -336,11 +333,6 @@ const Note = ({
               setUnsavedChanges={setUnsavedChanges}
               unsavedChanges={unsavedChanges}
               onLinkIndicatorClick={onLinkIndicatorClick}
-            />
-            <NoteKeyValues
-              note={note}
-              setNote={setNote}
-              setUnsavedChanges={setUnsavedChanges}
             />
             {
               (!note.isUnsaved)

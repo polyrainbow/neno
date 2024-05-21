@@ -3,6 +3,7 @@ import {
   BlockCode,
   BlockEmpty,
   BlockHeading,
+  BlockKeyValuePair,
   BlockParagraph,
   BlockQuote,
   BlockType,
@@ -12,7 +13,7 @@ import {
   UnorderedListItemBlock,
 } from "./types/Block";
 
-function serializeInlineText(spans: InlineText): string {
+export function serializeInlineText(spans: InlineText): string {
   return spans.reduce((acc: string, span: Span) => {
     return acc + span.text;
   }, "");
@@ -24,6 +25,13 @@ function serializeParagraph(block: BlockParagraph): string {
 
 function serializeHeading(block: BlockHeading): string {
   return "#" + block.data.whitespace + serializeInlineText(block.data.text);
+}
+
+function serializeKeyValuePair(block: BlockKeyValuePair): string {
+  return "$"
+    + block.data.key
+    + block.data.whitespace
+    + serializeInlineText(block.data.value);
 }
 
 function serializeQuote(block: BlockQuote): string {
@@ -69,6 +77,8 @@ export default function serialize(blocks: Block[]): string {
         return serializeCodeBlock(block);
       case BlockType.QUOTE:
         return serializeQuote(block);
+      case BlockType.KEY_VALUE_PAIR:
+        return serializeKeyValuePair(block);
       case BlockType.EMPTY:
         return serializeEmpty(block);
     }

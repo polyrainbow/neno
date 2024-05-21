@@ -113,7 +113,7 @@ export default (
       isUnsaved: false,
       initialContent: noteFromServer.content,
       files: noteFromServer.files,
-      keyValues: Object.entries(noteFromServer.meta.custom),
+      additionalHeaders: Object.entries(noteFromServer.meta.additionalHeaders),
       flags: noteFromServer.meta.flags,
     });
     setSlugInput(noteFromServer.meta.slug);
@@ -129,7 +129,7 @@ export default (
         note: {
           content: noteContentRef.current,
           meta: {
-            custom: Object.fromEntries(activeNote.keyValues),
+            additionalHeaders: {},
             flags: activeNote.flags,
           },
         },
@@ -150,7 +150,7 @@ export default (
         note: {
           content: noteContentRef.current,
           meta: {
-            custom: Object.fromEntries(activeNote.keyValues),
+            additionalHeaders: Object.fromEntries(activeNote.additionalHeaders),
             slug: activeNote.slug,
             createdAt: activeNote.createdAt,
             updatedAt: activeNote.updatedAt,
@@ -210,7 +210,6 @@ export default (
     const newActiveNote: UnsavedActiveNote = {
       isUnsaved: true,
       initialContent: parsedNote.content,
-      keyValues: Object.entries(parsedNote.meta.custom),
       flags: [...parsedNote.meta.flags, "IMPORTED"],
       files: [],
     };
@@ -244,7 +243,7 @@ export default (
     const noteSaveRequest: NewNoteSaveRequest = {
       note: {
         meta: {
-          custom: Object.fromEntries(activeNote.keyValues),
+          additionalHeaders: Object.fromEntries(activeNote.additionalHeaders),
           flags: [...activeNote.flags, `DUPLICATE_OF(${activeNote.slug})`],
         },
         content: noteContentRef.current,

@@ -631,4 +631,15 @@ div[data-lexical-editor] {
   :not(.list-item, p.s-heading):has(+ .list-item) {
     margin-bottom: 10px;
   }
+
+
+  .key-value {
+    margin: 10px 0;
+
+    .key-value-key {
+      font-family: var(--code-font);
+      color: var(--alt-content-color);
+      margin-left: 3px;
+    }
+  }
 }

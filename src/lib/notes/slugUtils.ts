@@ -4,12 +4,12 @@ import {
 } from "../subwaytext/types/Block.js";
 import { Slug } from "./types/Slug.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
-import { inferNoteTitle } from "./noteUtils.js";
 import { FileInfo } from "./types/FileInfo.js";
 import {
   getExtensionFromFilename,
   removeExtensionFromFilename,
 } from "./utils.js";
+import { getNoteTitle } from "./noteUtils.js";
 
 
 const isValidFileSlug = (slug: Slug): boolean => {
@@ -121,7 +121,7 @@ const createSlug = (
   noteContent: string,
   existingSlugs: Slug[],
 ): Slug => {
-  const title = inferNoteTitle(noteContent);
+  const title = getNoteTitle(noteContent);
   let slugStem = sluggifyNoteText(title);
 
   let n = 1;

@@ -15,7 +15,6 @@ import {
 import {
   ExistingNoteMetadata,
   NewNoteMetadata,
-  NoteMetadata,
 } from "./types/NoteMetadata.js";
 import { CanonicalNoteHeader } from "./types/CanonicalNoteHeader.js";
 import NewNote from "./types/NewNote.js";
@@ -102,7 +101,7 @@ const parseSerializedExistingNote = (
   const serializedNoteCleaned = cleanSerializedNote(serializedNote);
   const headers = parseNoteHeaders(serializedNoteCleaned);
   const partialMeta: Partial<ExistingNoteMetadata> = {};
-  const custom: Record<string, string> = {};
+  const additionalHeaders: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
     if (canonicalHeaderKeys.has(key as CanonicalNoteHeader)) {
       (canonicalHeaderKeys.get(key as CanonicalNoteHeader) as MetaModifier)(
@@ -110,7 +109,7 @@ const parseSerializedExistingNote = (
         value,
       );
     } else {
-      custom[key] = value;
+      additionalHeaders[key] = value;
     }
   }
 
@@ -119,7 +118,7 @@ const parseSerializedExistingNote = (
     createdAt: partialMeta.createdAt,
     updatedAt: partialMeta.updatedAt,
     flags: partialMeta.flags ?? [],
-    custom,
+    additionalHeaders,
   };
 
   const note: ExistingNote = {
@@ -138,7 +137,7 @@ const parseSerializedNewNote = (serializedNote: string): NewNote => {
   const serializedNoteCleaned = cleanSerializedNote(serializedNote);
   const headers = parseNoteHeaders(serializedNoteCleaned);
   const partialMeta: Partial<NewNoteMetadata> = {};
-  const custom: Record<string, string> = {};
+  const additionalHeaders: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
     if (canonicalHeaderKeys.has(key as CanonicalNoteHeader)) {
       (canonicalHeaderKeys.get(key as CanonicalNoteHeader) as MetaModifier)(
@@ -146,13 +145,13 @@ const parseSerializedNewNote = (serializedNote: string): NewNote => {
         value,
       );
     } else {
-      custom[key] = value;
+      additionalHeaders[key] = value;
     }
   }
 
   const meta: NewNoteMetadata = {
     flags: partialMeta.flags ?? [],
-    custom,
+    additionalHeaders,
   };
 
   const note: NewNote = {
@@ -189,9 +188,9 @@ const serializeNote = (note: ExistingNote): string => {
     note.meta.flags.join(","),
   );
 
-  for (const key in note.meta.custom) {
-    if (Object.hasOwn(note.meta.custom, key)) {
-      headersToSerialize.set(key, note.meta.custom[key]);
+  for (const key in note.meta.additionalHeaders) {
+    if (Object.hasOwn(note.meta.additionalHeaders, key)) {
+      headersToSerialize.set(key, note.meta.additionalHeaders[key]);
     }
   }
 
@@ -207,30 +206,12 @@ const serializeNewNote = (note: NewNote): string => {
     ],
   ]);
 
-  for (const key in note.meta.custom) {
-    if (Object.hasOwn(note.meta.custom, key)) {
-      headers.set(key, note.meta.custom[key]);
-    }
-  }
-
   return serializeNoteHeaders(headers) + "\n\n" + note.content;
 };
 
 
 const getNumberOfCharacters = (note: ExistingNote): number => {
   return note.content.length;
-};
-
-
-const removeCustomMetadataWithEmptyKeys = (
-  meta: NoteMetadata["custom"],
-): NoteMetadata["custom"] => {
-  return Object.fromEntries(
-    Object.entries(meta)
-      .filter((entry) => {
-        return entry[0].trim().length > 0;
-      }),
-  );
 };
 
 
@@ -248,7 +229,7 @@ const removeQuoteBlockSigil = (text: string): string => {
 };
 
 
-const inferNoteTitle = (noteContent: string, maxLength = 800): string => {
+const getNoteTitle = (noteContent: string, maxLength = 800): string => {
   const lines = noteContent.split("\n");
   const firstContentLine = lines.find((line) => line.trim().length > 0);
   if (!firstContentLine) {
@@ -261,15 +242,6 @@ const inferNoteTitle = (noteContent: string, maxLength = 800): string => {
 
   const titleShortened = shortenText(textNormalized, maxLength).trim();
   return titleShortened;
-};
-
-
-const getNoteTitle = (note: ExistingNote): string => {
-  if (note.meta.custom.title) {
-    return note.meta.custom.title;
-  } else {
-    return inferNoteTitle(note.content);
-  }
 };
 
 
@@ -330,7 +302,7 @@ const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
     content: note.content,
     slug,
     aliases: getAliasesOfSlug(graph, slug),
-    title: getNoteTitle(note),
+    title: getNoteTitle(note.content),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,
   };
@@ -353,7 +325,7 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
       const backlink: SparseNoteInfo = {
         slug: note.meta.slug,
         aliases: getAliasesOfSlug(graph, note.meta.slug),
-        title: getNoteTitle(note),
+        title: getNoteTitle(note.content),
         createdAt: note.meta.createdAt,
         updatedAt: note.meta.updatedAt,
       };
@@ -394,6 +366,8 @@ const getAllInlineSpans = (blocks: Block[]): Span[] => {
       spans.push(...block.data.text);
     } else if (block.type === BlockType.UNORDERED_LIST_ITEM) {
       spans.push(...block.data.text);
+    } else if (block.type === BlockType.KEY_VALUE_PAIR) {
+      spans.push(...block.data.value);
     }
   });
   return spans;
@@ -535,7 +509,7 @@ const createNoteListItem = (
   const noteListItem: NoteListItem = {
     slug: note.meta.slug,
     aliases: getAliasesOfSlug(graph, note.meta.slug),
-    title: getNoteTitle(note),
+    title: getNoteTitle(note.content),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,
     features: getNoteFeatures(note, graph),
@@ -629,9 +603,7 @@ const handleExistingNoteUpdate = async (
     ? noteFromUser.meta.updatedAt
     : Date.now();
   existingNote.meta.flags = noteFromUser.meta.flags;
-  existingNote.meta.custom = removeCustomMetadataWithEmptyKeys(
-    noteFromUser.meta.custom,
-  );
+  existingNote.meta.additionalHeaders = noteFromUser.meta.additionalHeaders;
 
   const aliasesToUpdate: Set<Slug> = new Set();
 
@@ -734,7 +706,7 @@ const handleExistingNoteUpdate = async (
           thatNote.meta.slug,
         ) as Block[];
 
-        const noteTitle = getNoteTitle(existingNote);
+        const noteTitle = getNoteTitle(existingNote.content);
         const newSluggifiableTitle = sluggify(noteTitle) === newSlug
           ? noteTitle
           : newSlug;
@@ -840,9 +812,7 @@ const handleNewNoteSaveRequest = async (
       slug,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      custom: removeCustomMetadataWithEmptyKeys(
-        noteFromUser.meta.custom,
-      ),
+      additionalHeaders: {},
       flags: noteFromUser.meta.flags,
     },
     content: noteFromUser.content,
@@ -864,7 +834,6 @@ const handleNewNoteSaveRequest = async (
 
 
 export {
-  inferNoteTitle,
   getNumberOfLinkedNotes,
   createNoteToTransmit,
   getNoteFeatures,
@@ -879,7 +848,6 @@ export {
   parseSerializedNewNote,
   serializeNote,
   serializeNewNote,
-  removeCustomMetadataWithEmptyKeys,
   getBacklinks,
   getNoteTitle,
   removeWikilinkPunctuation,

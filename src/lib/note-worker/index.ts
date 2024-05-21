@@ -15,11 +15,9 @@ import {
   handleNewNoteSaveRequest,
   changeSlugReferencesInNote,
   getNoteTitle,
-  inferNoteTitle,
 } from "../notes";
 
 globalThis.getNoteTitle = getNoteTitle;
-globalThis.inferNoteTitle = inferNoteTitle;
 
 /*
   Making Worker environment safer
@@ -69,7 +67,6 @@ const wl = new Set([
   "Worker",
   // notes provider utils
   "getNoteTitle",
-  "inferNoteTitle",
 ]);
 
 Object.getOwnPropertyNames( globalThis ).forEach( function( prop ) {

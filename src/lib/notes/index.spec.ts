@@ -81,7 +81,7 @@ describe("Notes module", () => {
       note: {
         content: "",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -93,7 +93,7 @@ describe("Notes module", () => {
       note: {
         content: "",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -126,7 +126,7 @@ describe("Notes module", () => {
       note: {
         content: "",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -138,7 +138,7 @@ describe("Notes module", () => {
       note: {
         content: "",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -171,7 +171,7 @@ describe("Notes module", () => {
           /7 /8 /9 /10 /test
           `,
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -185,7 +185,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -199,7 +199,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 3 with link to [[1]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -221,7 +221,7 @@ describe("Notes module", () => {
     },
   );
 
-  it("should correctly update key-value pairs", async () => {
+  it("should correctly update additional headers", async () => {
     const mockStorageProvider = new MockStorageProvider();
     const notesProvider = new NotesProvider(mockStorageProvider);
 
@@ -229,7 +229,7 @@ describe("Notes module", () => {
       note: {
         content: "",
         meta: {
-          custom: {
+          additionalHeaders: {
             "test": "1",
           },
           flags: [],
@@ -246,7 +246,7 @@ describe("Notes module", () => {
         content: "",
         meta: {
           slug: note.meta.slug,
-          custom: {
+          additionalHeaders: {
             "test": "12",
           },
           flags: [],
@@ -258,7 +258,7 @@ describe("Notes module", () => {
 
     const updatedNote = await notesProvider.put(noteSaveRequest2);
 
-    expect(updatedNote.meta.custom.test).toBe("12");
+    expect(updatedNote.meta.additionalHeaders.test).toBe("12");
 
     const noteFromStorageProvider = await mockStorageProvider
       .readObjectAsString(
@@ -275,7 +275,7 @@ describe("Notes module", () => {
       note: {
         content: "Note 1 with a link to [[Note 2]] that does not exist yet.",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -290,7 +290,7 @@ describe("Notes module", () => {
       note: {
         content: "This is Note 2",
         meta: {
-          custom: {
+          additionalHeaders: {
             "test": "12",
           },
           flags: [],
@@ -315,7 +315,7 @@ describe("Notes module", () => {
       note: {
         content: "Note 1",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -331,7 +331,7 @@ describe("Notes module", () => {
         content: "Note 1 with new slug",
         meta: {
           slug: "note-1",
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -368,7 +368,7 @@ describe("Notes module", () => {
         note: {
           content: "",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -383,7 +383,7 @@ describe("Notes module", () => {
         note: {
           content: "# Heading with a link to [[Note 1]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -406,7 +406,7 @@ describe("Notes module", () => {
         note: {
           content: "",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -421,7 +421,7 @@ describe("Notes module", () => {
         note: {
           content: "> Quote with a link to [[Note 1]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -443,7 +443,7 @@ describe("Notes module", () => {
       note: {
         content: "Note 1 with a reference to itself: [[Note 1]]",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -458,7 +458,7 @@ describe("Notes module", () => {
       note: {
         content: "Note 2 with a wikilink to Note 1: [[Note 1]]",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -473,7 +473,7 @@ describe("Notes module", () => {
       note: {
         content: "Note 3 with a slashlink to Note 1: /note-1\n# [[Note 1]]",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -490,7 +490,7 @@ describe("Notes module", () => {
         content: "Note 1 with a reference to itself: [[Note 1]]",
         meta: {
           slug: "note-1",
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -528,7 +528,7 @@ describe("Notes module", () => {
       note: {
         content: "[[n1]]",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -543,7 +543,7 @@ describe("Notes module", () => {
       note: {
         content: "",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -560,7 +560,7 @@ describe("Notes module", () => {
         content: "",
         meta: {
           slug: "n1",
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -580,7 +580,7 @@ describe("Notes module", () => {
         content: "",
         meta: {
           slug: "n1a",
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -604,7 +604,7 @@ describe("Notes module", () => {
       note: {
         content: "",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -619,7 +619,7 @@ describe("Notes module", () => {
       note: {
         content: "[[n1]]",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -896,7 +896,7 @@ describe("Notes module", () => {
       note: {
         content: "",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -910,7 +910,7 @@ describe("Notes module", () => {
       note: {
         content: "Note with a link to [[another existing note]]",
         meta: {
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       },
@@ -937,7 +937,7 @@ describe("Notes module", () => {
           content: `A note with several links to non-existent notes
           [[foo]] [[bar]] /baz`,
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -996,7 +996,7 @@ describe("Notes module", () => {
         note: {
           content: "A note that will be pinned",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1014,7 +1014,7 @@ describe("Notes module", () => {
           content: "A note that will be pinned",
           meta: {
             slug: "n1",
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1043,7 +1043,7 @@ describe("Notes module", () => {
         note: {
           content: "Note with link to [[Foo Bar]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1066,7 +1066,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2 with link to [[Foo Bar]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1081,7 +1081,7 @@ describe("Notes module", () => {
         note: {
           content: "Foo Bar",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1118,7 +1118,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1160,7 +1160,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1193,7 +1193,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1209,7 +1209,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1225,7 +1225,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 3",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1256,7 +1256,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1272,7 +1272,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1288,7 +1288,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 3",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1320,7 +1320,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1336,7 +1336,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1352,7 +1352,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 3",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1384,7 +1384,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1400,7 +1400,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1416,7 +1416,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 3",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1500,7 +1500,7 @@ describe("Notes module", () => {
           content: "Test note",
           meta: {
             slug: "note",
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1524,7 +1524,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1554,7 +1554,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1578,7 +1578,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1594,7 +1594,7 @@ describe("Notes module", () => {
           content: "Note 1",
           meta: {
             slug: "note-1",
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1618,7 +1618,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1647,7 +1647,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1 with an alias.",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1662,7 +1662,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2 with a link to the [[alias]].",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1704,7 +1704,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1 with an alias.",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1719,7 +1719,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2 with a link to the [[alias]].",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1743,7 +1743,7 @@ describe("Notes module", () => {
         note: {
           content: "link to [[y]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1758,7 +1758,7 @@ describe("Notes module", () => {
         note: {
           content: "",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1782,7 +1782,7 @@ describe("Notes module", () => {
         note: {
           content: "link to [[alias]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1798,7 +1798,7 @@ describe("Notes module", () => {
         note: {
           content: "",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1815,7 +1815,7 @@ describe("Notes module", () => {
           content: "",
           meta: {
             slug: "x",
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1837,7 +1837,7 @@ describe("Notes module", () => {
         note: {
           content: "",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1852,7 +1852,7 @@ describe("Notes module", () => {
         note: {
           content: "link to [[y]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1883,7 +1883,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1972,7 +1972,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 1 with slashlink to /files/a.txt",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -1988,7 +1988,7 @@ describe("Notes module", () => {
         note: {
           content: "Note 2 with wikilink to [[files/a.txt]]",
           meta: {
-            custom: {},
+            additionalHeaders: {},
             flags: [],
           },
         },
@@ -2103,4 +2103,42 @@ describe("Notes module", () => {
       expect(metadataFileWrites.length).toBe(0);
     },
   );
+
+
+  it(
+    "backlinks of note should include notes that links to slug in KV value",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1\n$written-in [[Berlin]]",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Berlin",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set(),
+      };
+
+      const note2 = await notesProvider.put(noteSaveRequest2);
+
+      expect(note2.backlinks.length).toBe(1);
+      expect(note2.backlinks[0].slug).toBe("note-1");
+    });
 });

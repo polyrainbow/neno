@@ -1,18 +1,18 @@
 import ExistingNote from "./types/ExistingNote.js";
 import NewNote from "./types/NewNote.js";
 import {
-  inferNoteTitle,
+  getNoteTitle,
   parseSerializedExistingNote,
   parseSerializedNewNote,
   serializeNote,
 } from "./noteUtils.js";
 import { describe, it, expect } from "vitest";
 
-describe("inferNoteTitle", () => {
+describe("getNoteTitle", () => {
   it(
     "should remove wikilink punctuation",
     async () => {
-      expect(inferNoteTitle(
+      expect(getNoteTitle(
         "a title with a [[wikilink]] and some brackets []",
       )).toBe("a title with a wikilink and some brackets []");
     },
@@ -21,7 +21,7 @@ describe("inferNoteTitle", () => {
   it(
     "should remove heading sigil",
     async () => {
-      expect(inferNoteTitle(
+      expect(getNoteTitle(
         "#   A heading with # and ##",
       )).toBe("A heading with # and ##");
     },
@@ -30,7 +30,7 @@ describe("inferNoteTitle", () => {
   it(
     "should remove quote block sigil",
     async () => {
-      expect(inferNoteTitle(
+      expect(getNoteTitle(
         ">  A quote block with an <HTMLElement>",
       )).toBe("A quote block with an <HTMLElement>");
     },
@@ -48,7 +48,7 @@ describe("serializeNote", () => {
           slug: "1",
           createdAt: 1000,
           updatedAt: 2000,
-          custom: {
+          additionalHeaders: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",
           },
@@ -93,7 +93,7 @@ This is a note`;
           slug: "1",
           createdAt: 1000,
           updatedAt: 2000,
-          custom: {
+          additionalHeaders: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",
           },
@@ -121,7 +121,7 @@ This is a note`;
           slug: "1",
           createdAt: undefined,
           updatedAt: undefined,
-          custom: {},
+          additionalHeaders: {},
           flags: [],
         },
       };
@@ -151,7 +151,7 @@ blocks`;
           slug: "1",
           createdAt: 1000,
           updatedAt: 2000,
-          custom: {
+          additionalHeaders: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",
           },
@@ -179,8 +179,8 @@ describe("parseSerializedNewNote", () => {
       const expectedResult: NewNote = {
         content: "This is a note",
         meta: {
-          custom: {},
           flags: [],
+          additionalHeaders: {},
         },
       };
 

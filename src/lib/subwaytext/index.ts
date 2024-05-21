@@ -3,6 +3,7 @@ import {
   BlockCode,
   BlockEmpty,
   BlockHeading,
+  BlockKeyValuePair,
   BlockParagraph,
   BlockQuote,
   BlockType,
@@ -57,6 +58,23 @@ const parse = (input: string): Block[] => {
             data: {
               whitespace: line.substring(1).match(/^\s*/g)?.[0] ?? "",
               text: parseText(line.substring(1).trimStart()),
+            },
+          };
+
+          blocks.push(newBlock);
+
+          return blocks;
+        } else if (
+          /^\$[\p{L}\p{M}\d\-_]+(\s(.*)?)?$/gu.test(line)
+        ) {
+          const newBlock: BlockKeyValuePair = {
+            type: BlockType.KEY_VALUE_PAIR,
+            data: {
+              key: line.substring(1).match(/^[^\s]+/)?.[0] ?? "",
+              whitespace: line.substring(1).match(/\s+/g)?.[0] ?? "",
+              value: parseText(
+                Array.from(line.matchAll(/^[^\s]+\s*(.*)$/g))[0][1] ?? "",
+              ),
             },
           };
 

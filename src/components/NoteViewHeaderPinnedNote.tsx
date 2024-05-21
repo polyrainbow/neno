@@ -21,7 +21,7 @@ const NoteViewHeaderPinnedNote = ({
   onDragEnd,
   onDragOver,
 }: NoteViewHeaderPinnedNoteProps) => {
-  const noteTitle = getNoteTitle(note);
+  const noteTitle = getNoteTitle(note.content);
 
   return <HeaderButton
     className={"pinned-note " + (isActive ? "active" : "")}
