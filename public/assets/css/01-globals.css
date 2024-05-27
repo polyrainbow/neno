@@ -235,14 +235,6 @@ code {
   white-space: normal;
 }
 
-.no-margin {
-  margin: 0;
-}
-
-.clickable {
-  cursor: pointer;
-}
-
 .flex-container {
   display: flex;
 }
