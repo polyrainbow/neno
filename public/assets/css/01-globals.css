@@ -47,6 +47,7 @@
     --accent-color-2: var(--neno-red-2);
     --accent-color-interactible: var(--neno-gray-2);
     --error-and-danger-background-color: var(--neno-red-3);
+    --error-and-danger-background-color-low: var(--neno-red-2);
     --error-and-danger-text-color: var(--neno-red-4);
     --background-color: white;
     --main-content-color: black;
@@ -67,6 +68,7 @@
     --accent-color-2: var(--neno-red-7);
     --accent-color-interactible: var(--neno-gray-9);
     --error-and-danger-background-color: var(--neno-red-7);
+    --error-and-danger-background-color-low: var(--neno-red-8);
     --error-and-danger-text-color: var(--neno-red-4);
     --background-color: black;
     --main-content-color: white;
@@ -576,6 +578,13 @@ input:checked + .slider::before {
 
     img {
       margin-right: 3px;
+    }
+  }
+
+  &.dangerous {
+    background-color: var(--error-and-danger-background-color-low);
+    &:hover {
+      background-color: var(--error-and-danger-background-color);
     }
   }
 }

@@ -162,6 +162,7 @@ const FileView = () => {
           }
           <HeaderButton
             icon="delete"
+            dangerous
             disabled={!fileInfo}
             onClick={async () => {
               if (!fileInfo) return;

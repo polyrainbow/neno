@@ -9,6 +9,7 @@ interface HeaderButtonProps extends React.PropsWithChildren {
   onDragOver?: (e: React.DragEvent<HTMLButtonElement>) => void,
   className?: string,
   draggable?: boolean,
+  dangerous?: boolean,
 }
 
 const HeaderButton = ({
@@ -21,6 +22,7 @@ const HeaderButton = ({
   onDragOver,
   className,
   draggable,
+  dangerous,
 }: HeaderButtonProps) => {
   return <button
     disabled={disabled}
@@ -32,6 +34,7 @@ const HeaderButton = ({
       "header-button "
       + (icon ? "with-icon" : "without-icon")
       + (className ? (" " + className) : "")
+      + (dangerous ? (" dangerous") : "")
     }
     onClick={() => onClick()}
   >
