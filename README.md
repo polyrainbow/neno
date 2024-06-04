@@ -3,7 +3,7 @@
     style="text-align: center;"
     src="./public/assets/app-icon/logo.svg"
     alt="NENO Logo"
-    width="200" height="200" 
+    width="200" height="200"
   >
 </p>
 
