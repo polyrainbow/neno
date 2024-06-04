@@ -5,6 +5,7 @@ import useConfirmDiscardingUnsavedChangesDialog
 import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
 import { Slug } from "../lib/notes/types/Slug";
+import { getCompareKeyForTimestamp } from "../lib/notes/utils";
 
 
 interface NoteBacklinksProps {
@@ -42,7 +43,9 @@ const NoteBacklinks = ({
     <div className="note-backlinks">
       {
         note.backlinks
-          .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
+          .sort((a, b) => getCompareKeyForTimestamp(b.updatedAt)
+            - getCompareKeyForTimestamp(a.updatedAt),
+          )
           .map((displayedLinkedNote) => <NoteListItem
             key={"note-link-list-item-" + displayedLinkedNote.slug}
             note={displayedLinkedNote}

@@ -11,6 +11,19 @@ export const setDefaultDate = async (page: Page): Promise<void> => {
   // Update the Date accordingly in your test pages
   await page.addInitScript(`{
     let step = 0;
+    Date = class extends Date {
+      constructor(...args) {
+        if (args.length === 0) {
+          const timestamp = ${fakeNow};
+          // increase timestamp with every call so we can simulate an order of
+          // events
+          step = step + 1000;
+          super(timestamp + step);
+        } else {
+          super(...args);
+        }
+      }
+    }
     Date.now = () => {
       const timestamp = ${fakeNow};
       // increase timestamp with every call so we can simulate an order of

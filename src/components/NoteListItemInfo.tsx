@@ -15,7 +15,7 @@ const NoteListItemInfo = ({
     <span className="slug" key={"nli-" + note.slug}>/{note.slug}</span>,
   ];
 
-  if (typeof note.updatedAt === "number") {
+  if (typeof note.updatedAt === "string") {
     sections.push(
       <span>{(new Date(note.updatedAt)).toLocaleDateString()}</span>,
     );

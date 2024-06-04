@@ -28,7 +28,7 @@ const getParameterByName = (name: string, url: string): string | null => {
 };
 
 
-const makeTimestampHumanReadable = (timestamp: number): string => {
+const ISOTimestampToLocaleString = (timestamp: string): string => {
   return (new Date(timestamp)).toLocaleString();
 };
 
@@ -271,7 +271,7 @@ export {
   isNotFalse,
   getPagedMatches,
   getParameterByName,
-  makeTimestampHumanReadable,
+  ISOTimestampToLocaleString,
   getNewNoteObject,
   humanFileSize,
   shortenText,

@@ -1,6 +1,6 @@
 import { l, lf } from "../lib/intl";
 import GraphStats from "../lib/notes/types/GraphStats";
-import { humanFileSize, makeTimestampHumanReadable } from "../lib/utils";
+import { ISOTimestampToLocaleString, humanFileSize } from "../lib/utils";
 
 interface StatsViewAnalysisTableProps {
   stats: Required<GraphStats>;
@@ -28,11 +28,11 @@ const StatsViewAnalysisTable = ({
     <tbody>
       <tr>
         <td>{l("stats.metadata.created-at")}</td>
-        <td>{makeTimestampHumanReadable(stats.metadata.createdAt)}</td>
+        <td>{ISOTimestampToLocaleString(stats.metadata.createdAt)}</td>
       </tr>
       <tr>
         <td>{l("stats.metadata.updated-at")}</td>
-        <td>{makeTimestampHumanReadable(stats.metadata.updatedAt)}</td>
+        <td>{ISOTimestampToLocaleString(stats.metadata.updatedAt)}</td>
       </tr>
       <tr>
         <td>{l("stats.analysis.notes")}</td>

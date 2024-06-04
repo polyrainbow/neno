@@ -4,11 +4,11 @@ import { Block } from "../../subwaytext/types/Block.js";
 import { Slug } from "./Slug.js";
 
 export interface GraphMetadata {
-  createdAt: number, // the time of creation of this metadata object
-  updatedAt: number, // the time of the last change of this metadata object
+  createdAt: string, // the time of creation of this metadata object
+  updatedAt: string, // the time of the last change of this metadata object
   pinnedNotes: Slug[],
   files: FileInfo[],
-  version: "4",
+  version: "5",
 }
 
 // We are extensively using Maps here because they must be implemented with
