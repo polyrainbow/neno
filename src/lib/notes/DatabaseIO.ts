@@ -26,6 +26,7 @@ import { Slug } from "./types/Slug.js";
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
 import { isValidFileSlug } from "./slugUtils.js";
+import { getCurrentISODateTime, unixToISOTimestamp } from "./utils.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -92,6 +93,48 @@ export default class DatabaseIO {
       graphMetadata = JSON.parse(
         metadataSerialized,
       ) as GraphMetadata;
+
+      if ((graphMetadata.version as string) === "4") {
+        graphMetadata.createdAt
+          = unixToISOTimestamp(parseInt(graphMetadata.createdAt));
+        graphMetadata.updatedAt
+          = unixToISOTimestamp(parseInt(graphMetadata.updatedAt));
+
+        for (const file of graphMetadata.files) {
+          file.createdAt = unixToISOTimestamp(parseInt(
+            graphMetadata.updatedAt,
+          ));
+        }
+
+        graphMetadata.version = "5";
+
+        await this.writeGraphMetadataFile(graphMetadata);
+
+        for (const [slug, note] of parsedNotes.entries()) {
+          let flushNote = false;
+          if (note.meta.createdAt && /^\d+$/.test(note.meta.createdAt)) {
+            note.meta.createdAt = unixToISOTimestamp(parseInt(
+              note.meta.createdAt,
+            ));
+            flushNote = true;
+          }
+
+          if (note.meta.updatedAt && /^\d+$/.test(note.meta.updatedAt)) {
+            note.meta.updatedAt = unixToISOTimestamp(parseInt(
+              note.meta.updatedAt,
+            ));
+            flushNote = true;
+          }
+
+          if (flushNote) {
+            const filename = DatabaseIO.getFilenameForNoteSlug(slug);
+            await this.#storageProvider.writeObject(
+              filename,
+              serializeNote(note),
+            );
+          }
+        }
+      }
     } else {
       graphMetadata = this.createEmptyGraphMetadata();
       await this.writeGraphMetadataFile(graphMetadata);
@@ -298,11 +341,11 @@ export default class DatabaseIO {
 
   private createEmptyGraphMetadata(): GraphMetadata {
     return {
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: getCurrentISODateTime(),
+      updatedAt: getCurrentISODateTime(),
       pinnedNotes: [],
       files: [],
-      version: "4",
+      version: "5",
     };
   }
 
@@ -386,7 +429,7 @@ export default class DatabaseIO {
         writeGraphMetadata
           === WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
       ) {
-        graph.metadata.updatedAt = Date.now();
+        graph.metadata.updatedAt = getCurrentISODateTime();
       }
       await this.writeGraphMetadataFile(graph.metadata);
     }

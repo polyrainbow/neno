@@ -4,6 +4,11 @@ import NoteListItem from "./types/NoteListItem.js";
 import ExistingNote from "./types/ExistingNote.js";
 import { Slug } from "./types/Slug.js";
 import Graph from "./types/Graph.js";
+import {
+  getCompareKeyForTimestamp,
+  getEarliestISOTimestamp,
+  getLatestISOTimestamp,
+} from "./utils.js";
 
 const getSortKeyForTitle = (title: string): string => {
   return title
@@ -19,19 +24,23 @@ const getSortFunction = (
   const sortFunctions = {
     [NoteListSortMode.CREATION_DATE_ASCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
-        return (a.createdAt ?? 0) - (b.createdAt ?? 0);
+        return getCompareKeyForTimestamp(a.createdAt)
+          - getCompareKeyForTimestamp(b.createdAt);
       },
     [NoteListSortMode.CREATION_DATE_DESCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
-        return (b.createdAt ?? 0) - (a.createdAt ?? 0);
+        return getCompareKeyForTimestamp(b.createdAt)
+          - getCompareKeyForTimestamp(a.createdAt);
       },
     [NoteListSortMode.UPDATE_DATE_ASCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
-        return (a.updatedAt ?? 0) - (b.updatedAt ?? 0);
+        return getCompareKeyForTimestamp(a.updatedAt)
+          - getCompareKeyForTimestamp(b.updatedAt);
       },
     [NoteListSortMode.UPDATE_DATE_DESCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
-        return (b.updatedAt ?? 0) - (a.updatedAt ?? 0);
+        return getCompareKeyForTimestamp(b.updatedAt)
+          - getCompareKeyForTimestamp(a.updatedAt);
       },
     [NoteListSortMode.TITLE_ASCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
@@ -85,25 +94,29 @@ const getNoteSortFunction = (
     [
       NoteListSortMode.CREATION_DATE_ASCENDING,
       (a: ExistingNote, b: ExistingNote) => {
-        return (a.meta.createdAt ?? 0) - (b.meta.createdAt ?? 0);
+        return getCompareKeyForTimestamp(a.meta.createdAt)
+          - getCompareKeyForTimestamp(b.meta.createdAt);
       },
     ],
     [
       NoteListSortMode.CREATION_DATE_DESCENDING,
       (a: ExistingNote, b: ExistingNote) => {
-        return (b.meta.createdAt ?? 0) - (a.meta.createdAt ?? 0);
+        return getCompareKeyForTimestamp(b.meta.createdAt)
+          - getCompareKeyForTimestamp(a.meta.createdAt);
       },
     ],
     [
       NoteListSortMode.UPDATE_DATE_ASCENDING,
       (a: ExistingNote, b: ExistingNote) => {
-        return (a.meta.updatedAt ?? 0) - (b.meta.updatedAt ?? 0);
+        return getCompareKeyForTimestamp(a.meta.updatedAt)
+          - getCompareKeyForTimestamp(b.meta.updatedAt);
       },
     ],
     [
       NoteListSortMode.UPDATE_DATE_DESCENDING,
       (a: ExistingNote, b: ExistingNote) => {
-        return (b.meta.updatedAt ?? 0) - (a.meta.updatedAt ?? 0);
+        return getCompareKeyForTimestamp(b.meta.updatedAt)
+          - getCompareKeyForTimestamp(a.meta.updatedAt);
       },
     ],
     [
@@ -227,24 +240,24 @@ const getNumberOfComponents = (
   return numberOfComponents;
 };
 
-const getGraphCreationTimestamp = (graph: Graph): number => {
-  return Math.min(
+const getGraphCreationTimestamp = (graph: Graph): string => {
+  return getEarliestISOTimestamp(
     ...Array.from(graph.notes.values())
       .map((note: ExistingNote) => note.meta.createdAt)
-      .filter((createdAt: number | undefined): createdAt is number => {
-        return createdAt !== undefined;
+      .filter((createdAt): createdAt is string => {
+        return typeof createdAt === "string";
       }),
     graph.metadata.createdAt,
   );
 };
 
 
-const getGraphUpdateTimestamp = (graph: Graph): number => {
-  return Math.max(
+const getGraphUpdateTimestamp = (graph: Graph): string => {
+  return getLatestISOTimestamp(
     ...Array.from(graph.notes.values())
       .map((note: ExistingNote) => note.meta.updatedAt)
-      .filter((updatedAt: number | undefined): updatedAt is number => {
-        return updatedAt !== undefined;
+      .filter((createdAt): createdAt is string => {
+        return typeof createdAt === "string";
       }),
     graph.metadata.updatedAt,
   );

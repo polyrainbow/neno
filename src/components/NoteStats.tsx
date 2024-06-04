@@ -1,8 +1,8 @@
 import { SavedActiveNote } from "../types/ActiveNote";
 import { l } from "../lib/intl";
 import {
-  makeTimestampHumanReadable,
   humanFileSize,
+  ISOTimestampToLocaleString,
 } from "../lib/utils";
 import NoteStatsFileLink from "./NoteStatsFileLink";
 import { getMediaTypeFromFilename } from "../lib/notes/utils";
@@ -30,7 +30,7 @@ const NoteStats = ({
           <td>{
             note.createdAt === undefined
               ? l("editor.stats.unknown")
-              : makeTimestampHumanReadable(note.createdAt)
+              : ISOTimestampToLocaleString(note.createdAt)
           }</td>
         </tr>
         <tr>
@@ -38,7 +38,7 @@ const NoteStats = ({
           <td>{
             note.updatedAt === undefined
               ? l("editor.stats.unknown")
-              : makeTimestampHumanReadable(note.updatedAt)
+              : ISOTimestampToLocaleString(note.updatedAt)
           }</td>
         </tr>
         <tr>

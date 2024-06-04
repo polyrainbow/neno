@@ -37,7 +37,11 @@ import ByteRange from "./types/ByteRange.js";
 import { Slug } from "./types/Slug.js";
 import { Block } from "../subwaytext/types/Block.js";
 import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
-import { getExtensionFromFilename, getRandomKey } from "./utils.js";
+import {
+  getCurrentISODateTime,
+  getExtensionFromFilename,
+  getRandomKey,
+} from "./utils.js";
 import {
   getSlugFromFilename,
   isValidSlug,
@@ -241,7 +245,7 @@ export default class NotesProvider {
     const fileInfo: FileInfo = {
       slug,
       size,
-      createdAt: Date.now(),
+      createdAt: getCurrentISODateTime(),
     };
     graph.metadata.files.push(fileInfo);
     await this.#io.flushChanges(

@@ -10,6 +10,7 @@ import CreateScript from "./CreateScript";
 import Pagination from "./Pagination";
 import { SEARCH_RESULTS_PER_PAGE } from "../config";
 import { getPagedMatches } from "../lib/utils";
+import { getCompareKeyForTimestamp } from "../lib/notes/utils";
 
 enum FileSortMode {
   CREATED_AT_DESCENDING = "CREATED_AT_DESCENDING",
@@ -45,9 +46,11 @@ const FilesView = () => {
     ))
     .toSorted((a, b): number => {
       if (sortMode === FileSortMode.CREATED_AT_DESCENDING) {
-        return b.createdAt - a.createdAt;
+        return getCompareKeyForTimestamp(b.createdAt)
+          - getCompareKeyForTimestamp(a.createdAt);
       } else if (sortMode === FileSortMode.CREATED_AT_ASCENDING) {
-        return a.createdAt - b.createdAt;
+        return getCompareKeyForTimestamp(a.createdAt)
+          - getCompareKeyForTimestamp(b.createdAt);
       } else if (sortMode === FileSortMode.NAME_ASCENDING) {
         if (a.slug.toLowerCase() < b.slug.toLowerCase()) return -1;
         if (a.slug.toLowerCase() > b.slug.toLowerCase()) return 1;

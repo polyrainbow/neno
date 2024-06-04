@@ -6,8 +6,8 @@ export interface GraphSize {
 
 interface GraphStatsMetadata {
   readonly size: GraphSize,
-  readonly createdAt: number,
-  readonly updatedAt: number,
+  readonly createdAt: string,
+  readonly updatedAt: string,
 }
 
 

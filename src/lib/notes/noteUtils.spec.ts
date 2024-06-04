@@ -46,8 +46,8 @@ describe("serializeNote", () => {
         content: "This is a note",
         meta: {
           slug: "1",
-          createdAt: 1000,
-          updatedAt: 2000,
+          createdAt: "2024-06-01T20:30:00+02:00",
+          updatedAt: "2024-06-01T20:31:00+02:00",
           additionalHeaders: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",
@@ -59,8 +59,8 @@ describe("serializeNote", () => {
         },
       };
 
-      const expectedResult = `:created-at:1000
-:updated-at:2000
+      const expectedResult = `:created-at:2024-06-01T20:30:00+02:00
+:updated-at:2024-06-01T20:31:00+02:00
 :neno-flags:flag1,flag2
 :custom-header-1:custom-value-1
 :custom-header-2:custom-value-2
@@ -79,8 +79,8 @@ describe("parseSerializedExistingNote", () => {
   it(
     "should parse a note with optional and custom headers",
     async () => {
-      const serializedNote = `:created-at:1000
-:updated-at:2000
+      const serializedNote = `:created-at:2024-06-01T20:30:00+02:00
+:updated-at:2024-06-01T20:31:00+02:00
 :neno-flags:flag1,flag2
 :custom-header-1:custom-value-1
 :custom-header-2:custom-value-2
@@ -91,8 +91,8 @@ This is a note`;
         content: "This is a note",
         meta: {
           slug: "1",
-          createdAt: 1000,
-          updatedAt: 2000,
+          createdAt: "2024-06-01T20:30:00+02:00",
+          updatedAt: "2024-06-01T20:31:00+02:00",
           additionalHeaders: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",
@@ -135,8 +135,8 @@ This is a note`;
   it(
     "should parse a note with CR chars",
     async () => {
-      const serializedNote = `:created-at:1000\r
-:updated-at:2000\r
+      const serializedNote = `:created-at:2024-06-01T20:30:00+02:00\r
+:updated-at:2024-06-01T20:31:00+02:00\r
 :neno-flags:flag1,flag2\r
 :custom-header-1:custom-value-1\r
 :custom-header-2:custom-value-2\r
@@ -149,8 +149,8 @@ blocks`;
         content: "This is a note\nwith several\nblocks",
         meta: {
           slug: "1",
-          createdAt: 1000,
-          updatedAt: 2000,
+          createdAt: "2024-06-01T20:30:00+02:00",
+          updatedAt: "2024-06-01T20:31:00+02:00",
           additionalHeaders: {
             "custom-header-1": "custom-value-1",
             "custom-header-2": "custom-value-2",

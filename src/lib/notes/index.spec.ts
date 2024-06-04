@@ -11,6 +11,7 @@ import { Block } from "../subwaytext/types/Block.js";
 // @ts-ignore
 Object.assign(global, { TextDecoder, TextEncoder });
 import { describe, it, expect, vi } from "vitest";
+import { getCompareKeyForTimestamp } from "./utils.js";
 
 vi.stubGlobal("navigator", {
   hardwareConcurrency: 4,
@@ -982,7 +983,7 @@ describe("Notes module", () => {
       const graphFile = await storageProvider.readObjectAsString(".graph.json");
       const graph = JSON.parse(graphFile);
 
-      expect(graph.version).toBe("4");
+      expect(graph.version).toBe("5");
     },
   );
 
@@ -1170,7 +1171,7 @@ describe("Notes module", () => {
       };
 
       await notesProvider.put(noteSaveRequest);
-      await sleep(100);
+      await sleep(2000);
       await notesProvider.pin("n1");
 
       const graphFileCheck2
@@ -1178,8 +1179,10 @@ describe("Notes module", () => {
       const graphCheck2 = JSON.parse(graphFileCheck2);
       const graphMetadataUpdateTimeCheck2 = graphCheck2.updatedAt;
 
-      expect(graphMetadataUpdateTimeCheck2)
-        .toBeGreaterThan(graphMetadataUpdateTimeCheck1);
+      expect(getCompareKeyForTimestamp(graphMetadataUpdateTimeCheck2))
+        .toBeGreaterThan(
+          getCompareKeyForTimestamp(graphMetadataUpdateTimeCheck1),
+        );
     },
   );
 

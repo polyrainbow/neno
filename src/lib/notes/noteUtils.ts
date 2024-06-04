@@ -23,7 +23,11 @@ import SparseNoteInfo from "./types/SparseNoteInfo.js";
 import LinkCount from "./types/LinkCount.js";
 import NotePreview from "./types/NotePreview.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
-import { getMediaTypeFromFilename, shortenText } from "./utils.js";
+import {
+  getCurrentISODateTime,
+  getMediaTypeFromFilename,
+  shortenText,
+} from "./utils.js";
 import {
   createSlug,
   getSlugsFromInlineText,
@@ -69,13 +73,13 @@ const canonicalHeaderKeys = new Map<CanonicalNoteHeader, MetaModifier>([
   [
     CanonicalNoteHeader.CREATED_AT,
     (meta, val) => {
-      meta.createdAt = parseInt(val);
+      meta.createdAt = val;
     },
   ],
   [
     CanonicalNoteHeader.UPDATED_AT,
     (meta, val) => {
-      meta.updatedAt = parseInt(val);
+      meta.updatedAt = val;
     },
   ],
   [
@@ -601,7 +605,7 @@ const handleExistingNoteUpdate = async (
   existingNote.content = noteFromUser.content;
   existingNote.meta.updatedAt = noteSaveRequest.disableTimestampUpdate
     ? noteFromUser.meta.updatedAt
-    : Date.now();
+    : getCurrentISODateTime();
   existingNote.meta.flags = noteFromUser.meta.flags;
   existingNote.meta.additionalHeaders = noteFromUser.meta.additionalHeaders;
 
@@ -810,8 +814,8 @@ const handleNewNoteSaveRequest = async (
   const newNote: ExistingNote = {
     meta: {
       slug,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: getCurrentISODateTime(),
+      updatedAt: getCurrentISODateTime(),
       additionalHeaders: {},
       flags: noteFromUser.meta.flags,
     },

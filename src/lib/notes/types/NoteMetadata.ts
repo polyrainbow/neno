@@ -11,8 +11,8 @@ export type NewNoteMetadata = BaseNoteMetadata;
 
 export interface ExistingNoteMetadata extends BaseNoteMetadata {
   slug: Slug,
-  createdAt?: number,
-  updatedAt?: number,
+  createdAt?: string,
+  updatedAt?: string,
 }
 
 export type NoteMetadata = NewNoteMetadata | ExistingNoteMetadata;

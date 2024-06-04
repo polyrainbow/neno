@@ -4,11 +4,11 @@ import {
 } from "react-router-dom";
 import NoteListItem from "../lib/notes/types/NoteListItem";
 import {
+  ISOTimestampToLocaleString,
   createContentFromSlugs,
   getAppPath,
   getUrl,
   humanFileSize,
-  makeTimestampHumanReadable,
 } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
@@ -200,7 +200,7 @@ const FileView = () => {
         fileInfo
           ? l("stats.metadata.created-at")
             + ": "
-            + makeTimestampHumanReadable(fileInfo.createdAt)
+            + ISOTimestampToLocaleString(fileInfo.createdAt)
           : ""
       }</p>
       <h2>{l("files.used-in")}</h2>

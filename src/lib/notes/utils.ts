@@ -98,6 +98,76 @@ const getRandomKey = <K>(collection: Map<K, unknown>): K | null => {
   return null;
 };
 
+const toISODateTime = (date: Date): string => {
+  const timeZone = -date.getTimezoneOffset();
+  const dif = timeZone >= 0 ? "+" : "-";
+  const pad = (num: number): string => {
+    return num.toString().padStart(2, "0");
+  };
+
+  return date.getFullYear()
+    + "-" + pad(date.getMonth() + 1)
+    + "-" + pad(date.getDate())
+    + "T" + pad(date.getHours())
+    + ":" + pad(date.getMinutes())
+    + ":" + pad(date.getSeconds())
+    + dif + pad(Math.floor(Math.abs(timeZone) / 60))
+    + ":" + pad(Math.abs(timeZone) % 60);
+};
+
+
+const getCurrentISODateTime = () => {
+  const date = new Date();
+  return toISODateTime(date);
+};
+
+
+const toUnixTimestamp = (date: Date): number => {
+  return Math.floor(new Date(date).getTime() / 1000);
+};
+
+const getCompareKeyForTimestamp = (dateRaw: string | undefined): number => {
+  if (!dateRaw) return 0;
+  const date = new Date(dateRaw);
+  return toUnixTimestamp(date);
+};
+
+const unixToISOTimestamp = (unixTimestamp: number) => {
+  return toISODateTime(new Date(unixTimestamp));
+};
+
+
+const getEarliestISOTimestamp = (...timestamps: string[]): string => {
+  let earliest = timestamps[0];
+  let earliestUNIX = toUnixTimestamp(new Date(earliest));
+
+  for (let i = 1; i < timestamps.length; i++) {
+    const unixTimestamp = toUnixTimestamp(new Date(timestamps[i]));
+    if (unixTimestamp < earliestUNIX) {
+      earliest = timestamps[i];
+      earliestUNIX = unixTimestamp;
+    }
+  }
+
+  return earliest;
+};
+
+
+const getLatestISOTimestamp = (...timestamps: string[]): string => {
+  let latest = timestamps[0];
+  let latestUNIX = toUnixTimestamp(new Date(latest));
+
+  for (let i = 1; i < timestamps.length; i++) {
+    const unixTimestamp = toUnixTimestamp(new Date(timestamps[i]));
+    if (unixTimestamp > latestUNIX) {
+      latest = timestamps[i];
+      latestUNIX = unixTimestamp;
+    }
+  }
+
+  return latest;
+};
+
 export {
   getExtensionFromFilename,
   removeExtensionFromFilename,
@@ -105,4 +175,10 @@ export {
   shortenText,
   setsAreEqual,
   getRandomKey,
+  getCurrentISODateTime,
+  toUnixTimestamp,
+  getCompareKeyForTimestamp,
+  unixToISOTimestamp,
+  getEarliestISOTimestamp,
+  getLatestISOTimestamp,
 };
