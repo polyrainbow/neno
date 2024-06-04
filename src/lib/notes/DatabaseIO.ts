@@ -102,7 +102,7 @@ export default class DatabaseIO {
 
         for (const file of graphMetadata.files) {
           file.createdAt = unixToISOTimestamp(parseInt(
-            graphMetadata.updatedAt,
+            file.createdAt,
           ));
         }
 
