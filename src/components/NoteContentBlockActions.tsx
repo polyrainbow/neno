@@ -5,7 +5,7 @@ import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
 import FlexContainer from "./FlexContainer";
 import Icon from "./Icon";
-import { LOCAL_GRAPH_ID } from "../config";
+import { LOCAL_GRAPH_ID, NENO_SCRIPT_FILE_SUFFIX } from "../config";
 import { saveFile } from "../lib/LocalDataStorage";
 
 interface NoteContentBlockActionsProps {
@@ -16,7 +16,24 @@ interface NoteContentBlockActionsProps {
 const NoteContentBlockActions = ({
   file,
 }: NoteContentBlockActionsProps) => {
+  const isNenoScript = file.slug.endsWith(NENO_SCRIPT_FILE_SUFFIX);
   return <FlexContainer className="preview-block-file-actions">
+    {
+      isNenoScript
+        ? <Link to={
+          getAppPath(PathTemplate.SCRIPT, new Map([
+            ["GRAPH_ID", LOCAL_GRAPH_ID],
+            ["SCRIPT_SLUG", file.slug],
+          ]))
+        }>
+          <Icon
+            icon="play_arrow"
+            title="Open in script editor"
+            size={24}
+          />
+        </Link>
+        : ""
+    }
     <Link to={
       getAppPath(PathTemplate.FILE, new Map([
         ["GRAPH_ID", LOCAL_GRAPH_ID],

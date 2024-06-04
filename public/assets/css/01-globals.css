@@ -583,6 +583,7 @@ input:checked + .slider::before {
 
   &.dangerous {
     background-color: var(--error-and-danger-background-color-low);
+
     &:hover {
       background-color: var(--error-and-danger-background-color);
     }
