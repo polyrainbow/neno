@@ -94,6 +94,10 @@ const StatsViewAnalysisTable = ({
         <td>{l("stats.metadata.pins")}</td>
         <td>{stats.numberOfPins.toLocaleString()}</td>
       </tr>
+      <tr>
+        <td>{l("stats.metadata.graph-version")}</td>
+        <td>{stats.metadata.version}</td>
+      </tr>
     </tbody>
   </table>;
 };

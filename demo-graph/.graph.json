@@ -1,11 +1,6 @@
 {
-  "createdAt": 1690400000000,
-  "updatedAt": 1692946788222,
-  "screenPosition": {
-    "translateX": 65.23245282438756,
-    "translateY": -106.9099381342902,
-    "scale": 1.1015595292490572
-  },
+  "createdAt": "2023-07-26T21:33:20+02:00",
+  "updatedAt": "2023-08-25T08:59:48+02:00",
   "pinnedNotes": [
     "welcome-to-neno",
     "i-like-pizza",
@@ -15,13 +10,13 @@
     {
       "slug": "files/beach.jpg",
       "size": 301495,
-      "createdAt": 1690400000000
+      "createdAt": "2023-07-26T21:33:20+02:00"
     },
     {
       "slug": "files/pizza.jpg",
       "size": 790444,
-      "createdAt": 1692347504963
+      "createdAt": "2023-08-18T10:31:44+02:00"
     }
   ],
-  "version": "3"
+  "version": "5"
 }

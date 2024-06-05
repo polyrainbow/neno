@@ -158,6 +158,7 @@
   "stats.loading-stats": "Statistiken werden geladen …",
   "stats.metadata.created-at": "Erstellt am",
   "stats.metadata.graph-size-without-files": "Größe des Graphs (ohne Dateien)",
+  "stats.metadata.graph-version": "Graph-Version",
   "stats.metadata.number-of-files": "Dateien",
   "stats.metadata.pins": "Angepinnte Notizen",
   "stats.metadata.size-of-all-files": "Größe aller Dateien",

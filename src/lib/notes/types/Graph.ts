@@ -8,6 +8,10 @@ export interface GraphMetadata {
   updatedAt: string, // the time of the last change of this metadata object
   pinnedNotes: Slug[],
   files: FileInfo[],
+  /*
+    Caution: When changing the version, create a migration flow and also
+    update demo graphs.
+  */
   version: "5",
 }
 

@@ -149,6 +149,7 @@ export default class NotesProvider {
             return a + b.size;
           }, 0),
         },
+        version: graph.metadata.version,
       };
     }
 
