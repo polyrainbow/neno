@@ -426,7 +426,7 @@ button {
 
 .floating-action-button {
   display: block;
-  position: absolute;
+  position: fixed;
   bottom: 20px;
   right: 20px;
   border: none;
