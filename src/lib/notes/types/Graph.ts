@@ -9,8 +9,8 @@ export interface GraphMetadata {
   pinnedNotes: Slug[],
   files: FileInfo[],
   /*
-    Caution: When changing the version, create a migration flow and also
-    update demo graphs.
+    Caution: Create a migration flow when updating the version.
+    Remember to update the demo graph generation as well.
   */
   version: "5",
 }
