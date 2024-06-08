@@ -519,6 +519,10 @@ export default class NotesProvider {
     const graph = await this.#io.getGraph();
     return graph;
   }
+
+  async graphExistsInStorage(): Promise<boolean> {
+    return this.#io.graphExistsInStorage();
+  }
 }
 
 // exporting utils to be used in custom scripts

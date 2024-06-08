@@ -577,4 +577,17 @@ export default class DatabaseIO {
       return 0;
     }
   }
+
+  async graphExistsInStorage(): Promise<boolean> {
+    try {
+      await this.#storageProvider.readObjectAsString(
+        this.#GRAPH_METADATA_FILENAME,
+      );
+      return true;
+    } catch (e) {
+      const noteFilenamesInStorage
+        = await this.getNoteFilenamesFromGraphDirectory();
+      return noteFilenamesInStorage.length > 0;
+    }
+  }
 }

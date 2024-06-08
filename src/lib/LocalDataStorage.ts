@@ -4,10 +4,10 @@ import FileSystemAccessAPIStorageProvider
 import { getWritableStream, streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
-import { createDemoGraph, folderHasGraph } from "./DemoGraph";
 import { Slug } from "./notes/types/Slug";
 import MockStorageProvider from "./notes/test/MockStorageProvider";
 import { getFilenameFromFileSlug } from "./notes/slugUtils";
+import { createDemoGraph } from "./DemoGraph";
 
 /*
   Notes:
@@ -100,12 +100,12 @@ export const initializeNotesProvider = async (
 
   folderHandle = newFolderHandle;
 
-  if (!(await folderHasGraph(folderHandle))) {
-    await createDemoGraph(folderHandle);
-  }
-
   const storageProvider = new FileSystemAccessAPIStorageProvider(folderHandle);
   notesProvider = new NotesProvider(storageProvider);
+
+  if (!(await notesProvider.graphExistsInStorage())) {
+    await createDemoGraph(notesProvider);
+  }
   return notesProvider;
 };
 
