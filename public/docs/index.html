@@ -555,6 +555,172 @@
     it has. Use the "Stats" view for this, which you can find in the app menu.
   </p>
 
+  <h2>Scripting</h2>
+
+  <p>
+    Scripting is probably the most powerful (and also most dangerous)
+    feature of NENO as it allows the programmatic manipulation of your
+    knowledge graph, using the full flexibility of a JavaScript environment.
+    Use with caution and be sure to backup your data beforehand.
+  </p>
+
+  <h3>Creating a script</h3>
+
+  <p>
+    Go to "Files" view. Scroll to the section "Create script" at the bottom,
+    enter the name of the script
+    and click on "Create". You should now be able too see the new script
+    in the files list. Click on it and then click on "Open in script editor".
+  </p>
+
+  <h3>Symbols</h3>
+
+  <p>
+    The following symbols are defined in the JavaScript environment:
+  </p>
+
+    <h4><code>notesProvider</code></h4>
+    <p>
+      A collection of functions for accessing and manipulating the currently
+      loaded graph.
+    </p>
+
+    <p>
+      Type: <code><a href="https://github.com/polyrainbow/neno/blob/main/src/lib/notes/index.ts#L55">NotesProvider</a></code>
+    </p>
+
+    <h4><code>graph</code></h4>
+    <p>
+      A representation of the currently loaded graph, including all notes,
+      aliases, and some metadata.
+    </p>
+
+    <p>
+      Type: <code><a href="https://github.com/polyrainbow/neno/blob/main/src/lib/notes/types/Graph.ts#L20">GraphObject</a></code>
+    </p>
+
+    <h4><code>println</code></h4>
+    <p>
+      A function to add a line to the output.
+    </p>
+
+    <p>
+      Type: <code>(val: string): void</code>
+    </p>
+
+  <h3>Example scripts</h3>
+
+  <h4>List all aliases and their canonical slugs</h4>
+
+  <pre class="code-block">
+println(
+    "Graph contains "
+    + graph.aliases.size
+    + " aliase(s):"
+);
+
+for (const [alias, slug] of graph.aliases) {
+    println(
+        alias.padEnd(25, " ") + "=> " + slug);
+}</pre>
+
+  <h4>List events</h4>
+
+  <p>
+    All events (links in the form of <code>[[YYYY-MM-DD]]</code>, e.g.
+    <code>[[2024-06-01]]</code>) will be listed here, ordered by date and
+    grouped by month.
+  </p>
+
+  <pre class="code-block">
+const SHOW_NOTE_CREATED_EVENTS = false;
+const START_YEAR = 2024;
+const START_MONTH = 5;
+
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+function createEvent(note, date, type) {
+  const month = parseInt(date.substring(5, 7));
+  const year = parseInt(date.substring(0, 4));
+  return {
+    title: getNoteTitle(note.content),
+    date,
+    month,
+    year,
+    type,
+  };
+}
+
+function getEventsOfNote(slug, note) {
+  const events = [];
+
+  if (SHOW_NOTE_CREATED_EVENTS) {
+    const creationDate = note.meta.createdAt
+      .substring(0, 10);
+    events.push(
+      createEvent(note, creationDate, "NOTE_CREATED"),
+    );
+  }
+
+  if (slug.match(/\d{4}-\d{2}-\d{2}/)) {
+    const date = slug.match(/\d{4}-\d{2}-\d{2}/)[0];
+    const type = "MENTIONED_IN_SLUG";
+    events.push(createEvent(note, date, type));
+  }
+  const dateMatches = note.content.matchAll(
+    /\[\[(\d{4}-\d{2}-\d{2})\]\]/g,
+  );
+  for (const match of dateMatches) {
+    const date = match[1];
+    const type = "MENTIONED_IN_CONTENT";
+    events.push(createEvent(note, date, type));
+  }
+
+  return events;
+}
+
+const table = Array.from(graph.notes.entries())
+  .map(([slug, note]) => [...getEventsOfNote(slug, note)])
+  .flat()
+  .filter((event) => {
+      return event.year >= START_YEAR
+        && event.month >= START_MONTH;
+  })
+  .toSorted((a,b) => {
+    if (a.date > b.date) return 1;
+    if (a.date < b.date) return -1;
+    return 0;
+  })
+  .reduce((accumulator, thisEvent, i, events) => {
+    const previousEvent = events[i-1];
+    if ((!previousEvent) || previousEvent.month !== thisEvent.month) {
+      if (previousEvent) {
+        accumulator += "\n";
+      }
+      accumulator += MONTH_NAMES[thisEvent.month - 1] + " " + thisEvent.year + "\n";
+    }
+    return accumulator += thisEvent.date
+      + " | " + thisEvent.title.padEnd(35, " ")
+      + " | " + thisEvent.type
+      + "\n";
+  }, "");
+
+println(table);</pre>
+
+
   <h2>Acknowledgements</h2>
   <p>
     NENO's primitives are inspired by the work of the

@@ -52,7 +52,7 @@ h2 {
   margin-top: 1em;
 }
 
-h3 {
+h3, h4 {
   margin-top: 1em;
   margin-bottom: 1rem;
 }
@@ -97,4 +97,9 @@ footer {
 
 pre.note-content {
   text-wrap: wrap;
+}
+
+pre.code-block {
+  background-color: var(--alt-color);
+  padding: 20px;
 }
