@@ -214,8 +214,8 @@ export default (
       files: [],
     };
     setActiveNote(newActiveNote);
-    // For now, we let the system suggest the slug for imported notes.
-    // TODO: Could be improved in the future.
+    // If the user does not change the slug input, we let the app
+    // suggest the slug of an imported note.
     setSlugInput("");
     setUnsavedChanges(true);
     noteContentRef.current = parsedNote.content;
