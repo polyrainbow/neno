@@ -3,7 +3,7 @@ import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import BusyIndicator from "./BusyIndicator";
 import noteWorkerUrl from "../lib/note-worker/index.js?worker&url";
 import {
-  getFolderHandle,
+  getActiveFolderHandle,
   invalidateNotesProvider,
 } from "../lib/LocalDataStorage";
 import useRunOnce from "../hooks/useRunOnce";
@@ -68,7 +68,7 @@ const ScriptView = () => {
     const notesWorker = new Worker(noteWorkerUrl, { type: "module" });
     notesWorker.postMessage({
       action: "initialize",
-      folderHandle: getFolderHandle(),
+      folderHandle: getActiveFolderHandle(),
     });
     notesWorker.onmessage = (e) => {
       if (e.data.type === "EVALUATION_COMPLETED") {

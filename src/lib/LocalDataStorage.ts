@@ -44,32 +44,52 @@ let folderHandle: FileSystemDirectoryHandle | null = null;
 let notesProvider: NotesProvider | null = null;
 
 
-export const getFolderHandleName = async (): Promise<string | null> => {
+export const getExistingFolderHandleName = async (): Promise<string | null> => {
   if (folderHandle) {
     return folderHandle.name;
   }
 
-  const newFolderHandle = await IDB.get(FOLDER_HANDLE_STORAGE_KEY);
-  if (!newFolderHandle) {
-    return null;
+  const folderHandleFromStorage = await IDB.get<FileSystemDirectoryHandle>(
+    FOLDER_HANDLE_STORAGE_KEY,
+  );
+  if (folderHandleFromStorage) {
+    return folderHandleFromStorage.name;
   }
 
-  folderHandle = newFolderHandle as FileSystemDirectoryHandle;
-  return folderHandle.name;
+  return null;
 };
 
 
-export const getFolderHandle = (): FileSystemDirectoryHandle | null => {
+export const getActiveFolderHandle = (): FileSystemDirectoryHandle | null => {
   return folderHandle;
 };
 
-export const getSavedFolderHandle = async (
+export const getFolderHandleFromStorage = async (
 ): Promise<FileSystemDirectoryHandle> => {
-  const folderHandle = await IDB.get(FOLDER_HANDLE_STORAGE_KEY);
+  const folderHandle = await IDB.get<FileSystemDirectoryHandle>(
+    FOLDER_HANDLE_STORAGE_KEY,
+  );
   if (!folderHandle) {
-    throw new Error("No folder handle saved");
+    throw new Error("No folder handle in storage");
   }
-  return folderHandle as FileSystemDirectoryHandle;
+  return folderHandle;
+};
+
+
+const createMockNotesProvider = async (
+  createDummyNotes: boolean,
+): Promise<NotesProvider> => {
+  const memoryStorageProvider = new MockStorageProvider();
+  if (createDummyNotes) {
+    for (let i = 1; i <= 1000; i++) {
+      await memoryStorageProvider.writeObject(
+        "note-" + i + ".subtext",
+        "Test note " + i,
+      );
+    }
+  }
+  notesProvider = new NotesProvider(memoryStorageProvider);
+  return notesProvider;
 };
 
 
@@ -78,17 +98,7 @@ export const initializeNotesProvider = async (
   createDummyNotes?: boolean,
 ): Promise<NotesProvider> => {
   if (!newFolderHandle) {
-    const memoryStorageProvider = new MockStorageProvider();
-    if (createDummyNotes) {
-      for (let i = 1; i <= 1000; i++) {
-        await memoryStorageProvider.writeObject(
-          "note-" + i + ".subtext",
-          "Test note " + i,
-        );
-      }
-    }
-    notesProvider = new NotesProvider(memoryStorageProvider);
-    return notesProvider;
+    return createMockNotesProvider(createDummyNotes ?? false);
   }
 
   await verifyPermission(newFolderHandle, true);
@@ -110,15 +120,17 @@ export const initializeNotesProvider = async (
 };
 
 
-export const initializeNotesProviderWithExistingFolderHandle = async (
+export const initializeNotesProviderWithFolderHandleFromStorage = async (
 ): Promise<NotesProvider> => {
-  const folderHandle = await getSavedFolderHandle();
-  return initializeNotesProvider(folderHandle);
+  const folderHandleFromStorage = await getFolderHandleFromStorage();
+  return initializeNotesProvider(folderHandleFromStorage);
 };
+
 
 export const isInitialized = (): boolean => {
   return notesProvider instanceof NotesProvider;
 };
+
 
 export const getNotesProvider = (): NotesProvider | null => {
   return notesProvider;
@@ -134,7 +146,7 @@ export const invalidateNotesProvider = async (): Promise<NotesProvider> => {
 };
 
 
-export const getUrlForSlug = async (slug: Slug) => {
+export const getUrlForSlug = async (slug: Slug): Promise<string> => {
   if (!notesProvider) {
     throw new Error("Notes provider not initialized");
   }
@@ -151,6 +163,7 @@ export const getUrlForSlug = async (slug: Slug) => {
   const url = URL.createObjectURL(blob);
   return url;
 };
+
 
 export const saveFile = async (slug: Slug) => {
   if (!notesProvider) {

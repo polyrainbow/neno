@@ -66,7 +66,7 @@ const SearchPresets = ({
   const [currentQueryLabel, setCurrentQueryLabel] = useState<string>("");
 
   useEffect(() => {
-    IDB.get("SEARCH_PRESETS")
+    IDB.get<SearchPreset[]>("SEARCH_PRESETS")
       .then((searchPresets) => {
         setSearchPresets(searchPresets || DEFAULT_SEARCH_PRESETS);
       })

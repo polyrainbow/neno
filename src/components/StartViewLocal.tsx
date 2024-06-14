@@ -6,9 +6,9 @@ import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
 import {
-  getFolderHandleName,
+  getExistingFolderHandleName,
   initializeNotesProvider,
-  initializeNotesProviderWithExistingFolderHandle,
+  initializeNotesProviderWithFolderHandleFromStorage,
 } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
@@ -25,7 +25,7 @@ const StartViewLocal = () => {
   useEffect(() => {
     const retrieveLocalDatabaseFolderHandle = async () => {
       const folderHandleName
-        = await getFolderHandleName();
+        = await getExistingFolderHandleName();
       setLocalDatabaseFolderHandleName(folderHandleName);
     };
 
@@ -60,7 +60,7 @@ const StartViewLocal = () => {
             className="default-button default-action"
             onClick={async () => {
               try {
-                await initializeNotesProviderWithExistingFolderHandle();
+                await initializeNotesProviderWithFolderHandleFromStorage();
                 const urlSearchParams
                   = new URLSearchParams(window.location.search);
                 if (urlSearchParams.has("redirect")) {
