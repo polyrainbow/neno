@@ -17,17 +17,6 @@ const shortenText = (text: string, maxLength: number): string => {
 };
 
 
-const getParameterByName = (name: string, url: string): string | null => {
-  if (!url) url = window.location.href;
-  name = name.replace(/[[\]]/g, "\\$&");
-  const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
-  const results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return "";
-  return decodeURIComponent(results[2].replace(/\+/g, " "));
-};
-
-
 const ISOTimestampToLocaleString = (timestamp: string): string => {
   return (new Date(timestamp)).toLocaleString();
 };
@@ -104,14 +93,6 @@ const streamToBlob = async (
 };
 
 
-const getWindowDimensions = (): { width: number, height: number } => {
-  const docEl = document.documentElement;
-  const width = window.innerWidth || docEl.clientWidth;
-  const height = window.innerHeight || docEl.clientHeight;
-  return { width, height };
-};
-
-
 const getAppPath = (
   pathTemplate: PathTemplate,
   params?: Map<string, string>,
@@ -148,9 +129,6 @@ const getIconSrc = (iconName: string): string => {
   }
   return Config.ICON_PATH + iconName + ".svg";
 };
-
-
-const stringContainsOnlyDigits = (val: string): boolean => /^\d+$/.test(val);
 
 
 const getFilesFromUserSelection = async (
@@ -207,16 +185,6 @@ const getWritableStream = async (opts: SaveFilePickerOptions) => {
 };
 
 
-function isNotEmpty<TValue>(value: TValue | null | undefined): value is TValue {
-  return value !== null && value !== undefined;
-}
-
-
-function isNotFalse<TValue>(value: TValue | false): value is TValue {
-  return value !== false;
-}
-
-
 const getPagedMatches = <T>(
   allMatches: Array<T>,
   page: number,
@@ -267,19 +235,14 @@ const getWikilinkForNote = (slug: Slug, title: string): string => {
 
 
 export {
-  isNotEmpty,
-  isNotFalse,
   getPagedMatches,
-  getParameterByName,
   ISOTimestampToLocaleString,
   getNewNoteObject,
   humanFileSize,
   shortenText,
   streamToBlob,
-  getWindowDimensions,
   getAppPath,
   getIconSrc,
-  stringContainsOnlyDigits,
   getFilesFromUserSelection,
   getWritableStream,
   readFileAsString,
