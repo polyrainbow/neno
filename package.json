@@ -6,8 +6,12 @@
   "dependencies": {
     "@lexical/link": "^0.16.0",
     "@lexical/react": "^0.16.0",
+    "idb-keyval": "^6.2.1",
     "lexical": "^0.16.0",
     "monaco-editor": "^0.48.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.0",
     "vite-plugin-pwa": "^0.20.0"
   },
   "devDependencies": {
@@ -22,11 +26,7 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.2",
-    "idb-keyval": "^6.2.1",
     "jsdom": "^24.0.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.23.0",
     "stylelint": "^16.5.0",
     "stylelint-config-standard": "^36.0.0",
     "typescript": "^5.4.5",
