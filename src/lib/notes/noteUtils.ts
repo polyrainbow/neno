@@ -187,10 +187,12 @@ const serializeNote = (note: ExistingNote): string => {
     );
   }
 
-  headersToSerialize.set(
-    CanonicalNoteHeader.FLAGS,
-    note.meta.flags.join(","),
-  );
+  if (note.meta.flags.length > 0) {
+    headersToSerialize.set(
+      CanonicalNoteHeader.FLAGS,
+      note.meta.flags.join(","),
+    );
+  }
 
   for (const key in note.meta.additionalHeaders) {
     if (Object.hasOwn(note.meta.additionalHeaders, key)) {

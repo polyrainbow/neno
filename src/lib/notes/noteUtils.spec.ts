@@ -72,6 +72,31 @@ This is a note`;
       ).toBe(expectedResult);
     },
   );
+
+  it(
+    "should not send empty flags header",
+    async () => {
+      const note: ExistingNote = {
+        content: "This is a note",
+        meta: {
+          slug: "1",
+          createdAt: "2024-06-01T20:30:00+02:00",
+          updatedAt: "2024-06-01T20:31:00+02:00",
+          additionalHeaders: {},
+          flags: [],
+        },
+      };
+
+      const expectedResult = `:created-at:2024-06-01T20:30:00+02:00
+:updated-at:2024-06-01T20:31:00+02:00
+
+This is a note`;
+
+      expect(
+        serializeNote(note),
+      ).toBe(expectedResult);
+    },
+  );
 });
 
 
