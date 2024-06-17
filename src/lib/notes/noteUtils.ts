@@ -611,6 +611,9 @@ const handleExistingNoteUpdate = async (
   existingNote.meta.flags = noteFromUser.meta.flags;
   existingNote.meta.additionalHeaders = noteFromUser.meta.additionalHeaders;
 
+  const canonicalSlugShouldChange = "changeSlugTo" in noteSaveRequest
+    && typeof noteSaveRequest.changeSlugTo === "string";
+
   const aliasesToUpdate: Set<Slug> = new Set();
 
   if (noteSaveRequest.aliases) {
@@ -629,16 +632,22 @@ const handleExistingNoteUpdate = async (
         throw new Error(ErrorMessage.INVALID_ALIAS);
       }
       if (alias === existingNote.meta.slug) {
-        throw new Error(ErrorMessage.ALIAS_EXISTS);
+        /*
+          We allow assigning the canonical slug as an alias here only if
+          the canonical slug is also about to change to something else.
+          If the canonical slug should not change, this is an invalid operation.
+        */
+        if (!canonicalSlugShouldChange) {
+          throw new Error(ErrorMessage.ALIAS_EXISTS);
+        }
+      } else if (graph.notes.has(alias)) {
+        throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
       }
       if (
         graph.aliases.has(alias)
         && graph.aliases.get(alias) !== existingNote.meta.slug
       ) {
         throw new Error(ErrorMessage.ALIAS_EXISTS);
-      }
-      if (graph.notes.has(alias)) {
-        throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
       }
       if (
         graph.aliases.has(alias)

@@ -12,6 +12,7 @@ import { Block } from "../subwaytext/types/Block.js";
 Object.assign(global, { TextDecoder, TextEncoder });
 import { describe, it, expect, vi } from "vitest";
 import { getCompareKeyForTimestamp } from "./utils.js";
+import { ErrorMessage } from "./types/ErrorMessage.js";
 
 vi.stubGlobal("navigator", {
   hardwareConcurrency: 4,
@@ -2144,4 +2145,169 @@ describe("Notes module", () => {
       expect(note2.backlinks.length).toBe(1);
       expect(note2.backlinks[0].slug).toBe("note-1");
     });
+
+  it("should allow degrading canonical slugs to aliases", async () => {
+    const mockStorageProvider = new MockStorageProvider();
+    const notesProvider = new NotesProvider(mockStorageProvider);
+
+    const noteSaveRequest1: NewNoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          additionalHeaders: {},
+          flags: [],
+        },
+      },
+      changeSlugTo: "main-slug",
+      ignoreDuplicateTitles: false,
+      aliases: new Set(),
+    };
+    await notesProvider.put(noteSaveRequest1);
+
+    const noteSaveRequest2: NoteSaveRequest = {
+      note: {
+        content: "",
+        meta: {
+          slug: "main-slug",
+          additionalHeaders: {},
+          flags: [],
+        },
+      },
+      ignoreDuplicateTitles: false,
+      changeSlugTo: "new-canonical-slug",
+      aliases: new Set(["main-slug"]), // same as old canonical slug
+    };
+    const note = await notesProvider.put(noteSaveRequest2);
+
+    expect(note.meta.slug).toBe("new-canonical-slug");
+    expect(note.aliases.size).toBe(1);
+    expect(note.aliases.has("main-slug")).toBe(true);
+  });
+
+  it(
+    "should fail when adding a slug of an existing note as alias to a new note",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const noteSaveRequest1: NewNoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "s1",
+        ignoreDuplicateTitles: false,
+        aliases: new Set(),
+      };
+      await notesProvider.put(noteSaveRequest1);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "s2",
+        aliases: new Set(["s1"]),
+      };
+      expect(notesProvider.put(noteSaveRequest2))
+        .rejects.toThrowError(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+    },
+  );
+
+  it(
+    "should fail when adding a slug of an existing note as alias to an "
+    + "existing note",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const noteSaveRequest1: NewNoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "s1",
+        ignoreDuplicateTitles: false,
+        aliases: new Set(),
+      };
+      await notesProvider.put(noteSaveRequest1);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "s2",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            slug: "s2",
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        ignoreDuplicateTitles: false,
+        aliases: new Set(["s1"]),
+      };
+      expect(notesProvider.put(noteSaveRequest3))
+        .rejects.toThrowError(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+    },
+  );
+
+  it(
+    "should fail when adding an existing alias as alias",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const noteSaveRequest1: NewNoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "s1",
+        ignoreDuplicateTitles: false,
+        aliases: new Set(["alias"]),
+      };
+      await notesProvider.put(noteSaveRequest1);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "s2",
+        aliases: new Set(["alias"]),
+      };
+      expect(notesProvider.put(noteSaveRequest2))
+        .rejects.toThrowError(ErrorMessage.ALIAS_EXISTS);
+    },
+  );
 });
