@@ -725,6 +725,39 @@ test.describe("Editor view", () => {
   );
 
 
+  test(
+    "Note Search Result Selection: Pressing arrow up should select last note",
+    async ({ page }) => {
+      await page.keyboard.type("foo1");
+      await page.click("#button_upload");
+      await page.click("#button_new");
+
+      await page.keyboard.type("foo2");
+      await page.click("#button_upload");
+      await page.click("#button_new");
+
+      await page.keyboard.type("foo3");
+      await page.click("#button_upload");
+      await page.click("#button_new");
+
+      await page.keyboard.type("foo4");
+      await page.click("#button_upload");
+      await page.click("#button_new");
+
+      await page.locator("#search-input").focus();
+      await page.keyboard.type("foo");
+
+      await page.keyboard.press("ArrowUp");
+
+      expect(
+        await page.locator(".note-list-item").nth(3).getAttribute("class"),
+      ).toBe(
+        "note-list-item selected linkable",
+      );
+    },
+  );
+
+
   /*
     Test disabled because dead keys are not testable:
     https://github.com/microsoft/playwright/issues/7396#issuecomment-2098305274

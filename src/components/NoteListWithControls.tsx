@@ -84,15 +84,15 @@ const NoteListWithControls = ({
   useKeyboardShortcuts(
     {
       onArrowUp: () => {
-        const newIndex = selectedIndex > -1
+        const newIndex = selectedIndex > 0
           ? selectedIndex - 1
-          : selectedIndex;
+          : noteListItems.length - 1;
         setSelectedIndex(newIndex);
       },
       onArrowDown: () => {
         const newIndex = selectedIndex < noteListItems.length - 1
           ? selectedIndex + 1
-          : selectedIndex;
+          : 0;
         setSelectedIndex(newIndex);
       },
       onEnter: async () => {
