@@ -11,6 +11,48 @@ import { Slug } from "../../notes/types/Slug";
 import { TransclusionContentGetter } from "../types/TransclusionContentGetter";
 
 
+const Transclusion = ({
+  slug,
+  getTransclusionContent,
+}: {
+  slug: Slug,
+  getTransclusionContent: TransclusionContentGetter,
+}) => {
+  const [content, setContent] = useState<ReactElement | null>(null);
+  const [isError, setIsError] = useState(false);
+
+  useEffect(() => {
+    getTransclusionContent(slug)
+      .then((content) => {
+        setContent(content);
+        setIsError(false);
+      })
+      .catch(() => {
+        setContent(<p>Not available.</p>);
+        setIsError(true);
+      });
+  }, [slug]);
+
+  return <div
+    className={"transclusion " + (isError ? "unavailable" : "")}
+    data-transclusion-id={slug}
+  >
+    <p className="slug">/{slug}</p>
+    {
+      isError
+        ? <div className="not-available-disclaimer">
+          <Icon
+            icon="warning"
+            title={l("editor.transclusion.not-available")}
+            size={70}
+          />
+          {l("editor.transclusion.not-available")}
+        </div>
+        : (content ?? <div>Loading...</div>)
+    }
+  </div>;
+};
+
 export class TransclusionNode extends DecoratorNode<ReactNode> {
   static getType(): string {
     return "transclusion";
@@ -38,44 +80,10 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
-    // eslint-disable-next-line react/prop-types
-    const Transclusion = ({ slug }: { slug: Slug }) => {
-      const [content, setContent] = useState<ReactElement | null>(null);
-      const [isError, setIsError] = useState(false);
-
-      useEffect(() => {
-        this.__getTransclusionContent(slug)
-          .then((content) => {
-            setContent(content);
-            setIsError(false);
-          })
-          .catch(() => {
-            setContent(<p>Not available.</p>);
-            setIsError(true);
-          });
-      }, [slug]);
-
-      return <div
-        className={"transclusion " + (isError ? "unavailable" : "")}
-        data-transclusion-id={slug}
-      >
-        <p className="slug">{this.__link}</p>
-        {
-          isError
-            ? <div className="not-available-disclaimer">
-              <Icon
-                icon="warning"
-                title={l("editor.transclusion.not-available")}
-                size={70}
-              />
-              {l("editor.transclusion.not-available")}
-            </div>
-            : (content ?? <div>Loading...</div>)
-        }
-      </div>;
-    };
-
-    return <Transclusion slug={this.__link.substring(1)}/>;
+    return <Transclusion
+      slug={this.__link.substring(1)}
+      getTransclusionContent={this.__getTransclusionContent}
+    />;
   }
 
   createDOM(): HTMLDivElement {
@@ -83,7 +91,6 @@ export class TransclusionNode extends DecoratorNode<ReactNode> {
     div.classList.add("transclusion-wrapper");
     return div;
   }
-
 
   updateDOM(): false {
     return false;
