@@ -44,7 +44,7 @@ export default class DatabaseIO {
 
   // Returns the filename for a note with the given slug.
   static getFilenameForNoteSlug(slug: Slug): string {
-    if (!slug) {
+    if (slug.length === 0) {
       throw new Error("Cannot get filename for empty slug");
     }
     return `${slug}${DatabaseIO.#NOTE_FILE_EXTENSION}`;
