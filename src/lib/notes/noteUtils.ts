@@ -33,7 +33,8 @@ import {
   getSlugsFromInlineText,
   isValidFileSlug,
   isValidSlug,
-  sluggify,
+  sluggifyNoteText,
+  sluggifyWikilinkText,
 } from "./slugUtils.js";
 import { ErrorMessage } from "./types/ErrorMessage.js";
 import {
@@ -575,7 +576,9 @@ const changeSlugReferencesInNote = (
       span.text = "/" + newSlug;
     } else if (
       span.type === SpanType.WIKILINK
-      && sluggify(span.text.substring(2, span.text.length - 2)) === oldSlug
+      && sluggifyWikilinkText(
+        span.text.substring(2, span.text.length - 2),
+      ) === oldSlug
     ) {
       span.text = "[[" + (newSluggifiableTitle ?? newSlug) + "]]";
     }
@@ -722,7 +725,7 @@ const handleExistingNoteUpdate = async (
         ) as Block[];
 
         const noteTitle = getNoteTitle(existingNote.content);
-        const newSluggifiableTitle = sluggify(noteTitle) === newSlug
+        const newSluggifiableTitle = sluggifyNoteText(noteTitle) === newSlug
           ? noteTitle
           : newSlug;
 

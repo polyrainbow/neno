@@ -28,22 +28,22 @@ const trimSlug = (slug: string): string => {
 
 
 /*
-  Turns note text into a slug, without truncating.
-  For example, it can be used to obtain a slug from a Wikilink.
-  We will replace slashes and dots with dashes, as we do not allow
+  Turns wiki link text into a slug, without truncating.
+  It is used to obtain a slug from a Wikilink.
+  We will replace dots with dashes, as we do not allow
   these chars in note slugs (even though they are generally allowed
   in slugs).
-  As a consequence, this means that uploaded files with slashes in slugs
+  As a consequence, this means that uploaded files with dots in slugs
   (like `files/image.png`) cannot be referenced via a Wikilink.
 */
-const sluggify = (text: string): string => {
+const sluggifyWikilinkText = (text: string): string => {
   const slug = text
     // Trim leading/trailing whitespace
     .trim()
     // remove invalid chars
     .replace(/['’]+/g, "")
-    // Replace invalid chars with dashes.
-    .replace(/[^\p{L}\p{M}\d\-_]+/gu, "-")
+    // Replace invalid chars with dashes (slashes are valid).
+    .replace(/[^\p{L}\p{M}\d\-_/]+/gu, "-")
     // Replace runs of one or more dashes with a single dash
     .replace(/-+/g, "-")
     .toLowerCase();
@@ -74,12 +74,24 @@ const sluggifyFilename = (text: string): string => {
 
 /*
   Transforms note text like into a slug and truncates it.
-  We will replace slashes and dots with dashes, as these are not allowed for
-  note slugs (only allowed for general slugs). We do not want
-  to have these chars when creating a simple slug for a normal note.
+  We will replace slashes and dots with dashes:
+  Dots are not allowed in note slugs.
+  And we do not want to have slashes in the slug when creating a simple slug
+  for a normal note.
 */
 const sluggifyNoteText = (text: string): string => {
-  return sluggify(text)
+  const slug = text
+    // Trim leading/trailing whitespace
+    .trim()
+    // remove invalid chars
+    .replace(/['’]+/g, "")
+    // Replace invalid chars with dashes (including invalid slashes).
+    .replace(/[^\p{L}\p{M}\d\-_]+/gu, "-")
+    // Replace runs of one or more dashes with a single dash
+    .replace(/-+/g, "-")
+    .toLowerCase();
+
+  return trimSlug(slug)
     // Truncate to avoid file name length limit issues.
     // Windows systems can handle up to 255, but we truncate at 200 to leave
     // a bit of room for things like version numbers.
@@ -111,7 +123,7 @@ const getSlugsFromInlineText = (text: InlineText): Slug[] => {
     if (span.type === SpanType.SLASHLINK) {
       return span.text.substring(1);
     } else {
-      return sluggify(span.text.substring(2, span.text.length - 2));
+      return sluggifyWikilinkText(span.text.substring(2, span.text.length - 2));
     }
   });
 };
@@ -206,7 +218,7 @@ export {
   getSlugsFromInlineText,
   isValidFileSlug,
   isValidSlug,
-  sluggify,
+  sluggifyWikilinkText,
   sluggifyNoteText,
   trimSlug,
   isValidSlugOrEmpty,
