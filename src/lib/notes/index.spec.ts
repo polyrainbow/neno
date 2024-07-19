@@ -2310,4 +2310,41 @@ describe("Notes module", () => {
         .rejects.toThrowError(ErrorMessage.ALIAS_EXISTS);
     },
   );
+
+
+  it(
+    "should save and retrieve notes with slashes in slug",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+
+      await mockStorageProvider.writeObject(
+        "folder/note-1.subtext",
+        "test",
+      );
+
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const note1 = await notesProvider.get("folder/note-1");
+      expect(note1.content).toBe("test");
+
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "test 2",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        ignoreDuplicateTitles: false,
+        changeSlugTo: "a/b/c/d",
+        aliases: new Set(["y"]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const noteFromProvider = await notesProvider.get("a/b/c/d");
+      expect(noteFromProvider.content).toBe("test 2");
+    },
+  );
 });
