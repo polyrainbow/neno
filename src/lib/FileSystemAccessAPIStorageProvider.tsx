@@ -227,7 +227,7 @@ implements StorageProvider {
     );
 
     const filenames: string[] = [];
-    // @ts-ignore Not correctly typed
+    // @ts-ignore not correctly typed
     for await (const handle of dirHandle.values()) {
       if (handle.kind === "file") {
         filenames.push(handle.name);
