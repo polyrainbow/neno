@@ -573,13 +573,15 @@ export default class DatabaseIO {
   }
 
 
-  async getSizeOfGraph(): Promise<number> {
-    try {
-      const size = await this.#storageProvider.getTotalSize();
-      return size;
-    } catch (e) {
-      return 0;
+  async getSizeOfNotes(): Promise<number> {
+    const noteFilenames = await this.getNoteFilenamesFromStorageProvider();
+    const noteSizes = [];
+    for (const noteFilename of noteFilenames) {
+      const noteSize = await this.#storageProvider.getObjectSize(noteFilename);
+      noteSizes.push(noteSize);
     }
+
+    return noteSizes.reduce((a, b) => a + b, 0);
   }
 
   async graphExistsInStorage(): Promise<boolean> {

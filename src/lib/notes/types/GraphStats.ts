@@ -1,5 +1,5 @@
 export interface GraphSize {
-  graph: number,
+  notes: number,
   files: number,
 }
 

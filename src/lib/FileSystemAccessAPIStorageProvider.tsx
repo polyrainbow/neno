@@ -270,32 +270,34 @@ implements StorageProvider {
   }
 
 
-  // TODO: make recursive
-  async getTotalSize(): Promise<number> {
+  async #getFolderSize(folderPath: string): Promise<number> {
     const folderHandle = await this.#getDescendantFolderHandle(
       this.#directoryHandle,
+      folderPath,
     );
 
-    const values: (FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
+    let sum = 0;
+
     // @ts-ignore not correctly typed
     for await (const handle of folderHandle.values()) {
-      values.push(handle);
+      if (handle.kind === "file") {
+        const file = await handle.getFile();
+        const fileSize = file.size;
+        sum += fileSize;
+      } else {
+        if (handle.name === ".git") continue;
+        const folderSize = await this.#getFolderSize(
+          this.#joinPath(folderPath, handle.name),
+        );
+        sum += folderSize;
+      }
     }
 
-    const entryNames = values
-      .filter((value): value is FileSystemFileHandle => value.kind === "file");
+    return sum;
+  }
 
-    const filePromises = entryNames
-      .map((fileHandle) => {
-        return fileHandle.getFile();
-      });
 
-    const files = await Promise.all(filePromises);
-    const fileSizes = files.map((file) => file.size);
-    const folderSize = fileSizes.reduce((accumulator, size) => {
-      return accumulator + size;
-    }, 0);
-
-    return folderSize;
+  async getTotalSize(): Promise<number> {
+    return this.#getFolderSize("");
   }
 }

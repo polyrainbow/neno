@@ -144,7 +144,7 @@ export default class NotesProvider {
         createdAt: getGraphCreationTimestamp(graph),
         updatedAt: getGraphUpdateTimestamp(graph),
         size: {
-          graph: await this.#io.getSizeOfGraph(),
+          notes: await this.#io.getSizeOfNotes(),
           files: graph.metadata.files.reduce((a, b) => {
             return a + b.size;
           }, 0),

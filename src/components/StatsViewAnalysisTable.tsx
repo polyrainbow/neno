@@ -79,8 +79,12 @@ const StatsViewAnalysisTable = ({
         }</td>
       </tr>
       <tr>
-        <td>{l("stats.metadata.graph-size-without-files")}</td>
-        <td>{humanFileSize(stats.metadata.size.graph)}</td>
+        <td>{l("stats.metadata.size-of-notes")}</td>
+        <td>{
+          humanFileSize(
+            stats.metadata.size.notes,
+          )
+        }</td>
       </tr>
       <tr>
         <td>{l("stats.metadata.size-of-all-files")}</td>
