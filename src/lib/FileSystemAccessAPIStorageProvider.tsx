@@ -51,7 +51,7 @@ implements StorageProvider {
     }
 
     const pathSegments = descendantFolderPath.length > 0
-      ? this.splitPath(descendantFolderPath)
+      ? this.#splitPath(descendantFolderPath)
       : [];
 
     let dirHandle = folderHandle;
@@ -74,7 +74,7 @@ implements StorageProvider {
     filePath: string,
     create: boolean,
   ): Promise<FileSystemFileHandle> {
-    const pathSegments = this.splitPath(filePath);
+    const pathSegments = this.#splitPath(filePath);
     const folderPathSegments = pathSegments.slice(0, pathSegments.length - 1);
     const filename = pathSegments[pathSegments.length - 1];
 
@@ -154,7 +154,7 @@ implements StorageProvider {
     const fileHandle = await this.#getFileHandle(requestPath, true);
     const writable = await fileHandle.createWritable();
     await readableStream.pipeTo(writable);
-    const size = await this.getFileSize(requestPath);
+    const size = await this.getObjectSize(requestPath);
     return size;
   }
 
@@ -220,38 +220,47 @@ implements StorageProvider {
   }
 
 
-  async listDirectory(
-    requestPath?: string,
-  ): Promise<string[]> {
+  async #getFilenamesInFolder(folderPath: string): Promise<string[]> {
     const dirHandle = await this.#getDescendantFolderHandle(
       this.#directoryHandle,
-      requestPath,
+      folderPath,
     );
 
-    const values: (FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];
-    // @ts-ignore not correctly typed
+    const filenames: string[] = [];
+    // @ts-ignore Not correctly typed
     for await (const handle of dirHandle.values()) {
-      values.push(handle);
+      if (handle.kind === "file") {
+        filenames.push(handle.name);
+      } else {
+        const filesInSubFolder = await this.#getFilenamesInFolder(
+          this.#joinPath(folderPath, handle.name),
+        );
+        const requestPaths = filesInSubFolder.map(filename => {
+          return this.#joinPath(folderPath, handle.name, filename);
+        });
+        filenames.push(...requestPaths);
+      }
     }
-
-    const entryNames = values
-      .map((dirHandle) => dirHandle.name);
-
-    return entryNames;
+    return filenames;
   }
 
 
-  joinPath(...args: string[]): string {
+  async getAllObjectNames(): Promise<string[]> {
+    return this.#getFilenamesInFolder("");
+  }
+
+
+  #joinPath(...args: string[]): string {
     return args.filter((arg) => arg.length > 0).join(this.DS);
   }
 
 
-  splitPath(path: string): string[] {
+  #splitPath(path: string): string[] {
     return path.split(this.DS);
   }
 
 
-  async getFileSize(
+  async getObjectSize(
     requestPath: string,
   ): Promise<number> {
     const fileHandle = await this.#getFileHandle(requestPath, false);
@@ -261,12 +270,10 @@ implements StorageProvider {
   }
 
 
-  async getFolderSize(
-    requestPath?: string,
-  ): Promise<number> {
+  // TODO: make recursive
+  async getTotalSize(): Promise<number> {
     const folderHandle = await this.#getDescendantFolderHandle(
       this.#directoryHandle,
-      requestPath,
     );
 
     const values: (FileSystemDirectoryHandle | FileSystemFileHandle)[] = [];

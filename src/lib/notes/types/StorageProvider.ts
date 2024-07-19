@@ -4,6 +4,7 @@ export default interface StorageProvider {
   readObjectAsString: (
     requestPath: string,
   ) => Promise<string>,
+  getAllObjectNames: () => Promise<string[]>,
   getReadableStream: (
     requestPath: string,
     range?: ByteRange,
@@ -21,8 +22,6 @@ export default interface StorageProvider {
     requestPath: string,
     readableStream: ReadableStream,
   ) => Promise<number>,
-  joinPath: (...segments: string[]) => string,
-  getFileSize(requestPath: string): Promise<number>,
-  listDirectory(requestPath?: string): Promise<string[]>,
-  getFolderSize(requestPath?: string): Promise<number>,
+  getTotalSize(): Promise<number>,
+  getObjectSize(requestPath: string): Promise<number>,
 }

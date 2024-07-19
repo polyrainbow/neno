@@ -58,11 +58,15 @@ export default class DatabaseIO {
     });
   }
 
-  private async getNoteFilenamesFromGraphDirectory(): Promise<string[]> {
-    return (await this.#storageProvider.listDirectory())
-      .filter((entry: string): boolean => {
-        return entry.endsWith(DatabaseIO.#NOTE_FILE_EXTENSION);
-      });
+  private async getNoteFilenamesFromStorageProvider(): Promise<string[]> {
+    const objectNames = await this.#storageProvider.getAllObjectNames();
+
+    return objectNames
+      .filter(
+        (filename: string) => filename.endsWith(
+          DatabaseIO.#NOTE_FILE_EXTENSION,
+        ),
+      );
   }
 
   private async parseGraph(
@@ -184,7 +188,7 @@ export default class DatabaseIO {
       NOTES AND ALIASES
     */
 
-    const noteFilenames = await this.getNoteFilenamesFromGraphDirectory();
+    const noteFilenames = await this.getNoteFilenamesFromStorageProvider();
 
     const serializedNotes = new Map(
       await Promise.all(
@@ -563,7 +567,7 @@ export default class DatabaseIO {
     }
 
     const fileSize
-      = await this.#storageProvider.getFileSize(slug);
+      = await this.#storageProvider.getObjectSize(slug);
 
     return fileSize;
   }
@@ -571,7 +575,7 @@ export default class DatabaseIO {
 
   async getSizeOfGraph(): Promise<number> {
     try {
-      const size = await this.#storageProvider.getFolderSize();
+      const size = await this.#storageProvider.getTotalSize();
       return size;
     } catch (e) {
       return 0;
@@ -586,7 +590,7 @@ export default class DatabaseIO {
       return true;
     } catch (e) {
       const noteFilenamesInStorage
-        = await this.getNoteFilenamesFromGraphDirectory();
+        = await this.getNoteFilenamesFromStorageProvider();
       return noteFilenamesInStorage.length > 0;
     }
   }
