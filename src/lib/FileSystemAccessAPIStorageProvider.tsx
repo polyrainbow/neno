@@ -236,7 +236,7 @@ implements StorageProvider {
           this.#joinPath(folderPath, handle.name),
         );
         const requestPaths = filesInSubFolder.map(filename => {
-          return this.#joinPath(folderPath, handle.name, filename);
+          return this.#joinPath(handle.name, filename);
         });
         filenames.push(...requestPaths);
       }
