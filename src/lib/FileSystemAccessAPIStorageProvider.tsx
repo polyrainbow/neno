@@ -128,8 +128,14 @@ implements StorageProvider {
     oldRequestPath: string,
     newRequestPath: string,
   ): Promise<void> {
-    const oldFolder = oldRequestPath.substring(0, oldRequestPath.indexOf("/"));
-    const newFolder = newRequestPath.substring(0, newRequestPath.indexOf("/"));
+    const oldFolder = oldRequestPath.substring(
+      0,
+      oldRequestPath.lastIndexOf("/"),
+    );
+    const newFolder = newRequestPath.substring(
+      0,
+      newRequestPath.lastIndexOf("/"),
+    );
 
     if (oldFolder === newFolder) {
       const fileHandle = await this.#getFileHandle(oldRequestPath, true);

@@ -17,7 +17,8 @@ const isValidFileSlug = (slug: Slug): boolean => {
     A file slug is a slug that is saved in a subfolder of the root graph
     directory.
   */
-  return slug.match(/\//gi)?.length === 1
+  const numberOfSlashes = slug.match(/\//gi)?.length ?? 0;
+  return numberOfSlashes >= 1
     && !slug.startsWith("/");
 };
 
