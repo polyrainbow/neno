@@ -4,7 +4,6 @@ import { getNoteTitle, removeWikilinkPunctuation } from "./notes/noteUtils";
 import ActiveNote from "../types/ActiveNote";
 import NotesProvider from "./notes";
 import { Slug } from "./notes/types/Slug";
-import { isValidFileSlug } from "./notes/slugUtils";
 import { getMediaTypeFromFilename } from "./notes/utils";
 import { MediaType } from "./notes/types/MediaType";
 import NoteContentBlockAudio from "../components/NoteContentBlockAudio";
@@ -67,17 +66,11 @@ export const getTransclusionContent = async (
     throw new Error("INVALID_FILE_SLUG");
   }
 
-  if (isValidFileSlug(slug)) {
-    const availableFileInfos = [
-      ...note.files,
-    ];
+  const file = (await notesProvider.getFiles()).find(f => slug === f.slug);
 
+  if (file) {
     const mediaType = getMediaTypeFromFilename(slug);
-    let file = availableFileInfos.find((file) => file.slug === slug);
-
-    if (!file) {
-      file = await notesProvider.getFileInfo(slug);
-    }
+    const file = await notesProvider.getFileInfo(slug);
 
     if (
       mediaType === MediaType.AUDIO
@@ -112,6 +105,8 @@ export const getTransclusionContent = async (
       />;
     }
   }
+
+  // no file available, so maybe it is a note transclusion
 
   if ("outgoingLinks" in note) {
     const linkedNote = note.outgoingLinks.find(
