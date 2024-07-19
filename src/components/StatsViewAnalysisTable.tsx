@@ -80,11 +80,7 @@ const StatsViewAnalysisTable = ({
       </tr>
       <tr>
         <td>{l("stats.metadata.size-of-notes")}</td>
-        <td>{
-          humanFileSize(
-            stats.metadata.size.notes,
-          )
-        }</td>
+        <td>{humanFileSize(stats.metadata.size.notes)}</td>
       </tr>
       <tr>
         <td>{l("stats.metadata.size-of-all-files")}</td>
