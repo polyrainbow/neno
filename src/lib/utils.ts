@@ -5,7 +5,7 @@ import { FileInfo } from "./notes/types/FileInfo";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { getUrlForSlug } from "./LocalDataStorage";
 import { Slug } from "./notes/types/Slug";
-import { sluggify } from "./notes/slugUtils";
+import { sluggifyWikilinkText } from "./notes/slugUtils";
 
 
 const shortenText = (text: string, maxLength: number): string => {
@@ -225,7 +225,7 @@ const getLines = (
 const getWikilinkForNote = (slug: Slug, title: string): string => {
   // If the title can be sluggified to the note's slug, use the
   // title as link text, because it looks much nicer.
-  const wikilinkContent = sluggify(title) === slug
+  const wikilinkContent = sluggifyWikilinkText(title) === slug
     ? title
     : slug;
 

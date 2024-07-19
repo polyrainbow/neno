@@ -4,7 +4,8 @@ import {
   createSlug,
   getSlugFromFilename,
   getSlugsFromInlineText,
-  sluggify,
+  sluggifyNoteText,
+  sluggifyWikilinkText,
 } from "./slugUtils.js";
 import { describe, it, expect } from "vitest";
 
@@ -23,40 +24,84 @@ describe("getSlugFromFilename", () => {
 });
 
 
-describe("sluggify", () => {
+describe("sluggifyNoteText", () => {
   it(
     "should create correct slugs",
     async () => {
-      expect(sluggify("AUDIO.mp3")).toBe("audio-mp3");
-      expect(sluggify("Der Äther")).toBe("der-äther");
-      expect(sluggify("--hey there")).toBe("hey-there");
+      expect(sluggifyNoteText("AUDIO.mp3")).toBe("audio-mp3");
+      expect(sluggifyNoteText("Der Äther")).toBe("der-äther");
+      expect(sluggifyNoteText("--hey there")).toBe("hey-there");
       expect(
-        sluggify("#   This is a heading"),
+        sluggifyNoteText("#   This is a heading"),
       ).toBe(
         "this-is-a-heading",
       );
       expect(
-        sluggify("#   This is a heading\n\nThis is a paragraph"),
+        sluggifyNoteText("#   This is a heading\n\nThis is a paragraph"),
       ).toBe(
         "this-is-a-heading-this-is-a-paragraph",
       );
       expect(
-        sluggify("slashes/and.dots.are/transformed"),
+        sluggifyNoteText("dots.and.slashes.are/trans.formed"),
       ).toBe(
-        "slashes-and-dots-are-transformed",
+        "dots-and-slashes-are-trans-formed",
       );
       expect(
-        sluggify("Apostrophes won't be used, but will be removed"),
+        sluggifyNoteText("Apostrophes won't be used, but will be removed"),
       ).toBe(
         "apostrophes-wont-be-used-but-will-be-removed",
       );
       expect(
-        sluggify("Underscores are VALID_CHARS"),
+        sluggifyNoteText("Underscores are VALID_CHARS"),
       ).toBe(
         "underscores-are-valid_chars",
       );
     },
   );
+
+
+  describe("sluggifyWikilinkText", () => {
+    it(
+      "should create correct slugs",
+      async () => {
+        expect(sluggifyWikilinkText("AUDIO.mp3")).toBe("audio-mp3");
+        expect(sluggifyWikilinkText("Der Äther")).toBe("der-äther");
+        expect(sluggifyWikilinkText("--hey there")).toBe("hey-there");
+        expect(
+          sluggifyWikilinkText("#   This is a heading"),
+        ).toBe(
+          "this-is-a-heading",
+        );
+        expect(
+          sluggifyWikilinkText("#   This is a heading\n\nThis is a paragraph"),
+        ).toBe(
+          "this-is-a-heading-this-is-a-paragraph",
+        );
+        expect(
+          sluggifyWikilinkText("dots.are/trans.formed"),
+        ).toBe(
+          "dots-are/trans-formed",
+        );
+        expect(
+          sluggifyWikilinkText("slashes/are/kept"),
+        ).toBe(
+          "slashes/are/kept",
+        );
+        expect(
+          sluggifyWikilinkText(
+            "Apostrophes won't be used, but will be removed",
+          ),
+        ).toBe(
+          "apostrophes-wont-be-used-but-will-be-removed",
+        );
+        expect(
+          sluggifyWikilinkText("Underscores are VALID_CHARS"),
+        ).toBe(
+          "underscores-are-valid_chars",
+        );
+      },
+    );
+  });
 
 
   describe("createSlug", () => {

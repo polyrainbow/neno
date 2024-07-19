@@ -28,7 +28,7 @@ import NoteSlug from "./NoteSlug";
 import { UserRequestType } from "../lib/editor/types/UserRequestType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import { isValidFileSlug, sluggify } from "../lib/notes/slugUtils";
+import { isValidFileSlug, sluggifyWikilinkText } from "../lib/notes/slugUtils";
 import { LinkType } from "../types/LinkType";
 import useGoToNote from "../hooks/useGoToNote";
 import { getTransclusionContent } from "../lib/Transclusion";
@@ -207,23 +207,19 @@ const Note = ({
     linkType: LinkType,
   ): Promise<boolean> => {
     const slug = linkType === LinkType.WIKILINK
-      ? sluggify(linkText)
+      ? sluggifyWikilinkText(linkText)
       : linkText;
 
-    if (isValidFileSlug(slug)) {
+    try {
+      await notesProvider.getFileInfo(slug);
+      return true;
+    } catch (e) {
       try {
-        await notesProvider.getFileInfo(slug);
+        await notesProvider.get(slug);
         return true;
       } catch (e) {
         return false;
       }
-    }
-
-    try {
-      await notesProvider.get(slug);
-      return true;
-    } catch (e) {
-      return false;
     }
   };
 
@@ -298,7 +294,7 @@ const Note = ({
                   }
 
                   const slug = type === UserRequestType.WIKILINK
-                    ? sluggify(value)
+                    ? sluggifyWikilinkText(value)
                     : value;
 
                   if (isValidFileSlug(slug)) {
