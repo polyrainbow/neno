@@ -400,7 +400,7 @@ export default class NotesProvider {
     if (!graph.metadata.files.map((file) => file.slug).includes(slug)) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
-    const stream = await this.#io.getReadableFileStream(slug, range);
+    const stream = await this.#io.getReadableStream(slug, range);
     return stream;
   }
 

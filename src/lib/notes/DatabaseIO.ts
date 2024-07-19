@@ -25,7 +25,7 @@ import { Slug } from "./types/Slug.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
-import { isValidFileSlug } from "./slugUtils.js";
+import { isValidFileSlug, isValidSlug } from "./slugUtils.js";
 import { getCurrentISODateTime, unixToISOTimestamp } from "./utils.js";
 
 export default class DatabaseIO {
@@ -538,11 +538,11 @@ export default class DatabaseIO {
   }
 
 
-  async getReadableFileStream(
+  async getReadableStream(
     slug: Slug,
     range?: ByteRange,
   ): Promise<ReadableStream> {
-    if (!isValidFileSlug(slug)) {
+    if (!isValidSlug(slug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
