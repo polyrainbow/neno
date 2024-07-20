@@ -63,7 +63,7 @@ const getMediaTypeFromFilename = (
 
   const extension = getExtensionFromFilename(filename);
   if (!extension) {
-    return MediaType.TEXT;
+    return MediaType.OTHER;
   }
 
   return map.has(extension)
