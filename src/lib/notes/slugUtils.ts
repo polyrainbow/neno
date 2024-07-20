@@ -36,6 +36,10 @@ const trimSlug = (slug: string): string => {
   in slugs).
   As a consequence, this means that uploaded files with dots in slugs
   (like `files/image.png`) cannot be referenced via a Wikilink.
+  Also, it will replace series of multiple slashes (//, ///, ...)
+  with single slashes (/).
+  In order to link to nested note slugs, we have to use "//" as separator,
+  e.g. [[Person//Alice A.]]
 */
 const sluggifyWikilinkText = (text: string): string => {
   const slug = text
@@ -43,8 +47,12 @@ const sluggifyWikilinkText = (text: string): string => {
     .trim()
     // remove invalid chars
     .replace(/['’]+/g, "")
-    // Replace invalid chars with dashes (slashes are valid).
+    // Replace invalid chars with dashes. Keep / for processing afterwards
     .replace(/[^\p{L}\p{M}\d\-_/]+/gu, "-")
+    // replace single slashes
+    .replace(/(?<!\/)\/(?!\/)/g, "-")
+    // replace multiple slashes (//, ///, ...) with /
+    .replace(/\/\/+/g, "/")
     // Replace runs of one or more dashes with a single dash
     .replace(/-+/g, "-")
     .toLowerCase();
@@ -109,8 +117,22 @@ const isValidSlug = (slug: Slug): boolean => {
 };
 
 
+const isValidNoteSlug = (slug: Slug): boolean => {
+  return (
+    slug.length > 0
+    && slug.length <= 200
+    && slug.match(/^[\p{L}\d_][\p{L}\d\-/_]*$/u) !== null
+  );
+};
+
+
 const isValidSlugOrEmpty = (slug: Slug): boolean => {
   return isValidSlug(slug) || slug.length === 0;
+};
+
+
+const isValidNoteSlugOrEmpty = (slug: Slug): boolean => {
+  return isValidNoteSlug(slug) || slug.length === 0;
 };
 
 
@@ -219,6 +241,8 @@ export {
   getSlugsFromInlineText,
   isValidFileSlug,
   isValidSlug,
+  isValidNoteSlug,
+  isValidNoteSlugOrEmpty,
   sluggifyWikilinkText,
   sluggifyNoteText,
   trimSlug,

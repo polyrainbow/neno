@@ -3,7 +3,6 @@ import NewNote from "./NewNote.js";
 import { Slug } from "./Slug.js";
 
 interface BaseNoteSaveRequest {
-  ignoreDuplicateTitles: boolean,
   aliases?: Set<Slug>,
   changeSlugTo?: Slug,
 }

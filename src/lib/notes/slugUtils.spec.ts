@@ -78,14 +78,19 @@ describe("sluggifyNoteText", () => {
           "this-is-a-heading-this-is-a-paragraph",
         );
         expect(
-          sluggifyWikilinkText("dots.are/trans.formed"),
+          sluggifyWikilinkText("dots.are..trans.....formed"),
         ).toBe(
-          "dots-are/trans-formed",
+          "dots-are-trans-formed",
         );
         expect(
-          sluggifyWikilinkText("slashes/are/kept"),
+          sluggifyWikilinkText("single/slashes/are/removed"),
         ).toBe(
-          "slashes/are/kept",
+          "single-slashes-are-removed",
+        );
+        expect(
+          sluggifyWikilinkText("double/slashes//are/transformed"),
+        ).toBe(
+          "double-slashes/are-transformed",
         );
         expect(
           sluggifyWikilinkText(

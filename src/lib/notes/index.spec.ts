@@ -87,7 +87,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest1);
@@ -99,7 +98,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest2);
@@ -132,7 +130,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest1);
@@ -144,7 +141,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest2);
@@ -177,7 +173,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "1",
         aliases: new Set(),
       };
@@ -191,7 +186,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "2",
         aliases: new Set(),
       };
@@ -205,7 +199,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "test",
         aliases: new Set(),
       };
@@ -237,7 +230,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       aliases: new Set(),
     };
 
@@ -254,7 +246,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       aliases: new Set(),
     };
 
@@ -281,7 +272,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "note-1",
       aliases: new Set(),
     };
@@ -298,7 +288,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "note-2",
       aliases: new Set(),
     };
@@ -321,7 +310,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "note-1",
       aliases: new Set(),
     };
@@ -337,7 +325,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "note-1a",
       aliases: new Set(),
     };
@@ -374,7 +361,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "note-1",
         aliases: new Set(),
       };
@@ -389,7 +375,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
       };
       const noteFromProvider = await notesProvider.put(noteSaveRequest2);
@@ -412,7 +397,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "note-1",
         aliases: new Set(),
       };
@@ -427,7 +411,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
       };
       const noteFromProvider = await notesProvider.put(noteSaveRequest2);
@@ -449,7 +432,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "note-1",
       aliases: new Set(),
     };
@@ -464,7 +446,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "note-2",
       aliases: new Set(),
     };
@@ -479,7 +460,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "note-3",
       aliases: new Set(),
     };
@@ -496,7 +476,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "note-1a",
       updateReferences: true,
       aliases: new Set(),
@@ -534,7 +513,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "n2",
       aliases: new Set(),
     };
@@ -549,7 +527,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "n1",
       aliases: new Set(),
     };
@@ -566,7 +543,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "n1a",
       updateReferences: false,
       aliases: new Set(),
@@ -586,7 +562,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "n1",
       updateReferences: false,
       aliases: new Set(),
@@ -610,7 +585,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "n1",
       aliases: new Set(),
     };
@@ -625,7 +599,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "n2",
       aliases: new Set(),
     };
@@ -902,7 +875,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "another-existing-note",
       aliases: new Set(),
     };
@@ -916,7 +888,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest2);
@@ -943,7 +914,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
         aliases: new Set(),
       };
@@ -1002,7 +972,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
         aliases: new Set(),
       };
@@ -1020,7 +989,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
         aliases: new Set(),
       };
@@ -1049,7 +1017,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
         aliases: new Set(),
       };
@@ -1072,7 +1039,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
         aliases: new Set(),
       };
@@ -1087,7 +1053,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
       };
 
@@ -1124,7 +1089,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
         aliases: new Set(),
       };
@@ -1166,7 +1130,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
         aliases: new Set(),
       };
@@ -1201,7 +1164,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
         aliases: new Set(),
       };
@@ -1217,7 +1179,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
         aliases: new Set(),
       };
@@ -1233,7 +1194,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n3",
         aliases: new Set(),
       };
@@ -1264,7 +1224,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
         aliases: new Set(),
       };
@@ -1280,7 +1239,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
         aliases: new Set(),
       };
@@ -1296,7 +1254,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n3",
         aliases: new Set(),
       };
@@ -1328,7 +1285,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
         aliases: new Set(),
       };
@@ -1344,7 +1300,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
         aliases: new Set(),
       };
@@ -1360,7 +1315,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n3",
         aliases: new Set(),
       };
@@ -1392,7 +1346,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n1",
         aliases: new Set(),
       };
@@ -1408,7 +1361,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n2",
         aliases: new Set(),
       };
@@ -1424,7 +1376,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "n3",
         aliases: new Set(),
       };
@@ -1498,7 +1449,6 @@ describe("Notes module", () => {
       const notesProvider = new NotesProvider(storageProvider);
 
       const putRequest: NoteSaveRequest = {
-        ignoreDuplicateTitles: false,
         aliases: new Set([]),
         note: {
           content: "Test note",
@@ -1532,7 +1482,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(["note-alias"]),
       };
 
@@ -1562,7 +1511,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set([""]),
       };
 
@@ -1586,7 +1534,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
         changeSlugTo: "note-1",
       };
@@ -1602,7 +1549,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set([""]),
       };
 
@@ -1626,7 +1572,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "a",
         aliases: new Set(["b", "c"]),
       };
@@ -1655,7 +1600,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "note-1",
         aliases: new Set(["alias"]),
       };
@@ -1670,7 +1614,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "note-2",
         aliases: new Set(),
       };
@@ -1712,7 +1655,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "note-1",
         aliases: new Set(["alias"]),
       };
@@ -1727,7 +1669,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "note-2",
         aliases: new Set(),
       };
@@ -1751,7 +1692,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "z",
         aliases: new Set([]),
       };
@@ -1766,7 +1706,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "x",
         aliases: new Set(["y"]),
       };
@@ -1790,7 +1729,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "y",
         aliases: new Set([]),
       };
@@ -1806,7 +1744,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "x",
         aliases: new Set([]),
       };
@@ -1823,7 +1760,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(["alias"]),
       };
 
@@ -1845,7 +1781,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "x",
         aliases: new Set(["y"]),
       };
@@ -1860,7 +1795,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "z",
         aliases: new Set([]),
       };
@@ -1891,7 +1825,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "a",
         aliases: new Set(["alias"]),
       };
@@ -1980,7 +1913,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
         changeSlugTo: "note-1",
       };
@@ -1996,7 +1928,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
         changeSlugTo: "note-2",
       };
@@ -2122,7 +2053,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
       };
 
@@ -2136,7 +2066,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
       };
 
@@ -2159,7 +2088,6 @@ describe("Notes module", () => {
         },
       },
       changeSlugTo: "main-slug",
-      ignoreDuplicateTitles: false,
       aliases: new Set(),
     };
     await notesProvider.put(noteSaveRequest1);
@@ -2173,7 +2101,6 @@ describe("Notes module", () => {
           flags: [],
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: "new-canonical-slug",
       aliases: new Set(["main-slug"]), // same as old canonical slug
     };
@@ -2199,7 +2126,6 @@ describe("Notes module", () => {
           },
         },
         changeSlugTo: "s1",
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
       };
       await notesProvider.put(noteSaveRequest1);
@@ -2212,12 +2138,11 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "s2",
         aliases: new Set(["s1"]),
       };
       expect(notesProvider.put(noteSaveRequest2))
-        .rejects.toThrowError(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+        .rejects.toThrowError(ErrorMessage.SLUG_EXISTS);
     },
   );
 
@@ -2237,7 +2162,6 @@ describe("Notes module", () => {
           },
         },
         changeSlugTo: "s1",
-        ignoreDuplicateTitles: false,
         aliases: new Set(),
       };
       await notesProvider.put(noteSaveRequest1);
@@ -2250,7 +2174,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "s2",
         aliases: new Set(),
       };
@@ -2266,11 +2189,10 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         aliases: new Set(["s1"]),
       };
       expect(notesProvider.put(noteSaveRequest3))
-        .rejects.toThrowError(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+        .rejects.toThrowError(ErrorMessage.SLUG_EXISTS);
     },
   );
 
@@ -2289,7 +2211,6 @@ describe("Notes module", () => {
           },
         },
         changeSlugTo: "s1",
-        ignoreDuplicateTitles: false,
         aliases: new Set(["alias"]),
       };
       await notesProvider.put(noteSaveRequest1);
@@ -2302,7 +2223,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "s2",
         aliases: new Set(["alias"]),
       };
@@ -2336,7 +2256,6 @@ describe("Notes module", () => {
             flags: [],
           },
         },
-        ignoreDuplicateTitles: false,
         changeSlugTo: "a/b/c/d",
         aliases: new Set(["y"]),
       };

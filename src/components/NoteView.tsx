@@ -12,7 +12,6 @@ import {
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import { ErrorMessage } from "../lib/notes/types/ErrorMessage";
 import { l } from "../lib/intl";
 import NoteListWithControls from "./NoteListWithControls";
 import useNotesProvider from "../hooks/useNotesProvider";
@@ -22,7 +21,6 @@ import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { Slug } from "../lib/notes/types/Slug";
 import NotesProvider, { getNoteTitle } from "../lib/notes";
-import useConfirm from "../hooks/useConfirm";
 import { Context } from "../lib/editor";
 import useGoToNote from "../hooks/useGoToNote";
 import { PathTemplate } from "../types/PathTemplate";
@@ -57,7 +55,6 @@ const NoteView = () => {
   const notesProvider = useNotesProvider();
   const isSmallScreen = useIsSmallScreen();
   const navigate = useNavigate();
-  const confirm = useConfirm();
   const { slug } = useParams();
   const location = useLocation();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
@@ -105,10 +102,8 @@ const NoteView = () => {
     await refreshPinnedNotes();
   };
 
-  const saveActiveNoteAndRefreshViews = async (
-    ignoreDuplicateTitles: boolean,
-  ) => {
-    const noteFromDatabase = await saveActiveNote(ignoreDuplicateTitles);
+  const saveActiveNoteAndRefreshViews = async () => {
+    const noteFromDatabase = await saveActiveNote();
 
     goToNote(
       noteFromDatabase.meta.slug,
@@ -131,25 +126,9 @@ const NoteView = () => {
   const handleNoteSaveRequest = async (): Promise<void> => {
     setUploadInProgress(true);
     try {
-      await saveActiveNoteAndRefreshViews(false);
+      await saveActiveNoteAndRefreshViews();
     } catch (e) {
-      if (
-        e instanceof Error
-        && e.message === ErrorMessage.NOTE_WITH_SAME_TITLE_EXISTS
-      ) {
-        await confirm({
-          text: l("editor.title-already-exists-confirmation"),
-          confirmText: l("editor.save-anyway"),
-          cancelText: l("editor.cancel"),
-          encourageConfirmation: false,
-        });
-
-        saveActiveNoteAndRefreshViews(true).catch((e) => {
-          alert(e);
-        });
-      } else {
-        alert(e);
-      }
+      alert(e);
     }
     setUploadInProgress(false);
   };
@@ -177,7 +156,7 @@ const NoteView = () => {
 
   useKeyboardShortcuts({
     onSave: () => {
-      if (!NotesProvider.isValidSlugOrEmpty(slugInput)) {
+      if (!NotesProvider.isValidNoteSlugOrEmpty(slugInput)) {
         return;
       }
       handleNoteSaveRequest();

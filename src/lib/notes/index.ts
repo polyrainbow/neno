@@ -47,6 +47,7 @@ import {
   isValidSlug,
   isValidSlugOrEmpty,
   isValidFileSlug,
+  isValidNoteSlugOrEmpty,
 } from "./slugUtils.js";
 import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 import serialize from "../subwaytext/serialize.js";
@@ -60,6 +61,7 @@ export default class NotesProvider {
   static serializeNewNote = serializeNewNote;
   static isValidSlug = isValidSlug;
   static isValidSlugOrEmpty = isValidSlugOrEmpty;
+  static isValidNoteSlugOrEmpty = isValidNoteSlugOrEmpty;
 
   #io: DatabaseIO;
 
@@ -302,8 +304,16 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
 
-    if ((!isValidSlug(newSlug)) || (!isValidFileSlug(newSlug))) {
+    if (!isValidFileSlug(newSlug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
+    if (
+      graph.notes.has(newSlug)
+      || graph.aliases.has(newSlug)
+      || graph.metadata.files.find((f) => f.slug === newSlug)
+    ) {
+      throw new Error(ErrorMessage.SLUG_EXISTS);
     }
 
     await this.#io.renameFile(

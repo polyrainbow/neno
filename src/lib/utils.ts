@@ -227,7 +227,7 @@ const getWikilinkForNote = (slug: Slug, title: string): string => {
   // title as link text, because it looks much nicer.
   const wikilinkContent = sluggifyWikilinkText(title) === slug
     ? title
-    : slug;
+    : slug.replace(/\//g, "//");
 
   const wikilink = `[[${wikilinkContent}]]`;
   return wikilink;

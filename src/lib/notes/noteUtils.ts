@@ -32,7 +32,7 @@ import {
   createSlug,
   getSlugsFromInlineText,
   isValidFileSlug,
-  isValidSlug,
+  isValidNoteSlug,
   sluggifyNoteText,
   sluggifyWikilinkText,
 } from "./slugUtils.js";
@@ -631,7 +631,7 @@ const handleExistingNoteUpdate = async (
     }
 
     noteSaveRequest.aliases.forEach((alias) => {
-      if (!isValidSlug(alias)) {
+      if (!isValidNoteSlug(alias)) {
         throw new Error(ErrorMessage.INVALID_ALIAS);
       }
       if (alias === existingNote.meta.slug) {
@@ -644,7 +644,7 @@ const handleExistingNoteUpdate = async (
           throw new Error(ErrorMessage.ALIAS_EXISTS);
         }
       } else if (graph.notes.has(alias)) {
-        throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+        throw new Error(ErrorMessage.SLUG_EXISTS);
       }
       if (
         graph.aliases.has(alias)
@@ -668,11 +668,11 @@ const handleExistingNoteUpdate = async (
     "changeSlugTo" in noteSaveRequest
     && typeof noteSaveRequest.changeSlugTo === "string"
   ) {
-    if (!isValidSlug(noteSaveRequest.changeSlugTo)) {
+    if (!isValidNoteSlug(noteSaveRequest.changeSlugTo)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
     if (graph.notes.has(noteSaveRequest.changeSlugTo)) {
-      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+      throw new Error(ErrorMessage.SLUG_EXISTS);
     }
     if (graph.aliases.has(noteSaveRequest.changeSlugTo)) {
       throw new Error(ErrorMessage.ALIAS_EXISTS);
@@ -788,14 +788,14 @@ const handleNewNoteSaveRequest = async (
     "changeSlugTo" in noteSaveRequest
     && typeof noteSaveRequest.changeSlugTo === "string"
   ) {
-    if (!isValidSlug(noteSaveRequest.changeSlugTo)) {
+    if (!isValidNoteSlug(noteSaveRequest.changeSlugTo)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
     if (
       graph.notes.has(noteSaveRequest.changeSlugTo)
       || graph.aliases.has(noteSaveRequest.changeSlugTo)
     ) {
-      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+      throw new Error(ErrorMessage.SLUG_EXISTS);
     }
 
     slug = noteSaveRequest.changeSlugTo;
@@ -808,7 +808,7 @@ const handleNewNoteSaveRequest = async (
 
   const aliasesToUpdate: Set<Slug> = new Set();
   noteSaveRequest.aliases?.forEach((alias) => {
-    if (!isValidSlug(alias)) {
+    if (!isValidNoteSlug(alias)) {
       throw new Error(ErrorMessage.INVALID_ALIAS);
     }
     if (
@@ -818,7 +818,7 @@ const handleNewNoteSaveRequest = async (
       throw new Error(ErrorMessage.ALIAS_EXISTS);
     }
     if (graph.notes.has(alias)) {
-      throw new Error(ErrorMessage.NOTE_WITH_SAME_SLUG_EXISTS);
+      throw new Error(ErrorMessage.SLUG_EXISTS);
     }
     graph.aliases.set(alias, slug);
     aliasesToUpdate.add(alias);

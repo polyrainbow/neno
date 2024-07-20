@@ -28,7 +28,7 @@ import NoteSlug from "./NoteSlug";
 import { UserRequestType } from "../lib/editor/types/UserRequestType";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
-import { isValidFileSlug, sluggifyWikilinkText } from "../lib/notes/slugUtils";
+import { sluggifyWikilinkText } from "../lib/notes/slugUtils";
 import { LinkType } from "../types/LinkType";
 import useGoToNote from "../hooks/useGoToNote";
 import { getTransclusionContent } from "../lib/Transclusion";
@@ -233,7 +233,7 @@ const Note = ({
   return <>
     <NoteMenuBar
       activeNote={note}
-      disableNoteSaving={!NotesProvider.isValidSlugOrEmpty(slugInput)}
+      disableNoteSaving={!NotesProvider.isValidNoteSlugOrEmpty(slugInput)}
       handleNoteSaveRequest={handleNoteSaveRequest}
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}
@@ -297,14 +297,16 @@ const Note = ({
                     ? sluggifyWikilinkText(value)
                     : value;
 
-                  if (isValidFileSlug(slug)) {
+                  try {
+                    await notesProvider.getFileInfo(slug);
+
                     navigate(
                       getAppPath(PathTemplate.FILE, new Map([
                         ["GRAPH_ID", LOCAL_GRAPH_ID],
                         ["FILE_SLUG", slug],
                       ])),
                     );
-                  } else {
+                  } catch (e) {
                     goToNote(slug, {
                       contentIfNewNote: type === UserRequestType.WIKILINK
                         ? value

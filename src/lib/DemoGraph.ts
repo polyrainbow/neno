@@ -29,7 +29,6 @@ export const createDemoGraph = async (
           additionalHeaders: {},
         },
       },
-      ignoreDuplicateTitles: false,
       changeSlugTo: demoNoteSlug,
     };
 

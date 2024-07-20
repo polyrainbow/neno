@@ -46,7 +46,7 @@ const NoteSlug = ({
         className={
           "note-slug "
           + (
-            !NotesProvider.isValidSlugOrEmpty(slugInput)
+            !NotesProvider.isValidNoteSlugOrEmpty(slugInput)
               ? "invalid"
               : ""
           )
@@ -85,7 +85,7 @@ const NoteSlug = ({
         }}
       />
       {
-        !NotesProvider.isValidSlugOrEmpty(slugInput)
+        !NotesProvider.isValidNoteSlugOrEmpty(slugInput)
           ? <div className="note-slug-validation-error">
             {l("note.slug.invalid-slug").toLocaleUpperCase()}
           </div>
@@ -128,7 +128,7 @@ const NoteSlug = ({
             className={
               "note-slug "
               + (
-                !NotesProvider.isValidSlugOrEmpty(slugInput)
+                !NotesProvider.isValidNoteSlugOrEmpty(slugInput)
                   ? "invalid"
                   : ""
               )
@@ -179,7 +179,7 @@ const NoteSlug = ({
             }}
           />
           {
-            !NotesProvider.isValidSlugOrEmpty(slugAlias)
+            !NotesProvider.isValidNoteSlugOrEmpty(slugAlias)
               ? <div className="note-slug-validation-error">
                 {l("note.slug.invalid-slug").toLocaleUpperCase()}
               </div>

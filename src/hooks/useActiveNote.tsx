@@ -121,9 +121,7 @@ export default (
   };
 
 
-  const prepareNoteSaveRequest = (
-    ignoreDuplicateTitles: boolean,
-  ): NoteSaveRequest => {
+  const prepareNoteSaveRequest = (): NoteSaveRequest => {
     if (activeNote.isUnsaved) {
       return {
         note: {
@@ -133,7 +131,6 @@ export default (
             flags: activeNote.flags,
           },
         },
-        ignoreDuplicateTitles,
         // for new notes, use slug input if available. for existing notes, use
         // slug input only if it's different from the current slug.
         changeSlugTo: NotesProvider.isValidSlug(slugInput)
@@ -157,7 +154,6 @@ export default (
             flags: activeNote.flags,
           },
         },
-        ignoreDuplicateTitles,
         // for new notes, use slug input if available. for existing notes, use
         // slug input only if it's different from the current slug.
         changeSlugTo: slugInput !== activeNote.slug
@@ -177,14 +173,12 @@ export default (
   };
 
 
-  const saveActiveNote = async (
-    ignoreDuplicateTitles: boolean,
-  ): Promise<NoteToTransmit> => {
-    if (!NotesProvider.isValidSlugOrEmpty(slugInput)) {
+  const saveActiveNote = async (): Promise<NoteToTransmit> => {
+    if (!NotesProvider.isValidNoteSlugOrEmpty(slugInput)) {
       throw new Error("Tried saving an invalid slug. This should not happen!");
     }
 
-    const noteSaveRequest = prepareNoteSaveRequest(ignoreDuplicateTitles);
+    const noteSaveRequest = prepareNoteSaveRequest();
     const noteFromDatabase = await notesProvider.put(noteSaveRequest);
     setActiveNoteFromServer(noteFromDatabase);
     // After the saving has been done, let's check if there was an editor update
@@ -248,7 +242,6 @@ export default (
         },
         content: noteContentRef.current,
       },
-      ignoreDuplicateTitles: true,
       aliases: new Set(),
     };
     const noteFromServer = await notesProvider.put(noteSaveRequest);
