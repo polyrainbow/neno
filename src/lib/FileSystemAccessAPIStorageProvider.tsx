@@ -291,7 +291,6 @@ implements StorageProvider {
         const fileSize = file.size;
         sum += fileSize;
       } else {
-        if (handle.name === ".git") continue;
         const folderSize = await this.#getFolderSize(
           this.#joinPath(folderPath, handle.name),
         );

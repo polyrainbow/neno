@@ -162,6 +162,7 @@
   "stats.metadata.pins": "Pins",
   "stats.metadata.size-of-all-files": "Size of all files",
   "stats.metadata.size-of-notes": "Size of notes",
+  "stats.metadata.total-storage-size": "Total storage size",
   "stats.metadata.updated-at": "Updated at",
   "stats.number-of-links": "Number of links",
   "stats.number-of-notes": "Number of notes",

@@ -87,6 +87,10 @@ const StatsViewAnalysisTable = ({
         <td>{humanFileSize(stats.metadata.size.files)}</td>
       </tr>
       <tr>
+        <td>{l("stats.metadata.total-storage-size")}</td>
+        <td>{humanFileSize(stats.metadata.size.total)}</td>
+      </tr>
+      <tr>
         <td>{l("stats.metadata.number-of-files")}</td>
         <td>{stats.numberOfFiles.toLocaleString()}</td>
       </tr>

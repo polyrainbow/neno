@@ -584,6 +584,10 @@ export default class DatabaseIO {
     return noteSizes.reduce((a, b) => a + b, 0);
   }
 
+  async getTotalStorageSize(): Promise<number> {
+    return this.#storageProvider.getTotalSize();
+  }
+
   async graphExistsInStorage(): Promise<boolean> {
     try {
       await this.#storageProvider.readObjectAsString(

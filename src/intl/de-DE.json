@@ -162,6 +162,7 @@
   "stats.metadata.pins": "Angepinnte Notizen",
   "stats.metadata.size-of-all-files": "Größe aller Dateien",
   "stats.metadata.size-of-notes": "Größe aller Notizen",
+  "stats.metadata.total-storage-size": "Gesamte Speicherplatzbelegung",
   "stats.metadata.updated-at": "Letzte Aktualisierung",
   "stats.number-of-links": "Verbindungen",
   "stats.number-of-notes": "Notizen",
