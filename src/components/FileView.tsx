@@ -261,7 +261,11 @@ const FileView = () => {
                 ).toLowerCase();
                 setSlugRenameInput(newValue);
               }}
-            />.{extension}
+            />{
+              typeof extension === "string"
+                ? `.${extension}`
+                : ""
+            }
           </div>
         </div>
         <div className="update-references">
@@ -291,7 +295,12 @@ const FileView = () => {
               || slugRenameInput === getRenameInput(slug || "")
               || !isValidFileSlug(slugRenameInput)
             ) return;
-            const newSlug = slugRenameInput + "." + extension;
+            const newSlug = slugRenameInput
+              + (
+                typeof extension === "string"
+                  ? + "." + extension
+                  : ""
+              );
             try {
               const newFileInfo = await notesProvider.renameFile(
                 slug,
