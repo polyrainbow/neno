@@ -674,6 +674,11 @@ const handleExistingNoteUpdate = async (
     if (graph.notes.has(noteSaveRequest.changeSlugTo)) {
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }
+    if (
+      graph.metadata.files.find(f => f.slug === noteSaveRequest.changeSlugTo)
+    ) {
+      throw new Error(ErrorMessage.SLUG_EXISTS);
+    }
     if (graph.aliases.has(noteSaveRequest.changeSlugTo)) {
       throw new Error(ErrorMessage.ALIAS_EXISTS);
     }
@@ -794,6 +799,11 @@ const handleNewNoteSaveRequest = async (
     if (
       graph.notes.has(noteSaveRequest.changeSlugTo)
       || graph.aliases.has(noteSaveRequest.changeSlugTo)
+    ) {
+      throw new Error(ErrorMessage.SLUG_EXISTS);
+    }
+    if (
+      graph.metadata.files.find(f => f.slug === noteSaveRequest.changeSlugTo)
     ) {
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }

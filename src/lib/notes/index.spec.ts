@@ -2266,4 +2266,100 @@ describe("Notes module", () => {
       expect(noteFromProvider.content).toBe("test 2");
     },
   );
+
+  it(
+    "should not allow changing a slug of a new note to an existing file slug",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      await notesProvider.addFile(
+        readable,
+        "files",
+        "file",
+      );
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "test",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "files/file",
+        aliases: new Set(),
+      };
+
+      await expect(notesProvider.put(noteSaveRequest))
+        .rejects.toThrow(ErrorMessage.SLUG_EXISTS);
+    },
+  );
+
+  it(
+    "should not allow changing a slug of an existing note "
+    + "to an existing file slug",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      await notesProvider.addFile(
+        readable,
+        "files",
+        "file",
+      );
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "test",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "n1",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "test",
+          meta: {
+            slug: "n1",
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "files/file",
+        aliases: new Set(),
+      };
+
+      await expect(notesProvider.put(noteSaveRequest2))
+        .rejects.toThrow(ErrorMessage.SLUG_EXISTS);
+    },
+  );
 });
