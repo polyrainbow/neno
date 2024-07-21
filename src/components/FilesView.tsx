@@ -41,9 +41,16 @@ const FilesView = () => {
   };
 
   const filteredFiles = files
-    .filter((file) => file.slug.toLowerCase().startsWith(
-      filterInput.toLowerCase(),
-    ))
+    .filter((file) => {
+      if (filterInput.startsWith("ends-with:")) {
+        const suffix = filterInput.substring("ends-with:".length);
+        return file.slug.toLowerCase().endsWith(suffix);
+      } else {
+        return file.slug.toLowerCase().startsWith(
+          filterInput.toLowerCase(),
+        );
+      }
+    })
     .toSorted((a, b): number => {
       if (sortMode === FileSortMode.CREATED_AT_DESCENDING) {
         return getCompareKeyForTimestamp(b.createdAt)
@@ -132,7 +139,7 @@ const FilesView = () => {
               <button
                 className="default-button-small"
                 onClick={() => {
-                  setFilterInput("scripts/");
+                  setFilterInput("ends-with:.neno.js");
                   setPage(1);
                 }}
               >
