@@ -2362,4 +2362,28 @@ describe("Notes module", () => {
         .rejects.toThrow(ErrorMessage.SLUG_EXISTS);
     },
   );
+
+
+  it(
+    "should ignore files with invalid slugs",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+
+      await mockStorageProvider.writeObject(
+        "invalid slug/note-1.subtext",
+        "note text",
+      );
+
+      await mockStorageProvider.writeObject(
+        "valid-slug/note-2.subtext",
+        "note text",
+      );
+
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const notes = await notesProvider.getNotesList({});
+      expect(notes.numberOfResults).toBe(1);
+      expect(notes.results[0].slug).toBe("valid-slug/note-2");
+    },
+  );
 });

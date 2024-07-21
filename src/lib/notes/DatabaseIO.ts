@@ -50,12 +50,14 @@ export default class DatabaseIO {
     return `${slug}${DatabaseIO.#NOTE_FILE_EXTENSION}`;
   }
 
-  static getSlugsFromFilenames(filenames: string[]): Slug[] {
-    return filenames.filter((filename: string): boolean => {
-      return filename.endsWith(DatabaseIO.#NOTE_FILE_EXTENSION);
-    }).map((filename: string): Slug => {
-      return filename.slice(0, -DatabaseIO.#NOTE_FILE_EXTENSION.length);
-    });
+  static getSlugFromNoteFilename(filename: string): Slug {
+    if (!filename.endsWith(DatabaseIO.#NOTE_FILE_EXTENSION)) {
+      throw new Error(
+        "Filename does not end with default note filename extension",
+      );
+    }
+
+    return filename.slice(0, -DatabaseIO.#NOTE_FILE_EXTENSION.length);
   }
 
   private async getNoteFilenamesFromStorageProvider(): Promise<string[]> {
@@ -63,9 +65,10 @@ export default class DatabaseIO {
 
     return objectNames
       .filter(
-        (filename: string) => filename.endsWith(
-          DatabaseIO.#NOTE_FILE_EXTENSION,
-        ),
+        (filename: string) => {
+          return filename.endsWith(DatabaseIO.#NOTE_FILE_EXTENSION)
+            && isValidSlug(DatabaseIO.getSlugFromNoteFilename(filename));
+        },
       );
   }
 
