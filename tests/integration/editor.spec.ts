@@ -855,4 +855,36 @@ test.describe("Editor view", () => {
     },
   );
   */
+
+  test(
+    "wikilink should not be created inside code block node",
+    async ({ page }) => {
+      await page.keyboard.type("```");
+      await page.keyboard.press("Enter", { delay: 20 });
+      await page.keyboard.type("[[link]]", { delay: 20 });
+
+      const codeBlock = await page.locator(
+        "div[data-lexical-editor] .editor-paragraph:nth-child(2) > *",
+      ).all();
+
+      // expect node to be a text node
+      expect(await codeBlock[0].getAttribute("class")).toBe(null);
+      expect(await codeBlock[0].textContent()).toBe("[[link]]");
+
+      await page.keyboard.press("ArrowUp", { delay: 20 });
+      await page.keyboard.press("Backspace", { delay: 20 });
+
+      // now wikilink should have been created, because code block has been removed
+
+      expect(await codeBlock[0].getAttribute("class")).toBe("wikilink-punctuation");
+      expect(await codeBlock[0].textContent()).toBe("[[");
+
+      // re-create code block
+      await page.keyboard.type("`");
+
+      // expect node to be a simple text node again
+      expect(await codeBlock[0].getAttribute("class")).toBe(null);
+      expect(await codeBlock[0].textContent()).toBe("[[link]]");
+    },
+  );
 });

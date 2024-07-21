@@ -46,6 +46,7 @@ import {
   WikiLinkPunctuationNode,
 } from "../nodes/WikiLinkPunctuationNode";
 import { $isKeyValuePairKeyNode } from "../nodes/KeyValuePairKeyNode";
+import { $isCodeBlockNode } from "../nodes/CodeBlockNode";
 
 const REGEX = /\[\[[^[\]]+\]\]/;
 
@@ -78,6 +79,10 @@ function registerWikilinkTransforms(
 
   const textNodeTransform = (node: TextNode): void => {
     if (!node.isSimpleText()) {
+      return;
+    }
+
+    if ($isCodeBlockNode(node.getParent())) {
       return;
     }
 
@@ -172,6 +177,7 @@ function registerWikilinkTransforms(
       || !node.isValid()
       || !prevSibling.isValid()
       || !nextSibling.isValid()
+      || $isCodeBlockNode(node.getParent())
     ) {
       replaceWithSimpleText(node);
 
