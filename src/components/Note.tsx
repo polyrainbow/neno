@@ -213,11 +213,11 @@ const Note = ({
     try {
       await notesProvider.getFileInfo(slug);
       return true;
-    } catch (e) {
+    } catch (_e) {
       try {
         await notesProvider.get(slug);
         return true;
-      } catch (e) {
+      } catch (_e) {
         return false;
       }
     }
@@ -306,7 +306,7 @@ const Note = ({
                         ["FILE_SLUG", slug],
                       ])),
                     );
-                  } catch (e) {
+                  } catch (_e) {
                     goToNote(slug, {
                       contentIfNewNote: type === UserRequestType.WIKILINK
                         ? value

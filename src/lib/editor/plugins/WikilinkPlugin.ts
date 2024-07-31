@@ -181,11 +181,13 @@ function registerWikilinkTransforms(
     ) {
       replaceWithSimpleText(node);
 
-      $isWikiLinkPunctuationNode(prevSibling)
-        && replaceWithSimpleText(prevSibling);
+      if ($isWikiLinkPunctuationNode(prevSibling)) {
+        replaceWithSimpleText(prevSibling);
+      }
 
-      $isWikiLinkPunctuationNode(nextSibling)
-        && replaceWithSimpleText(nextSibling);
+      if ($isWikiLinkPunctuationNode(nextSibling)) {
+        replaceWithSimpleText(nextSibling);
+      }
     }
   };
 

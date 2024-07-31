@@ -65,7 +65,9 @@ const NoteList = ({
     const container = containerRef.current;
 
     const onScroll = () => {
-      container && setScrollTop(container.scrollTop);
+      if (container) {
+        setScrollTop(container.scrollTop);
+      }
     };
 
     if (!container) {

@@ -55,7 +55,6 @@ const parseNoteHeaders = (note: string): NoteHeaders => {
   const headerSection = note.substring(0, note.indexOf("\n\n"));
   const regex = /^:([^:]*):(.*)$/gm;
   const headers = new Map<string, string>();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [_match, key, value] of headerSection.matchAll(regex)) {
     headers.set(key, value);
   }

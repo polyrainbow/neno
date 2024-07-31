@@ -35,8 +35,9 @@ const registerBlockNodeTransform = (
     while (currentNode && !$isParagraphNode(currentNode)) {
       currentNode = currentNode.getParent();
     }
-    currentNode
-      && refreshTransclusionsForBlock(currentNode, getTransclusionContent);
+    if (currentNode) {
+      refreshTransclusionsForBlock(currentNode, getTransclusionContent);
+    }
   });
 };
 

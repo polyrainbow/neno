@@ -136,8 +136,8 @@ export default function usePagination(
   });
 
   const handleClick = (event: React.ChangeEvent, value: number | null) => {
-    if (!pageProp) {
-      value && setPageState(value);
+    if ((!pageProp) && value) {
+      setPageState(value);
     }
     if (handleChange && value !== null) {
       handleChange(event, value);
@@ -213,16 +213,16 @@ export default function usePagination(
   // Map the button type to its page number
   const buttonPage = (type: PaginationItemType): number | null => {
     switch (type) {
-      case PaginationItemType.First:
-        return 1;
-      case PaginationItemType.Previous:
-        return page - 1;
-      case PaginationItemType.Next:
-        return page + 1;
-      case PaginationItemType.Last:
-        return count;
-      default:
-        return null;
+    case PaginationItemType.First:
+      return 1;
+    case PaginationItemType.Previous:
+      return page - 1;
+    case PaginationItemType.Next:
+      return page + 1;
+    case PaginationItemType.Last:
+      return count;
+    default:
+      return null;
     }
   };
 

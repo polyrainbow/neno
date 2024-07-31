@@ -59,7 +59,7 @@ const ScriptView = () => {
         value,
       });
       setScriptInput(value);
-    } catch (e) {
+    } catch (_e) {
       setError("SCRIPT_NOT_FOUND");
     }
   });

@@ -89,7 +89,7 @@ export default class DatabaseIO {
           parsedNote = parseSerializedExistingNote(serializedNote, slug);
           parsedNotes.set(slug, parsedNote);
         }
-      } catch (e) {
+      } catch (_e) {
         continue;
       }
     }
@@ -183,7 +183,7 @@ export default class DatabaseIO {
         = await this.#storageProvider.readObjectAsString(
           this.#GRAPH_METADATA_FILENAME,
         );
-    } catch (e) {
+    } catch (_e) {
       graphMetadataSerialized = undefined;
     }
 
@@ -597,7 +597,7 @@ export default class DatabaseIO {
         this.#GRAPH_METADATA_FILENAME,
       );
       return true;
-    } catch (e) {
+    } catch (_e) {
       const noteFilenamesInStorage
         = await this.getNoteFilenamesFromStorageProvider();
       return noteFilenamesInStorage.length > 0;

@@ -177,7 +177,6 @@ implements StorageProvider {
 
   async getReadableStream(
     requestPath: string,
-    // eslint-disable-next-line
     _range?: ByteRange, // to be implemented
   ): Promise<ReadableStream<Uint8Array>> {
     const fileHandle = await this.#getFileHandle(requestPath, false);

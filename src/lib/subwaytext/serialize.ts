@@ -65,22 +65,22 @@ function serializeOrderedListItem(block: OrderedListItemBlock): string {
 export default function serialize(blocks: Block[]): string {
   return blocks.map((block: Block) => {
     switch (block.type) {
-      case BlockType.PARAGRAPH:
-        return serializeParagraph(block);
-      case BlockType.HEADING:
-        return serializeHeading(block);
-      case BlockType.UNORDERED_LIST_ITEM:
-        return serializeUnorderedListItem(block);
-      case BlockType.ORDERED_LIST_ITEM:
-        return serializeOrderedListItem(block);
-      case BlockType.CODE:
-        return serializeCodeBlock(block);
-      case BlockType.QUOTE:
-        return serializeQuote(block);
-      case BlockType.KEY_VALUE_PAIR:
-        return serializeKeyValuePair(block);
-      case BlockType.EMPTY:
-        return serializeEmpty(block);
+    case BlockType.PARAGRAPH:
+      return serializeParagraph(block);
+    case BlockType.HEADING:
+      return serializeHeading(block);
+    case BlockType.UNORDERED_LIST_ITEM:
+      return serializeUnorderedListItem(block);
+    case BlockType.ORDERED_LIST_ITEM:
+      return serializeOrderedListItem(block);
+    case BlockType.CODE:
+      return serializeCodeBlock(block);
+    case BlockType.QUOTE:
+      return serializeQuote(block);
+    case BlockType.KEY_VALUE_PAIR:
+      return serializeKeyValuePair(block);
+    case BlockType.EMPTY:
+      return serializeEmpty(block);
     }
   }).join("\n");
 }

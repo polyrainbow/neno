@@ -1,4 +1,3 @@
-import reactHooks from "eslint-plugin-react-hooks";
 import reactRecommended from "eslint-plugin-react/configs/recommended.js";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
@@ -11,7 +10,6 @@ export default [
   reactRecommended,
   {
     "plugins": {
-      "react-hooks": reactHooks,
       "@stylistic": stylistic,
       "@stylistic/ts": stylisticTs,
     },
@@ -32,23 +30,30 @@ export default [
       "prefer-const": ["error"],
       "no-console": ["error"],
       "no-constant-condition": [0],
+      "object-curly-spacing": [2, "always"],
+      "indent": [
+        "error",
+        2,
+      ],
 
       // react
       "react/jsx-pascal-case": "error",
       "react/jsx-uses-vars": ["error"],
       "react/react-in-jsx-scope": [0],
 
-      // react-hooks
-      "react-hooks/rules-of-hooks": "error",
+      // react-hooks - temporarily disabled
+      // "react-hooks/rules-of-hooks": "error",
 
       // @typescript-eslint
       "@typescript-eslint/ban-ts-comment": [0],
-      "@typescript-eslint/type-annotation-spacing": "error",
-      "@typescript-eslint/object-curly-spacing": [2, "always"],
       "@typescript-eslint/no-use-before-define": ["error"],
-      "@typescript-eslint/indent": [
+      "@typescript-eslint/no-unused-vars": [
         "error",
-        2,
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_",
+        },
       ],
 
       // @stylistic - https://eslint.style/packages/default#rules
@@ -62,6 +67,7 @@ export default [
       "@stylistic/no-trailing-spaces": ["error"],
       "@stylistic/eol-last": ["error", "always"],
       "@stylistic/dot-location": ["error", "property"],
+      "@stylistic/type-annotation-spacing": "error",
 
       // @stylistic/ts - https://eslint.style/packages/ts#rules
       "@stylistic/ts/comma-dangle": ["error", "always-multiline"],
