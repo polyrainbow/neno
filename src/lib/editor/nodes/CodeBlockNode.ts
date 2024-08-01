@@ -9,6 +9,7 @@
 import type {
   EditorConfig,
   LexicalNode,
+  NodeKey,
   SerializedParagraphNode,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
@@ -21,12 +22,12 @@ export class CodeBlockNode extends ParagraphNode {
     return ElementNodeType.CODE;
   }
 
-  constructor() {
-    super();
+  static clone(node: CodeBlockNode): CodeBlockNode {
+    return new CodeBlockNode(node.__key);
   }
 
-  static clone(): CodeBlockNode {
-    return new CodeBlockNode();
+  constructor(key?: NodeKey) {
+    super(key);
   }
 
   createDOM(config: EditorConfig): HTMLElement {

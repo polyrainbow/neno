@@ -9,6 +9,7 @@
 import type {
   EditorConfig,
   LexicalNode,
+  NodeKey,
   SerializedTextNode,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
@@ -20,7 +21,11 @@ export class WikiLinkContentNode extends TextNode {
   }
 
   static clone(node: WikiLinkContentNode): WikiLinkContentNode {
-    return new WikiLinkContentNode(node.__text, node.getLinkAvailability);
+    return new WikiLinkContentNode(
+      node.__text,
+      node.getLinkAvailability,
+      node.__key,
+    );
   }
 
   constructor(
@@ -28,8 +33,9 @@ export class WikiLinkContentNode extends TextNode {
     private readonly getLinkAvailability: (
       link: string,
     ) => Promise<boolean>,
+    key?: NodeKey,
   ) {
-    super(text);
+    super(text, key);
   }
 
   createDOM(config: EditorConfig): HTMLElement {

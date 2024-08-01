@@ -11,6 +11,7 @@
 import type {
   EditorConfig,
   LexicalNode,
+  NodeKey,
   SerializedTextNode,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
@@ -27,13 +28,13 @@ export class WikiLinkPunctuationNode extends TextNode {
   }
 
   static clone(node: WikiLinkPunctuationNode): WikiLinkPunctuationNode {
-    return new WikiLinkPunctuationNode(node.__isClosing);
+    return new WikiLinkPunctuationNode(node.__isClosing, node.__key);
   }
 
   __isClosing = false;
 
-  constructor(isClosing: boolean) {
-    super(isClosing ? "]]" : "[[");
+  constructor(isClosing: boolean, key?: NodeKey) {
+    super(isClosing ? "]]" : "[[", key);
     this.__isClosing = isClosing;
   }
 

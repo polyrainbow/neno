@@ -9,6 +9,7 @@
 import type {
   EditorConfig,
   LexicalNode,
+  NodeKey,
   SerializedTextNode,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
@@ -20,13 +21,11 @@ export class KeyValuePairKeyNode extends TextNode {
   }
 
   static clone(node: KeyValuePairKeyNode): KeyValuePairKeyNode {
-    return new KeyValuePairKeyNode(node.__text);
+    return new KeyValuePairKeyNode(node.__text, node.__key);
   }
 
-  constructor(
-    text: string,
-  ) {
-    super(text);
+  constructor(text: string, key?: NodeKey) {
+    super(text, key);
   }
 
   createDOM(config: EditorConfig): HTMLElement {

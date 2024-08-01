@@ -9,6 +9,7 @@
 import type {
   EditorConfig,
   LexicalNode,
+  NodeKey,
   SerializedParagraphNode,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
@@ -21,12 +22,12 @@ export class QuoteBlockNode extends ParagraphNode {
     return ElementNodeType.QUOTE;
   }
 
-  constructor() {
-    super();
+  static clone(node: QuoteBlockNode): QuoteBlockNode {
+    return new QuoteBlockNode(node.__key);
   }
 
-  static clone(): QuoteBlockNode {
-    return new QuoteBlockNode();
+  constructor(key?: NodeKey) {
+    super(key);
   }
 
   createDOM(config: EditorConfig): HTMLElement {
