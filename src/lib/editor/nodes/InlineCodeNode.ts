@@ -9,7 +9,6 @@ import type {
 import { addClassNamesToElement } from "@lexical/utils";
 import { $applyNodeReplacement, TextNode } from "lexical";
 
-/** @noInheritDoc */
 export class InlineCodeNode extends TextNode {
   static getType(): string {
     return "inline-code";

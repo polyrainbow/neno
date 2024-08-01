@@ -16,7 +16,6 @@ import { addClassNamesToElement } from "@lexical/utils";
 import { $applyNodeReplacement, ParagraphNode } from "lexical";
 import { ElementNodeType } from "../types/ElementNodeType";
 
-/** @noInheritDoc */
 export class QuoteBlockNode extends ParagraphNode {
   static getType(): string {
     return ElementNodeType.QUOTE;

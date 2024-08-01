@@ -17,7 +17,6 @@ import type {
 import { addClassNamesToElement } from "@lexical/utils";
 import { $applyNodeReplacement, TextNode } from "lexical";
 
-/** @noInheritDoc */
 export class BoldNode extends TextNode {
   static getType(): string {
     return "bold";
