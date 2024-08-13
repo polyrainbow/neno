@@ -53,4 +53,14 @@ test.describe("File view", () => {
     expect(textInEditor.startsWith("/files/test.txt"))
       .toBe(true);
   });
+
+  test("should rename file correctly", async ({ page }) => {
+    const textbox = page.getByRole("textbox");
+    await textbox.click();
+    await textbox.clear();
+    await page.keyboard.type("files/new-name");
+    await page.getByRole("button", { name: "Rename" }).click();
+    const newSlug = await page.locator("h1").innerText();
+    expect(newSlug).toBe("files/new-name.txt");
+  });
 });

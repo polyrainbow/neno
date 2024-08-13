@@ -298,7 +298,7 @@ const FileView = () => {
             const newSlug = slugRenameInput
               + (
                 typeof extension === "string"
-                  ? + "." + extension
+                  ? "." + extension
                   : ""
               );
             try {
