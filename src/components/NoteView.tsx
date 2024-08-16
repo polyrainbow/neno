@@ -30,6 +30,7 @@ import {
 } from "@lexical/react/LexicalComposerContext";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
+import useRunOnce from "../hooks/useRunOnce";
 
 
 const getValidNoteSlug = (
@@ -205,7 +206,7 @@ const NoteView = () => {
   }, []);
 
 
-  useEffect(() => {
+  useRunOnce(() => {
     refreshContentViews();
 
     if (getValidNoteSlug(slug) === null) {
@@ -214,7 +215,7 @@ const NoteView = () => {
       });
       setCanonicalNewNotePath();
     }
-  }, []);
+  });
 
 
   const loadNoteAndRefreshURL = async (
