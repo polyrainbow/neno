@@ -197,10 +197,7 @@ export default class DatabaseIO {
       await Promise.all(
         noteFilenames.map(
           async (filename: string): Promise<[Slug, string]> => {
-            const slug = filename.slice(
-              0,
-              -DatabaseIO.#NOTE_FILE_EXTENSION.length,
-            );
+            const slug = DatabaseIO.getSlugFromNoteFilename(filename);
             const serializedNote
               = await this.#storageProvider.readObjectAsString(
                 filename,
