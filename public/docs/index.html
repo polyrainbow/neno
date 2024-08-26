@@ -712,8 +712,11 @@ const table = Array.from(graph.notes.entries())
   .map(([slug, note]) => [...getEventsOfNote(slug, note)])
   .flat()
   .filter((event) => {
-      return event.year >= START_YEAR
-        && event.month >= START_MONTH;
+    return event.year > START_YEAR
+      || (
+        event.year === START_YEAR
+        && event.month >= START_MONTH
+      );
   })
   .toSorted((a,b) => {
     if (a.date > b.date) return 1;
