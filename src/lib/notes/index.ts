@@ -108,6 +108,9 @@ export default class NotesProvider {
   }
 
 
+  /*
+    Returns the unparsed note as saved in the file system.
+  */
   async getRawNote(
     slug: Slug,
   ): Promise<string> {
