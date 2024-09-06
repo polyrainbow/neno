@@ -446,6 +446,24 @@ test.describe("Editor view", () => {
 
 
   test(
+    "enable URLs with curly and square brackets in the editor",
+    async ({ page }) => {
+      await page.keyboard.type(
+        "https://example.org/changesets/123?filters={%22uids%22:[{%22label%22:%22%22,%22value%22:%22%22}],%22date__gte%22:[{%22label%22:%22%22,%22value%22:%22%22}]}",
+      );
+
+      const link = (
+        await page.$("div[data-lexical-editor] .editor-paragraph a")
+      ) as ElementHandle<HTMLElement>;
+
+      expect(await link.getAttribute("href")).toBe(
+        "https://example.org/changesets/123?filters={%22uids%22:[{%22label%22:%22%22,%22value%22:%22%22}],%22date__gte%22:[{%22label%22:%22%22,%22value%22:%22%22}]}",
+      );
+    },
+  );
+
+
+  test(
     "enable localhost URLs in the editor",
     async ({ page }) => {
       await page.keyboard.type("http://localhost:8080/page");
