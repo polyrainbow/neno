@@ -27,6 +27,7 @@ export default defineConfig({
         // default is ["**\/*.{js,css,html}"] but we'll remove css as
         // we'll only use CSS as public assets
         globPatterns: ["**/*.{js,html}"],
+        maximumFileSizeToCacheInBytes: 20000000,
       },
       // public resources to be added to the PWA manifest (with revisions)
       includeAssets: [
