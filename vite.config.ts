@@ -31,7 +31,7 @@ export default defineConfig({
       },
       // public resources to be added to the PWA manifest (with revisions)
       includeAssets: [
-        "**/*.{css,woff2,svg,subtext,json,jpg}",
+        "**/*.{css,woff2,svg,subtext,json,jpg,png}",
       ],
       manifest: {
         "name": "NENO",
