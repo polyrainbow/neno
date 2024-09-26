@@ -574,7 +574,7 @@ input:checked + .slider::before {
   }
 
   &.with-icon {
-    padding-left: 7px;
+    padding-left: 6px;
 
     img {
       margin-right: 3px;
