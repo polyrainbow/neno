@@ -740,6 +740,46 @@ const table = Array.from(graph.notes.entries())
 
 println(table);</pre>
 
+  <h4>List all invalid links</h4>
+
+  <p>
+    Prints a list of red links (non-existing slugs that are linked somewhere),
+    and how often and in which notes they are referenced.
+  </p>
+
+  <pre class="code-block">
+const redLinks = new Map();
+
+const allExistingSlugs = new Set([
+  ...graph.notes.keys(),
+  ...graph.aliases.keys(),
+  ...graph.metadata.files.map((f) => f.slug),
+]);
+
+for (const [slug, note] of graph.notes.entries()) {
+  const spans = getAllInlineSpans(graph.indexes.blocks.get(slug));
+  const linkTargets = getSlugsFromInlineText(spans);
+  for (const linkTarget of linkTargets) {
+    if (!allExistingSlugs.has(linkTarget)) {
+      if (redLinks.has(linkTarget)) {
+        redLinks.get(linkTarget).add(slug);
+      } else {
+        redLinks.set(linkTarget, new Set([slug]));
+      }
+    }
+  }
+}
+
+Array.from(redLinks.entries())
+  .toSorted((a, b) => b[1].size - a[1].size)
+  .forEach(([target, refs]) => {
+    println(
+      target.padEnd(20, " ")
+      + " | " + refs.size
+      + " | " + Array.from(refs)
+    );
+  });
+  </pre>
 
   <h2>Acknowledgements</h2>
   <p>
