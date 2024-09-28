@@ -820,4 +820,68 @@ code inside code
 
     expect(subwaytext(input)).toStrictEqual(expectedResult);
   });
+
+  it("slashlinks must not end with a slash", () => {
+    const input = "/slashlink/";
+
+    const expectedResult = [
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "/slashlink/",
+            },
+          ],
+        },
+      },
+    ];
+
+    expect(subwaytext(input)).toStrictEqual(expectedResult);
+  });
+
+  it("slashlink within text must not end with a slash", () => {
+    const input = "text /slashlink/ text";
+
+    const expectedResult = [
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "text /slashlink/ text",
+            },
+          ],
+        },
+      },
+    ];
+
+    expect(subwaytext(input)).toStrictEqual(expectedResult);
+  });
+
+  it(
+    // eslint-disable-next-line @stylistic/max-len
+    "slashlinks within text with several fake slashlinks must not end with a invalid slashlink end char",
+    () => {
+      const input = "A fake /slashlink/ and /another/ one";
+
+      const expectedResult = [
+        {
+          type: BlockType.PARAGRAPH,
+          data: {
+            text: [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "A fake /slashlink/ and /another/ one",
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(subwaytext(input)).toStrictEqual(expectedResult);
+    },
+  );
 });

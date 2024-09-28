@@ -55,6 +55,16 @@ export const parseText = (text: string): InlineText => {
       && char === "/"
       && currentSpanType !== SpanType.WIKILINK
       && /^[\p{L}\d_]$/u.test(iterator.peek(1).join(""))
+      && (
+        (
+          typeof iterator.charsUntil(" ") === "string"
+          && /^[\p{L}\d_]$/u.test(iterator.charsUntil(" ")!.slice(-1))
+        )
+        || (
+          iterator.charsUntil(" ") === null
+          && /^[\p{L}\d_]$/u.test(iterator.getRest().slice(-1))
+        )
+      )
     ) {
       if (currentSpanType) {
         spans.push({
