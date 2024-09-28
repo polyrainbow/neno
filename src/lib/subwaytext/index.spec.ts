@@ -800,4 +800,24 @@ code inside code
 
     expect(subwaytext(input)).toStrictEqual(expectedResult);
   });
+
+  it("should not accept two slashes as slashlink", () => {
+    const input = "//";
+
+    const expectedResult = [
+      {
+        type: BlockType.PARAGRAPH,
+        data: {
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "//",
+            },
+          ],
+        },
+      },
+    ];
+
+    expect(subwaytext(input)).toStrictEqual(expectedResult);
+  });
 });

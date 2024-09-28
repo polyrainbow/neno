@@ -13,7 +13,6 @@ export const parseText = (text: string): InlineText => {
   let currentSpanType: SpanType | null = null;
   let currentSpanText = "";
 
-
   while (true) {
     const step = iterator.next();
     if (step.done) {
@@ -55,7 +54,7 @@ export const parseText = (text: string): InlineText => {
       )
       && char === "/"
       && currentSpanType !== SpanType.WIKILINK
-      && !isWhiteSpace(iterator.peek(1).join(""))
+      && /^[\p{L}\d_]$/u.test(iterator.peek(1).join(""))
     ) {
       if (currentSpanType) {
         spans.push({
