@@ -18,6 +18,8 @@ import {
 } from "../notes";
 
 globalThis.getNoteTitle = getNoteTitle;
+globalThis.getAllInlineSpans = getAllInlineSpans;
+globalThis.getSlugsFromInlineText = getSlugsFromInlineText;
 
 /*
   Making Worker environment safer
@@ -67,6 +69,8 @@ const wl = new Set([
   "Worker",
   // notes provider utils
   "getNoteTitle",
+  "getSlugsFromInlineText",
+  "getAllInlineSpans",
 ]);
 
 Object.getOwnPropertyNames( globalThis ).forEach( function( prop ) {
