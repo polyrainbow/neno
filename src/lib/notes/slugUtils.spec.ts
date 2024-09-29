@@ -4,6 +4,8 @@ import {
   createSlug,
   getSlugFromFilename,
   getSlugsFromInlineText,
+  isValidNoteSlug,
+  isValidSlug,
   sluggifyNoteText,
   sluggifyWikilinkText,
 } from "./slugUtils.js";
@@ -157,4 +159,70 @@ describe("sluggifyNoteText", () => {
       },
     );
   });
+});
+
+
+describe("isValidSlug", () => {
+  it(
+    "should approve file slugs with dots",
+    () => {
+      expect(
+        isValidSlug("files/file.mp3"),
+      ).toBe(true);
+    },
+  );
+
+  it(
+    "should catch slugs with whitespace",
+    () => {
+      expect(
+        isValidSlug("invalid slug/file.mp3"),
+      ).toBe(false);
+      expect(
+        isValidSlug("invalid-slug/file 1.mp3"),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs with invalid end char",
+    () => {
+      expect(
+        isValidSlug("slug/"),
+      ).toBe(false);
+    },
+  );
+});
+
+
+describe("isValidNoteSlug", () => {
+  it(
+    "should catch file slugs with dots",
+    () => {
+      expect(
+        isValidNoteSlug("files/file.mp3"),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs with whitespace",
+    () => {
+      expect(
+        isValidNoteSlug("invalid slug/file.mp3"),
+      ).toBe(false);
+      expect(
+        isValidNoteSlug("invalid-slug/file 1.mp3"),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs with invalid end char",
+    () => {
+      expect(
+        isValidNoteSlug("slug/"),
+      ).toBe(false);
+    },
+  );
 });

@@ -112,7 +112,7 @@ const isValidSlug = (slug: Slug): boolean => {
   return (
     slug.length > 0
     && slug.length <= 200
-    && slug.match(/^[\p{L}\d_][\p{L}\d\-/._]*$/u) !== null
+    && slug.match(/^[\p{L}\d\-._]+(\/[\p{L}\d\-._]+)*$/u) !== null
   );
 };
 
@@ -121,7 +121,7 @@ const isValidNoteSlug = (slug: Slug): boolean => {
   return (
     slug.length > 0
     && slug.length <= 200
-    && slug.match(/^[\p{L}\d_][\p{L}\d\-/_]*$/u) !== null
+    && slug.match(/^[\p{L}\d\-_]+(\/[\p{L}\d\-_]+)*$/u) !== null
   );
 };
 
