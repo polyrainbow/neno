@@ -884,4 +884,35 @@ code inside code
       expect(subwaytext(input)).toStrictEqual(expectedResult);
     },
   );
+
+  it(
+    "slashlinks within text should be recognized",
+    () => {
+      const input = "A nice /link with two words before";
+
+      const expectedResult = [
+        {
+          type: BlockType.PARAGRAPH,
+          data: {
+            text: [
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: "A nice ",
+              },
+              {
+                type: SpanType.SLASHLINK,
+                text: "/link",
+              },
+              {
+                type: SpanType.NORMAL_TEXT,
+                text: " with two words before",
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(subwaytext(input)).toStrictEqual(expectedResult);
+    },
+  );
 });
