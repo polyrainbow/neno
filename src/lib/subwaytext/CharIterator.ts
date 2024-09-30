@@ -52,7 +52,7 @@ export default class CharIterator {
     }
 
     const charsUntilDelimiter = stringToAnalyse
-      .slice(this.#index, delimiterIndex);
+      .slice(0, delimiterIndex);
     return charsUntilDelimiter;
   }
 }
