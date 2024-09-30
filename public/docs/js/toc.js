@@ -8,77 +8,56 @@ const getId = (text) => {
 
 
 const createToc = () => {
-  const h2s = document.querySelectorAll("h2");
-  const h3s = document.querySelectorAll("h3");
-  const h4s = document.querySelectorAll("h4");
+  const anchors = document.querySelectorAll("h2,h3,h4");
   const toc = [];
-  let h2index = 1;
 
-  for (const h2 of h2s) {
-    const nextH2 = h2s[h2index];
-    const text = h2.textContent;
+  let h2Index = 0;
+  let h3Index;
+  let h4Index;
 
-    const h2Children = Array.from(h3s)
-      .filter(h3 => {
-        return (
-          h3.compareDocumentPosition(h2) === Node.DOCUMENT_POSITION_PRECEDING
-          && (
-            !nextH2
-            || (
-              h3.compareDocumentPosition(nextH2)
-                === Node.DOCUMENT_POSITION_FOLLOWING
-            )
-          )
-        );
-      })
-      .map((h3, h3Index, h3Array) => {
-        const nextH3 = h3Array[h3Index + 1];
+  for (const anchor of anchors) {
+    const text = anchor.textContent;
 
-        const h3Children = Array.from(h4s)
-          .filter(h4 => {
-            return (
-              h4.compareDocumentPosition(h3)
-                === Node.DOCUMENT_POSITION_PRECEDING
-              && (
-                !nextH3
-                || (
-                  h4.compareDocumentPosition(nextH3)
-                    === Node.DOCUMENT_POSITION_FOLLOWING
-                )
-              )
-              && (
-                !nextH2
-                || h4.compareDocumentPosition(nextH2)
-                  === Node.DOCUMENT_POSITION_FOLLOWING
-              )
-            );
-          })
-          .map((h4, h4Index) => {
-            return {
-              text: h4.textContent,
-              number: `${h2index}.${h3Index}.${h4Index + 1}`,
-              element: h4,
-              id: getId(h4.textContent),
-            };
-          });
+    if (anchor.nodeName === "H2") {
+      h2Index++;
+      h3Index = 0;
+      h4Index = 0;
 
-        return {
-          text: h3.textContent,
-          number: `${h2index}.${h3Index + 1}`,
-          element: h3,
-          id: getId(h3.textContent),
-          children: h3Children,
-        };
-      });
+      const entry = {
+        text,
+        children: [],
+        number: h2Index.toString(),
+        element: anchor,
+        id: getId(text),
+      };
 
-    toc.push({
-      text,
-      children: h2Children,
-      number: h2index.toString(),
-      element: h2,
-      id: getId(h2.textContent),
-    });
-    h2index++;
+      toc.push(entry);
+    } else if (anchor.nodeName === "H3") {
+      h3Index++;
+      h4Index = 0;
+
+      const entry = {
+        text,
+        number: `${h2Index}.${h3Index}`,
+        element: anchor,
+        id: getId(text),
+        children: [],
+      };
+
+      toc[toc.length - 1].children.push(entry);
+    } else if (anchor.nodeName === "H4") {
+      h4Index++;
+
+      const entry = {
+        text,
+        number: `${h2Index}.${h3Index}.${h4Index}`,
+        element: anchor,
+        id: getId(text),
+      };
+
+      const h3List = toc[toc.length - 1].children;
+      h3List[h3List.length - 1].children.push(entry);
+    }
   }
 
   return toc;
