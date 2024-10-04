@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Subtext Graph Specification</title>
   <link rel="stylesheet" href="css/reboot.css">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" type="image/svg" href="../assets/app-icon/logo.svg">
 </head>
 <body>
   <main>
@@ -469,7 +467,9 @@ foo/
   <p>
     This
     <code><a href="#subtext-graph-file">Subtext graph file</a></code>
-    MUST have a header with the key
+    MUST have a
+    <code><a href="#header">header</a></code>
+    with the key
     <code>alias-of</code>,
     and the value of the target slug.
   </p>
@@ -483,18 +483,44 @@ foo/
     <code><a href="#content-section">content section</a></code>.
   </p>
 
-  <h2>Arbitrary graph files</h2>
+  <h2>Arbitrary graph file</h2>
 
   <p>
-    Implementations MUST store arbitrary graph files inside the
-    <code><a href="#graph-directory">graph directory</a></code> or its
+    An
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
+    is a file with a different filename extension
+    than the one of a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
+    An arbitrary graph file is part of the
+    <code><a href="#subtext-graph">Subtext graph</a></code>.
+  </p>
+
+  <p>
+    Implementations MUST store an
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
+    inside the
+    <code><a href="#graph-directory">graph directory</a></code> or one of its
     subdirectories.
-    The file's name MUST be the same as the slug. A
+  </p>
+
+  <p>
+    A
     <code><a href="#subtext-graph-file">Subtext graph file</a></code> MUST be
-    created to accompany and point towards the arbitrary graph file. The
-    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
-    MUST have the same
-    name as the file, with the addition of the <code>.subtext</code> extension.
+    created to accompany and point towards the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>. This
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code> MUST be
+    stored in the same directory as the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>.
+  </p>
+
+  <p>
+    The
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
+    name MAY be the same as the
+    <code><a href="#slug">slug</a></code>
+    of its
+    accompanying
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
   </p>
 
   <div class="note">
@@ -510,25 +536,36 @@ foo/
     <p class="disclaimer">This section is non-normative.</p>
     <p class="note-text">
       <span class="label">Note:</span>
-      Example filenames for graph files that point to arbitrary files are:
+      Example filenames for Subtext graph files that point to arbitrary
+      graph files are:
       <code>song.mp3.subtext</code> pointing towards <code>song.mp3</code>,
-      <code>movie.mp4.subtext</code> pointing towards <code>movie.mp4</code>
+      <code>good-movie.subtext</code> pointing towards
+      <code>movie-1234.mp4</code>
     </p>
   </div>
 
   <p>
     To identify a
     <code><a href="#subtext-graph-file">Subtext graph file</a></code>
-    as a pointer towards an arbitrary file, the
+    as a file that accompanies an
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>,
+    the
     <code><a href="#subtext-graph-file">Subtext graph file</a></code>
-    MUST have a header with the key <code>file</code> and
-    the file's
-    name
-    as value. The
-    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
-    SHOULD
-    have no
-    content section.
+    MUST have a
+    <code><a href="#header">header</a></code>
+    with the key <code>file</code> and
+    the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
+    name as value.
+  </p>
+
+  <p>
+    A <code><a href="#subtext-graph-file">Subtext graph file</a></code> with a
+    <code><a href="#header">header</a></code>
+    with the key <code>file</code>
+    MUST NOT
+    have a
+    <code><a href="#content-section">content section</a></code>.
   </p>
 
   <div class="note">
@@ -543,7 +580,10 @@ foo/
 
   <p>
     A <code><a href="#subtext-graph-file">Subtext graph file</a></code>
-    that has a header with the key <code>file</code> MUST also have a header
+    that has a
+    <code><a href="#header">header</a></code>
+    with the key <code>file</code> MUST also have a
+    <code><a href="#header">header</a></code>
     with the key <code>size</code> and as value the size of the
     <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
     in bytes.
@@ -551,9 +591,15 @@ foo/
 
   <p>
     If a <code><a href="#subtext-graph-file">Subtext graph file</a></code>
-    has a <code>file</code> header but no <code>size</code> header,
+    has a <code>file</code>
+    <code><a href="#header">header</a></code>
+    but no <code>size</code>
+    <code><a href="#header">header</a></code>,
     an implementation MUST ignore this
-    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    and the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
+    it points towards.
   </p>
 
   <h3>Deriving a slug for an arbitrary graph file</h3>

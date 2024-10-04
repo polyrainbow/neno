@@ -30,6 +30,7 @@ import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import { isValidFileSlug, isValidSlug } from "./slugUtils.js";
 import { FileInfo } from "./types/FileInfo.js";
 import { CanonicalNoteHeader } from "./types/CanonicalNoteHeader.js";
+import migrateToSpecV01 from "./migration/migrateToSpecV01.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -155,9 +156,7 @@ export default class DatabaseIO {
 
 
   private async readAndParseGraphFromDisk(): Promise<Graph> {
-    /*
-      METADATA
-    */
+    await migrateToSpecV01(this.#storageProvider);
 
     let pinsSerialized: string | undefined;
     try {
