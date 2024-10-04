@@ -11,7 +11,6 @@ import { Block } from "../subwaytext/types/Block.js";
 // @ts-ignore
 Object.assign(global, { TextDecoder, TextEncoder });
 import { describe, it, expect, vi } from "vitest";
-import { getCompareKeyForTimestamp } from "./utils.js";
 import { ErrorMessage } from "./types/ErrorMessage.js";
 
 vi.stubGlobal("navigator", {
@@ -944,17 +943,15 @@ describe("Notes module", () => {
   );
 
   it(
-    "should create graph metadata file if missing",
+    "should create pins file if missing",
     async () => {
       const storageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(storageProvider);
 
       await notesProvider.getNotesList({});
 
-      const graphFile = await storageProvider.readObjectAsString(".graph.json");
-      const graph = JSON.parse(graphFile);
-
-      expect(graph.version).toBe("5");
+      const pins = await storageProvider.readObjectAsString(".pins.neno");
+      expect(pins).toBe("");
     },
   );
 
@@ -1059,94 +1056,6 @@ describe("Notes module", () => {
       const note3 = await notesProvider2.put(noteSaveRequest3);
 
       expect(note3.backlinks.length).toBe(2);
-    },
-  );
-
-  it(
-    "should not update the timestamp in graph metadata on a note update",
-    async () => {
-      function sleep(ms: number) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-      }
-
-      const storageProvider = new MockStorageProvider();
-      const notesProvider = new NotesProvider(storageProvider);
-
-      await notesProvider.getNotesList({});
-
-      const graphFileCheck1
-        = await storageProvider.readObjectAsString(".graph.json");
-      const graphCheck1 = JSON.parse(graphFileCheck1);
-      const graphMetadataUpdateTimeCheck1 = graphCheck1.updatedAt;
-
-      await sleep(100);
-
-      const noteSaveRequest: NoteSaveRequest = {
-        note: {
-          content: "Note 1",
-          meta: {
-            additionalHeaders: {},
-            flags: [],
-          },
-        },
-        changeSlugTo: "n1",
-        aliases: new Set(),
-      };
-
-      await notesProvider.put(noteSaveRequest);
-
-      const graphFileCheck2
-        = await storageProvider.readObjectAsString(".graph.json");
-      const graphCheck2 = JSON.parse(graphFileCheck2);
-      const graphMetadataUpdateTimeCheck2 = graphCheck2.updatedAt;
-
-      expect(graphMetadataUpdateTimeCheck2).toBe(graphMetadataUpdateTimeCheck1);
-    },
-  );
-
-
-  it(
-    "should update the timestamp in graph metadata on pin update",
-    async () => {
-      function sleep(ms: number) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-      }
-
-      const storageProvider = new MockStorageProvider();
-      const notesProvider = new NotesProvider(storageProvider);
-
-      await notesProvider.getNotesList({});
-
-      const graphFileCheck1
-        = await storageProvider.readObjectAsString(".graph.json");
-      const graphCheck1 = JSON.parse(graphFileCheck1);
-      const graphMetadataUpdateTimeCheck1 = graphCheck1.updatedAt;
-
-      const noteSaveRequest: NoteSaveRequest = {
-        note: {
-          content: "Note 1",
-          meta: {
-            additionalHeaders: {},
-            flags: [],
-          },
-        },
-        changeSlugTo: "n1",
-        aliases: new Set(),
-      };
-
-      await notesProvider.put(noteSaveRequest);
-      await sleep(2000);
-      await notesProvider.pin("n1");
-
-      const graphFileCheck2
-        = await storageProvider.readObjectAsString(".graph.json");
-      const graphCheck2 = JSON.parse(graphFileCheck2);
-      const graphMetadataUpdateTimeCheck2 = graphCheck2.updatedAt;
-
-      expect(getCompareKeyForTimestamp(graphMetadataUpdateTimeCheck2))
-        .toBeGreaterThan(
-          getCompareKeyForTimestamp(graphMetadataUpdateTimeCheck1),
-        );
     },
   );
 
@@ -1983,16 +1892,8 @@ describe("Notes module", () => {
       );
 
       await mockStorageProvider.writeObject(
-        ".graph.json",
-        `{
-          "files": [
-            {
-              "slug": "files/a.txt",
-              "size": 5,
-              "createdAt": 1234
-            }
-          ]
-        }`,
+        "files/a.txt.subtext",
+        ":file:files/a.txt\n:size:5",
       );
 
       const notesProvider = new NotesProvider(mockStorageProvider);
@@ -2384,6 +2285,115 @@ describe("Notes module", () => {
       const notes = await notesProvider.getNotesList({});
       expect(notes.numberOfResults).toBe(1);
       expect(notes.results[0].slug).toBe("valid-slug/note-2");
+    },
+  );
+
+  it(
+    // eslint-disable-next-line @stylistic/max-len
+    "adding an arbitrary file should result in correct metadata being added to subtext graph file",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      await notesProvider.addFile(
+        readable,
+        "files",
+        "test.txt",
+      );
+
+      const subtextGraphFile = await mockStorageProvider.readObjectAsString(
+        "files/test.txt.subtext",
+      );
+
+      const headers = subtextGraphFile.split("\n");
+
+      const sgfContainsCorrectFileHeader = headers.includes(
+        ":file:files/test.txt",
+      );
+
+      expect(sgfContainsCorrectFileHeader).toBe(true);
+
+      const sgfContainsCorrectSizeHeader = headers.includes(
+        ":size:6",
+      );
+
+      expect(sgfContainsCorrectSizeHeader).toBe(true);
+
+      const sgfContainsCreatedAtHeader = headers.some(
+        h => h.startsWith(":created-at:"),
+      );
+
+      expect(sgfContainsCreatedAtHeader).toBe(true);
+
+      const sgfContainsUpdatedAtHeader = headers.some(
+        h => h.startsWith(":updated-at:"),
+      );
+
+      expect(sgfContainsUpdatedAtHeader).toBe(true);
+    },
+  );
+
+
+  it(
+    "renaming an arbitrary file should change updated-at timestamp",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      await notesProvider.addFile(
+        readable,
+        "files",
+        "test.txt",
+      );
+
+      const subtextGraphFileOld = await mockStorageProvider.readObjectAsString(
+        "files/test.txt.subtext",
+      );
+
+      const updatedAtHeaderOld = subtextGraphFileOld.split("\n").find(
+        h => h.startsWith(":updated-at:"),
+      );
+
+      // wait 2 secs because timestamp precision is in seconds
+      await new Promise(res => setTimeout(res, 2000));
+
+      await notesProvider.renameFile(
+        "files/test.txt",
+        "files/test-updated.txt",
+        false,
+      );
+
+      const subtextGraphFileNew = await mockStorageProvider.readObjectAsString(
+        "files/test-updated.txt.subtext",
+      );
+
+      const updatedAtHeaderNew = subtextGraphFileNew.split("\n").find(
+        h => h.startsWith(":updated-at:"),
+      );
+
+      expect(updatedAtHeaderOld !== updatedAtHeaderNew).toBe(true);
     },
   );
 });

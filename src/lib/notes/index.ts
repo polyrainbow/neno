@@ -36,7 +36,6 @@ import NoteListPage from "./types/NoteListPage.js";
 import ByteRange from "./types/ByteRange.js";
 import { Slug } from "./types/Slug.js";
 import { Block } from "../subwaytext/types/Block.js";
-import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
 import {
   getCurrentISODateTime,
   getExtensionFromFilename,
@@ -138,8 +137,8 @@ export default class NotesProvider {
     const stats: GraphStats = {
       numberOfAllNotes: graph.notes.size,
       numberOfLinks: getGraphLinks(graph).length,
-      numberOfFiles: graph.metadata.files.length,
-      numberOfPins: graph.metadata.pinnedNotes.length,
+      numberOfFiles: graph.files.size,
+      numberOfPins: graph.pinnedNotes.length,
       numberOfAliases: graph.aliases.size,
       numberOfUnlinkedNotes,
     };
@@ -151,11 +150,10 @@ export default class NotesProvider {
         size: {
           total: await this.#io.getTotalStorageSize(),
           notes: await this.#io.getSizeOfNotes(),
-          files: graph.metadata.files.reduce((a, b) => {
+          files: Array.from(graph.files.values()).reduce((a, b) => {
             return a + b.size;
           }, 0),
         },
-        version: graph.metadata.version,
       };
     }
 
@@ -220,11 +218,11 @@ export default class NotesProvider {
       }
     }
 
-    let flushMetadata = WriteGraphMetadataAction.NONE;
-    graph.metadata.pinnedNotes
-      = graph.metadata.pinnedNotes.filter((s) => {
+    let flushPins = false;
+    graph.pinnedNotes
+      = graph.pinnedNotes.filter((s) => {
         if (s === slug) {
-          flushMetadata = WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE;
+          flushPins = true;
         }
         return s !== slug;
       });
@@ -233,9 +231,10 @@ export default class NotesProvider {
 
     await this.#io.flushChanges(
       graph,
-      flushMetadata,
+      flushPins,
       new Set([slug]),
       aliasesToRemove,
+      new Set(),
     );
   }
 
@@ -246,20 +245,26 @@ export default class NotesProvider {
     filename: string,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
-    const slug = getSlugFromFilename(folder, filename, graph.metadata.files);
+    const slug = getSlugFromFilename(
+      folder,
+      filename,
+      Array.from(graph.files.keys()),
+    );
     const size = await this.#io.addFile(slug, readable);
 
     const fileInfo: FileInfo = {
       slug,
       size,
       createdAt: getCurrentISODateTime(),
+      updatedAt: getCurrentISODateTime(),
     };
-    graph.metadata.files.push(fileInfo);
+    graph.files.set(slug, fileInfo);
     await this.#io.flushChanges(
       graph,
-      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      false,
       new Set(),
       new Set(),
+      new Set([slug]),
     );
 
     return fileInfo;
@@ -271,9 +276,7 @@ export default class NotesProvider {
     slug: Slug,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
-    const fileInfo = graph.metadata.files.find((file: FileInfo) => {
-      return file.slug === slug;
-    });
+    const fileInfo = graph.files.get(slug);
 
     if (!fileInfo) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
@@ -284,9 +287,10 @@ export default class NotesProvider {
 
     await this.#io.flushChanges(
       graph,
-      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      false,
       new Set(),
       new Set(),
+      new Set([slug]),
     );
 
     return fileInfo;
@@ -299,9 +303,7 @@ export default class NotesProvider {
     updateReferences: boolean,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
-    const fileInfo = graph.metadata.files.find((file: FileInfo) => {
-      return file.slug === oldSlug;
-    });
+    const fileInfo = graph.files.get(oldSlug);
 
     if (!fileInfo) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
@@ -314,7 +316,7 @@ export default class NotesProvider {
     if (
       graph.notes.has(newSlug)
       || graph.aliases.has(newSlug)
-      || graph.metadata.files.find((f) => f.slug === newSlug)
+      || graph.files.has(newSlug)
     ) {
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }
@@ -325,6 +327,10 @@ export default class NotesProvider {
     );
 
     fileInfo.slug = newSlug;
+    fileInfo.updatedAt = getCurrentISODateTime();
+
+    graph.files.delete(oldSlug);
+    graph.files.set(newSlug, fileInfo);
 
     const notesThatNeedUpdate = new Set<Slug>;
 
@@ -360,9 +366,10 @@ export default class NotesProvider {
 
     await this.#io.flushChanges(
       graph,
-      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      false,
       notesThatNeedUpdate,
       new Set(),
+      new Set([oldSlug, newSlug]),
     );
 
     return fileInfo;
@@ -373,36 +380,35 @@ export default class NotesProvider {
     slug: Slug,
   ): Promise<void> {
     await this.#io.deleteFile(slug);
-
     const graph = await this.#io.getGraph();
-    graph.metadata.files
-      = graph.metadata.files.filter((file) => file.slug !== slug);
+    graph.files.delete(slug);
     await this.#io.flushChanges(
       graph,
-      WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE,
+      false,
       new Set(),
       new Set(),
+      new Set([slug]),
     );
   }
 
 
   async getFiles(): Promise<FileInfo[]> {
     const graph = await this.#io.getGraph();
-    return graph.metadata.files;
+    return Array.from(graph.files.values());
   }
 
   // get files not used in any note
-  async getDanglingFiles(): Promise<FileInfo[]> {
+  async getSlugsOfDanglingFiles(): Promise<Slug[]> {
     const graph = await this.#io.getGraph();
     const allBlocks: Block[]
       = Array.from(graph.indexes.blocks.values()).flat();
     const allInlineSpans = getAllInlineSpans(allBlocks);
     const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
     const allUsedFileSlugs = allUsedSlugs.filter(isValidFileSlug);
-    const danglingFiles = graph.metadata.files.filter((file) => {
-      return !allUsedFileSlugs.includes(file.slug);
-    });
-    return danglingFiles;
+    return Array.from(graph.files.keys())
+      .filter((slug) => {
+        return !allUsedFileSlugs.includes(slug);
+      });
   }
 
 
@@ -411,7 +417,7 @@ export default class NotesProvider {
     range?: ByteRange,
   ): Promise<ReadableStream> {
     const graph = await this.#io.getGraph();
-    if (!graph.metadata.files.map((file) => file.slug).includes(slug)) {
+    if (!graph.files.has(slug)) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
     const stream = await this.#io.getReadableStream(slug, range);
@@ -423,9 +429,7 @@ export default class NotesProvider {
     slug: Slug,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
-    const fileInfo = graph.metadata.files.find(
-      (file) => file.slug === slug,
-    );
+    const fileInfo = graph.files.get(slug);
     if (!fileInfo) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
@@ -440,7 +444,7 @@ export default class NotesProvider {
     // more liberal with the pinned notes. If a slug is pinned but not in the
     // graph, we should just silently ignore it.
     const pinnedNotes: NoteToTransmit[] = (await Promise.allSettled(
-      graph.metadata.pinnedNotes
+      graph.pinnedNotes
         .map((slug) => {
           return this.get(slug);
         }),
@@ -463,18 +467,22 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.NOTE_NOT_FOUND);
     }
 
-    const oldLength = graph.metadata.pinnedNotes.length;
+    const oldLength = graph.pinnedNotes.length;
 
-    graph.metadata.pinnedNotes = Array.from(
-      new Set([...graph.metadata.pinnedNotes, slug]),
+    graph.pinnedNotes = Array.from(
+      new Set([...graph.pinnedNotes, slug]),
     );
 
-    const newLength = graph.metadata.pinnedNotes.length;
+    const newLength = graph.pinnedNotes.length;
 
-    const updateMetadata = oldLength !== newLength
-      ? WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
-      : WriteGraphMetadataAction.NONE;
-    await this.#io.flushChanges(graph, updateMetadata, new Set(), new Set());
+    const updatePins = oldLength !== newLength;
+    await this.#io.flushChanges(
+      graph,
+      updatePins,
+      new Set(),
+      new Set(),
+      new Set(),
+    );
 
     return this.getPins();
   }
@@ -486,7 +494,7 @@ export default class NotesProvider {
   ): Promise<NoteToTransmit[]> {
     const graph = await this.#io.getGraph();
 
-    const oldPins = graph.metadata.pinnedNotes;
+    const oldPins = graph.pinnedNotes;
 
     if (!oldPins.includes(slug)) {
       throw new Error(ErrorMessage.PINNED_NOTE_NOT_FOUND);
@@ -499,12 +507,16 @@ export default class NotesProvider {
       .toSpliced(oldIndex, 1)
       .toSpliced(newIndex, 0, slug);
 
-    graph.metadata.pinnedNotes = newPins;
+    graph.pinnedNotes = newPins;
 
-    const updateMetadata = offset !== 0
-      ? WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
-      : WriteGraphMetadataAction.NONE;
-    await this.#io.flushChanges(graph, updateMetadata, new Set(), new Set());
+    const updatePins = offset !== 0;
+    await this.#io.flushChanges(
+      graph,
+      updatePins,
+      new Set(),
+      new Set(),
+      new Set(),
+    );
 
     return this.getPins();
   }
@@ -514,17 +526,23 @@ export default class NotesProvider {
   ): Promise<NoteToTransmit[]> {
     const graph = await this.#io.getGraph();
 
-    let updateMetadata = WriteGraphMetadataAction.NONE;
+    let updatePins = false;
 
-    graph.metadata.pinnedNotes
-      = graph.metadata.pinnedNotes.filter((s) => {
+    graph.pinnedNotes
+      = graph.pinnedNotes.filter((s) => {
         if (s === slugToRemove) {
-          updateMetadata = WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE;
+          updatePins = true;
         }
         return s !== slugToRemove;
       });
 
-    await this.#io.flushChanges(graph, updateMetadata, new Set(), new Set());
+    await this.#io.flushChanges(
+      graph,
+      updatePins,
+      new Set(),
+      new Set(),
+      new Set(),
+    );
 
     return this.getPins();
   }

@@ -197,8 +197,8 @@ const FileView = () => {
       }
       <p>{
         fileInfo ? humanFileSize(fileInfo.size) : ""
-      }{SPAN_SEPARATOR}{
-        fileInfo
+      }{fileInfo?.createdAt ? SPAN_SEPARATOR : ""}{
+        fileInfo?.createdAt
           ? l("stats.metadata.created-at")
             + ": "
             + ISOTimestampToLocaleString(fileInfo.createdAt)

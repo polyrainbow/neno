@@ -34,10 +34,10 @@ const FilesView = () => {
   const [page, setPage] = useState(1);
 
   const updateDanglingFiles = async () => {
-    const danglingFiles: FileInfo[]
-      = await notesProvider.getDanglingFiles();
+    const slugsOfDanglingFiles: Slug[]
+      = await notesProvider.getSlugsOfDanglingFiles();
 
-    setDanglingFileSlugs(danglingFiles.map((file) => file.slug));
+    setDanglingFileSlugs(slugsOfDanglingFiles);
   };
 
   const filteredFiles = files

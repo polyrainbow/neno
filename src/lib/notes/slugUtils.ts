@@ -4,7 +4,6 @@ import {
 } from "../subwaytext/types/Block.js";
 import { Slug } from "./types/Slug.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
-import { FileInfo } from "./types/FileInfo.js";
 import {
   getExtensionFromFilename,
   removeExtensionFromFilename,
@@ -184,9 +183,8 @@ const createSlug = (
 const getSlugFromFilename = (
   folder: string,
   filename: string,
-  existingFiles: FileInfo[],
+  existingFileSlugs: Slug[],
 ): Slug => {
-  const existingFileSlugs = existingFiles.map((file) => file.slug);
   const extension = getExtensionFromFilename(filename);
   const filenameWithoutExtension = removeExtensionFromFilename(filename);
   const sluggifiedFileStem = sluggifyFilename(filenameWithoutExtension);
