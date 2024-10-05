@@ -75,6 +75,13 @@ export default class DatabaseIO {
       : filename;
   }
 
+  static parsePinsFile(pinsSerialized: string): Slug[] {
+    if (pinsSerialized.length === 0) {
+      return [];
+    }
+    return pinsSerialized.split("\n") as Slug[];
+  }
+
   private async getGraphFilenamesFromStorageProvider(): Promise<string[]> {
     const objectNames = await this.#storageProvider.getAllObjectNames();
 
@@ -133,7 +140,7 @@ export default class DatabaseIO {
     let pinnedNotes: Slug[];
 
     if (typeof pinsSerialized === "string") {
-      pinnedNotes = pinsSerialized.split("\n") as Slug[];
+      pinnedNotes = DatabaseIO.parsePinsFile(pinsSerialized);
     } else {
       pinnedNotes = [];
       await this.writePinsFile(pinnedNotes);
@@ -507,10 +514,7 @@ export default class DatabaseIO {
     }
 
     if (flushPins) {
-      await this.#storageProvider.writeObject(
-        DatabaseIO.#PINS_FILENAME,
-        graph.pinnedNotes.join("\n"),
-      );
+      await this.writePinsFile(graph.pinnedNotes);
     }
   }
 
