@@ -7,7 +7,6 @@ import {
   ISOTimestampToLocaleString,
   createContentFromSlugs,
   getAppPath,
-  getUrl,
   humanFileSize,
 } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
@@ -28,7 +27,10 @@ import {
 import {
   isValidSlug,
 } from "../lib/notes/slugUtils";
-import { saveFile } from "../lib/LocalDataStorage";
+import {
+  getObjectUrlForArbitraryGraphFile,
+  saveFile,
+} from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
 import FileViewPreview from "./FileViewPreview";
 import HeaderButton from "./HeaderButton";
@@ -36,7 +38,7 @@ import HeaderButton from "./HeaderButton";
 const FileView = () => {
   const notesProvider = useNotesProvider();
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
-  const [src, setSrc] = useState<string>("");
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
   // status can be READY, BUSY
   const [notes, setNotes] = useState<NoteListItem[] | null>(null);
   const [text, setText] = useState<string>("");
@@ -48,29 +50,22 @@ const FileView = () => {
 
   const navigate = useNavigate();
 
-  const type = slug
-    ? getMediaTypeFromFilename(slug)
+  const type = fileInfo
+    ? getMediaTypeFromFilename(fileInfo.filename)
     : null;
 
   const confirm = useConfirm();
 
   const canShowTextPreview = type === MediaType.TEXT;
   const isNenoScript = slug?.endsWith(NENO_SCRIPT_FILE_SUFFIX) ?? false;
-
   useEffect(() => {
     if (typeof slug !== "string") return;
 
     const getFileInfo = async () => {
       const fileInfo = await notesProvider.getFileInfo(slug);
       setFileInfo(fileInfo);
-      const src = await getUrl(fileInfo);
-      setSrc(src);
-
-      if (canShowTextPreview) {
-        fetch(src)
-          .then((response) => response.text())
-          .then((text) => setText(text));
-      }
+      const objectUrl = await getObjectUrlForArbitraryGraphFile(fileInfo);
+      setObjectUrl(objectUrl);
     };
 
     const getNotes = async () => {
@@ -83,6 +78,15 @@ const FileView = () => {
     getFileInfo();
     getNotes();
   }, [notesProvider, slug]);
+
+
+  useEffect(() => {
+    if (canShowTextPreview && typeof objectUrl === "string") {
+      fetch(objectUrl)
+        .then((response) => response.text())
+        .then((text) => setText(text));
+    }
+  }, [objectUrl, canShowTextPreview]);
 
   const canShowPreview = type !== MediaType.OTHER;
 
@@ -179,10 +183,10 @@ const FileView = () => {
     <section className="content-section-wide file-section">
       <h1>{fileInfo ? fileInfo.slug : ""}</h1>
       {
-        canShowPreview && type
+        canShowPreview && type && objectUrl
           ? <FileViewPreview
             type={type}
-            src={src}
+            src={objectUrl}
             text={text}
           />
           : ""
@@ -282,29 +286,26 @@ const FileView = () => {
               || !isValidSlug(slugRenameInput)
             ) return;
             const newSlug = slugRenameInput;
-            try {
-              const newFileInfo = await notesProvider.renameFileSlug(
-                slug,
-                newSlug,
-                updateReferences,
-              );
-              const src = await getUrl(newFileInfo);
-              setFileInfo(newFileInfo);
-              setSrc(src);
+            const newFileInfo = await notesProvider.renameFileSlug(
+              slug,
+              newSlug,
+              updateReferences,
+            );
+            const objectUrl = await getObjectUrlForArbitraryGraphFile(
+              newFileInfo,
+            );
+            setFileInfo(newFileInfo);
+            setObjectUrl(objectUrl);
 
-              navigate(getAppPath(
-                PathTemplate.FILE,
-                new Map([
-                  ["GRAPH_ID", LOCAL_GRAPH_ID],
-                  ["FILE_SLUG", newSlug],
-                ]),
-              ), {
-                replace: true,
-              });
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error(e);
-            }
+            navigate(getAppPath(
+              PathTemplate.FILE,
+              new Map([
+                ["GRAPH_ID", LOCAL_GRAPH_ID],
+                ["FILE_SLUG", newSlug],
+              ]),
+            ), {
+              replace: true,
+            });
           }}
         >
           {l("files.rename")}

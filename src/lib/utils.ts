@@ -1,9 +1,7 @@
 import { PathTemplate } from "../types/PathTemplate";
 import { UnsavedActiveNote } from "../types/ActiveNote";
 import * as Config from "../config";
-import { FileInfo } from "./notes/types/FileInfo";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
-import { getUrlForSlug } from "./LocalDataStorage";
 import { Slug } from "./notes/types/Slug";
 import { sluggifyWikilinkText } from "./notes/slugUtils";
 
@@ -166,15 +164,6 @@ const readFileAsString = async (file: File): Promise<string> => {
 };
 
 
-const getUrl = async (
-  file: FileInfo,
-) => {
-  const slug = file.slug;
-  const url = await getUrlForSlug(slug);
-  return url;
-};
-
-
 // @ts-ignore
 const getWritableStream = async (opts: SaveFilePickerOptions) => {
   // @ts-ignore
@@ -249,5 +238,4 @@ export {
   createContentFromSlugs,
   getLines,
   getWikilinkForNote,
-  getUrl,
 };

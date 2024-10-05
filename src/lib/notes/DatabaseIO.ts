@@ -68,6 +68,13 @@ export default class DatabaseIO {
     return filename.slice(0, -DatabaseIO.#GRAPH_FILE_EXTENSION.length);
   }
 
+  static getArbitraryGraphFilepath(slug: Slug, filename: string): string {
+    const lastSlashPos = slug.lastIndexOf("/");
+    return lastSlashPos > -1
+      ? slug.substring(0, lastSlashPos + 1) + filename
+      : filename;
+  }
+
   private async getGraphFilenamesFromStorageProvider(): Promise<string[]> {
     const objectNames = await this.#storageProvider.getAllObjectNames();
 
@@ -452,14 +459,14 @@ export default class DatabaseIO {
 
     if (arbitraryFilesToFlush instanceof Set) {
       await Promise.all(Array.from(arbitraryFilesToFlush).map(async (slug) => {
-        const sgfFilename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
+        const sgfFilepath = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
         if (!graph.files.has(slug)) {
-          await this.#storageProvider.removeObject(sgfFilename);
+          await this.#storageProvider.removeObject(sgfFilepath);
         } else {
           const fileInfo = graph.files.get(slug)!;
           const sizeHeaderValue = fileInfo.size.toString();
           const noteHeaders = new Map<string, string>([
-            [DatabaseIO.#ARBITRARY_FILE_HEADER_KEY, slug],
+            [DatabaseIO.#ARBITRARY_FILE_HEADER_KEY, fileInfo.filename],
             [DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY, sizeHeaderValue],
           ]);
 
@@ -479,7 +486,7 @@ export default class DatabaseIO {
 
           const data = serializeNoteHeaders(noteHeaders);
           await this.#storageProvider.writeObject(
-            sgfFilename,
+            sgfFilepath,
             data,
           );
         }
@@ -489,7 +496,7 @@ export default class DatabaseIO {
         const filename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
         const size = fileInfo.size;
         const data = serializeNoteHeaders(new Map<string, string>([
-          [DatabaseIO.#ARBITRARY_FILE_HEADER_KEY, slug],
+          [DatabaseIO.#ARBITRARY_FILE_HEADER_KEY, fileInfo.filename],
           [DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY, size.toString()],
         ]));
         await this.#storageProvider.writeObject(
@@ -525,9 +532,10 @@ export default class DatabaseIO {
   }
 
 
-  async renameFileSlug(
+  async moveArbitraryGraphFile(
     slug: Slug,
     newSlug: Slug,
+    filename: string,
   ): Promise<void> {
     if (!isValidSlug(slug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
@@ -537,10 +545,15 @@ export default class DatabaseIO {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
-    await this.#storageProvider.renameFile(
-      DatabaseIO.getSubtextGraphFilenameForSlug(slug),
-      DatabaseIO.getSubtextGraphFilenameForSlug(newSlug),
-    );
+    // Move AGF
+    const oldFilepath = DatabaseIO.getArbitraryGraphFilepath(slug, filename);
+    const newFilepath = DatabaseIO.getArbitraryGraphFilepath(newSlug, filename);
+    if (oldFilepath !== newFilepath) {
+      await this.#storageProvider.renameFile(
+        oldFilepath,
+        newFilepath,
+      );
+    }
   }
 
 
@@ -551,16 +564,14 @@ export default class DatabaseIO {
   }
 
 
-  async getReadableStream(
+  async getReadableArbitraryGraphFileStream(
     slug: Slug,
+    filename: string,
     range?: ByteRange,
   ): Promise<ReadableStream> {
-    if (!isValidSlug(slug)) {
-      throw new Error(ErrorMessage.INVALID_SLUG);
-    }
-
+    const filepath = DatabaseIO.getArbitraryGraphFilepath(slug, filename);
     const stream = await this.#storageProvider.getReadableStream(
-      slug,
+      filepath,
       range,
     );
 

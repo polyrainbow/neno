@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import {
-  getUrl,
-} from "../lib/utils";
 import NotesProvider from "../lib/notes";
+import { getObjectUrlForArbitraryGraphFile } from "../lib/LocalDataStorage";
 
 interface NoteContentBlockImageProps {
   file: FileInfo,
@@ -18,7 +16,7 @@ const NoteContentBlockImage = ({
   const [url, setUrl] = useState<string>("");
 
   useEffect(() => {
-    getUrl(file)
+    getObjectUrlForArbitraryGraphFile(file)
       .then((url) => {
         setUrl(url);
       });

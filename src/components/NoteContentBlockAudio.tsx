@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import { getUrl, humanFileSize } from "../lib/utils";
+import { humanFileSize } from "../lib/utils";
 import NotesProvider from "../lib/notes";
 import NoteContentBlockActions from "./NoteContentBlockActions";
+import { getObjectUrlForArbitraryGraphFile } from "../lib/LocalDataStorage";
 
 interface NoteContentBlockAudioProps {
   file: FileInfo,
@@ -17,7 +18,7 @@ const NoteContentBlockAudio = ({
   const [url, setUrl] = useState<string>("");
 
   useEffect(() => {
-    getUrl(file)
+    getObjectUrlForArbitraryGraphFile(file)
       .then((url) => {
         setUrl(url);
       });

@@ -322,9 +322,10 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }
 
-    await this.#io.renameFileSlug(
+    await this.#io.moveArbitraryGraphFile(
       oldSlug,
       newSlug,
+      fileInfo.filename,
     );
 
     fileInfo.updatedAt = getCurrentISODateTime();
@@ -420,7 +421,7 @@ export default class NotesProvider {
   }
 
 
-  async getReadableFileStream(
+  async getReadableArbitraryGraphFileStream(
     slug: Slug,
     range?: ByteRange,
   ): Promise<ReadableStream> {
@@ -428,7 +429,14 @@ export default class NotesProvider {
     if (!graph.files.has(slug)) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
-    const stream = await this.#io.getReadableStream(slug, range);
+
+    const filename = graph.files.get(slug)!.filename;
+
+    const stream = await this.#io.getReadableArbitraryGraphFileStream(
+      slug,
+      filename,
+      range,
+    );
     return stream;
   }
 

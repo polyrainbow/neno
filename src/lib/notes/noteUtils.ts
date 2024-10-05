@@ -384,7 +384,7 @@ const getAllInlineSpans = (blocks: Block[]): Span[] => {
 };
 
 
-const getFileSlugsInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
+const getFileSlugsReferencedInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
   const blocks: Block[]
     = graph.indexes.blocks.get(noteSlug) as Block[];
   const allInlineSpans = getAllInlineSpans(blocks);
@@ -397,7 +397,7 @@ const getFileInfosForFilesLinkedInNote = (
   graph: Graph,
   slugOfNote: Slug,
 ): FileInfo[] => {
-  return getFileSlugsInNote(graph, slugOfNote)
+  return getFileSlugsReferencedInNote(graph, slugOfNote)
     // we can make a non-null assertion because getFileSlugsInNote
     // only returns file slugs in use
     .map((fileSlug: Slug) => graph.files.get(fileSlug)!);
@@ -480,9 +480,9 @@ const getNoteFeatures = (
   let containsAudio = false;
   let containsVideo = false;
 
-  const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
-  fileSlugs.forEach((fileSlug: Slug) => {
-    const mediaType = getMediaTypeFromFilename(fileSlug);
+  const fileInfos = getFileInfosForFilesLinkedInNote(graph, note.meta.slug);
+  fileInfos.forEach((fileInfo: FileInfo) => {
+    const mediaType = getMediaTypeFromFilename(fileInfo.filename);
     if (mediaType === MediaType.IMAGE) {
       containsImages = true;
     } else if (mediaType === MediaType.PDF) {
@@ -508,7 +508,7 @@ const getNoteFeatures = (
 
 
 const getNumberOfFiles = (graph: Graph, noteSlug: Slug): number => {
-  return getFileSlugsInNote(graph, noteSlug).length;
+  return getFileSlugsReferencedInNote(graph, noteSlug).length;
 };
 
 
@@ -894,11 +894,12 @@ export {
   changeSlugReferencesInNote,
   mapInlineSpans,
   getBlocks,
-  getFileSlugsInNote,
+  getFileSlugsReferencedInNote,
   handleExistingNoteUpdate,
   getSlugsFromParsedNote,
   isExistingNoteSaveRequest,
   handleNewNoteSaveRequest,
   getAliasesOfSlug,
   cleanSerializedNote,
+  getFileInfosForFilesLinkedInNote,
 };

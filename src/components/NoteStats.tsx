@@ -67,7 +67,7 @@ const NoteStats = ({
             note.files.length > 0
               ? note.files
                 .map((file, i, array) => {
-                  const fileType = getMediaTypeFromFilename(file.slug);
+                  const fileType = getMediaTypeFromFilename(file.filename);
 
                   return <Fragment
                     key={"nsfwt_" + file.slug + note.slug}

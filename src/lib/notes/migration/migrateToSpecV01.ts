@@ -16,10 +16,17 @@ const createPinsFile = async (
   await storageProvider.writeObject(".pins.neno", pinnedNotes.join("\n"));
 };
 
+const getFilenameFromSlug = (slug: Slug): string => {
+  const posOfLastSlash = slug.lastIndexOf("/");
+  return posOfLastSlash > -1
+    ? slug.substring(posOfLastSlash + 1)
+    : slug;
+};
+
 const getSidecarFileContent = (fileInfo: LegacyFileInfo): string => {
   const headers = new Map<string, string>([
     ["size", fileInfo.size.toString()],
-    ["file", fileInfo.slug],
+    ["file", getFilenameFromSlug(fileInfo.slug)],
   ]);
 
   if (fileInfo.createdAt) {

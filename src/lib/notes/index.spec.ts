@@ -847,7 +847,9 @@ describe("Notes module", () => {
       );
 
       const readableFromProvider
-        = await notesProvider.getReadableFileStream(fileInfo.slug);
+        = await notesProvider.getReadableArbitraryGraphFileStream(
+          fileInfo.slug,
+        );
 
       const utf8ToString = (bytes: Uint8Array) => {
         const decoder = new TextDecoder();
@@ -2328,7 +2330,7 @@ describe("Notes module", () => {
       const headers = subtextGraphFile.split("\n");
 
       const sgfContainsCorrectFileHeader = headers.includes(
-        ":file:files/test.txt",
+        ":file:test.txt",
       );
 
       expect(sgfContainsCorrectFileHeader).toBe(true);
@@ -2405,6 +2407,44 @@ describe("Notes module", () => {
       );
 
       expect(updatedAtHeaderOld !== updatedAtHeaderNew).toBe(true);
+    },
+  );
+
+  it(
+    // eslint-disable-next-line @stylistic/max-len
+    "chaning an arbitrary file's slug number of slashes should move the file to another folder",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const readable = new ReadableStream({
+        async pull(controller) {
+          const strToUTF8 = (str: string) => {
+            const encoder = new TextEncoder();
+            return encoder.encode(str);
+          };
+          controller.enqueue(strToUTF8("foobar"));
+          controller.close();
+        },
+      });
+
+      await notesProvider.addFile(
+        readable,
+        "files",
+        "test.txt",
+      );
+
+      await notesProvider.renameFileSlug(
+        "files/test.txt",
+        "a",
+        false,
+      );
+
+      const arbitraryGraphFile = await mockStorageProvider.readObjectAsString(
+        "test.txt",
+      );
+
+      expect(arbitraryGraphFile).toBe("foobar");
     },
   );
 });

@@ -11,7 +11,7 @@ import { getAppPath, getIconSrc } from "../lib/utils";
 import {
   getMediaTypeFromFilename,
 } from "../lib/notes/utils";
-import { getUrlForSlug } from "../lib/LocalDataStorage";
+import { getObjectUrlForArbitraryGraphFile } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID, NENO_SCRIPT_FILE_SUFFIX } from "../config";
 import FloatingActionButton from "./FloatingActionButton";
 
@@ -26,14 +26,14 @@ const FilesViewPreviewBox = ({
   isDangling,
 }: FilesViewPreviewBoxProps) => {
   const navigate = useNavigate();
-  const type = getMediaTypeFromFilename(file.slug) || "unknown";
+  const type = getMediaTypeFromFilename(file.filename) || "unknown";
   const isNenoScript = file.slug.endsWith(NENO_SCRIPT_FILE_SUFFIX);
   const [thumbnailImageSrc, setThumbnailImageSrc]
     = useState<string | null>(null);
 
 
   useEffect(() => {
-    getUrlForSlug(file.slug)
+    getObjectUrlForArbitraryGraphFile(file)
       .then((src) => {
         if (isNenoScript) {
           setThumbnailImageSrc(getIconSrc("neno"));
