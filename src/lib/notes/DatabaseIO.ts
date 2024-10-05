@@ -27,7 +27,9 @@ import ExistingNote from "./types/ExistingNote.js";
 import { Slug } from "./types/Slug.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
-import { isValidFileSlug, isValidSlug } from "./slugUtils.js";
+import {
+  isValidSlug,
+} from "./slugUtils.js";
 import { FileInfo } from "./types/FileInfo.js";
 import { CanonicalNoteHeader } from "./types/CanonicalNoteHeader.js";
 import migrateToSpecV01 from "./migration/migrateToSpecV01.js";
@@ -49,7 +51,7 @@ export default class DatabaseIO {
   static #workerPool: Worker[] = [];
 
   // Returns the filename for a graph file with the given slug.
-  static getFilenameForSlug(slug: Slug): string {
+  static getSubtextGraphFilenameForSlug(slug: Slug): string {
     if (slug.length === 0) {
       throw new Error("Cannot get filename for empty slug");
     }
@@ -101,10 +103,11 @@ export default class DatabaseIO {
           && headers.has(DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY)
         ) {
           const fileInfo: FileInfo = {
+            slug,
             size: parseInt(
               headers.get(DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY)!,
             ),
-            slug,
+            filename: headers.get(DatabaseIO.#ARBITRARY_FILE_HEADER_KEY)!,
             createdAt: headers.get("created-at"),
           };
           files.set(slug, fileInfo);
@@ -337,7 +340,7 @@ export default class DatabaseIO {
     slug: Slug,
   ): Promise<string> {
     const rawNote = await this.#storageProvider.readObjectAsString(
-      DatabaseIO.getFilenameForSlug(slug),
+      DatabaseIO.getSubtextGraphFilenameForSlug(slug),
     );
     if (!rawNote) {
       throw new Error(ErrorMessage.GRAPH_NOT_FOUND);
@@ -401,7 +404,7 @@ export default class DatabaseIO {
     if (canonicalNoteSlugsToFlush instanceof Set) {
       await Promise.all(
         Array.from(canonicalNoteSlugsToFlush).map(async (slug) => {
-          const filename = DatabaseIO.getFilenameForSlug(slug);
+          const filename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
           if (!graph.notes.has(slug)) {
             await this.#storageProvider.removeObject(filename);
           } else {
@@ -414,7 +417,7 @@ export default class DatabaseIO {
       );
     } else {
       for (const [slug, note] of graph.notes) {
-        const filename = DatabaseIO.getFilenameForSlug(slug);
+        const filename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
         await this.#storageProvider.writeObject(
           filename,
           serializeNote(note),
@@ -425,7 +428,7 @@ export default class DatabaseIO {
 
     if (aliasesToFlush instanceof Set) {
       await Promise.all(Array.from(aliasesToFlush).map(async (alias) => {
-        const filename = DatabaseIO.getFilenameForSlug(alias);
+        const filename = DatabaseIO.getSubtextGraphFilenameForSlug(alias);
         if (!graph.aliases.has(alias)) {
           await this.#storageProvider.removeObject(filename);
         } else {
@@ -438,7 +441,7 @@ export default class DatabaseIO {
       }));
     } else {
       for (const [alias, canonicalSlug] of graph.aliases) {
-        const filename = DatabaseIO.getFilenameForSlug(alias);
+        const filename = DatabaseIO.getSubtextGraphFilenameForSlug(alias);
         await this.#storageProvider.writeObject(
           filename,
           `${DatabaseIO.#ALIAS_HEADER_KEY}${canonicalSlug}`,
@@ -449,9 +452,9 @@ export default class DatabaseIO {
 
     if (arbitraryFilesToFlush instanceof Set) {
       await Promise.all(Array.from(arbitraryFilesToFlush).map(async (slug) => {
-        const filename = DatabaseIO.getFilenameForSlug(slug);
+        const sgfFilename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
         if (!graph.files.has(slug)) {
-          await this.#storageProvider.removeObject(filename);
+          await this.#storageProvider.removeObject(sgfFilename);
         } else {
           const fileInfo = graph.files.get(slug)!;
           const sizeHeaderValue = fileInfo.size.toString();
@@ -476,14 +479,14 @@ export default class DatabaseIO {
 
           const data = serializeNoteHeaders(noteHeaders);
           await this.#storageProvider.writeObject(
-            filename,
+            sgfFilename,
             data,
           );
         }
       }));
     } else {
       for (const [slug, fileInfo] of graph.files) {
-        const filename = DatabaseIO.getFilenameForSlug(slug);
+        const filename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
         const size = fileInfo.size;
         const data = serializeNoteHeaders(new Map<string, string>([
           [DatabaseIO.#ARBITRARY_FILE_HEADER_KEY, slug],
@@ -509,7 +512,7 @@ export default class DatabaseIO {
     slug: Slug,
     source: ReadableStream,
   ): Promise<number> {
-    if (!isValidFileSlug(slug)) {
+    if (!isValidSlug(slug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
@@ -522,33 +525,29 @@ export default class DatabaseIO {
   }
 
 
-  async renameFile(
+  async renameFileSlug(
     slug: Slug,
     newSlug: Slug,
   ): Promise<void> {
-    if (!isValidFileSlug(slug)) {
+    if (!isValidSlug(slug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
-    if (!isValidFileSlug(newSlug)) {
+    if (!isValidSlug(newSlug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
     await this.#storageProvider.renameFile(
-      slug,
-      newSlug,
+      DatabaseIO.getSubtextGraphFilenameForSlug(slug),
+      DatabaseIO.getSubtextGraphFilenameForSlug(newSlug),
     );
   }
 
 
-  async deleteFile(
-    slug: Slug,
+  async deleteArbitraryGraphFile(
+    relativeFilePath: string,
   ): Promise<void> {
-    if (!isValidFileSlug(slug)) {
-      throw new Error(ErrorMessage.INVALID_SLUG);
-    }
-
-    await this.#storageProvider.removeObject(slug);
+    await this.#storageProvider.removeObject(relativeFilePath);
   }
 
 
@@ -572,7 +571,7 @@ export default class DatabaseIO {
   async getFileSize(
     slug: Slug,
   ): Promise<number> {
-    if (!isValidFileSlug(slug)) {
+    if (!isValidSlug(slug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 

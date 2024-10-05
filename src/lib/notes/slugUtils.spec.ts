@@ -2,7 +2,7 @@ import { InlineText } from "../subwaytext/types/Block.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
 import {
   createSlug,
-  getSlugFromFilename,
+  getSlugForNewArbitraryFile,
   getSlugsFromInlineText,
   isValidNoteSlug,
   isValidSlug,
@@ -11,15 +11,15 @@ import {
 } from "./slugUtils.js";
 import { describe, it, expect } from "vitest";
 
-describe("getSlugFromFilename", () => {
+describe("getSlugForNewArbitraryFile", () => {
   it(
     "should correctly create slugs for dotfiles",
     async () => {
       expect(
-        getSlugFromFilename("files", ".graph.json", []),
+        getSlugForNewArbitraryFile("files", ".graph.json", new Set()),
       ).toBe("files/graph.json");
       expect(
-        getSlugFromFilename("files", ".htaccess", []),
+        getSlugForNewArbitraryFile("files", ".htaccess", new Set()),
       ).toBe("files/htaccess");
     },
   );

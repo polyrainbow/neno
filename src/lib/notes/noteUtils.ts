@@ -31,7 +31,6 @@ import {
 import {
   createSlug,
   getSlugsFromInlineText,
-  isValidFileSlug,
   isValidNoteSlug,
   sluggifyNoteText,
   sluggifyWikilinkText,
@@ -390,7 +389,7 @@ const getFileSlugsInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
     = graph.indexes.blocks.get(noteSlug) as Block[];
   const allInlineSpans = getAllInlineSpans(blocks);
   const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-  return allUsedSlugs.filter(isValidFileSlug);
+  return allUsedSlugs.filter(s => graph.files.has(s));
 };
 
 
@@ -399,8 +398,9 @@ const getFileInfosForFilesLinkedInNote = (
   slugOfNote: Slug,
 ): FileInfo[] => {
   return getFileSlugsInNote(graph, slugOfNote)
-    .map((fileSlug: Slug) => graph.files.get(fileSlug))
-    .filter(fileInfo => !!fileInfo);
+    // we can make a non-null assertion because getFileSlugsInNote
+    // only returns file slugs in use
+    .map((fileSlug: Slug) => graph.files.get(fileSlug)!);
 };
 
 

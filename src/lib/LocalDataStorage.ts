@@ -6,7 +6,6 @@ import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { Slug } from "./notes/types/Slug";
 import MockStorageProvider from "./notes/test/MockStorageProvider";
-import { getFilenameFromFileSlug } from "./notes/slugUtils";
 import { createDemoGraph } from "./DemoGraph";
 
 /*
@@ -170,6 +169,8 @@ export const saveFile = async (slug: Slug) => {
     throw new Error("Notes provider not initialized");
   }
 
+  const fileInfo = await notesProvider.getFileInfo(slug);
+
   const readable
     = await notesProvider.getReadableFileStream(
       slug,
@@ -185,7 +186,7 @@ export const saveFile = async (slug: Slug) => {
         [mimeType]: ["." + extension],
       },
     }],
-    suggestedName: getFilenameFromFileSlug(slug),
+    suggestedName: fileInfo.filename,
   });
 
   await readable.pipeTo(writable);

@@ -149,8 +149,13 @@
       gap: var(--default-gap);
       align-items: center;
 
+      label {
+        white-space: nowrap;
+      }
+
       & input {
         margin: 0;
+        width: 100%;
       }
     }
 

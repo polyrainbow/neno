@@ -37,16 +37,17 @@ import ByteRange from "./types/ByteRange.js";
 import { Slug } from "./types/Slug.js";
 import { Block } from "../subwaytext/types/Block.js";
 import {
+  getArbitraryFilePath,
   getCurrentISODateTime,
   getExtensionFromFilename,
   getRandomKey,
 } from "./utils.js";
 import {
-  getSlugFromFilename,
+  getSlugForNewArbitraryFile,
   isValidSlug,
   isValidSlugOrEmpty,
-  isValidFileSlug,
   isValidNoteSlugOrEmpty,
+  getAllUsedSlugsInGraph,
 } from "./slugUtils.js";
 import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 import serialize from "../subwaytext/serialize.js";
@@ -238,22 +239,22 @@ export default class NotesProvider {
     );
   }
 
-
   async addFile(
     readable: ReadableStream,
-    folder: string,
+    slugPrefix: string,
     filename: string,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
-    const slug = getSlugFromFilename(
-      folder,
+    const slug = getSlugForNewArbitraryFile(
+      slugPrefix,
       filename,
-      Array.from(graph.files.keys()),
+      getAllUsedSlugsInGraph(graph),
     );
     const size = await this.#io.addFile(slug, readable);
 
     const fileInfo: FileInfo = {
       slug,
+      filename,
       size,
       createdAt: getCurrentISODateTime(),
       updatedAt: getCurrentISODateTime(),
@@ -297,7 +298,7 @@ export default class NotesProvider {
   }
 
 
-  async renameFile(
+  async renameFileSlug(
     oldSlug: Slug,
     newSlug: Slug,
     updateReferences: boolean,
@@ -309,7 +310,7 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
     }
 
-    if (!isValidFileSlug(newSlug)) {
+    if (!isValidSlug(newSlug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
@@ -321,13 +322,13 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }
 
-    await this.#io.renameFile(
+    await this.#io.renameFileSlug(
       oldSlug,
       newSlug,
     );
 
-    fileInfo.slug = newSlug;
     fileInfo.updatedAt = getCurrentISODateTime();
+    fileInfo.slug = newSlug;
 
     graph.files.delete(oldSlug);
     graph.files.set(newSlug, fileInfo);
@@ -379,8 +380,15 @@ export default class NotesProvider {
   async deleteFile(
     slug: Slug,
   ): Promise<void> {
-    await this.#io.deleteFile(slug);
     const graph = await this.#io.getGraph();
+    if (!graph.files.has(slug)) {
+      throw new Error(ErrorMessage.FILE_NOT_FOUND);
+    }
+
+    const fileInfo = graph.files.get(slug)!;
+    const agfPath = getArbitraryFilePath(fileInfo);
+    await this.#io.deleteArbitraryGraphFile(agfPath);
+
     graph.files.delete(slug);
     await this.#io.flushChanges(
       graph,
@@ -404,7 +412,7 @@ export default class NotesProvider {
       = Array.from(graph.indexes.blocks.values()).flat();
     const allInlineSpans = getAllInlineSpans(allBlocks);
     const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-    const allUsedFileSlugs = allUsedSlugs.filter(isValidFileSlug);
+    const allUsedFileSlugs = allUsedSlugs.filter(isValidSlug);
     return Array.from(graph.files.keys())
       .filter((slug) => {
         return !allUsedFileSlugs.includes(slug);

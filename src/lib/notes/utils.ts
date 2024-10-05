@@ -1,3 +1,4 @@
+import { FileInfo } from "./types/FileInfo.js";
 import { MediaType } from "./types/MediaType.js";
 
 const getExtensionFromFilename = (filename: string): string | null => {
@@ -168,6 +169,16 @@ const getLatestISOTimestamp = (...timestamps: string[]): string => {
   return latest;
 };
 
+
+const getArbitraryFilePath = (fileInfo: FileInfo): string => {
+  const slug = fileInfo.slug;
+  const lastSlashPos = slug.lastIndexOf("/");
+
+  return lastSlashPos > -1
+    ? slug.substring(0, lastSlashPos + 1) + fileInfo.filename
+    : fileInfo.filename;
+};
+
 export {
   getExtensionFromFilename,
   removeExtensionFromFilename,
@@ -181,4 +192,5 @@ export {
   unixToISOTimestamp,
   getEarliestISOTimestamp,
   getLatestISOTimestamp,
+  getArbitraryFilePath,
 };

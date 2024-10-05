@@ -9,17 +9,7 @@ import {
   removeExtensionFromFilename,
 } from "./utils.js";
 import { getNoteTitle } from "./noteUtils.js";
-
-
-const isValidFileSlug = (slug: Slug): boolean => {
-  /*
-    A file slug is a slug that is saved in a subfolder of the root graph
-    directory.
-  */
-  const numberOfSlashes = slug.match(/\//gi)?.length ?? 0;
-  return numberOfSlashes >= 1
-    && !slug.startsWith("/");
-};
+import GraphObject from "./types/Graph.js";
 
 
 const trimSlug = (slug: string): string => {
@@ -111,7 +101,7 @@ const isValidSlug = (slug: Slug): boolean => {
   return (
     slug.length > 0
     && slug.length <= 200
-    && slug.match(/^[\p{L}\d\-._]+(\/[\p{L}\d\-._]+)*$/u) !== null
+    && slug.match(/^[\p{L}\p{M}\d\-._]+(\/[\p{L}\p{M}\d\-._]+)*$/u) !== null
   );
 };
 
@@ -180,10 +170,10 @@ const createSlug = (
 };
 
 
-const getSlugFromFilename = (
-  folder: string,
+const getSlugForNewArbitraryFile = (
+  slugPrefix: string,
   filename: string,
-  existingFileSlugs: Slug[],
+  existingSlugs: Set<Slug>,
 ): Slug => {
   const extension = getExtensionFromFilename(filename);
   const filenameWithoutExtension = removeExtensionFromFilename(filename);
@@ -202,7 +192,7 @@ const getSlugFromFilename = (
       ? `${sluggifiedFileStem}-${n}`
       : sluggifiedFileStem;
 
-    const slug: Slug = folder + "/"
+    const slug: Slug = slugPrefix + "/"
       + stemWithOptionalIntegerSuffix
       + (
         extension
@@ -214,7 +204,7 @@ const getSlugFromFilename = (
           : ""
       );
 
-    if (!existingFileSlugs.includes(slug)) {
+    if (!existingSlugs.has(slug)) {
       return slug;
     }
     n++;
@@ -222,22 +212,16 @@ const getSlugFromFilename = (
 };
 
 
-const getFilenameFromFileSlug = (
-  fileSlug: Slug,
-) => {
-  if (!isValidFileSlug(fileSlug)) {
-    throw new Error("Not a file slug: " + fileSlug);
-  }
-  return fileSlug.substring(fileSlug.indexOf("/") + 1);
+const getAllUsedSlugsInGraph = (graph: GraphObject): Set<Slug> => {
+  return (new Set(graph.files.keys()))
+    .union(new Set(graph.notes.keys()))
+    .union(new Set(graph.aliases.keys()));
 };
-
 
 export {
   createSlug,
-  getFilenameFromFileSlug,
-  getSlugFromFilename,
+  getSlugForNewArbitraryFile,
   getSlugsFromInlineText,
-  isValidFileSlug,
   isValidSlug,
   isValidNoteSlug,
   isValidNoteSlugOrEmpty,
@@ -246,4 +230,5 @@ export {
   trimSlug,
   isValidSlugOrEmpty,
   sluggifyFilename,
+  getAllUsedSlugsInGraph,
 };

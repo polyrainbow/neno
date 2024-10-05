@@ -23,22 +23,15 @@ import {
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import {
-  getExtensionFromFilename,
   getMediaTypeFromFilename,
-  removeExtensionFromFilename,
 } from "../lib/notes/utils";
 import {
-  isValidFileSlug,
+  isValidSlug,
 } from "../lib/notes/slugUtils";
 import { saveFile } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
 import FileViewPreview from "./FileViewPreview";
-import { Slug } from "../lib/notes/types/Slug";
 import HeaderButton from "./HeaderButton";
-
-const getRenameInput = (slug: Slug): string => {
-  return removeExtensionFromFilename(slug);
-};
 
 const FileView = () => {
   const notesProvider = useNotesProvider();
@@ -49,9 +42,8 @@ const FileView = () => {
   const [text, setText] = useState<string>("");
   const { slug } = useParams();
   const [slugRenameInput, setSlugRenameInput] = useState<string>(
-    slug ? getRenameInput(slug) : "",
+    slug ?? "",
   );
-  const extension = slug ? getExtensionFromFilename(slug) : "";
   const [updateReferences, setUpdateReferences] = useState(true);
 
   const navigate = useNavigate();
@@ -239,34 +231,28 @@ const FileView = () => {
           <label htmlFor="file-slug-rename-input">
             {l("files.rename.new-slug")}:
           </label>
-          <div>
-            <input
-              id="file-slug-rename-input"
-              type="text"
-              value={slugRenameInput}
-              onInput={(e) => {
-                const element = e.currentTarget;
-                const newValue = element.value.replace(
-                  // In the input field, we also allow \p{SK} modifiers, as
-                  // they are used to create a full letter with modifier in a
-                  // second step. They are not valid slug characters on
-                  // their own, though.
-                  // We also allow apostrophes ('), as they might be used as a
-                  // dead key for letters like é.
-                  // Unfortunately, it seems like we cannot simulate pressing
-                  // dead keys in Playwright currently, so we cannot
-                  // add a meaningful test for this.
-                  /[^\p{L}\p{Sk}\d\-/._']/gu,
-                  "",
-                ).toLowerCase();
-                setSlugRenameInput(newValue);
-              }}
-            />{
-              typeof extension === "string"
-                ? `.${extension}`
-                : ""
-            }
-          </div>
+          <input
+            id="file-slug-rename-input"
+            type="text"
+            value={slugRenameInput}
+            onInput={(e) => {
+              const element = e.currentTarget;
+              const newValue = element.value.replace(
+                // In the input field, we also allow \p{SK} modifiers, as
+                // they are used to create a full letter with modifier via a
+                // composition session. They are not valid slug characters on
+                // their own, though.
+                // We also allow apostrophes ('), as they might be used as a
+                // dead key for letters like é.
+                // Unfortunately, it seems like we cannot simulate pressing
+                // dead keys in Playwright currently, so we cannot
+                // add a meaningful test for this.
+                /[^\p{L}\p{Sk}\d\-/._']/gu,
+                "",
+              ).toLowerCase();
+              setSlugRenameInput(newValue);
+            }}
+          />
         </div>
         <div className="update-references">
           <label className="switch">
@@ -285,24 +271,19 @@ const FileView = () => {
         </div>
         <button
           disabled={
-            slugRenameInput === getRenameInput(slug || "")
-            || !isValidFileSlug(slugRenameInput)
+            slugRenameInput === slug
+            || !isValidSlug(slugRenameInput)
           }
           className="default-button-small dangerous-action"
           onClick={async () => {
             if (
               !slug
-              || slugRenameInput === getRenameInput(slug || "")
-              || !isValidFileSlug(slugRenameInput)
+              || slugRenameInput === slug
+              || !isValidSlug(slugRenameInput)
             ) return;
-            const newSlug = slugRenameInput
-              + (
-                typeof extension === "string"
-                  ? "." + extension
-                  : ""
-              );
+            const newSlug = slugRenameInput;
             try {
-              const newFileInfo = await notesProvider.renameFile(
+              const newFileInfo = await notesProvider.renameFileSlug(
                 slug,
                 newSlug,
                 updateReferences,

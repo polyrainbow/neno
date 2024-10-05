@@ -1,8 +1,13 @@
 import { serializeNoteHeaders } from "../noteUtils";
 import { CanonicalNoteHeader } from "../types/CanonicalNoteHeader";
-import { FileInfo } from "../types/FileInfo";
 import { Slug } from "../types/Slug";
 import StorageProvider from "../types/StorageProvider";
+
+interface LegacyFileInfo {
+  slug: Slug,
+  createdAt: string,
+  size: number,
+}
 
 const createPinsFile = async (
   pinnedNotes: Slug[],
@@ -11,7 +16,7 @@ const createPinsFile = async (
   await storageProvider.writeObject(".pins.neno", pinnedNotes.join("\n"));
 };
 
-const getSidecarFileContent = (fileInfo: FileInfo): string => {
+const getSidecarFileContent = (fileInfo: LegacyFileInfo): string => {
   const headers = new Map<string, string>([
     ["size", fileInfo.size.toString()],
     ["file", fileInfo.slug],
@@ -25,7 +30,7 @@ const getSidecarFileContent = (fileInfo: FileInfo): string => {
 };
 
 const createSidecarFiles = async (
-  fileInfos: FileInfo[],
+  fileInfos: LegacyFileInfo[],
   storageProvider: StorageProvider,
 ) => {
   for (const fileInfo of fileInfos) {

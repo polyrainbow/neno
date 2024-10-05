@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import { isValidFileSlug } from "../lib/notes/slugUtils";
+import { isValidSlug } from "../lib/notes/slugUtils";
 import { l } from "../lib/intl";
 import { NENO_SCRIPT_FILE_SUFFIX } from "../config";
 
@@ -33,7 +33,7 @@ const CreateScript = ({
         className="default-button-small default-action"
         disabled={
           existingFiles.map(s => s.slug).includes(newSlug)
-            || !isValidFileSlug(newSlug)
+            || !isValidSlug(newSlug)
             || newScriptName.length === 0
         }
         onClick={async () => {

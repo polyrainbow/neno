@@ -1753,7 +1753,8 @@ describe("Notes module", () => {
   it(
     "should find file after rename",
     async () => {
-      const notesProvider = new NotesProvider(new MockStorageProvider());
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
 
       const readable = new ReadableStream({
         async pull(controller) {
@@ -1774,7 +1775,7 @@ describe("Notes module", () => {
 
       expect(fileInfo.slug).toBe("files/a.txt");
 
-      const fileInfoUpdated = await notesProvider.renameFile(
+      const fileInfoUpdated = await notesProvider.renameFileSlug(
         "files/a.txt",
         "files/a-renamed.txt",
         false,
@@ -1782,11 +1783,19 @@ describe("Notes module", () => {
 
       expect(fileInfoUpdated.slug).toBe("files/a-renamed.txt");
 
-      const readable2 = await notesProvider.getReadableFileStream(
-        "files/a-renamed.txt",
+      // New subtext graph file should exist on disk
+      const sgrContent = await mockStorageProvider.readObjectAsString(
+        "files/a-renamed.txt.subtext",
       );
 
-      expect(readable2 instanceof ReadableStream).toBe(true);
+      expect(typeof sgrContent).toBe("string");
+
+      // arbitrary graph file should still have the original name
+      const agfReadable = await mockStorageProvider.readObjectAsString(
+        "files/a.txt",
+      );
+
+      expect(agfReadable).toBe("foobar");
     },
   );
 
@@ -1844,23 +1853,23 @@ describe("Notes module", () => {
       await notesProvider.put(noteSaveRequest2);
       */
 
-      const fileInfoUpdated = await notesProvider.renameFile(
+      const fileInfoUpdated = await notesProvider.renameFileSlug(
         "files/a.txt",
-        "files/a-renamed.txt",
+        "files/a-renamed",
         true,
       );
 
-      expect(fileInfoUpdated.slug).toBe("files/a-renamed.txt");
+      expect(fileInfoUpdated.slug).toBe("files/a-renamed");
 
       const note1 = await notesProvider.get("note-1");
       expect(note1.content).toBe(
-        "Note 1 with slashlink to /files/a-renamed.txt",
+        "Note 1 with slashlink to /files/a-renamed",
       );
 
       expect(note1.files.length).toBe(1);
-      expect(note1.files[0].slug).toBe("files/a-renamed.txt");
+      expect(note1.files[0].slug).toBe("files/a-renamed");
 
-      // It is currently not possible that files are referenced via Wikilinks
+      // It is not possible that files are referenced via Wikilinks
       // because Wikilink-to-slug normalization normalizes the slashes to
       // dashes.
       /*
@@ -1898,7 +1907,7 @@ describe("Notes module", () => {
 
       const notesProvider = new NotesProvider(mockStorageProvider);
 
-      await notesProvider.renameFile(
+      await notesProvider.renameFileSlug(
         "files/a.txt",
         "files/a-renamed.txt",
         true,
@@ -2346,7 +2355,7 @@ describe("Notes module", () => {
 
 
   it(
-    "renaming an arbitrary file should change updated-at timestamp",
+    "renaming an arbitrary file's slug should change updated-at timestamp",
     async () => {
       const mockStorageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(mockStorageProvider);
@@ -2362,11 +2371,13 @@ describe("Notes module", () => {
         },
       });
 
-      await notesProvider.addFile(
+      const fileInfo = await notesProvider.addFile(
         readable,
         "files",
         "test.txt",
       );
+
+      expect(fileInfo.slug).toBe("files/test.txt");
 
       const subtextGraphFileOld = await mockStorageProvider.readObjectAsString(
         "files/test.txt.subtext",
@@ -2379,7 +2390,7 @@ describe("Notes module", () => {
       // wait 2 secs because timestamp precision is in seconds
       await new Promise(res => setTimeout(res, 2000));
 
-      await notesProvider.renameFile(
+      await notesProvider.renameFileSlug(
         "files/test.txt",
         "files/test-updated.txt",
         false,
