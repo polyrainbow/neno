@@ -43,11 +43,11 @@ import {
   getRandomKey,
 } from "./utils.js";
 import {
-  getSlugForNewArbitraryFile,
   isValidSlug,
   isValidSlugOrEmpty,
   isValidNoteSlugOrEmpty,
   getAllUsedSlugsInGraph,
+  getSlugAndNameForNewArbitraryFile,
 } from "./slugUtils.js";
 import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 import serialize from "../subwaytext/serialize.js";
@@ -241,13 +241,13 @@ export default class NotesProvider {
 
   async addFile(
     readable: ReadableStream,
-    slugPrefix: string,
-    filename: string,
+    namespace: string,
+    originalFilename: string,
   ): Promise<FileInfo> {
     const graph = await this.#io.getGraph();
-    const slug = getSlugForNewArbitraryFile(
-      slugPrefix,
-      filename,
+    const { slug, filename } = getSlugAndNameForNewArbitraryFile(
+      namespace,
+      originalFilename,
       getAllUsedSlugsInGraph(graph),
     );
     const size = await this.#io.addFile(slug, readable);

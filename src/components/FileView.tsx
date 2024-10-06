@@ -22,7 +22,9 @@ import {
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import {
+  getExtensionFromFilename,
   getMediaTypeFromFilename,
+  removeExtensionFromFilename,
 } from "../lib/notes/utils";
 import {
   isValidSlug,
@@ -44,7 +46,13 @@ const FileView = () => {
   const [text, setText] = useState<string>("");
   const { slug } = useParams();
   const [slugRenameInput, setSlugRenameInput] = useState<string>(
-    slug ?? "",
+    slug ? removeExtensionFromFilename(slug) : "",
+  );
+  const extension = fileInfo ? getExtensionFromFilename(fileInfo.filename) : "";
+  const potentialNewSlug = slugRenameInput + (
+    typeof extension === "string"
+      ? `.${extension}`
+      : ""
   );
   const [updateReferences, setUpdateReferences] = useState(true);
 
@@ -256,7 +264,11 @@ const FileView = () => {
               ).toLowerCase();
               setSlugRenameInput(newValue);
             }}
-          />
+          />{
+            typeof extension === "string"
+              ? `.${extension}`
+              : ""
+          }
         </div>
         <div className="update-references">
           <label className="switch">
@@ -275,20 +287,19 @@ const FileView = () => {
         </div>
         <button
           disabled={
-            slugRenameInput === slug
-            || !isValidSlug(slugRenameInput)
+            slugRenameInput === removeExtensionFromFilename(slug ?? "")
+            || !isValidSlug(potentialNewSlug)
           }
           className="default-button-small dangerous-action"
           onClick={async () => {
             if (
               !slug
               || slugRenameInput === slug
-              || !isValidSlug(slugRenameInput)
+              || !isValidSlug(potentialNewSlug)
             ) return;
-            const newSlug = slugRenameInput;
             const newFileInfo = await notesProvider.renameFileSlug(
               slug,
-              newSlug,
+              potentialNewSlug,
               updateReferences,
             );
             const objectUrl = await getObjectUrlForArbitraryGraphFile(
@@ -301,7 +312,7 @@ const FileView = () => {
               PathTemplate.FILE,
               new Map([
                 ["GRAPH_ID", LOCAL_GRAPH_ID],
-                ["FILE_SLUG", newSlug],
+                ["FILE_SLUG", potentialNewSlug],
               ]),
             ), {
               replace: true,

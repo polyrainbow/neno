@@ -101,16 +101,20 @@ const isValidSlug = (slug: Slug): boolean => {
   return (
     slug.length > 0
     && slug.length <= 200
-    && slug.match(/^[\p{L}\p{M}\d\-._]+(\/[\p{L}\p{M}\d\-._]+)*$/u) !== null
+    && slug.match(
+      // eslint-disable-next-line @stylistic/max-len
+      /^[\p{L}\p{M}\d\-_][\p{L}\p{M}\d\-._]*((?<!\.)\/[\p{L}\p{M}\d\-_][\p{L}\p{M}\d\-._]*)*$/u,
+    ) !== null
+    && !slug.includes("..")
+    && !slug.endsWith(".")
   );
 };
 
 
 const isValidNoteSlug = (slug: Slug): boolean => {
   return (
-    slug.length > 0
-    && slug.length <= 200
-    && slug.match(/^[\p{L}\d\-_]+(\/[\p{L}\d\-_]+)*$/u) !== null
+    isValidSlug(slug)
+    && !slug.includes(".")
   );
 };
 
@@ -170,14 +174,16 @@ const createSlug = (
 };
 
 
-const getSlugForNewArbitraryFile = (
-  slugPrefix: string,
-  filename: string,
+const getSlugAndNameForNewArbitraryFile = (
+  namespace: string,
+  originalFilename: string,
   existingSlugs: Set<Slug>,
-): Slug => {
-  const extension = getExtensionFromFilename(filename);
-  const filenameWithoutExtension = removeExtensionFromFilename(filename);
-  const sluggifiedFileStem = sluggifyFilename(filenameWithoutExtension);
+): { slug: Slug, filename: string } => {
+  const extension = getExtensionFromFilename(originalFilename);
+  const originalFilenameWithoutExtension = removeExtensionFromFilename(
+    originalFilename,
+  );
+  const sluggifiedFileStem = sluggifyFilename(originalFilenameWithoutExtension);
 
   let n = 1;
 
@@ -192,20 +198,21 @@ const getSlugForNewArbitraryFile = (
       ? `${sluggifiedFileStem}-${n}`
       : sluggifiedFileStem;
 
-    const slug: Slug = slugPrefix + "/"
-      + stemWithOptionalIntegerSuffix
-      + (
-        extension
-          ? (
-            stemWithOptionalIntegerSuffix
-              ? "."
-              : ""
-          ) + extension.trim().toLowerCase()
-          : ""
-      );
+    const filename = stemWithOptionalIntegerSuffix
+    + (
+      extension
+        ? (
+          stemWithOptionalIntegerSuffix
+            ? "."
+            : ""
+        ) + extension.trim().toLowerCase()
+        : ""
+    );
+
+    const slug: Slug = `${namespace}/${filename}`;
 
     if (!existingSlugs.has(slug)) {
-      return slug;
+      return { slug, filename };
     }
     n++;
   }
@@ -220,7 +227,7 @@ const getAllUsedSlugsInGraph = (graph: GraphObject): Set<Slug> => {
 
 export {
   createSlug,
-  getSlugForNewArbitraryFile,
+  getSlugAndNameForNewArbitraryFile,
   getSlugsFromInlineText,
   isValidSlug,
   isValidNoteSlug,
