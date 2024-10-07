@@ -302,6 +302,7 @@ const FileView = () => {
               potentialNewSlug,
               updateReferences,
             );
+
             const objectUrl = await getObjectUrlForArbitraryGraphFile(
               newFileInfo,
             );

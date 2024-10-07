@@ -377,12 +377,13 @@
   </p>
 
   <p>
-    An implementation SHOULD translate a slug to a file path relative to the
+    An implementation SHOULD map a slug to a file path relative to the
     <code><a href="#graph-directory">graph directory</a></code>
     when
     storing or retrieving the
     <code><a href="#subtext-graph-file">Subtext graph file</a></code>
-    for a specific slug. Slashes (/) in the slug SHOULD be interpreted as
+    for a specific slug. Slashes (<code>/</code>) in the slug SHOULD be
+    interpreted as
     directory separators, so that a
     <code><a href="#subtext-graph-file">Subtext graph file</a></code>
     that has a slug with a slash in it will be placed in a subdirectory of the
@@ -412,8 +413,34 @@
   </p>
 
   <pre class="code-block">
-/^[\p{L}\p{M}\d\-._]+(\/[\p{L}\p{M}\d\-._]+)*$/u
+/^[\p{L}\p{M}\d_][\p{L}\p{M}\d\-._]*((?&lt;!\.)\/[\p{L}\p{M}\d\-_][\p{L}\p{M}\d\-._]*)*$/u
 </pre>
+
+  <p>
+    A slug MUST NOT contain two dots in direct succession
+    (<code>..</code>).
+  </p>
+
+  <p>
+    A slug MUST NOT start or end with a dot (<code>.</code>).
+  </p>
+
+  <p>
+    A slug MUST NOT start with a dash (<code>-</code>).
+  </p>
+
+  <p>
+    A slug contains one or more slug segments. The segments can be obtained by
+    separating the slug at every slash (<code>/</code>).
+  </p>
+
+  <p>
+    A slug segment MUST NOT start or end with a dot (<code>.</code>).
+  </p>
+
+  <p>
+    A slug segment MUST NOT start with a dash (<code>-</code>).
+  </p>
 
   <div class="note">
     <p class="disclaimer">This section is non-normative.</p>
@@ -423,6 +450,7 @@
       <pre class="code-block">
 foo
 foo/bar
+f-o-o/b-a-r
 f/o/o/b/a/r
 foo/bar.png
 </pre>
@@ -434,6 +462,11 @@ foo/bar.png
           <pre class="code-block">
 /foo
 foo/
+.foo
+foo.
+foo./bar
+foo/.bar
+-foo
 </pre>
     </p>
   </div>
@@ -513,6 +546,15 @@ foo/
     <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>.
   </p>
 
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+    <p class="note-text">
+      <span class="label">Note:</span>
+      Technically, the Subtext graph file acts in this case as a
+      <a href="https://en.wikipedia.org/wiki/Sidecar_file">sidecar file</a>.
+    </p>
+  </div>
+
   <p>
     The
     <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
@@ -523,12 +565,24 @@ foo/
     <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
   </p>
 
+  <p>
+    The
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
+    name SHOULD be the same as the last slug segment of the
+    <code><a href="#slug">slug</a></code>
+    of its
+    accompanying
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
+  </p>
+
   <div class="note">
     <p class="disclaimer">This section is non-normative.</p>
     <p class="note-text">
-      <span class="label">Note:</span>
-      Technically, the Subtext graph file acts in this case as a
-      <a href="https://en.wikipedia.org/wiki/Sidecar_file">sidecar file</a>.
+      It might be easier for implementations to enforce that the arbitrary
+      graph file's name is the same as its slug's last segment,
+      because then it can derive
+      filename from slug and it does not need to keep track of possible filename
+      collisions <em>in addition to</em> slug collisions.
     </p>
   </div>
 
@@ -605,9 +659,12 @@ foo/
   <h3>Deriving a slug for an arbitrary graph file</h3>
 
   <p>
-    If an arbitrary file with an arbitrary file name is to be included
+    If an implementation wants to include an
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
     in the graph, the implementation MAY use the following algorithm to
-    derive a slug from the filename:
+    derive a slug from the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
+    name:
   </p>
 
 <pre class="code-block">

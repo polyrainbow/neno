@@ -221,6 +221,15 @@ describe("isValidSlug", () => {
   );
 
   it(
+    "should catch slugs starting with a dash",
+    () => {
+      expect(
+        isValidSlug("-slug"),
+      ).toBe(false);
+    },
+  );
+
+  it(
     "should catch slugs with dot as first char after a slash",
     () => {
       expect(

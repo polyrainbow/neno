@@ -12,6 +12,7 @@ import { Block } from "../subwaytext/types/Block.js";
 Object.assign(global, { TextDecoder, TextEncoder });
 import { describe, it, expect, vi } from "vitest";
 import { ErrorMessage } from "./types/ErrorMessage.js";
+import { getNewTestFileReadable } from "./test/utils.js";
 
 vi.stubGlobal("navigator", {
   hardwareConcurrency: 4,
@@ -614,16 +615,7 @@ describe("Notes module", () => {
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable,
@@ -641,16 +633,7 @@ describe("Notes module", () => {
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable,
@@ -667,16 +650,7 @@ describe("Notes module", () => {
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable,
@@ -686,16 +660,7 @@ describe("Notes module", () => {
 
       expect(fileInfo.slug).toBe("files/graph.json");
 
-      const readable2 = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable2 = getNewTestFileReadable("foobar");
 
       const fileInfo2 = await notesProvider.addFile(
         readable2,
@@ -712,16 +677,7 @@ describe("Notes module", () => {
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
-      const readable1 = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable1 = getNewTestFileReadable("foobar");
 
       await notesProvider.addFile(
         readable1,
@@ -729,16 +685,7 @@ describe("Notes module", () => {
         "test.txt",
       );
 
-      const readable2 = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable2 = getNewTestFileReadable("foobar");
 
       const fileInfo2 = await notesProvider.addFile(
         readable2,
@@ -748,16 +695,7 @@ describe("Notes module", () => {
 
       expect(fileInfo2.slug).toBe("files/test-2.txt");
 
-      const readable3 = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable3 = getNewTestFileReadable("foobar");
 
       const fileInfo3 = await notesProvider.addFile(
         readable3,
@@ -774,16 +712,7 @@ describe("Notes module", () => {
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
-      const readable1 = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable1 = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable1,
@@ -800,16 +729,7 @@ describe("Notes module", () => {
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable,
@@ -829,16 +749,7 @@ describe("Notes module", () => {
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable,
@@ -1758,16 +1669,7 @@ describe("Notes module", () => {
       const mockStorageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(mockStorageProvider);
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable,
@@ -1792,9 +1694,8 @@ describe("Notes module", () => {
 
       expect(typeof sgrContent).toBe("string");
 
-      // arbitrary graph file should still have the original name
       const agfReadable = await mockStorageProvider.readObjectAsString(
-        "files/a.txt",
+        "files/a-renamed.txt",
       );
 
       expect(agfReadable).toBe("foobar");
@@ -1806,16 +1707,7 @@ describe("Notes module", () => {
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable,
@@ -1839,50 +1731,21 @@ describe("Notes module", () => {
 
       await notesProvider.put(noteSaveRequest);
 
-      /*
-      const noteSaveRequest2: NoteSaveRequest = {
-        note: {
-          content: "Note 2 with wikilink to [[files/a.txt]]",
-          meta: {
-            additionalHeaders: {},
-            flags: [],
-          },
-        },
-        aliases: new Set(),
-        changeSlugTo: "note-2",
-      };
-
-      await notesProvider.put(noteSaveRequest2);
-      */
-
       const fileInfoUpdated = await notesProvider.renameFileSlug(
         "files/a.txt",
-        "files/a-renamed",
+        "files/a-renamed.txt",
         true,
       );
 
-      expect(fileInfoUpdated.slug).toBe("files/a-renamed");
+      expect(fileInfoUpdated.slug).toBe("files/a-renamed.txt");
 
       const note1 = await notesProvider.get("note-1");
       expect(note1.content).toBe(
-        "Note 1 with slashlink to /files/a-renamed",
+        "Note 1 with slashlink to /files/a-renamed.txt",
       );
 
       expect(note1.files.length).toBe(1);
-      expect(note1.files[0].slug).toBe("files/a-renamed");
-
-      // It is not possible that files are referenced via Wikilinks
-      // because Wikilink-to-slug normalization normalizes the slashes to
-      // dashes.
-      /*
-      const note2 = await notesProvider.get("note-2");
-      expect(note2.content).toBe(
-        "Note 2 with wikilink to [[files/a-renamed.txt]]",
-      );
-
-      expect(note2.files.length).toBe(1);
-      expect(note2.files[0].slug).toBe("files/a-renamed.txt");
-      */
+      expect(note1.files[0].slug).toBe("files/a-renamed.txt");
     },
   );
 
@@ -2185,16 +2048,7 @@ describe("Notes module", () => {
       const mockStorageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(mockStorageProvider);
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       await notesProvider.addFile(
         readable,
@@ -2226,16 +2080,7 @@ describe("Notes module", () => {
       const mockStorageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(mockStorageProvider);
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       await notesProvider.addFile(
         readable,
@@ -2306,16 +2151,7 @@ describe("Notes module", () => {
       const mockStorageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(mockStorageProvider);
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       await notesProvider.addFile(
         readable,
@@ -2362,16 +2198,7 @@ describe("Notes module", () => {
       const mockStorageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(mockStorageProvider);
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       const fileInfo = await notesProvider.addFile(
         readable,
@@ -2417,16 +2244,7 @@ describe("Notes module", () => {
       const mockStorageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(mockStorageProvider);
 
-      const readable = new ReadableStream({
-        async pull(controller) {
-          const strToUTF8 = (str: string) => {
-            const encoder = new TextEncoder();
-            return encoder.encode(str);
-          };
-          controller.enqueue(strToUTF8("foobar"));
-          controller.close();
-        },
-      });
+      const readable = getNewTestFileReadable("foobar");
 
       await notesProvider.addFile(
         readable,
@@ -2436,15 +2254,59 @@ describe("Notes module", () => {
 
       await notesProvider.renameFileSlug(
         "files/test.txt",
-        "a",
+        "a.txt",
         false,
       );
 
       const arbitraryGraphFile = await mockStorageProvider.readObjectAsString(
-        "test.txt",
+        "a.txt",
       );
 
       expect(arbitraryGraphFile).toBe("foobar");
+    },
+  );
+
+  it(
+    "should reject changing file extension in slug of arbitrary graph file",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const readable = getNewTestFileReadable("foobar");
+
+      await notesProvider.addFile(
+        readable,
+        "files",
+        "test.txt",
+      );
+
+      expect(
+        notesProvider.renameFileSlug("files/test.txt", "file.mp3", false),
+      ).rejects.toThrow("INVALID_SLUG");
+    },
+  );
+
+  it(
+    "should update filename when renaming slug of arbitrary graph file",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      const readable = getNewTestFileReadable("foobar");
+
+      await notesProvider.addFile(
+        readable,
+        "files",
+        "test.txt",
+      );
+
+      const updatedFileInfo = await notesProvider.renameFileSlug(
+        "files/test.txt",
+        "new-name.txt",
+        false,
+      );
+
+      expect(updatedFileInfo.filename).toBe("new-name.txt");
     },
   );
 });

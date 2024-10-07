@@ -61,7 +61,7 @@ test.describe("File view", () => {
     await page.keyboard.type("new-name");
     await page.getByRole("button", { name: "Rename" }).click();
     const newSlug = await page.locator("h1").innerText();
-    expect(newSlug).toBe("new-name");
+    expect(newSlug).toBe("new-name.txt");
   });
 
   test("should display text file preview", async ({ page }) => {

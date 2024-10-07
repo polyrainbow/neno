@@ -118,7 +118,7 @@ export default class MockStorageProvider implements StorageProvider {
   }
 
 
-  async renameFile(
+  async renameObject(
     oldRequestPath: string,
     newRequestPath: string,
   ): Promise<void> {

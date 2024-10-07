@@ -48,6 +48,7 @@ import {
   isValidNoteSlugOrEmpty,
   getAllUsedSlugsInGraph,
   getSlugAndNameForNewArbitraryFile,
+  getLastSlugSegment,
 } from "./slugUtils.js";
 import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 import serialize from "../subwaytext/serialize.js";
@@ -314,6 +315,13 @@ export default class NotesProvider {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
+    const extension = getExtensionFromFilename(fileInfo.filename);
+
+    // Enforce that slug has correct filename extension
+    if (typeof extension === "string" && !newSlug.endsWith(`.${extension}`)) {
+      throw new Error(ErrorMessage.INVALID_SLUG);
+    }
+
     if (
       graph.notes.has(newSlug)
       || graph.aliases.has(newSlug)
@@ -325,11 +333,11 @@ export default class NotesProvider {
     await this.#io.moveArbitraryGraphFile(
       oldSlug,
       newSlug,
-      fileInfo.filename,
     );
 
     fileInfo.updatedAt = getCurrentISODateTime();
     fileInfo.slug = newSlug;
+    fileInfo.filename = getLastSlugSegment(newSlug);
 
     graph.files.delete(oldSlug);
     graph.files.set(newSlug, fileInfo);

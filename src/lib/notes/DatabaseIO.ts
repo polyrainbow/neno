@@ -537,25 +537,13 @@ export default class DatabaseIO {
 
 
   async moveArbitraryGraphFile(
-    slug: Slug,
+    oldSlug: Slug,
     newSlug: Slug,
-    filename: string,
   ): Promise<void> {
-    if (!isValidSlug(slug)) {
-      throw new Error(ErrorMessage.INVALID_SLUG);
-    }
-
-    if (!isValidSlug(newSlug)) {
-      throw new Error(ErrorMessage.INVALID_SLUG);
-    }
-
-    // Move AGF
-    const oldFilepath = DatabaseIO.getArbitraryGraphFilepath(slug, filename);
-    const newFilepath = DatabaseIO.getArbitraryGraphFilepath(newSlug, filename);
-    if (oldFilepath !== newFilepath) {
-      await this.#storageProvider.renameFile(
-        oldFilepath,
-        newFilepath,
+    if (oldSlug !== newSlug) {
+      await this.#storageProvider.renameObject(
+        oldSlug,
+        newSlug,
       );
     }
   }

@@ -37,8 +37,11 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("File view", () => {
   test("should look fine - light", async ({ page }) => {
-    expect(await page.screenshot()).toMatchSnapshot("file-view-light.png", {
-      maxDiffPixels: 200,
-    });
+    expect(await page.screenshot()).toMatchSnapshot("file-view-light.png");
+  });
+
+  test("should look fine - dark", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+    expect(await page.screenshot()).toMatchSnapshot("file-view-dark.png");
   });
 });

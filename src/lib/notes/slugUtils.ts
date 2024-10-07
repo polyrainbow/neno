@@ -103,7 +103,7 @@ const isValidSlug = (slug: Slug): boolean => {
     && slug.length <= 200
     && slug.match(
       // eslint-disable-next-line @stylistic/max-len
-      /^[\p{L}\p{M}\d\-_][\p{L}\p{M}\d\-._]*((?<!\.)\/[\p{L}\p{M}\d\-_][\p{L}\p{M}\d\-._]*)*$/u,
+      /^[\p{L}\p{M}\d_][\p{L}\p{M}\d\-._]*((?<!\.)\/[\p{L}\p{M}\d\-_][\p{L}\p{M}\d\-._]*)*$/u,
     ) !== null
     && !slug.includes("..")
     && !slug.endsWith(".")
@@ -225,6 +225,17 @@ const getAllUsedSlugsInGraph = (graph: GraphObject): Set<Slug> => {
     .union(new Set(graph.aliases.keys()));
 };
 
+
+const getLastSlugSegment = (slug: Slug): string => {
+  const posOfLastSlash = slug.lastIndexOf("/");
+
+  if (posOfLastSlash > -1) {
+    return slug.substring(posOfLastSlash + 1);
+  } else {
+    return slug;
+  }
+};
+
 export {
   createSlug,
   getSlugAndNameForNewArbitraryFile,
@@ -238,4 +249,5 @@ export {
   isValidSlugOrEmpty,
   sluggifyFilename,
   getAllUsedSlugsInGraph,
+  getLastSlugSegment,
 };
