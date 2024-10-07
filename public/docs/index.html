@@ -753,7 +753,7 @@ const redLinks = new Map();
 const allExistingSlugs = new Set([
   ...graph.notes.keys(),
   ...graph.aliases.keys(),
-  ...graph.metadata.files.map((f) => f.slug),
+  ...graph.files.keys(),
 ]);
 
 for (const [slug, note] of graph.notes.entries()) {
