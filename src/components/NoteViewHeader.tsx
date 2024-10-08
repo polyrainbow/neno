@@ -14,6 +14,7 @@ import FlexContainer from "./FlexContainer";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import AppMenuContext from "../contexts/AppMenuContext";
 import { Slug } from "../lib/notes/types/Slug";
+import BusyIndicator from "./BusyIndicator";
 
 interface NoteViewHeaderProps {
   stats: GraphStats | null,
@@ -165,7 +166,7 @@ const NoteViewHeader = ({
       {
         stats
           ? <AppHeaderStats stats={stats} />
-          : ""
+          : <BusyIndicator alt={l("loading")} height={28} />
       }
     </HeaderContainer>
   );

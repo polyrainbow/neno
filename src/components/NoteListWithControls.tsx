@@ -20,7 +20,6 @@ export enum NoteListView {
 }
 
 interface NoteListWithControlsProps {
-  numberOfAllNotes?: number,
   handleSearchInputChange: (value: string) => void,
   searchValue: string,
   sortMode: NoteListSortMode,
@@ -40,7 +39,6 @@ interface NoteListWithControlsProps {
 }
 
 const NoteListWithControls = ({
-  numberOfAllNotes,
   handleSearchInputChange,
   searchValue,
   sortMode,
@@ -136,7 +134,6 @@ const NoteListWithControls = ({
             setPage(page);
             setNoteListScrollTop(0);
           }}
-          numberOfAllNotes={numberOfAllNotes}
           itemsAreLinkable={itemsAreLinkable}
           setUnsavedChanges={setUnsavedChanges}
           unsavedChanges={unsavedChanges}
