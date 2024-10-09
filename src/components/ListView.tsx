@@ -53,7 +53,6 @@ const ListView = () => {
       setNoteListScrollTop={controlledNoteList.setScrollTop}
       page={controlledNoteList.page}
       setPage={controlledNoteList.setPage}
-      numberOfAllNotes={headerStats?.numberOfAllNotes}
       itemsAreLinkable={false}
       onLinkIndicatorClick={() => {
         return;
