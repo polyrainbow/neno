@@ -20,27 +20,23 @@ const IconButton = ({
   const popoverRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    const anchorName = `--${id}`;
+
+    if (ref.current) {
+      // @ts-ignore
+      ref.current.style.anchorName = anchorName;
+    }
+
     const showPopover = () => {
       const popoverElement = document.createElement("div");
       popoverElement.popover = "auto";
       popoverElement.className = "tooltip";
+      // @ts-ignore
+      popoverElement.style.positionAnchor = anchorName;
       document.body.appendChild(popoverElement);
       popoverElement.innerHTML = title;
       popoverElement.showPopover();
       popoverRef.current = popoverElement;
-
-      const popoverRect = popoverElement.getBoundingClientRect();
-      const targetRect = ref.current?.getBoundingClientRect();
-
-      if (!targetRect) throw new Error("Target rect undefined");
-
-      const css = new CSSStyleSheet();
-      css.replaceSync(`
-      .tooltip:popover-open {
-        top: ${targetRect.y - 35}px;
-        left: ${targetRect.x + 25 - (popoverRect.width / 2)}px;
-      }`);
-      document.adoptedStyleSheets = [css];
     };
 
     const hidePopover = () => {

@@ -557,6 +557,10 @@ input:checked + .slider::before {
   font-size: var(--small-font-size);
   padding: 10px;
   border-radius: var(--border-radius);
+  bottom: anchor(top);
+  justify-self: anchor-center;
+  width: max-content;
+  margin: 0;
 }
 
 
