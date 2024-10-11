@@ -12,6 +12,7 @@
     --primary-color: #000;
     --alt-color: #d4d4d4;
     --link-color: #3131ff;
+    --note-background-color: #59ff6f;
   }
 }
 
@@ -21,6 +22,7 @@
     --primary-color: #fff;
     --alt-color: #333;
     --link-color: #85a6ff;
+    --note-background-color: #026146;
   }
 }
 
@@ -60,6 +62,26 @@ h3, h4 {
 p {
   line-height: 1.6em;
   font-size: large;
+}
+
+div.note {
+  background: var(--note-background-color);
+  padding: 20px;
+  margin: 20px 0;
+
+  p.disclaimer {
+    font-style: italic;
+    font-size: medium;
+  }
+
+  .note-text {
+    margin: 0;
+
+    .label {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  }
 }
 
 ul {
