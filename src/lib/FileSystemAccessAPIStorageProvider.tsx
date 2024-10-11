@@ -6,6 +6,7 @@
 
 import ByteRange from "./notes/types/ByteRange";
 import StorageProvider from "./notes/types/StorageProvider";
+
 export default class FileSystemAccessAPIStorageProvider
 implements StorageProvider {
   constructor(directoryHandle: FileSystemDirectoryHandle) {
@@ -124,7 +125,7 @@ implements StorageProvider {
     await writable.close();
   }
 
-  async renameFile(
+  async renameObject(
     oldRequestPath: string,
     newRequestPath: string,
   ): Promise<void> {

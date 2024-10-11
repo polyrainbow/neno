@@ -1,4 +1,5 @@
 import {
+  getArbitraryFilePath,
   getExtensionFromFilename,
   removeExtensionFromFilename,
 } from "./utils.js";
@@ -27,3 +28,23 @@ describe("removeExtensionFromFilename", () => {
     },
   );
 });
+
+describe("getArbitraryFilePath", () => {
+  it(
+    "should correctly infer file path from file info",
+    async () => {
+      expect(getArbitraryFilePath({
+        slug: "files/audio",
+        filename: "abc.wav",
+        size: 100,
+      })).toBe("files/abc.wav");
+
+      expect(getArbitraryFilePath({
+        slug: "a.wav",
+        filename: "b.wav",
+        size: 100,
+      })).toBe("b.wav");
+    },
+  );
+});
+

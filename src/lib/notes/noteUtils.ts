@@ -31,7 +31,6 @@ import {
 import {
   createSlug,
   getSlugsFromInlineText,
-  isValidFileSlug,
   isValidNoteSlug,
   sluggifyNoteText,
   sluggifyWikilinkText,
@@ -42,7 +41,6 @@ import {
   NewNoteSaveRequest,
   NoteSaveRequest,
 } from "./types/NoteSaveRequest.js";
-import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
 import serialize from "../subwaytext/serialize.js";
 import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 import DatabaseIO from "./DatabaseIO.js";
@@ -51,8 +49,14 @@ import GraphObject from "./types/Graph.js";
 type NoteHeaders = Map<CanonicalNoteHeader | string, string>;
 type MetaModifier = (meta: Partial<ExistingNoteMetadata>, val: string) => void;
 
-const parseNoteHeaders = (note: string): NoteHeaders => {
-  const headerSection = note.substring(0, note.indexOf("\n\n"));
+const parseGraphFileHeaders = (note: string): NoteHeaders => {
+  const headerContentDelimiter = "\n\n";
+  const headerContentDelimiterPos = note.indexOf(headerContentDelimiter);
+
+  const headerSection = headerContentDelimiterPos > -1
+    ? note.substring(0, headerContentDelimiterPos)
+    : note;
+
   const regex = /^:([^:]*):(.*)$/gm;
   const headers = new Map<string, string>();
   for (const [_match, key, value] of headerSection.matchAll(regex)) {
@@ -98,12 +102,12 @@ const cleanSerializedNote = (serializedNote: string): string => {
 };
 
 
-const parseSerializedExistingNote = (
+const parseSerializedExistingGraphFile = (
   serializedNote: string,
   slug: Slug,
 ): ExistingNote => {
   const serializedNoteCleaned = cleanSerializedNote(serializedNote);
-  const headers = parseNoteHeaders(serializedNoteCleaned);
+  const headers = parseGraphFileHeaders(serializedNoteCleaned);
   const partialMeta: Partial<ExistingNoteMetadata> = {};
   const additionalHeaders: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
@@ -139,7 +143,7 @@ const parseSerializedExistingNote = (
 
 const parseSerializedNewNote = (serializedNote: string): NewNote => {
   const serializedNoteCleaned = cleanSerializedNote(serializedNote);
-  const headers = parseNoteHeaders(serializedNoteCleaned);
+  const headers = parseGraphFileHeaders(serializedNoteCleaned);
   const partialMeta: Partial<NewNoteMetadata> = {};
   const additionalHeaders: Record<string, string> = {};
   for (const [key, value] of headers.entries()) {
@@ -380,23 +384,23 @@ const getAllInlineSpans = (blocks: Block[]): Span[] => {
 };
 
 
-const getFileSlugsInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
+const getFileSlugsReferencedInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
   const blocks: Block[]
     = graph.indexes.blocks.get(noteSlug) as Block[];
   const allInlineSpans = getAllInlineSpans(blocks);
   const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-  return allUsedSlugs.filter(isValidFileSlug);
+  return allUsedSlugs.filter(s => graph.files.has(s));
 };
 
 
-const getFileInfos = (
+const getFileInfosForFilesLinkedInNote = (
   graph: Graph,
-  slug: Slug,
+  slugOfNote: Slug,
 ): FileInfo[] => {
-  const fileSlugs = getFileSlugsInNote(graph, slug);
-  const files = graph.metadata.files
-    .filter((file: FileInfo) => fileSlugs.includes(file.slug));
-  return files;
+  return getFileSlugsReferencedInNote(graph, slugOfNote)
+    // we can make a non-null assertion because getFileSlugsInNote
+    // only returns file slugs in use
+    .map((fileSlug: Slug) => graph.files.get(fileSlug)!);
 };
 
 
@@ -432,7 +436,7 @@ const createNoteToTransmit = async (
     backlinks: getBacklinks(graph, existingNote.meta.slug),
     numberOfCharacters: getNumberOfCharacters(existingNote),
     numberOfBlocks: getBlocks(existingNote, graph.indexes.blocks).length,
-    files: getFileInfos(graph, existingNote.meta.slug),
+    files: getFileInfosForFilesLinkedInNote(graph, existingNote.meta.slug),
     aliases: getAliasesOfSlug(graph, existingNote.meta.slug),
   };
 
@@ -476,9 +480,9 @@ const getNoteFeatures = (
   let containsAudio = false;
   let containsVideo = false;
 
-  const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
-  fileSlugs.forEach((fileSlug: Slug) => {
-    const mediaType = getMediaTypeFromFilename(fileSlug);
+  const fileInfos = getFileInfosForFilesLinkedInNote(graph, note.meta.slug);
+  fileInfos.forEach((fileInfo: FileInfo) => {
+    const mediaType = getMediaTypeFromFilename(fileInfo.filename);
     if (mediaType === MediaType.IMAGE) {
       containsImages = true;
     } else if (mediaType === MediaType.PDF) {
@@ -504,7 +508,7 @@ const getNoteFeatures = (
 
 
 const getNumberOfFiles = (graph: Graph, noteSlug: Slug): number => {
-  return getFileSlugsInNote(graph, noteSlug).length;
+  return getFileSlugsReferencedInNote(graph, noteSlug).length;
 };
 
 
@@ -674,7 +678,7 @@ const handleExistingNoteUpdate = async (
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }
     if (
-      graph.metadata.files.find(f => f.slug === noteSaveRequest.changeSlugTo)
+      graph.files.has( noteSaveRequest.changeSlugTo)
     ) {
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }
@@ -693,12 +697,12 @@ const handleExistingNoteUpdate = async (
     graph.notes.delete(oldSlug);
     removeSlugFromIndexes(graph, oldSlug);
 
-    let flushMetadata = WriteGraphMetadataAction.NONE;
+    let flushPins = false;
 
-    for (let i = 0; i < graph.metadata.pinnedNotes.length; i++) {
-      if (graph.metadata.pinnedNotes[i] === oldSlug) {
-        graph.metadata.pinnedNotes[i] = newSlug;
-        flushMetadata = WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE;
+    for (let i = 0; i < graph.pinnedNotes.length; i++) {
+      if (graph.pinnedNotes[i] === oldSlug) {
+        graph.pinnedNotes[i] = newSlug;
+        flushPins = true;
       }
     }
 
@@ -712,7 +716,11 @@ const handleExistingNoteUpdate = async (
     }
 
     await io.flushChanges(
-      graph, flushMetadata, new Set([oldSlug]), aliasesToUpdate,
+      graph,
+      flushPins,
+      new Set([oldSlug]),
+      aliasesToUpdate,
+      new Set(),
     );
 
     existingNote.meta.slug = newSlug;
@@ -745,8 +753,9 @@ const handleExistingNoteUpdate = async (
         updateIndexes(graph, thatNote);
         await io.flushChanges(
           graph,
-          WriteGraphMetadataAction.NONE,
+          flushPins,
           new Set([thatNote.meta.slug]),
+          new Set(),
           new Set(),
         );
       }
@@ -758,9 +767,10 @@ const handleExistingNoteUpdate = async (
   updateIndexes(graph, existingNote);
   await io.flushChanges(
     graph,
-    WriteGraphMetadataAction.NONE,
+    false,
     new Set([existingNote.meta.slug]),
     aliasesToUpdate,
+    new Set(),
   );
 
   const noteToTransmit: NoteToTransmit
@@ -802,7 +812,7 @@ const handleNewNoteSaveRequest = async (
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }
     if (
-      graph.metadata.files.find(f => f.slug === noteSaveRequest.changeSlugTo)
+      graph.files.has(noteSaveRequest.changeSlugTo)
     ) {
       throw new Error(ErrorMessage.SLUG_EXISTS);
     }
@@ -849,9 +859,10 @@ const handleNewNoteSaveRequest = async (
   updateIndexes(graph, newNote);
   await io.flushChanges(
     graph,
-    WriteGraphMetadataAction.NONE,
+    false,
     new Set([newNote.meta.slug]),
     aliasesToUpdate,
+    new Set(),
   );
 
   const noteToTransmit: NoteToTransmit
@@ -869,9 +880,9 @@ export {
   createNoteListItem,
   createNoteListItems,
   getNumberOfUnlinkedNotes,
-  parseNoteHeaders,
+  parseGraphFileHeaders,
   serializeNoteHeaders,
-  parseSerializedExistingNote,
+  parseSerializedExistingGraphFile,
   parseSerializedNewNote,
   serializeNote,
   serializeNewNote,
@@ -883,10 +894,12 @@ export {
   changeSlugReferencesInNote,
   mapInlineSpans,
   getBlocks,
-  getFileSlugsInNote,
+  getFileSlugsReferencedInNote,
   handleExistingNoteUpdate,
   getSlugsFromParsedNote,
   isExistingNoteSaveRequest,
   handleNewNoteSaveRequest,
   getAliasesOfSlug,
+  cleanSerializedNote,
+  getFileInfosForFilesLinkedInNote,
 };

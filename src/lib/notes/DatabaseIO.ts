@@ -8,13 +8,16 @@
 */
 
 
-import Graph, { GraphMetadata } from "./types/Graph.js";
+import Graph from "./types/Graph.js";
 import { ErrorMessage } from "./types/ErrorMessage.js";
 import StorageProvider from "./types/StorageProvider.js";
 import {
+  cleanSerializedNote,
   getSlugsFromParsedNote,
-  parseSerializedExistingNote,
+  parseGraphFileHeaders,
+  parseSerializedExistingGraphFile,
   serializeNote,
+  serializeNoteHeaders,
 } from "./noteUtils.js";
 import {
   Block,
@@ -24,9 +27,11 @@ import ExistingNote from "./types/ExistingNote.js";
 import { Slug } from "./types/Slug.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
-import WriteGraphMetadataAction from "./types/FlushGraphMetadataAction.js";
-import { isValidFileSlug, isValidSlug } from "./slugUtils.js";
-import { getCurrentISODateTime } from "./utils.js";
+import {
+  isValidSlug,
+} from "./slugUtils.js";
+import { FileInfo } from "./types/FileInfo.js";
+import { CanonicalNoteHeader } from "./types/CanonicalNoteHeader.js";
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -34,59 +39,96 @@ export default class DatabaseIO {
   #graphRetrievalInProgress: Promise<void> | null = null;
   #finishedObtainingGraph: (() => void) = () => {};
 
-  #GRAPH_METADATA_FILENAME = ".graph.json";
-  static #NOTE_FILE_EXTENSION = ".subtext";
-  #ALIAS_HEADER = ":alias-of:";
+  static #PINS_FILENAME = ".pins.neno";
+  static #GRAPH_FILE_EXTENSION = ".subtext";
+  static #ALIAS_HEADER_KEY = "alias-of";
+  static #ARBITRARY_FILE_HEADER_KEY = "file";
+  static #ARBITRARY_FILE_SIZE_HEADER_KEY = "size";
 
   // Block parsing is CPU intensive, so we use a web worker pool to parse
   // multiple notes in parallel.
   static #workerPool: Worker[] = [];
 
-  // Returns the filename for a note with the given slug.
-  static getFilenameForNoteSlug(slug: Slug): string {
+  // Returns the filename for a graph file with the given slug.
+  static getSubtextGraphFilenameForSlug(slug: Slug): string {
     if (slug.length === 0) {
       throw new Error("Cannot get filename for empty slug");
     }
-    return `${slug}${DatabaseIO.#NOTE_FILE_EXTENSION}`;
+    return `${slug}${DatabaseIO.#GRAPH_FILE_EXTENSION}`;
   }
 
-  static getSlugFromNoteFilename(filename: string): Slug {
-    if (!filename.endsWith(DatabaseIO.#NOTE_FILE_EXTENSION)) {
+  static getSlugFromGraphFilename(filename: string): Slug {
+    if (!filename.endsWith(DatabaseIO.#GRAPH_FILE_EXTENSION)) {
       throw new Error(
         "Filename does not end with default note filename extension",
       );
     }
 
-    return filename.slice(0, -DatabaseIO.#NOTE_FILE_EXTENSION.length);
+    return filename.slice(0, -DatabaseIO.#GRAPH_FILE_EXTENSION.length);
   }
 
-  private async getNoteFilenamesFromStorageProvider(): Promise<string[]> {
+  static getArbitraryGraphFilepath(slug: Slug, filename: string): string {
+    const lastSlashPos = slug.lastIndexOf("/");
+    return lastSlashPos > -1
+      ? slug.substring(0, lastSlashPos + 1) + filename
+      : filename;
+  }
+
+  static parsePinsFile(pinsSerialized: string): Slug[] {
+    if (pinsSerialized.length === 0) {
+      return [];
+    }
+    return pinsSerialized.split("\n") as Slug[];
+  }
+
+  private async getGraphFilenamesFromStorageProvider(): Promise<string[]> {
     const objectNames = await this.#storageProvider.getAllObjectNames();
 
     return objectNames
       .filter(
         (filename: string) => {
-          return filename.endsWith(DatabaseIO.#NOTE_FILE_EXTENSION)
-            && isValidSlug(DatabaseIO.getSlugFromNoteFilename(filename));
+          return filename.endsWith(DatabaseIO.#GRAPH_FILE_EXTENSION)
+            && isValidSlug(DatabaseIO.getSlugFromGraphFilename(filename));
         },
       );
   }
 
   private async parseGraph(
-    serializedNotesAndAliases: Map<Slug, string>,
-    metadataSerialized?: string,
+    serializedGraphFiles: Map<Slug, string>,
+    pinsSerialized?: string,
   ): Promise<Graph> {
     const parsedNotes = new Map<Slug, ExistingNote>();
     const aliases = new Map<Slug, Slug>();
+    const files = new Map<Slug, FileInfo>();
 
-    for (const [slug, serializedNote] of serializedNotesAndAliases) {
-      let parsedNote: ExistingNote;
+    for (const [slug, serializedGraphFile] of serializedGraphFiles) {
       try {
-        if (serializedNote.startsWith(this.#ALIAS_HEADER)) {
-          const canonicalSlug = serializedNote.slice(this.#ALIAS_HEADER.length);
-          aliases.set(slug, canonicalSlug);
+        const serializedGraphFileCleaned = cleanSerializedNote(
+          serializedGraphFile,
+        );
+        const headers = parseGraphFileHeaders(serializedGraphFileCleaned);
+
+        if (headers.has(DatabaseIO.#ALIAS_HEADER_KEY)) {
+          const targetSlug = headers.get(DatabaseIO.#ALIAS_HEADER_KEY)!;
+          aliases.set(slug, targetSlug);
+        } else if (
+          headers.has(DatabaseIO.#ARBITRARY_FILE_HEADER_KEY)
+          && headers.has(DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY)
+        ) {
+          const fileInfo: FileInfo = {
+            slug,
+            size: parseInt(
+              headers.get(DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY)!,
+            ),
+            filename: headers.get(DatabaseIO.#ARBITRARY_FILE_HEADER_KEY)!,
+            createdAt: headers.get("created-at"),
+          };
+          files.set(slug, fileInfo);
         } else {
-          parsedNote = parseSerializedExistingNote(serializedNote, slug);
+          const parsedNote = parseSerializedExistingGraphFile(
+            serializedGraphFile,
+            slug,
+          );
           parsedNotes.set(slug, parsedNote);
         }
       } catch (_e) {
@@ -94,15 +136,13 @@ export default class DatabaseIO {
       }
     }
 
-    let graphMetadata;
+    let pinnedNotes: Slug[];
 
-    if (typeof metadataSerialized === "string") {
-      graphMetadata = JSON.parse(
-        metadataSerialized,
-      ) as GraphMetadata;
+    if (typeof pinsSerialized === "string") {
+      pinnedNotes = DatabaseIO.parsePinsFile(pinsSerialized);
     } else {
-      graphMetadata = this.createEmptyGraphMetadata();
-      await this.writeGraphMetadataFile(graphMetadata);
+      pinnedNotes = [];
+      await this.writePinsFile(pinnedNotes);
     }
 
     const blockIndex = await DatabaseIO.createBlockIndex(
@@ -118,12 +158,13 @@ export default class DatabaseIO {
     const parsedGraphObject: Graph = {
       notes: parsedNotes,
       aliases,
+      files,
+      pinnedNotes,
       indexes: {
         blocks: blockIndex,
         outgoingLinks: outgoingLinkIndex,
         backlinks: backlinkIndex,
       },
-      metadata: graphMetadata,
     };
 
     return parsedGraphObject;
@@ -131,31 +172,28 @@ export default class DatabaseIO {
 
 
   private async readAndParseGraphFromDisk(): Promise<Graph> {
-    /*
-      METADATA
-    */
 
-    let graphMetadataSerialized: string | undefined;
+    let pinsSerialized: string | undefined;
     try {
-      graphMetadataSerialized
+      pinsSerialized
         = await this.#storageProvider.readObjectAsString(
-          this.#GRAPH_METADATA_FILENAME,
+          DatabaseIO.#PINS_FILENAME,
         );
     } catch (_e) {
-      graphMetadataSerialized = undefined;
+      pinsSerialized = undefined;
     }
 
     /*
       NOTES AND ALIASES
     */
 
-    const noteFilenames = await this.getNoteFilenamesFromStorageProvider();
+    const noteFilenames = await this.getGraphFilenamesFromStorageProvider();
 
     const serializedNotes = new Map(
       await Promise.all(
         noteFilenames.map(
           async (filename: string): Promise<[Slug, string]> => {
-            const slug = DatabaseIO.getSlugFromNoteFilename(filename);
+            const slug = DatabaseIO.getSlugFromGraphFilename(filename);
             const serializedNote
               = await this.#storageProvider.readObjectAsString(
                 filename,
@@ -166,7 +204,7 @@ export default class DatabaseIO {
       ),
     );
 
-    return this.parseGraph(serializedNotes, graphMetadataSerialized);
+    return this.parseGraph(serializedNotes, pinsSerialized);
   }
 
 
@@ -292,23 +330,11 @@ export default class DatabaseIO {
   }
 
 
-  private async writeGraphMetadataFile(graphMetadata: GraphMetadata) {
+  private async writePinsFile(pins: Slug[]) {
     await this.#storageProvider.writeObject(
-      this.#GRAPH_METADATA_FILENAME,
-      // we pretty print the JSON for Git to be able to show better diffs
-      JSON.stringify(graphMetadata, null, 2),
+      DatabaseIO.#PINS_FILENAME,
+      pins.join("\n"),
     );
-  }
-
-
-  private createEmptyGraphMetadata(): GraphMetadata {
-    return {
-      createdAt: getCurrentISODateTime(),
-      updatedAt: getCurrentISODateTime(),
-      pinnedNotes: [],
-      files: [],
-      version: "5",
-    };
   }
 
   /**
@@ -326,7 +352,7 @@ export default class DatabaseIO {
     slug: Slug,
   ): Promise<string> {
     const rawNote = await this.#storageProvider.readObjectAsString(
-      DatabaseIO.getFilenameForNoteSlug(slug),
+      DatabaseIO.getSubtextGraphFilenameForSlug(slug),
     );
     if (!rawNote) {
       throw new Error(ErrorMessage.GRAPH_NOT_FOUND);
@@ -376,80 +402,117 @@ export default class DatabaseIO {
   // written to the disk and thus are persistent. It should always be called
   // after any operation on the internal graph representation
   // has been performed.
+  // Beware that "all" won't delete abandoned graph files. So if a note is to
+  // be deleted, its slug must be provided explicitly.
   async flushChanges(
     graph: Graph,
-    writeGraphMetadata: WriteGraphMetadataAction,
-    canonicalSlugsToFlush: Set<Slug> | "all",
+    flushPins: boolean,
+    canonicalNoteSlugsToFlush: Set<Slug> | "all",
     aliasesToFlush: Set<Slug> | "all",
+    arbitraryFilesToFlush: Set<Slug> | "all",
   ): Promise<void> {
-    if (
-      writeGraphMetadata === WriteGraphMetadataAction.WRITE
-      || writeGraphMetadata
-        === WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
-    ) {
-      if (
-        writeGraphMetadata
-          === WriteGraphMetadataAction.UPDATE_TIMESTAMP_AND_WRITE
-      ) {
-        graph.metadata.updatedAt = getCurrentISODateTime();
-      }
-      await this.writeGraphMetadataFile(graph.metadata);
-    }
-
     this.#loadedGraph = graph;
 
-    if (canonicalSlugsToFlush instanceof Set) {
-      await Promise.all(Array.from(canonicalSlugsToFlush).map(async (slug) => {
-        const filename = DatabaseIO.getFilenameForNoteSlug(slug);
-        if (!graph.notes.has(slug)) {
-          await this.#storageProvider.removeObject(filename);
-        } else {
-          await this.#storageProvider.writeObject(
-            filename,
-            serializeNote(graph.notes.get(slug) as ExistingNote),
-          );
-        }
-      }));
+    if (canonicalNoteSlugsToFlush instanceof Set) {
+      await Promise.all(
+        Array.from(canonicalNoteSlugsToFlush).map(async (slug) => {
+          const filename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
+          if (!graph.notes.has(slug)) {
+            await this.#storageProvider.removeObject(filename);
+          } else {
+            await this.#storageProvider.writeObject(
+              filename,
+              serializeNote(graph.notes.get(slug) as ExistingNote),
+            );
+          }
+        }),
+      );
     } else {
       for (const [slug, note] of graph.notes) {
-        const filename = DatabaseIO.getFilenameForNoteSlug(slug);
-        if (!graph.notes.has(slug)) {
-          await this.#storageProvider.removeObject(filename);
-        } else {
-          await this.#storageProvider.writeObject(
-            filename,
-            serializeNote(note),
-          );
-        }
+        const filename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
+        await this.#storageProvider.writeObject(
+          filename,
+          serializeNote(note),
+        );
       }
     }
 
 
     if (aliasesToFlush instanceof Set) {
       await Promise.all(Array.from(aliasesToFlush).map(async (alias) => {
-        const filename = DatabaseIO.getFilenameForNoteSlug(alias);
+        const filename = DatabaseIO.getSubtextGraphFilenameForSlug(alias);
         if (!graph.aliases.has(alias)) {
           await this.#storageProvider.removeObject(filename);
         } else {
           const canonicalSlug = graph.aliases.get(alias) as Slug;
           await this.#storageProvider.writeObject(
             filename,
-            `${this.#ALIAS_HEADER}${canonicalSlug}`,
+            `${DatabaseIO.#ALIAS_HEADER_KEY}${canonicalSlug}`,
           );
         }
       }));
     } else {
       for (const [alias, canonicalSlug] of graph.aliases) {
-        const filename = DatabaseIO.getFilenameForNoteSlug(alias);
-        if (!graph.aliases.has(alias)) {
-          await this.#storageProvider.removeObject(filename);
+        const filename = DatabaseIO.getSubtextGraphFilenameForSlug(alias);
+        await this.#storageProvider.writeObject(
+          filename,
+          `${DatabaseIO.#ALIAS_HEADER_KEY}${canonicalSlug}`,
+        );
+      }
+    }
+
+
+    if (arbitraryFilesToFlush instanceof Set) {
+      await Promise.all(Array.from(arbitraryFilesToFlush).map(async (slug) => {
+        const sgfFilepath = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
+        if (!graph.files.has(slug)) {
+          await this.#storageProvider.removeObject(sgfFilepath);
         } else {
+          const fileInfo = graph.files.get(slug)!;
+          const sizeHeaderValue = fileInfo.size.toString();
+          const noteHeaders = new Map<string, string>([
+            [DatabaseIO.#ARBITRARY_FILE_HEADER_KEY, fileInfo.filename],
+            [DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY, sizeHeaderValue],
+          ]);
+
+          if (fileInfo.createdAt) {
+            noteHeaders.set(
+              CanonicalNoteHeader.CREATED_AT,
+              fileInfo.createdAt?.toString(),
+            );
+          }
+
+          if (fileInfo.updatedAt) {
+            noteHeaders.set(
+              CanonicalNoteHeader.UPDATED_AT,
+              fileInfo.updatedAt?.toString(),
+            );
+          }
+
+          const data = serializeNoteHeaders(noteHeaders);
           await this.#storageProvider.writeObject(
-            filename,
-            `${this.#ALIAS_HEADER}${canonicalSlug}`,
+            sgfFilepath,
+            data,
           );
         }
+      }));
+    } else {
+      for (const [slug, fileInfo] of graph.files) {
+        const filename = DatabaseIO.getSubtextGraphFilenameForSlug(slug);
+        const size = fileInfo.size;
+        const data = serializeNoteHeaders(new Map<string, string>([
+          [DatabaseIO.#ARBITRARY_FILE_HEADER_KEY, fileInfo.filename],
+          [DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY, size.toString()],
+        ]));
+        await this.#storageProvider.writeObject(
+          filename,
+          data,
+        );
       }
+    }
+
+    if (flushPins) {
+      await this.writePinsFile(graph.pinnedNotes);
     }
   }
 
@@ -458,7 +521,7 @@ export default class DatabaseIO {
     slug: Slug,
     source: ReadableStream,
   ): Promise<number> {
-    if (!isValidFileSlug(slug)) {
+    if (!isValidSlug(slug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
@@ -466,50 +529,39 @@ export default class DatabaseIO {
       slug,
       source,
     );
+
     return size;
   }
 
 
-  async renameFile(
-    slug: Slug,
+  async moveArbitraryGraphFile(
+    oldSlug: Slug,
     newSlug: Slug,
   ): Promise<void> {
-    if (!isValidFileSlug(slug)) {
-      throw new Error(ErrorMessage.INVALID_SLUG);
+    if (oldSlug !== newSlug) {
+      await this.#storageProvider.renameObject(
+        oldSlug,
+        newSlug,
+      );
     }
-
-    if (!isValidFileSlug(newSlug)) {
-      throw new Error(ErrorMessage.INVALID_SLUG);
-    }
-
-    await this.#storageProvider.renameFile(
-      slug,
-      newSlug,
-    );
   }
 
 
-  async deleteFile(
-    slug: Slug,
+  async deleteArbitraryGraphFile(
+    relativeFilePath: string,
   ): Promise<void> {
-    if (!isValidFileSlug(slug)) {
-      throw new Error(ErrorMessage.INVALID_SLUG);
-    }
-
-    await this.#storageProvider.removeObject(slug);
+    await this.#storageProvider.removeObject(relativeFilePath);
   }
 
 
-  async getReadableStream(
+  async getReadableArbitraryGraphFileStream(
     slug: Slug,
+    filename: string,
     range?: ByteRange,
   ): Promise<ReadableStream> {
-    if (!isValidSlug(slug)) {
-      throw new Error(ErrorMessage.INVALID_SLUG);
-    }
-
+    const filepath = DatabaseIO.getArbitraryGraphFilepath(slug, filename);
     const stream = await this.#storageProvider.getReadableStream(
-      slug,
+      filepath,
       range,
     );
 
@@ -520,7 +572,7 @@ export default class DatabaseIO {
   async getFileSize(
     slug: Slug,
   ): Promise<number> {
-    if (!isValidFileSlug(slug)) {
+    if (!isValidSlug(slug)) {
       throw new Error(ErrorMessage.INVALID_SLUG);
     }
 
@@ -532,7 +584,7 @@ export default class DatabaseIO {
 
 
   async getSizeOfNotes(): Promise<number> {
-    const noteFilenames = await this.getNoteFilenamesFromStorageProvider();
+    const noteFilenames = await this.getGraphFilenamesFromStorageProvider();
     const noteSizes = [];
     for (const noteFilename of noteFilenames) {
       const noteSize = await this.#storageProvider.getObjectSize(noteFilename);
@@ -547,15 +599,8 @@ export default class DatabaseIO {
   }
 
   async graphExistsInStorage(): Promise<boolean> {
-    try {
-      await this.#storageProvider.readObjectAsString(
-        this.#GRAPH_METADATA_FILENAME,
-      );
-      return true;
-    } catch (_e) {
-      const noteFilenamesInStorage
-        = await this.getNoteFilenamesFromStorageProvider();
-      return noteFilenamesInStorage.length > 0;
-    }
+    const noteFilenamesInStorage
+      = await this.getGraphFilenamesFromStorageProvider();
+    return noteFilenamesInStorage.length > 0;
   }
 }

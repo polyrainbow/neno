@@ -2,7 +2,7 @@ import ExistingNote from "./types/ExistingNote.js";
 import NewNote from "./types/NewNote.js";
 import {
   getNoteTitle,
-  parseSerializedExistingNote,
+  parseSerializedExistingGraphFile,
   parseSerializedNewNote,
   serializeNote,
 } from "./noteUtils.js";
@@ -100,7 +100,7 @@ This is a note`;
 });
 
 
-describe("parseSerializedExistingNote", () => {
+describe("parseSerializedExistingGraphFile", () => {
   it(
     "should parse a note with optional and custom headers",
     async () => {
@@ -130,7 +130,7 @@ This is a note`;
       };
 
       expect(
-        parseSerializedExistingNote(serializedNote, "1"),
+        parseSerializedExistingGraphFile(serializedNote, "1"),
       ).toStrictEqual(expectedResult);
     },
   );
@@ -152,7 +152,7 @@ This is a note`;
       };
 
       expect(
-        parseSerializedExistingNote(serializedNote, "1"),
+        parseSerializedExistingGraphFile(serializedNote, "1"),
       ).toStrictEqual(expectedResult);
     },
   );
@@ -188,7 +188,7 @@ blocks`;
       };
 
       expect(
-        parseSerializedExistingNote(serializedNote, "1"),
+        parseSerializedExistingGraphFile(serializedNote, "1"),
       ).toStrictEqual(expectedResult);
     },
   );

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import { getUrl } from "../lib/utils";
 import NotesProvider from "../lib/notes";
 import NoteContentBlockActions from "./NoteContentBlockActions";
+import { getObjectUrlForArbitraryGraphFile } from "../lib/LocalDataStorage";
 
 interface NoteContentBlockTextFileProps {
   file: FileInfo,
@@ -17,7 +17,7 @@ const NoteContentBlockTextFile = ({
   const [text, setText] = useState<string>("");
 
   useEffect(() => {
-    getUrl(file)
+    getObjectUrlForArbitraryGraphFile(file)
       .then((url) => {
         return fetch(url);
       })

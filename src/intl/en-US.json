@@ -151,7 +151,6 @@
   "stats.graph-stats": "Graph Stats",
   "stats.loading-stats": "Loading stats…",
   "stats.metadata.created-at": "Created at",
-  "stats.metadata.graph-version": "Graph version",
   "stats.metadata.number-of-files": "Number of files",
   "stats.metadata.pins": "Pins",
   "stats.metadata.size-of-all-files": "Size of all files",

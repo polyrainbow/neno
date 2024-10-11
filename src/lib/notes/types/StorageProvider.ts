@@ -14,9 +14,9 @@ export default interface StorageProvider {
     requestPath: string,
     data: string,
   ) => Promise<void>,
-  renameFile: (
+  renameObject: (
     requestPath: string,
-    newName: string,
+    newPath: string,
   ) => Promise<void>,
   writeObjectFromReadable: (
     requestPath: string,

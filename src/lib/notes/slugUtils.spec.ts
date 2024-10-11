@@ -2,7 +2,7 @@ import { InlineText } from "../subwaytext/types/Block.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
 import {
   createSlug,
-  getSlugFromFilename,
+  getSlugAndNameForNewArbitraryFile,
   getSlugsFromInlineText,
   isValidNoteSlug,
   isValidSlug,
@@ -11,16 +11,16 @@ import {
 } from "./slugUtils.js";
 import { describe, it, expect } from "vitest";
 
-describe("getSlugFromFilename", () => {
+describe("getSlugAndNameForNewArbitraryFile", () => {
   it(
     "should correctly create slugs for dotfiles",
     async () => {
       expect(
-        getSlugFromFilename("files", ".graph.json", []),
-      ).toBe("files/graph.json");
+        getSlugAndNameForNewArbitraryFile("files", ".graph.json", new Set()),
+      ).toStrictEqual({ slug: "files/graph.json", filename: "graph.json" });
       expect(
-        getSlugFromFilename("files", ".htaccess", []),
-      ).toBe("files/htaccess");
+        getSlugAndNameForNewArbitraryFile("files", ".htaccess", new Set()),
+      ).toStrictEqual({ slug: "files/htaccess", filename: "htaccess" });
     },
   );
 });
@@ -167,7 +167,16 @@ describe("isValidSlug", () => {
     "should approve file slugs with dots",
     () => {
       expect(
-        isValidSlug("files/file.mp3"),
+        isValidSlug("fi.les/file.mp3"),
+      ).toBe(true);
+    },
+  );
+
+  it(
+    "should approve slugs with single-letter namespaces",
+    () => {
+      expect(
+        isValidSlug("a/b/c"),
       ).toBe(true);
     },
   );
@@ -185,10 +194,67 @@ describe("isValidSlug", () => {
   );
 
   it(
-    "should catch slugs with invalid end char",
+    "should catch slugs with slash as last char",
     () => {
       expect(
         isValidSlug("slug/"),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs with dot as last char",
+    () => {
+      expect(
+        isValidSlug("slug."),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs with dot as first char",
+    () => {
+      expect(
+        isValidSlug(".slug"),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs starting with a dash",
+    () => {
+      expect(
+        isValidSlug("-slug"),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs with dot as first char after a slash",
+    () => {
+      expect(
+        isValidSlug("files/.slug"),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs with dot as last char before a slash",
+    () => {
+      expect(
+        isValidSlug("files./slug"),
+      ).toBe(false);
+    },
+  );
+
+  it(
+    "should catch slugs with double dots",
+    () => {
+      expect(
+        isValidSlug("files/sl..ug"),
+      ).toBe(false);
+      expect(
+        isValidSlug("fi..les/slug"),
       ).toBe(false);
     },
   );
