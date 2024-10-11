@@ -66,12 +66,15 @@ export const getTransclusionContent = async (
     throw new Error("INVALID_FILE_SLUG");
   }
 
-  const file = (await notesProvider.getFiles()).find(f => slug === f.slug);
+  let file;
+  try {
+    file = await notesProvider.getFileInfo(slug);
+  } catch (_e) {
+    file = null;
+  }
 
   if (file) {
-    const mediaType = getMediaTypeFromFilename(slug);
-    const file = await notesProvider.getFileInfo(slug);
-
+    const mediaType = getMediaTypeFromFilename(file.filename);
     if (
       mediaType === MediaType.AUDIO
     ) {

@@ -26,7 +26,6 @@ interface NoteListProps {
   sortMode: NoteListSortMode,
   page: number,
   setPage: (newPage: number) => void,
-  numberOfAllNotes?: number,
   itemsAreLinkable: boolean,
   unsavedChanges: boolean,
   setUnsavedChanges: (unsavedChanges: boolean) => void,
@@ -46,7 +45,6 @@ const NoteList = ({
   sortMode,
   page,
   setPage,
-  numberOfAllNotes,
   itemsAreLinkable,
   onLinkIndicatorClick,
   selectedIndex,
@@ -119,7 +117,6 @@ const NoteList = ({
     <NoteSearchDisclaimer
       searchValue={searchValue}
       numberOfResults={numberOfResults}
-      numberOfAllNotes={numberOfAllNotes}
     />
     <div
       className="note-list"

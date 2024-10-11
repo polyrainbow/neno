@@ -6,8 +6,8 @@ import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { Slug } from "./notes/types/Slug";
 import MockStorageProvider from "./notes/test/MockStorageProvider";
-import { getFilenameFromFileSlug } from "./notes/slugUtils";
 import { createDemoGraph } from "./DemoGraph";
+import { FileInfo } from "./notes/types/FileInfo";
 
 /*
   Notes:
@@ -146,16 +146,16 @@ export const invalidateNotesProvider = async (): Promise<NotesProvider> => {
 };
 
 
-export const getUrlForSlug = async (slug: Slug): Promise<string> => {
+export const getObjectUrlForArbitraryGraphFile = async (
+  fileInfo: FileInfo,
+): Promise<string> => {
   if (!notesProvider) {
     throw new Error("Notes provider not initialized");
   }
 
   const readable
-    = await notesProvider.getReadableFileStream(
-      slug,
-    );
-  const extension = NotesProvider.getExtensionFromFilename(slug);
+    = await notesProvider.getReadableArbitraryGraphFileStream(fileInfo.slug);
+  const extension = NotesProvider.getExtensionFromFilename(fileInfo.filename);
   const mimeType = extension && MimeTypes.has(extension)
     ? MimeTypes.get(extension) as string
     : "application/neno-filestream";
@@ -170,8 +170,10 @@ export const saveFile = async (slug: Slug) => {
     throw new Error("Notes provider not initialized");
   }
 
+  const fileInfo = await notesProvider.getFileInfo(slug);
+
   const readable
-    = await notesProvider.getReadableFileStream(
+    = await notesProvider.getReadableArbitraryGraphFileStream(
       slug,
     );
   const extension = NotesProvider.getExtensionFromFilename(slug);
@@ -185,7 +187,7 @@ export const saveFile = async (slug: Slug) => {
         [mimeType]: ["." + extension],
       },
     }],
-    suggestedName: getFilenameFromFileSlug(slug),
+    suggestedName: fileInfo.filename,
   });
 
   await readable.pipeTo(writable);

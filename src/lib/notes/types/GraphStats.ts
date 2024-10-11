@@ -9,7 +9,6 @@ interface GraphStatsMetadata {
   readonly size: GraphSize,
   readonly createdAt: string,
   readonly updatedAt: string,
-  readonly version: string,
 }
 
 

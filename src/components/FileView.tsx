@@ -7,7 +7,6 @@ import {
   ISOTimestampToLocaleString,
   createContentFromSlugs,
   getAppPath,
-  getUrl,
   humanFileSize,
 } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
@@ -28,57 +27,53 @@ import {
   removeExtensionFromFilename,
 } from "../lib/notes/utils";
 import {
-  isValidFileSlug,
+  isValidSlug,
 } from "../lib/notes/slugUtils";
-import { saveFile } from "../lib/LocalDataStorage";
+import {
+  getObjectUrlForArbitraryGraphFile,
+  saveFile,
+} from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
 import FileViewPreview from "./FileViewPreview";
-import { Slug } from "../lib/notes/types/Slug";
 import HeaderButton from "./HeaderButton";
-
-const getRenameInput = (slug: Slug): string => {
-  return removeExtensionFromFilename(slug);
-};
 
 const FileView = () => {
   const notesProvider = useNotesProvider();
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
-  const [src, setSrc] = useState<string>("");
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
   // status can be READY, BUSY
   const [notes, setNotes] = useState<NoteListItem[] | null>(null);
   const [text, setText] = useState<string>("");
   const { slug } = useParams();
   const [slugRenameInput, setSlugRenameInput] = useState<string>(
-    slug ? getRenameInput(slug) : "",
+    slug ? removeExtensionFromFilename(slug) : "",
   );
-  const extension = slug ? getExtensionFromFilename(slug) : "";
+  const extension = fileInfo ? getExtensionFromFilename(fileInfo.filename) : "";
+  const potentialNewSlug = slugRenameInput + (
+    typeof extension === "string"
+      ? `.${extension}`
+      : ""
+  );
   const [updateReferences, setUpdateReferences] = useState(true);
 
   const navigate = useNavigate();
 
-  const type = slug
-    ? getMediaTypeFromFilename(slug)
+  const type = fileInfo
+    ? getMediaTypeFromFilename(fileInfo.filename)
     : null;
 
   const confirm = useConfirm();
 
   const canShowTextPreview = type === MediaType.TEXT;
   const isNenoScript = slug?.endsWith(NENO_SCRIPT_FILE_SUFFIX) ?? false;
-
   useEffect(() => {
     if (typeof slug !== "string") return;
 
     const getFileInfo = async () => {
       const fileInfo = await notesProvider.getFileInfo(slug);
       setFileInfo(fileInfo);
-      const src = await getUrl(fileInfo);
-      setSrc(src);
-
-      if (canShowTextPreview) {
-        fetch(src)
-          .then((response) => response.text())
-          .then((text) => setText(text));
-      }
+      const objectUrl = await getObjectUrlForArbitraryGraphFile(fileInfo);
+      setObjectUrl(objectUrl);
     };
 
     const getNotes = async () => {
@@ -91,6 +86,15 @@ const FileView = () => {
     getFileInfo();
     getNotes();
   }, [notesProvider, slug]);
+
+
+  useEffect(() => {
+    if (canShowTextPreview && typeof objectUrl === "string") {
+      fetch(objectUrl)
+        .then((response) => response.text())
+        .then((text) => setText(text));
+    }
+  }, [objectUrl, canShowTextPreview]);
 
   const canShowPreview = type !== MediaType.OTHER;
 
@@ -187,18 +191,18 @@ const FileView = () => {
     <section className="content-section-wide file-section">
       <h1>{fileInfo ? fileInfo.slug : ""}</h1>
       {
-        canShowPreview && type
+        canShowPreview && type && objectUrl
           ? <FileViewPreview
             type={type}
-            src={src}
+            src={objectUrl}
             text={text}
           />
           : ""
       }
       <p>{
         fileInfo ? humanFileSize(fileInfo.size) : ""
-      }{SPAN_SEPARATOR}{
-        fileInfo
+      }{fileInfo?.createdAt ? SPAN_SEPARATOR : ""}{
+        fileInfo?.createdAt
           ? l("stats.metadata.created-at")
             + ": "
             + ISOTimestampToLocaleString(fileInfo.createdAt)
@@ -239,34 +243,32 @@ const FileView = () => {
           <label htmlFor="file-slug-rename-input">
             {l("files.rename.new-slug")}:
           </label>
-          <div>
-            <input
-              id="file-slug-rename-input"
-              type="text"
-              value={slugRenameInput}
-              onInput={(e) => {
-                const element = e.currentTarget;
-                const newValue = element.value.replace(
-                  // In the input field, we also allow \p{SK} modifiers, as
-                  // they are used to create a full letter with modifier in a
-                  // second step. They are not valid slug characters on
-                  // their own, though.
-                  // We also allow apostrophes ('), as they might be used as a
-                  // dead key for letters like é.
-                  // Unfortunately, it seems like we cannot simulate pressing
-                  // dead keys in Playwright currently, so we cannot
-                  // add a meaningful test for this.
-                  /[^\p{L}\p{Sk}\d\-/._']/gu,
-                  "",
-                ).toLowerCase();
-                setSlugRenameInput(newValue);
-              }}
-            />{
-              typeof extension === "string"
-                ? `.${extension}`
-                : ""
-            }
-          </div>
+          <input
+            id="file-slug-rename-input"
+            type="text"
+            value={slugRenameInput}
+            onInput={(e) => {
+              const element = e.currentTarget;
+              const newValue = element.value.replace(
+                // In the input field, we also allow \p{SK} modifiers, as
+                // they are used to create a full letter with modifier via a
+                // composition session. They are not valid slug characters on
+                // their own, though.
+                // We also allow apostrophes ('), as they might be used as a
+                // dead key for letters like é.
+                // Unfortunately, it seems like we cannot simulate pressing
+                // dead keys in Playwright currently, so we cannot
+                // add a meaningful test for this.
+                /[^\p{L}\p{Sk}\d\-/._']/gu,
+                "",
+              ).toLowerCase();
+              setSlugRenameInput(newValue);
+            }}
+          />{
+            typeof extension === "string"
+              ? `.${extension}`
+              : ""
+          }
         </div>
         <div className="update-references">
           <label className="switch">
@@ -285,45 +287,37 @@ const FileView = () => {
         </div>
         <button
           disabled={
-            slugRenameInput === getRenameInput(slug || "")
-            || !isValidFileSlug(slugRenameInput)
+            slugRenameInput === removeExtensionFromFilename(slug ?? "")
+            || !isValidSlug(potentialNewSlug)
           }
           className="default-button-small dangerous-action"
           onClick={async () => {
             if (
               !slug
-              || slugRenameInput === getRenameInput(slug || "")
-              || !isValidFileSlug(slugRenameInput)
+              || slugRenameInput === slug
+              || !isValidSlug(potentialNewSlug)
             ) return;
-            const newSlug = slugRenameInput
-              + (
-                typeof extension === "string"
-                  ? "." + extension
-                  : ""
-              );
-            try {
-              const newFileInfo = await notesProvider.renameFile(
-                slug,
-                newSlug,
-                updateReferences,
-              );
-              const src = await getUrl(newFileInfo);
-              setFileInfo(newFileInfo);
-              setSrc(src);
+            const newFileInfo = await notesProvider.renameFileSlug(
+              slug,
+              potentialNewSlug,
+              updateReferences,
+            );
 
-              navigate(getAppPath(
-                PathTemplate.FILE,
-                new Map([
-                  ["GRAPH_ID", LOCAL_GRAPH_ID],
-                  ["FILE_SLUG", newSlug],
-                ]),
-              ), {
-                replace: true,
-              });
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error(e);
-            }
+            const objectUrl = await getObjectUrlForArbitraryGraphFile(
+              newFileInfo,
+            );
+            setFileInfo(newFileInfo);
+            setObjectUrl(objectUrl);
+
+            navigate(getAppPath(
+              PathTemplate.FILE,
+              new Map([
+                ["GRAPH_ID", LOCAL_GRAPH_ID],
+                ["FILE_SLUG", potentialNewSlug],
+              ]),
+            ), {
+              replace: true,
+            });
           }}
         >
           {l("files.rename")}

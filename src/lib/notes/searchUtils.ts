@@ -2,7 +2,8 @@ import { serializeInlineText } from "../subwaytext/serialize";
 import { BlockType } from "../subwaytext/types/Block";
 import {
   getBlocks,
-  getFileSlugsInNote,
+  getFileInfosForFilesLinkedInNote,
+  getFileSlugsReferencedInNote,
   getNoteTitle,
   getURLsOfNote,
 } from "./noteUtils";
@@ -122,7 +123,7 @@ const getNotesWithFile = (
   fileSlug: Slug,
 ): ExistingNote[] => {
   return notes.filter((note: ExistingNote) => {
-    const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
+    const fileSlugs = getFileSlugsReferencedInNote(graph, note.meta.slug);
     return fileSlugs.includes(fileSlug);
   });
 };
@@ -230,10 +231,10 @@ const getNotesWithMediaTypes = (
     ? notes
       // every single note must contain blocks from all the types
       .filter((note: ExistingNote): boolean => {
-        const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
+        const files = getFileInfosForFilesLinkedInNote(graph, note.meta.slug);
         const includedMediaTypes = new Set(
-          fileSlugs
-            .map((fileSlug) => getMediaTypeFromFilename(fileSlug)),
+          files
+            .map((file) => getMediaTypeFromFilename(file.filename)),
         );
 
         return setsAreEqual(requiredMediaTypes, includedMediaTypes);
@@ -241,10 +242,10 @@ const getNotesWithMediaTypes = (
     // every note must contain at least one of requiredMediaTypes:
     : notes
       .filter((note: ExistingNote): boolean => {
-        const fileSlugs = getFileSlugsInNote(graph, note.meta.slug);
+        const files = getFileInfosForFilesLinkedInNote(graph, note.meta.slug);
         const includedMediaTypes = new Set(
-          fileSlugs
-            .map((fileSlug) => getMediaTypeFromFilename(fileSlug)),
+          files
+            .map((file) => getMediaTypeFromFilename(file.filename)),
         );
 
         return Array.from(requiredMediaTypes)

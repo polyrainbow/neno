@@ -50,7 +50,7 @@ const ScriptView = () => {
     if (typeof slug !== "string") return;
 
     try {
-      const readable = await notesProvider.getReadableFileStream(
+      const readable = await notesProvider.getReadableArbitraryGraphFileStream(
         slug,
       );
       const value = await new Response(readable).text();

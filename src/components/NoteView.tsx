@@ -98,9 +98,15 @@ const NoteView = () => {
   const controlledNoteList = useControlledNoteList(notesProvider);
 
   const refreshContentViews = async (): Promise<void> => {
-    await refreshHeaderStats();
     await controlledNoteList.refresh();
     await refreshPinnedNotes();
+    /*
+      Header stats are rather expensive and have lower priority than the note
+      list, so we wait until we have capacity. This increases INP significantly.
+    */
+    requestIdleCallback(async () => {
+      await refreshHeaderStats();
+    });
   };
 
   const saveActiveNoteAndRefreshViews = async () => {
@@ -297,7 +303,6 @@ const NoteView = () => {
               setNoteListScrollTop={controlledNoteList.setScrollTop}
               page={controlledNoteList.page}
               setPage={controlledNoteList.setPage}
-              numberOfAllNotes={headerStats?.numberOfAllNotes}
               itemsAreLinkable={true}
               onLinkIndicatorClick={(slug: Slug, title: string) => {
                 const wikilink = Utils.getWikilinkForNote(slug, title);

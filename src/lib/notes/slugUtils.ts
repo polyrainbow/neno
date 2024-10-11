@@ -4,23 +4,12 @@ import {
 } from "../subwaytext/types/Block.js";
 import { Slug } from "./types/Slug.js";
 import { SpanType } from "../subwaytext/types/SpanType.js";
-import { FileInfo } from "./types/FileInfo.js";
 import {
   getExtensionFromFilename,
   removeExtensionFromFilename,
 } from "./utils.js";
 import { getNoteTitle } from "./noteUtils.js";
-
-
-const isValidFileSlug = (slug: Slug): boolean => {
-  /*
-    A file slug is a slug that is saved in a subfolder of the root graph
-    directory.
-  */
-  const numberOfSlashes = slug.match(/\//gi)?.length ?? 0;
-  return numberOfSlashes >= 1
-    && !slug.startsWith("/");
-};
+import GraphObject from "./types/Graph.js";
 
 
 const trimSlug = (slug: string): string => {
@@ -112,16 +101,20 @@ const isValidSlug = (slug: Slug): boolean => {
   return (
     slug.length > 0
     && slug.length <= 200
-    && slug.match(/^[\p{L}\d\-._]+(\/[\p{L}\d\-._]+)*$/u) !== null
+    && slug.match(
+      // eslint-disable-next-line @stylistic/max-len
+      /^[\p{L}\p{M}\d_][\p{L}\p{M}\d\-._]*((?<!\.)\/[\p{L}\p{M}\d\-_][\p{L}\p{M}\d\-._]*)*$/u,
+    ) !== null
+    && !slug.includes("..")
+    && !slug.endsWith(".")
   );
 };
 
 
 const isValidNoteSlug = (slug: Slug): boolean => {
   return (
-    slug.length > 0
-    && slug.length <= 200
-    && slug.match(/^[\p{L}\d\-_]+(\/[\p{L}\d\-_]+)*$/u) !== null
+    isValidSlug(slug)
+    && !slug.includes(".")
   );
 };
 
@@ -181,65 +174,67 @@ const createSlug = (
 };
 
 
-const getSlugFromFilename = (
-  folder: string,
-  filename: string,
-  existingFiles: FileInfo[],
-): Slug => {
-  const existingFileSlugs = existingFiles.map((file) => file.slug);
-  const extension = getExtensionFromFilename(filename);
-  const filenameWithoutExtension = removeExtensionFromFilename(filename);
-  const sluggifiedFileStem = sluggifyFilename(filenameWithoutExtension);
+const getSlugAndNameForNewArbitraryFile = (
+  namespace: string,
+  originalFilename: string,
+  existingSlugs: Set<Slug>,
+): { slug: Slug, filename: string } => {
+  const extension = getExtensionFromFilename(originalFilename);
+  const originalFilenameWithoutExtension = removeExtensionFromFilename(
+    originalFilename,
+  );
+  const sluggifiedFileStem = sluggifyFilename(originalFilenameWithoutExtension);
 
   let n = 1;
 
   while (true) {
-    // We don't want to use just "new" as a slug, because that would conflict
-    // with the "new" keyword in the URL schema. So let's use "new-1" instead.
-    // If that's taken, we'll try "new-2", etc.
-    // With other slugs, we only want to append a number if there's a conflict,
-    // starting with "2".
     const showIntegerSuffix = n > 1;
     const stemWithOptionalIntegerSuffix = showIntegerSuffix
       ? `${sluggifiedFileStem}-${n}`
       : sluggifiedFileStem;
 
-    const slug: Slug = folder + "/"
-      + stemWithOptionalIntegerSuffix
-      + (
-        extension
-          ? (
-            stemWithOptionalIntegerSuffix
-              ? "."
-              : ""
-          ) + extension.trim().toLowerCase()
-          : ""
-      );
+    const filename = stemWithOptionalIntegerSuffix
+    + (
+      extension
+        ? (
+          stemWithOptionalIntegerSuffix
+            ? "."
+            : ""
+        ) + extension.trim().toLowerCase()
+        : ""
+    );
 
-    if (!existingFileSlugs.includes(slug)) {
-      return slug;
+    const slug: Slug = `${namespace}/${filename}`;
+
+    if (!existingSlugs.has(slug)) {
+      return { slug, filename };
     }
     n++;
   }
 };
 
 
-const getFilenameFromFileSlug = (
-  fileSlug: Slug,
-) => {
-  if (!isValidFileSlug(fileSlug)) {
-    throw new Error("Not a file slug: " + fileSlug);
-  }
-  return fileSlug.substring(fileSlug.indexOf("/") + 1);
+const getAllUsedSlugsInGraph = (graph: GraphObject): Set<Slug> => {
+  return (new Set(graph.files.keys()))
+    .union(new Set(graph.notes.keys()))
+    .union(new Set(graph.aliases.keys()));
 };
 
 
+const getLastSlugSegment = (slug: Slug): string => {
+  const posOfLastSlash = slug.lastIndexOf("/");
+
+  if (posOfLastSlash > -1) {
+    return slug.substring(posOfLastSlash + 1);
+  } else {
+    return slug;
+  }
+};
+
 export {
   createSlug,
-  getFilenameFromFileSlug,
-  getSlugFromFilename,
+  getSlugAndNameForNewArbitraryFile,
   getSlugsFromInlineText,
-  isValidFileSlug,
   isValidSlug,
   isValidNoteSlug,
   isValidNoteSlugOrEmpty,
@@ -248,4 +243,6 @@ export {
   trimSlug,
   isValidSlugOrEmpty,
   sluggifyFilename,
+  getAllUsedSlugsInGraph,
+  getLastSlugSegment,
 };

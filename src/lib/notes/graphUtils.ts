@@ -247,7 +247,6 @@ const getGraphCreationTimestamp = (graph: Graph): string => {
       .filter((createdAt): createdAt is string => {
         return typeof createdAt === "string";
       }),
-    graph.metadata.createdAt,
   );
 };
 
@@ -259,7 +258,6 @@ const getGraphUpdateTimestamp = (graph: Graph): string => {
       .filter((createdAt): createdAt is string => {
         return typeof createdAt === "string";
       }),
-    graph.metadata.updatedAt,
   );
 };
 

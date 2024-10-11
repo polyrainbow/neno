@@ -32,7 +32,7 @@ test.beforeEach(async ({ page }) => {
 
   await page.getByAltText("Menu").click();
   await page.getByAltText("Files").click();
-  await page.getByText("test.txt").click();
+  await page.getByText("files/test.txt").click();
 });
 
 test.describe("File view", () => {
@@ -58,9 +58,19 @@ test.describe("File view", () => {
     const textbox = page.getByRole("textbox");
     await textbox.click();
     await textbox.clear();
-    await page.keyboard.type("files/new-name");
+    await page.keyboard.type("new-name");
     await page.getByRole("button", { name: "Rename" }).click();
     const newSlug = await page.locator("h1").innerText();
-    expect(newSlug).toBe("files/new-name.txt");
+    expect(newSlug).toBe("new-name.txt");
+  });
+
+  test("should display text file preview", async ({ page }) => {
+    const previewLocator = page.locator(".preview-block-file-text");
+    await previewLocator.waitFor();
+    const textInEditor
+      = await previewLocator.innerText();
+
+    expect(textInEditor)
+      .toBe("This is the content\nof the plain text file.");
   });
 });
