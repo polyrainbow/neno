@@ -163,11 +163,13 @@ const NoteViewHeader = ({
             : ""
         }
       </FlexContainer>
-      {
-        stats
-          ? <AppHeaderStats stats={stats} />
-          : <BusyIndicator alt={l("loading")} height={28} />
-      }
+      <div className="stats-container">
+        {
+          stats
+            ? <AppHeaderStats stats={stats} />
+            : <BusyIndicator alt={l("app.loading")} height={28} />
+        }
+      </div>
     </HeaderContainer>
   );
 };

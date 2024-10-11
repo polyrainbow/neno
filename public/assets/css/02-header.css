@@ -31,20 +31,24 @@
     background: none;
   }
 
-  .header-stats {
-    white-space: pre;
+  .stats-container {
     display: flex;
-    gap: 15px;
 
-    .app-header-stats-item {
+    .header-stats {
+      white-space: pre;
       display: flex;
-      align-items: center;
-      gap: 2px;
+      gap: 15px;
+
+      .app-header-stats-item {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
     }
   }
 
   @media only screen and (max-width: 1280px) {
-    .header-stats {
+    .stats-container {
       display: none;
     }
   }

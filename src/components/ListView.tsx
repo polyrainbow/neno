@@ -19,7 +19,7 @@ const ListView = () => {
 
   const controlledNoteList = useControlledNoteList(notesProvider);
 
-  const [headerStats] = useHeaderStats(
+  const [headerStats, refreshHeaderStats] = useHeaderStats(
     notesProvider,
   );
 
@@ -31,6 +31,9 @@ const ListView = () => {
 
   useEffect(() => {
     refreshPinnedNotes();
+    requestIdleCallback(async () => {
+      await refreshHeaderStats();
+    });
   }, []);
 
   return <>
