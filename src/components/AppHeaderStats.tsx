@@ -1,7 +1,6 @@
 import { l } from "../lib/intl";
 import GraphStats from "../lib/notes/types/GraphStats";
 import AppHeaderStatsItem from "./AppHeaderStatsItem";
-import BusyIndicator from "./BusyIndicator";
 
 interface AppHeaderStatsProps {
   stats: GraphStats,
@@ -11,19 +10,8 @@ interface AppHeaderStatsProps {
 const AppHeaderStats = ({
   stats,
 }: AppHeaderStatsProps) => {
-  const showStats = !!stats;
-
-  if (!showStats) {
-    return <div className="header-stats">
-      <BusyIndicator
-        alt={l("stats.loading-stats")}
-        height={20}
-      />
-    </div>;
-  }
-
   let percentageOfUnlinkedNotes = NaN;
-  if (showStats && (stats.numberOfAllNotes > 0)) {
+  if (stats.numberOfAllNotes > 0) {
     percentageOfUnlinkedNotes = Math.round(
       (stats.numberOfUnlinkedNotes / stats.numberOfAllNotes) * 100 * 100,
     ) / 100;
