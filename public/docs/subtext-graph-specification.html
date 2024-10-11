@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subtext Graph Specification</title>
+  <link rel="stylesheet" href="css/reboot.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+  <h1>Subtext Graph Specification</h1>
+
+  <p>
+    Version: 0.1
+    <br>
+    Author: <a href="https://polyrainbow.github.io/">Sebastian</a>
+  </p>
+
+  <div id="toc"></div>
+
+  <h2>Abstract</h2>
+
+  <p>
+    This document describes a specification for storing a knowledge graph
+    based on the <a href="https://github.com/polyrainbow/subtext/">Subtext
+    markup language</a> in a file system.
+    Applications adhering to this
+    specification are able read and manipulate Subtext graphs in a conformant
+    way. The
+    specification includes a directory structure and a file format.
+  </p>
+
+  <h2>Introduction and motivation</h2>
+
+  <p>
+    Out of discontent with existing note-taking apps, the author started working on
+    the note-taking application
+    <a href="https://polyrainbow.github.io/neno/">NENO</a>
+    (acronym for "network of
+    notes") in early
+    2020. Please read the
+    <a href="https://polyrainbow.github.io/neno/docs/index.html#design-principles">design
+    principles of NENO</a> as these have significant influence on this
+    specification. Since the author did not want to create just another app, but an
+    open and interoperable knowledge management system independent of single
+    apps, the desire for an open specification arose. This also pays in to the
+    goal of having all the de-facto rules of NENO not only documented in, and
+    spread throughout the code, but collected in a normative ruleset.
+  </p>
+
+  <h2>Specification requirement levels</h2>
+
+  <p>
+    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+    "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+    document are to be interpreted as described in
+    <a href="https://datatracker.ietf.org/doc/html/rfc2119">RFC 2119</a>.
+  </p>
+
+  <h2>Graph directory</h2>
+
+  <p>
+    A
+    <code><a href="#graph-directory">graph directory</a></code>
+    is a directory on a file system that contains a
+    <code><a href="#subtext-graph">Subtext graph</a></code>.
+  </p>
+
+  <h2>Subtext Graph</h2>
+
+  <p>
+    A <code><a href="#subtext-graph">Subtext graph</a></code> consists of
+    <code><a href="#subtext-graph-file">Subtext graph files</a></code> and
+    <code><a href="#arbitrary-graph-file">arbitrary graph files</a></code>
+    in a
+    <code><a href="#graph-directory">graph directory</a></code>
+    and its subdirectories.
+    To obtain a representation of
+    the full graph, implementations MUST collect and parse all
+    <code><a href="#subtext-graph-file">Subtext graph files</a></code> in
+    the
+    <code><a href="#graph-directory">graph directory</a></code>
+    and its subdirectories.
+  </p>
+
+  <h2>Subtext graph file</h2>
+
+  <p>
+    A
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    is an UTF8-encoded text file with the filename
+    extension
+    <code>.subtext</code>.
+  </p>
+  
+  <p>
+    The <code><a href="#subtext-graph-file">Subtext graph file</a></code>'s 
+    name consists of its
+    <code><a href="#slug">slug</a></code>, followed by the filename
+    extension.
+  </p>
+    
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+
+    <p class="note-text">
+      <span class="label">Note:</span>
+      A subtext graph file looks like this: <code>&lt;slug&gt;.subtext</code>
+      (replace <code>&lt;slug&gt;</code> with the actual slug)
+    </p>
+  </div>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+
+    <p class="note-text">
+      <span class="label">Note:</span>
+      The author has considered to use a different filename extension than
+      <code>.subtext</code> for Subtext graph files
+      (e.g. <code>.subg</code>, <code>.sugra</code>, or <code>.neno</code>),
+      to distinguish Subtext
+      graph files from files that just contain Subtext markup
+      language. This would also promote the fact that Subtext graph
+      files could contain content with a different type than Subtext markup.
+      However, that would introduce a breaking change in how 
+      <code>.subtext</code> files are currently being used by several active
+      users.
+    </p>
+  </div>
+
+  <p>
+    A <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    can contain zero or more
+    <code><a href="#header">headers</a></code>, followed by an
+    optional
+    <code><a href="#content-section">content section</a></code>.
+  </p>
+
+  <p>
+    If a <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    has at least one
+    <code><a href="#header">header</a></code>
+    and a <code><a href="#content-section">content section</a></code>,
+    the <code><a href="#header">header section</a></code> and the
+    <code><a href="#content-section">content section</a></code>
+    MUST be separated
+    with an empty line.
+  </p>
+
+  <p>
+    If a <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    has no <code><a href="#header">headers</a></code> but a
+    <code><a href="#content-section">content section</a></code>, the
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    MUST start with
+    the <code><a href="#content-section">content section</a></code>,
+    unless the lines from the beginning of the
+    <code><a href="#content-section">content section</a></code>
+    until the first empty line or <code>EOF</code> could be parsed as
+    valid <code><a href="#header">headers</a></code>.
+    In that case, implementations MUST insert a
+    <code><a href="#header">header section</a></code>
+    with
+    an <code><a href="#empty-header">empty header</a></code>
+    at the beginning of the
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+
+    <p class="note-text">
+      <span class="label">Note:</span>
+      A content section whose first lines could be parsed as a
+      spec-compliant header section should be a very rare case. Here is an
+      example of
+      how the file has to look like in that case:
+
+      <pre class="code-block">
+::
+
+:this-is:the-content
+:section:
+</pre>
+    </p>
+  </div>
+
+  <p>
+    If a <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    contains at least one header but no content
+    section, the
+    file ends with the line of the last header.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+
+    <p class="note-text">
+      <span class="label">Note:</span>
+      It is possible that a Subtext graph file can have an empty
+      content section which is different from having no content section at all.
+      If there is an empty content section, the file ends with two newline
+      characters.
+    </p>
+  </div>
+
+  <p>
+    The default content type of a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code> is
+    <code>text/vnd.subtext</code>.
+  </p>
+
+  <p>
+    Implementations MUST NOT add a 
+    <code><a href="#newline-character">newline character</a></code> at the end
+    of the file.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+
+    <p class="note-text">
+      <span class="label">Note:</span>
+      However, a file can still end with a newline character, this is then
+      considered part of the content section.
+    </p>
+  </div>
+
+  <h3>Header</h3>
+
+  <p>
+    A header section can be at the beginning of a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    and consists of one or more
+    line-separated headers.
+    A header has the following format:
+  </p>
+
+  <p>
+    <code>:&lt;KEY&gt;:&lt;VALUE&gt;</code>
+    <br>
+    where <code>&lt;KEY&gt;</code> is the header key and 
+    <code>&lt;VALUE&gt;</code> is the header value.
+  </p>
+
+  <p>
+    A header key has a minimum length of 0 characters, and a maximum
+    length of 200 characters.
+    Allowed are all Unicode
+    characters, except for a colon
+    (<code>:</code>)
+    and
+    the <code><a href="#newline-character">newline
+      character</a></code>. Implementations SHOULD use only lower-case letters
+    and hyphens (<code>-</code>) in a header key.
+  </p>
+
+  <p>
+    A header value has a minimum length of 0 characters.
+    There is no maximum length.
+    Allowed are all Unicode characters, except for the
+    <code><a href="#newline-character">newline
+    character</a></code>.
+  </p>
+
+  <h4>Empty header</h4>
+
+  <p>
+    An empty header key is a <code><a href="#header">header</a></code>
+    key with zero characters. Empty header keys
+    are reserved for special use.
+  </p>
+
+  <p>
+    An empty header has an empty header key and a value with zero characters
+    (<code>::</code>).
+  </p>
+
+  <h4>Canonical header</h4>
+
+  <p>
+    Implementations SHOULD include the following header when creating a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>:
+    <br>
+    Key: <code>created-at</code>, value: An ISO 8601 timestamp of the time of the
+    creation of this file
+  </p>
+
+  <p>
+    Implementations SHOULD include the following header when creating a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>:
+    Key: <code>updated-at</code>, value: An ISO 8601 timestamp of the last time
+    the file's name, any
+    header, or the
+    <code><a href="#content-section">content section</a></code>
+    of the file has been changed.
+  </p>
+
+  <p>
+    If a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code> has an
+    <code>updated-at</code> header, implementations SHOULD update the
+    ISO 8601 timestamp in the header
+    value each time the file's name, any
+    header, or the
+    <code><a href="#content-section">content section</a></code>
+    of the file has been changed.
+  </p>
+
+  <p>
+    If the <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+      has a <code><a href="#content-section">content section</a></code>
+      with the default content type,
+    implementations MAY include the following header when creating a content
+    file:
+    <br>
+    Key: <code>content-type</code>, Value: The MIME type of the content
+  </p>
+
+  <p>
+    If the <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    has a <code><a href="#content-section">content section</a></code>
+    with a different than the default
+    content type, implementations MUST include the <code>content-type</code>
+    header.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+
+    <p class="note-text">
+      <span class="label">Note:</span>
+      Example structure of a header section for a Subtext graph file with content.
+    </p>
+
+    <pre class="code-block">
+:created-at:&lt;ISO timestamp&gt;
+:updated-at:&lt;ISO timestamp&gt;
+:content-type:&lt;MIME type&gt;
+</pre>
+
+  <p>
+    Structure of a header section for a Subtext graph file with content with example
+    values:
+  </p>
+
+<pre class="code-block">
+:created-at:2024-09-29T19:22:43+02:00
+:updated-at:2024-09-29T19:22:43+02:00
+:content-type:text/vnd.subtext
+</pre>
+</div>
+
+  <h3>Content section</h3>
+
+  <p>
+    The content section can include any Unicode code points and MUST contain
+    content of the
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>'s
+    content-type.
+  </p>
+
+  <h2>Slug</h2>
+
+  <p>
+    A <code><a href="#slug">slug</a></code>
+    is a string that identifies a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
+  </p>
+
+  <p>
+    An implementation that wants to create a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    MUST assign it a <code><a href="#slug">slug</a></code> that is unique in the
+    <code><a href="#subtext-graph">Subtext graph</a></code>.
+  </p>
+
+  <p>
+    An implementation SHOULD map a slug to a file path relative to the
+    <code><a href="#graph-directory">graph directory</a></code>
+    when
+    storing or retrieving the
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    for a specific slug. Slashes (<code>/</code>) in the slug SHOULD be
+    interpreted as
+    directory separators, so that a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    that has a slug with a slash in it will be placed in a subdirectory of the
+    <code><a href="#graph-directory">graph directory</a></code>.
+  </p>
+
+  <h3>Slug syntax</h3>
+
+  <p>
+    A slug MUST have a length of at least 1 Unicode code point and 200 Unicode
+    code points maximum.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+
+    <p class="note-text">
+      <span class="label">Note:</span>
+      Windows systems can handle up to 255 chars in a filename, but we truncate
+      at 200 to leave a bit of room for the filename extension and possible
+      future prefixes and suffixes.
+    </p>
+  </div>
+
+  <p>
+    A slug MUST match this ECMAScript regular expression:
+  </p>
+
+  <pre class="code-block">
+/^[\p{L}\p{M}\d_][\p{L}\p{M}\d\-._]*((?&lt;!\.)\/[\p{L}\p{M}\d\-_][\p{L}\p{M}\d\-._]*)*$/u
+</pre>
+
+  <p>
+    A slug MUST NOT contain two dots in direct succession
+    (<code>..</code>).
+  </p>
+
+  <p>
+    A slug MUST NOT start or end with a dot (<code>.</code>).
+  </p>
+
+  <p>
+    A slug MUST NOT start with a dash (<code>-</code>).
+  </p>
+
+  <p>
+    A slug contains one or more slug segments. The segments can be obtained by
+    separating the slug at every slash (<code>/</code>).
+  </p>
+
+  <p>
+    A slug segment MUST NOT start or end with a dot (<code>.</code>).
+  </p>
+
+  <p>
+    A slug segment MUST NOT start with a dash (<code>-</code>).
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+    <p class="note-text">
+      <span class="label">Note:</span>
+      Examples of valid slugs:
+      <pre class="code-block">
+foo
+foo/bar
+f-o-o/b-a-r
+f/o/o/b/a/r
+foo/bar.png
+</pre>
+        
+          <p>
+            Examples of invalid slugs:
+          </p>
+        
+          <pre class="code-block">
+/foo
+foo/
+.foo
+foo.
+foo./bar
+foo/.bar
+-foo
+</pre>
+    </p>
+  </div>
+
+  <p>
+    Implementations MUST only use lower-case letters in a slug.
+  </p>
+
+  <p>
+    Implementations MUST disallow the usage of dots (.) in slugs that do not
+    point towards
+    <code><a href="#arbitrary-graph-file">arbitrary graph files</a></code>.
+  </p>
+
+  <h2>Alias</h2>
+
+  <p>
+    An <code><a href="#alias">alias</a></code>
+    is a <code><a href="#slug">slug</a></code> that points to another
+    <code><a href="#slug">slug</a></code>.
+  </p>
+
+  <p>
+    To create an <code><a href="#alias">alias</a></code>, an implementation
+    MUST create a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    whose <code><a href="#slug">slug</a></code> is the
+    <code><a href="#alias">alias</a></code>.
+  </p>
+
+  <p>
+    This
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    MUST have a
+    <code><a href="#header">header</a></code>
+    with the key
+    <code>alias-of</code>,
+    and the value of the target slug.
+  </p>
+
+  <p>
+    A <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    that contains a
+    <code><a href="#header">header</a></code>
+    with the key <code>alias-of</code>
+    SHOULD have no
+    <code><a href="#content-section">content section</a></code>.
+  </p>
+
+  <h2>Arbitrary graph file</h2>
+
+  <p>
+    An
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
+    is a file with a different filename extension
+    than the one of a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
+    An arbitrary graph file is part of the
+    <code><a href="#subtext-graph">Subtext graph</a></code>.
+  </p>
+
+  <p>
+    Implementations MUST store an
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
+    inside the
+    <code><a href="#graph-directory">graph directory</a></code> or one of its
+    subdirectories.
+  </p>
+
+  <p>
+    A
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code> MUST be
+    created to accompany and point towards the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>. This
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code> MUST be
+    stored in the same directory as the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+    <p class="note-text">
+      <span class="label">Note:</span>
+      Technically, the Subtext graph file acts in this case as a
+      <a href="https://en.wikipedia.org/wiki/Sidecar_file">sidecar file</a>.
+    </p>
+  </div>
+
+  <p>
+    The
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
+    name MAY be the same as the
+    <code><a href="#slug">slug</a></code>
+    of its
+    accompanying
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
+  </p>
+
+  <p>
+    The
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
+    name SHOULD be the same as the last slug segment of the
+    <code><a href="#slug">slug</a></code>
+    of its
+    accompanying
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+    <p class="note-text">
+      It might be easier for implementations to enforce that the arbitrary
+      graph file's name is the same as its slug's last segment,
+      because then it can derive
+      filename from slug and it does not need to keep track of possible filename
+      collisions <em>in addition to</em> slug collisions.
+    </p>
+  </div>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+    <p class="note-text">
+      <span class="label">Note:</span>
+      Example filenames for Subtext graph files that point to arbitrary
+      graph files are:
+      <code>song.mp3.subtext</code> pointing towards <code>song.mp3</code>,
+      <code>good-movie.subtext</code> pointing towards
+      <code>movie-1234.mp4</code>
+    </p>
+  </div>
+
+  <p>
+    To identify a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    as a file that accompanies an
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>,
+    the
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    MUST have a
+    <code><a href="#header">header</a></code>
+    with the key <code>file</code> and
+    the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
+    name as value.
+  </p>
+
+  <p>
+    A <code><a href="#subtext-graph-file">Subtext graph file</a></code> with a
+    <code><a href="#header">header</a></code>
+    with the key <code>file</code>
+    MUST NOT
+    have a
+    <code><a href="#content-section">content section</a></code>.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+    <p class="note-text">
+      <span class="label">Note:</span>
+      Example header in an accompanying graph file:
+      <br>
+      <code>:file:song.mp3</code>
+    </p>
+  </div>
+
+  <p>
+    A <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    that has a
+    <code><a href="#header">header</a></code>
+    with the key <code>file</code> MUST also have a
+    <code><a href="#header">header</a></code>
+    with the key <code>size</code> and as value the size of the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
+    in bytes.
+  </p>
+
+  <p>
+    If a <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    has a <code>file</code>
+    <code><a href="#header">header</a></code>
+    but no <code>size</code>
+    <code><a href="#header">header</a></code>,
+    an implementation MUST ignore this
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    and the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
+    it points towards.
+  </p>
+
+  <h3>Creating a slug and a normalized filename for an arbitrary graph file</h3>
+
+  <p>
+    If an implementation wants to include an
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>
+    in the graph, the implementation MAY use the following algorithm to
+    derive a slug and a normalized filename from the
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>'s
+    original name:
+  </p>
+
+<pre class="code-block">
+/*********************
+  Helper functions
+*********************/
+
+const getExtensionFromFilename = (filename: string): string | null => {
+  const posOfDot = filename.lastIndexOf(".");
+  if (posOfDot === -1) {
+    return null;
+  }
+
+  const extension = filename.substring(posOfDot + 1).toLowerCase();
+  if (extension.length === 0) {
+    return null;
+  }
+
+  return extension;
+};
+
+
+const removeExtensionFromFilename = (filename: string): string => {
+  const posOfDot = filename.lastIndexOf(".");
+  if (posOfDot === -1) {
+    return filename;
+  }
+
+  return filename.substring(0, posOfDot);
+};
+
+const sluggifyFilename = (filename: string): string => {
+  return filename
+    // Trim leading/trailing whitespace
+    .trim()
+    // remove invalid chars
+    .replace(/['’]+/g, "")
+    // Replace invalid chars with dashes.
+    .replace(/[^\p{L}\p{M}\d\-._]+/gu, "-")
+    // Replace runs of one or more dashes with a single dash
+    .replace(/-+/g, "-")
+    // remove initial dot from dotfiles
+    .replace(/^\./g, "")
+    .toLowerCase()
+    // remove leading and trailing dashes
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+};
+
+/*********************
+  Main function
+*********************/
+
+const getSlugAndNameForNewArbitraryFile = (
+  namespace: string, // e.g. "files" for "files/image.png"
+  originalFilename: string,
+  existingSlugs: Set:&lt;Slug&gt;,
+): { slug: Slug, filename: string } => {
+  const extension = getExtensionFromFilename(originalFilename);
+  const originalFilenameWithoutExtension = removeExtensionFromFilename(
+    originalFilename,
+  );
+  const sluggifiedFileStem = sluggifyFilename(originalFilenameWithoutExtension);
+
+  let n = 1;
+
+  while (true) {
+    const showIntegerSuffix = n > 1;
+    const stemWithOptionalIntegerSuffix = showIntegerSuffix
+      ? `${sluggifiedFileStem}-${n}`
+      : sluggifiedFileStem;
+
+    const filename = stemWithOptionalIntegerSuffix
+    + (
+      extension
+        ? (
+          stemWithOptionalIntegerSuffix
+            ? "."
+            : ""
+        ) + extension.trim().toLowerCase()
+        : ""
+    );
+
+    const slug: Slug = `${namespace}/${filename}`;
+
+    if (!existingSlugs.has(slug)) {
+      return { slug, filename };
+    }
+    n++;
+  }
+};
+</pre>
+
+  <h2>Subtext</h2>
+
+  <p>
+    Subtext markup, as defined in
+    <a href="https://github.com/polyrainbow/subtext/">https://github.com/polyrainbow/subtext/</a>
+    is the default content type for
+    <code><a href="#content-section">content sections</a></code>.
+    Implementations MUST
+    incorporate a Subtext parser to be able to evaluate the edges of the
+    <code><a href="#subtext-graph">Subtext graph</a></code>.
+  </p>
+
+  <h3>Interpretation of slashlinks</h3>
+
+  <p>
+    Implementations MUST interpret the value of a Subtext slashlink as a
+    <code><a href="#slug">slug</a></code> and, if the entity that the
+    <code><a href="#slug">slug</a></code>
+    refers to exists, interpret this slashlink as an edge of the
+    <code><a href="#subtext-graph">Subtext graph</a></code>.
+  </p>
+
+  <h3>Interpretation of wikilinks</h3>
+
+  <p>
+    Implementations MUST resolve a Wikilink value to a
+    <code><a href="#slug">slug</a></code> and,
+    if the entity that the <code><a href="#slug">slug</a></code>
+    refers to exists, interpret this Wikilink as an edge of the
+    <code><a href="#subtext-graph">Subtext graph</a></code>.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+    <p class="note-text">
+      <span class="label">Note:</span>
+      Wikilinks can
+      only point to other notes or aliases, but not arbitrary graph files,
+      because
+      dots are replaced when resolving the slug from the Wikilink value.
+      Dots are a common symbol used
+      in Wikilink texts, so it is not desirable to leave them as-is when
+      resolving a slug.
+    </p>
+  </div>
+
+  <h3>Wikilink slug resolver algorithm</h3>
+
+  <p>
+    Implementations MUST use the following algorithm to resolve a
+    <code><a href="#slug">slug</a></code> from a
+    Wikilink value:
+  </p>
+
+<pre class="code-block">
+/*
+  We will replace dots with dashes, as we do not allow
+  these chars in note slugs (even though they are generally allowed
+  in slugs).
+  As a consequence, this means that uploaded files with dots in slugs
+  (like `files/image.png`) cannot be referenced via a Wikilink.
+  Also, it will replace series of multiple slashes (//, ///, ...)
+  with single slashes (/).
+  In order to link to nested note slugs, we have to use "//" as separator,
+  e.g. [[Person//Alice A.]]
+*/
+const sluggifyWikilinkText = (text: string): string => {
+  return text
+    // Trim leading/trailing whitespace
+    .trim()
+    // remove invalid chars
+    .replace(/['’]+/g, "")
+    // Replace invalid chars with dashes. Keep / for processing afterwards
+    .replace(/[^\p{L}\p{M}\d\-_/]+/gu, "-")
+    // replace single slashes
+    .replace(/(?&lt;!\/)\/(?!\/)/g, "-")
+    // replace multiple slashes (//, ///, ...) with /
+    .replace(/\/\/+/g, "/")
+    // Replace runs of one or more dashes with a single dash
+    .replace(/-+/g, "-")
+    .toLowerCase()
+    // remove leading and trailing dashes
+    .replace(/^-+/, "")
+    .replace(/-+$/, "");
+};
+</pre>
+
+  <h2>Additional implementation file</h2>
+
+  <p>
+    An additional implementation file is a file in the
+    <code><a href="#graph-directory">graph directory</a></code>
+    that
+    is neither a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>, nor an
+    <code><a href="#arbitrary-graph-file">arbitrary graph file</a></code>.
+    Implementations MAY store
+    <code><a href="#additional-implementation-file">additional implementation files</a></code>
+    in the graph
+    directory.
+    Such files MUST NOT have the filename extension <code>.subtext</code> and
+    there MUST NOT be a
+    <code><a href="#subtext-graph-file">Subtext graph file</a></code>
+    with the same <code><a href="#slug">slug</a></code>
+    as the additional implementation file's name.
+  </p>
+
+  <div class="note">
+    <p class="disclaimer">This section is non-normative.</p>
+    <p class="note-text">
+      <span class="label">Note:</span>
+      As an example, an application might want to store the favorite notes
+      of a user inside the
+      <code><a href="#graph-directory">graph directory</a></code>.
+      It could do that by creating a file named
+      <code>favorites.txt</code>. The application then needs to take care that no
+      arbitrary graph file with the same slug is created.
+      <br>
+      The application might also want to use dotfiles (e.g.
+      <code>.favorites</code>) for this use case. Since dots (.) are disallowed
+      at the beginning of a slug, there is no danger of a collision with a
+      slug.
+    </p>
+  </div>
+    
+
+  <h2>Newline character</h2>
+
+  <p>
+    Newline characters are <code>\n</code> characters. <code>\r</code> characters are
+    ignored.
+  </p>
+
+  <h2>License</h2>
+
+  <p>
+    CC-BY-SA 4.0
+  </p>
+
+  </main>
+  <script src="js/toc.js" type="module"></script>
+</body>
+</html>
