@@ -12,6 +12,20 @@ code block
 
 \`\`\``;
 
+const isMac = process.platform === "darwin";
+const isKDEPlasma = process.env.DESKTOP_SESSION === "plasma";
+
+const KEY_COMBINATIONS = {
+  MOVE_CURSOR_TO_BEGINNING_OF_LINE: isMac
+    ? "Meta+ArrowLeft"
+    : isKDEPlasma
+      ? "Home" // https://docs.kde.org/stable5/en/kate/katepart/keybindings.html
+      : "Control+ArrowLeft",
+  SELECT_ALL: isMac ? "Meta+A" : "Control+A",
+  COPY: isMac ? "Meta+KeyC" : "Control+KeyC",
+  PASTE: isMac ? "Meta+KeyV" : "Control+KeyV",
+};
+
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
   await page.waitForSelector("img[alt='NENO logo']");
@@ -117,10 +131,10 @@ test.describe("Editor view", () => {
   test(
     "backspace at the beginning of a heading should remove heading block",
     async ({ page }) => {
-      const isMac = process.platform === "darwin";
-
       await page.keyboard.type("test\n# heading");
-      await page.keyboard.press(isMac ? "Meta+ArrowLeft" : "Home");
+      await page.keyboard.press(
+        KEY_COMBINATIONS.MOVE_CURSOR_TO_BEGINNING_OF_LINE,
+      );
       await page.keyboard.press("Backspace");
       await page.keyboard.press("Space");
 
@@ -511,10 +525,8 @@ test.describe("Editor view", () => {
   test(
     "select all command works with URL",
     async ({ page }) => {
-      const isMac = process.platform === "darwin";
-
       await page.keyboard.type("http://example.com");
-      await page.keyboard.press(isMac ? "Meta+A" : "Control+A");
+      await page.keyboard.press(KEY_COMBINATIONS.SELECT_ALL);
       await page.keyboard.press("Backspace");
 
       const paragraphs = (
@@ -529,9 +541,8 @@ test.describe("Editor view", () => {
   test(
     "select all command works",
     async ({ page }) => {
-      const isMac = process.platform === "darwin";
       await page.keyboard.type("# block 1\n- block 2\nblock 3");
-      await page.keyboard.press(isMac ? "Meta+A" : "Control+A");
+      await page.keyboard.press(KEY_COMBINATIONS.SELECT_ALL);
       await page.keyboard.press("Backspace");
 
       const paragraphs = (
@@ -546,10 +557,9 @@ test.describe("Editor view", () => {
   test(
     "remove wikilink opening punctuation at once should remove the whole wikilink",
     async ({ page }) => {
-      const isMac = process.platform === "darwin";
       await page.keyboard.type("[[link]]");
       await page.keyboard.press(
-        isMac ? "Meta+ArrowLeft" : "Control+ArrowLeft",
+        KEY_COMBINATIONS.MOVE_CURSOR_TO_BEGINNING_OF_LINE,
         { delay: 20 },
       );
       await page.keyboard.press("Shift+ArrowRight", { delay: 20 });
@@ -825,8 +835,6 @@ test.describe("Editor view", () => {
     "copying and pasting multiline text should work",
     async ({ page, context }) => {
       await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-      const isMac = process.platform === "darwin";
-
       await page.keyboard.type("1", { delay: 20 });
       await page.keyboard.press("Enter", { delay: 20 });
       await page.keyboard.type("2", { delay: 20 });
@@ -841,7 +849,7 @@ test.describe("Editor view", () => {
 
       // copy
       await page.keyboard.press(
-        isMac ? "Meta+KeyC" : "Control+KeyC", { delay: 20 }
+        KEY_COMBINATIONS.COPY, { delay: 20 }
       );
 
       const clipboardText1 = await page.evaluate(
@@ -859,7 +867,7 @@ test.describe("Editor view", () => {
 
       // paste
       await page.keyboard.press(
-        isMac ? "Meta+KeyV" : "Control+KeyV", { delay: 20 }
+        KEY_COMBINATIONS.PASTE, { delay: 20 }
       );
 
       await page.waitForTimeout(100);
