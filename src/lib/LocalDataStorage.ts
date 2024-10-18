@@ -5,7 +5,6 @@ import { getWritableStream, streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { Slug } from "./notes/types/Slug";
-import MockStorageProvider from "./notes/test/MockStorageProvider";
 import { createDemoGraph } from "./DemoGraph";
 import { FileInfo } from "./notes/types/FileInfo";
 
@@ -24,12 +23,12 @@ async function verifyPermission(
   if (readWrite) {
     options.mode = "readwrite";
   }
-  // Check if permission was already granted. If so, return true.
+  // Check if permission was already granted. If so, resolve.
   // @ts-ignore
   if ((await fileSystemHandle.queryPermission(options)) === "granted") {
     return;
   }
-  // Request permission. If the user grants permission, return true.
+  // Request permission. If the user grants permission, resolve.
   // @ts-ignore
   if ((await fileSystemHandle.requestPermission(options)) === "granted") {
     return;
@@ -75,11 +74,16 @@ export const getFolderHandleFromStorage = async (
   return folderHandle;
 };
 
-
-const createMockNotesProvider = async (
+/*
+  Creates a NotesProvider that stores all data in the Origin private file system
+*/
+const createOPFSNotesProvider = async (
   createDummyNotes: boolean,
 ): Promise<NotesProvider> => {
-  const memoryStorageProvider = new MockStorageProvider();
+  const opfsDirectory = await navigator.storage.getDirectory();
+  const memoryStorageProvider = new FileSystemAccessAPIStorageProvider(
+    opfsDirectory,
+  );
   if (createDummyNotes) {
     for (let i = 1; i <= 1000; i++) {
       await memoryStorageProvider.writeObject(
@@ -98,7 +102,7 @@ export const initializeNotesProvider = async (
   createDummyNotes?: boolean,
 ): Promise<NotesProvider> => {
   if (!newFolderHandle) {
-    return createMockNotesProvider(createDummyNotes ?? false);
+    return createOPFSNotesProvider(createDummyNotes ?? false);
   }
 
   await verifyPermission(newFolderHandle, true);
