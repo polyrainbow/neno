@@ -19,9 +19,43 @@ implements StorageProvider {
   ****************/
 
 
+  #MAX_OPEN_FILES = 512;
   #directoryHandle: FileSystemDirectoryHandle;
   #descendantFolderHandles: Map<string, FileSystemDirectoryHandle> = new Map();
+  #jobsInProgress = 0;
+  #jobPromiseQueue: Array<PromiseWithResolvers<void>> = [];
 
+  /*
+    Ensures that there are no more than #MAX_OPEN_FILES files opened in
+    parallel, as the OS might have an upper limit (e.g. 1024 on Fedora).
+    Every function that opens a file descriptor should call this
+    function before starting with the main logic.
+    Exceptions are functions that are not closing the file descriptor before the
+    function is finished, e.g. when it is returning a Readable that can be
+    read after the function is finished. We currently cannot track them.
+  */
+  async #scheduleJob(): Promise<void> {
+    if (this.#jobsInProgress < this.#MAX_OPEN_FILES) {
+      this.#jobsInProgress++;
+    } else {
+      const promiseWithResolvers = Promise.withResolvers<void>();
+      this.#jobPromiseQueue.push(promiseWithResolvers);
+      await promiseWithResolvers.promise;
+    }
+  }
+
+  /*
+    Every function that reads from or writes to a file should call this
+    function after it is finished reading, or after an error occured.
+  */
+  #declareJobDone(): void {
+    if (this.#jobPromiseQueue.length > 0) {
+      const jobPromise = this.#jobPromiseQueue.shift()!;
+      jobPromise.resolve();
+    } else {
+      this.#jobsInProgress--;
+    }
+  }
 
   async #getSubFolderHandle(
     folderHandle: FileSystemDirectoryHandle,
@@ -119,10 +153,15 @@ implements StorageProvider {
     requestPath: string,
     data: FileSystemWriteChunkType,
   ): Promise<void> {
-    const fileHandle = await this.#getFileHandle(requestPath, true);
-    const writable = await fileHandle.createWritable();
-    await writable.write(data);
-    await writable.close();
+    await this.#scheduleJob();
+    try {
+      const fileHandle = await this.#getFileHandle(requestPath, true);
+      const writable = await fileHandle.createWritable();
+      await writable.write(data);
+      await writable.close();
+    } finally {
+      this.#declareJobDone();
+    }
   }
 
   async renameObject(
@@ -158,21 +197,31 @@ implements StorageProvider {
     requestPath: string,
     readableStream: ReadableStream,
   ): Promise<number> {
-    const fileHandle = await this.#getFileHandle(requestPath, true);
-    const writable = await fileHandle.createWritable();
-    await readableStream.pipeTo(writable);
-    const size = await this.getObjectSize(requestPath);
-    return size;
+    await this.#scheduleJob();
+    try {
+      const fileHandle = await this.#getFileHandle(requestPath, true);
+      const writable = await fileHandle.createWritable();
+      await readableStream.pipeTo(writable);
+      const size = await this.getObjectSize(requestPath);
+      return size;
+    } finally {
+      this.#declareJobDone();
+    }
   }
 
 
   async readObjectAsString(
     requestPath: string,
   ): Promise<string> {
-    const fileHandle = await this.#getFileHandle(requestPath, false);
-    const file = await fileHandle.getFile();
-    const string = await file.text();
-    return string;
+    await this.#scheduleJob();
+    try {
+      const fileHandle = await this.#getFileHandle(requestPath, false);
+      const file = await fileHandle.getFile();
+      const string = await file.text();
+      return string;
+    } finally {
+      this.#declareJobDone();
+    }
   }
 
 
