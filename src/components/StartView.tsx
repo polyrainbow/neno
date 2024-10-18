@@ -42,12 +42,12 @@ const StartView = () => {
       {
         memoryStorageProviderVisbility
           ? <div
-            className="memory-storage-providers"
+            className="browser-storage-providers"
           >
             <button
               type="button"
               className="default-button default-action"
-              id="memory-storage-load-button"
+              id="browser-storage-load-button"
               onClick={async () => {
                 await initializeNotesProvider(undefined, false);
                 const urlSearchParams
@@ -62,12 +62,12 @@ const StartView = () => {
                 }
               }}
             >
-              Memory Storage
+              Browser Storage
             </button>
             <button
               type="button"
-              className="default-button memory-storage"
-              id="memory-storage-dummy-notes-load-button"
+              className="default-button browser-storage"
+              id="browser-storage-dummy-notes-load-button"
               onClick={async () => {
                 await initializeNotesProvider(undefined, true);
                 const urlSearchParams
@@ -82,7 +82,7 @@ const StartView = () => {
                 }
               }}
             >
-              Memory Storage with dummy notes
+              Browser storage with dummy notes
             </button>
           </div>
           : ""

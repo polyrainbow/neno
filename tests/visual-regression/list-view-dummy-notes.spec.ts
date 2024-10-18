@@ -7,10 +7,10 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
   await page.waitForSelector("img[alt='NENO logo']");
   await page.keyboard.press("Control+.");
-  await page.waitForSelector("#memory-storage-dummy-notes-load-button");
-  await page.click("#memory-storage-dummy-notes-load-button");
+  await page.waitForSelector("#browser-storage-dummy-notes-load-button");
+  await page.click("#browser-storage-dummy-notes-load-button");
   await page.click("#button_list");
-  await page.getByText("Test note 1").nth(0).waitFor();
+  await page.getByText("Test note 999").nth(0).waitFor();
 });
 
 test.describe("Editor", () => {

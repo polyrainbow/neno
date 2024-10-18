@@ -52,7 +52,7 @@
     text-align: center;
   }
 
-  .memory-storage-providers {
+  .browser-storage-providers {
     display: flex;
     justify-content: center;
     gap: var(--default-gap);

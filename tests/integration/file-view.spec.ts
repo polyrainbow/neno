@@ -6,8 +6,8 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/", { "waitUntil": "networkidle" });
   await page.waitForSelector("img[alt='NENO logo']");
   await page.keyboard.press("Control+.");
-  await page.waitForSelector("#memory-storage-load-button");
-  await page.click("#memory-storage-load-button");
+  await page.waitForSelector("#browser-storage-load-button");
+  await page.click("#browser-storage-load-button");
   await page.getByText("No notes found").waitFor();
   await page.getByAltText("No notes found").waitFor();
 
@@ -59,7 +59,10 @@ test.describe("File view", () => {
     await textbox.click();
     await textbox.clear();
     await page.keyboard.type("new-name");
-    await page.getByRole("button", { name: "Rename" }).click();
+    const button = page.getByRole("button", { name: "Rename" });
+    await button.click();
+    // button is disabled again only after action is finished, so let's wait
+    await expect(button).toBeDisabled();
     const newSlug = await page.locator("h1").innerText();
     expect(newSlug).toBe("new-name.txt");
   });
