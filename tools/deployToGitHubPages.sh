@@ -1,18 +1,22 @@
-'''
+: '
 Deploys NENO to GitHub pages.
 
 Requires another repository (TARGET_DIRECTORY) that is checked out in the
 branch that will deploy to gh-pages.
-
-Known issue: The sed command only work with macOS sed, not GNU sed.
-https://unix.stackexchange.com/questions/13711/differences-between-sed-on-mac-osx-and-other-standard-sed
-'''
+'
 
 TARGET_DIRECTORY=../../neno-gh-pages
 
-DIR="$( cd "$( dirname "$0" )" && pwd )"
+SCRIPT_DIRECTORY="$( cd "$( dirname "$0" )" && pwd )"
 
-sed -i '' -E "s/\"\/\"/\"\/neno\/\"/" ../vite.config.ts
+# see https://unix.stackexchange.com/questions/13711/differences-between-sed-on-mac-osx-and-other-standard-sed
+# for differences between macOS sed and GNU sed
+if [ "$(uname)" = "Darwin" ]; then
+  sed -i '' -E "s/\"\/\"/\"\/neno\/\"/" ../vite.config.ts
+else # uname = Linux
+  sed -i -r "s/\"\/\"/\"\/neno\/\"/" ../vite.config.ts
+fi
+
 
 npm run build
 
@@ -20,6 +24,7 @@ echo "Removing old target directory content"
 rm $TARGET_DIRECTORY/*.html
 rm $TARGET_DIRECTORY/*.js
 rm $TARGET_DIRECTORY/*.json
+rm $TARGET_DIRECTORY/*.webmanifest
 rm -R $TARGET_DIRECTORY/assets
 
 echo "Copying files to target directory"
@@ -35,7 +40,12 @@ git commit --amend --no-edit
 git push --force
 
 # Reset vite config
-cd $DIR
-sed -i '' -E "s/\"\/neno\/\"/\"\/\"/" ../vite.config.ts
+cd $SCRIPT_DIRECTORY
+
+if [ "$(uname)" = "Darwin" ]; then
+  sed -i '' -E "s/\"\/neno\/\"/\"\/\"/" ../vite.config.ts
+else
+  sed -i -r "s/\"\/neno\/\"/\"\/\"/" ../vite.config.ts
+fi
 
 echo "Done."
