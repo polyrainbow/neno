@@ -9,6 +9,7 @@ If you want to contribute, here are some links that offer some basic
 insights on how NENO works:
 
 * [README](./README.md)
+* [Subtext Graph Specification](https://polyrainbow.github.io/neno/docs/subtext-graph-specification.html)
 * [User Manual](https://polyrainbow.github.io/neno/docs/index.html)
 
 ## Development setup

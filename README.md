@@ -25,9 +25,8 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
 
 * Full data ownership: You decide where your data is stored: On your device or on a cloud storage of your choice.
 * Multiple media types: Paste video, audio, PDF documents, images and code, or any arbitrary file into your note
-* Graph View: Drag and drop nodes and create your custom knowledge graph visualization
-* Simple modeless markup with [Subtext](https://github.com/subconsciousnetwork/subtext/)
-* Interoperability: NENO's data format is backed by human-readable plain-text files for high interoperability
+* Simple modeless markup with [Subtext](https://github.com/polyrainbow/subtext/)
+* Interoperability: NENO works with human-readable plain-text files and implemenents the free and open [Subtext Graph Specification](https://polyrainbow.github.io/neno/docs/subtext-graph-specification.html)
 * Powerful full-text search
 * Tap-to-link: One click is enough to link one note to another
 * File overview: All files in one view
@@ -36,9 +35,10 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
 ## Getting started
 
 Read the [user manual](https://polyrainbow.github.io/neno/docs/index.html) or just [go to the app](https://polyrainbow.github.io/neno). Please note that your browser
-must support File System Access (Chrome, Edge, ...).
+must support File System Access (e.g. Chrome, Edge).
 
 ## Further reading
 
 * [User manual](https://polyrainbow.github.io/neno/docs/index.html)
+* [Subtext Graph Specification](https://polyrainbow.github.io/neno/docs/subtext-graph-specification.html)
 * [Contributing](./CONTRIBUTING.md)
