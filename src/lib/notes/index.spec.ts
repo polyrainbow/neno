@@ -1291,7 +1291,7 @@ describe("Notes module", () => {
   );
 
   it(
-    "should correctly create aliases",
+    "should correctly create aliases in memory",
     async () => {
       const storageProvider = new MockStorageProvider();
       const notesProvider = new NotesProvider(storageProvider);
@@ -1315,6 +1315,34 @@ describe("Notes module", () => {
       const aliases = notes.results[0].aliases;
       expect(aliases.size).toBe(1);
       expect(aliases.has("note-alias")).toBe(true);
+    },
+  );
+
+
+  it(
+    "should correctly create aliases in persistent storage",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note 1",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        aliases: new Set(["note-alias"]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const aliasSGFContent = await storageProvider.readObjectAsString(
+        "note-alias.subtext",
+      );
+
+      expect(aliasSGFContent).toBe(":alias-of:note-1");
     },
   );
 

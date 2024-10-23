@@ -449,7 +449,10 @@ export default class DatabaseIO {
           const canonicalSlug = graph.aliases.get(alias) as Slug;
           await this.#storageProvider.writeObject(
             filename,
-            `${DatabaseIO.#ALIAS_HEADER_KEY}${canonicalSlug}`,
+            serializeNoteHeaders(new Map<string, string>([[
+              DatabaseIO.#ALIAS_HEADER_KEY,
+              canonicalSlug,
+            ]])),
           );
         }
       }));
@@ -458,7 +461,10 @@ export default class DatabaseIO {
         const filename = DatabaseIO.getSubtextGraphFilenameForSlug(alias);
         await this.#storageProvider.writeObject(
           filename,
-          `${DatabaseIO.#ALIAS_HEADER_KEY}${canonicalSlug}`,
+          serializeNoteHeaders(new Map<string, string>([[
+            DatabaseIO.#ALIAS_HEADER_KEY,
+            canonicalSlug,
+          ]])),
         );
       }
     }
