@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import {
   FileInfo,
 } from "../lib/notes/types/FileInfo";
@@ -13,15 +12,15 @@ interface NoteStatsFileLinkProps {
 const NoteStatsFileLink = ({
   file,
 }: NoteStatsFileLinkProps) => {
-  return <Link
+  return <a
     key={"note-stats-link-" + file.slug}
-    to={getAppPath(PathTemplate.FILE, new Map([
+    href={getAppPath(PathTemplate.FILE, new Map([
       ["GRAPH_ID", LOCAL_GRAPH_ID],
       ["FILE_SLUG", file.slug],
     ]))}
   >
     {file.slug}
-  </Link>;
+  </a>;
 };
 
 export default NoteStatsFileLink;

@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
-import {
-  useParams, Link, useNavigate,
-} from "react-router-dom";
 import NoteListItem from "../lib/notes/types/NoteListItem";
 import {
   ISOTimestampToLocaleString,
-  createContentFromSlugs,
   getAppPath,
   humanFileSize,
 } from "../lib/utils";
@@ -40,9 +36,7 @@ const FileView = () => {
   // status can be READY, BUSY
   const [notes, setNotes] = useState<NoteListItem[] | null>(null);
   const [text, setText] = useState<string>("");
-  const { slug } = useParams();
-
-  const navigate = useNavigate();
+  const slug = "not-set"; // TODO: use from props/params;
 
   const type = fileInfo
     ? getMediaTypeFromFilename(fileInfo.filename)
@@ -91,11 +85,9 @@ const FileView = () => {
           <HeaderButton
             icon="list"
             onClick={() => {
-              navigate(
-                getAppPath(
-                  PathTemplate.FILES,
-                  new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-                ),
+              location.href = getAppPath(
+                PathTemplate.FILES,
+                new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
               );
             }}
           >
@@ -107,16 +99,18 @@ const FileView = () => {
             onClick={async () => {
               if (!fileInfo) return;
 
-              navigate(getAppPath(
+              location.href = getAppPath(
                 PathTemplate.NEW_NOTE,
                 new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-              ), {
+              );
+              
+              /*{
                 state: {
                   contentIfNewNote: createContentFromSlugs([
                     fileInfo.slug,
                   ]),
                 },
-              });
+              });*/
             }}
           >
             {l("files.create-note-with-file")}
@@ -137,13 +131,13 @@ const FileView = () => {
                 onClick={async () => {
                   if (!fileInfo) return;
 
-                  navigate(getAppPath(
+                  location.href = getAppPath(
                     PathTemplate.SCRIPT,
                     new Map([
                       ["GRAPH_ID", LOCAL_GRAPH_ID],
                       ["SCRIPT_SLUG", fileInfo.slug],
                     ]),
-                  ));
+                  );
                 }}
               >
                 {l("files.open-in-script-editor")}
@@ -165,10 +159,11 @@ const FileView = () => {
               });
 
               await notesProvider.deleteFile(fileInfo.slug);
-              navigate(getAppPath(
+
+              location.href = getAppPath(
                 PathTemplate.FILES,
                 new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-              ));
+              );
             }}
           >{l("files.delete")}</HeaderButton>
         </div>
@@ -202,8 +197,8 @@ const FileView = () => {
               ? <ul>{
                 notes.map((note) => {
                   return <li key={"notelink-" + note.slug}>
-                    <Link
-                      to={
+                    <a
+                      href={
                         getAppPath(
                           PathTemplate.EXISTING_NOTE,
                           new Map([
@@ -212,7 +207,7 @@ const FileView = () => {
                           ]),
                         )
                       }
-                    >{note.title}</Link>
+                    >{note.title}</a>
                   </li>;
                 })
               }</ul>
@@ -234,7 +229,7 @@ const FileView = () => {
               setFileInfo(newFileInfo);
               setObjectUrl(objectUrl);
 
-              navigate(getAppPath(
+              location.href = getAppPath(
                 PathTemplate.FILE,
                 new Map([
                   ["GRAPH_ID", LOCAL_GRAPH_ID],
@@ -242,7 +237,7 @@ const FileView = () => {
                 ]),
               ), {
                 replace: true,
-              });
+              };
             }}
           />
           : ""

@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
@@ -20,7 +19,7 @@ const NoteContentBlockActions = ({
   return <FlexContainer className="preview-block-file-actions">
     {
       isNenoScript
-        ? <Link to={
+        ? <a href={
           getAppPath(PathTemplate.SCRIPT, new Map([
             ["GRAPH_ID", LOCAL_GRAPH_ID],
             ["SCRIPT_SLUG", file.slug],
@@ -31,10 +30,10 @@ const NoteContentBlockActions = ({
             title="Open in script editor"
             size={24}
           />
-        </Link>
+        </a>
         : ""
     }
-    <Link to={
+    <a href={
       getAppPath(PathTemplate.FILE, new Map([
         ["GRAPH_ID", LOCAL_GRAPH_ID],
         ["FILE_SLUG", file.slug],
@@ -45,7 +44,7 @@ const NoteContentBlockActions = ({
         title="File details"
         size={24}
       />
-    </Link>
+    </a>
     <a
       className="preview-block-file-download-button"
       onClick={(e) => {

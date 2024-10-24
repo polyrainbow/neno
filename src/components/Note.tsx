@@ -33,7 +33,6 @@ import { LinkType } from "../types/LinkType";
 import useGoToNote from "../hooks/useGoToNote";
 import { getTransclusionContent } from "../lib/Transclusion";
 import { PathTemplate } from "../types/PathTemplate";
-import { useNavigate } from "react-router-dom";
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
@@ -95,7 +94,6 @@ const Note = ({
   const goToNote = useGoToNote();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
-  const navigate = useNavigate();
   const [editor] = useLexicalComposerContext();
 
   /*
@@ -300,7 +298,8 @@ const Note = ({
                   try {
                     await notesProvider.getFileInfo(slug);
 
-                    navigate(
+                    // @ts-ignore
+                    navigation.navigate(
                       getAppPath(PathTemplate.FILE, new Map([
                         ["GRAPH_ID", LOCAL_GRAPH_ID],
                         ["FILE_SLUG", slug],

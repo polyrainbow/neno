@@ -8,7 +8,6 @@ import {
 } from "../lib/LocalDataStorage";
 import useRunOnce from "../hooks/useRunOnce";
 import useNotesProvider from "../hooks/useNotesProvider";
-import { useNavigate, useParams } from "react-router-dom";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
@@ -42,8 +41,7 @@ const ScriptView = () => {
   const [saveInProgress, setSaveInProgress] = useState(false);
 
   const notesProvider = useNotesProvider();
-  const { slug } = useParams();
-  const navigate = useNavigate();
+  const slug = "test" // TODO: Take from params, props
   const editorContainerRef = useRef(null);
 
   useRunOnce(async () => {
@@ -163,7 +161,8 @@ const ScriptView = () => {
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              navigate(
+              // @ts-ignore
+              navigation.navigate(
                 getAppPath(
                   PathTemplate.FILES,
                   new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
@@ -196,7 +195,8 @@ const ScriptView = () => {
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              navigate(
+              // @ts-ignore
+              navigation.navigate(
                 getAppPath(
                   PathTemplate.FILE,
                   new Map([

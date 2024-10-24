@@ -1,8 +1,4 @@
 import { useEffect, useState } from "react";
-import {
-  Link,
-  useNavigate,
-} from "react-router-dom";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import { MediaType } from "../lib/notes/types/MediaType";
 import { PathTemplate } from "../types/PathTemplate";
@@ -25,7 +21,6 @@ const FilesViewPreviewBox = ({
   file,
   isDangling,
 }: FilesViewPreviewBoxProps) => {
-  const navigate = useNavigate();
   const type = getMediaTypeFromFilename(file.filename) || "unknown";
   const isNenoScript = file.slug.endsWith(NENO_SCRIPT_FILE_SUFFIX);
   const [thumbnailImageSrc, setThumbnailImageSrc]
@@ -57,8 +52,8 @@ const FilesViewPreviewBox = ({
   return <div
     className="files-view-preview-box"
   >
-    <Link
-      to={getAppPath(PathTemplate.FILE, new Map([
+    <a
+      href={getAppPath(PathTemplate.FILE, new Map([
         ["GRAPH_ID", LOCAL_GRAPH_ID],
         ["FILE_SLUG", file.slug],
       ]))}
@@ -93,7 +88,8 @@ const FilesViewPreviewBox = ({
             title={l("files.open-in-script-editor")}
             icon="create"
             onClick={(e) => {
-              navigate(getAppPath(
+              // @ts-ignore
+              navigation.navigate(getAppPath(
                 PathTemplate.SCRIPT,
                 new Map([
                   ["GRAPH_ID", LOCAL_GRAPH_ID],
@@ -107,7 +103,7 @@ const FilesViewPreviewBox = ({
           />
           : ""
       }
-    </Link>
+    </a>
   </div>;
 };
 

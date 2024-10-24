@@ -7,7 +7,6 @@ import { initializeNotesProvider } from "../lib/LocalDataStorage";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const StartView = () => {
@@ -15,8 +14,6 @@ const StartView = () => {
     memoryStorageProviderVisbility,
     setMemoryStorageProviderVisbility,
   ] = useState<boolean>(false);
-
-  const navigate = useNavigate();
 
   useKeyboardShortcuts({
     onCmdDot: () => {
@@ -53,9 +50,11 @@ const StartView = () => {
                 const urlSearchParams
                   = new URLSearchParams(window.location.search);
                 if (urlSearchParams.has("redirect")) {
-                  navigate(urlSearchParams.get("redirect") ?? "/");
+                  // @ts-ignore
+                  navigation.navigate(urlSearchParams.get("redirect") ?? "/");
                 } else {
-                  navigate(getAppPath(
+                  // @ts-ignore
+                  navigation.navigate(getAppPath(
                     PathTemplate.NEW_NOTE,
                     new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
                   ));
@@ -73,9 +72,11 @@ const StartView = () => {
                 const urlSearchParams
                   = new URLSearchParams(window.location.search);
                 if (urlSearchParams.has("redirect")) {
-                  navigate(urlSearchParams.get("redirect") ?? "/");
+                  // @ts-ignore
+                  navigation.navigate(urlSearchParams.get("redirect") ?? "/");
                 } else {
-                  navigate(getAppPath(
+                  // @ts-ignore
+                  navigation.navigate(getAppPath(
                     PathTemplate.NEW_NOTE,
                     new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
                   ));

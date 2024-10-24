@@ -5,10 +5,6 @@ import NoteViewHeader from "./NoteViewHeader";
 import Note from "./Note";
 import * as Utils from "../lib/utils";
 import * as Config from "../config";
-import {
-  useLocation,
-  useNavigate, useParams,
-} from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import { FileInfo } from "../lib/notes/types/FileInfo";
@@ -51,13 +47,13 @@ const getValidNoteSlug = (
   }
 };
 
+interface NoteViewProps {
+  slug: Slug,
+}
 
-const NoteView = () => {
+const NoteView = ({ slug }: NoteViewProps) => {
   const notesProvider = useNotesProvider();
   const isSmallScreen = useIsSmallScreen();
-  const navigate = useNavigate();
-  const { slug } = useParams();
-  const location = useLocation();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
   const goToNote = useGoToNote();
   const [editor] = useLexicalComposerContext();
@@ -151,7 +147,8 @@ const NoteView = () => {
     if (location.pathname !== targetPath) {
       /* whatever has been written to the address bar, let's replace it with
       the canonical path for a new note */
-      navigate(
+      // @ts-ignore
+      navigation.navigate(
         targetPath,
         {
           replace: true,
@@ -259,7 +256,8 @@ const NoteView = () => {
         typeof receivedNoteSlug === "string"
         && validNoteSlug !== receivedNoteSlug
       ) {
-        navigate(
+        // @ts-ignore
+        navigation.navigate(
           Utils.getAppPath(
             PathTemplate.EXISTING_NOTE,
             new Map([
@@ -364,9 +362,9 @@ const NoteView = () => {
 };
 
 
-const NoteViewWithEditorContext = () => {
+const NoteViewWithEditorContext = ({ slug }: NoteViewProps) => {
   return <Context>
-    <NoteView />
+    <NoteView slug={slug} />
   </Context>;
 };
 

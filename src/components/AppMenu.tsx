@@ -3,7 +3,6 @@ import AppMenuItem from "./AppMenuItem";
 import OutsideAlerter from "./OutsideAlerter";
 import { l } from "../lib/intl";
 import AppMenuContext from "../contexts/AppMenuContext";
-import { useLocation, useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
@@ -29,9 +28,7 @@ const AppMenu = () => {
   const [unsavedChanges, setUnsavedChanges]
     = useContext(UnsavedChangesContext);
 
-  const location = useLocation();
   const pathname = location.pathname;
-  const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -52,7 +49,8 @@ const AppMenu = () => {
             setUnsavedChanges(false);
           }
 
-          navigate(getAppPath(PathTemplate.START));
+          // @ts-ignore
+          navigation.navigate(getAppPath(PathTemplate.START));
           setIsAppMenuOpen(false);
         }}
       />
@@ -75,7 +73,8 @@ const AppMenu = () => {
             setUnsavedChanges(false);
           }
 
-          navigate(target);
+          // @ts-ignore
+          navigation.navigate(target);
           setIsAppMenuOpen(false);
         }}
       />
@@ -95,7 +94,8 @@ const AppMenu = () => {
             setUnsavedChanges(false);
           }
 
-          navigate(target);
+          // @ts-ignore
+          navigation.navigate(target);
           setIsAppMenuOpen(false);
         }}
       />
@@ -115,7 +115,8 @@ const AppMenu = () => {
             setUnsavedChanges(false);
           }
 
-          navigate(target);
+          // @ts-ignore
+          navigation.navigate(target);
           setIsAppMenuOpen(false);
         }}
       />
@@ -135,7 +136,8 @@ const AppMenu = () => {
             setUnsavedChanges(false);
           }
 
-          navigate(target);
+          // @ts-ignore
+          navigation.navigate(target);
           setIsAppMenuOpen(false);
         }}
       />
