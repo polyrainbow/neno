@@ -37,15 +37,17 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe("Editor view", () => {
-  test("should show note list item", async ({ page }) => {
+  test("should show newly created note list item", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_upload");
-    const noteListItems = await page.$$(".sidebar .note-list .note-list-item");
+    const noteListItemLocator = page.locator(
+      ".sidebar .note-list .note-list-item",
+    );
+    await expect(noteListItemLocator).toHaveCount(1);
 
-    expect(noteListItems.length).toBe(1);
-    const titleElement = await noteListItems[0].$(".title");
-    const title = await titleElement?.innerText();
+    const noteListItemTitleLocator = noteListItemLocator.locator(".title");
+    const title = await noteListItemTitleLocator.innerText();
     expect(title).toBe("Welcome to NENO");
   });
 
@@ -613,16 +615,19 @@ test.describe("Editor view", () => {
   test("should delete notes", async ({ page }) => {
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_upload");
-    const noteListItems1 = await page.$$(".sidebar .note-list .note-list-item");
-    expect(noteListItems1.length).toBe(1);
-    const titleElement = await noteListItems1[0].$(".title");
-    const title = await titleElement?.innerText();
+    const noteListItems = await page.locator(
+      ".sidebar .note-list .note-list-item",
+    );
+    await expect(noteListItems).toHaveCount(1);
+    const titleLocator = await noteListItems.locator(".title");
+    const title = await titleLocator.innerText();
     expect(title).toBe("Welcome to NENO");
+
     await page.click("#button_remove");
     const removeNoteButton = page.getByRole("dialog").getByText("Remove note");
     await removeNoteButton.click();
-    const noteListItems2 = await page.$$(".sidebar .note-list .note-list-item");
-    expect(noteListItems2.length).toBe(0);
+
+    await expect(noteListItems).toHaveCount(0);
   });
 
   test(
