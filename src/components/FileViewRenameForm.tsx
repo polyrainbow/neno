@@ -9,6 +9,7 @@ import {
   isValidSlug,
 } from "../lib/notes/slugUtils";
 import { FileInfo } from "../lib/notes/types/FileInfo";
+import { ErrorMessage } from "../lib/notes/types/ErrorMessage";
 
 interface FileViewRenameFormProps {
   fileInfo: FileInfo;
@@ -31,6 +32,7 @@ const FileViewRenameForm = ({
       : ""
   );
   const [updateReferences, setUpdateReferences] = useState(true);
+  const [error, setError] = useState<ErrorMessage | null>(null);
 
   return <>
     <h2>{l("files.rename")}</h2>
@@ -59,6 +61,7 @@ const FileViewRenameForm = ({
               "",
             ).toLowerCase();
             setSlugRenameInput(newValue);
+            setError(null);
           }}
         />{
           typeof extension === "string"
@@ -81,6 +84,13 @@ const FileViewRenameForm = ({
           {l("note.slug.update-references")}
         </span>
       </div>
+      {
+        error === ErrorMessage.SLUG_EXISTS
+          ? <p className="error">
+            {l("files.rename.slug-already-exists")}
+          </p>
+          : ""
+      }
       <button
         disabled={
           slugRenameInput === removeExtensionFromFilename(slug ?? "")
@@ -93,13 +103,22 @@ const FileViewRenameForm = ({
             || slugRenameInput === slug
             || !isValidSlug(potentialNewSlug)
           ) return;
-          const newFileInfo = await notesProvider.renameFileSlug(
-            slug,
-            potentialNewSlug,
-            updateReferences,
-          );
 
-          setFileInfo(newFileInfo);
+          try {
+            const newFileInfo = await notesProvider.renameFileSlug(
+              slug,
+              potentialNewSlug,
+              updateReferences,
+            );
+
+            setFileInfo(newFileInfo);
+          } catch (e) {
+            if (e instanceof Error && e.message === ErrorMessage.SLUG_EXISTS) {
+              setError(ErrorMessage.SLUG_EXISTS);
+            } else {
+              throw e;
+            }
+          }
         }}
       >
         {l("files.rename")}

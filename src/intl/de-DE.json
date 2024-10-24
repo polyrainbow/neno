@@ -58,6 +58,7 @@
   "files.open-in-script-editor": "Im Skript-Editor öffnen",
   "files.rename": "Umbenennen",
   "files.rename.new-slug": "Neuer Slug",
+  "files.rename.slug-already-exists": "Dieser Slug existiert bereits. Bitte wähle einen anderen.",
   "files.save-duplicate": "Duplikat speichern",
   "files.show-all-files": "Zeige alle Dateien",
   "files.show-neno-scripts": "NENO-Skripte anzeigen",
