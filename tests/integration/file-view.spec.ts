@@ -28,6 +28,21 @@ test.beforeEach(async ({ page }) => {
     dataTransfer: dataTransfer1,
   });
 
+  const dataTransfer2 = await page.evaluateHandle(() => {
+    const dt = new DataTransfer();
+    const file = new File(
+      ["This is the content\nof the second plain text file."],
+      "test-2.txt",
+      { type: "text/plain" },
+    );
+    dt.items.add(file);
+    return dt;
+  });
+
+  await page.dispatchEvent("section.note", "drop", {
+    dataTransfer: dataTransfer2,
+  });
+
   await page.locator("#button_upload").click();
 
   await page.getByAltText("Menu").click();
@@ -66,6 +81,26 @@ test.describe("File view", () => {
     const newSlug = await page.locator("h1").innerText();
     expect(newSlug).toBe("new-name.txt");
   });
+
+  test(
+    "should show an error if file slug is renamed to existing",
+    async ({ page }) => {
+      const textbox = page.getByRole("textbox");
+      await textbox.click();
+      await textbox.clear();
+      await page.keyboard.type("files/test-2");
+      const button = page.getByRole("button", { name: "Rename" });
+      await button.click();
+      const errorLocator = await page.getByText(
+        "This slug does already exist. Please choose another",
+      );
+      await expect(errorLocator).toBeAttached();
+
+      await textbox.click();
+      await textbox.clear();
+      await expect(errorLocator).not.toBeAttached();
+    },
+  );
 
   test("should display text file preview", async ({ page }) => {
     const previewLocator = page.locator(".preview-block-file-text");

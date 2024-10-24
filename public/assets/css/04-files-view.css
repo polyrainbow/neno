@@ -169,6 +169,11 @@
       }
     }
 
+    .error {
+      color: var(--error-and-danger-text-color);
+      margin: 0;
+    }
+
     button {
       width: fit-content;
     }

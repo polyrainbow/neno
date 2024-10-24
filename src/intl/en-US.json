@@ -58,6 +58,7 @@
   "files.open-in-script-editor": "Open in script editor",
   "files.rename": "Rename",
   "files.rename.new-slug": "New slug",
+  "files.rename.slug-already-exists": "This slug does already exist. Please choose another.",
   "files.save-duplicate": "Save duplicate",
   "files.show-all-files": "Show all files",
   "files.show-neno-scripts": "Show NENO scripts",
