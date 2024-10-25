@@ -11,6 +11,10 @@ test.beforeEach(async ({ page }) => {
   await page.click("#browser-storage-dummy-notes-load-button");
   await page.click("#button_list");
   await page.getByText("Test note 999").nth(0).waitFor();
+  // The svg img might take a moment to load so let's wait for it too.
+  await page.locator(".note-list-item-linked-notes-indicator-content img")
+    .nth(0)
+    .waitFor();
 });
 
 test.describe("Editor", () => {

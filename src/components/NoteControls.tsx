@@ -1,5 +1,4 @@
 import IconButton from "./IconButton";
-import { useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
@@ -44,7 +43,6 @@ const NoteControls = ({
 }: NoteControlsProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
-  const navigate = useNavigate();
   const isSmallScreen = useIsSmallScreen();
   const confirm = useConfirm();
   const goToNote = useGoToNote();
@@ -61,7 +59,8 @@ const NoteControls = ({
               await confirmDiscardingUnsavedChanges();
               setUnsavedChanges(false);
             }
-            navigate(getAppPath(
+            // @ts-ignore
+            navigation.navigate(getAppPath(
               PathTemplate.LIST,
               new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
             ));

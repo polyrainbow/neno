@@ -8,7 +8,6 @@ import {
 } from "../lib/LocalDataStorage";
 import useRunOnce from "../hooks/useRunOnce";
 import useNotesProvider from "../hooks/useNotesProvider";
-import { useNavigate, useParams } from "react-router-dom";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
@@ -21,14 +20,20 @@ import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { l } from "../lib/intl";
+import { Slug } from "../lib/notes/types/Slug";
 
 interface CustomScript {
   slug: string;
   value: string;
 }
 
+interface ScriptViewProps {
+  slug: Slug,
+};
 
-const ScriptView = () => {
+const ScriptView = ({
+  slug,
+}: ScriptViewProps) => {
   const [activeScript, setActiveScript] = useState<CustomScript | null>(null);
   const [scriptInput, setScriptInput] = useState<string | null>(null);
   const [output, setOutput] = useState<string | null>(null);
@@ -42,8 +47,6 @@ const ScriptView = () => {
   const [saveInProgress, setSaveInProgress] = useState(false);
 
   const notesProvider = useNotesProvider();
-  const { slug } = useParams();
-  const navigate = useNavigate();
   const editorContainerRef = useRef(null);
 
   useRunOnce(async () => {
@@ -163,7 +166,8 @@ const ScriptView = () => {
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              navigate(
+              // @ts-ignore
+              navigation.navigate(
                 getAppPath(
                   PathTemplate.FILES,
                   new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
@@ -196,7 +200,8 @@ const ScriptView = () => {
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              navigate(
+              // @ts-ignore
+              navigation.navigate(
                 getAppPath(
                   PathTemplate.FILE,
                   new Map([
