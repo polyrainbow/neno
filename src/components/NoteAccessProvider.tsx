@@ -8,7 +8,6 @@ import {
   initializeNotesProviderWithFolderHandleFromStorage,
   isInitialized,
 } from "../lib/LocalDataStorage";
-import { useNavigate } from "react-router-dom";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { ROOT_PATH } from "../config";
@@ -18,7 +17,6 @@ const NoteAccessProvider = ({
   children,
 }: React.PropsWithChildren) => {
   const [isReady, setIsReady] = useState(false);
-  const navigate = useNavigate();
 
   useRunOnce(() => {
     if (!isInitialized()) {
@@ -32,7 +30,10 @@ const NoteAccessProvider = ({
             "redirect",
             window.location.pathname.substring(ROOT_PATH.length - 1),
           );
-          navigate(getAppPath(PathTemplate.START, new Map(), urlParams));
+          // @ts-ignore
+          navigation.navigate(
+            getAppPath(PathTemplate.START, new Map(), urlParams),
+          );
         });
     } else {
       setIsReady(true);

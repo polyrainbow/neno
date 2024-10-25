@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import NoteViewHeader from "./NoteViewHeader";
 import NoteListWithControls from "./NoteListWithControls";
-import { useNavigate } from "react-router-dom";
 import FloatingActionButton from "./FloatingActionButton";
 import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
@@ -14,7 +13,6 @@ import { LOCAL_GRAPH_ID } from "../config";
 
 
 const ListView = () => {
-  const navigate = useNavigate();
   const notesProvider = useNotesProvider();
 
   const controlledNoteList = useControlledNoteList(notesProvider);
@@ -66,7 +64,8 @@ const ListView = () => {
     <FloatingActionButton
       title={l("editor.new-note")}
       icon="add"
-      onClick={() => navigate(getAppPath(
+      // @ts-ignore
+      onClick={() => navigation.navigate(getAppPath(
         PathTemplate.NEW_NOTE,
         new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
       ))}

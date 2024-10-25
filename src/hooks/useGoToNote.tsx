@@ -1,6 +1,3 @@
-import {
-  useNavigate,
-} from "react-router-dom";
 import { PathTemplate } from "../types/PathTemplate";
 import { getAppPath } from "../lib/utils";
 import { Slug } from "../lib/notes/types/Slug";
@@ -12,8 +9,6 @@ interface Params {
 }
 
 const useGoToNote = () => {
-  const navigate = useNavigate();
-
   const goToNote = (
     slug: Slug,
     params?: Params,
@@ -26,7 +21,8 @@ const useGoToNote = () => {
       ]),
     );
 
-    return navigate(path, {
+    // @ts-ignore
+    return navigation.navigate(path, {
       replace: params?.replace,
       state: {
         contentIfNewNote: params?.contentIfNewNote,

@@ -1,7 +1,4 @@
 import { useEffect, useState } from "react";
-import {
-  useNavigate,
-} from "react-router-dom";
 import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
@@ -19,8 +16,6 @@ const StartViewLocal = () => {
     localDatabaseFolderHandleName,
     setLocalDatabaseFolderHandleName,
   ] = useState<string | null>(null);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const retrieveLocalDatabaseFolderHandle = async () => {
@@ -64,9 +59,11 @@ const StartViewLocal = () => {
                 const urlSearchParams
                   = new URLSearchParams(window.location.search);
                 if (urlSearchParams.has("redirect")) {
-                  navigate(urlSearchParams.get("redirect") ?? "/");
+                  // @ts-ignore
+                  navigation.navigate(urlSearchParams.get("redirect") ?? "/");
                 } else {
-                  navigate(getAppPath(
+                  // @ts-ignore
+                  navigation.navigate(getAppPath(
                     PathTemplate.NEW_NOTE,
                     new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
                   ));
@@ -98,7 +95,8 @@ const StartViewLocal = () => {
           // @ts-ignore
           const folderHandle = await window.showDirectoryPicker();
           await initializeNotesProvider(folderHandle);
-          navigate(getAppPath(
+          // @ts-ignore
+          navigation.navigate(getAppPath(
             PathTemplate.NEW_NOTE,
             new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
           ));
