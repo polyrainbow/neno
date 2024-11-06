@@ -55,10 +55,10 @@ test.describe("Editor view", () => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_upload");
-    const editorParagraphs = await page.$$(
+    const editorParagraphs = page.locator(
       "div[data-lexical-editor] .editor-paragraph",
     );
-    expect(editorParagraphs.length).toBe(10);
+    await expect(editorParagraphs).toHaveCount(10);
   });
 
   test("slug bar should show correct value", async ({ page }) => {
@@ -73,9 +73,9 @@ test.describe("Editor view", () => {
   test("editor paragraphs should have correct types", async ({ page }) => {
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_upload");
-    const editorParagraphs = await page.$$(
+    const editorParagraphs = await page.locator(
       "div[data-lexical-editor] .editor-paragraph",
-    );
+    ).all();
     const classes = await Promise.all(
       editorParagraphs.map((p) => p.getAttribute("class")),
     );
@@ -916,6 +916,70 @@ test.describe("Editor view", () => {
       // expect node to be a simple text node again
       expect(await codeBlock[0].getAttribute("class")).toBe(null);
       expect(await codeBlock[0].textContent()).toBe("[[link]]");
+    },
+  );
+
+  test(
+    "List item sigil and content nodes should be created properly",
+    async ({ page }) => {
+      await page.keyboard.type(`-no list item
+- list item 1
+-     li2
+- 
+- `);
+
+      const editorParagraphsLocator = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+
+      await expect(editorParagraphsLocator).toHaveCount(5);
+
+      const editorParagraphs = await editorParagraphsLocator.all();
+
+      // Line 1
+      expect(await editorParagraphs[0].getAttribute("class"))
+        .toBe("editor-paragraph ltr");
+
+      // Line 2
+      const paragraph1 = editorParagraphs[1];
+      const className1 = await paragraph1.getAttribute("class");
+      expect(className1).toBe("editor-paragraph list-item ltr");
+      const children1 = await paragraph1.locator(">*").all();
+      expect(await children1[0].getAttribute("class"))
+        .toBe("list-item-sigil");
+      expect(await children1[1].getAttribute("class"))
+        .toBe("list-item-content ltr");
+
+      // Line 3
+      const paragraph2 = editorParagraphs[2];
+      const className2 = await paragraph2.getAttribute("class");
+      expect(className2).toBe("editor-paragraph list-item ltr");
+      const children2 = await paragraph2.locator(">*").all();
+      expect(await children2[0].getAttribute("class"))
+        .toBe("list-item-sigil");
+      expect(await children2[1].getAttribute("class"))
+        .toBe("list-item-content ltr");
+
+      // Line 4
+      const paragraph3 = editorParagraphs[3];
+      const className3 = await paragraph3.getAttribute("class");
+      expect(className3).toBe("editor-paragraph list-item");
+      const children3 = await paragraph3.locator(">*").all();
+      expect(await children3[0].getAttribute("class"))
+        .toBe("list-item-sigil");
+      expect(await children3[1].getAttribute("class"))
+        .toBe("list-item-content");
+
+      // Line 5
+      const paragraph4 = editorParagraphs[4];
+      const className4 = await paragraph4.getAttribute("class");
+      expect(className4).toBe("editor-paragraph list-item");
+      const children4 = await paragraph4.locator(">*").all();
+      expect(await children4[0].getAttribute("class"))
+        .toBe("list-item-sigil");
+      expect(await children4[1].getAttribute("class"))
+        .toBe("list-item-content");
+
     },
   );
 });

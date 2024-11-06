@@ -12,6 +12,7 @@ import { AutoLinkNode } from "@lexical/link";
 import { ListItemNode } from "../nodes/ListItemNode";
 import { HeadingNode } from "../nodes/HeadingNode";
 import { TransclusionContentGetter } from "../types/TransclusionContentGetter";
+import { ListItemContentNode } from "../nodes/ListItemContentNode";
 
 
 const registerBlockNodeTransform = (
@@ -25,6 +26,13 @@ const registerBlockNodeTransform = (
   editor.registerNodeTransform(ListItemNode, (node: ListItemNode) => {
     refreshTransclusionsForBlock(node, getTransclusionContent);
   });
+
+  editor.registerNodeTransform(
+    ListItemContentNode,
+    (node: ListItemContentNode) => {
+      refreshTransclusionsForBlock(node.getParent()!, getTransclusionContent);
+    },
+  );
 
   editor.registerNodeTransform(HeadingNode, (node: HeadingNode) => {
     refreshTransclusionsForBlock(node, getTransclusionContent);

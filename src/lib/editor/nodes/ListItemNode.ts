@@ -48,8 +48,8 @@ export class ListItemNode extends ParagraphNode {
 }
 
 
-export function $createListItemNode(): ListItemNode {
-  return $applyNodeReplacement(new ListItemNode());
+export function $createListItemNode(text = ""): ListItemNode {
+  return $applyNodeReplacement(new ListItemNode(text));
 }
 
 

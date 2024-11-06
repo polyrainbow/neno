@@ -14,6 +14,7 @@ import {
 import { $isAutoLinkNode, AutoLinkNode } from "@lexical/link";
 import { ElementNodeType } from "../types/ElementNodeType";
 import { TransclusionContentGetter } from "../types/TransclusionContentGetter";
+import { $isListItemContentNode } from "../nodes/ListItemContentNode";
 
 const transclusionsMatchSlashlinks = (
   slashlinks: AutoLinkNode[],
@@ -64,6 +65,15 @@ const splitParagraphAtLineBreaks = (node: ParagraphNode): void => {
 };
 
 
+const isSlashlinkNode = (node: LexicalNode): node is AutoLinkNode => {
+  return $isAutoLinkNode(node)
+    && (
+      node.getTextContent().startsWith("/")
+      || node.getTextContent().startsWith("@")
+    );
+};
+
+
 export default (
   node: ParagraphNode,
   getTransclusionContent: TransclusionContentGetter,
@@ -77,20 +87,26 @@ export default (
     return;
   }
 
-  const slashlinks = [
-    ElementNodeType.PARAGRAPH,
-    ElementNodeType.LIST_ITEM,
-    ElementNodeType.HEADING,
-  ].includes(node.getType() as ElementNodeType)
-    ? node.getChildren()
-      .filter((child): child is AutoLinkNode => {
-        return $isAutoLinkNode(child)
-          && (
-            child.getTextContent().startsWith("/")
-            || child.getTextContent().startsWith("@")
-          );
-      })
-    : []; // don't create slashlinks on code or quote blocks
+  const nodeType = node.getType() as ElementNodeType;
+
+  let slashlinks: AutoLinkNode[];
+
+  if (nodeType === ElementNodeType.LIST_ITEM) {
+    const contentNode = node.getChildren()[1];
+    if (!$isListItemContentNode(contentNode)) {
+      // Maybe the other transformations have not been performed yet, so let's
+      // wait first.
+      return [];
+    }
+    slashlinks = contentNode.getChildren().filter(isSlashlinkNode);
+  } else if (
+    nodeType === ElementNodeType.PARAGRAPH
+    || nodeType === ElementNodeType.HEADING
+  ) {
+    slashlinks = node.getChildren().filter(isSlashlinkNode);
+  } else {
+    slashlinks = []; // don't create slashlinks on code or quote blocks
+  }
 
   const transclusions: TransclusionNode[] = node.getChildren()
     .filter(
