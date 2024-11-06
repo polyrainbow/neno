@@ -53,11 +53,10 @@ test.beforeEach(async ({ page }) => {
 test.describe("File view", () => {
   test("should forward to 'used in' note", async ({ page }) => {
     await page.getByText("Note with a file").click();
-    const textInEditor
-      = await page.locator("div[data-lexical-editor]").innerText();
-
-    expect(textInEditor.startsWith("Note with a file"))
-      .toBe(true);
+    const firstParagraphInEditor = await page.locator(
+      "div[data-lexical-editor] > .editor-paragraph",
+    ).nth(0);
+    await expect(firstParagraphInEditor).toHaveText("Note with a file");
   });
 
   test("should create new note with file as reference", async ({ page }) => {
