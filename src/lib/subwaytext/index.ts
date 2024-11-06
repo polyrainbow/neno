@@ -81,7 +81,7 @@ const parse = (input: string): Block[] => {
           blocks.push(newBlock);
 
           return blocks;
-        } else if (line.startsWith("-")) {
+        } else if (line.startsWith("- ")) {
           const newBlock: UnorderedListItemBlock = {
             type: BlockType.UNORDERED_LIST_ITEM,
             data: {

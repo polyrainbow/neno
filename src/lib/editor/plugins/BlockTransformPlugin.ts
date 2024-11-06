@@ -25,7 +25,7 @@ import {
 import { $createQuoteBlockNode, QuoteBlockNode } from "../nodes/QuoteBlockNode";
 import { ElementNodeType } from "../types/ElementNodeType";
 import { $createHeadingNode, HeadingNode } from "../nodes/HeadingNode";
-import { $createListItemNode, ListItemNode } from "../nodes/ListItemNode";
+import { ListItemNode } from "../nodes/ListItemNode";
 import { $createKeyValueNode, KeyValueNode } from "../nodes/KeyValueNode";
 
 type BlockNode = ParagraphNode
@@ -53,7 +53,7 @@ const assignCorrectElementNodes = (
         typeNodeShouldHaveMap.set(node, ElementNodeType.QUOTE);
       } else if (nodeText.startsWith("#")) {
         typeNodeShouldHaveMap.set(node, ElementNodeType.HEADING);
-      } else if (nodeText.startsWith("-")) {
+      } else if (nodeText.startsWith("- ")) {
         typeNodeShouldHaveMap.set(node, ElementNodeType.LIST_ITEM);
       } else if (
         /\$[\p{L}\p{M}\d\-_]+(\s(.*)?)?$/gu.test(nodeText)
@@ -87,7 +87,7 @@ const assignCorrectElementNodes = (
       } else if (typeNodeShouldHave === ElementNodeType.HEADING) {
         elementNode.replace($createHeadingNode(), true);
       } else if (typeNodeShouldHave === ElementNodeType.LIST_ITEM) {
-        elementNode.replace($createListItemNode(), true);
+        elementNode.replace(new ListItemNode(), true);
       } else if (typeNodeShouldHave === ElementNodeType.KEY_VALUE_NODE) {
         elementNode.replace($createKeyValueNode(), true);
       } else {

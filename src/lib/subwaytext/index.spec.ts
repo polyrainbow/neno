@@ -14,8 +14,9 @@ some
 multiline
 text
 
--List
--  unordered
+-Not a List item due to missing whitespace
+- unordered list item 1
+-   unordered list item 2
 1.ordered list
 2. another item
 3..item3
@@ -113,13 +114,12 @@ A paragraph with a https://link.com and a /slashlink`;
         },
       },
       {
-        type: BlockType.UNORDERED_LIST_ITEM,
+        type: BlockType.PARAGRAPH,
         data: {
-          whitespace: "",
           text: [
             {
               type: SpanType.NORMAL_TEXT,
-              text: "List",
+              text: "-Not a List item due to missing whitespace",
             },
           ],
         },
@@ -127,11 +127,23 @@ A paragraph with a https://link.com and a /slashlink`;
       {
         type: BlockType.UNORDERED_LIST_ITEM,
         data: {
-          whitespace: "  ",
+          whitespace: " ",
           text: [
             {
               type: SpanType.NORMAL_TEXT,
-              text: "unordered",
+              text: "unordered list item 1",
+            },
+          ],
+        },
+      },
+      {
+        type: BlockType.UNORDERED_LIST_ITEM,
+        data: {
+          whitespace: "   ",
+          text: [
+            {
+              type: SpanType.NORMAL_TEXT,
+              text: "unordered list item 2",
             },
           ],
         },

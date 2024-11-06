@@ -502,6 +502,19 @@ div[data-lexical-editor] {
 
   & > p.list-item {
     margin-inline-start: 20px;
+
+    .list-item-content {
+      margin-left: 1px;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .list-item-sigil {
+      white-space: pre;
+      color: var(--alt-content-color);
+      font-weight: 900;
+      font-size: large;
+    }
   }
 
   .wikilink-content {

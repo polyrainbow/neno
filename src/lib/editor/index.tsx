@@ -37,6 +37,9 @@ import { highlightHeadingSigils } from "./utils/highlight";
 import { KeyValueNode } from "./nodes/KeyValueNode";
 import { KeyValuePairKeyNode } from "./nodes/KeyValuePairKeyNode";
 import { KeyValuePlugin } from "./plugins/KeyValuePlugin";
+import { ListItemSigilNode } from "./nodes/ListItemSigilNode";
+import { ListItemPlugin } from "./plugins/ListItemPlugin";
+import { ListItemContentNode } from "./nodes/ListItemContentNode";
 
 /*
   Convention:
@@ -92,6 +95,7 @@ export const Editor = ({
     <InlineCodePlugin />
     <KeyValuePlugin />
     <LinkPlugin />
+    <ListItemPlugin />
     <WikiLinkPlugin getLinkAvailability={(linkText: string) => {
       return getLinkAvailability(linkText, LinkType.WIKILINK);
     }} />
@@ -169,6 +173,8 @@ const Context = ({
       CodeBlockNode,
       QuoteBlockNode,
       ListItemNode,
+      ListItemSigilNode,
+      ListItemContentNode,
       KeyValueNode,
       KeyValuePairKeyNode,
     ],
