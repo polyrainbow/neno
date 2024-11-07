@@ -62,6 +62,10 @@ interface NoteComponentProps {
   setUpdateReferences: (val: boolean) => void,
   onLinkIndicatorClick: (slug: Slug, title: string) => void,
   handleNoteExportRequest: () => void,
+  loadNote: (
+    slug: Slug | "random" | "new",
+    contentForNewNote?: string,
+  ) => Promise<Slug | null>,
 }
 
 
@@ -88,6 +92,7 @@ const Note = ({
   setUpdateReferences,
   onLinkIndicatorClick,
   handleNoteExportRequest,
+  loadNote,
 }: NoteComponentProps) => {
   const noteElement = useRef<HTMLElement>(null);
   const notesProvider = useNotesProvider();
@@ -242,6 +247,7 @@ const Note = ({
       uploadInProgress={uploadInProgress}
       importNote={importNote}
       handleNoteExportRequest={handleNoteExportRequest}
+      loadNote={loadNote}
     />
     {
       isBusy

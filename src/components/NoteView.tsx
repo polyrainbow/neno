@@ -361,6 +361,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
             insert(wikilink, editor);
           }}
           handleNoteExportRequest={handleNoteExportRequest}
+          loadNote={loadNote}
         />
       </div>
     </main>

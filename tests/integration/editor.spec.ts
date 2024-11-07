@@ -982,4 +982,21 @@ test.describe("Editor view", () => {
 
     },
   );
+
+
+  test(
+    "discarding unsaved note should empty editor",
+    async ({ page }) => {
+      await page.keyboard.type(DEMO_NOTE);
+      await page.click("#button_new");
+      await page.getByText("Discard changes").click();
+
+      const editorParagraphsLocator = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+
+      await expect(editorParagraphsLocator).toHaveCount(1);
+      await expect(editorParagraphsLocator).toBeEmpty();
+    },
+  );
 });

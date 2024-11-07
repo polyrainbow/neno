@@ -26,6 +26,10 @@ interface NoteControlsProps {
   importNote: () => void,
   disableNoteSaving: boolean,
   handleNoteExportRequest: () => void,
+  loadNote: (
+    slug: Slug | "random" | "new",
+    contentForNewNote?: string,
+  ) => Promise<Slug | null>,
 }
 
 const NoteControls = ({
@@ -40,6 +44,7 @@ const NoteControls = ({
   importNote,
   disableNoteSaving,
   handleNoteExportRequest,
+  loadNote,
 }: NoteControlsProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
@@ -81,7 +86,16 @@ const NoteControls = ({
                 setUnsavedChanges(false);
               }
 
-              goToNote("new");
+              goToNote("new", {
+                contentIfNewNote: "",
+              });
+
+              /*
+                goToNote does not have any effect here, because route and
+                state do not change and thus no re-render is triggered.
+                We need to manually reset the editor.
+              */
+              loadNote("new");
             }}
           />
           <IconButton

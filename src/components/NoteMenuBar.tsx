@@ -16,6 +16,10 @@ interface NoteMenuBarProps {
   importNote: () => void,
   disableNoteSaving: boolean,
   handleNoteExportRequest: () => void,
+  loadNote: (
+    slug: Slug | "random" | "new",
+    contentForNewNote?: string,
+  ) => Promise<Slug | null>,
 }
 
 const NoteMenuBar = ({
@@ -31,6 +35,7 @@ const NoteMenuBar = ({
   importNote,
   disableNoteSaving,
   handleNoteExportRequest,
+  loadNote,
 }: NoteMenuBarProps) => {
   return <section className="note-controls">
     <div className="note-controls-left">
@@ -46,6 +51,7 @@ const NoteMenuBar = ({
         importNote={importNote}
         disableNoteSaving={disableNoteSaving}
         handleNoteExportRequest={handleNoteExportRequest}
+        loadNote={loadNote}
       />
     </div>
     <div className="note-controls-right">
