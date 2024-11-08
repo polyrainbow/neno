@@ -30,7 +30,7 @@ test.beforeEach(async ({ page }) => {
 
   await page.locator("#button_upload").click();
   await page.getByAltText("Menu").click();
-  await page.getByAltText("Files").click();
+  await page.getByAltText("Files", { exact: true }).click();
 });
 
 test.describe("Files view", () => {

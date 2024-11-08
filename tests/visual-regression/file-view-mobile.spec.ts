@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { setDefaultDate } from "../utils";
-import { join } from "node:path";
 import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 test.beforeEach(async ({ page }) => {
   await setDefaultDate(page); // needs to be added before page.goto
@@ -14,21 +14,6 @@ test.beforeEach(async ({ page }) => {
   await page.getByAltText("No notes found").waitFor();
 
   await page.keyboard.type("Note with a file\n");
-
-  const dataTransfer1 = await page.evaluateHandle(() => {
-    const dt = new DataTransfer();
-    const file = new File(
-      ["This is the content\nof the plain text file."],
-      "test.txt",
-      { type: "text/plain" },
-    );
-    dt.items.add(file);
-    return dt;
-  });
-
-  await page.dispatchEvent("section.note", "drop", {
-    dataTransfer: dataTransfer1,
-  });
 
   const buffer = await readFile(
     join(import.meta.dirname, "..", "resources", "beach.jpg"),
@@ -47,28 +32,17 @@ test.beforeEach(async ({ page }) => {
   }, buffer.toString("base64"));
 
   await page.dispatchEvent("section.note", "drop", { dataTransfer });
-
   await page.locator("#button_upload").click();
   await page.getByAltText("Menu").click();
   await page.getByAltText("Files", { exact: true }).click();
-  await page.getByText("test.txt").click();
+  await page.getByText("beach.jpg").click();
+  await page.locator(".file-container img").waitFor();
 });
 
-test.describe("File view", () => {
+test.describe("File view mobile", () => {
   test("should look fine - light", async ({ page }) => {
-    expect(await page.screenshot()).toMatchSnapshot("file-view-light.png");
-  });
-
-  test("should look fine - dark", async ({ page }) => {
-    page.emulateMedia({ colorScheme: "dark" });
-    expect(await page.screenshot()).toMatchSnapshot("file-view-dark.png");
-  });
-
-  test("should look fine with image - light", async ({ page }) => {
-    await page.getByText("Show all files", { exact: true }).click();
-    await page.getByText("beach.jpg").click();
-    await page.locator(".file-container img").waitFor();
+    await page.setViewportSize({ width: 412, height: 914 });
     expect(await page.screenshot())
-      .toMatchSnapshot("file-view-image-light.png");
+      .toMatchSnapshot("file-view-mobile-light.png");
   });
 });

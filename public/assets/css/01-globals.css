@@ -568,6 +568,7 @@ input:checked + .slider::before {
   height: 35px;
   background: var(--accent-color-1-light);
   border-radius: var(--border-radius);
+  white-space: nowrap;
 
   &:hover {
     background-color: var(--accent-color-1-intense);
