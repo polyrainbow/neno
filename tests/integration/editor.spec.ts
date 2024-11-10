@@ -1002,7 +1002,7 @@ test.describe("Editor view", () => {
   );
 
 
-  test.only(
+  test(
     "editor should keep focus after saving with key combination",
     async ({ page }) => {
       await page.keyboard.type("foo");
