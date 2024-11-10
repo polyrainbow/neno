@@ -49,62 +49,59 @@ const FilesViewPreviewBox = ({
   }, []);
 
 
-  return <div
+  return <a
     className="files-view-preview-box"
+    href={getAppPath(PathTemplate.FILE, new Map([
+      ["GRAPH_ID", LOCAL_GRAPH_ID],
+      ["FILE_SLUG", file.slug],
+    ]))}
   >
-    <a
-      href={getAppPath(PathTemplate.FILE, new Map([
-        ["GRAPH_ID", LOCAL_GRAPH_ID],
-        ["FILE_SLUG", file.slug],
-      ]))}
+    <img
+      src={thumbnailImageSrc || ""}
+      loading="lazy"
+      className={
+        type === MediaType.IMAGE
+          ? "checkerboard-background preview-image"
+          : "file-type-icon"
+      }
+    />
+    <div
+      className="file-info"
     >
-      <img
-        src={thumbnailImageSrc || ""}
-        loading="lazy"
-        className={
-          type === MediaType.IMAGE
-            ? "checkerboard-background preview-image"
-            : "file-type-icon"
-        }
-      />
       <div
-        className="file-info"
-      >
-        <div
-          className="filename"
-        >{file.slug}</div>
-        {
-          isDangling
-            ? <div
-              title={l("files.dangling")}
-              className="dangling-file-indicator"
-            />
-            : ""
-        }
-      </div>
+        className="filename"
+      >{file.slug}</div>
       {
-        isNenoScript
-          ? <FloatingActionButton
-            title={l("files.open-in-script-editor")}
-            icon="create"
-            onClick={(e) => {
-              // @ts-ignore
-              navigation.navigate(getAppPath(
-                PathTemplate.SCRIPT,
-                new Map([
-                  ["GRAPH_ID", LOCAL_GRAPH_ID],
-                  ["SCRIPT_SLUG", file.slug],
-                ]),
-              ));
-
-              e.stopPropagation();
-              e.preventDefault();
-            }}
+        isDangling
+          ? <div
+            title={l("files.dangling")}
+            className="dangling-file-indicator"
           />
           : ""
       }
-    </a>
-  </div>;
+    </div>
+    {
+      isNenoScript
+        ? <FloatingActionButton
+          title={l("files.open-in-script-editor")}
+          icon="create"
+          onClick={(e) => {
+            // @ts-ignore
+            navigation.navigate(getAppPath(
+              PathTemplate.SCRIPT,
+              new Map([
+                ["GRAPH_ID", LOCAL_GRAPH_ID],
+                ["SCRIPT_SLUG", file.slug],
+              ]),
+            ));
+
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        />
+        : ""
+    }
+  </a>;
 };
 
 export default FilesViewPreviewBox;

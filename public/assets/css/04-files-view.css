@@ -26,10 +26,8 @@
       border-radius: var(--border-radius);
       overflow: hidden;
       position: relative;
-    
-      a {
-        text-decoration: none;
-      }
+      text-decoration: none;
+      display: block;
     
       img {
         display: block;
