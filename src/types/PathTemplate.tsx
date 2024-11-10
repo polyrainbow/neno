@@ -1,4 +1,5 @@
 export enum PathTemplate {
+  BASE = "",
   UNSELECTED_NOTE = "graph/%GRAPH_ID%/note",
   EXISTING_NOTE = "graph/%GRAPH_ID%/note/%SLUG%",
   NEW_NOTE = "graph/%GRAPH_ID%/note/new",

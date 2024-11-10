@@ -25,7 +25,7 @@ const AppRouter = () => {
       routes: [
         {
           id: "root",
-          path: "",
+          path: getAppPath(PathTemplate.BASE),
         },
         {
           id: "start",
