@@ -5,7 +5,6 @@ import { getWritableStream, streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
 import NotesProvider from "./notes";
 import { Slug } from "./notes/types/Slug";
-import { createDemoGraph } from "./DemoGraph";
 import { FileInfo } from "./notes/types/FileInfo";
 
 /*
@@ -113,13 +112,8 @@ export const initializeNotesProvider = async (
   );
 
   folderHandle = newFolderHandle;
-
   const storageProvider = new FileSystemAccessAPIStorageProvider(folderHandle);
   notesProvider = new NotesProvider(storageProvider);
-
-  if (!(await notesProvider.graphExistsInStorage())) {
-    await createDemoGraph(notesProvider);
-  }
   return notesProvider;
 };
 
