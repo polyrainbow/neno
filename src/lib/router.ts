@@ -103,7 +103,7 @@ export const initRouter = ({
       }
       // @ts-ignore
       event.intercept({
-        focusReset: "manual"
+        focusReset: "manual",
       });
       callback(activeRoute);
     } else {
