@@ -14,8 +14,9 @@ const AppMenuItem = ({
   onClick,
   disabled = false,
 }: AppMenuItemProps) => {
-  return <div
-    onClick={disabled ? undefined : onClick}
+  return <button
+    disabled={disabled}
+    onClick={onClick}
     className={"app-menu-item" + (disabled ? " disabled" : "")}
   >
     <img
@@ -28,7 +29,7 @@ const AppMenuItem = ({
     <p
       className="label"
     >{label}</p>
-  </div>;
+  </button>;
 };
 
 export default AppMenuItem;

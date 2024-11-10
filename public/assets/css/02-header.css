@@ -105,7 +105,8 @@
     display: flex;
     padding: 15px 10px;
     align-items: center;
-    cursor: pointer;
+    background: transparent;
+    width: 100%;
 
     .label {
       margin: 0;
@@ -114,8 +115,6 @@
     }
 
     &.disabled {
-      cursor: default;
-
       img.svg-icon {
         filter: opacity(0.5);
       }
