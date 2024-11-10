@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { getActiveLanguage, l, setLanguage, supportedLangs } from "../lib/intl";
+import {
+  getActiveLanguage,
+  l,
+  setLanguage,
+  SUPPORTED_LANGS,
+} from "../lib/intl";
 
 const ChangeLanguageSetting = () => {
   const activeLanguage = getActiveLanguage();
-  const languages = supportedLangs;
-
   const [selectedLanguage, setSelectedLanguage] = useState(activeLanguage);
 
   return <section className="setting">
@@ -15,7 +18,7 @@ const ChangeLanguageSetting = () => {
       onChange={(e) => setSelectedLanguage(e.target.value)}
     >
       {
-        languages.map((language) => {
+        SUPPORTED_LANGS.map((language) => {
           return <option
             value={language}
             key={language}
@@ -25,8 +28,8 @@ const ChangeLanguageSetting = () => {
     </select>
     <div>
       <button
-        onClick={() => {
-          setLanguage(selectedLanguage);
+        onClick={async () => {
+          await setLanguage(selectedLanguage);
         }}
         className="default-button dialog-box-button default-action"
       >{l("change-language.change")}</button>

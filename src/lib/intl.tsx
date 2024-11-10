@@ -3,28 +3,40 @@ interface Replacements {
   [key: string]: string
 }
 
-export const supportedLangs = [
+type CallbackFunction = (newLanguage: string) => void;
+
+export const SUPPORTED_LANGS = [
   "en-US",
   "de-DE",
 ];
 
-const defaultLang = "en-US";
+const DEFAULT_LANG = "en-US";
 
-let lang = defaultLang;
+let lang: string;
+let langFile: Record<string, string>;
+const callbacks: CallbackFunction[] = [];
 
-const localStorageValue = localStorage.getItem("language");
+export const init = async () => {
+  const localStorageValue = localStorage.getItem("language");
 
-if (localStorageValue && supportedLangs.includes(localStorageValue)) {
-  lang = localStorageValue;
-} else if (supportedLangs.includes(navigator.language)) {
-  lang = navigator.language;
-}
+  if (localStorageValue && SUPPORTED_LANGS.includes(localStorageValue)) {
+    lang = localStorageValue;
+  } else if (SUPPORTED_LANGS.includes(navigator.language)) {
+    lang = navigator.language;
+  } else {
+    lang = DEFAULT_LANG;
+  }
 
-localStorage.setItem("language", lang);
+  localStorage.setItem("language", lang);
+  langFile = (await import(`../intl/${lang}.json`)).default;
+};
 
-const langFile = (await import(`../intl/${lang}.json`)).default;
 
 export function l(key: string, replacements?: Replacements): string {
+  if (!langFile) {
+    throw new Error("Intl module not initialized yet.");
+  }
+
   if (typeof langFile[key] === "string") {
     let output = langFile[key];
     for (const replacement in replacements) {
@@ -46,6 +58,10 @@ export function lf(
   key: string,
   replacements?: Replacements,
 ): Iterable<React.ReactNode> {
+  if (!langFile) {
+    throw new Error("Intl module not initialized yet.");
+  }
+
   const output = l(key, replacements);
 
   if (output.includes("%EXTERNAL_LINK")) {
@@ -75,12 +91,25 @@ export function lf(
   }
 }
 
-export function getActiveLanguage() {
+export function getActiveLanguage(): string {
+  if (!langFile) {
+    throw new Error("Intl module not initialized yet.");
+  }
   return lang;
 }
 
-export function setLanguage(language: string) {
-  lang = language;
-  localStorage.setItem("language", lang);
-  location.reload();
+export async function setLanguage(newLanguage: string) {
+  if (!SUPPORTED_LANGS.includes(newLanguage)) {
+    throw new Error("Unsupported language: " + newLanguage);
+  }
+  langFile = (await import(`../intl/${newLanguage}.json`)).default;
+  lang = newLanguage;
+  localStorage.setItem("language", newLanguage);
+  for (const callback of callbacks) {
+    callback(newLanguage);
+  }
 }
+
+export const onChange = (callback: CallbackFunction): void => {
+  callbacks.push(callback);
+};

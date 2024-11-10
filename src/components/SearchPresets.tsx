@@ -10,46 +10,6 @@ interface SearchPreset {
 }
 
 
-const DEFAULT_SEARCH_PRESETS: SearchPreset[] = [
-  {
-    "label": l("list.search.presets.untitled-notes"),
-    "query": "exact:",
-  },
-  {
-    "label": l("list.search.presets.notes-with-duplicate-titles"),
-    "query": "duplicates:title",
-  },
-  {
-    "label": l("list.search.presets.notes-with-duplicate-urls"),
-    "query": "duplicates:url",
-  },
-  {
-    "label": l("list.search.presets.notes-with-audio"),
-    "query": "has-media:audio",
-  },
-  {
-    "label": l("list.search.presets.notes-with-video"),
-    "query": "has-media:video",
-  },
-  {
-    "label": l("list.search.presets.notes-with-pdfs"),
-    "query": "has-media:pdf",
-  },
-  {
-    "label": l("list.search.presets.notes-with-images"),
-    "query": "has-media:image",
-  },
-  {
-    "label": l("list.search.presets.has-list"),
-    "query": "has-block:unordered-list-item|ordered-list-item",
-  },
-  {
-    "label": l("list.search.presets.has-key-value-pairs"),
-    "query": "has-block:key-value-pair",
-  },
-];
-
-
 interface SearchPresetsProps {
   onSelect: (query: string) => void,
   currentQuery: string,
@@ -62,6 +22,45 @@ const SearchPresets = ({
   currentQuery,
   onClose,
 }: SearchPresetsProps) => {
+  const DEFAULT_SEARCH_PRESETS: SearchPreset[] = [
+    {
+      "label": l("list.search.presets.untitled-notes"),
+      "query": "exact:",
+    },
+    {
+      "label": l("list.search.presets.notes-with-duplicate-titles"),
+      "query": "duplicates:title",
+    },
+    {
+      "label": l("list.search.presets.notes-with-duplicate-urls"),
+      "query": "duplicates:url",
+    },
+    {
+      "label": l("list.search.presets.notes-with-audio"),
+      "query": "has-media:audio",
+    },
+    {
+      "label": l("list.search.presets.notes-with-video"),
+      "query": "has-media:video",
+    },
+    {
+      "label": l("list.search.presets.notes-with-pdfs"),
+      "query": "has-media:pdf",
+    },
+    {
+      "label": l("list.search.presets.notes-with-images"),
+      "query": "has-media:image",
+    },
+    {
+      "label": l("list.search.presets.has-list"),
+      "query": "has-block:unordered-list-item|ordered-list-item",
+    },
+    {
+      "label": l("list.search.presets.has-key-value-pairs"),
+      "query": "has-block:key-value-pair",
+    },
+  ];
+
   const [searchPresets, setSearchPresets] = useState<SearchPreset[]>([]);
   const [currentQueryLabel, setCurrentQueryLabel] = useState<string>("");
 
