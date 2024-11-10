@@ -24,6 +24,7 @@ const KEY_COMBINATIONS = {
   SELECT_ALL: isMac ? "Meta+A" : "Control+A",
   COPY: isMac ? "Meta+KeyC" : "Control+KeyC",
   PASTE: isMac ? "Meta+KeyV" : "Control+KeyV",
+  SAVE: isMac ? "Meta+KeyS" : "Control+KeyS",
 };
 
 test.beforeEach(async ({ page }) => {
@@ -997,6 +998,22 @@ test.describe("Editor view", () => {
 
       await expect(editorParagraphsLocator).toHaveCount(1);
       await expect(editorParagraphsLocator).toBeEmpty();
+    },
+  );
+
+
+  test.only(
+    "editor should keep focus after saving with key combination",
+    async ({ page }) => {
+      await page.keyboard.type("foo");
+      await page.keyboard.press(KEY_COMBINATIONS.SAVE);
+      await page.keyboard.type("bar");
+
+      const editorParagraphsLocator = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+
+      await expect(editorParagraphsLocator).toHaveText("foobar");
     },
   );
 });
