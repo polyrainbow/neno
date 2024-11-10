@@ -97,9 +97,7 @@ const getAppPath = (
   urlParams?: URLSearchParams,
   doNotEncode?: boolean,
 ): string => {
-  // We don't use ROOT_PATH here because it is automatically used by the router
-  // via its `basename` property
-  let path = `/${pathTemplate}`;
+  let path = `${Config.ROOT_PATH}${pathTemplate}`;
 
   params?.forEach((value, key) => {
     if (value.length === 0) {

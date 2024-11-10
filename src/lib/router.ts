@@ -94,10 +94,8 @@ export const initRouter = ({
     const url = new URL(event.destination.url);
 
     if (url.pathname.startsWith(basename)) {
-      const path = url.pathname.substring(basename.length);
-
       const activeRoute = getActiveRouteFromPath(
-        path,
+        url.pathname,
         routes.map(parseRoute),
       );
       if (!activeRoute) {
@@ -111,14 +109,12 @@ export const initRouter = ({
     }
   });
 
-
   if (location.pathname.startsWith(basename)) {
-    const path = location.pathname.substring(basename.length);
-
     const activeRoute = getActiveRouteFromPath(
-      path,
+      location.pathname,
       routes.map(parseRoute),
     );
+
     if (!activeRoute) {
       return;
     }
