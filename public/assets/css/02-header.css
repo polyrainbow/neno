@@ -34,6 +34,10 @@
   .stats-container {
     display: flex;
 
+    .busy-indicator {
+      height: 28px;
+    }
+
     .header-stats {
       white-space: pre;
       display: flex;

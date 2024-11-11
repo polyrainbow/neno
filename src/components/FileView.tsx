@@ -198,33 +198,36 @@ const FileView = ({
             + ISOTimestampToLocaleString(fileInfo.createdAt)
           : ""
       }</p>
-      <h2>{l("files.used-in")}</h2>
       {
         notes
-          ? (
-            notes.length > 0
-              ? <ul>{
-                notes.map((note) => {
-                  return <li key={"notelink-" + note.slug}>
-                    <a
-                      href={
-                        getAppPath(
-                          PathTemplate.EXISTING_NOTE,
-                          new Map([
-                            ["GRAPH_ID", LOCAL_GRAPH_ID],
-                            ["SLUG", note.slug],
-                          ]),
-                        )
-                      }
-                    >{note.title}</a>
-                  </li>;
-                })
-              }</ul>
-              : <p>{l("files.used-in.none")}</p>
-          )
+          ? <>
+            <h2>{l("files.used-in")}</h2>
+            {
+              notes.length > 0
+                ? <ul>
+                  {
+                    notes.map((note) => {
+                      return <li key={"notelink-" + note.slug}>
+                        <a
+                          href={
+                            getAppPath(
+                              PathTemplate.EXISTING_NOTE,
+                              new Map([
+                                ["GRAPH_ID", LOCAL_GRAPH_ID],
+                                ["SLUG", note.slug],
+                              ]),
+                            )
+                          }
+                        >{note.title}</a>
+                      </li>;
+                    })
+                  }
+                </ul>
+                : <p>{l("files.used-in.none")}</p>
+            }
+          </>
           : <BusyIndicator
             alt={l("app.loading")}
-            height={30}
           />
       }
       {

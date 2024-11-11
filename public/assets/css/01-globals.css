@@ -252,6 +252,10 @@ code {
   padding: var(--default-gap);
   overflow: auto;
   height: calc(100vh - var(--header-bar-height) - (2 * var(--default-gap)));
+
+  .busy-indicator {
+    height: 64px;
+  }
 }
 
 .content-section-wide {
@@ -268,6 +272,10 @@ code {
 
   .svg-icon {
     width: 100px;
+  }
+
+  .busy-indicator {
+    height: 64px;
   }
 }
 
@@ -640,12 +648,20 @@ input:checked + .slider::before {
         margin: 0;
         width: 100%;
       }
+
+      .busy-indicator {
+        height: 80px;
+      }
     }
   }
 }
 
 .script-view-main-busy {
   padding: var(--default-padding);
+
+  .busy-indicator {
+    height: 100px;
+  }
 }
 
 .setting {
@@ -660,4 +676,8 @@ input:checked + .slider::before {
   select {
     width: fit-content;
   }
+}
+
+.busy-view .busy-indicator {
+  height: 80px;
 }

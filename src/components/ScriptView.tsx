@@ -238,7 +238,6 @@ const ScriptView = ({
               isBusyComputingOutput
                 ? <BusyIndicator
                   alt="Busy"
-                  height={100}
                 />
                 : <p className="script-output">{output ?? ""}</p>
             }
@@ -247,7 +246,7 @@ const ScriptView = ({
         : error === "SCRIPT_NOT_FOUND"
           ? <p>Script not found.</p>
           : <div className="script-view-main-busy">
-            <BusyIndicator height={100} alt="Loading script" />
+            <BusyIndicator alt="Loading script" />
           </div>
     }
   </>;

@@ -33,7 +33,6 @@ const StatsView = () => {
           />
           : <BusyIndicator
             alt={l("stats.fetching")}
-            height={64}
           />
       }
     </section>
