@@ -22,7 +22,7 @@ const StartView = () => {
   });
 
   return <>
-    <HeaderContainerLeftRight noBackground />
+    <HeaderContainerLeftRight />
     <section className="section-start">
       <div
         className="start-welcome"

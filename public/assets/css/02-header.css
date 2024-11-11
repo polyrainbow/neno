@@ -14,6 +14,10 @@
   left: 0;
   z-index: 5;
 
+  &:has(~ .section-start) {
+    background: transparent;
+  }
+
   .header-left {
     display: flex;
     justify-content: center;
@@ -25,10 +29,6 @@
     display: flex;
     height: var(--header-bar-height);
     align-items: center;
-  }
-
-  &.no-background {
-    background: none;
   }
 
   .stats-container {
