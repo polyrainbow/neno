@@ -167,7 +167,7 @@ const NoteViewHeader = ({
         {
           stats
             ? <AppHeaderStats stats={stats} />
-            : <BusyIndicator alt={l("app.loading")} height={28} />
+            : <BusyIndicator alt={l("app.loading")} />
         }
       </div>
     </HeaderContainer>

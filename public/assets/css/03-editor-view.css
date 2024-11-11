@@ -211,6 +211,10 @@
 .note-busy-container {
   text-align: center;
   margin: 15px;
+
+  .busy-indicator {
+    height: 64px;
+  }
 }
 
 .note {

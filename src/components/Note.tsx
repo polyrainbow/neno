@@ -252,7 +252,7 @@ const Note = ({
     {
       isBusy
         ? <div className="note-busy-container">
-          <BusyIndicator alt={l("app.loading")} height={64} />
+          <BusyIndicator alt={l("app.loading")} />
         </div>
         : <section
           className="note"

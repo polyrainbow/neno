@@ -137,6 +137,10 @@
     gap: var(--default-gap);
   }
 
+  .busy-indicator {
+    height: 30px;
+  }
+
   .rename {
     display: flex;
     flex-direction: column;

@@ -19,7 +19,7 @@ const NoteListStatusIndicator = ({
     return <div
       className="splash-message"
     >
-      <BusyIndicator alt={l("list.status.busy")} height={64} />
+      <BusyIndicator alt={l("list.status.busy")} />
     </div>;
   }
 
