@@ -5,7 +5,12 @@ import type {
   SerializedParagraphNode,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
-import { $applyNodeReplacement, ElementNode, ParagraphNode } from "lexical";
+import {
+  $applyNodeReplacement,
+  $createParagraphNode,
+  ElementNode,
+  ParagraphNode,
+} from "lexical";
 import { ElementNodeType } from "../types/ElementNodeType";
 
 export class ListItemContentNode extends ElementNode {
@@ -40,7 +45,12 @@ export class ListItemContentNode extends ElementNode {
   }
 
   isInline(): boolean {
-    return true;
+    return false;
+  }
+
+  insertNewAfter(): null | LexicalNode {
+    const p = $createParagraphNode();
+    return p;
   }
 
   canInsertTextBefore(): boolean {
