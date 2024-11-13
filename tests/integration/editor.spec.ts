@@ -1016,4 +1016,26 @@ test.describe("Editor view", () => {
       await expect(editorParagraphsLocator).toHaveText("foobar");
     },
   );
+
+  test(
+    "Inserting line break in list item should break text correctly",
+    async ({ page }) => {
+      await page.keyboard.type("- foobar");
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("Enter", { delay: 20 });
+
+      const editorParagraphsLocator = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+
+      const editorParagraphs = await editorParagraphsLocator.all();
+
+      expect(await editorParagraphs[0].textContent())
+        .toBe("- foo");
+      expect(await editorParagraphs[1].textContent())
+        .toBe("bar");
+    },
+  );
 });

@@ -31,6 +31,7 @@ import {
   PASTE_COMMAND,
   REMOVE_TEXT_COMMAND,
   $selectAll,
+  $isParagraphNode,
 } from "lexical";
 import {
   $insertDataTransferForPlainText,
@@ -196,12 +197,26 @@ export function registerSubtext(editor: LexicalEditor): () => void {
         // There is a selectStart argument passed to this function which can
         // be used
         const selection = $getSelection();
-
         if (!$isRangeSelection(selection)) {
           return false;
         }
 
-        selection.insertParagraph();
+        const focusNodeOfInitialSelection = selection.focus.getNode();
+        const newParagraph = selection.insertParagraph();
+
+        /*
+          If newParagraph is not attached yet, attach it as next sibling to
+          original selection's focus node's paragraph ancestor.
+          This is necessary in the special case that we insert a paragraph
+          in a different ElementNode than the default ParagraphNode for a
+          block (e.g. ListItemContentNode).
+        */
+        if (newParagraph && !newParagraph.getParent()) {
+          const parentsOfFocus = focusNodeOfInitialSelection.getParents();
+          const paragraph = parentsOfFocus.find($isParagraphNode);
+          paragraph?.insertAfter(newParagraph);
+        }
+
         return true;
       },
       COMMAND_PRIORITY_EDITOR,
