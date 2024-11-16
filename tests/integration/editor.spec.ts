@@ -1038,4 +1038,27 @@ test.describe("Editor view", () => {
         .toBe("bar");
     },
   );
+
+  test(
+    "Selection should be correct after adding line break at start of list item",
+    async ({ page }) => {
+      await page.keyboard.type("- 1");
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("Enter", { delay: 20 });
+      await page.keyboard.type("a");
+
+      const editorParagraphsLocator = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+
+      const editorParagraphs = await editorParagraphsLocator.all();
+
+      expect(await editorParagraphs[0].textContent())
+        .toBe("");
+      expect(await editorParagraphs[1].textContent())
+        .toBe("a- 1");
+    },
+  );
 });

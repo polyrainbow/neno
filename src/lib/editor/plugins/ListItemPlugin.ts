@@ -60,7 +60,13 @@ const restoreSigil = (licNode: ListItemContentNode) => {
     const sigilNode = licNode.replace(
       new ListItemSigilNode(licNode.getTextContent()),
     );
-    sigilNode.selectEnd();
+    /*
+      This transform usually happens when a list item is moved to another line,
+      which happens when pressing enter at beginning of list item.
+      With current transformation setup, we have to restore the selection
+      manually.
+    */
+    sigilNode.selectStart();
   }
 };
 
