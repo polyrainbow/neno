@@ -16,6 +16,11 @@ import {
   $isListItemContentNode,
   ListItemContentNode,
 } from "../nodes/ListItemContentNode";
+import { AutoLinkNode } from "@lexical/link";
+import { BoldNode } from "../nodes/BoldNode";
+import { InlineCodeNode } from "../nodes/InlineCodeNode";
+import { WikiLinkContentNode } from "../nodes/WikiLinkContentNode";
+import { WikiLinkPunctuationNode } from "../nodes/WikiLinkPunctuationNode";
 
 
 
@@ -107,6 +112,24 @@ const appendTextNodesToContent = (textNode: TextNode) => {
   }
 };
 
+const appendAutoLinkNodesToContent = (textNode: AutoLinkNode) => {
+  if (!$isListItemNode(textNode.getParent())) return;
+
+  const nextSibling = textNode.getNextSibling();
+  if ($isListItemContentNode(nextSibling)) {
+    const firstContentChild = nextSibling.getFirstChild();
+    if (firstContentChild) {
+      firstContentChild.insertBefore(textNode);
+    } else {
+      nextSibling.append(textNode);
+    }
+  }
+
+  const previousSibling = textNode.getPreviousSibling();
+  if ($isListItemContentNode(previousSibling)) {
+    previousSibling.append(textNode);
+  }
+};
 
 export function ListItemPlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
@@ -129,6 +152,31 @@ export function ListItemPlugin(): JSX.Element | null {
 
     editor.registerNodeTransform(
       TextNode,
+      appendTextNodesToContent,
+    );
+
+    editor.registerNodeTransform(
+      AutoLinkNode,
+      appendAutoLinkNodesToContent,
+    );
+
+    editor.registerNodeTransform(
+      BoldNode,
+      appendTextNodesToContent,
+    );
+
+    editor.registerNodeTransform(
+      InlineCodeNode,
+      appendTextNodesToContent,
+    );
+
+    editor.registerNodeTransform(
+      WikiLinkContentNode,
+      appendTextNodesToContent,
+    );
+
+    editor.registerNodeTransform(
+      WikiLinkPunctuationNode,
       appendTextNodesToContent,
     );
 

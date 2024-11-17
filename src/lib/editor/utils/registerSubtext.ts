@@ -32,6 +32,9 @@ import {
   REMOVE_TEXT_COMMAND,
   $selectAll,
   $isParagraphNode,
+  TextNode,
+  LexicalNode,
+  $isDecoratorNode,
 } from "lexical";
 import {
   $insertDataTransferForPlainText,
@@ -47,6 +50,7 @@ import {
   IS_IOS,
   IS_SAFARI,
 } from "./environment";
+import { $isListItemContentNode } from "../nodes/ListItemContentNode";
 
 function onCopyForPlainText(
   event: CommandPayloadType<typeof COPY_COMMAND>,
@@ -202,7 +206,6 @@ export function registerSubtext(editor: LexicalEditor): () => void {
         }
 
         const focusNodeOfInitialSelection = selection.focus.getNode();
-        const newParagraph = selection.insertParagraph();
 
         /*
           If newParagraph is not attached yet, attach it as next sibling to
@@ -211,10 +214,31 @@ export function registerSubtext(editor: LexicalEditor): () => void {
           in a different ElementNode than the default ParagraphNode for a
           block (e.g. ListItemContentNode).
         */
-        if (newParagraph && !newParagraph.getParent()) {
+        const anchorNode = selection.anchor.getNode();
+        const isInLiCNode = anchorNode.getParents()
+          .find((n) => $isListItemContentNode(n));
+        if (isInLiCNode) {
+          let textAfterSelection = anchorNode.getTextContent().substring(
+            selection.anchor.offset,
+          );
+          let cursorNode: LexicalNode | null = anchorNode;
+          while (cursorNode?.getNextSibling()) {
+            cursorNode = cursorNode?.getNextSibling();
+            if (!$isDecoratorNode(cursorNode)) {
+              textAfterSelection += cursorNode?.getTextContent();
+            }
+          }
+          const newParagraph = selection.insertParagraph()!;
+          for (const child of newParagraph.getChildren()) {
+            child.remove();
+          }
+          newParagraph.append(new TextNode(textAfterSelection));
           const parentsOfFocus = focusNodeOfInitialSelection.getParents();
           const paragraph = parentsOfFocus.find($isParagraphNode);
           paragraph?.insertAfter(newParagraph);
+          newParagraph.selectStart();
+        } else {
+          selection.insertParagraph();
         }
 
         return true;

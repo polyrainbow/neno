@@ -45,7 +45,15 @@ export class ListItemContentNode extends ElementNode {
   }
 
   isInline(): boolean {
-    return false;
+    /*
+      Needs to be true bc. RangeSelection.getTextContent() adds linebreak
+      otherwise.
+      https://github.com/facebook/lexical/blob/main/packages/lexical/src/
+      LexicalSelection.ts#L556
+
+      Currently not testable due to missing Playwright clipboard isolation.
+    */
+    return true;
   }
 
   insertNewAfter(): null | LexicalNode {
