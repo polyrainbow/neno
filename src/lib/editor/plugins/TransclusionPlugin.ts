@@ -12,7 +12,10 @@ import { AutoLinkNode } from "@lexical/link";
 import { ListItemNode } from "../nodes/ListItemNode";
 import { HeadingNode } from "../nodes/HeadingNode";
 import { TransclusionContentGetter } from "../types/TransclusionContentGetter";
-import { ListItemContentNode } from "../nodes/ListItemContentNode";
+import {
+  $isListItemContentNode,
+  ListItemContentNode,
+} from "../nodes/ListItemContentNode";
 
 
 const registerBlockNodeTransform = (
@@ -40,7 +43,13 @@ const registerBlockNodeTransform = (
 
   editor.registerNodeTransform(AutoLinkNode, (node: AutoLinkNode) => {
     let currentNode = node.getParent();
-    while (currentNode && !$isParagraphNode(currentNode)) {
+    while (
+      currentNode
+      && (
+        !$isParagraphNode(currentNode)
+        || $isListItemContentNode(currentNode)
+      )
+    ) {
       currentNode = currentNode.getParent();
     }
     if (currentNode) {
