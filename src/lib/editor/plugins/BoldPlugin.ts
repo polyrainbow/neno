@@ -14,8 +14,6 @@ import {
 import { useLexicalTextEntity } from "@lexical/react/useLexicalTextEntity";
 import { useCallback, useEffect } from "react";
 
-const REGEX = /\*[^*]+\*/;
-
 export function BoldPlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
@@ -30,19 +28,33 @@ export function BoldPlugin(): JSX.Element | null {
   }, []);
 
   const getBoldMatch = useCallback((text: string) => {
-    const matchArr = REGEX.exec(text);
+    let startOffset = -1;
 
-    if (matchArr === null) {
-      return null;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const charIsSigil = char === "*";
+
+      if ((startOffset === -1) && charIsSigil) {
+        startOffset = i;
+
+      // break if a ` is between two *
+      } else if (startOffset > -1 && char === "`") {
+        startOffset = -1;
+      } else if (startOffset > -1 && charIsSigil) {
+
+        // break if * is followed immediately by *
+        if (i === startOffset + 1) {
+          startOffset = -1;
+        } else {
+          return {
+            end: i + 1,
+            start: startOffset,
+          };
+        }
+      }
     }
 
-    const headingLength = matchArr[0].length;
-    const startOffset = matchArr.index;
-    const endOffset = startOffset + headingLength;
-    return {
-      end: endOffset,
-      start: startOffset,
-    };
+    return null;
   }, []);
 
   useLexicalTextEntity<BoldNode>(
