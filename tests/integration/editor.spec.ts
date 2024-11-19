@@ -24,7 +24,7 @@ const KEY_COMBINATIONS = {
   SELECT_ALL: isMac ? "Meta+A" : "Control+A",
   COPY: isMac ? "Meta+KeyC" : "Control+KeyC",
   PASTE: isMac ? "Meta+KeyV" : "Control+KeyV",
-  SAVE: isMac ? "Meta+KeyS" : "Control+KeyS",
+  SAVE: isMac ? "Meta+S" : "Control+KeyS",
 };
 
 test.beforeEach(async ({ page }) => {
@@ -1061,4 +1061,36 @@ test.describe("Editor view", () => {
         .toBe("a- 1");
     },
   );
+
+
+  test(
+    "backticks should have precedence over asterisks on initial note load",
+    async ({ page }) => {
+      await page.keyboard.type(
+        "Precedence test\n`http://*.example.com` and `http://*.example.com`",
+      );
+      await page.click("#button_upload", { delay: 20 });
+      const noteListItemLocator = page.locator(
+        ".note-list-item",
+        { hasText: "Precedence test" },
+      );
+      await noteListItemLocator.waitFor();
+      await page.click("#button_new", { delay: 20 });
+      await noteListItemLocator.click();
+
+      const nodes = await page.locator(
+        "div[data-lexical-editor] .editor-paragraph:nth-child(2) > *",
+      ).all();
+
+      expect(await nodes[0].getAttribute("class")).toBe("inline-code");
+      expect(await nodes[0].textContent()).toBe("`http://*.example.com`");
+
+      expect(await nodes[1].getAttribute("class")).toBe(null);
+      expect(await nodes[1].textContent()).toBe(" and ");
+
+      expect(await nodes[2].getAttribute("class")).toBe("inline-code");
+      expect(await nodes[2].textContent()).toBe("`http://*.example.com`");
+    },
+  );
+
 });
