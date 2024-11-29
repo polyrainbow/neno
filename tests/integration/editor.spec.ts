@@ -1093,4 +1093,14 @@ test.describe("Editor view", () => {
     },
   );
 
+  test("text starting with www should not become a link", async ({ page }) => {
+    await page.keyboard.type("www.example.com");
+
+    const onlyParagraphChild = await page.locator(
+      "div[data-lexical-editor] .editor-paragraph > *",
+    );
+
+    await expect(onlyParagraphChild).not.toHaveAttribute("href");
+    await expect(onlyParagraphChild).toHaveText("www.example.com");
+  });
 });
