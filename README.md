@@ -15,11 +15,11 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
 
 ## Screenshots
 
-![NENO Editor view](./public/docs/img/neno-light.png)
-*NENO Editor view in light mode*
-
 ![NENO Editor view in dark mode](./public/docs/img/neno-dark.png)
 *NENO Editor view in dark mode*
+
+![NENO Editor view in light mode](./public/docs/img/neno-light.png)
+*NENO Editor view in light mode*
 
 ## Features
 
@@ -30,7 +30,7 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
 * Powerful full-text search
 * Tap-to-link: One click is enough to link one note to another
 * File overview: All files in one view
-* Dark mode: Eye-friendly note-taking at night time
+* Light and dark mode
 
 ## Getting started
 
