@@ -33,7 +33,10 @@ import PlainTextStateExchangePlugin
 import theme from "./theme";
 import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
 import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
-import { highlightHeadingSigils, highlightQuoteBlockSigils } from "./utils/highlight";
+import {
+  highlightHeadingSigils,
+  highlightQuoteBlockSigils,
+} from "./utils/highlight";
 import { KeyValueNode } from "./nodes/KeyValueNode";
 import { KeyValuePairKeyNode } from "./nodes/KeyValuePairKeyNode";
 import { KeyValuePlugin } from "./plugins/KeyValuePlugin";
