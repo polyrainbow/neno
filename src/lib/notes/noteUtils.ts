@@ -422,7 +422,10 @@ const getBlocks = (
 const createNoteToTransmit = async (
   existingNote: ExistingNote,
   graph: Graph,
+  includeParsedContent?: boolean,
 ): Promise<NoteToTransmit> => {
+  const blocks = getBlocks(existingNote, graph.indexes.blocks);
+
   const noteToTransmit: NoteToTransmit = {
     content: existingNote.content,
     meta: existingNote.meta,
@@ -435,10 +438,14 @@ const createNoteToTransmit = async (
       }),
     backlinks: getBacklinks(graph, existingNote.meta.slug),
     numberOfCharacters: getNumberOfCharacters(existingNote),
-    numberOfBlocks: getBlocks(existingNote, graph.indexes.blocks).length,
+    numberOfBlocks: blocks.length,
     files: getFileInfosForFilesLinkedInNote(graph, existingNote.meta.slug),
     aliases: getAliasesOfSlug(graph, existingNote.meta.slug),
   };
+
+  if (includeParsedContent) {
+    noteToTransmit.parsedContent = blocks;
+  }
 
   return noteToTransmit;
 };

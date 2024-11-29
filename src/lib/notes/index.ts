@@ -75,6 +75,9 @@ export default class NotesProvider {
 
   async get(
     slug: Slug,
+    options?: {
+      includeParsedContent?: boolean,
+    },
   ): Promise<NoteToTransmit> {
     const graph = await this.#io.getGraph();
 
@@ -86,8 +89,12 @@ export default class NotesProvider {
 
     const noteFromDB = graph.notes.get(canonicalSlug) as ExistingNote;
 
-    const noteToTransmit: NoteToTransmit
-      = await createNoteToTransmit(noteFromDB, graph);
+    const noteToTransmit: NoteToTransmit = await createNoteToTransmit(
+      noteFromDB,
+      graph,
+      options?.includeParsedContent,
+    );
+
     return noteToTransmit;
   }
 
