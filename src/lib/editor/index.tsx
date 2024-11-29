@@ -33,7 +33,7 @@ import PlainTextStateExchangePlugin
 import theme from "./theme";
 import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
 import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
-import { highlightHeadingSigils } from "./utils/highlight";
+import { highlightHeadingSigils, highlightQuoteBlockSigils } from "./utils/highlight";
 import { KeyValueNode } from "./nodes/KeyValueNode";
 import { KeyValuePairKeyNode } from "./nodes/KeyValuePairKeyNode";
 import { KeyValuePlugin } from "./plugins/KeyValuePlugin";
@@ -84,6 +84,7 @@ export const Editor = ({
       (editorState: EditorState) => {
         editorState.read(() => {
           highlightHeadingSigils();
+          highlightQuoteBlockSigils();
           const root = $getRoot();
           onChange(getSubtextFromEditor(root));
         });

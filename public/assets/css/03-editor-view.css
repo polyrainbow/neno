@@ -593,6 +593,10 @@ div[data-lexical-editor] {
     font-style: italic;
     background: var(--accent-color-interactible);
     margin-inline: 0;
+
+    ::highlight(quote-block-sigil) {
+      color: var(--alt-content-color)
+    }
   }
 
   /*
