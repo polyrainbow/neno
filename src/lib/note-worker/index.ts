@@ -104,6 +104,7 @@ onmessage = async (event) => {
       eventData.folderHandle,
     );
     globalThis.notesProvider = new NotesProvider(storageProvider);
+    globalThis.storageProvider = storageProvider;
     initialized = true;
   } else if (eventData.action === "evaluate") {
     if (!initialized) {
