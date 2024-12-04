@@ -581,6 +581,23 @@
     Use with caution and be sure to backup your data beforehand.
   </p>
 
+  <p>
+    The possibilities are endless but here are some example use cases:
+
+    <ul>
+      <li>
+        creating a list of red links (links to non-existing notes) and how
+        often they occur
+      </li>
+      <li>
+        creating a list of events based on dates mentioned in the note graph
+      </li>
+      <li>
+        creating a website with aggregated data from the note graph.
+      </li>
+    </ul>
+  </p>
+
   <h3>Creating a script</h3>
 
   <p>
@@ -590,10 +607,10 @@
     in the files list. Click on it and then click on "Open in script editor".
   </p>
 
-  <h3>Symbols</h3>
+  <h3>Variables</h3>
 
   <p>
-    The following symbols are defined in the JavaScript environment:
+    The following variables are defined in the JavaScript environment:
   </p>
 
     <h4><code>notesProvider</code></h4>
@@ -604,6 +621,18 @@
 
     <p>
       Type: <code><a href="https://github.com/polyrainbow/neno/blob/main/src/lib/notes/index.ts#L55">NotesProvider</a></code>
+    </p>
+
+    <h4><code>storageProvider</code></h4>
+    <p>
+      A collection of functions for reading from and writing to the file system.
+      Operations are limited to the graph folder. Use this interface if you need
+      a low-level way of manipulating the graph or if you want to save
+      arbitrary files.
+    </p>
+
+    <p>
+      Type: <code><a href="https://github.com/polyrainbow/neno/blob/main/src/lib/notes/types/StorageProvider.ts#L3">StorageProvider</a></code>
     </p>
 
     <h4><code>graph</code></h4>
