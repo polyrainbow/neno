@@ -98,7 +98,7 @@ const assignCorrectElementNodes = (
 };
 
 
-export function BlockTransformPlugin(): JSX.Element | null {
+export function BlockTransformPlugin(): null {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     editor.registerNodeTransform(RootNode, (root: RootNode) => {

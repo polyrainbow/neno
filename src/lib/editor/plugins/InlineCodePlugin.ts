@@ -9,7 +9,7 @@ import { useCallback, useEffect } from "react";
 
 const REGEX = /`[^`]+`/;
 
-export function InlineCodePlugin(): JSX.Element | null {
+export function InlineCodePlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
