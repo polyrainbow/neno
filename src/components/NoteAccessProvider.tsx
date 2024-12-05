@@ -44,11 +44,11 @@ const NoteAccessProvider = ({
     return <BusyView />;
   }
 
-  return <NotesProviderContext.Provider
+  return <NotesProviderContext
     value={getNotesProvider()}
   >
     {children}
-  </NotesProviderContext.Provider>;
+  </NotesProviderContext>;
 };
 
 

@@ -34,17 +34,17 @@ const App = () => {
 
   if (!intlModuleReady) return "";
 
-  return <NotesProviderContext.Provider value={notesProvider}>
+  return <NotesProviderContext value={notesProvider}>
     <ConfirmationServiceProvider>
-      <UnsavedChangesContext.Provider
+      <UnsavedChangesContext
         value={[unsavedChanges, setUnsavedChanges]}
       >
-        <AppMenuContext.Provider value={appMenuControl}>
+        <AppMenuContext value={appMenuControl}>
           <AppRouter />
-        </AppMenuContext.Provider>
-      </UnsavedChangesContext.Provider>
+        </AppMenuContext>
+      </UnsavedChangesContext>
     </ConfirmationServiceProvider>
-  </NotesProviderContext.Provider>;
+  </NotesProviderContext>;
 };
 
 export default App;

@@ -59,12 +59,12 @@ const ConfirmationServiceProvider = ({
       onConfirm={handleConfirm}
       onCancel={handleCancel}
     />
-    <ConfirmationServiceContext.Provider
+    <ConfirmationServiceContext
       // @ts-ignore
       value={openConfirmation}
     >
       {children}
-    </ConfirmationServiceContext.Provider>
+    </ConfirmationServiceContext>
   </>;
 };
 
