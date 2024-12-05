@@ -13,7 +13,7 @@ const NoteContentBlockImage = ({
   file,
   notesProvider,
 }: NoteContentBlockImageProps) => {
-  const [url, setUrl] = useState<string>("");
+  const [url, setUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     getObjectUrlForArbitraryGraphFile(file)

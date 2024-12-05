@@ -131,7 +131,7 @@ const appendAutoLinkNodesToContent = (textNode: AutoLinkNode) => {
   }
 };
 
-export function ListItemPlugin(): JSX.Element | null {
+export function ListItemPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

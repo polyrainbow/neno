@@ -24,7 +24,7 @@ const FilesViewPreviewBox = ({
   const type = getMediaTypeFromFilename(file.filename) || "unknown";
   const isNenoScript = file.slug.endsWith(NENO_SCRIPT_FILE_SUFFIX);
   const [thumbnailImageSrc, setThumbnailImageSrc]
-    = useState<string | null>(null);
+    = useState<string | undefined>(undefined);
 
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const FilesViewPreviewBox = ({
     ]))}
   >
     <img
-      src={thumbnailImageSrc || ""}
+      src={thumbnailImageSrc}
       loading="lazy"
       className={
         type === MediaType.IMAGE

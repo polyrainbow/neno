@@ -27,12 +27,13 @@ import {
 } from "@lexical/react/LexicalComposerContext";
 import { useSubtextSetup } from "../hooks/useSubtextSetup";
 import { ErrorBoundaryType, useDecorators } from "../hooks/useDecorators";
+import { ReactElement } from "react";
 
 export function SubtextPlugin({
   ErrorBoundary,
 }: {
   ErrorBoundary: ErrorBoundaryType;
-}): JSX.Element {
+}): ReactElement {
   const [editor] = useLexicalComposerContext();
   const decorators = useDecorators(editor, ErrorBoundary);
   useSubtextSetup(editor);

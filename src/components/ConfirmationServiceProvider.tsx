@@ -13,7 +13,7 @@ const ConfirmationServiceProvider = ({
   ] = React.useState<ConfirmationDialogParams | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const awaitingPromiseRef = React.useRef<any>();
+  const awaitingPromiseRef = React.useRef<any>(Promise.resolve());
 
   const openConfirmation = (params: ConfirmationDialogParams) => {
     setConfirmationState(params);

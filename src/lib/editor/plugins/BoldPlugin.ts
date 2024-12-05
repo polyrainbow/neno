@@ -14,7 +14,7 @@ import {
 import { useLexicalTextEntity } from "@lexical/react/useLexicalTextEntity";
 import { useCallback, useEffect } from "react";
 
-export function BoldPlugin(): JSX.Element | null {
+export function BoldPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

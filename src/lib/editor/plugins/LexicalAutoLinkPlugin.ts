@@ -366,7 +366,7 @@ export function AutoLinkPlugin({
 }: {
   matchers: Array<LinkMatcher>;
   onChange?: ChangeHandler;
-}): JSX.Element | null {
+}): null {
   const [editor] = useLexicalComposerContext();
 
   useAutoLink(editor, matchers, onChange);

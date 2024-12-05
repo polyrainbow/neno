@@ -240,7 +240,7 @@ export function WikiLinkPlugin(
   {
     getLinkAvailability,
   }: { getLinkAvailability: (link: string) => Promise<boolean> },
-): JSX.Element | null {
+): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

@@ -194,7 +194,7 @@ function registerTransforms(
   ];
 }
 
-export function KeyValuePlugin(): JSX.Element | null {
+export function KeyValuePlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

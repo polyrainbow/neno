@@ -39,7 +39,7 @@ interface KeyboardShortCutHandlers {
 
 export default (
   handlers: KeyboardShortCutHandlers,
-  elementRef?: RefObject<HTMLElement>,
+  elementRef?: RefObject<HTMLElement | null>,
 ): void => {
   const handleKeydown = (e: KeyboardEvent) => {
     if (

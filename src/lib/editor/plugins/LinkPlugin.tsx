@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import { ReactElement } from "react";
 import {
   AutoLinkPlugin,
   createLinkMatcherWithRegExp,
@@ -58,6 +59,6 @@ const MATCHERS = [
   }),
 ];
 
-export default function LexicalAutoLinkPlugin(): JSX.Element {
+export default function LexicalAutoLinkPlugin(): ReactElement {
   return <AutoLinkPlugin matchers={MATCHERS} />;
 }
