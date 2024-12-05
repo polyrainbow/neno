@@ -1,4 +1,3 @@
-import React from "react";
 import { getIconSrc } from "../lib/utils";
 
 interface IconProps {
@@ -11,9 +10,8 @@ const Icon = ({
   icon,
   title,
   size,
-}: IconProps, ref: React.ForwardedRef<HTMLImageElement>) => {
+}: IconProps) => {
   return <img
-    ref={ref}
     src={getIconSrc(icon)}
     alt={title}
     width={size.toString()}
@@ -22,4 +20,4 @@ const Icon = ({
   />;
 };
 
-export default React.forwardRef(Icon);
+export default Icon;
