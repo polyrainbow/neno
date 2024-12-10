@@ -156,6 +156,10 @@ select {
   border-radius: var(--border-radius);
 }
 
+input::placeholder {
+  color: var(--alt-content-color);
+}
+
 /*
   Explicitly setting height for select to match input[type=text]
   https://stackoverflow.com/a/8189977/3890888
