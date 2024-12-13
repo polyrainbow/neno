@@ -51,6 +51,6 @@
     "version:minor": "npm version minor",
     "version:patch": "npm version patch"
   },
-  "author": "Sebastian Zimmer",
+  "author": "Sebastian",
   "license": "Apache License 2.0"
 }

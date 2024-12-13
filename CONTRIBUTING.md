@@ -14,7 +14,7 @@ insights on how NENO works:
 
 ## Development setup
 
-Make sure you have Node.js v20 or newer installed. Clone this repo and run
+Make sure you have Node.js v22 or newer installed. Clone this repo and run
 `npm i`. To start a development instance, run `npm run dev`.
 
 ## Publishing a release
@@ -35,7 +35,7 @@ The release package will now be built remotely with the script
 - Entry point: `/src/main.tsx`
 
 ### Editor
-- Technology: Lexical
+- Technology: [Lexical](https://lexical.dev)
 - Entry point: `/src/lib/editor`
 
 ### Notes
@@ -74,15 +74,12 @@ Run `npm i`
 
 ### 3. Build the app from the source
 
-Set the constant `ROOT_PATH` in `src/config.tsx`, and the `base` property in
-the Vite config to the correct basepath.
-of your hosting environment. Then go to the `tools` directory and open the script
-`./buildLocalInstance.sh`. Set the target directory to which the built is saved.
-Now run this script.
+Set the `base` property in the Vite config to the correct basepath of your
+hosting environment and run `npm run build`.
 
 ### 4. Copy files to webspace
 
-Copy the all the files in the target directory your filespace.
+Copy the all files from the `dist` directory your filespace.
 
 Make sure that your webspace contains a SPA fallback mechanism so that requests
-to non-existing files are forwarded to `index.html`
+to non-existing files are forwarded to `index.html`.
