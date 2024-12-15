@@ -471,6 +471,7 @@ button {
   td {
     text-align: left;
     padding: 5px;
+    vertical-align: top;
   }
 
   tr td:nth-of-type(2) {
