@@ -1,6 +1,6 @@
 {
   "name": "neno",
-  "version": "9.5.1",
+  "version": "9.6.0",
   "description": "NENO is a note-taking app that helps you manage your personal knowledge garden.",
   "type": "module",
   "dependencies": {
