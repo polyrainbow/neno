@@ -39,3 +39,33 @@ export const highlightQuoteBlockSigils = () => {
   // @ts-ignore
   CSS.highlights.set("quote-block-sigil", highlight);
 };
+
+
+export const highlightInlineCodeSigils = () => {
+  const inlineCodeSpans = document.querySelectorAll(
+    "div[data-lexical-editor] .inline-code",
+  );
+
+  const ranges: Range[] = [];
+  Array.from(inlineCodeSpans).forEach((span) => {
+    const textNode = span.childNodes[0];
+    const rangeStart = new Range();
+    rangeStart.setStart(textNode, 0);
+    rangeStart.setEnd(textNode, 1);
+    ranges.push(rangeStart);
+
+    const textContent = textNode.textContent;
+
+    if (textContent) {
+      const rangeEnd = new Range();
+      rangeEnd.setStart(textNode, textContent.length - 1);
+      rangeEnd.setEnd(textNode, textContent.length);
+      ranges.push(rangeEnd);
+    }
+  });
+
+  // @ts-ignore
+  const highlight = new Highlight(...ranges);
+  // @ts-ignore
+  CSS.highlights.set("inline-code-sigil", highlight);
+};

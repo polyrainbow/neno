@@ -585,6 +585,10 @@ div[data-lexical-editor] {
   .inline-code, .code-block {
     font-family: var(--code-font);
     background-color: var(--accent-color-interactible);
+
+    &::highlight(inline-code-sigil) {
+      color: var(--alt-content-color);
+    }
   }
 
   .quote-block {
@@ -595,7 +599,7 @@ div[data-lexical-editor] {
     margin-inline: 0;
 
     ::highlight(quote-block-sigil) {
-      color: var(--alt-content-color)
+      color: var(--alt-content-color);
     }
   }
 
