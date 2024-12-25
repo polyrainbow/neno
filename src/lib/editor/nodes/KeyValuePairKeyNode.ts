@@ -36,7 +36,7 @@ export class KeyValuePairKeyNode extends TextNode {
 
 
   updateDOM(
-    prevNode: TextNode,
+    prevNode: this,
     element: HTMLElement,
     config: EditorConfig,
   ): boolean {
