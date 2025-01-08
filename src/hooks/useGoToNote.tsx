@@ -23,7 +23,7 @@ const useGoToNote = () => {
 
     // @ts-ignore
     return navigation.navigate(path, {
-      replace: params?.replace,
+      history: params?.replace ? "replace" : "push",
       state: {
         contentIfNewNote: params?.contentIfNewNote,
       },

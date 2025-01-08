@@ -33,6 +33,9 @@ const NoteAccessProvider = ({
           // @ts-ignore
           navigation.navigate(
             getAppPath(PathTemplate.START, new Map(), urlParams),
+            {
+              history: "replace",
+            },
           );
         });
     } else {
