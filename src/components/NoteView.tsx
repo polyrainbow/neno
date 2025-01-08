@@ -268,7 +268,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
             ]),
             new URLSearchParams(location.search),
           ),
-          { replace: true },
+          { history: "replace" },
         );
       }
     }

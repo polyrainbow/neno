@@ -1103,4 +1103,24 @@ test.describe("Editor view", () => {
     await expect(onlyParagraphChild).not.toHaveAttribute("href");
     await expect(onlyParagraphChild).toHaveText("www.example.com");
   });
+
+  test(
+    "opening a random note should create one history entry",
+    async ({ page }) => {
+      await page.keyboard.type("Note 1");
+      await page.click("#button_upload"); // save as "note-1"
+
+      await page.click("#button_random-note");
+      await page.click("#button_random-note");
+      await page.click("#button_random-note");
+
+      // history length should be 6 now:
+      // start, new, note-1, random, random, random
+
+      const result = await page.evaluate(() => {
+        return navigation.entries().map(e => e.url);
+      });
+      expect(result.length).toBe(6);
+    },
+  );
 });
