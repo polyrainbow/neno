@@ -336,7 +336,7 @@ describe("Notes module", () => {
     expect(notes.numberOfResults).toBe(1);
     expect(notes.results[0].slug).toBe("note-1a");
 
-    expect(
+    await expect(
       mockStorageProvider.readObjectAsString("note-1.subtext"),
     ).rejects.toThrow();
 
@@ -936,7 +936,7 @@ describe("Notes module", () => {
       // Let's create a second notes provider to simulate a new session
       const notesProvider2 = new NotesProvider(storageProvider);
 
-      expect(notesProvider2.get("n1")).resolves.toBeDefined();
+      await expect(notesProvider2.get("n1")).resolves.toBeDefined();
       expect(
         (await notesProvider2.getNotesList({})).numberOfResults,
       ).toBe(1);
@@ -1944,7 +1944,7 @@ describe("Notes module", () => {
         changeSlugTo: "s2",
         aliases: new Set(["s1"]),
       };
-      expect(notesProvider.put(noteSaveRequest2))
+      await expect(notesProvider.put(noteSaveRequest2))
         .rejects.toThrowError(ErrorMessage.SLUG_EXISTS);
     },
   );
@@ -1994,7 +1994,8 @@ describe("Notes module", () => {
         },
         aliases: new Set(["s1"]),
       };
-      expect(notesProvider.put(noteSaveRequest3))
+
+      await expect(notesProvider.put(noteSaveRequest3))
         .rejects.toThrowError(ErrorMessage.SLUG_EXISTS);
     },
   );
@@ -2029,7 +2030,8 @@ describe("Notes module", () => {
         changeSlugTo: "s2",
         aliases: new Set(["alias"]),
       };
-      expect(notesProvider.put(noteSaveRequest2))
+
+      await expect(notesProvider.put(noteSaveRequest2))
         .rejects.toThrowError(ErrorMessage.ALIAS_EXISTS);
     },
   );
@@ -2308,7 +2310,7 @@ describe("Notes module", () => {
         "test.txt",
       );
 
-      expect(
+      await expect(
         notesProvider.renameFileSlug("files/test.txt", "file.mp3", false),
       ).rejects.toThrow("INVALID_SLUG");
     },
