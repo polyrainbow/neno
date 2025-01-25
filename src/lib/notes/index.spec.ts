@@ -2030,7 +2030,7 @@ describe("Notes module", () => {
         changeSlugTo: "s2",
         aliases: new Set(["alias"]),
       };
-      
+
       await expect(notesProvider.put(noteSaveRequest2))
         .rejects.toThrowError(ErrorMessage.ALIAS_EXISTS);
     },
