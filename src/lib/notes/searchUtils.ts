@@ -124,7 +124,7 @@ const getNotesWithFile = (
 ): ExistingNote[] => {
   return notes.filter((note: ExistingNote) => {
     const fileSlugs = getFileSlugsReferencedInNote(graph, note.meta.slug);
-    return fileSlugs.includes(fileSlug);
+    return fileSlugs.has(fileSlug);
   });
 };
 
@@ -233,7 +233,7 @@ const getNotesWithMediaTypes = (
       .filter((note: ExistingNote): boolean => {
         const files = getFileInfosForFilesLinkedInNote(graph, note.meta.slug);
         const includedMediaTypes = new Set(
-          files
+          files.values()
             .map((file) => getMediaTypeFromFilename(file.filename)),
         );
 
@@ -245,6 +245,7 @@ const getNotesWithMediaTypes = (
         const files = getFileInfosForFilesLinkedInNote(graph, note.meta.slug);
         const includedMediaTypes = new Set(
           files
+            .values()
             .map((file) => getMediaTypeFromFilename(file.filename)),
         );
 

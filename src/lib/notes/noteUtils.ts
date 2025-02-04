@@ -384,23 +384,28 @@ const getAllInlineSpans = (blocks: Block[]): Span[] => {
 };
 
 
-const getFileSlugsReferencedInNote = (graph: Graph, noteSlug: Slug): Slug[] => {
+const getFileSlugsReferencedInNote = (
+  graph: Graph,
+  noteSlug: Slug,
+): Set<Slug> => {
   const blocks: Block[]
     = graph.indexes.blocks.get(noteSlug) as Block[];
   const allInlineSpans = getAllInlineSpans(blocks);
-  const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-  return allUsedSlugs.filter(s => graph.files.has(s));
+  const allReferencedSlugs = getSlugsFromInlineText(allInlineSpans);
+  return new Set(allReferencedSlugs.filter(s => graph.files.has(s)));
 };
 
 
 const getFileInfosForFilesLinkedInNote = (
   graph: Graph,
   slugOfNote: Slug,
-): FileInfo[] => {
-  return getFileSlugsReferencedInNote(graph, slugOfNote)
-    // we can make a non-null assertion because getFileSlugsInNote
-    // only returns file slugs in use
-    .map((fileSlug: Slug) => graph.files.get(fileSlug)!);
+): Set<FileInfo> => {
+  const fileSlugs = getFileSlugsReferencedInNote(graph, slugOfNote);
+  // we can make a non-null assertion because getFileSlugsInNote
+  // only returns file slugs in use
+  return new Set(
+    fileSlugs.values().map((fileSlug: Slug) => graph.files.get(fileSlug)!),
+  );
 };
 
 
@@ -515,7 +520,7 @@ const getNoteFeatures = (
 
 
 const getNumberOfFiles = (graph: Graph, noteSlug: Slug): number => {
-  return getFileSlugsReferencedInNote(graph, noteSlug).length;
+  return getFileSlugsReferencedInNote(graph, noteSlug).size;
 };
 
 

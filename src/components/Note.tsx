@@ -48,7 +48,7 @@ interface NoteComponentProps {
   displayedSlugAliases: string[],
   setDisplayedSlugAliases: (val: string[]) => void,
   handleEditorContentChange: (title: string) => void,
-  addFilesToNoteObject: (responses: FileInfo[]) => void,
+  addFilesToNoteObject: (responses: Set<FileInfo>) => void,
   setUnsavedChanges: (val: boolean) => void,
   handleNoteSaveRequest: () => void,
   removeActiveNote: () => void,
@@ -144,7 +144,7 @@ const Note = ({
     );
 
     setUploadInProgress(false);
-    addFilesToNoteObject(fileInfos);
+    addFilesToNoteObject(new Set(fileInfos));
     return fileInfos;
   };
 

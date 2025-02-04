@@ -1772,8 +1772,10 @@ describe("Notes module", () => {
         "Note 1 with slashlink to /files/a-renamed.txt",
       );
 
-      expect(note1.files.length).toBe(1);
-      expect(note1.files[0].slug).toBe("files/a-renamed.txt");
+      expect(note1.files.size).toBe(1);
+      expect(
+        note1.files.values().next().value!.slug,
+      ).toBe("files/a-renamed.txt");
     },
   );
 
@@ -1811,8 +1813,10 @@ describe("Notes module", () => {
         "Note 1 with slashlink to /files/a-renamed.txt",
       );
 
-      expect(note1.files.length).toBe(1);
-      expect(note1.files[0].slug).toBe("files/a-renamed.txt");
+      expect(note1.files.size).toBe(1);
+      expect(
+        note1.files.values().next().value!.slug,
+      ).toBe("files/a-renamed.txt");
     },
   );
 
@@ -2337,6 +2341,47 @@ describe("Notes module", () => {
       );
 
       expect(updatedFileInfo.filename).toBe("new-name.txt");
+    },
+  );
+
+
+  it(
+    "a file mounted twice in a note should only be returned once in note files",
+    async () => {
+      const notesProvider = new NotesProvider(new MockStorageProvider());
+
+      const readable = getNewTestFileReadable("foobar");
+
+      const fileInfo = await notesProvider.addFile(
+        readable,
+        "files",
+        "a.txt",
+      );
+
+      expect(fileInfo.slug).toBe("files/a.txt");
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: `Note 1 with two references to the same file
+          /files/a.txt
+          /files/a.txt`,
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        aliases: new Set(),
+        changeSlugTo: "note-1",
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const note1 = await notesProvider.get("note-1");
+
+      expect(note1.files.size).toBe(1);
+      expect(
+        note1.files.values().next().value!.slug,
+      ).toBe("files/a.txt");
     },
   );
 });

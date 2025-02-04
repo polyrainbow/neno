@@ -328,11 +328,11 @@ const NoteView = ({ slug }: NoteViewProps) => {
           displayedSlugAliases={displayedSlugAliases}
           setDisplayedSlugAliases={setDisplayedSlugAliases}
           handleEditorContentChange={handleEditorContentChange}
-          addFilesToNoteObject={(files: FileInfo[]): void => {
+          addFilesToNoteObject={(files: Set<FileInfo>): void => {
             setActiveNote((previousState) => {
               return {
                 ...previousState,
-                files: [...previousState.files, ...files],
+                files: new Set([...previousState.files, ...files]),
               };
             });
           }}

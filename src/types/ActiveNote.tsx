@@ -5,7 +5,7 @@ import SparseNoteInfo from "../lib/notes/types/SparseNoteInfo";
 
 interface BaseActiveNote {
   initialContent: string,
-  files: FileInfo[],
+  files: Set<FileInfo>,
   flags: string[],
 }
 
