@@ -4,6 +4,8 @@ import NoteSlugUpdateReferencesToggle from "./NoteSlugUpdateReferencesToggle";
 import { l } from "../lib/intl";
 import Icon from "./Icon";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
+import { sluggifyNoteText } from "../lib/notes/slugUtils";
+import { flushSync } from "react-dom";
 
 interface NoteSlugProps {
   note: ActiveNote,
@@ -82,6 +84,30 @@ const NoteSlug = ({
             e.preventDefault();
             setSlugInput("slug" in note ? note.slug : "");
           }
+        }}
+        onPaste={(e) => {
+          e.preventDefault();
+          const element = e.currentTarget;
+
+          const pastedText = e.clipboardData.getData("text");
+          const pastedTextSluggified = sluggifyNoteText(pastedText);
+          const originalSelectionStart = element.selectionStart!;
+          const originalSelectionEnd = element.selectionEnd!;
+          const oldText = element.value;
+          const newText = oldText.substring(0, originalSelectionStart)
+            + pastedTextSluggified
+            + oldText.substring(originalSelectionEnd, oldText.length);
+
+          // flushSync is necessary to ensure that the value is updated before
+          // we set the selection range. Otherwise, the selection range would
+          // be set based on the old value.
+          flushSync(() => {
+            setSlugInput(newText);
+          });
+
+          const selectionOffset = (oldText.substring(0, originalSelectionStart)
+            + pastedTextSluggified).length;
+          element.setSelectionRange(selectionOffset, selectionOffset);
         }}
       />
       {
@@ -176,6 +202,35 @@ const NoteSlug = ({
                   = Array.from(displayedSlugAliases).splice(index, 1);
                 setDisplayedSlugAliases(newDisplayedSlugAliases);
               }
+            }}
+            onPaste={(e) => {
+              e.preventDefault();
+              const element = e.currentTarget;
+
+              const pastedText = e.clipboardData.getData("text");
+              const pastedTextSluggified = sluggifyNoteText(pastedText);
+              const originalSelectionStart = element.selectionStart!;
+              const originalSelectionEnd = element.selectionEnd!;
+              const oldText = element.value;
+              const newText = oldText.substring(0, originalSelectionStart)
+                + pastedTextSluggified
+                + oldText.substring(originalSelectionEnd, oldText.length);
+
+              const newDisplayedSlugAliases = [...displayedSlugAliases];
+              newDisplayedSlugAliases[index] = newText;
+
+              // flushSync is necessary to ensure that the value is updated
+              // before we set the selection range. Otherwise, the selection
+              // range would be set based on the old value.
+              flushSync(() => {
+                setDisplayedSlugAliases(newDisplayedSlugAliases);
+              });
+
+              const selectionOffset = (
+                oldText.substring(0, originalSelectionStart)
+                + pastedTextSluggified
+              ).length;
+              element.setSelectionRange(selectionOffset, selectionOffset);
             }}
           />
           {
