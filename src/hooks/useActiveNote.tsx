@@ -205,7 +205,7 @@ export default (
       isUnsaved: true,
       initialContent: parsedNote.content,
       flags: [...parsedNote.meta.flags, "IMPORTED"],
-      files: [],
+      files: new Set(),
     };
     setActiveNote(newActiveNote);
     // If the user does not change the slug input, we let the app

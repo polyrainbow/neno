@@ -6,7 +6,7 @@ import NotePreview from "./NotePreview.js";
 export default interface NoteToTransmit extends ExistingNote {
   readonly backlinks: SparseNoteInfo[],
   readonly outgoingLinks: NotePreview[],
-  readonly files: FileInfo[],
+  readonly files: Set<FileInfo>,
   readonly numberOfCharacters: number,
   readonly numberOfBlocks: number,
   readonly aliases: Set<string>,

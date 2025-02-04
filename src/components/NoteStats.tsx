@@ -64,9 +64,9 @@ const NoteStats = ({
         <tr>
           <td>{l("editor.stats.files")}</td>
           <td>{
-            note.files.length > 0
-              ? note.files
-                .map((file, i, array) => {
+            note.files.size > 0
+              ? note.files.values()
+                .map((file, i) => {
                   const fileType = getMediaTypeFromFilename(file.filename);
 
                   return <Fragment
@@ -78,7 +78,7 @@ const NoteStats = ({
                     <span> </span>
                     ({fileType}, {humanFileSize(file.size)})
                     {
-                      i < array.length - 1
+                      i < note.files.size - 1
                         ? <br />
                         : null
                     }
