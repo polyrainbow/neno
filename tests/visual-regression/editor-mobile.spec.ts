@@ -26,12 +26,15 @@ test.beforeEach(async ({ page }) => {
   await page.keyboard.press("Control+.");
   await page.waitForSelector("#browser-storage-load-button");
   await page.click("#browser-storage-load-button");
+
+  // wait for editor to be ready
+  await page.getByRole("textbox").nth(1).waitFor();
 });
 
 test.describe("Editor", () => {
   test("should look fine empty", async ({ page }) => {
     await page.setViewportSize({ width: 412, height: 914 });
-    await page.keyboard.type(TEST_NOTE);
+    await page.keyboard.type(TEST_NOTE, { delay: 20 });
     expect(await page.screenshot())
       .toMatchSnapshot("editor.png");
   });
