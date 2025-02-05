@@ -34,7 +34,14 @@ export function BoldPlugin(): null {
       const char = text[i];
       const charIsSigil = char === "*";
 
-      if ((startOffset === -1) && charIsSigil) {
+      if (
+        (startOffset === -1)
+        && charIsSigil
+        && (
+          !text[i-1]
+          || text[i-1].trim().length === 0
+        )
+      ) {
         startOffset = i;
 
       // break if a ` is between two *
