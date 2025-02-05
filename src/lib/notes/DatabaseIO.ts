@@ -525,6 +525,9 @@ export default class DatabaseIO {
   }
 
 
+  /*
+    Caution: We don't do any overwrite checks here. Last write wins.
+  */
   async addFile(
     slug: Slug,
     source: ReadableStream,
