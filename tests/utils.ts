@@ -1,7 +1,7 @@
 /* eslint-disable @stylistic/max-len */
 // Set default date for all tests.
 
-import { Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
 
 // See https://github.com/microsoft/playwright/issues/6347#issuecomment-1085850728
 export const setDefaultDate = async (page: Page): Promise<void> => {
