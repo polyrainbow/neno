@@ -1,5 +1,5 @@
 /* eslint-disable @stylistic/max-len */
-import { test, expect, ElementHandle } from "@playwright/test";
+import { test, expect, type ElementHandle } from "@playwright/test";
 
 const DEMO_NOTE = `# Welcome to NENO
 Paragraph block
