@@ -247,36 +247,60 @@ export default class NotesProvider {
     );
   }
 
+  #fileAdditionInProgress: Promise<void> | null = null;
+  #finishedAddingFile: (() => void) = () => {};
+
   async addFile(
     readable: ReadableStream,
     namespace: string,
     originalFilename: string,
   ): Promise<FileInfo> {
-    const graph = await this.#io.getGraph();
-    const { slug, filename } = getSlugAndNameForNewArbitraryFile(
-      namespace,
-      originalFilename,
-      getAllUsedSlugsInGraph(graph),
-    );
-    const size = await this.#io.addFile(slug, readable);
 
-    const fileInfo: FileInfo = {
-      slug,
-      filename,
-      size,
-      createdAt: getCurrentISODateTime(),
-      updatedAt: getCurrentISODateTime(),
-    };
-    graph.files.set(slug, fileInfo);
-    await this.#io.flushChanges(
-      graph,
-      false,
-      new Set(),
-      new Set(),
-      new Set([slug]),
-    );
+    /*
+      We need to add files one after another, so we need to wait for the
+      previous file addition to finish.
+      Reason: We need to make sure that the slug of the new file is unique.
+    */
+    if (this.#fileAdditionInProgress) {
+      await this.#fileAdditionInProgress;
+    }
 
-    return fileInfo;
+    this.#fileAdditionInProgress = new Promise((resolve) => {
+      this.#finishedAddingFile = () => {
+        this.#fileAdditionInProgress = null;
+        resolve();
+      };
+    });
+
+    try {
+      const graph = await this.#io.getGraph();
+      const { slug, filename } = getSlugAndNameForNewArbitraryFile(
+        namespace,
+        originalFilename,
+        getAllUsedSlugsInGraph(graph),
+      );
+      const size = await this.#io.addFile(slug, readable);
+
+      const fileInfo: FileInfo = {
+        slug,
+        filename,
+        size,
+        createdAt: getCurrentISODateTime(),
+        updatedAt: getCurrentISODateTime(),
+      };
+      graph.files.set(slug, fileInfo);
+      await this.#io.flushChanges(
+        graph,
+        false,
+        new Set(),
+        new Set(),
+        new Set([slug]),
+      );
+
+      return fileInfo;
+    } finally {
+      this.#finishedAddingFile();
+    }
   }
 
 
