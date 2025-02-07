@@ -538,7 +538,11 @@ div[data-lexical-editor] {
   }
 
   .bold {
-    font-weight: bold;
+    font-weight: 900;
+
+    &::highlight(bold-sigil) {
+      color: var(--alt-content-color);
+    }
   }
 
   .transclusion-wrapper {
