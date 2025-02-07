@@ -69,3 +69,32 @@ export const highlightInlineCodeSigils = () => {
   // @ts-ignore
   CSS.highlights.set("inline-code-sigil", highlight);
 };
+
+export const highlightBoldSigils = () => {
+  const boldSpans = document.querySelectorAll(
+    "div[data-lexical-editor] span.bold",
+  );
+
+  const ranges: Range[] = [];
+  Array.from(boldSpans).forEach((span) => {
+    const textNode = span.childNodes[0];
+    const rangeStart = new Range();
+    rangeStart.setStart(textNode, 0);
+    rangeStart.setEnd(textNode, 1);
+    ranges.push(rangeStart);
+
+    const textContent = textNode.textContent;
+
+    if (textContent) {
+      const rangeEnd = new Range();
+      rangeEnd.setStart(textNode, textContent.length - 1);
+      rangeEnd.setEnd(textNode, textContent.length);
+      ranges.push(rangeEnd);
+    }
+  });
+
+  // @ts-ignore
+  const highlight = new Highlight(...ranges);
+  // @ts-ignore
+  CSS.highlights.set("bold-sigil", highlight);
+};

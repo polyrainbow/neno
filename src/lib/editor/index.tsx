@@ -34,6 +34,7 @@ import theme from "./theme";
 import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
 import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
 import {
+  highlightBoldSigils,
   highlightHeadingSigils,
   highlightInlineCodeSigils,
   highlightQuoteBlockSigils,
@@ -90,6 +91,7 @@ export const Editor = ({
           highlightHeadingSigils();
           highlightQuoteBlockSigils();
           highlightInlineCodeSigils();
+          highlightBoldSigils();
           const root = $getRoot();
           onChange(getSubtextFromEditor(root));
         });
