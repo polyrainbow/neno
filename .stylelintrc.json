@@ -4,7 +4,8 @@
     "no-duplicate-selectors": null,
     "media-feature-range-notation": "prefix",
     "no-descending-specificity": null,
-    "declaration-block-no-redundant-longhand-properties": null
+    "declaration-block-no-redundant-longhand-properties": null,
+    "import-notation": null
   },
-  "ignoreFiles": ["dist/**/*.css"]
+  "ignoreFiles": ["dist/**/*.css", "**/reboot.css"]
 }
