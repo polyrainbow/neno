@@ -22,8 +22,6 @@ const AppMenuItem = ({
     <img
       src={getIconSrc(icon)}
       alt={label}
-      width="24"
-      height="24"
       className="svg-icon"
     />
     <p

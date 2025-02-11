@@ -1,0 +1,100 @@
+.files-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--default-gap);
+
+  h1 {
+    margin: var(--small-gap) 0;
+  }
+
+  .dangling-file-indicator {
+    background: var(--error-and-danger-text-color);
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 100%;
+    margin: 0;
+    align-self: center;
+    flex-shrink: 0;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--default-gap);
+  }
+
+  .files {
+    flex-wrap: wrap;
+    gap: var(--default-gap);
+
+    .files-view-preview-box {
+      width: 12.5rem;
+      min-height: 15.063rem;
+      background: var(--accent-color-interactible);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      position: relative;
+      text-decoration: none;
+      display: block;
+    
+      img {
+        display: block;
+
+        &.file-type-icon {
+          width: 9.375rem;
+          height: 9.375rem;
+          padding: 1.563rem;
+          display: block;
+        }
+    
+        &.preview-image {
+          width: 12.5rem;
+          height: 12.5rem;
+          padding: 0;
+          object-fit: cover;
+        }
+      }
+    
+      .file-info {
+        color: var(--main-content-color);
+        text-decoration: none;
+        padding: 0.313rem;
+        font-size: var(--small-font-size);
+        min-height: 1.938rem;
+        display: flex;
+        justify-content: space-between;
+        overflow-wrap: anywhere;
+        height: 2.875rem;
+      }
+
+      .floating-action-button {
+        bottom: 4.188rem;
+        right: 0.563rem;
+        min-width: 1.563rem;
+        padding: 0.375rem;
+        background: var(--accent-color-2);
+        width: 2.188rem;
+        height: 2.188rem;
+        position: absolute;
+      }
+    }
+  }
+
+  .create-script {
+    .controls {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      input {
+        margin: 0 0.313rem;
+      }
+    }
+
+    .error {
+      color: var(--error-and-danger-text-color);
+    }
+  }
+}

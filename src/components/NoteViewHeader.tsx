@@ -1,5 +1,4 @@
 import { Fragment, ReactNode, useContext, useRef, useState } from "react";
-import AppTitle from "./AppTitle";
 import AppHeaderStats from "./AppHeaderStats";
 import NoteViewHeaderPinnedNote from "./NoteViewHeaderPinnedNote";
 import useGoToNote from "../hooks/useGoToNote";
@@ -15,6 +14,7 @@ import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import AppMenuContext from "../contexts/AppMenuContext";
 import { Slug } from "../lib/notes/types/Slug";
 import BusyIndicator from "./BusyIndicator";
+import AppMenuToggle from "./AppMenuToggle";
 
 interface NoteViewHeaderProps {
   stats: GraphStats | null,
@@ -46,7 +46,7 @@ const NoteViewHeader = ({
 
   return (
     <HeaderContainer>
-      <AppTitle
+      <AppMenuToggle
         toggleAppMenu={toggleAppMenu}
       />
       <FlexContainer

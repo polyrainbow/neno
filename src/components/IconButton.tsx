@@ -1,5 +1,6 @@
+import useRunOnce from "../hooks/useRunOnce";
 import Icon from "./Icon";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 interface IconButtonProps {
   id?: string,
@@ -7,6 +8,7 @@ interface IconButtonProps {
   icon: string,
   onClick: () => void,
   disabled?: boolean,
+  disableTooltip?: boolean,
 }
 
 const IconButton = ({
@@ -15,11 +17,14 @@ const IconButton = ({
   icon,
   onClick,
   disabled = false,
+  disableTooltip = false,
 }: IconButtonProps) => {
   const ref = useRef<HTMLButtonElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  useRunOnce(() => {
+    if (disableTooltip) return;
+
     const showPopover = () => {
       const popoverElement = document.createElement("div");
       popoverElement.popover = "auto";
@@ -44,8 +49,10 @@ const IconButton = ({
     };
 
     const hidePopover = () => {
-      popoverRef.current?.hidePopover();
-      popoverRef.current?.parentElement?.removeChild(popoverRef.current);
+      const element = popoverRef.current;
+      if (!element) return;
+      element.hidePopover();
+      element.remove();
     };
 
     ref.current?.addEventListener("mouseenter", showPopover);
@@ -55,7 +62,7 @@ const IconButton = ({
       ref.current?.removeEventListener("mouseenter", showPopover);
       ref.current?.removeEventListener("mouseleave", hidePopover);
     };
-  }, []);
+  });
 
   return <button
     className="icon-button"
@@ -63,11 +70,11 @@ const IconButton = ({
     onClick={onClick}
     disabled={disabled}
     ref={ref}
+    aria-label={title}
+    title={disableTooltip ? title : ""}
   >
     <Icon
       icon={icon}
-      title={title}
-      size={24}
     />
   </button>;
 };

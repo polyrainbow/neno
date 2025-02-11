@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Mona Sans";
-  /* stylelint-disable-next-line function-no-unknown */
+  /* stylelint-disable-next-line at-rule-descriptor-value-no-unknown */
   src: url("../../assets/fonts/Mona-Sans.woff2") format("woff2") tech(variations);
   font-weight: 200 900;
   font-stretch: 75% 125%;

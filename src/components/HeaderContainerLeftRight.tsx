@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import AppMenuContext from "../contexts/AppMenuContext";
-import AppTitle from "./AppTitle";
 import HeaderContainer from "./HeaderContainer";
+import AppMenuToggle from "./AppMenuToggle";
 
 interface HeaderContainerLeftRightProps {
   leftContent?: React.ReactNode,
@@ -17,7 +17,7 @@ const HeaderContainerLeftRight = ({
   return (
     <HeaderContainer>
       <div className="header-left">
-        <AppTitle
+        <AppMenuToggle
           toggleAppMenu={toggleAppMenu}
         />
         {leftContent}

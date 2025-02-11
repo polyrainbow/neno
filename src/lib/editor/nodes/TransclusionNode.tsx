@@ -43,8 +43,6 @@ const Transclusion = ({
         ? <div className="not-available-disclaimer">
           <Icon
             icon="warning"
-            title={l("editor.transclusion.not-available")}
-            size={70}
           />
           {l("editor.transclusion.not-available")}
         </div>

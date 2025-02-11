@@ -43,14 +43,12 @@ const HeaderButton = ({
         ? <img
           src={getIconSrc(icon)}
           role="presentation"
-          width="24"
-          height="24"
           className="svg-icon"
           draggable={false}
         />
         : ""
     }
-    <p>{children}</p>
+    <span>{children}</span>
   </button>;
 };
 

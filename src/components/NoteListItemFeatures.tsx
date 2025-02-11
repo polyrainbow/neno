@@ -3,22 +3,39 @@ import NoteListItemFeaturesType
   from "../lib/notes/types/NoteListItemFeatures";
 import Icon from "./Icon";
 
-const ICON_SIZE = 15;
-
 const NoteListItemFeatures = ({
   features,
 }: {
   features: NoteListItemFeaturesType,
 }) => {
+  const labels = [];
+  if (features.containsWeblink) {
+    labels.push(l("list.item.features.contains-links"));
+  }
+  if (features.containsCode) {
+    labels.push(l("list.item.features.contains-code"));
+  }
+  if (features.containsImages) {
+    labels.push(l("list.item.features.contains-images"));
+  }
+  if (features.containsDocuments) {
+    labels.push(l("list.item.features.contains-documents"));
+  }
+  if (features.containsAudio) {
+    labels.push(l("list.item.features.contains-audio"));
+  }
+  if (features.containsVideo) {
+    labels.push(l("list.item.features.contains-video"));
+  }
+
   return <span
     className="note-features"
+    aria-label={labels.join(", ")}
   >
     {
       features.containsWeblink
         ? <Icon
           icon="public"
-          title={l("list.item.features.contains-links")}
-          size={ICON_SIZE}
         />
         : null
     }
@@ -26,8 +43,6 @@ const NoteListItemFeatures = ({
       features.containsCode
         ? <Icon
           icon="code"
-          title={l("list.item.features.contains-code")}
-          size={ICON_SIZE}
         />
         : null
     }
@@ -35,8 +50,6 @@ const NoteListItemFeatures = ({
       features.containsImages
         ? <Icon
           icon="image"
-          title={l("list.item.features.contains-images")}
-          size={ICON_SIZE}
         />
         : null
     }
@@ -44,8 +57,6 @@ const NoteListItemFeatures = ({
       features.containsDocuments
         ? <Icon
           icon="note"
-          title={l("list.item.features.contains-documents")}
-          size={ICON_SIZE}
         />
         : null
     }
@@ -53,8 +64,6 @@ const NoteListItemFeatures = ({
       features.containsAudio
         ? <Icon
           icon="headphones"
-          title={l("list.item.features.contains-audio")}
-          size={ICON_SIZE}
         />
         : null
     }
@@ -62,8 +71,6 @@ const NoteListItemFeatures = ({
       features.containsVideo
         ? <Icon
           icon="movie"
-          title={l("list.item.features.contains-video")}
-          size={ICON_SIZE}
         />
         : null
     }

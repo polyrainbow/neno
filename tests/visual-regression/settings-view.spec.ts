@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
   await page.getByText("No notes found").waitFor();
   await page.getByAltText("No notes found").waitFor();
 
-  await page.getByAltText("Menu").click();
+  await page.getByTitle("Menu").click();
   await page.getByText("Settings").click();
 });
 

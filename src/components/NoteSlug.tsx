@@ -134,11 +134,11 @@ const NoteSlug = ({
       <button
         className="alias-control-button"
         onClick={handleNewAliasRequest}
+        aria-label={l("editor.add-alias")}
+        title={l("editor.add-alias")}
       >
         <Icon
           icon={"add"}
-          title={"Add alias"}
-          size={20}
         />
       </button>
     </div>
@@ -247,11 +247,11 @@ const NoteSlug = ({
               newDisplayedSlugAliases.splice(index, 1);
               setDisplayedSlugAliases(newDisplayedSlugAliases);
             }}
+            aria-label={l("editor.remove-alias")}
+            title={l("editor.remove-alias")}
           >
             <Icon
               icon={"delete"}
-              title={"Remove alias"}
-              size={20}
             />
           </button>
         </div>;

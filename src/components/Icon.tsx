@@ -2,21 +2,16 @@ import { getIconSrc } from "../lib/utils";
 
 interface IconProps {
   icon: string,
-  title: string,
-  size: number,
 }
 
 const Icon = ({
   icon,
-  title,
-  size,
 }: IconProps) => {
   return <img
     src={getIconSrc(icon)}
-    alt={title}
-    width={size.toString()}
-    height={size.toString()}
+    alt=""
     className="svg-icon"
+    aria-hidden="true"
   />;
 };
 

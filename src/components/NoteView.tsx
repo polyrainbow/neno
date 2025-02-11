@@ -290,7 +290,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
       movePin={move}
       activeNote={activeNote}
     />
-    <main>
+    <main className="note-view-content">
       {
         !isSmallScreen
           ? <div className="sidebar">

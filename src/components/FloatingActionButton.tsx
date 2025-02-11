@@ -23,8 +23,6 @@ const FloatingActionButton = ({
     <img
       src={getIconSrc(icon)}
       alt={title}
-      width="24"
-      height="24"
       className="svg-icon"
     />
   </button>;
