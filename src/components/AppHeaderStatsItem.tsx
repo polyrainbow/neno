@@ -13,8 +13,8 @@ const AppHeaderStatsItem = ({
 }: AppHeaderStatsItemProps) => {
   return <div
     className="app-header-stats-item"
-    title={label}
-  ><Icon icon={icon} size={24} title={label}/> {value}</div>;
+    aria-label={label}
+  ><Icon icon={icon} /> {value}</div>;
 };
 
 

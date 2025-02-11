@@ -1,5 +1,5 @@
 import { l } from "../lib/intl";
-import StatusIndicatorItem from "./StatusIndicatorItem";
+import Icon from "./Icon";
 
 interface StatusIndicatorProps {
   isNew: boolean,
@@ -14,28 +14,53 @@ const StatusIndicator = ({
   isEverythingSaved,
   isUploading,
 }: StatusIndicatorProps) => {
-  return <>
-    <StatusIndicatorItem
-      isActive={isNew}
-      title={l("editor.note-has-not-been-saved-yet")}
-      icon={"fiber_new"}
-    />
-    <StatusIndicatorItem
-      isActive={hasUnsavedChanges}
-      title={l("editor.unsaved-changes")}
-      icon={"stream"}
-    />
-    <StatusIndicatorItem
-      isActive={isEverythingSaved}
-      title={l("editor.no-unsaved-changes")}
-      icon={"done"}
-    />
-    <StatusIndicatorItem
-      isActive={isUploading}
-      title={l("editor.upload-in-progress")}
-      icon={"file_upload"}
-    />
-  </>;
+  const labels = [];
+  if (isNew) {
+    labels.push(l("editor.note-has-not-been-saved-yet"));
+  }
+  if (hasUnsavedChanges) {
+    labels.push(l("editor.unsaved-changes"));
+  }
+  if (isEverythingSaved) {
+    labels.push(l("editor.no-unsaved-changes"));
+  }
+  if (isUploading) {
+    labels.push(l("editor.upload-in-progress"));
+  }
+
+  return <div
+    className="status-indicator"
+    aria-label={labels.join(", ")}
+  >
+    {
+      isNew
+        ? <Icon
+          icon="fiber_new"
+        />
+        : null
+    }
+    {
+      hasUnsavedChanges
+        ? <Icon
+          icon="stream"
+        />
+        : null
+    }
+    {
+      isEverythingSaved
+        ? <Icon
+          icon="done"
+        />
+        : null
+    }
+    {
+      isUploading
+        ? <Icon
+          icon="file_upload"
+        />
+        : null
+    }
+  </div>;
 };
 
 export default StatusIndicator;

@@ -2,7 +2,7 @@
   background: var(--header-background-color);
   margin: 0;
   padding: 0;
-  padding-right: 10px;
+  padding-right: 0.625em;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -35,18 +35,18 @@
     display: flex;
 
     .busy-indicator {
-      height: 28px;
+      height: 1.75rem;
     }
 
     .header-stats {
       white-space: pre;
       display: flex;
-      gap: 15px;
+      gap: var(--default-gap);
 
       .app-header-stats-item {
         display: flex;
         align-items: center;
-        gap: 2px;
+        gap: 0.125rem;
       }
     }
   }
@@ -59,7 +59,7 @@
 
   .pinned-notes {
     align-items: center;
-    gap: 5px;
+    gap: 0.313rem;
     height: 100%;
     overflow: auto;
     justify-content: flex-start;
@@ -70,7 +70,7 @@
     }
   
     .pinned-notes-placeholder {
-      padding: 0 10px;
+      padding: 0 var(--small-interactive-element-padding);
     }
   
     .pinned-note {
@@ -92,44 +92,41 @@
     .pin-insert-indicator {
       height: 100%;
       background-color: var(--main-content-color);
-      width: 3px;
+      width: var(--thick-line-width);
       flex-shrink: 0;
     }
   }
-}
 
-.app-menu {
-  background-color: var(--header-background-color);
-  z-index: 10;
-  position: fixed;
-  top: 50px;
-  left: 0;
-
-  .app-menu-item {
+  .header-button {
+    padding: 0 var(--small-interactive-element-padding);
     display: flex;
-    padding: 15px 10px;
+    gap: var(--thick-line-width);
     align-items: center;
-    background: transparent;
-    width: 100%;
-
-    .label {
-      margin: 0;
-      margin-left: 15px;
-      color: inherit;
+    cursor: pointer;
+    height: 2.188rem;
+    background: var(--accent-color-1-light);
+    border-radius: var(--border-radius);
+    white-space: nowrap;
+  
+    &:hover {
+      background-color: var(--accent-color-1-intense);
     }
-
-    &.disabled {
-      img.svg-icon {
-        filter: opacity(0.5);
+  
+    &.with-icon {
+      padding-left: 0.375rem;
+    }
+  
+    &.dangerous {
+      background-color: var(--error-and-danger-background-color-low);
+  
+      &:hover {
+        background-color: var(--error-and-danger-background-color);
       }
-
-      .label {
-        color: var(--neno-gray-4);
-      }
     }
-
-    &:not(.disabled):hover {
-      background-color: var(--accent-color-1-light);
-    }
+  }
+  
+  .header-controls {
+    gap: var(--small-gap);
+    display: flex;
   }
 }

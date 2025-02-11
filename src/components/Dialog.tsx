@@ -13,7 +13,7 @@ const Dialog = ({
     onClick={onClickOnOverlay}
   >
     <dialog
-      className={"dialog-box " + (className ?? "")}
+      className={className ?? ""}
       onClick={(e) => e.stopPropagation()}
     >
       {children}

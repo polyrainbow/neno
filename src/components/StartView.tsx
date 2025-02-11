@@ -32,8 +32,10 @@ const StartView = () => {
           alt={l("start.logo.alt")}
           id="start-logo"
         />
-        <div className="start-welcome-app-title">{l("app.title")}</div>
-        <div>{l("start.introduction")}</div>
+        <div className="text">
+          <div className="title">{l("app.title")}</div>
+          <div className="slogan">{l("start.introduction")}</div>
+        </div>
       </div>
       <StartViewLocal />
       {
