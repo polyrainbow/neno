@@ -83,7 +83,7 @@ const NoteStats = ({
                         : null
                     }
                   </Fragment>;
-                })
+                }).toArray()
               : l("editor.stats.files.none")
           }</td>
         </tr>
