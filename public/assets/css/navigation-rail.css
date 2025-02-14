@@ -34,8 +34,10 @@
   }
 
   button[disabled] {
-    img.svg-icon {
-      filter: opacity(0.5);
+    @media (prefers-color-scheme: light) {
+      img.svg-icon {
+        filter: opacity(0.5);
+      }
     }
 
     .label {
@@ -43,7 +45,7 @@
     }
   }
 
-  button:not(.disabled):hover {
+  button:not([disabled]):hover {
     background-color: var(--accent-color-1-light);
   }
 }
