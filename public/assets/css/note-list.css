@@ -1,3 +1,15 @@
+.list-view {
+  .note-list-with-controls-wrapper {
+    width: calc(100vw - var(--navigation-rail-width));
+
+    @media only screen and (max-width: 599px) {
+      & {
+        width: 100vw;
+      }
+    }  
+  }
+}
+
 .note-list-controls {
   padding: 0 var(--small-interactive-element-padding);
   display: flex;

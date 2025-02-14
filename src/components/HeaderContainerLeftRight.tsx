@@ -1,5 +1,4 @@
-import React, { useContext } from "react";
-import AppMenuContext from "../contexts/AppMenuContext";
+import React from "react";
 import HeaderContainer from "./HeaderContainer";
 import AppMenuToggle from "./AppMenuToggle";
 
@@ -12,14 +11,10 @@ const HeaderContainerLeftRight = ({
   leftContent,
   rightContent,
 }: HeaderContainerLeftRightProps) => {
-  const { toggleAppMenu } = useContext(AppMenuContext);
-
   return (
     <HeaderContainer>
       <div className="header-left">
-        <AppMenuToggle
-          toggleAppMenu={toggleAppMenu}
-        />
+        <AppMenuToggle />
         {leftContent}
       </div>
       <div className="header-right">

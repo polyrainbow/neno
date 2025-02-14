@@ -1,21 +1,29 @@
 .app-header {
   background: var(--header-background-color);
   margin: 0;
-  padding: 0;
-  padding-right: 0.625em;
+  padding: 0 0.625em;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: var(--header-bar-height);
   user-select: none;
-  width: 100vw;
+  width: calc(100vw - var(--navigation-rail-width));
   box-sizing: border-box;
-  top: 0;
-  left: 0;
-  z-index: 5;
+
+  @media only screen and (max-width: 599px) {
+    & {
+      width: 100vw;
+    }
+  }  
 
   &:has(~ .section-start) {
     background: transparent;
+  }
+
+  input, select {
+    background: var(--accent-color-1-light);
+    height: 2.188rem;
+    padding: 0 var(--small-interactive-element-padding);
   }
 
   .header-left {
@@ -23,6 +31,7 @@
     justify-content: center;
     height: var(--header-bar-height);
     align-items: center;
+    gap: var(--small-gap);
   }
   
   .header-right {
@@ -46,7 +55,7 @@
       .app-header-stats-item {
         display: flex;
         align-items: center;
-        gap: 0.125rem;
+        gap: var(--thick-line-width);
       }
     }
   }
@@ -64,6 +73,7 @@
     overflow: auto;
     justify-content: flex-start;
     width: 100vw;
+    padding: 0 var(--outline-thickness);
   
     &::-webkit-scrollbar {
       display: none;
@@ -97,7 +107,7 @@
     }
   }
 
-  .header-button {
+  button {
     padding: 0 var(--small-interactive-element-padding);
     display: flex;
     gap: var(--thick-line-width);

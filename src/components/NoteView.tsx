@@ -27,6 +27,7 @@ import {
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useRunOnce from "../hooks/useRunOnce";
+import NavigationRail from "./NavigationRail";
 
 
 const getValidNoteSlug = (
@@ -283,7 +284,8 @@ const NoteView = ({ slug }: NoteViewProps) => {
     );
   }, [slug]);
 
-  return <>
+  return <div className="view note-view">
+    <NavigationRail activeView="notes" />
     <NoteViewHeader
       stats={headerStats}
       pinnedNotes={pinnedNotes}
@@ -365,7 +367,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
         />
       </div>
     </main>
-  </>;
+  </div>;
 };
 
 

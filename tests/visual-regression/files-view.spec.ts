@@ -28,16 +28,18 @@ test.beforeEach(async ({ page }) => {
     dataTransfer: dataTransfer1,
   });
 
-  await page.locator("#button_upload").click();
-  await page.getByTitle("Menu").click();
-  await page.getByAltText("Files", { exact: true }).click();
+  await page.locator("#button_save").click();
+  await page.getByLabel("Files", { exact: true }).click();
 });
 
 test.describe("Files view", () => {
   test("Script files should look fine", async ({ page }) => {
+    // go to scripts view, create script and come back to files view
+    await page.getByLabel("Scripting", { exact: true }).click();
     await page.locator("input[type=\"text\"]").focus();
     await page.keyboard.type("s1");
     await page.getByRole("button", { name: "Create" }).click();
+    await page.getByLabel("Files", { exact: true }).click();
     expect(await page.screenshot()).toMatchSnapshot("script-files-light.png");
   });
 });

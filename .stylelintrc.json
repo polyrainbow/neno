@@ -5,7 +5,8 @@
     "media-feature-range-notation": "prefix",
     "no-descending-specificity": null,
     "declaration-block-no-redundant-longhand-properties": null,
-    "import-notation": null
+    "import-notation": null,
+    "selector-id-pattern": null
   },
   "ignoreFiles": ["dist/**/*.css", "**/reboot.css"]
 }

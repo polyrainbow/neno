@@ -11,7 +11,6 @@ import ActiveNote from "../types/ActiveNote";
 import HeaderContainer from "./HeaderContainer";
 import FlexContainer from "./FlexContainer";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
-import AppMenuContext from "../contexts/AppMenuContext";
 import { Slug } from "../lib/notes/types/Slug";
 import BusyIndicator from "./BusyIndicator";
 import AppMenuToggle from "./AppMenuToggle";
@@ -33,7 +32,6 @@ const NoteViewHeader = ({
     = useConfirmDiscardingUnsavedChangesDialog();
   const goToNote = useGoToNote();
   const [unsavedChanges, setUnsavedChanges] = useContext(UnsavedChangesContext);
-  const { toggleAppMenu } = useContext(AppMenuContext);
   const draggedPinIndex = useRef<number>(-1);
   const pinRects = useRef<DOMRect[] | null>(null);
   const [dragTargetSlotIndex, setDragTargetSlotIndex] = useState(-1);
@@ -46,9 +44,7 @@ const NoteViewHeader = ({
 
   return (
     <HeaderContainer>
-      <AppMenuToggle
-        toggleAppMenu={toggleAppMenu}
-      />
+      <AppMenuToggle />
       <FlexContainer
         className="pinned-notes"
       >

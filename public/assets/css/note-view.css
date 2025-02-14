@@ -1,5 +1,6 @@
 .note-view-content {
   display: grid;
+  grid-area: main-content;
 }
 
 .note-controls {
@@ -18,6 +19,20 @@
 
     .status-indicator {
       display: flex;
+
+      @media screen and (max-width: 599px) {
+        & {
+          display: none;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 599px) {
+    #button_import-note,
+    #button_export-note,
+    #button_random-note {
+      display: none;
     }
   }
 
@@ -92,7 +107,13 @@
 
   .main-content-besides-sidebar {
     grid-area: 1 / 2 / 2 / 3;
-    width: calc(100vw - var(--xl-list-width));
+    width: calc(100vw - var(--navigation-rail-width) - var(--xl-list-width));
+
+    @media only screen and (max-width: 599px) {
+      & {
+        width: calc(100vw - var(--xl-list-width));
+      }
+    }  
   }
 
   .note {
@@ -105,10 +126,31 @@
   .note-view-content {
     grid-template-columns: var(--xl-list-width) auto;
     grid-template-rows: 100%;
-    position: fixed;
-    bottom: 0;
     top: var(--header-bar-height);
     width: 100%;
+    height: 100%;
+  }
+}
+
+@media only screen and (max-width: 1280px) and (min-width: 600px) {
+  .note-view-content {
+    width: calc(100vw - var(--navigation-rail-width));
+  }
+
+  .main-content-besides-sidebar {
+    grid-area: 1 / 1 / 2 / 2;
+    width: calc(100vw - var(--navigation-rail-width));
+  }
+}
+
+@media only screen and (max-width: 599px) {
+  .note-view-content {
+    width: 100vw;
+  }
+
+  .main-content-besides-sidebar {
+    grid-area: 1 / 1 / 2 / 2;
+    width: 100vw;
   }
 }
 

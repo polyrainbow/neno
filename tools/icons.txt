@@ -8,6 +8,7 @@ adjust
 archive
 audio_file
 audiotrack
+bolt
 cached
 cancel
 cancel_presentation
@@ -25,6 +26,7 @@ description
 done
 draft
 dynamic_feed
+edit
 edit_location
 edit_note
 edit_square
@@ -64,6 +66,7 @@ movie
 not_interested
 note
 note_add
+notes
 open_in_browser
 pending
 people

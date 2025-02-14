@@ -8,6 +8,7 @@ import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
 import { useState } from "react";
+import NavigationRail from "./NavigationRail";
 
 const StartView = () => {
   const [
@@ -21,7 +22,8 @@ const StartView = () => {
     },
   });
 
-  return <>
+  return <div className="view">
+    <NavigationRail activeView="launchpad" />
     <HeaderContainerLeftRight />
     <section className="section-start">
       <div
@@ -106,7 +108,7 @@ const StartView = () => {
         <p className="version">{VERSION}</p>
       </footer>
     </section>
-  </>;
+  </div>;
 };
 
 export default StartView;

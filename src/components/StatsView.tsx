@@ -5,6 +5,7 @@ import GraphStats from "../lib/notes/types/GraphStats";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import BusyIndicator from "./BusyIndicator";
+import NavigationRail from "./NavigationRail";
 
 const StatsView = () => {
   const notesProvider = useNotesProvider();
@@ -22,10 +23,10 @@ const StatsView = () => {
     updateStats();
   }, [notesProvider]);
 
-  return <>
+  return <div className="view">
+    <NavigationRail activeView="stats" />
     <HeaderContainerLeftRight />
     <section className="content-section">
-      <h1>{l("stats.graph-stats")}</h1>
       {
         stats !== null
           ? <StatsViewAnalysisTable
@@ -36,7 +37,7 @@ const StatsView = () => {
           />
       }
     </section>
-  </>;
+  </div>;
 };
 
 export default StatsView;

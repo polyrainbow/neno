@@ -78,7 +78,7 @@
     --main-content-color: white;
     --alt-content-color: var(--neno-gray-4);
     --link-color: var(--neno-blue-3);
-    --overlay-gradient: linear-gradient(45deg, rgb(0 0 0) 0%, rgb(0 0 117 / 62%) 35%, rgb(0 0 0) 100%);
+    --overlay-gradient: linear-gradient(45deg, rgb(0 0 0) 0%, rgb(0 0 117 / 62%) 35%, rgb(49 0 48) 100%);
     --icon-button-enabled-filter: invert(1);
     --icon-button-disabled-filter: contrast(0.1);
     --default-border: var(--line-width) solid var(--neno-gray-8);
@@ -108,12 +108,13 @@
   --default-gap: 0.938rem;
   --small-gap: 0.625rem;
   --default-padding: 0.938rem;
-  --xl-list-width: 37.5rem;
+  --xl-list-width: 34rem;
   --small-font-size: 0.813rem;
   --default-font-size: 1rem;
   --large-font-size: 1.25rem;
   --h1-font-size: 1.75rem;
   --header-bar-height: 3.125rem;
+  --navigation-rail-width: 3.063rem; /* including border */
   --max-content-width: 75rem;
   --default-box-shadow:
     0 1px 1px hsl(0deg 0% 0% / 7.5%),
@@ -124,9 +125,10 @@
   --small-interactive-element-padding: 0.625rem;
   --input-padding: 0.5rem;
   --bold: 700;
-  --focus-outline: 0.125rem solid var(--font-color);
   --line-width: 0.0625rem;
   --thick-line-width: 0.188rem;
+  --outline-thickness: 0.125rem;
+  --focus-outline: var(--outline-thickness) solid var(--font-color);
 }
 
 .emoji {
@@ -252,9 +254,10 @@ code {
 
 .content-section-wide {
   margin: 0 auto;
-  padding: var(--default-gap);
+  padding: var(--default-padding);
   overflow: auto;
-  height: calc(100vh - var(--header-bar-height) - (2 * var(--default-gap)));
+  height: calc(100vh - var(--header-bar-height) - (2 * var(--default-padding)));
+  width: calc(100% - 2 * var(--default-padding));
 }
 
 .svg-icon {
@@ -386,7 +389,7 @@ button {
   padding: 0;
   background: none;
   text-align: center;
-  margin: 0.125rem; /* for outline */
+  margin: var(--outline-thickness); /* for outline */
   border-radius: var(--border-radius);
 
   &[disabled] {
@@ -525,14 +528,17 @@ input:checked + .slider::before {
 }
 
 .tooltip:popover-open {
-  position: absolute;
-  inset: unset;
+  position: fixed;
   background: var(--accent-color-interactible);
   color: var(--main-content-color);
   border: none;
   font-size: var(--small-font-size);
   padding: var(--small-interactive-element-padding);
   border-radius: var(--border-radius);
+  white-space: nowrap;
+  margin: 0;
+  position-area: top span-all;
+  position-try-fallbacks: center right, center left;
 }
 
 .busy-view .busy-indicator {
@@ -558,4 +564,19 @@ input:checked + .slider::before {
     background-color: var(--button-background-color-active);
     font-weight: var(--bold);
   }
+}
+
+.view {
+  display: grid;
+  grid: "navigation-rail app-header" var(--header-bar-height)
+"navigation-rail main-content" auto / var(--navigation-rail-width) auto;
+  width: 100vw;
+  height: 100vh;
+
+  @media only screen and (max-width: 599px) {
+    & {
+      grid: "app-header" var(--header-bar-height)
+"main-content" auto / auto;
+    }
+  }  
 }

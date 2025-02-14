@@ -41,7 +41,7 @@ test.describe("Editor view", () => {
   test("should show newly created note list item", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
-    await page.click("#button_upload");
+    await page.click("#button_save");
     const noteListItemLocator = page.locator(
       ".sidebar .note-list .note-list-item",
     );
@@ -55,7 +55,7 @@ test.describe("Editor view", () => {
   test("should have correct number of editor paragraphs", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
-    await page.click("#button_upload");
+    await page.click("#button_save");
     const editorParagraphs = page.locator(
       "div[data-lexical-editor] .editor-paragraph",
     );
@@ -65,7 +65,7 @@ test.describe("Editor view", () => {
   test("slug bar should show correct value", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
-    await page.click("#button_upload");
+    await page.click("#button_save");
     const slugElement = await page.$(".slug-line .note-slug");
     const slug = await slugElement?.inputValue();
     expect(slug).toBe("welcome-to-neno");
@@ -73,7 +73,7 @@ test.describe("Editor view", () => {
 
   test("editor paragraphs should have correct types", async ({ page }) => {
     await page.keyboard.type(DEMO_NOTE);
-    await page.click("#button_upload");
+    await page.click("#button_save");
     const editorParagraphs = await page.locator(
       "div[data-lexical-editor] .editor-paragraph",
     ).all();
@@ -96,7 +96,7 @@ test.describe("Editor view", () => {
     "two slashlinks in one paragraph should be correctly linked",
     async ({ page }) => {
       await page.keyboard.type("Two /link-1 and /link-2");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
       ))!;
@@ -157,7 +157,7 @@ test.describe("Editor view", () => {
     "clicking on note list item link indicator should insert wikilink to this note at current editor selection",
     async ({ page }) => {
       await page.keyboard.type("Note 1");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_new");
 
       await page.keyboard.type("Foo bar baz");
@@ -260,7 +260,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("[[Link 1]][[Link 2]][[Link 3]]");
 
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_new");
       await page.click(".note-list .note-list-item");
 
@@ -402,7 +402,7 @@ test.describe("Editor view", () => {
     "selecting already active note should not trigger confirm discarding changes dialog",
     async ({ page }) => {
       await page.keyboard.type("note");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("div[data-lexical-editor]");
       await page.keyboard.type("more text");
       await page.click(".note-list .note-list-item");
@@ -416,7 +416,7 @@ test.describe("Editor view", () => {
     "selecting already active pin should not trigger confirm discarding changes dialog",
     async ({ page }) => {
       await page.keyboard.type("note");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_pin");
       await page.click("div[data-lexical-editor]");
       await page.keyboard.type("more text");
@@ -431,10 +431,10 @@ test.describe("Editor view", () => {
     "clicking on a backlink's 'Link to this' should add a wikilink to the editor",
     async ({ page }) => {
       await page.keyboard.type("Note 1\nwith link to [[Note 2]]");
-      await page.click("#button_upload"); // save as "note-1"
+      await page.click("#button_save"); // save as "note-1"
       await page.click("#button_new");
       await page.keyboard.type("Note 2\nwith link to ");
-      await page.click("#button_upload"); // save as "note-2"
+      await page.click("#button_save"); // save as "note-2"
 
       await page.click(".note-backlinks .note-list-item-linked-notes-indicator");
 
@@ -633,7 +633,7 @@ test.describe("Editor view", () => {
 
   test("should delete notes", async ({ page }) => {
     await page.keyboard.type(DEMO_NOTE);
-    await page.click("#button_upload");
+    await page.click("#button_save");
     const noteListItems = await page.locator(
       ".sidebar .note-list .note-list-item",
     );
@@ -693,7 +693,7 @@ test.describe("Editor view", () => {
     "Click on red wikilink should create new note with content of wikilink",
     async ({ page }) => {
       await page.keyboard.type("A note with a [[Link to a non-existing note]]");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.locator("span")
         .filter({ hasText: "Link to a non-existing note" })
         .click();
@@ -718,7 +718,7 @@ test.describe("Editor view", () => {
     "Cancel discarding changes should not overwrite current location",
     async ({ page }) => {
       await page.keyboard.type("A note");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.getByRole("textbox").nth(1).focus();
       await page.keyboard.type(" edited");
       await page.click("#button_new");
@@ -732,7 +732,7 @@ test.describe("Editor view", () => {
     "Dragging & dropping pin to editor should insert Wikilink with note title",
     async ({ page }) => {
       await page.keyboard.type("A note");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_pin");
       await page.click("#button_new");
       await page.locator(".pinned-note").hover();
@@ -749,7 +749,7 @@ test.describe("Editor view", () => {
     "Wikilink availability should update on linktext change",
     async ({ page }) => {
       await page.keyboard.type("A note");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_new");
 
       await page.keyboard.type("[[A not]]");
@@ -781,19 +781,19 @@ test.describe("Editor view", () => {
     "Note Search Result Selection: Pressing arrow up should select last note",
     async ({ page }) => {
       await page.keyboard.type("foo1");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_new");
 
       await page.keyboard.type("foo2");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_new");
 
       await page.keyboard.type("foo3");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_new");
 
       await page.keyboard.type("foo4");
-      await page.click("#button_upload");
+      await page.click("#button_save");
       await page.click("#button_new");
 
       await page.locator("#search-input").focus();
@@ -1087,7 +1087,7 @@ test.describe("Editor view", () => {
       await page.keyboard.type(
         "Precedence test\n`http://*.example.com` and `http://*.example.com`",
       );
-      await page.click("#button_upload", { delay: 20 });
+      await page.click("#button_save", { delay: 20 });
       const noteListItemLocator = page.locator(
         ".note-list-item",
         { hasText: "Precedence test" },
@@ -1126,7 +1126,7 @@ test.describe("Editor view", () => {
     "opening a random note should create one history entry",
     async ({ page }) => {
       await page.keyboard.type("Note 1");
-      await page.click("#button_upload"); // save as "note-1"
+      await page.click("#button_save"); // save as "note-1"
 
       await page.click("#button_random-note");
       await page.click("#button_random-note");

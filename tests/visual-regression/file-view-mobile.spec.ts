@@ -32,9 +32,8 @@ test.beforeEach(async ({ page }) => {
   }, buffer.toString("base64"));
 
   await page.dispatchEvent("section.note", "drop", { dataTransfer });
-  await page.locator("#button_upload").click();
-  await page.getByTitle("Menu").click();
-  await page.getByAltText("Files", { exact: true }).click();
+  await page.locator("#button_save").click();
+  await page.getByLabel("Files", { exact: true }).click();
   await page.getByText("beach.jpg").click();
   await page.locator(".file-container img").waitFor();
 });

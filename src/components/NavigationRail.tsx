@@ -1,5 +1,5 @@
-import { useContext, useState } from "react";
-import AppMenuItem from "./AppMenuItem";
+import { useContext } from "react";
+import NavigationRailItem from "./NavigationRailItem";
 import { l } from "../lib/intl";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { getAppPath } from "../lib/utils";
@@ -10,24 +10,13 @@ import useConfirmDiscardingUnsavedChangesDialog
 import { isInitialized } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 
-/*
-  Closing the app menu after calling navigate() is essential.
-  Before, we had the close app menu handler on the div.app-menu,
-  but this led to the navigate() call not having any effect, as it was not
-  followed by a state change.
-*/
-
-interface AppMenuProps {
-  ref: React.RefObject<HTMLDialogElement | null>,
-  onSelect: () => void,
+interface NavigationRailProps {
+  activeView: string,
 }
 
-const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
-  const [
-    isAppMenuOpen,
-    setIsAppMenuOpen,
-  ] = useState<boolean>(true);
-
+const NavigationRail = ({
+  activeView,
+}: NavigationRailProps) => {
   const [unsavedChanges, setUnsavedChanges]
     = useContext(UnsavedChangesContext);
 
@@ -36,20 +25,14 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
-  if (!isAppMenuOpen) return null;
-
-  return <dialog
-    className="app-menu"
-    ref={ref}
-    id="app-menu"
-  >
-    <AppMenuItem
+  return <div className="navigation-rail">
+    <NavigationRailItem
+      isActive={activeView === "launchpad"}
+      id="launchpad"
       disabled={false}
       label={l("menu.launchpad")}
       icon="rocket_launch"
       onClick={async () => {
-        onSelect();
-
         if (unsavedChanges) {
           await confirmDiscardingUnsavedChanges();
           setUnsavedChanges(false);
@@ -57,16 +40,15 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
 
         // @ts-ignore
         navigation.navigate(getAppPath(PathTemplate.START));
-        setIsAppMenuOpen(false);
       }}
     />
-    <AppMenuItem
+    <NavigationRailItem
+      isActive={["notes", "list"].includes(activeView)}
+      id="note-view"
       disabled={!isInitialized()}
       label={isSmallScreen ? l("menu.note-list") : l("menu.editor")}
-      icon={isSmallScreen ? "list" : "create"}
+      icon={isSmallScreen ? "list" : "edit"}
       onClick={async () => {
-        onSelect();
-
         const target = getAppPath(
           isSmallScreen
             ? PathTemplate.LIST
@@ -83,16 +65,15 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
 
         // @ts-ignore
         navigation.navigate(target);
-        setIsAppMenuOpen(false);
       }}
     />
-    <AppMenuItem
+    <NavigationRailItem
+      isActive={activeView === "files"}
+      id="files-view"
       disabled={!isInitialized()}
       label={l("menu.files")}
       icon="grid_view"
       onClick={async () => {
-        onSelect();
-
         const target = getAppPath(
           PathTemplate.FILES,
           new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
@@ -106,16 +87,37 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
 
         // @ts-ignore
         navigation.navigate(target);
-        setIsAppMenuOpen(false);
       }}
     />
-    <AppMenuItem
+    <NavigationRailItem
+      isActive={activeView === "scripting"}
+      id="scripting-view"
       disabled={!isInitialized()}
-      label={l("menu.stats")}
+      label={l("menu.scripting")}
+      icon="bolt"
+      onClick={async () => {
+        const target = getAppPath(
+          PathTemplate.SCRIPTING,
+          new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+        );
+        if (pathname === target) return;
+
+        if (unsavedChanges) {
+          await confirmDiscardingUnsavedChanges();
+          setUnsavedChanges(false);
+        }
+
+        // @ts-ignore
+        navigation.navigate(target);
+      }}
+    />
+    <NavigationRailItem
+      isActive={activeView === "stats"}
+      id="stats-view"
+      disabled={!isInitialized()}
+      label={l("stats.graph-stats")}
       icon="query_stats"
       onClick={async () => {
-        onSelect();
-
         const target = getAppPath(
           PathTemplate.STATS,
           new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
@@ -129,16 +131,15 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
 
         // @ts-ignore
         navigation.navigate(target);
-        setIsAppMenuOpen(false);
       }}
     />
-    <AppMenuItem
+    <NavigationRailItem
+      isActive={activeView === "settings"}
+      id="settings-view"
       disabled={false}
       label={l("menu.settings")}
       icon="settings"
       onClick={async () => {
-        onSelect();
-
         const target = getAppPath(
           PathTemplate.SETTINGS,
           new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
@@ -152,10 +153,9 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
 
         // @ts-ignore
         navigation.navigate(target);
-        setIsAppMenuOpen(false);
       }}
     />
-  </dialog>;
+  </div>;
 };
 
-export default AppMenu;
+export default NavigationRail;

@@ -13,6 +13,7 @@ import ScriptView from "./ScriptView";
 import { useState } from "react";
 import { ActiveRoute, initRouter } from "../lib/router";
 import useRunOnce from "../hooks/useRunOnce";
+import ScriptsView from "./ScriptsView";
 
 const AppRouter = () => {
   const [activeRoute, setActiveRoute] = useState<ActiveRoute | null>(null);
@@ -56,6 +57,15 @@ const AppRouter = () => {
           id: "files",
           path: getAppPath(
             PathTemplate.FILES,
+            new Map([["GRAPH_ID", ":graphId"]]),
+            undefined,
+            true,
+          ),
+        },
+        {
+          id: "scripts",
+          path: getAppPath(
+            PathTemplate.SCRIPTING,
             new Map([["GRAPH_ID", ":graphId"]]),
             undefined,
             true,
@@ -165,6 +175,10 @@ const AppRouter = () => {
   } else if (routeId === "list") {
     return <NoteAccessProvider>
       <ListView />
+    </NoteAccessProvider>;
+  } else if (routeId === "scripts") {
+    return <NoteAccessProvider>
+      <ScriptsView />
     </NoteAccessProvider>;
   } else if (routeId === "script") {
     return <NoteAccessProvider>

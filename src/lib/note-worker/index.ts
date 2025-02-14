@@ -106,6 +106,9 @@ onmessage = async (event) => {
     globalThis.notesProvider = new NotesProvider(storageProvider);
     globalThis.storageProvider = storageProvider;
     initialized = true;
+    postMessage({
+      type: "INITIALIZED",
+    });
   } else if (eventData.action === "evaluate") {
     if (!initialized) {
       postMessage({

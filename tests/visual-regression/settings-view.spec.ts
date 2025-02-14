@@ -10,9 +10,7 @@ test.beforeEach(async ({ page }) => {
   await page.click("#browser-storage-load-button");
   await page.getByText("No notes found").waitFor();
   await page.getByAltText("No notes found").waitFor();
-
-  await page.getByTitle("Menu").click();
-  await page.getByText("Settings").click();
+  await page.getByLabel("Settings").click();
 });
 
 test.describe("Settings view", () => {
