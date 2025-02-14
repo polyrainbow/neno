@@ -30,6 +30,7 @@ import FileViewPreview from "./FileViewPreview";
 import HeaderButton from "./HeaderButton";
 import FileViewRenameForm from "./FileViewRenameForm";
 import { Slug } from "../lib/notes/types/Slug";
+import NavigationRail from "./NavigationRail";
 
 interface FileViewProps {
   slug: Slug,
@@ -85,7 +86,8 @@ const FileView = ({
 
   const canShowPreview = type !== MediaType.OTHER;
 
-  return <>
+  return <div className="view">
+    <NavigationRail activeView="files" />
     <HeaderContainerLeftRight
       leftContent={
         <div className="header-controls">
@@ -259,7 +261,7 @@ const FileView = ({
           : ""
       }
     </section>
-  </>;
+  </div>;
 };
 
 export default FileView;

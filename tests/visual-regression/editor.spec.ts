@@ -45,10 +45,10 @@ test.describe("Editor", () => {
   test("existing notes - light", async ({ page }) => {
     page.emulateMedia({ colorScheme: "light" });
     await page.keyboard.type("Note 1");
-    await page.click("#button_upload");
+    await page.click("#button_save");
     await page.click("#button_new");
     await page.keyboard.type("Note 2");
-    await page.click("#button_upload");
+    await page.click("#button_save");
     expect(await page.screenshot())
       .toMatchSnapshot("editor-existing-notes-light.png");
   });
@@ -56,10 +56,10 @@ test.describe("Editor", () => {
   test("existing notes - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type("Note 1");
-    await page.click("#button_upload");
+    await page.click("#button_save");
     await page.click("#button_new");
     await page.keyboard.type("Note 2");
-    await page.click("#button_upload");
+    await page.click("#button_save");
     expect(await page.screenshot())
       .toMatchSnapshot("editor-existing-notes-dark.png");
   });
@@ -93,10 +93,10 @@ test.describe("Editor", () => {
   test("search results disclaimer - light", async ({ page }) => {
     page.emulateMedia({ colorScheme: "light" });
     await page.keyboard.type("1");
-    await page.click("#button_upload");
+    await page.click("#button_save");
     await page.click("#button_new");
     await page.keyboard.type("2");
-    await page.click("#button_upload");
+    await page.click("#button_save");
     await page.locator("#search-input").click();
     await page.keyboard.type("1", { delay: 20 });
     expect(await page.screenshot())
@@ -106,10 +106,10 @@ test.describe("Editor", () => {
   test("search results disclaimer - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type("1");
-    await page.click("#button_upload");
+    await page.click("#button_save");
     await page.click("#button_new");
     await page.keyboard.type("2");
-    await page.click("#button_upload");
+    await page.click("#button_save");
     await page.locator("#search-input").click();
     await page.keyboard.type("1", { delay: 20 });
     expect(await page.screenshot())
@@ -136,7 +136,7 @@ test.describe("Editor", () => {
     }, buffer.toString("base64"));
 
     await page.dispatchEvent("section.note", "drop", { dataTransfer });
-    await page.click("#button_upload");
+    await page.click("#button_save");
     await page.locator(".preview-block-image-wrapper img").waitFor();
     expect(await page.locator(".note").screenshot())
       .toMatchSnapshot("editor-note-with-image-light.png");
@@ -163,7 +163,7 @@ test.describe("Editor", () => {
     }, buffer.toString("base64"));
 
     await page.dispatchEvent("section.note", "drop", { dataTransfer });
-    await page.click("#button_upload");
+    await page.click("#button_save");
     await page.locator(".preview-block-image-wrapper img").waitFor();
     expect(await page.locator(".note").screenshot())
       .toMatchSnapshot("editor-note-with-image-dark.png");
@@ -188,7 +188,7 @@ test.describe("Editor", () => {
     }, buffer);
 
     await page.dispatchEvent("section.note", "drop", { dataTransfer });
-    await page.click("#button_upload");
+    await page.click("#button_save");
     expect(await page.locator(".note").screenshot())
       .toMatchSnapshot("editor-note-with-plain-text-file-light.png");
   });
@@ -212,7 +212,7 @@ test.describe("Editor", () => {
     }, buffer);
 
     await page.dispatchEvent("section.note", "drop", { dataTransfer });
-    await page.click("#button_upload");
+    await page.click("#button_save");
     expect(await page.locator(".note").screenshot())
       .toMatchSnapshot("editor-note-with-plain-text-file-dark.png");
   });
@@ -250,7 +250,7 @@ test.describe("Editor", () => {
       dataTransfer: dataTransfer2,
     });
 
-    await page.click("#button_upload");
+    await page.click("#button_save");
 
     await page.getByRole("link", { name: "/files/test.txt" })
       .locator("span")

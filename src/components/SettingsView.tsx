@@ -1,16 +1,16 @@
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
-import { l } from "../lib/intl";
 import ChangeLanguageSetting from "./ChangeLanguageSetting";
+import NavigationRail from "./NavigationRail";
 
 
 const SettingsView = () => {
-  return <>
+  return <div className="view">
+    <NavigationRail activeView="settings" />
     <HeaderContainerLeftRight />
     <section className="settings-view content-section-wide">
-      <h1>{l("settings")}</h1>
       <ChangeLanguageSetting />
     </section>
-  </>;
+  </div>;
 };
 
 export default SettingsView;

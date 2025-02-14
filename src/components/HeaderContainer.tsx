@@ -1,5 +1,3 @@
-import AppMenu from "./AppMenu";
-
 interface HeaderContainerProps {
   children?: React.ReactNode,
 }
@@ -7,14 +5,9 @@ interface HeaderContainerProps {
 const HeaderContainer = ({
   children,
 }: HeaderContainerProps) => {
-  return (
-    <>
-      <header className="app-header">
-        {children}
-      </header>
-      <AppMenu />
-    </>
-  );
+  return <header className="app-header">
+    {children}
+  </header>;
 };
 
 export default HeaderContainer;

@@ -1,9 +1,20 @@
+#app-menu-toggle {
+  display: none;
+}
+
+@media only screen and (max-width: 599px) {
+  #app-menu-toggle {
+    display: block;
+  }
+}
+
 .app-menu {
   background-color: var(--header-background-color);
-  z-index: 10;
-  position: fixed;
-  top: 3.125rem;
-  left: 0;
+  user-select: none;
+
+  &::backdrop {
+    background: var(--overlay-gradient);
+  }
 
   .app-menu-item {
     display: flex;

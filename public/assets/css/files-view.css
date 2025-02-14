@@ -28,6 +28,7 @@
   .files {
     flex-wrap: wrap;
     gap: var(--default-gap);
+    justify-content: center;
 
     .files-view-preview-box {
       width: 12.5rem;
@@ -79,22 +80,6 @@
         height: 2.188rem;
         position: absolute;
       }
-    }
-  }
-
-  .create-script {
-    .controls {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-
-      input {
-        margin: 0 0.313rem;
-      }
-    }
-
-    .error {
-      color: var(--error-and-danger-text-color);
     }
   }
 }

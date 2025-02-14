@@ -10,6 +10,7 @@ import useNotesProvider from "../hooks/useNotesProvider";
 import useHeaderStats from "../hooks/useHeaderStats";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { LOCAL_GRAPH_ID } from "../config";
+import NavigationRail from "./NavigationRail";
 
 
 const ListView = () => {
@@ -34,7 +35,8 @@ const ListView = () => {
     });
   }, []);
 
-  return <>
+  return <div className="view list-view">
+    <NavigationRail activeView="list" />
     <NoteViewHeader
       stats={headerStats}
       pinnedNotes={pinnedNotes}
@@ -70,7 +72,7 @@ const ListView = () => {
         new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
       ))}
     ></FloatingActionButton>
-  </>;
+  </div>;
 };
 
 export default ListView;

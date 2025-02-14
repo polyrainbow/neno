@@ -5,8 +5,7 @@ test.beforeEach(async ({ page }) => {
   await setDefaultDate(page); // needs to be added before page.goto
   await page.goto("/", { "waitUntil": "networkidle" });
   await page.waitForSelector("img[alt='NENO logo']");
-  await page.getByTitle("Menu").click();
-  await page.getByAltText("Settings", { exact: true }).click();
+  await page.getByLabel("Settings", { exact: true }).click();
 });
 
 test.describe("Settings view", () => {

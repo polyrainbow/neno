@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
 import { l } from "../lib/intl";
 import { FileInfo } from "../lib/notes/types/FileInfo";
@@ -6,11 +6,13 @@ import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { Slug } from "../lib/notes/types/Slug";
-import CreateScript from "./CreateScript";
 import Pagination from "./Pagination";
 import { SEARCH_RESULTS_PER_PAGE } from "../config";
 import { getPagedMatches } from "../lib/utils";
 import { getCompareKeyForTimestamp } from "../lib/notes/utils";
+import NavigationRail from "./NavigationRail";
+import AppHeaderStatsItem from "./AppHeaderStatsItem";
+import BusyIndicator from "./BusyIndicator";
 
 enum FileSortMode {
   CREATED_AT_DESCENDING = "CREATED_AT_DESCENDING",
@@ -32,6 +34,7 @@ const FilesView = () => {
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
   const [page, setPage] = useState(1);
+  const containerRef = useRef<HTMLElement | null>(null);
 
   const updateDanglingFiles = async () => {
     const slugsOfDanglingFiles: Slug[]
@@ -91,61 +94,86 @@ const FilesView = () => {
     updateFiles();
   }, [notesProvider]);
 
-  return <>
-    <HeaderContainerLeftRight />
-    <section className="content-section-wide files-view">
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+    container.scrollTop = 0;
+  }, [page]);
+
+  return <div className="view">
+    <NavigationRail activeView="files" />
+    <HeaderContainerLeftRight
+      leftContent={<>
+        <select
+          onChange={(e) => setSortMode(e.target.value as FileSortMode)}
+        >
+          <option
+            value={FileSortMode.CREATED_AT_DESCENDING}
+          >{l("files.sort-mode.created-at.descending")}</option>
+          <option
+            value={FileSortMode.CREATED_AT_ASCENDING}
+          >{l("files.sort-mode.created-at.ascending")}</option>
+          <option
+            value={FileSortMode.NAME_ASCENDING}
+          >{l("files.sort-mode.name.ascending")}</option>
+          <option
+            value={FileSortMode.NAME_DESCENDING}
+          >{l("files.sort-mode.name.descending")}</option>
+          <option
+            value={FileSortMode.SIZE_ASCENDING}
+          >{l("files.sort-mode.size.ascending")}</option>
+          <option
+            value={FileSortMode.SIZE_DESCENDING}
+          >{l("files.sort-mode.size.descending")}</option>
+        </select>
+        <input
+          className="filter"
+          type="search"
+          placeholder={l("files.filter")}
+          value={filterInput}
+          onChange={(e) => {
+            setFilterInput(e.target.value);
+            setPage(1);
+          }}
+        />
+      </>
+      }
+      rightContent={
+        <div className="stats-container">
+          {
+            status === "READY"
+              ? <div className="header-stats">
+                <AppHeaderStatsItem
+                  icon={"note"}
+                  label={l(
+                    "files.files-heading",
+                    { numberOfFiles: files.length.toString() },
+                  )}
+                  value={files.length.toLocaleString()}
+                />
+                <AppHeaderStatsItem
+                  icon={"link_off"}
+                  label={l(
+                    "files.files-heading",
+                    { numberOfFiles: files.length.toString() },
+                  )}
+                  value={danglingFileSlugs.length.toLocaleString()}
+                />
+              </div>
+              : <BusyIndicator alt={l("app.loading")} />
+          }
+        </div>
+      }
+    />
+    <section
+      className="content-section-wide files-view"
+      ref={containerRef}
+    >
       {
         status === "READY"
           ? <>
-            <h1>{l(
-              "files.files-heading",
-              { numberOfFiles: files.length.toString() },
-            )}</h1>
-            <div
-              className="controls"
-            >
-              <select
-                onChange={(e) => setSortMode(e.target.value as FileSortMode)}
-              >
-                <option
-                  value={FileSortMode.CREATED_AT_DESCENDING}
-                >{l("files.sort-mode.created-at.descending")}</option>
-                <option
-                  value={FileSortMode.CREATED_AT_ASCENDING}
-                >{l("files.sort-mode.created-at.ascending")}</option>
-                <option
-                  value={FileSortMode.NAME_ASCENDING}
-                >{l("files.sort-mode.name.ascending")}</option>
-                <option
-                  value={FileSortMode.NAME_DESCENDING}
-                >{l("files.sort-mode.name.descending")}</option>
-                <option
-                  value={FileSortMode.SIZE_ASCENDING}
-                >{l("files.sort-mode.size.ascending")}</option>
-                <option
-                  value={FileSortMode.SIZE_DESCENDING}
-                >{l("files.sort-mode.size.descending")}</option>
-              </select>
-              <input
-                className="filter"
-                type="search"
-                placeholder={l("files.filter")}
-                value={filterInput}
-                onChange={(e) => {
-                  setFilterInput(e.target.value);
-                  setPage(1);
-                }}
-              />
-              <button
-                className="default-button-small"
-                onClick={() => {
-                  setFilterInput("ends-with:.neno.js");
-                  setPage(1);
-                }}
-              >
-                {l("files.show-neno-scripts")}
-              </button>
-            </div>
             <Pagination
               numberOfResults={filteredFiles.length}
               page={page}
@@ -163,15 +191,17 @@ const FilesView = () => {
                 />;
               })}
             </FlexContainer>
-            <CreateScript
-              existingFiles={files}
-              onCreated={() => updateFiles()}
+            <Pagination
+              numberOfResults={filteredFiles.length}
+              page={page}
+              searchResultsPerPage={SEARCH_RESULTS_PER_PAGE}
+              onChange={(newPage) => setPage(newPage)}
             />
           </>
           : <p>{l("files.fetching")}</p>
       }
     </section>
-  </>;
+  </div>;
 };
 
 export default FilesView;

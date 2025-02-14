@@ -21,6 +21,7 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { l } from "../lib/intl";
 import { Slug } from "../lib/notes/types/Slug";
+import NavigationRail from "./NavigationRail";
 
 interface CustomScript {
   slug: string;
@@ -49,14 +50,31 @@ const ScriptView = ({
   const notesProvider = useNotesProvider();
   const editorContainerRef = useRef(null);
 
+  const runScript = async (_worker?: Worker, _input?: string) => {
+    setIsBusyComputingOutput(true);
+    const usedWorker = _worker ?? worker;
+    const usedInput = _input ?? scriptInput;
+    if (!usedWorker) throw new Error("Worker not initialized!");
+    usedWorker.postMessage({
+      action: "evaluate",
+      script: usedInput,
+    });
+  };
+
   useRunOnce(async () => {
-    if (typeof slug !== "string") return;
+    if (typeof slug !== "string") {
+      setError("SCRIPT_NOT_FOUND");
+      return;
+    }
+
+    let value;
 
     try {
-      const readable = await notesProvider.getReadableArbitraryGraphFileStream(
-        slug,
-      );
-      const value = await new Response(readable).text();
+      const readable = await notesProvider
+        .getReadableArbitraryGraphFileStream(
+          slug,
+        );
+      value = await new Response(readable).text();
       setActiveScript({
         slug: slug,
         value,
@@ -64,22 +82,32 @@ const ScriptView = ({
       setScriptInput(value);
     } catch (_e) {
       setError("SCRIPT_NOT_FOUND");
+      return;
     }
-  });
 
-  useRunOnce(() => {
     const notesWorker = new Worker(noteWorkerUrl, { type: "module" });
     notesWorker.postMessage({
       action: "initialize",
       folderHandle: getActiveFolderHandle(),
     });
+    const { promise: workerIsReady, resolve } = Promise.withResolvers<void>();
+
     notesWorker.onmessage = (e) => {
-      if (e.data.type === "EVALUATION_COMPLETED") {
+      if (e.data.type === "INITIALIZED") {
+        resolve();
+      } else if (e.data.type === "EVALUATION_COMPLETED") {
         setIsBusyComputingOutput(false);
         setOutput(e.data.output);
       }
     };
+
+    await workerIsReady;
     setWorker(notesWorker);
+
+    // check if script should run at startup
+    if (location.search.includes("run=true")) {
+      runScript(notesWorker, value);
+    }
   });
 
   useEffect(() => {
@@ -155,36 +183,15 @@ const ScriptView = ({
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
 
-  return <>
+  return <div className="view">
+    <NavigationRail activeView="scripting" />
     <HeaderContainerLeftRight
       leftContent={
         <div className="header-controls">
           <HeaderButton
-            icon="list"
-            onClick={async () => {
-              if (unsavedChanges) {
-                await confirmDiscardingUnsavedChanges();
-                setUnsavedChanges(false);
-              }
-              // @ts-ignore
-              navigation.navigate(
-                getAppPath(
-                  PathTemplate.FILES,
-                  new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-                ),
-              );
-            }}
-          >{l("files.all-files")}</HeaderButton>
-          <HeaderButton
             icon="play_arrow"
             disabled={!activeScript}
-            onClick={async () => {
-              setIsBusyComputingOutput(true);
-              worker?.postMessage({
-                action: "evaluate",
-                script: scriptInput,
-              });
-            }}
+            onClick={runScript}
           >{l("scripts.run")}</HeaderButton>
           <HeaderButton
             icon="save"
@@ -249,7 +256,7 @@ const ScriptView = ({
             <BusyIndicator alt="Loading script" />
           </div>
     }
-  </>;
+  </div>;
 };
 
 export default ScriptView;

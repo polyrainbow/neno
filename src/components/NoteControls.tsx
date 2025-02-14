@@ -123,7 +123,7 @@ const NoteControls = ({
         : null
     }
     <IconButton
-      id="button_upload"
+      id="button_save"
       title={l("editor.save-note")}
       icon="save"
       disabled={disableNoteSaving}
@@ -183,7 +183,7 @@ const NoteControls = ({
       onClick={() => handleNoteExportRequest()}
     />
     <IconButton
-      id="button_upload-file"
+      id="button_add-file"
       disabled={false}
       title={l("editor.upload-file")}
       icon="upload_file"

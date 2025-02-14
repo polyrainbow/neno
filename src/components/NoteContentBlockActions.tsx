@@ -19,19 +19,36 @@ const NoteContentBlockActions = ({
   return <FlexContainer className="preview-block-file-actions">
     {
       isNenoScript
-        ? <a
-          href={
-            getAppPath(PathTemplate.SCRIPT, new Map([
-              ["GRAPH_ID", LOCAL_GRAPH_ID],
-              ["SCRIPT_SLUG", file.slug],
-            ]))
-          }
-          aria-label={l("files.open-in-script-editor")}
-        >
-          <Icon
-            icon="play_arrow"
-          />
-        </a>
+        ? <>
+          <a
+            href={
+              getAppPath(PathTemplate.SCRIPT, new Map([
+                ["GRAPH_ID", LOCAL_GRAPH_ID],
+                ["SCRIPT_SLUG", file.slug],
+              ]), new URLSearchParams({ run: "true" }))
+            }
+            aria-label={l("note.execute-script")}
+            title={l("note.execute-script")}
+          >
+            <Icon
+              icon="play_arrow"
+            />
+          </a>
+          <a
+            href={
+              getAppPath(PathTemplate.SCRIPT, new Map([
+                ["GRAPH_ID", LOCAL_GRAPH_ID],
+                ["SCRIPT_SLUG", file.slug],
+              ]))
+            }
+            aria-label={l("files.open-in-script-editor")}
+            title={l("files.open-in-script-editor")}
+          >
+            <Icon
+              icon="edit"
+            />
+          </a>
+        </>
         : ""
     }
     <a
@@ -41,7 +58,8 @@ const NoteContentBlockActions = ({
           ["FILE_SLUG", file.slug],
         ]))
       }
-      aria-label="File details"
+      aria-label={l("note.file-details")}
+      title={l("note.file-details")}
     >
       <Icon
         icon="info"
@@ -54,6 +72,7 @@ const NoteContentBlockActions = ({
         e.stopPropagation();
       }}
       aria-label={l("note.download-file")}
+      title={l("note.download-file")}
     >
       <Icon
         icon="file_download"

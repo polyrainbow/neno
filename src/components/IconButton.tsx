@@ -34,18 +34,21 @@ const IconButton = ({
       popoverElement.showPopover();
       popoverRef.current = popoverElement;
 
-      const popoverRect = popoverElement.getBoundingClientRect();
       const targetRect = ref.current?.getBoundingClientRect();
 
       if (!targetRect) throw new Error("Target rect undefined");
 
-      const css = new CSSStyleSheet();
-      css.replaceSync(`
-      .tooltip:popover-open {
-        top: ${targetRect.y - 35}px;
-        left: ${targetRect.x + 25 - (popoverRect.width / 2)}px;
-      }`);
-      document.adoptedStyleSheets = [css];
+      if (id) {
+        const css = new CSSStyleSheet();
+        css.replaceSync(`
+        #${id} {
+          anchor-name: --icon-button-${id};
+        }
+        .tooltip:popover-open {
+          position-anchor: --icon-button-${id};
+        }`);
+        document.adoptedStyleSheets = [css];
+      }
     };
 
     const hidePopover = () => {
@@ -57,6 +60,7 @@ const IconButton = ({
 
     ref.current?.addEventListener("mouseenter", showPopover);
     ref.current?.addEventListener("mouseleave", hidePopover);
+    ref.current?.addEventListener("click", hidePopover);
 
     return () => {
       ref.current?.removeEventListener("mouseenter", showPopover);
