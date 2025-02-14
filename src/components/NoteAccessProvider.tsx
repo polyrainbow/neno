@@ -10,7 +10,6 @@ import {
 } from "../lib/LocalDataStorage";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
-import { ROOT_PATH } from "../config";
 import useRunOnce from "../hooks/useRunOnce";
 
 const NoteAccessProvider = ({
@@ -26,9 +25,14 @@ const NoteAccessProvider = ({
         })
         .catch(() => {
           const urlParams = new URLSearchParams();
+          /*
+            Note: redirect param includes ROOT_PATH, e.g. "/neno/".
+            When redirecting to it, consumers should not include ROOT_PATH
+            but use the path as is.
+          */
           urlParams.set(
             "redirect",
-            window.location.pathname.substring(ROOT_PATH.length - 1),
+            window.location.pathname,
           );
           // @ts-ignore
           navigation.navigate(
