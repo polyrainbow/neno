@@ -214,6 +214,7 @@
   .alias-control-button {
     display: flex;
     padding: 0.25rem;
+    outline-offset: -0.125rem;
   }
 
   .update-references-toggle {

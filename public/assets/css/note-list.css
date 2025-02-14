@@ -63,6 +63,7 @@
     padding: 0.9em;
     width: 100%;
     gap: 0.125em;
+    outline-offset: -0.125rem;
 
     &.with-link-edge {
       width: calc(100% - 2.5rem);
@@ -126,6 +127,7 @@
     justify-content: center;
     box-sizing: content-box;
     font-size: var(--default-font-size);
+    outline-offset: -0.125rem;
 
     .note-list-item-linked-notes-indicator-content {
       text-align: center;
