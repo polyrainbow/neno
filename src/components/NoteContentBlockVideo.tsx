@@ -15,7 +15,7 @@ const NoteContentBlockVideo = ({
   file,
   notesProvider,
 }: NoteContentBlockVideoProps) => {
-  const [url, setUrl] = useState<string>("");
+  const [url, setUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     getObjectUrlForArbitraryGraphFile(file)

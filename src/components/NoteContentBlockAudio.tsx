@@ -15,7 +15,7 @@ const NoteContentBlockAudio = ({
   file,
   notesProvider,
 }: NoteContentBlockAudioProps) => {
-  const [url, setUrl] = useState<string>("");
+  const [url, setUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     getObjectUrlForArbitraryGraphFile(file)

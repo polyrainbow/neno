@@ -31,8 +31,7 @@ const HeaderButton = ({
     onDragEnd={onDragEnd}
     onDragOver={onDragOver}
     className={
-      "header-button "
-      + (icon ? "with-icon" : "without-icon")
+      (icon ? "with-icon" : "without-icon")
       + (className ? (" " + className) : "")
       + (dangerous ? (" dangerous") : "")
     }

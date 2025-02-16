@@ -83,7 +83,7 @@ const Pagination = ({
                   }
                   {...item}
                 >
-                  {type === "previous" ? "<" : ">"}
+                  {type === "previous" ? "←" : "→"}
                 </button>
               );
             }

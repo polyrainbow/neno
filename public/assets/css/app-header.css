@@ -117,6 +117,10 @@
     background: var(--accent-color-1-light);
     border-radius: var(--border-radius);
     white-space: nowrap;
+
+    span {
+      text-box: trim-both cap alphabetic;
+    }
   
     &:hover {
       background-color: var(--accent-color-1-intense);
