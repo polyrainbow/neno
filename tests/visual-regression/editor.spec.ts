@@ -263,4 +263,24 @@ test.describe("Editor", () => {
     expect(await page.locator(".note").screenshot())
       .toMatchSnapshot("editor-note-stats-with-files-light.png");
   });
+
+  test("modal - light", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "light" });
+
+    page.keyboard.type(" ");
+    await page.click("#button_new");
+
+    expect(await page.screenshot())
+      .toMatchSnapshot("editor-modal-light.png");
+  });
+
+  test("modal - dark", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+
+    page.keyboard.type(" ");
+    await page.click("#button_new");
+
+    expect(await page.screenshot())
+      .toMatchSnapshot("editor-modal-dark.png");
+  });
 });

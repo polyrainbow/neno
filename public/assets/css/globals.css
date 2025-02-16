@@ -147,6 +147,7 @@
 
 h1 {
   font-size: var(--h1-font-size);
+  text-box: trim-both cap alphabetic;
 }
 
 input,
@@ -321,12 +322,17 @@ dialog {
   .dialog-text {
     margin-top: 0;
     font-size: var(--large-font-size);
+    text-box: trim-both cap alphabetic;
   }
 
   .dialog-action-bar {
     display: flex;
     flex-wrap: wrap;
     gap: var(--default-gap);
+
+    & > button {
+      flex-grow: 10;
+    }
   }
 }
 
@@ -336,6 +342,14 @@ button {
   background-color: var(--buton-background-color);
   color: var(--font-color);
   font-size: var(--default-font-size);
+
+  &:not(:has(img)) {
+    text-box: trim-both cap alphabetic;
+  }
+
+  & > span {
+    text-box: trim-both cap alphabetic;
+  }
 
   &[disabled] {
     cursor: inherit;
@@ -354,7 +368,7 @@ button {
 .default-button {
   border-radius: var(--border-radius);
   font-size: var(--large-font-size);
-  padding: var(--small-interactive-element-padding) 1.25rem;
+  padding: 1rem;
   user-select: none;
 
   &:disabled {
@@ -407,7 +421,8 @@ button {
 }
 
 .floating-action-button {
-  display: block;
+  display: flex;
+  align-items: center;
   position: fixed;
   bottom: 1.25rem;
   right: 1.25rem;

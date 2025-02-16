@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import Overlay from "./Overlay";
 
 const Dialog = ({
@@ -9,10 +10,17 @@ const Dialog = ({
   onClickOnOverlay: () => void;
   className?: string;
 }) => {
+  const ref = useRef<HTMLDialogElement | null>(null);
+
+  useEffect(() => {
+    ref.current?.showModal();
+  });
+
   return <Overlay
     onClick={onClickOnOverlay}
   >
     <dialog
+      ref={ref}
       className={className ?? ""}
       onClick={(e) => e.stopPropagation()}
     >
