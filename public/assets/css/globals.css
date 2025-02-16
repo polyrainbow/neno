@@ -342,7 +342,14 @@ button {
   background-color: var(--buton-background-color);
   color: var(--font-color);
   font-size: var(--default-font-size);
-  text-box: trim-both cap alphabetic;
+
+  &:not(:has(img)) {
+    text-box: trim-both cap alphabetic;
+  }
+
+  & > span {
+    text-box: trim-both cap alphabetic;
+  }
 
   &[disabled] {
     cursor: inherit;
