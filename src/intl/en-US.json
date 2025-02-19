@@ -130,6 +130,8 @@
   "note.file-details": "File details",
   "note.slug.invalid-slug": "Invalid slug",
   "note.slug.update-references": "Update references",
+  "scripts.delete": "Delete",
+  "scripts.edit": "Edit",
   "scripts.run": "Run",
   "scripts.save": "Save",
   "scripts.show-file-properties": "Show file properties",

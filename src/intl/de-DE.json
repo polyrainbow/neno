@@ -130,6 +130,8 @@
   "note.file-details": "Dateieigenschaften",
   "note.slug.invalid-slug": "Ungültiger Slug",
   "note.slug.update-references": "Links aktualisieren",
+  "scripts.delete": "Löschen",
+  "scripts.edit": "Bearbeiten",
   "scripts.run": "Ausführen",
   "scripts.save": "Speichern",
   "scripts.show-file-properties": "Dateieigenschaften",

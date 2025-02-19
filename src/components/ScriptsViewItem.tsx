@@ -1,4 +1,5 @@
 import { LOCAL_GRAPH_ID } from "../config";
+import { l } from "../lib/intl";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
@@ -38,7 +39,7 @@ const ScriptsViewItem = ({
             new URLSearchParams({ run: "true" }),
           ));
         }}
-      >Run</button>
+      >{l("scripts.run")}</button>
       <button
         className="default-button-small default-action"
         onClick={() => {
@@ -51,11 +52,11 @@ const ScriptsViewItem = ({
             ]),
           ));
         }}
-      >Edit</button>
+      >{l("scripts.edit")}</button>
       <button
         className="default-button-small dangerous-action"
         onClick={onDelete}
-      >Delete</button>
+      >{l("scripts.delete")}</button>
     </div>
   </div>;
 };
