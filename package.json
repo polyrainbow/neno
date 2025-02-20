@@ -14,8 +14,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",
-    "@stylistic/eslint-plugin": "^3.0.1",
-    "@stylistic/eslint-plugin-ts": "^3.0.1",
+    "@stylistic/eslint-plugin": "^4.0.1",
+    "@stylistic/eslint-plugin-ts": "^4.0.1",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^4.3.1",
