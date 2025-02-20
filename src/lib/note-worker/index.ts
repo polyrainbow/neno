@@ -26,14 +26,14 @@ globalThis.getSlugsFromInlineText = getSlugsFromInlineText;
   https://stackoverflow.com/questions/10653809/making-webworkers-a-safe-environment/10796616#10796616
 */
 
-const wl = new Set([
+const enabledInterfaces = new Set([
   "self",
   "onmessage",
   "postMessage",
   "global",
   "globalThis",
   "console",
-  "wl",
+  "enabledInterfaces",
   "eval",
   "Array",
   "Boolean",
@@ -74,7 +74,7 @@ const wl = new Set([
 ]);
 
 Object.getOwnPropertyNames( globalThis ).forEach( function( prop ) {
-  if (!wl.has(prop)) {
+  if (!enabledInterfaces.has(prop)) {
     Object.defineProperty( globalThis, prop, {
       get: function() {
         throw "Security Exception: cannot access " + prop;
