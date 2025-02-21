@@ -21,7 +21,24 @@ const AppRouter = () => {
   useRunOnce(() => {
     initRouter({
       callback:
-        (activeRoute: ActiveRoute | null) => setActiveRoute(activeRoute),
+        (activeRoute: ActiveRoute | null) => {
+          /*
+            We're decoding the route params here because the router library
+            is encoding-agnostic.
+          */
+          const activeRouteDecoded = activeRoute
+            ? {
+              ...activeRoute,
+              params: Object.fromEntries(
+                Object.entries(activeRoute.params).map(([key, value]) => [
+                  key,
+                  decodeURIComponent(value),
+                ]),
+              ),
+            }
+            : null;
+          setActiveRoute(activeRouteDecoded);
+        },
       basename: ROOT_PATH,
       routes: [
         {
@@ -149,7 +166,7 @@ const AppRouter = () => {
     return <StartView />;
   } else if (routeId === "existing-note") {
     return <NoteAccessProvider>
-      <NoteView slug={activeRoute.params.get("slug")!} />
+      <NoteView slug={activeRoute.params.slug} />
     </NoteAccessProvider>;
   } else if (routeId === "files") {
     return <NoteAccessProvider>
@@ -157,7 +174,7 @@ const AppRouter = () => {
     </NoteAccessProvider>;
   } else if (routeId === "file") {
     return <NoteAccessProvider>
-      <FileView slug={activeRoute.params.get("slug")!} />
+      <FileView slug={activeRoute.params.slug} />
     </NoteAccessProvider>;
   } else if (routeId === "unselected-note") {
     // @ts-ignore
@@ -182,7 +199,7 @@ const AppRouter = () => {
     </NoteAccessProvider>;
   } else if (routeId === "script") {
     return <NoteAccessProvider>
-      <ScriptView slug={activeRoute.params.get("slug")!} />
+      <ScriptView slug={activeRoute.params.slug} />
     </NoteAccessProvider>;
   } else if (routeId === "stats") {
     return <NoteAccessProvider>

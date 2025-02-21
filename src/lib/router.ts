@@ -3,14 +3,9 @@ interface UnparsedRoute {
   id: string,
 }
 
-interface ParsedRoute extends UnparsedRoute {
-  params: Map<number, string>,
-  segments: string[],
-}
-
 export interface ActiveRoute {
   routeId: string,
-  params: Map<string, string>,
+  params: Record<string, string>,
 }
 
 interface Config {
@@ -19,43 +14,17 @@ interface Config {
   routes: UnparsedRoute[],
 }
 
-const getPathSegments = (path: string): string[] => {
-  return path.split("/").filter(s => s.trim().length > 0);
-};
-
-const pathMatchesRoute = (
-  path: string,
-  route: ParsedRoute,
-): Map<string, string> | false => {
-  const pathSegments = getPathSegments(path);
-  const params = new Map<string, string>();
-  let i = 0;
-  for (const pathSegment of pathSegments) {
-    if (route.params.has(i)) {
-      const paramName = route.params.get(i)!;
-      params.set(paramName, decodeURIComponent(pathSegment));
-      i++;
-    } else if (pathSegment === route.segments[i]) {
-      i++;
-      continue;
-    } else {
-      return false;
-    }
-  }
-
-  return params;
-};
-
-const getActiveRouteFromPath = (
-  path: string,
-  routes: ParsedRoute[],
+const getActiveRouteFromURL = (
+  url: string,
+  routes: UnparsedRoute[],
 ): ActiveRoute | null => {
   for (const route of routes) {
-    const match = pathMatchesRoute(path, route);
-    if (match) {
+    // @ts-ignore
+    const pattern = new URLPattern({ pathname: route.path });
+    if (pattern.test(url)) {
       return {
         routeId: route.id,
-        params: match,
+        params: pattern.exec(url).pathname.groups,
       };
     } else {
       continue;
@@ -63,25 +32,6 @@ const getActiveRouteFromPath = (
   }
 
   return null;
-};
-
-const parseRoute = (unparsedRoute: UnparsedRoute): ParsedRoute => {
-  const params = new Map<number, string>();
-  const segments = getPathSegments(unparsedRoute.path);
-  let i = 0;
-
-  for (const segment of segments) {
-    if (segment.startsWith(":")) {
-      params.set(i, segment.substring(1));
-    }
-    i++;
-  }
-
-  return {
-    ...unparsedRoute,
-    params,
-    segments,
-  };
 };
 
 export const initRouter = ({
@@ -94,9 +44,9 @@ export const initRouter = ({
     const url = new URL(event.destination.url);
 
     if (url.pathname.startsWith(basename)) {
-      const activeRoute = getActiveRouteFromPath(
-        url.pathname,
-        routes.map(parseRoute),
+      const activeRoute = getActiveRouteFromURL(
+        url.toString(),
+        routes,
       );
       if (!activeRoute) {
         return;
@@ -112,9 +62,9 @@ export const initRouter = ({
   });
 
   if (location.pathname.startsWith(basename)) {
-    const activeRoute = getActiveRouteFromPath(
-      location.pathname,
-      routes.map(parseRoute),
+    const activeRoute = getActiveRouteFromURL(
+      location.href,
+      routes,
     );
 
     if (!activeRoute) {
