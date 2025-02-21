@@ -132,6 +132,7 @@
   "note.slug.update-references": "Update references",
   "scripts.delete": "Delete",
   "scripts.edit": "Edit",
+  "scripts.number-of-scripts": "Number of scripts: {numberOfScripts}",
   "scripts.run": "Run",
   "scripts.save": "Save",
   "scripts.show-file-properties": "Show file properties",

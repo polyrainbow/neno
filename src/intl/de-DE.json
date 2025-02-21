@@ -132,6 +132,7 @@
   "note.slug.update-references": "Links aktualisieren",
   "scripts.delete": "Löschen",
   "scripts.edit": "Bearbeiten",
+  "scripts.number-of-scripts": "Anzahl Skripte: {numberOfScripts}",
   "scripts.run": "Ausführen",
   "scripts.save": "Speichern",
   "scripts.show-file-properties": "Dateieigenschaften",
