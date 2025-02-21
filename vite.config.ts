@@ -35,6 +35,7 @@ export default defineConfig({
       ],
       manifest: {
         "name": "NENO",
+        "short_name": "NENO",
         "theme_color": "#ff8598",
         "background_color": "#46b8ff",
         "display": "standalone",
