@@ -70,7 +70,7 @@ export class WikiLinkPunctuationNode extends TextNode {
     return true;
   }
 
-  isInline(): boolean {
+  isInline(): true {
     return true;
   }
 

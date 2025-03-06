@@ -60,7 +60,7 @@ export class KeyValuePairKeyNode extends TextNode {
     return false;
   }
 
-  isInline(): boolean {
+  isInline(): true {
     return true;
   }
 

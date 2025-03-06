@@ -49,7 +49,7 @@ export class ListItemSigilNode extends TextNode {
     return false;
   }
 
-  isInline(): boolean {
+  isInline(): true {
     return true;
   }
 }

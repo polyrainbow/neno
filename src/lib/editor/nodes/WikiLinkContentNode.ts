@@ -23,26 +23,27 @@ export class WikiLinkContentNode extends TextNode {
   static clone(node: WikiLinkContentNode): WikiLinkContentNode {
     return new WikiLinkContentNode(
       node.__text,
-      node.getLinkAvailability,
+      node.#getLinkAvailability,
       node.__key,
     );
   }
 
+  #getLinkAvailability: (link: string) => Promise<boolean>;
+
   constructor(
     text: string,
-    private readonly getLinkAvailability: (
-      link: string,
-    ) => Promise<boolean>,
+    getLinkAvailability: (link: string) => Promise<boolean>,
     key?: NodeKey,
   ) {
     super(text, key);
+    this.#getLinkAvailability = getLinkAvailability;
   }
 
   createDOM(config: EditorConfig): HTMLElement {
     const element = super.createDOM(config);
     addClassNamesToElement(element, config.theme.wikiLinkContent);
 
-    this.getLinkAvailability(this.__text)
+    this.#getLinkAvailability(this.__text)
       .then((isAvailable) => {
         if (isAvailable) {
           element?.classList.add("available");
@@ -62,7 +63,7 @@ export class WikiLinkContentNode extends TextNode {
   ): boolean {
     // We have to call the parent method so that text editing properly works
     super.updateDOM(prevNode, element, config);
-    this.getLinkAvailability(this.__text)
+    this.#getLinkAvailability(this.__text)
       .then((isAvailable) => {
         if (isAvailable) {
           element?.classList.add("available");
@@ -100,7 +101,7 @@ export class WikiLinkContentNode extends TextNode {
     return true;
   }
 
-  isInline(): boolean {
+  isInline(): true {
     return true;
   }
 
