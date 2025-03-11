@@ -108,4 +108,9 @@ test.describe("File view", () => {
     expect(textInEditor)
       .toBe("This is the content\nof the plain text file.");
   });
+
+  test("should have slug as document title", async ({ page }) => {
+    const pageTitle = await page.title();
+    expect(pageTitle).toBe("files/test.txt");
+  });
 });

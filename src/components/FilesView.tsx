@@ -7,7 +7,7 @@ import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
 import { Slug } from "../lib/notes/types/Slug";
 import Pagination from "./Pagination";
-import { SEARCH_RESULTS_PER_PAGE } from "../config";
+import { DEFAULT_DOCUMENT_TITLE, SEARCH_RESULTS_PER_PAGE } from "../config";
 import { getPagedMatches } from "../lib/utils";
 import { getCompareKeyForTimestamp } from "../lib/notes/utils";
 import NavigationRail from "./NavigationRail";
@@ -101,6 +101,18 @@ const FilesView = () => {
     }
     container.scrollTop = 0;
   }, [page]);
+
+  useEffect(() => {
+    const documentTitle = l("menu.files");
+
+    if (document.title !== documentTitle) {
+      document.title = documentTitle;
+    }
+
+    return () => {
+      document.title = DEFAULT_DOCUMENT_TITLE;
+    };
+  }, []);
 
   return <div className="view">
     <NavigationRail activeView="files" />

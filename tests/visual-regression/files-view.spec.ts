@@ -40,6 +40,7 @@ test.describe("Files view", () => {
     await page.keyboard.type("s1");
     await page.getByRole("button", { name: "Create" }).click();
     await page.getByLabel("Files", { exact: true }).click();
+    await page.getByAltText("Open in script editor").nth(0).waitFor();
     expect(await page.screenshot()).toMatchSnapshot("script-files-light.png");
   });
 });

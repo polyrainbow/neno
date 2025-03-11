@@ -12,6 +12,7 @@ import { MediaType } from "../lib/notes/types/MediaType";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import BusyIndicator from "./BusyIndicator";
 import {
+  DEFAULT_DOCUMENT_TITLE,
   LOCAL_GRAPH_ID,
   NENO_SCRIPT_FILE_SUFFIX,
   SPAN_SEPARATOR,
@@ -54,6 +55,7 @@ const FileView = ({
 
   const canShowTextPreview = type === MediaType.TEXT;
   const isNenoScript = slug?.endsWith(NENO_SCRIPT_FILE_SUFFIX) ?? false;
+
   useEffect(() => {
     if (typeof slug !== "string") return;
 
@@ -83,6 +85,20 @@ const FileView = ({
         .then((text) => setText(text));
     }
   }, [objectUrl, canShowTextPreview]);
+
+  useEffect(() => {
+    const documentTitle = fileInfo
+      ? fileInfo.slug
+      : DEFAULT_DOCUMENT_TITLE;
+
+    if (document.title !== documentTitle) {
+      document.title = documentTitle;
+    }
+
+    return () => {
+      document.title = DEFAULT_DOCUMENT_TITLE;
+    };
+  }, [fileInfo]);
 
   const canShowPreview = type !== MediaType.OTHER;
 
