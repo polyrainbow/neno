@@ -243,9 +243,27 @@ const NoteSlug = ({
           <button
             className="alias-control-button"
             onClick={() => {
+              setSlugInput(slugAlias);
+              const newDisplayedSlugAliases = [...displayedSlugAliases];
+              newDisplayedSlugAliases.splice(index, 1);
+              newDisplayedSlugAliases.push(slugInput);
+              setDisplayedSlugAliases(newDisplayedSlugAliases);
+              setUnsavedChanges(true);
+            }}
+            aria-label={l("editor.set-as-primary-slug")}
+            title={l("editor.set-as-primary-slug")}
+          >
+            <Icon
+              icon={"counter_1"}
+            />
+          </button>
+          <button
+            className="alias-control-button"
+            onClick={() => {
               const newDisplayedSlugAliases = [...displayedSlugAliases];
               newDisplayedSlugAliases.splice(index, 1);
               setDisplayedSlugAliases(newDisplayedSlugAliases);
+              setUnsavedChanges(true);
             }}
             aria-label={l("editor.remove-alias")}
             title={l("editor.remove-alias")}

@@ -27,6 +27,7 @@
   "editor.remove-note.confirm.confirm": "Remove note",
   "editor.remove-note.confirm.text": "Do you really want to remove this note?",
   "editor.save-note": "Save note",
+  "editor.set-as-primary-slug": "Set this alias as primary slug",
   "editor.stats.created-at": "Created at",
   "editor.stats.files": "Files",
   "editor.stats.files.none": "None",

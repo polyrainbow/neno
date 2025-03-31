@@ -635,13 +635,30 @@ const handleExistingNoteUpdate = async (
   const aliasesToUpdate: Set<Slug> = new Set();
 
   if (noteSaveRequest.aliases) {
+    // delete aliases that are not in the new list
     for (const [alias, canonicalSlug] of graph.aliases.entries()) {
       if (
         canonicalSlug === existingNote.meta.slug
         && !noteSaveRequest.aliases.has(alias)
       ) {
         graph.aliases.delete(alias);
-        aliasesToUpdate.add(alias);
+
+        /*
+          In the special case that a slug that was an alias is now the
+          canonical slug, we need to exclude it from the aliasesToUpdate set,
+          because otherwise the updating function would just delete the
+          alias file, as that alias does not exist anymore.
+          But it should only write the new complete note to the alias file.
+        */
+        const updateAliasOnDisk = !(
+          "changeSlugTo" in noteSaveRequest
+          && typeof noteSaveRequest.changeSlugTo === "string"
+          && noteSaveRequest.changeSlugTo === alias
+        );
+
+        if (updateAliasOnDisk) {
+          aliasesToUpdate.add(alias);
+        }
       }
     }
 
