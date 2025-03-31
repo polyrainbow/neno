@@ -2384,4 +2384,64 @@ describe("Notes module", () => {
       ).toBe("files/a.txt");
     },
   );
+
+  it(
+    "should correctly reassign aliases when setting alias as canonical slug",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note text",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "a",
+        aliases: new Set(["b", "c"]),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Note text",
+          meta: {
+            slug: "a",
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "b",
+        aliases: new Set(["c", "a"]),
+      };
+
+      const noteUpdated = await notesProvider.put(noteSaveRequest2);
+
+      // Assert memory
+      expect(noteUpdated.meta.slug).toBe("b");
+      expect(noteUpdated.aliases.size).toBe(2);
+      expect(noteUpdated.aliases.has("c")).toBe(true);
+      expect(noteUpdated.aliases.has("a")).toBe(true);
+
+      // Assert disk
+      const fileB = await storageProvider.readObjectAsString(
+        "b.subtext",
+      );
+
+      expect(fileB.includes("Note text")).toBe(true);
+
+      const fileA = await storageProvider.readObjectAsString(
+        "a.subtext",
+      );
+      expect(fileA).toBe(":alias-of:b");
+
+      const fileC = await storageProvider.readObjectAsString(
+        "c.subtext",
+      );
+      expect(fileC).toBe(":alias-of:b");
+    },
+  );
 });

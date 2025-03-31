@@ -27,6 +27,7 @@
   "editor.remove-note.confirm.confirm": "Notiz löschen",
   "editor.remove-note.confirm.text": "Möchtest du diese Notiz wirklich löschen?",
   "editor.save-note": "Notiz speichern",
+  "editor.set-as-primary-slug": "Diesen Alias als Haupt-Slug setzen",
   "editor.stats.created-at": "Erstellt am",
   "editor.stats.files": "Dateien",
   "editor.stats.files.none": "Keine",

@@ -19,6 +19,7 @@ close
 code
 component_exchange
 content_copy
+counter_1
 create
 crop_free
 delete
