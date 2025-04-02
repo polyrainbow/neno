@@ -2444,4 +2444,61 @@ describe("Notes module", () => {
       expect(fileC).toBe(":alias-of:b");
     },
   );
+
+  it(
+    "should update references in the value section of a key-value block",
+    async () => {
+      const storageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(storageProvider);
+
+      const noteSaveRequest: NoteSaveRequest = {
+        note: {
+          content: "Note text\n$written-in [[Berlin]]",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "a",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest);
+
+      const noteSaveRequest2: NoteSaveRequest = {
+        note: {
+          content: "Berlin",
+          meta: {
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "berlin",
+        aliases: new Set(),
+      };
+
+      await notesProvider.put(noteSaveRequest2);
+
+      const noteSaveRequest3: NoteSaveRequest = {
+        note: {
+          content: "Berlin City",
+          meta: {
+            slug: "berlin",
+            additionalHeaders: {},
+            flags: [],
+          },
+        },
+        changeSlugTo: "berlin-city",
+        aliases: new Set(),
+        updateReferences: true,
+      };
+
+      await notesProvider.put(noteSaveRequest3);
+
+      const noteA = await notesProvider.get("a");
+      expect(noteA.content).toBe(
+        "Note text\n$written-in [[Berlin City]]",
+      );
+    },
+  );
 });

@@ -471,6 +471,8 @@ const mapInlineSpans = (
       block.data.text = block.data.text.map(mapper);
     } else if (block.type === BlockType.UNORDERED_LIST_ITEM) {
       block.data.text = block.data.text.map(mapper);
+    } else if (block.type === BlockType.KEY_VALUE_PAIR) {
+      block.data.value = block.data.value.map(mapper);
     }
     return block;
   });
