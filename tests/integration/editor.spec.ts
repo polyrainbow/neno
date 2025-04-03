@@ -1141,4 +1141,20 @@ test.describe("Editor view", () => {
       expect(result.length).toBe(6);
     },
   );
+
+  test(
+    "loading a note with a list item that contains a slashlink should have one transclusion",
+    async ({ page }) => {
+      await page.keyboard.type("- test /link");
+      await page.click("#button_save", { delay: 20 });
+      await page.click("#button_new", { delay: 20 });
+      await page.locator(".note-list-item").click();
+
+      const transclusionWrapperLocator = (await page.locator(
+        ".transclusion-wrapper",
+      ))!;
+
+      expect(transclusionWrapperLocator).toHaveCount(1);
+    },
+  );
 });
