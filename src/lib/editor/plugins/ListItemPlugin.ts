@@ -21,6 +21,7 @@ import { BoldNode } from "../nodes/BoldNode";
 import { InlineCodeNode } from "../nodes/InlineCodeNode";
 import { WikiLinkContentNode } from "../nodes/WikiLinkContentNode";
 import { WikiLinkPunctuationNode } from "../nodes/WikiLinkPunctuationNode";
+import { $isTransclusionNode } from "../nodes/TransclusionNode";
 
 
 
@@ -37,11 +38,19 @@ const listItemNodeNormalizationTransform = (liNode: ListItemNode): void => {
   const newNodes = firstChild.splitText(2);
   if (newNodes.length === 0) return;
   const firstNewNode = newNodes[0];
-  firstNewNode.replace(new ListItemSigilNode("- "));
+  const sigilNode = new ListItemSigilNode("- ");
+  firstNewNode.replace(sigilNode);
 
   const contentNode = new ListItemContentNode();
-  contentNode.append(...liNode.getChildren().slice(1));
-  liNode.append(contentNode);
+  contentNode.append(...liNode.getChildren().slice(1).filter((child) => {
+    // Don't take transclusions into the content node
+    return !$isTransclusionNode(child);
+  }));
+
+  // There might be existing transclusions in the list item node, so we should
+  // keep them at the end and insert the content node before them, that means
+  // directly after the sigil node.
+  sigilNode.insertAfter(contentNode);
 };
 
 // same as above, but from sigil's perspective, if content node gets lost
