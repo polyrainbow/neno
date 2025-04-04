@@ -26,7 +26,7 @@
     "stylelint-config-standard": "^37.0.0",
     "typescript": "5.8.2",
     "typescript-eslint": "8.26.0",
-    "vite": "6.2.4",
+    "vite": "6.2.5",
     "vite-plugin-pwa": "0.21.1",
     "vitest": "3.0.8"
   },
