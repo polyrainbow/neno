@@ -7,6 +7,14 @@
       display: none !important;
     }
 
+    .note-view {
+      display: block !important; /* Disable grid */
+    }
+
+    .alias-control-button {
+      display: none !important;
+    }
+
     div[data-lexical-editor="true"] {
         padding-left: 0;
         padding-right: 0;
