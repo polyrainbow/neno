@@ -1,0 +1,15 @@
+@media print {
+    .navigation-rail,
+    .app-header,
+    .sidebar,
+    .note-controls,
+    .note-props {
+      display: none !important;
+    }
+
+    div[data-lexical-editor="true"] {
+        padding-left: 0;
+        padding-right: 0;
+        margin: 0;
+    }
+  }
