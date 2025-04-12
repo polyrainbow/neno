@@ -78,6 +78,14 @@ test.describe("Editor", () => {
       .toMatchSnapshot("editor-test-note-dark.png");
   });
 
+  test("test note - print", async ({ page }) => {
+    await page.setViewportSize({ width: 600, height: 900 });
+    await page.emulateMedia({ media: "print" });
+    await page.keyboard.type(TEST_NOTE);
+    expect(await page.screenshot())
+      .toMatchSnapshot("editor-test-note-print.png");
+  });
+
   test("search presets - light", async ({ page }) => {
     page.emulateMedia({ colorScheme: "light" });
     await page.click("#button_show-search-presets");
