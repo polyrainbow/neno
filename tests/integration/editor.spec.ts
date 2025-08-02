@@ -1154,7 +1154,7 @@ test.describe("Editor view", () => {
         ".transclusion-wrapper",
       ))!;
 
-      expect(transclusionWrapperLocator).toHaveCount(1);
+      await expect(transclusionWrapperLocator).toHaveCount(1);
     },
   );
 });
