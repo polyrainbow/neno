@@ -20,7 +20,7 @@ const getSortKeyForTitle = (title: string): string => {
 
 const getSortFunction = (
   sortMode: NoteListSortMode,
-):((a: NoteListItem, b: NoteListItem) => number) => {
+): ((a: NoteListItem, b: NoteListItem) => number) => {
   const sortFunctions = {
     [NoteListSortMode.CREATION_DATE_ASCENDING]:
       (a: NoteListItem, b: NoteListItem) => {
@@ -89,7 +89,7 @@ type ExistingNoteSortFunction = (a: ExistingNote, b: ExistingNote) => number;
 
 const getNoteSortFunction = (
   sortMode: NoteListSortMode,
-):((a: ExistingNote, b: ExistingNote) => number) => {
+): ((a: ExistingNote, b: ExistingNote) => number) => {
   const sortFunctions = new Map<NoteListSortMode, ExistingNoteSortFunction>([
     [
       NoteListSortMode.CREATION_DATE_ASCENDING,

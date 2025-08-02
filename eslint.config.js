@@ -1,7 +1,6 @@
 import reactRecommended from "eslint-plugin-react/configs/recommended.js";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import stylisticTs from "@stylistic/eslint-plugin-ts";
 import stylistic from "@stylistic/eslint-plugin";
 
 export default [
@@ -11,7 +10,6 @@ export default [
   {
     "plugins": {
       "@stylistic": stylistic,
-      "@stylistic/ts": stylisticTs,
     },
     "settings": {
       "react": {
@@ -68,17 +66,15 @@ export default [
       "@stylistic/eol-last": ["error", "always"],
       "@stylistic/dot-location": ["error", "property"],
       "@stylistic/type-annotation-spacing": "error",
-
-      // @stylistic/ts - https://eslint.style/packages/ts#rules
-      "@stylistic/ts/comma-dangle": ["error", "always-multiline"],
-      "@stylistic/ts/semi": ["error", "always"],
-      "@stylistic/ts/space-before-blocks": ["error", "always"],
-      "@stylistic/ts/quotes": [
+      "@stylistic/comma-dangle": ["error", "always-multiline"],
+      "@stylistic/semi": ["error", "always"],
+      "@stylistic/space-before-blocks": ["error", "always"],
+      "@stylistic/quotes": [
         "error",
         "double",
       ],
-      "@stylistic/ts/key-spacing": ["error", { "beforeColon": false }],
-      "@stylistic/ts/keyword-spacing": ["error"],
+      "@stylistic/key-spacing": ["error", { "beforeColon": false }],
+      "@stylistic/keyword-spacing": ["error"],
     },
   },
 ];

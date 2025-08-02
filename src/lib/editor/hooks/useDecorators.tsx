@@ -16,8 +16,8 @@ type ErrorBoundaryProps = {
   onError: (error: Error) => void;
 };
 
-export type ErrorBoundaryType =
-  | React.ComponentClass<ErrorBoundaryProps>
+export type ErrorBoundaryType
+  = React.ComponentClass<ErrorBoundaryProps>
   | React.FC<ErrorBoundaryProps>;
 
 export function useDecorators(
