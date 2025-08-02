@@ -30,6 +30,11 @@ test.beforeEach(async ({ page }) => {
   await page.click("#browser-storage-load-button");
   await page.getByText("No notes found").waitFor();
   await page.getByAltText("No notes found").waitFor();
+
+  // wait for header stats images to load
+  await page.getByLabel("Number of notes").locator("img").waitFor();
+  await page.getByLabel("Number of links").locator("img").waitFor();
+  await page.getByLabel("Unlinked notes").locator("img").waitFor();
 });
 
 test.describe("Editor", () => {
