@@ -49,22 +49,32 @@ test.describe("Editor", () => {
 
   test("existing notes - light", async ({ page }) => {
     page.emulateMedia({ colorScheme: "light" });
-    await page.keyboard.type("Note 1");
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill("Note 1");
     await page.click("#button_save");
     await page.click("#button_new");
-    await page.keyboard.type("Note 2");
+    await expect(editor).toBeFocused();
+    await editor.fill("Note 2");
     await page.click("#button_save");
+    const noteListItems = page.locator(".note-list-item");
+    await expect(noteListItems).toHaveCount(2);
     expect(await page.screenshot())
       .toMatchSnapshot("editor-existing-notes-light.png");
   });
 
   test("existing notes - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
-    await page.keyboard.type("Note 1");
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill("Note 1");
     await page.click("#button_save");
     await page.click("#button_new");
-    await page.keyboard.type("Note 2");
+    await expect(editor).toBeFocused();
+    await editor.fill("Note 2");
     await page.click("#button_save");
+    const noteListItems = page.locator(".note-list-item");
+    await expect(noteListItems).toHaveCount(2);
     expect(await page.screenshot())
       .toMatchSnapshot("editor-existing-notes-dark.png");
   });
@@ -105,26 +115,34 @@ test.describe("Editor", () => {
 
   test("search results disclaimer - light", async ({ page }) => {
     page.emulateMedia({ colorScheme: "light" });
-    await page.keyboard.type("1");
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill("1");
     await page.click("#button_save");
     await page.click("#button_new");
-    await page.keyboard.type("2");
+    await expect(editor).toBeFocused();
+    await editor.fill("2");
     await page.click("#button_save");
-    await page.locator("#search-input").click();
-    await page.keyboard.type("1", { delay: 20 });
+    const searchInput = page.locator("#search-input");
+    await searchInput.click();
+    await searchInput.fill("1");
     expect(await page.screenshot())
       .toMatchSnapshot("editor-search-results-disclaimer-light.png");
   });
 
   test("search results disclaimer - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
-    await page.keyboard.type("1");
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill("1");
     await page.click("#button_save");
     await page.click("#button_new");
-    await page.keyboard.type("2");
+    await expect(editor).toBeFocused();
+    await editor.fill("2");
     await page.click("#button_save");
-    await page.locator("#search-input").click();
-    await page.keyboard.type("1", { delay: 20 });
+    const searchInput = page.locator("#search-input");
+    await searchInput.click();
+    await searchInput.fill("1");
     expect(await page.screenshot())
       .toMatchSnapshot("editor-search-results-disclaimer-dark.png");
   });

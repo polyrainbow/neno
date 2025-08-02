@@ -51,6 +51,15 @@ test.beforeEach(async ({ page }) => {
   await page.locator("#button_save").click();
   await page.getByLabel("Files", { exact: true }).click();
   await page.getByText("test.txt").click();
+
+  // make sure all header icons are loaded for screenshots
+  const headerButtonIcons = await page.locator(
+    ".header-controls button img",
+  ).all();
+
+  for (const icon of headerButtonIcons) {
+    await icon.waitFor();
+  }
 });
 
 test.describe("File view", () => {
