@@ -110,7 +110,6 @@ test.describe("File view", () => {
   });
 
   test("should have slug as document title", async ({ page }) => {
-    const pageTitle = await page.title();
-    expect(pageTitle).toBe("files/test.txt");
+    await expect(page).toHaveTitle("files/test.txt");
   });
 });
