@@ -66,8 +66,8 @@ test.describe("Editor view", () => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_save");
-    const slugElement = await page.$(".slug-line .note-slug");
-    const slug = await slugElement?.inputValue();
+    const slugElement = page.locator(".slug-line .note-slug");
+    const slug = await slugElement.inputValue();
     expect(slug).toBe("welcome-to-neno");
   });
 
@@ -141,9 +141,9 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Backspace");
       await page.keyboard.press("Space");
 
-      const paragraph = (
-        await page.$("div[data-lexical-editor] .editor-paragraph")
-      ) as ElementHandle<HTMLElement>;
+      const paragraph = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
       const nodeName = await paragraph.evaluate((node) => node.nodeName);
 
       expect(await paragraph.innerText()).toBe("test # heading");
@@ -160,7 +160,10 @@ test.describe("Editor view", () => {
       await page.click("#button_save");
       await page.click("#button_new");
 
-      await page.keyboard.type("Foo bar baz");
+      const editor = page.locator("div[data-lexical-editor]");
+      await expect(editor).toBeFocused();
+
+      await page.keyboard.type("Foo bar baz", { delay: 20 });
 
       /*
         When pressing the same key (combination) multiple times, we should
@@ -306,9 +309,9 @@ test.describe("Editor view", () => {
       await page.keyboard.type("test /link");
 
 
-      const transclusionSlug = (await page.$(
+      const transclusionSlug = page.locator(
         "div[data-lexical-editor] .transclusion .slug",
-      ))!;
+      );
 
       expect(await transclusionSlug.innerText()).toBe("/link");
 
@@ -317,11 +320,11 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Backspace");
       await page.keyboard.press("Backspace");
 
-      const transclusionElement = (await page.$(
+      const transclusionElement = page.locator(
         "div[data-lexical-editor] .transclusion",
-      ));
+      );
 
-      expect(transclusionElement).toBeNull();
+      await expect(transclusionElement).not.toBeAttached();
     },
   );
 
@@ -330,10 +333,9 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("- test /link");
 
-
-      const transclusionSlug = (await page.$(
+      const transclusionSlug = await page.locator(
         "div[data-lexical-editor] .transclusion .slug",
-      ))!;
+      );
 
       expect(await transclusionSlug.innerText()).toBe("/link");
 
@@ -342,11 +344,11 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Backspace");
       await page.keyboard.press("Backspace");
 
-      const transclusionElement = (await page.$(
+      const transclusionElement = page.locator(
         "div[data-lexical-editor] .transclusion",
-      ));
+      );
 
-      expect(transclusionElement).toBeNull();
+      await expect(transclusionElement).not.toBeAttached();
     },
   );
 
@@ -355,9 +357,9 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("# test /link");
 
-      const transclusionSlug = (await page.$(
+      const transclusionSlug = await page.locator(
         "div[data-lexical-editor] .transclusion .slug",
-      ))!;
+      );
 
       expect(await transclusionSlug.innerText()).toBe("/link");
 
@@ -366,11 +368,11 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Backspace");
       await page.keyboard.press("Backspace");
 
-      const transclusionElement = (await page.$(
+      const transclusionElement = page.locator(
         "div[data-lexical-editor] .transclusion",
-      ));
+      );
 
-      expect(transclusionElement).toBeNull();
+      await expect(transclusionElement).not.toBeAttached();
     },
   );
 
@@ -433,10 +435,18 @@ test.describe("Editor view", () => {
       await page.keyboard.type("Note 1\nwith link to [[Note 2]]");
       await page.click("#button_save"); // save as "note-1"
       await page.click("#button_new");
-      await page.keyboard.type("Note 2\nwith link to ");
+
+      const editor = page.locator("div[data-lexical-editor]");
+      await expect(editor).toBeFocused();
+
+      await page.keyboard.type("Note 2\nwith link to ", { delay: 60 });
       await page.click("#button_save"); // save as "note-2"
 
-      await page.click(".note-backlinks .note-list-item-linked-notes-indicator");
+      const linkToThisButton = page.locator(
+        ".note-backlinks .note-list-item-linked-notes-indicator",
+      );
+      await linkToThisButton.waitFor();
+      await linkToThisButton.click();
 
       const paragraph = (
         await page.$("div[data-lexical-editor] .editor-paragraph:nth-child(2)")
@@ -451,9 +461,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("http://example.com/page#!hashbang");
 
-      const link = (
-        await page.$("div[data-lexical-editor] .editor-paragraph a")
-      ) as ElementHandle<HTMLElement>;
+      const link = page.locator("div[data-lexical-editor] .editor-paragraph a");
 
       expect(await link.getAttribute("href")).toBe(
         "http://example.com/page#!hashbang",
@@ -469,9 +477,7 @@ test.describe("Editor view", () => {
         "https://example.org/changesets/123?filters={%22uids%22:[{%22label%22:%22%22,%22value%22:%22%22}],%22date__gte%22:[{%22label%22:%22%22,%22value%22:%22%22}]}",
       );
 
-      const link = (
-        await page.$("div[data-lexical-editor] .editor-paragraph a")
-      ) as ElementHandle<HTMLElement>;
+      const link = page.locator("div[data-lexical-editor] .editor-paragraph a");
 
       expect(await link.getAttribute("href")).toBe(
         "https://example.org/changesets/123?filters={%22uids%22:[{%22label%22:%22%22,%22value%22:%22%22}],%22date__gte%22:[{%22label%22:%22%22,%22value%22:%22%22}]}",
@@ -487,9 +493,7 @@ test.describe("Editor view", () => {
         "https://example.org/foo*bar*baz",
       );
 
-      const link = (
-        await page.$("div[data-lexical-editor] .editor-paragraph a")
-      ) as ElementHandle<HTMLElement>;
+      const link = page.locator("div[data-lexical-editor] .editor-paragraph a");
 
       expect(await link.getAttribute("href")).toBe(
         "https://example.org/foo*bar*baz",
@@ -503,9 +507,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("http://localhost:8080/page");
 
-      const link = (
-        await page.$("div[data-lexical-editor] .editor-paragraph a")
-      ) as ElementHandle<HTMLElement>;
+      const link = page.locator("div[data-lexical-editor] .editor-paragraph a");
 
       expect(await link.getAttribute("href")).toBe(
         "http://localhost:8080/page",
@@ -519,9 +521,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("http://example.com/page;1");
 
-      const link = (
-        await page.$("div[data-lexical-editor] .editor-paragraph a")
-      ) as ElementHandle<HTMLElement>;
+      const link = page.locator("div[data-lexical-editor] .editor-paragraph a");
 
       expect(await link.getAttribute("href")).toBe(
         "http://example.com/page;1",
@@ -535,9 +535,7 @@ test.describe("Editor view", () => {
       const URL = "https://example.com/#:~:text=But%20as%20Hannah%20Arendt%20observes,nature'%E2%80%9D%20(469).";
       await page.keyboard.type(URL);
 
-      const link = (
-        await page.$("div[data-lexical-editor] .editor-paragraph a")
-      ) as ElementHandle<HTMLElement>;
+      const link = page.locator("div[data-lexical-editor] .editor-paragraph a");
 
       expect(await link.getAttribute("href")).toBe(URL);
     },
@@ -698,15 +696,14 @@ test.describe("Editor view", () => {
         .filter({ hasText: "Link to a non-existing note" })
         .click();
 
-      const slugElement = await page.$(".slug-line .note-slug");
-      const slug = await slugElement?.inputValue();
-      expect(slug).toBe("link-to-a-non-existing-note");
+      const slugElement = page.locator(".slug-line .note-slug");
+      await expect(slugElement).toHaveValue("link-to-a-non-existing-note");
 
-      const paragraphs = (
-        await page.$$("div[data-lexical-editor] .editor-paragraph")
-      ) as ElementHandle<HTMLElement>[];
+      const paragraphs = await page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      ).all();
 
-      expect(paragraphs.length).toBe(1);
+      expect(paragraphs).toHaveLength(1);
       expect((await paragraphs[0].innerText()).trim()).toBe(
         "Link to a non-existing note",
       );
@@ -720,7 +717,7 @@ test.describe("Editor view", () => {
       await page.keyboard.type("A note");
       await page.click("#button_save");
       await page.getByRole("textbox").nth(1).focus();
-      await page.keyboard.type(" edited");
+      await page.keyboard.type(" edited", { delay: 60 });
       await page.click("#button_new");
       await page.getByRole("button", { name: "Cancel" }).click();
       expect(page.url().endsWith("a-note")).toBe(true);
@@ -752,11 +749,16 @@ test.describe("Editor view", () => {
       await page.click("#button_save");
       await page.click("#button_new");
 
-      await page.keyboard.type("[[A not]]");
+      const editor = page.locator("div[data-lexical-editor]");
+      await expect(editor).toBeFocused();
 
-      const wikilinkContentNode = await page.locator(
+      await editor.fill("[[A not]]");
+
+      const wikilinkContentNode = page.locator(
         "div[data-lexical-editor] .editor-paragraph > *",
       ).nth(1);
+
+      await wikilinkContentNode.waitFor();
 
       expect(await wikilinkContentNode.getAttribute("class")).toBe(
         "wikilink-content unavailable",
@@ -780,25 +782,36 @@ test.describe("Editor view", () => {
   test(
     "Note Search Result Selection: Pressing arrow up should select last note",
     async ({ page }) => {
-      await page.keyboard.type("foo1");
+      const editor = page.locator("div[data-lexical-editor]");
+      await expect(editor).toBeFocused();
+
+      await editor.fill("foo1");
       await page.click("#button_save");
       await page.click("#button_new");
 
-      await page.keyboard.type("foo2");
+      await expect(editor).toBeFocused();
+
+      await editor.fill("foo2");
       await page.click("#button_save");
       await page.click("#button_new");
 
-      await page.keyboard.type("foo3");
+      await expect(editor).toBeFocused();
+
+      await editor.fill("foo3");
       await page.click("#button_save");
       await page.click("#button_new");
 
-      await page.keyboard.type("foo4");
+      await expect(editor).toBeFocused();
+
+      await editor.fill("foo4");
       await page.click("#button_save");
       await page.click("#button_new");
+
+      await expect(editor).toBeFocused();
 
       await page.locator("#search-input").focus();
       await page.keyboard.type("foo");
-
+      await page.locator(".note-list-item").nth(3).waitFor();
       await page.keyboard.press("ArrowUp");
 
       expect(
