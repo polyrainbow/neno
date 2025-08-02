@@ -6,7 +6,8 @@
     "no-descending-specificity": null,
     "declaration-block-no-redundant-longhand-properties": null,
     "import-notation": null,
-    "selector-id-pattern": null
+    "selector-id-pattern": null,
+    "block-no-redundant-nested-style-rules": null
   },
   "ignoreFiles": ["dist/**/*.css", "**/reboot.css"]
 }
