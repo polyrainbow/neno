@@ -162,7 +162,7 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await editor.fill("Foo bar baz");
+      await editor.pressSequentially("Foo bar baz");
 
       /*
         When pressing the same key (combination) multiple times, we should
@@ -438,7 +438,7 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await editor.fill("Note 2\nwith link to ");
+      await editor.pressSequentially("Note 2\nwith link to ");
       await page.click("#button_save"); // save as "note-2"
 
       const linkToThisButton = page.locator(
@@ -577,7 +577,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
-      await editor.fill("[[link]]");
+      await editor.pressSequentially("[[link]]");
       await page.keyboard.press(
         KEY_COMBINATIONS.MOVE_CURSOR_TO_BEGINNING_OF_LINE,
         { delay: 20 },
@@ -600,7 +600,9 @@ test.describe("Editor view", () => {
   test(
     "remove wikilink closing punctuation with some content should remove the whole wikilink",
     async ({ page }) => {
-      await page.keyboard.type("[[link]]");
+      const editor = page.locator("div[data-lexical-editor]");
+      await expect(editor).toBeFocused();
+      await editor.pressSequentially("[[link]]");
       await page.keyboard.press(
         "Shift+ArrowLeft",
         { delay: 20 },
@@ -749,7 +751,7 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await editor.fill("A note");
+      await editor.pressSequentially("A note");
       await page.click("#button_save");
       await page.click("#button_new");
 
@@ -788,25 +790,25 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await editor.fill("foo1");
+      await editor.pressSequentially("foo1");
       await page.click("#button_save");
       await page.click("#button_new");
 
       await expect(editor).toBeFocused();
 
-      await editor.fill("foo2");
+      await editor.pressSequentially("foo2");
       await page.click("#button_save");
       await page.click("#button_new");
 
       await expect(editor).toBeFocused();
 
-      await editor.fill("foo3");
+      await editor.pressSequentially("foo3");
       await page.click("#button_save");
       await page.click("#button_new");
 
       await expect(editor).toBeFocused();
 
-      await editor.fill("foo4");
+      await editor.pressSequentially("foo4");
       await page.click("#button_save");
       await page.click("#button_new");
 
@@ -814,7 +816,7 @@ test.describe("Editor view", () => {
 
       const searchInput = page.locator("#search-input");
       await searchInput.focus();
-      await searchInput.fill("foo");
+      await searchInput.pressSequentially("foo");
       await page.locator(".note-list-item").nth(3).waitFor();
       await page.keyboard.press("ArrowUp");
 
@@ -1057,7 +1059,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
-      await editor.fill("- foobar");
+      await editor.pressSequentially("- foobar");
       await page.keyboard.press("ArrowLeft", { delay: 20 });
       await page.keyboard.press("ArrowLeft", { delay: 20 });
       await page.keyboard.press("ArrowLeft", { delay: 20 });
