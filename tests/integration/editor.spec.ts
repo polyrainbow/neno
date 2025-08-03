@@ -791,26 +791,26 @@ test.describe("Editor view", () => {
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo1");
-      await page.click("#button_save");
-      await page.click("#button_new");
+      await page.click("#button_save", { delay: 20 });
+      await page.click("#button_new", { delay: 20 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo2");
-      await page.click("#button_save");
-      await page.click("#button_new");
+      await page.click("#button_save", { delay: 20 });
+      await page.click("#button_new", { delay: 20 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo3");
-      await page.click("#button_save");
-      await page.click("#button_new");
+      await page.click("#button_save", { delay: 20 });
+      await page.click("#button_new", { delay: 20 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo4");
-      await page.click("#button_save");
-      await page.click("#button_new");
+      await page.click("#button_save", { delay: 20 });
+      await page.click("#button_new", { delay: 20 });
 
       await expect(editor).toBeFocused();
 
@@ -820,11 +820,8 @@ test.describe("Editor view", () => {
       await page.locator(".note-list-item").nth(3).waitFor();
       await page.keyboard.press("ArrowUp");
 
-      expect(
-        await page.locator(".note-list-item").nth(3).getAttribute("class"),
-      ).toBe(
-        "note-list-item selected linkable",
-      );
+      const lastNote = page.locator(".note-list-item").nth(3);
+      await expect(lastNote).toHaveClass("note-list-item selected linkable");
     },
   );
 
