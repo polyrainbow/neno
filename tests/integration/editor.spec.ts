@@ -1074,12 +1074,12 @@ test.describe("Editor view", () => {
   test(
     "Selection should be correct after adding line break at start of list item",
     async ({ page }) => {
-      await page.keyboard.type("- 1");
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("Enter", { delay: 20 });
-      await page.keyboard.type("a");
+      await page.keyboard.type("- 1", { delay: 40 });
+      await page.keyboard.press("ArrowLeft", { delay: 40 });
+      await page.keyboard.press("ArrowLeft", { delay: 40 });
+      await page.keyboard.press("ArrowLeft", { delay: 40 });
+      await page.keyboard.press("Enter", { delay: 40 });
+      await page.keyboard.type("a", { delay: 40 });
 
       const editorParagraphs = page.locator(
         "div[data-lexical-editor] .editor-paragraph",
