@@ -34,7 +34,7 @@ test.beforeEach(async ({ page }) => {
 test.describe("Editor", () => {
   test("should look fine empty", async ({ page }) => {
     await page.setViewportSize({ width: 412, height: 914 });
-    await page.keyboard.type(TEST_NOTE, { delay: 20 });
+    await page.keyboard.type(TEST_NOTE, { delay: 100 });
     expect(await page.screenshot())
       .toMatchSnapshot("editor.png");
   });

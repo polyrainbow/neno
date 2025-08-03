@@ -86,16 +86,21 @@ const NoteControls = ({
                 setUnsavedChanges(false);
               }
 
+              const noteWasUnsaved = activeNote.isUnsaved;
+
               goToNote("new", {
                 contentIfNewNote: "",
               });
 
               /*
-                goToNote does not have any effect here, because route and
-                state do not change and thus no re-render is triggered.
-                We need to manually reset the editor.
+                goToNote might not have any effect here, because route and
+                state do not change and thus no re-render is triggered when
+                route before is "new" and route after is "new", too.
+                In that case we need to manually reset the editor.
               */
-              loadNote("new");
+              if (noteWasUnsaved) {
+                loadNote("new");
+              }
             }}
           />
           <IconButton
