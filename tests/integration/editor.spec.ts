@@ -155,14 +155,15 @@ test.describe("Editor view", () => {
   test(
     "clicking on note list item link indicator should insert wikilink to this note at current editor selection",
     async ({ page }) => {
-      await page.keyboard.type("Note 1");
-      await page.click("#button_save");
-      await page.click("#button_new");
-
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
+      await editor.pressSequentially("Note 1", { delay: 100 });
+      await page.click("#button_save", { delay: 100 });
+      await page.click("#button_new", { delay: 100 });
 
-      await editor.pressSequentially("Foo bar baz");
+      await expect(editor).toBeFocused();
+
+      await editor.pressSequentially("Foo bar baz", { delay: 100 });
 
       /*
         When pressing the same key (combination) multiple times, we should
@@ -183,7 +184,10 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
       await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
 
-      await page.click(".note-list-item-linked-notes-indicator");
+      await page.click(
+        ".note-list-item-linked-notes-indicator",
+        { delay: 100 },
+      );
 
       const paragraph = page.locator(
         "div[data-lexical-editor] .editor-paragraph",
@@ -194,25 +198,38 @@ test.describe("Editor view", () => {
 
       await paragraph.waitFor();
 
-      expect(await paragraph.innerText()).toBe("Foo [[Note 1]] baz");
-      expect(await paragraph.getAttribute("class"))
-        .toBe("editor-paragraph ltr");
+      await expect(paragraph).toHaveText("Foo [[Note 1]] baz");
+      await expect(paragraph).toHaveClass("editor-paragraph ltr");
 
-      const paragraphChildren = (await page.$$(
+      const paragraphChildren = page.locator(
         "div[data-lexical-editor] .editor-paragraph > *",
-      ))!;
+      );
 
-      expect(await paragraphChildren[0].innerText()).toBe("Foo ");
-      expect(await paragraphChildren[1].innerText()).toBe("[[");
-      expect(await paragraphChildren[1].getAttribute("class"))
-        .toBe("wikilink-punctuation");
-      expect(await paragraphChildren[2].innerText()).toBe("Note 1");
-      expect(await paragraphChildren[2].getAttribute("class"))
-        .toBe("wikilink-content available");
-      expect(await paragraphChildren[3].innerText()).toBe("]]");
-      expect(await paragraphChildren[3].getAttribute("class"))
-        .toBe("wikilink-punctuation");
-      expect(await paragraphChildren[4].innerText()).toBe(" baz");
+      await expect(paragraphChildren.nth(0)).toHaveText(/^Foo $/, {
+        useInnerText: true,
+      });
+
+      await expect(paragraphChildren.nth(1)).toHaveText("[[", {
+        useInnerText: true,
+      });
+      await expect(paragraphChildren.nth(1))
+        .toHaveClass("wikilink-punctuation");
+
+      await expect(paragraphChildren.nth(2)).toHaveText("Note 1", {
+        useInnerText: true,
+      });
+      await expect(paragraphChildren.nth(2))
+        .toHaveClass("wikilink-content available");
+
+      await expect(paragraphChildren.nth(3)).toHaveText("]]", {
+        useInnerText: true,
+      });
+      await expect(paragraphChildren.nth(3))
+        .toHaveClass("wikilink-punctuation");
+
+      await expect(paragraphChildren.nth(4)).toHaveText(/^ baz$/, {
+        useInnerText: true,
+      });
     },
   );
 
@@ -751,13 +768,13 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("A note");
-      await page.click("#button_save");
-      await page.click("#button_new");
+      await editor.pressSequentially("A note", { delay: 100 });
+      await page.click("#button_save", { delay: 100 });
+      await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("[[A not]]");
+      await editor.pressSequentially("[[A not]]", { delay: 100 });
 
       const wikilinkContentNode = page.locator(
         "div[data-lexical-editor] .editor-paragraph > *",
@@ -765,19 +782,19 @@ test.describe("Editor view", () => {
 
       await wikilinkContentNode.waitFor();
 
-      expect(await wikilinkContentNode.getAttribute("class")).toBe(
+      await expect(wikilinkContentNode).toHaveClass(
         "wikilink-content unavailable",
       );
 
-      await page.keyboard.press("ArrowLeft");
-      await page.keyboard.press("ArrowLeft");
-      await page.keyboard.type("e");
-      expect(await wikilinkContentNode.getAttribute("class")).toBe(
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.type("e", { delay: 100 });
+      await expect(wikilinkContentNode).toHaveClass(
         "wikilink-content available",
       );
 
-      await page.keyboard.press("Backspace");
-      expect(await wikilinkContentNode.getAttribute("class")).toBe(
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await expect(wikilinkContentNode).toHaveClass(
         "wikilink-content unavailable",
       );
     },
@@ -790,25 +807,25 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("foo1");
+      await editor.pressSequentially("foo1", { delay: 100 });
       await page.click("#button_save", { delay: 100 });
       await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("foo2");
+      await editor.pressSequentially("foo2", { delay: 100 });
       await page.click("#button_save", { delay: 100 });
       await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("foo3");
+      await editor.pressSequentially("foo3", { delay: 100 });
       await page.click("#button_save", { delay: 100 });
       await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("foo4");
+      await editor.pressSequentially("foo4", { delay: 100 });
       await page.click("#button_save", { delay: 100 });
       await page.click("#button_new", { delay: 100 });
 
@@ -816,7 +833,7 @@ test.describe("Editor view", () => {
 
       const searchInput = page.locator("#search-input");
       await searchInput.focus();
-      await searchInput.pressSequentially("foo");
+      await searchInput.pressSequentially("foo", { delay: 100 });
       await page.locator(".note-list-item").nth(3).waitFor();
       await page.keyboard.press("ArrowUp");
 
