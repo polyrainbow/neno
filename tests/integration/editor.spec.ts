@@ -1065,14 +1065,12 @@ test.describe("Editor view", () => {
       await page.keyboard.press("ArrowLeft", { delay: 20 });
       await page.keyboard.press("Enter", { delay: 20 });
 
-      const editorParagraphsLocator = page.locator(
+      const editorParagraphs = page.locator(
         "div[data-lexical-editor] .editor-paragraph",
       );
 
-      const editorParagraphs = await editorParagraphsLocator.all();
-
-      expect(editorParagraphs[0]).toHaveText("- foo");
-      expect(editorParagraphs[1]).toHaveText("bar");
+      expect(editorParagraphs.nth(0)).toHaveText("- foo");
+      expect(editorParagraphs.nth(1)).toHaveText("bar");
     },
   );
 
