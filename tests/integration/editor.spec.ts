@@ -173,15 +173,15 @@ test.describe("Editor view", () => {
       */
 
       // move cursor to "Foo bar| baz"
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
 
       // select "bar"
-      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
-      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
-      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
 
       await page.click(".note-list-item-linked-notes-indicator");
 
@@ -580,11 +580,11 @@ test.describe("Editor view", () => {
       await editor.pressSequentially("[[link]]");
       await page.keyboard.press(
         KEY_COMBINATIONS.MOVE_CURSOR_TO_BEGINNING_OF_LINE,
-        { delay: 20 },
+        { delay: 100 },
       );
-      await page.keyboard.press("Shift+ArrowRight", { delay: 20 });
-      await page.keyboard.press("Shift+ArrowRight", { delay: 20 });
-      await page.keyboard.press("Backspace", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowRight", { delay: 100 });
+      await page.keyboard.press("Shift+ArrowRight", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       const paragraphChildren = await page.locator(
         "div[data-lexical-editor] .editor-paragraph > *",
@@ -605,21 +605,21 @@ test.describe("Editor view", () => {
       await editor.pressSequentially("[[link]]");
       await page.keyboard.press(
         "Shift+ArrowLeft",
-        { delay: 20 },
+        { delay: 100 },
       );
       await page.keyboard.press(
         "Shift+ArrowLeft",
-        { delay: 20 },
+        { delay: 100 },
       );
       await page.keyboard.press(
         "Shift+ArrowLeft",
-        { delay: 20 },
+        { delay: 100 },
       );
       await page.keyboard.press(
         "Shift+ArrowLeft",
-        { delay: 20 },
+        { delay: 100 },
       );
-      await page.keyboard.press("Backspace", { delay: 20 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       const paragraphChildren = await page.locator(
         "div[data-lexical-editor] .editor-paragraph > *",
@@ -791,26 +791,26 @@ test.describe("Editor view", () => {
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo1");
-      await page.click("#button_save", { delay: 20 });
-      await page.click("#button_new", { delay: 20 });
+      await page.click("#button_save", { delay: 100 });
+      await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo2");
-      await page.click("#button_save", { delay: 20 });
-      await page.click("#button_new", { delay: 20 });
+      await page.click("#button_save", { delay: 100 });
+      await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo3");
-      await page.click("#button_save", { delay: 20 });
-      await page.click("#button_new", { delay: 20 });
+      await page.click("#button_save", { delay: 100 });
+      await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo4");
-      await page.click("#button_save", { delay: 20 });
-      await page.click("#button_new", { delay: 20 });
+      await page.click("#button_save", { delay: 100 });
+      await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
 
@@ -832,15 +832,15 @@ test.describe("Editor view", () => {
   test(
     "Pressing dead key and letter to create umlaut should work inside Wikilink",
     async ({ page }) => {
-      await page.keyboard.type("[[Wikilink]]", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("Alt+u", { delay: 20 });
-      await page.keyboard.press("u", { delay: 20 });
+      await page.keyboard.type("[[Wikilink]]", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Alt+u", { delay: 100 });
+      await page.keyboard.press("u", { delay: 100 });
 
       const editor = page.getByRole("textbox").nth(1);
       expect(await editor.textContent()).toBe("[[Wikiülink]]");
@@ -854,9 +854,9 @@ test.describe("Editor view", () => {
   test(
     "Pressing dead key and letter to create umlaut should work inside Wikilink",
     async ({ page }) => {
-      await page.keyboard.type("[[Wikilink]]", { delay: 20 });
-      await page.keyboard.press("Alt+u", { delay: 20 });
-      await page.keyboard.press("u", { delay: 20 });
+      await page.keyboard.type("[[Wikilink]]", { delay: 100 });
+      await page.keyboard.press("Alt+u", { delay: 100 });
+      await page.keyboard.press("u", { delay: 100 });
 
       const editor = page.getByRole("textbox").nth(1);
       expect(await editor.textContent()).toBe("[[Wikilink]]ü");
@@ -875,21 +875,21 @@ test.describe("Editor view", () => {
     "copying and pasting multiline text should work",
     async ({ page, context }) => {
       await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-      await page.keyboard.type("1", { delay: 20 });
-      await page.keyboard.press("Enter", { delay: 20 });
-      await page.keyboard.type("2", { delay: 20 });
-      await page.keyboard.press("Enter", { delay: 20 });
-      await page.keyboard.type("3", { delay: 20 });
-      await page.keyboard.press("Enter", { delay: 20 });
-      await page.keyboard.type("4", { delay: 20 });
+      await page.keyboard.type("1", { delay: 100 });
+      await page.keyboard.press("Enter", { delay: 100 });
+      await page.keyboard.type("2", { delay: 100 });
+      await page.keyboard.press("Enter", { delay: 100 });
+      await page.keyboard.type("3", { delay: 100 });
+      await page.keyboard.press("Enter", { delay: 100 });
+      await page.keyboard.type("4", { delay: 100 });
 
       // select 3 and 4
-      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
-      await page.keyboard.press("Shift+ArrowUp", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Shift+ArrowUp", { delay: 100 });
 
       // copy
       await page.keyboard.press(
-        KEY_COMBINATIONS.COPY, { delay: 20 }
+        KEY_COMBINATIONS.COPY, { delay: 100 }
       );
 
       const clipboardText1 = await page.evaluate(
@@ -898,16 +898,16 @@ test.describe("Editor view", () => {
       expect(clipboardText1).toBe("3\n4");
 
       // move cursor to end of line 2
-      await page.keyboard.press("ArrowUp", { delay: 20 });
-      await page.keyboard.press("ArrowRight", { delay: 20 });
+      await page.keyboard.press("ArrowUp", { delay: 100 });
+      await page.keyboard.press("ArrowRight", { delay: 100 });
 
       // select 1 and 2
-      await page.keyboard.press("Shift+ArrowLeft", { delay: 20 });
-      await page.keyboard.press("Shift+ArrowUp", { delay: 20 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Shift+ArrowUp", { delay: 100 });
 
       // paste
       await page.keyboard.press(
-        KEY_COMBINATIONS.PASTE, { delay: 20 }
+        KEY_COMBINATIONS.PASTE, { delay: 100 }
       );
 
       await page.waitForTimeout(100);
@@ -926,8 +926,8 @@ test.describe("Editor view", () => {
     "wikilink should not be created inside code block node",
     async ({ page }) => {
       await page.keyboard.type("```");
-      await page.keyboard.press("Enter", { delay: 20 });
-      await page.keyboard.type("[[link]]", { delay: 20 });
+      await page.keyboard.press("Enter", { delay: 100 });
+      await page.keyboard.type("[[link]]", { delay: 100 });
 
       const codeBlock = await page.locator(
         "div[data-lexical-editor] .editor-paragraph:nth-child(2) > *",
@@ -937,8 +937,8 @@ test.describe("Editor view", () => {
       expect(await codeBlock[0].getAttribute("class")).toBe(null);
       expect(await codeBlock[0].textContent()).toBe("[[link]]");
 
-      await page.keyboard.press("ArrowUp", { delay: 20 });
-      await page.keyboard.press("Backspace", { delay: 20 });
+      await page.keyboard.press("ArrowUp", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       // now wikilink should have been created, because code block has been removed
 
@@ -1056,11 +1056,11 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
-      await editor.pressSequentially("- foobar", { delay: 40 });
-      await page.keyboard.press("ArrowLeft", { delay: 40 });
-      await page.keyboard.press("ArrowLeft", { delay: 40 });
-      await page.keyboard.press("ArrowLeft", { delay: 40 });
-      await page.keyboard.press("Enter", { delay: 40 });
+      await editor.pressSequentially("- foobar", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Enter", { delay: 100 });
 
       const editorParagraphs = page.locator(
         "div[data-lexical-editor] .editor-paragraph",
@@ -1074,12 +1074,12 @@ test.describe("Editor view", () => {
   test(
     "Selection should be correct after adding line break at start of list item",
     async ({ page }) => {
-      await page.keyboard.type("- 1", { delay: 40 });
-      await page.keyboard.press("ArrowLeft", { delay: 40 });
-      await page.keyboard.press("ArrowLeft", { delay: 40 });
-      await page.keyboard.press("ArrowLeft", { delay: 40 });
-      await page.keyboard.press("Enter", { delay: 40 });
-      await page.keyboard.type("a", { delay: 40 });
+      await page.keyboard.type("- 1", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Enter", { delay: 100 });
+      await page.keyboard.type("a", { delay: 100 });
 
       const editorParagraphs = page.locator(
         "div[data-lexical-editor] .editor-paragraph",
@@ -1097,13 +1097,13 @@ test.describe("Editor view", () => {
       await page.keyboard.type(
         "Precedence test\n`http://*.example.com` and `http://*.example.com`",
       );
-      await page.click("#button_save", { delay: 20 });
+      await page.click("#button_save", { delay: 100 });
       const noteListItemLocator = page.locator(
         ".note-list-item",
         { hasText: "Precedence test" },
       );
       await noteListItemLocator.waitFor();
-      await page.click("#button_new", { delay: 20 });
+      await page.click("#button_new", { delay: 100 });
       await noteListItemLocator.click();
 
       const nodes = await page.locator(
@@ -1156,8 +1156,8 @@ test.describe("Editor view", () => {
     "loading a note with a list item that contains a slashlink should have one transclusion",
     async ({ page }) => {
       await page.keyboard.type("- test /link");
-      await page.click("#button_save", { delay: 20 });
-      await page.click("#button_new", { delay: 20 });
+      await page.click("#button_save", { delay: 100 });
+      await page.click("#button_new", { delay: 100 });
       await page.locator(".note-list-item").click();
 
       const transclusionWrapperLocator = (await page.locator(
