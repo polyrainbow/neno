@@ -198,7 +198,7 @@ test.describe("Editor view", () => {
 
       await paragraph.waitFor();
 
-      await expect(paragraph).toHaveText("Foo [[Note 1]] baz");
+      await expect(paragraph).toHaveText(/^Foo \[\[Note 1\]\] baz$/);
       await expect(paragraph).toHaveClass("editor-paragraph ltr");
 
       const paragraphChildren = page.locator(
@@ -209,19 +209,19 @@ test.describe("Editor view", () => {
         useInnerText: true,
       });
 
-      await expect(paragraphChildren.nth(1)).toHaveText("[[", {
+      await expect(paragraphChildren.nth(1)).toHaveText(/^\[\[$/, {
         useInnerText: true,
       });
       await expect(paragraphChildren.nth(1))
         .toHaveClass("wikilink-punctuation");
 
-      await expect(paragraphChildren.nth(2)).toHaveText("Note 1", {
+      await expect(paragraphChildren.nth(2)).toHaveText(/^Note 1$/, {
         useInnerText: true,
       });
       await expect(paragraphChildren.nth(2))
         .toHaveClass("wikilink-content available");
 
-      await expect(paragraphChildren.nth(3)).toHaveText("]]", {
+      await expect(paragraphChildren.nth(3)).toHaveText(/^\]\]$/, {
         useInnerText: true,
       });
       await expect(paragraphChildren.nth(3))
@@ -236,7 +236,11 @@ test.describe("Editor view", () => {
   test(
     "recognize wikilinks next to each other without space in between",
     async ({ page }) => {
-      await page.keyboard.type("[[Link 1]][[Link 2]][[Link 3]]");
+      const editor = page.locator("div[data-lexical-editor]");
+      await editor.pressSequentially(
+        "[[Link 1]][[Link 2]][[Link 3]]",
+        { delay: 100 },
+      );
 
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
@@ -807,35 +811,35 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("foo1", { delay: 100 });
-      await page.click("#button_save", { delay: 100 });
-      await page.click("#button_new", { delay: 100 });
+      await editor.pressSequentially("foo1", { delay: 400 });
+      await page.click("#button_save", { delay: 400 });
+      await page.click("#button_new", { delay: 400 });
 
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("foo2", { delay: 100 });
-      await page.click("#button_save", { delay: 100 });
-      await page.click("#button_new", { delay: 100 });
+      await editor.pressSequentially("foo2", { delay: 400 });
+      await page.click("#button_save", { delay: 400 });
+      await page.click("#button_new", { delay: 400 });
 
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("foo3", { delay: 100 });
-      await page.click("#button_save", { delay: 100 });
-      await page.click("#button_new", { delay: 100 });
+      await editor.pressSequentially("foo3", { delay: 400 });
+      await page.click("#button_save", { delay: 400 });
+      await page.click("#button_new", { delay: 400 });
 
       await expect(editor).toBeFocused();
 
-      await editor.pressSequentially("foo4", { delay: 100 });
-      await page.click("#button_save", { delay: 100 });
-      await page.click("#button_new", { delay: 100 });
+      await editor.pressSequentially("foo4", { delay: 400 });
+      await page.click("#button_save", { delay: 400 });
+      await page.click("#button_new", { delay: 400 });
 
       await expect(editor).toBeFocused();
 
       const searchInput = page.locator("#search-input");
       await searchInput.focus();
-      await searchInput.pressSequentially("foo", { delay: 100 });
+      await searchInput.pressSequentially("foo", { delay: 400 });
       await page.locator(".note-list-item").nth(3).waitFor();
-      await page.keyboard.press("ArrowUp");
+      await page.keyboard.press("ArrowUp", { delay: 400 });
 
       const lastNote = page.locator(".note-list-item").nth(3);
       await expect(lastNote).toHaveClass("note-list-item selected linkable");
