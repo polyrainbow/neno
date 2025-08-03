@@ -42,6 +42,7 @@ test.describe("Editor view", () => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_save");
+    await page.getByLabel("No unsaved changes").waitFor();
     const noteListItemLocator = page.locator(
       ".sidebar .note-list .note-list-item",
     );
@@ -56,6 +57,7 @@ test.describe("Editor view", () => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_save");
+    await page.getByLabel("No unsaved changes").waitFor();
     const editorParagraphs = page.locator(
       "div[data-lexical-editor] .editor-paragraph",
     );
@@ -66,6 +68,7 @@ test.describe("Editor view", () => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_save");
+    await page.getByLabel("No unsaved changes").waitFor();
     const slugElement = page.locator(".slug-line .note-slug");
     await expect(slugElement).toHaveValue("welcome-to-neno");
   });
@@ -73,6 +76,7 @@ test.describe("Editor view", () => {
   test("editor paragraphs should have correct types", async ({ page }) => {
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_save");
+    await page.getByLabel("No unsaved changes").waitFor();
     const editorParagraphs = await page.locator(
       "div[data-lexical-editor] .editor-paragraph",
     ).all();
@@ -96,6 +100,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("Two /link-1 and /link-2");
       await page.click("#button_save");
+      await page.getByLabel("No unsaved changes").waitFor();
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
       ))!;
@@ -159,6 +164,7 @@ test.describe("Editor view", () => {
       await expect(editor).toBeFocused();
       await editor.pressSequentially("Note 1", { delay: 100 });
       await page.click("#button_save", { delay: 100 });
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
@@ -284,6 +290,7 @@ test.describe("Editor view", () => {
       await page.keyboard.type("[[Link 1]][[Link 2]][[Link 3]]");
 
       await page.click("#button_save");
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new");
       await page.click(".note-list .note-list-item");
 
@@ -425,6 +432,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("note");
       await page.click("#button_save");
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("div[data-lexical-editor]");
       await page.keyboard.type("more text");
       await page.click(".note-list .note-list-item");
@@ -439,6 +447,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("note");
       await page.click("#button_save");
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_pin");
       await page.click("div[data-lexical-editor]");
       await page.keyboard.type("more text");
@@ -454,6 +463,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("Note 1\nwith link to [[Note 2]]");
       await page.click("#button_save"); // save as "note-1"
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new");
 
       const editor = page.locator("div[data-lexical-editor]");
@@ -461,6 +471,7 @@ test.describe("Editor view", () => {
 
       await editor.pressSequentially("Note 2\nwith link to ");
       await page.click("#button_save"); // save as "note-2"
+      await page.getByLabel("No unsaved changes").waitFor();
 
       const linkToThisButton = page.locator(
         ".note-backlinks .note-list-item-linked-notes-indicator",
@@ -656,6 +667,7 @@ test.describe("Editor view", () => {
   test("should delete notes", async ({ page }) => {
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_save");
+    await page.getByLabel("No unsaved changes").waitFor();
     const noteListItems = await page.locator(
       ".sidebar .note-list .note-list-item",
     );
@@ -716,6 +728,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("A note with a [[Link to a non-existing note]]");
       await page.click("#button_save");
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.locator("span")
         .filter({ hasText: "Link to a non-existing note" })
         .click();
@@ -740,6 +753,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("A note");
       await page.click("#button_save");
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.getByRole("textbox").nth(1).focus();
       await page.keyboard.type(" edited", { delay: 60 });
       await page.click("#button_new");
@@ -754,6 +768,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("A note");
       await page.click("#button_save");
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_pin");
       await page.click("#button_new");
       await page.locator(".pinned-note").hover();
@@ -774,6 +789,7 @@ test.describe("Editor view", () => {
 
       await editor.pressSequentially("A note", { delay: 100 });
       await page.click("#button_save", { delay: 100 });
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
@@ -813,24 +829,28 @@ test.describe("Editor view", () => {
 
       await editor.pressSequentially("foo1", { delay: 400 });
       await page.click("#button_save", { delay: 400 });
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new", { delay: 400 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo2", { delay: 400 });
       await page.click("#button_save", { delay: 400 });
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new", { delay: 400 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo3", { delay: 400 });
       await page.click("#button_save", { delay: 400 });
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new", { delay: 400 });
 
       await expect(editor).toBeFocused();
 
       await editor.pressSequentially("foo4", { delay: 400 });
       await page.click("#button_save", { delay: 400 });
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new", { delay: 400 });
 
       await expect(editor).toBeFocused();
@@ -1119,6 +1139,7 @@ test.describe("Editor view", () => {
         "Precedence test\n`http://*.example.com` and `http://*.example.com`",
       );
       await page.click("#button_save", { delay: 100 });
+      await page.getByLabel("No unsaved changes").waitFor();
       const noteListItemLocator = page.locator(
         ".note-list-item",
         { hasText: "Precedence test" },
@@ -1158,6 +1179,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("Note 1");
       await page.click("#button_save"); // save as "note-1"
+      await page.getByLabel("No unsaved changes").waitFor();
 
       await page.click("#button_random-note");
       await page.click("#button_random-note");
@@ -1178,6 +1200,7 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("- test /link");
       await page.click("#button_save", { delay: 100 });
+      await page.getByLabel("No unsaved changes").waitFor();
       await page.click("#button_new", { delay: 100 });
       await page.locator(".note-list-item").click();
 
