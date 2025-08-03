@@ -793,6 +793,7 @@ test.describe("Editor view", () => {
       await page.click("#button_new", { delay: 100 });
 
       await expect(editor).toBeFocused();
+      await expect(editor).toHaveText("");
       await editor.pressSequentially("[[A not]]", { delay: 100 });
 
       const wikilinkContentNode = page.locator(
