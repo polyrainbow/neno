@@ -1069,8 +1069,8 @@ test.describe("Editor view", () => {
         "div[data-lexical-editor] .editor-paragraph",
       );
 
-      expect(editorParagraphs.nth(0)).toHaveText("- foo");
-      expect(editorParagraphs.nth(1)).toHaveText("bar");
+      await expect(editorParagraphs.nth(0)).toHaveText("- foo");
+      await expect(editorParagraphs.nth(1)).toHaveText("bar");
     },
   );
 
@@ -1084,16 +1084,12 @@ test.describe("Editor view", () => {
       await page.keyboard.press("Enter", { delay: 20 });
       await page.keyboard.type("a");
 
-      const editorParagraphsLocator = page.locator(
+      const editorParagraphs = page.locator(
         "div[data-lexical-editor] .editor-paragraph",
       );
 
-      const editorParagraphs = await editorParagraphsLocator.all();
-
-      expect(await editorParagraphs[0].textContent())
-        .toBe("");
-      expect(await editorParagraphs[1].textContent())
-        .toBe("a- 1");
+      await expect(editorParagraphs.nth(0)).toHaveText("");
+      await expect(editorParagraphs.nth(1)).toHaveText("a- 1");
     },
   );
 
