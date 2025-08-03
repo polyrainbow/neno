@@ -44,6 +44,9 @@ test.beforeEach(async ({ page }) => {
     dataTransfer: dataTransfer2,
   });
 
+  // wait for transclusion to appear so we are sure that the import is finished
+  await page.getByText("/files/test-2.txt").nth(0).waitFor();
+
   await page.locator("#button_save").click();
   await page.getByLabel("No unsaved changes").waitFor();
   await page.getByLabel("Files", { exact: true }).click();
