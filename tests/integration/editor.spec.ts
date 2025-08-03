@@ -1056,11 +1056,11 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
-      await editor.pressSequentially("- foobar");
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("ArrowLeft", { delay: 20 });
-      await page.keyboard.press("Enter", { delay: 20 });
+      await editor.pressSequentially("- foobar", { delay: 40 });
+      await page.keyboard.press("ArrowLeft", { delay: 40 });
+      await page.keyboard.press("ArrowLeft", { delay: 40 });
+      await page.keyboard.press("ArrowLeft", { delay: 40 });
+      await page.keyboard.press("Enter", { delay: 40 });
 
       const editorParagraphs = page.locator(
         "div[data-lexical-editor] .editor-paragraph",
