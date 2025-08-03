@@ -1,6 +1,9 @@
 import {
   $createTextNode,
+  $getSelection,
+  $isRangeSelection,
   $isTextNode,
+  $setSelection,
   TextNode,
 } from "lexical";
 import {
@@ -87,9 +90,31 @@ const restoreSigil = (licNode: ListItemContentNode) => {
 const destroyListItemSigil = (lisNode: ListItemSigilNode) => {
   if (
     (!$isListItemNode(lisNode.getParent()))
-    || lisNode.getTextContent() !== "- "
+    && $isListItemSigilNode(lisNode)
+    && lisNode.getTextContent() !== "- "
   ) {
-    lisNode.replace($createTextNode(lisNode.getTextContent()));
+    const selection = $getSelection();
+    const newTextNode = $createTextNode(lisNode.getTextContent());
+    lisNode.replace(newTextNode);
+    if ($isRangeSelection(selection)) {
+      if (selection.anchor.getNode() === lisNode) {
+        selection.anchor.set(
+          newTextNode.getKey(),
+          selection.anchor.offset,
+          "text",
+        );
+      }
+
+      if (selection.focus.getNode() === lisNode) {
+        selection.focus.set(
+          newTextNode.getKey(),
+          selection.focus.offset,
+          "text",
+        );
+      }
+
+      $setSelection(selection);
+    }
   }
 };
 

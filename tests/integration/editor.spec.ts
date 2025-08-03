@@ -1211,4 +1211,20 @@ test.describe("Editor view", () => {
       await expect(transclusionWrapperLocator).toHaveCount(1);
     },
   );
+
+  test(
+    "cursor should be at correct position after removing space after list item sigil",
+    async ({ page }) => {
+      await page.keyboard.type("- ");
+      await page.keyboard.press("Backspace");
+
+      // expect caret position to be 1
+      const selection = await page.evaluate(() => {
+        const selection = window.getSelection();
+        return selection ? selection.anchorOffset : null;
+      });
+
+      expect(selection).toBe(1);
+    },
+  );
 });
