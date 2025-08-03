@@ -81,14 +81,18 @@ test.describe("Editor", () => {
 
   test("test note - light", async ({ page }) => {
     page.emulateMedia({ colorScheme: "light" });
-    await page.keyboard.type(TEST_NOTE);
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill(TEST_NOTE);
     expect(await page.screenshot())
       .toMatchSnapshot("editor-test-note-light.png");
   });
 
   test("test note - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
-    await page.keyboard.type(TEST_NOTE);
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill(TEST_NOTE);
     expect(await page.screenshot())
       .toMatchSnapshot("editor-test-note-dark.png");
   });
@@ -96,7 +100,9 @@ test.describe("Editor", () => {
   test("test note - print", async ({ page }) => {
     await page.setViewportSize({ width: 600, height: 900 });
     await page.emulateMedia({ media: "print" });
-    await page.keyboard.type(TEST_NOTE);
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill(TEST_NOTE);
     expect(await page.screenshot())
       .toMatchSnapshot("editor-test-note-print.png");
   });

@@ -45,8 +45,11 @@ test.beforeEach(async ({ page }) => {
   });
 
   await page.locator("#button_save").click();
+  await page.getByLabel("No unsaved changes").waitFor();
   await page.getByLabel("Files", { exact: true }).click();
+  await page.locator(".files-view-preview-box").nth(0).waitFor();
   await page.getByText("files/test.txt").click();
+  await page.locator("h1", { hasText: "files/test.txt" }).waitFor();
 });
 
 test.describe("File view", () => {
