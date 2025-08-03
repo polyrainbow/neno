@@ -110,12 +110,14 @@ test.describe("Editor", () => {
   test("search presets - light", async ({ page }) => {
     page.emulateMedia({ colorScheme: "light" });
     await page.click("#button_show-search-presets");
+    await page.waitForFunction(() => document.fonts.ready);
     expect(await page.screenshot()).toMatchSnapshot("search-presets-light.png");
   });
 
   test("search presets - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.click("#button_show-search-presets");
+    await page.waitForFunction(() => document.fonts.ready);
     expect(await page.screenshot()).toMatchSnapshot("search-presets-dark.png");
   });
 
