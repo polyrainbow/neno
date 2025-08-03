@@ -67,8 +67,7 @@ test.describe("Editor view", () => {
     await page.keyboard.type(DEMO_NOTE);
     await page.click("#button_save");
     const slugElement = page.locator(".slug-line .note-slug");
-    const slug = await slugElement.inputValue();
-    expect(slug).toBe("welcome-to-neno");
+    await expect(slugElement).toHaveValue("welcome-to-neno");
   });
 
   test("editor paragraphs should have correct types", async ({ page }) => {
@@ -163,7 +162,7 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await page.keyboard.type("Foo bar baz", { delay: 20 });
+      await editor.fill("Foo bar baz");
 
       /*
         When pressing the same key (combination) multiple times, we should
@@ -439,7 +438,7 @@ test.describe("Editor view", () => {
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await page.keyboard.type("Note 2\nwith link to ", { delay: 60 });
+      await editor.fill("Note 2\nwith link to ");
       await page.click("#button_save"); // save as "note-2"
 
       const linkToThisButton = page.locator(
@@ -448,10 +447,10 @@ test.describe("Editor view", () => {
       await linkToThisButton.waitFor();
       await linkToThisButton.click();
 
-      const paragraph = (
-        await page.$("div[data-lexical-editor] .editor-paragraph:nth-child(2)")
-      ) as ElementHandle<HTMLElement>;
-
+      const paragraph = page.locator(
+        "div[data-lexical-editor] .editor-paragraph:nth-child(2)",
+      );
+      await paragraph.waitFor();
       expect(await paragraph.innerText()).toBe("with link to [[Note 1]]");
     },
   );
@@ -576,7 +575,9 @@ test.describe("Editor view", () => {
   test(
     "remove wikilink opening punctuation at once should remove the whole wikilink",
     async ({ page }) => {
-      await page.keyboard.type("[[link]]");
+      const editor = page.locator("div[data-lexical-editor]");
+      await expect(editor).toBeFocused();
+      await editor.fill("[[link]]");
       await page.keyboard.press(
         KEY_COMBINATIONS.MOVE_CURSOR_TO_BEGINNING_OF_LINE,
         { delay: 20 },
@@ -745,14 +746,16 @@ test.describe("Editor view", () => {
   test(
     "Wikilink availability should update on linktext change",
     async ({ page }) => {
-      await page.keyboard.type("A note");
-      await page.click("#button_save");
-      await page.click("#button_new");
-
       const editor = page.locator("div[data-lexical-editor]");
       await expect(editor).toBeFocused();
 
-      await editor.fill("[[A not]]");
+      await editor.fill("A note");
+      await page.click("#button_save");
+      await page.click("#button_new");
+
+      await expect(editor).toBeFocused();
+
+      await editor.pressSequentially("[[A not]]");
 
       const wikilinkContentNode = page.locator(
         "div[data-lexical-editor] .editor-paragraph > *",
@@ -809,8 +812,9 @@ test.describe("Editor view", () => {
 
       await expect(editor).toBeFocused();
 
-      await page.locator("#search-input").focus();
-      await page.keyboard.type("foo");
+      const searchInput = page.locator("#search-input");
+      await searchInput.focus();
+      await searchInput.fill("foo");
       await page.locator(".note-list-item").nth(3).waitFor();
       await page.keyboard.press("ArrowUp");
 
@@ -1051,7 +1055,9 @@ test.describe("Editor view", () => {
   test(
     "Inserting line break in list item should break text correctly",
     async ({ page }) => {
-      await page.keyboard.type("- foobar");
+      const editor = page.locator("div[data-lexical-editor]");
+      await expect(editor).toBeFocused();
+      await editor.fill("- foobar");
       await page.keyboard.press("ArrowLeft", { delay: 20 });
       await page.keyboard.press("ArrowLeft", { delay: 20 });
       await page.keyboard.press("ArrowLeft", { delay: 20 });
@@ -1063,10 +1069,8 @@ test.describe("Editor view", () => {
 
       const editorParagraphs = await editorParagraphsLocator.all();
 
-      expect(await editorParagraphs[0].textContent())
-        .toBe("- foo");
-      expect(await editorParagraphs[1].textContent())
-        .toBe("bar");
+      expect(editorParagraphs[0]).toHaveText("- foo");
+      expect(editorParagraphs[1]).toHaveText("bar");
     },
   );
 

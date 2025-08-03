@@ -11,7 +11,8 @@ test.beforeEach(async ({ page }) => {
   await page.getByText("No notes found").waitFor();
   await page.getByAltText("No notes found").waitFor();
 
-  await page.keyboard.type("Note with a file\n");
+  const editor = page.locator("div[data-lexical-editor]");
+  await editor.fill("Note with a file\n");
 
   const dataTransfer1 = await page.evaluateHandle(() => {
     const dt = new DataTransfer();
