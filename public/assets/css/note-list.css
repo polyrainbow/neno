@@ -33,14 +33,6 @@
     padding: 0.5rem;
   }
 
-  /*
-    Explicitly setting height for select to match input[type=text]
-    https://stackoverflow.com/a/8189977/3890888
-  */
-  select {
-    height: 2.219rem;
-  }
-
   .note-list-sort-mode-select {
     width: 16.563rem;
   }
@@ -62,7 +54,6 @@
     cursor: pointer;
     padding: 0.9em;
     width: 100%;
-    gap: 0.125em;
     outline-offset: -0.125rem;
 
     &.with-link-edge {

@@ -1,7 +1,7 @@
 @font-face {
   font-family: "Mona Sans";
   /* stylelint-disable-next-line at-rule-descriptor-value-no-unknown */
-  src: url("../fonts/Mona-Sans.woff2") format("woff2") tech(variations);
+  src: url("../fonts/MonaSansVF[wdth,wght,ital].woff2") format("woff2") tech(variations);
   font-weight: 200 900;
   font-stretch: 75% 125%;
 }
