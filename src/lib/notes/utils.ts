@@ -41,6 +41,7 @@ const getMediaTypeFromFilename = (
 
     "wav": MediaType.AUDIO,
     "mp3": MediaType.AUDIO,
+    "m4a": MediaType.AUDIO,
     "ogg": MediaType.AUDIO,
     "flac": MediaType.AUDIO,
 

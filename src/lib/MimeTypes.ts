@@ -9,6 +9,7 @@ const MimeTypes = new Map<string, string>(Object.entries({
   "js": "text/javascript",
   "json": "application/json",
   "mp3": "audio/mp3",
+  "m4a": "audio/mp4", // https://stackoverflow.com/a/58551410
   "flac": "audio/flac",
   "mp4": "video/mp4",
   "webm": "video/webm",
