@@ -22,7 +22,7 @@ const FILE_PICKER_ACCEPT_TYPES: FilePickerAcceptType[] = [
   {
     description: "Media file",
     accept: {
-      "audio/*": [".mp3", ".flac"],
+      "audio/*": [".mp3", ".flac", ".m4a"],
       "video/*": [".mp4", ".webm"],
       "application/*": [".pdf", ".js"],
       "image/*": [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"],
