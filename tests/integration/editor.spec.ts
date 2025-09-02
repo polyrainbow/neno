@@ -21,6 +21,11 @@ const KEY_COMBINATIONS = {
     : isKDEPlasma
       ? "Home" // https://docs.kde.org/stable5/en/kate/katepart/keybindings.html
       : "Control+ArrowLeft",
+  MOVE_CURSOR_TO_END_OF_LINE: isMac
+    ? "Meta+ArrowRight"
+    : isKDEPlasma
+      ? "End"
+      : "Control+ArrowRight",
   SELECT_ALL: isMac ? "Meta+A" : "Control+A",
   COPY: isMac ? "Meta+KeyC" : "Control+KeyC",
   PASTE: isMac ? "Meta+KeyV" : "Control+KeyV",
@@ -1056,6 +1061,42 @@ test.describe("Editor view", () => {
       expect(await children4[1].getAttribute("class"))
         .toBe("list-item-content");
 
+    },
+  );
+
+
+  test(
+    "Two list item nodes should properly collapse into one",
+    async ({ page }) => {
+      await page.keyboard.type(`- li1
+- li2`);
+
+      await page.keyboard.press("ArrowUp", { delay: 100 });
+      await page.keyboard.press(
+        KEY_COMBINATIONS.MOVE_CURSOR_TO_END_OF_LINE,
+        { delay: 100 },
+      );
+      await page.keyboard.press("Delete", { delay: 100 });
+
+      const editorParagraphsLocator = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+
+      await expect(editorParagraphsLocator).toHaveCount(1);
+
+      const paragraph = await editorParagraphsLocator.nth(0);
+
+      // Line 1
+      expect(await paragraph.getAttribute("class"))
+        .toBe("editor-paragraph list-item");
+
+      const children = await paragraph.locator(">*").all();
+      expect(children).toHaveLength(2);
+      expect(await children[0].getAttribute("class"))
+        .toBe("list-item-sigil");
+      expect(await children[1].getAttribute("class"))
+        .toBe("list-item-content ltr");
+      expect(await children[1].innerText()).toBe("li1- li2");
     },
   );
 

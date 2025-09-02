@@ -27,7 +27,6 @@ import { WikiLinkPunctuationNode } from "../nodes/WikiLinkPunctuationNode";
 import { $isTransclusionNode } from "../nodes/TransclusionNode";
 
 
-
 const listItemNodeNormalizationTransform = (liNode: ListItemNode): void => {
   if (!$isListItemNode(liNode)) return;
   const firstChild = liNode.getFirstChild();
@@ -114,6 +113,24 @@ const destroyListItemSigil = (lisNode: ListItemSigilNode) => {
       }
 
       $setSelection(selection);
+    }
+    return;
+  }
+
+  const previousSibling = lisNode.getPreviousSibling();
+  const nextSibling = lisNode.getNextSibling();
+
+  if (
+    $isListItemNode(lisNode.getParent())
+    && $isListItemSigilNode(lisNode)
+    && $isListItemContentNode(previousSibling)
+  ) {
+    previousSibling.append($createTextNode(lisNode.getTextContent()));
+    lisNode.remove();
+
+    if (nextSibling) {
+      previousSibling.append($createTextNode(nextSibling.getTextContent()));
+      nextSibling.remove();
     }
   }
 };
