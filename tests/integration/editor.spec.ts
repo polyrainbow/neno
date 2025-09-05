@@ -88,14 +88,14 @@ test.describe("Editor view", () => {
     const classes = await Promise.all(
       editorParagraphs.map((p) => p.getAttribute("class")),
     );
-    expect(classes[0]).toBe("editor-paragraph s-heading ltr");
-    expect(classes[1]).toBe("editor-paragraph ltr");
+    expect(classes[0]).toBe("editor-paragraph s-heading");
+    expect(classes[1]).toBe("editor-paragraph");
     expect(classes[2]).toBe("editor-paragraph");
-    expect(classes[3]).toBe("editor-paragraph quote-block ltr");
-    expect(classes[4]).toBe("editor-paragraph list-item ltr");
-    expect(classes[5]).toBe("editor-paragraph ltr");
+    expect(classes[3]).toBe("editor-paragraph quote-block");
+    expect(classes[4]).toBe("editor-paragraph list-item");
+    expect(classes[5]).toBe("editor-paragraph");
     expect(classes[6]).toBe("editor-paragraph code-block");
-    expect(classes[7]).toBe("editor-paragraph code-block ltr");
+    expect(classes[7]).toBe("editor-paragraph code-block");
     expect(classes[8]).toBe("editor-paragraph code-block");
     expect(classes[9]).toBe("editor-paragraph code-block");
   });
@@ -158,7 +158,7 @@ test.describe("Editor view", () => {
       expect(await paragraph.innerText()).toBe("test # heading");
       expect(nodeName).toBe("P");
       expect(await paragraph.getAttribute("class"))
-        .toBe("editor-paragraph ltr");
+        .toBe("editor-paragraph");
     },
   );
 
@@ -210,7 +210,7 @@ test.describe("Editor view", () => {
       await paragraph.waitFor();
 
       await expect(paragraph).toHaveText(/^Foo \[\[Note 1\]\] baz$/);
-      await expect(paragraph).toHaveClass("editor-paragraph ltr");
+      await expect(paragraph).toHaveClass("editor-paragraph");
 
       const paragraphChildren = page.locator(
         "div[data-lexical-editor] .editor-paragraph > *",
@@ -1019,27 +1019,27 @@ test.describe("Editor view", () => {
 
       // Line 1
       expect(await editorParagraphs[0].getAttribute("class"))
-        .toBe("editor-paragraph ltr");
+        .toBe("editor-paragraph");
 
       // Line 2
       const paragraph1 = editorParagraphs[1];
       const className1 = await paragraph1.getAttribute("class");
-      expect(className1).toBe("editor-paragraph list-item ltr");
+      expect(className1).toBe("editor-paragraph list-item");
       const children1 = await paragraph1.locator(">*").all();
       expect(await children1[0].getAttribute("class"))
         .toBe("list-item-sigil");
       expect(await children1[1].getAttribute("class"))
-        .toBe("list-item-content ltr");
+        .toBe("list-item-content");
 
       // Line 3
       const paragraph2 = editorParagraphs[2];
       const className2 = await paragraph2.getAttribute("class");
-      expect(className2).toBe("editor-paragraph list-item ltr");
+      expect(className2).toBe("editor-paragraph list-item");
       const children2 = await paragraph2.locator(">*").all();
       expect(await children2[0].getAttribute("class"))
         .toBe("list-item-sigil");
       expect(await children2[1].getAttribute("class"))
-        .toBe("list-item-content ltr");
+        .toBe("list-item-content");
 
       // Line 4
       const paragraph3 = editorParagraphs[3];
@@ -1095,11 +1095,35 @@ test.describe("Editor view", () => {
       expect(await children[0].getAttribute("class"))
         .toBe("list-item-sigil");
       expect(await children[1].getAttribute("class"))
-        .toBe("list-item-content ltr");
+        .toBe("list-item-content");
       expect(await children[1].innerText()).toBe("li1- li2");
     },
   );
 
+
+  // Testing this bugfix:
+  // https://github.com/facebook/lexical/issues/7789
+  // https://github.com/facebook/lexical/pull/7794
+  test(
+    "Insertion at start of paragraph works correctly",
+    async ({ page }) => {
+      await page.keyboard.type(`foo
+
+bar`);
+
+      await page.keyboard.press("ArrowUp", { delay: 100 });
+      await page.keyboard.press("Delete", { delay: 100 });
+      await page.keyboard.type("x", { delay: 100 });
+
+      const editorParagraphsLocator = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+
+      await expect(editorParagraphsLocator).toHaveCount(2);
+      const paragraph2 = await editorParagraphsLocator.nth(1);
+      await expect(paragraph2).toHaveText("xbar");
+    },
+  );
 
   test(
     "discarding unsaved note should empty editor",
