@@ -32,7 +32,7 @@ type Callback = (
       id: string,
       parsedContent: Block[],
     }[],
-  }
+  },
 ) => void;
 
 class subwaytextWorkerMock {
