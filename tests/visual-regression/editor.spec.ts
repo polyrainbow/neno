@@ -59,6 +59,10 @@ test.describe("Editor", () => {
     await page.click("#button_save");
     const noteListItems = page.locator(".note-list-item");
     await expect(noteListItems).toHaveCount(2);
+
+    // header stats are updated asynchronously, wait for them
+    const headerStatsNoteCount = page.getByLabel("Number of notes");
+    await expect(headerStatsNoteCount).toHaveText("2");
     expect(await page.screenshot())
       .toMatchSnapshot("editor-existing-notes-light.png");
   });
@@ -75,6 +79,10 @@ test.describe("Editor", () => {
     await page.click("#button_save");
     const noteListItems = page.locator(".note-list-item");
     await expect(noteListItems).toHaveCount(2);
+
+    // header stats are updated asynchronously, wait for them
+    const headerStatsNoteCount = page.getByLabel("Number of notes");
+    await expect(headerStatsNoteCount).toHaveText("2");
     expect(await page.screenshot())
       .toMatchSnapshot("editor-existing-notes-dark.png");
   });
@@ -111,6 +119,8 @@ test.describe("Editor", () => {
     page.emulateMedia({ colorScheme: "light" });
     await page.click("#button_show-search-presets");
     await page.waitForFunction(() => document.fonts.ready);
+    const firstFindButtonLocator = page.getByText("Find").first();
+    await firstFindButtonLocator.waitFor();
     expect(await page.screenshot()).toMatchSnapshot("search-presets-light.png");
   });
 
@@ -118,6 +128,8 @@ test.describe("Editor", () => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.click("#button_show-search-presets");
     await page.waitForFunction(() => document.fonts.ready);
+    const firstFindButtonLocator = page.getByText("Find").first();
+    await firstFindButtonLocator.waitFor();
     expect(await page.screenshot()).toMatchSnapshot("search-presets-dark.png");
   });
 

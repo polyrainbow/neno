@@ -60,6 +60,9 @@ test.beforeEach(async ({ page }) => {
   for (const icon of headerButtonIcons) {
     await icon.waitFor();
   }
+
+  const previewLocator = page.getByText("This is the content");
+  await previewLocator.waitFor();
 });
 
 test.describe("File view", () => {

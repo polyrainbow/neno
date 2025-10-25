@@ -3,8 +3,6 @@ import ConfirmationServiceProvider from "./ConfirmationServiceProvider";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import AppRouter from "./AppRouter";
 import useWarnBeforeUnload from "../hooks/useWarnBeforeUnload";
-import NotesProviderContext from "../contexts/NotesProviderContext";
-import { getNotesProvider } from "../lib/LocalDataStorage";
 import { init, onChange } from "../lib/intl";
 import useRunOnce from "../hooks/useRunOnce";
 import useForceUpdate from "../hooks/useForceUpdate";
@@ -14,7 +12,6 @@ const App = () => {
   const [intlModuleReady, setIntlModuleReady] = useState<boolean>(false);
 
   const forceUpdate = useForceUpdate();
-  const notesProvider = getNotesProvider();
 
   useWarnBeforeUnload(unsavedChanges);
 
@@ -26,15 +23,13 @@ const App = () => {
 
   if (!intlModuleReady) return "";
 
-  return <NotesProviderContext value={notesProvider}>
-    <ConfirmationServiceProvider>
-      <UnsavedChangesContext
-        value={[unsavedChanges, setUnsavedChanges]}
-      >
-        <AppRouter />
-      </UnsavedChangesContext>
-    </ConfirmationServiceProvider>
-  </NotesProviderContext>;
+  return <ConfirmationServiceProvider>
+    <UnsavedChangesContext
+      value={[unsavedChanges, setUnsavedChanges]}
+    >
+      <AppRouter />
+    </UnsavedChangesContext>
+  </ConfirmationServiceProvider>;
 };
 
 export default App;

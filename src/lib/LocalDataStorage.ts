@@ -135,15 +135,6 @@ export const getNotesProvider = (): NotesProvider | null => {
 };
 
 
-export const invalidateNotesProvider = async (): Promise<NotesProvider> => {
-  if (!folderHandle) {
-    throw new Error("No folder handle available");
-  }
-  const notesProvider = await initializeNotesProvider(folderHandle);
-  return notesProvider;
-};
-
-
 export const getObjectUrlForArbitraryGraphFile = async (
   fileInfo: FileInfo,
 ): Promise<string> => {
