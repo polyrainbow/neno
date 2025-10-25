@@ -14,7 +14,7 @@ insights on how NENO works:
 
 ## Development setup
 
-Make sure you have Node.js v22 or newer installed. Clone this repo and run
+Make sure you have Node.js v24 installed. Clone this repo and run
 `npm i`. To start a development instance, run `npm run dev`.
 
 ## Publishing a release
