@@ -1,6 +1,7 @@
 .file-section {
   h1 {
     margin-top: var(--small-gap);
+    margin-bottom: 1.563rem;
   }
 
   .file-container {
