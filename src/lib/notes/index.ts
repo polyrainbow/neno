@@ -72,6 +72,15 @@ export default class NotesProvider {
     this.#io = new DatabaseIO({ storageProvider });
   }
 
+  /*
+    Forces re-indexing of the entire graph. This is useful when you suspect
+    that the indexes are out of sync with the actual notes, e.g., after an
+    external modification of the note files.
+  */
+  async reIndexGraph(): Promise<void> {
+    await this.#io.getGraph(true);
+  }
+
 
   async get(
     slug: Slug,

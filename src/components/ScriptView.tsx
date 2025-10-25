@@ -4,7 +4,6 @@ import BusyIndicator from "./BusyIndicator";
 import noteWorkerUrl from "../lib/note-worker/index.js?worker&url";
 import {
   getActiveFolderHandle,
-  invalidateNotesProvider,
 } from "../lib/LocalDataStorage";
 import useRunOnce from "../hooks/useRunOnce";
 import useNotesProvider from "../hooks/useNotesProvider";
@@ -152,7 +151,7 @@ const ScriptView = ({
 
   useEffect(() => {
     return () => {
-      invalidateNotesProvider();
+      notesProvider.reIndexGraph();
     };
   }, []);
 

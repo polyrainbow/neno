@@ -360,8 +360,13 @@ export default class DatabaseIO {
     return rawNote;
   }
 
-
-  async getGraph(): Promise<Graph> {
+  /*
+    Retrieves the graph object. If forceDiskRead is true, the graph will be
+    read from disk even if it is already loaded in memory.
+    This is useful when you want to make sure you have the latest data from
+    disk, e.g., after an external modification.
+  */
+  async getGraph(forceDiskRead = false): Promise<Graph> {
     // We only want to get one graph at a time to reduce unnecessary disk usage
     // that occurs when a consumer performs two or more API calls at the same
     // time. To prevent accessing the disk twice or more for the same data,
@@ -379,7 +384,7 @@ export default class DatabaseIO {
 
     // Now let's try to get the requested graph object in 2 ways:
     // Way 1: Fast memory access: try to get it from loaded graph objects
-    if (this.#loadedGraph) {
+    if (this.#loadedGraph && !forceDiskRead) {
       this.#finishedObtainingGraph();
       return this.#loadedGraph;
     }
