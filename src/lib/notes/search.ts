@@ -18,6 +18,7 @@ import {
   getNotesWithMediaTypes,
   getNotesWithKeyValue,
   getNotesWithFlag,
+  getNotesWithLinkToSlug,
 } from "./searchUtils.js";
 import { NoteListSortMode } from "./types/NoteListSortMode.js";
 import GraphObject from "./types/Graph.js";
@@ -168,6 +169,9 @@ export const search = async (
     // search for notes with specific file slugs
     } else if (key === "has-file") {
       matchingNotes = getNotesWithFile(matchingNotes, graph, value);
+    // search for notes that link to specific note slugs
+    } else if (key === "links-to") {
+      matchingNotes = getNotesWithLinkToSlug(matchingNotes, graph, value);
     } else if (key === "has-flag") {
       matchingNotes = getNotesWithFlag(matchingNotes, value);
 

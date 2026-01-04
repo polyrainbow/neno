@@ -257,6 +257,21 @@ const getNotesWithMediaTypes = (
 };
 
 
+const getNotesWithLinkToSlug = (
+  notes: ExistingNote[],
+  graph: Graph,
+  fileSlug: Slug,
+): ExistingNote[] => {
+  if (!graph.indexes.backlinks.has(fileSlug)) {
+    return [];
+  }
+
+  return notes.filter((note: ExistingNote) => {
+    return graph.indexes.backlinks.get(fileSlug)!.has(note.meta.slug);
+  });
+};
+
+
 export {
   getNotesWithDuplicateUrls,
   getNotesThatContainTokens,
@@ -269,4 +284,5 @@ export {
   getNotesWithMediaTypes,
   getNotesWithKeyValue,
   getNotesWithFlag,
+  getNotesWithLinkToSlug,
 };
