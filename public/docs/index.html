@@ -817,6 +817,19 @@ Array.from(redLinks.entries())
   });
   </pre>
 
+
+  <h2>Known issues</h2>
+
+  <h3>Browsers installed with Flatpak</h3>
+  <p>
+    On Linux, we do not recommend to use NENO with a browser installed via Flatpak.
+    In our tests, Chrome lacked necessary permissions to access files in the
+    local user
+    directory to access PWAs, but more importantly, performance of loading
+    a graph folder from disk is very slow compared to a Chrome installation
+    via the RPM file provided by Google.
+  </p>
+
   <h2>Acknowledgements</h2>
   <p>
     NENO's primitives are inspired by the work of the
