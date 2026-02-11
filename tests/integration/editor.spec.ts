@@ -1304,4 +1304,95 @@ bar`);
       expect(selection).toBe(1);
     },
   );
+
+  test(
+    "copy and paste selected list item should work correctly",
+    async ({ page }) => {
+
+      await page.keyboard.type("- a", { delay: 100 });
+      // select the whole line
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
+
+      // Dispatch synthetic copy then paste events to bypass headless
+      // Playwright clipboard limitations. Lexical's copy handler populates
+      // the DataTransfer, which we then replay in a paste event.
+      await page.evaluate(() => {
+        const editor = document.querySelector(
+          "[data-lexical-editor]",
+        )!;
+        const copyDt = new DataTransfer();
+        const copyEvent = new ClipboardEvent("copy", {
+          bubbles: true,
+          cancelable: true,
+          clipboardData: copyDt,
+        });
+        editor.dispatchEvent(copyEvent);
+
+        const pasteDt = new DataTransfer();
+        for (const type of copyDt.types) {
+          pasteDt.setData(type, copyDt.getData(type));
+        }
+        const pasteEvent = new ClipboardEvent("paste", {
+          bubbles: true,
+          cancelable: true,
+          clipboardData: pasteDt,
+        });
+        editor.dispatchEvent(pasteEvent);
+      });
+
+      const paragraphChildren = page.locator(
+        "div[data-lexical-editor] .editor-paragraph:nth-child(1) > *",
+      );
+
+      expect(paragraphChildren).toHaveCount(2);
+      expect(await paragraphChildren.nth(0).innerText())
+        .toBe("- ");
+      expect(await paragraphChildren.nth(1).innerText())
+        .toBe("a");
+
+      // After paste, selection should be collapsed (standard editor behavior).
+      // Verify by typing – the character should append, not replace.
+      await page.keyboard.type("b", { delay: 100 });
+
+      expect(paragraphChildren).toHaveCount(2);
+      expect(await paragraphChildren.nth(1).innerText())
+        .toBe("ab");
+    },
+  );
+
+  test(
+    "paste into middle of list item should work correctly",
+    async ({ page }) => {
+      await page.keyboard.type("- ac", { delay: 100 });
+      // Move cursor between "a" and "c"
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+
+      // Paste "b" via synthetic clipboard events
+      await page.evaluate(() => {
+        const editor = document.querySelector(
+          "[data-lexical-editor]",
+        )!;
+        const pasteDt = new DataTransfer();
+        pasteDt.setData("text/plain", "b");
+        const pasteEvent = new ClipboardEvent("paste", {
+          bubbles: true,
+          cancelable: true,
+          clipboardData: pasteDt,
+        });
+        editor.dispatchEvent(pasteEvent);
+      });
+
+      const paragraphChildren = page.locator(
+        "div[data-lexical-editor] .editor-paragraph:nth-child(1) > *",
+      );
+
+      expect(paragraphChildren).toHaveCount(2);
+      expect(await paragraphChildren.nth(0).innerText())
+        .toBe("- ");
+      expect(await paragraphChildren.nth(1).innerText())
+        .toBe("abc");
+    },
+  );
 });

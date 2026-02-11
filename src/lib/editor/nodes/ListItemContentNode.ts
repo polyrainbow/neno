@@ -2,12 +2,12 @@ import type {
   EditorConfig,
   LexicalNode,
   NodeKey,
+  RangeSelection,
   SerializedParagraphNode,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
 import {
   $applyNodeReplacement,
-  $createParagraphNode,
   ElementNode,
   ParagraphNode,
 } from "lexical";
@@ -56,9 +56,13 @@ export class ListItemContentNode extends ElementNode {
     return true;
   }
 
-  insertNewAfter(): null | LexicalNode {
-    const p = $createParagraphNode();
-    return p;
+  insertNewAfter(
+    _selection?: RangeSelection,
+    restoreSelection?: boolean,
+  ): null | LexicalNode {
+    const newContentNode = new ListItemContentNode();
+    this.insertAfter(newContentNode, restoreSelection);
+    return newContentNode;
   }
 
   canInsertTextBefore(): boolean {
