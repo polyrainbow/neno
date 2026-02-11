@@ -32,7 +32,9 @@ const listItemNodeNormalizationTransform = (liNode: ListItemNode): void => {
   const firstChild = liNode.getFirstChild();
   if (!firstChild) return;
   if (!(firstChild instanceof TextNode)) return;
-  if ($isListItemSigilNode(firstChild)) return;
+  if (
+    $isListItemSigilNode(firstChild) && firstChild.getTextContent() === "- "
+  ) return;
 
   const nodeText = firstChild.getTextContent();
   if (nodeText[0] !== "-" || nodeText[1] !== " ") return;
