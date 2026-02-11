@@ -1,4 +1,5 @@
 import {
+  $createRangeSelection,
   $createTextNode,
   $getSelection,
   $isRangeSelection,
@@ -39,22 +40,77 @@ const listItemNodeNormalizationTransform = (liNode: ListItemNode): void => {
   const nodeText = firstChild.getTextContent();
   if (nodeText[0] !== "-" || nodeText[1] !== " ") return;
 
+  // Save selection info before splitting, so we can restore cursor position
+  // after the transform restructures the node tree.
+  const selection = $getSelection();
+  let savedOffset: number | null = null;
+  if ($isRangeSelection(selection)) {
+    if (selection.anchor.key === firstChild.getKey()) {
+      savedOffset = selection.anchor.offset;
+    } else if (selection.isCollapsed()) {
+      // The anchor might reference an orphaned node with identical text
+      // (e.g., from a paste that triggered restoreSigil, where Lexical's
+      // internal selection management reverted the key after replace).
+      try {
+        const anchorNode = selection.anchor.getNode();
+        if (
+          $isTextNode(anchorNode)
+          && anchorNode.getTextContent() === nodeText
+        ) {
+          savedOffset = selection.anchor.offset;
+        }
+      } catch {
+        // Node was removed from tree, use anchor.offset directly since
+        // the text content was the same before removal
+        savedOffset = selection.anchor.offset;
+      }
+    }
+  }
+
   const newNodes = firstChild.splitText(2);
   if (newNodes.length === 0) return;
   const firstNewNode = newNodes[0];
   const sigilNode = new ListItemSigilNode("- ");
   firstNewNode.replace(sigilNode);
 
-  const contentNode = new ListItemContentNode();
-  contentNode.append(...liNode.getChildren().slice(1).filter((child) => {
+  // Collect children to move before inserting the content node, so that
+  // transclusion filtering uses the correct index range.
+  const childrenToMove = liNode.getChildren().slice(1).filter((child) => {
     // Don't take transclusions into the content node
     return !$isTransclusionNode(child);
-  }));
+  });
 
+  const contentNode = new ListItemContentNode();
   // There might be existing transclusions in the list item node, so we should
   // keep them at the end and insert the content node before them, that means
   // directly after the sigil node.
   sigilNode.insertAfter(contentNode);
+  contentNode.append(...childrenToMove);
+
+  // Restore cursor into the content node when it was in the content portion
+  // of the original text (offset > 2). splitText + replace + reparenting can
+  // lose the selection reference.
+  if (
+    savedOffset !== null
+    && savedOffset > 2
+    && $isRangeSelection(selection)
+  ) {
+    const contentChild = contentNode.getFirstChild();
+    if (contentChild) {
+      const targetOffset = Math.min(
+        savedOffset - 2,
+        contentChild.getTextContentSize(),
+      );
+      // Use $setSelection with a brand new selection to ensure Lexical's DOM
+      // reconciler picks up the change. Modifying the existing selection
+      // object via anchor.set/focus.set can be reverted by Lexical's internal
+      // selection management between transform passes.
+      const newSelection = $createRangeSelection();
+      newSelection.anchor.set(contentChild.getKey(), targetOffset, "text");
+      newSelection.focus.set(contentChild.getKey(), targetOffset, "text");
+      $setSelection(newSelection);
+    }
+  }
 };
 
 // same as above, but from sigil's perspective, if content node gets lost
@@ -75,16 +131,47 @@ const restoreSigil = (licNode: ListItemContentNode) => {
   if (!$isListItemNode(parent)) return;
 
   if (parent.getFirstChild() === licNode) {
+    // Check whether the cursor is inside the content node's subtree.
+    // If so, save the offset relative to the content's full text so we can
+    // transfer it to the replacement sigil node. Without this, the selection
+    // would reference destroyed child nodes after the replace.
+    const selection = $getSelection();
+    let savedOffset: number | null = null;
+
+    if ($isRangeSelection(selection)) {
+      const anchorNode = selection.anchor.getNode();
+      if (licNode.isParentOf(anchorNode)) {
+        // Calculate text offset from start of content node to cursor position.
+        let offset = selection.anchor.offset;
+        if ($isTextNode(anchorNode)) {
+          let preceding = anchorNode.getPreviousSibling();
+          while (preceding) {
+            offset += preceding.getTextContentSize();
+            preceding = preceding.getPreviousSibling();
+          }
+        }
+        savedOffset = offset;
+      }
+    }
+
     const sigilNode = licNode.replace(
       new ListItemSigilNode(licNode.getTextContent()),
     );
-    /*
-      This transform usually happens when a list item is moved to another line,
-      which happens when pressing enter at beginning of list item.
-      With current transformation setup, we have to restore the selection
-      manually.
-    */
-    sigilNode.selectStart();
+
+    if (savedOffset !== null && $isRangeSelection(selection)) {
+      // Transfer cursor position onto the new sigil node.
+      // The normalization transform will later re-split the sigil and
+      // move the cursor into the content portion.
+      selection.anchor.set(sigilNode.getKey(), savedOffset, "text");
+      selection.focus.set(sigilNode.getKey(), savedOffset, "text");
+    } else {
+      /*
+        This branch handles the case when a list item is moved to another line
+        (pressing enter at beginning of list item). With the current
+        transformation setup, we have to restore the selection manually.
+      */
+      sigilNode.selectStart();
+    }
   }
 };
 

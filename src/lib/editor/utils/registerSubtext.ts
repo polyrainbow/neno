@@ -86,6 +86,19 @@ function onPasteForPlainText(
 
       if (clipboardData !== null && $isRangeSelection(selection)) {
         $insertDataTransferForPlainText(clipboardData, selection);
+        // Standard editor behavior: collapse selection after paste so the
+        // cursor sits at the end of the inserted content.
+        const postPasteSelection = $getSelection();
+        if (
+          $isRangeSelection(postPasteSelection)
+          && !postPasteSelection.isCollapsed()
+        ) {
+          postPasteSelection.anchor.set(
+            postPasteSelection.focus.key,
+            postPasteSelection.focus.offset,
+            postPasteSelection.focus.type,
+          );
+        }
       }
     },
     {

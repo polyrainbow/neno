@@ -1308,6 +1308,7 @@ bar`);
   test(
     "copy and paste selected list item should work correctly",
     async ({ page }) => {
+
       await page.keyboard.type("- a", { delay: 100 });
       // select the whole line
       await page.keyboard.press("Shift+ArrowLeft", { delay: 100 });
@@ -1350,6 +1351,14 @@ bar`);
         .toBe("- ");
       expect(await paragraphChildren.nth(1).innerText())
         .toBe("a");
+
+      // After paste, selection should be collapsed (standard editor behavior).
+      // Verify by typing – the character should append, not replace.
+      await page.keyboard.type("b", { delay: 100 });
+
+      expect(paragraphChildren).toHaveCount(2);
+      expect(await paragraphChildren.nth(1).innerText())
+        .toBe("ab");
     },
   );
 });
