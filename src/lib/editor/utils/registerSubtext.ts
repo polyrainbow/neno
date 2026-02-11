@@ -85,7 +85,24 @@ function onPasteForPlainText(
           : event.clipboardData;
 
       if (clipboardData !== null && $isRangeSelection(selection)) {
-        $insertDataTransferForPlainText(clipboardData, selection);
+        const text = clipboardData.getData("text/plain")
+          || clipboardData.getData("text/uri-list");
+
+        if (text !== null && text !== undefined) {
+          if (selection.isCollapsed() && !/[\n\r\t]/.test(text)) {
+            // Single-line text at a collapsed cursor: use insertText directly.
+            // This avoids the insertNodes → $removeTextAndSplitBlock path which
+            // incorrectly splits inline element nodes (e.g.
+            // ListItemContentNode) and loses trailing text.
+            selection.insertText(text);
+          } else {
+            // Non-collapsed selection or multi-line/tabbed content: use
+            // Lexical's data transfer insertion which handles paragraph
+            // splitting and selection replacement correctly.
+            $insertDataTransferForPlainText(clipboardData, selection);
+          }
+        }
+
         // Standard editor behavior: collapse selection after paste so the
         // cursor sits at the end of the inserted content.
         const postPasteSelection = $getSelection();

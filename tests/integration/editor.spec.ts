@@ -1361,4 +1361,38 @@ bar`);
         .toBe("ab");
     },
   );
+
+  test(
+    "paste into middle of list item should work correctly",
+    async ({ page }) => {
+      await page.keyboard.type("- ac", { delay: 100 });
+      // Move cursor between "a" and "c"
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+
+      // Paste "b" via synthetic clipboard events
+      await page.evaluate(() => {
+        const editor = document.querySelector(
+          "[data-lexical-editor]",
+        )!;
+        const pasteDt = new DataTransfer();
+        pasteDt.setData("text/plain", "b");
+        const pasteEvent = new ClipboardEvent("paste", {
+          bubbles: true,
+          cancelable: true,
+          clipboardData: pasteDt,
+        });
+        editor.dispatchEvent(pasteEvent);
+      });
+
+      const paragraphChildren = page.locator(
+        "div[data-lexical-editor] .editor-paragraph:nth-child(1) > *",
+      );
+
+      expect(paragraphChildren).toHaveCount(2);
+      expect(await paragraphChildren.nth(0).innerText())
+        .toBe("- ");
+      expect(await paragraphChildren.nth(1).innerText())
+        .toBe("abc");
+    },
+  );
 });
