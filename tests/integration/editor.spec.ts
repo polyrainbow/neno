@@ -578,6 +578,18 @@ test.describe("Editor view", () => {
   );
 
   test(
+    "enable URLs with dollar signs",
+    async ({ page }) => {
+      const URL = "https://example.com/#a$b";
+      await page.keyboard.type(URL);
+
+      const link = page.locator("div[data-lexical-editor] .editor-paragraph a");
+
+      expect(await link.getAttribute("href")).toBe(URL);
+    },
+  );
+
+  test(
     "select all command works with URL",
     async ({ page }) => {
       await page.keyboard.type("http://example.com");
