@@ -708,19 +708,22 @@ describe("Notes module", () => {
   );
 
   it(
-    "should sluggify umlauts with combining diacritical marks correctly",
+    "should NFC-normalize umlauts with combining diacritical marks",
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());
 
       const readable1 = getNewTestFileReadable("foobar");
 
+      // Filename with NFD ö (o + combining diacritical mark)
       const fileInfo = await notesProvider.addFile(
         readable1,
         "files",
-        "ö.txt", // <-- ö with combining diacritical mark
+        "o\u0308.txt",
       );
 
-      expect(fileInfo.slug).toBe("files/ö.txt");
+      // Slug should be NFC-normalized
+      expect(fileInfo.slug).toBe("files/\u00F6.txt");
+      expect(fileInfo.slug).toBe(fileInfo.slug.normalize("NFC"));
     },
   );
 
