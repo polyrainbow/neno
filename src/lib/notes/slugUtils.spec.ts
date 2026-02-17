@@ -61,6 +61,17 @@ describe("sluggifyNoteText", () => {
     },
   );
 
+  it(
+    "should NFC-normalize slugs from NFD input",
+    () => {
+      // "ä" in NFD (a + combining diaeresis)
+      const nfdInput = "Der \u0041\u0308ther";
+      const slug = sluggifyNoteText(nfdInput);
+      expect(slug).toBe("der-\u00E4ther");
+      expect(slug).toBe(slug.normalize("NFC"));
+    },
+  );
+
 
   describe("sluggifyWikilinkText", () => {
     it(
@@ -106,6 +117,17 @@ describe("sluggifyNoteText", () => {
         ).toBe(
           "underscores-are-valid_chars",
         );
+      },
+    );
+
+    it(
+      "should NFC-normalize slugs from NFD input",
+      () => {
+        // "ä" in NFD (a + combining diaeresis)
+        const nfdInput = "Der \u0041\u0308ther";
+        const slug = sluggifyWikilinkText(nfdInput);
+        expect(slug).toBe("der-\u00E4ther");
+        expect(slug).toBe(slug.normalize("NFC"));
       },
     );
   });
@@ -156,6 +178,38 @@ describe("sluggifyNoteText", () => {
         expect(getSlugsFromInlineText(inlineText)).toStrictEqual(
           ["files/slashlink-to-file"],
         );
+      },
+    );
+
+    it(
+      "should NFC-normalize slugs from NFD slashlinks",
+      () => {
+        // "bär" in NFD (a + combining diaeresis)
+        const inlineText: InlineText = [
+          {
+            text: "/files/b\u0061\u0308r.jpg",
+            type: SpanType.SLASHLINK,
+          },
+        ];
+        const slugs = getSlugsFromInlineText(inlineText);
+        expect(slugs).toStrictEqual(["files/b\u00E4r.jpg"]);
+        expect(slugs[0]).toBe(slugs[0].normalize("NFC"));
+      },
+    );
+
+    it(
+      "should NFC-normalize slugs from NFD wikilinks",
+      () => {
+        // "Bär" in NFD (a + combining diaeresis)
+        const inlineText: InlineText = [
+          {
+            text: "[[B\u0061\u0308r]]",
+            type: SpanType.WIKILINK,
+          },
+        ];
+        const slugs = getSlugsFromInlineText(inlineText);
+        expect(slugs).toStrictEqual(["b\u00E4r"]);
+        expect(slugs[0]).toBe(slugs[0].normalize("NFC"));
       },
     );
   });

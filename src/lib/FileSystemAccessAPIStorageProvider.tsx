@@ -269,7 +269,7 @@ implements StorageProvider {
 
     const directoryNames = values
       .filter((value) => value.kind === "directory")
-      .map((dirHandle) => dirHandle.name);
+      .map((dirHandle) => dirHandle.name.normalize("NFC"));
 
     return directoryNames;
   }
@@ -285,13 +285,14 @@ implements StorageProvider {
     // @ts-ignore not correctly typed
     for await (const handle of dirHandle.values()) {
       if (handle.kind === "file") {
-        filenames.push(handle.name);
+        filenames.push(handle.name.normalize("NFC"));
       } else {
+        const normalizedDirName = handle.name.normalize("NFC");
         const filesInSubFolder = await this.#getFilenamesInFolder(
-          this.#joinPath(folderPath, handle.name),
+          this.#joinPath(folderPath, normalizedDirName),
         );
         const requestPaths = filesInSubFolder.map(filename => {
-          return this.#joinPath(handle.name, filename);
+          return this.#joinPath(normalizedDirName, filename);
         });
         filenames.push(...requestPaths);
       }
@@ -341,7 +342,7 @@ implements StorageProvider {
         sum += fileSize;
       } else {
         const folderSize = await this.#getFolderSize(
-          this.#joinPath(folderPath, handle.name),
+          this.#joinPath(folderPath, handle.name.normalize("NFC")),
         );
         sum += folderSize;
       }

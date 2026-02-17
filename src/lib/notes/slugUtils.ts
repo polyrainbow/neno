@@ -32,6 +32,8 @@ const trimSlug = (slug: string): string => {
 */
 const sluggifyWikilinkText = (text: string): string => {
   const slug = text
+    // Normalize to NFC to ensure canonical equivalence
+    .normalize("NFC")
     // Trim leading/trailing whitespace
     .trim()
     // remove invalid chars
@@ -54,6 +56,8 @@ const sluggifyWikilinkText = (text: string): string => {
 // should be used for uploaded files, but not for note content or note slugs.
 const sluggifyFilename = (text: string): string => {
   const slug = text
+    // Normalize to NFC to ensure canonical equivalence
+    .normalize("NFC")
     // Trim leading/trailing whitespace
     .trim()
     // remove invalid chars
@@ -79,6 +83,8 @@ const sluggifyFilename = (text: string): string => {
 */
 const sluggifyNoteText = (text: string): string => {
   const slug = text
+    // Normalize to NFC to ensure canonical equivalence
+    .normalize("NFC")
     // Trim leading/trailing whitespace
     .trim()
     // remove invalid chars
@@ -137,7 +143,7 @@ const getSlugsFromInlineText = (text: InlineText): Slug[] => {
     },
   ).map((span: Span): Slug => {
     if (span.type === SpanType.SLASHLINK) {
-      return span.text.substring(1);
+      return span.text.substring(1).normalize("NFC");
     } else {
       return sluggifyWikilinkText(span.text.substring(2, span.text.length - 2));
     }

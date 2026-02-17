@@ -88,6 +88,7 @@ export default class NotesProvider {
       includeParsedContent?: boolean,
     },
   ): Promise<NoteToTransmit> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
 
     const canonicalSlug = graph.aliases.get(slug) || slug;
@@ -131,6 +132,7 @@ export default class NotesProvider {
   async getRawNote(
     slug: Slug,
   ): Promise<string> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
     const canonicalSlug = graph.aliases.get(slug) || slug;
     return this.#io.getRawNote(canonicalSlug);
@@ -222,6 +224,7 @@ export default class NotesProvider {
   async remove(
     slug: Slug,
   ): Promise<void> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
     if (!graph.notes.has(slug)) {
       throw new Error(ErrorMessage.NOTE_NOT_FOUND);
@@ -317,6 +320,7 @@ export default class NotesProvider {
     readable: ReadableStream,
     slug: Slug,
   ): Promise<FileInfo> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
     const fileInfo = graph.files.get(slug);
 
@@ -344,6 +348,8 @@ export default class NotesProvider {
     newSlug: Slug,
     updateReferences: boolean,
   ): Promise<FileInfo> {
+    oldSlug = oldSlug.normalize("NFC");
+    newSlug = newSlug.normalize("NFC");
     const graph = await this.#io.getGraph();
     const fileInfo = graph.files.get(oldSlug);
 
@@ -429,6 +435,7 @@ export default class NotesProvider {
   async deleteFile(
     slug: Slug,
   ): Promise<void> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
     if (!graph.files.has(slug)) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
@@ -473,6 +480,7 @@ export default class NotesProvider {
     slug: Slug,
     range?: ByteRange,
   ): Promise<ReadableStream> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
     if (!graph.files.has(slug)) {
       throw new Error(ErrorMessage.FILE_NOT_FOUND);
@@ -492,6 +500,7 @@ export default class NotesProvider {
   async getFileInfo(
     slug: Slug,
   ): Promise<FileInfo> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
     const fileInfo = graph.files.get(slug);
     if (!fileInfo) {
@@ -525,6 +534,7 @@ export default class NotesProvider {
   async pin(
     slug: Slug,
   ): Promise<NoteToTransmit[]> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
 
     if (!graph.notes.has(slug)) {
@@ -556,6 +566,7 @@ export default class NotesProvider {
     slug: Slug,
     offset: number,
   ): Promise<NoteToTransmit[]> {
+    slug = slug.normalize("NFC");
     const graph = await this.#io.getGraph();
 
     const oldPins = graph.pinnedNotes;
@@ -588,6 +599,7 @@ export default class NotesProvider {
   async unpin(
     slugToRemove: Slug,
   ): Promise<NoteToTransmit[]> {
+    slugToRemove = slugToRemove.normalize("NFC");
     const graph = await this.#io.getGraph();
 
     let updatePins = false;
