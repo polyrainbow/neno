@@ -46,3 +46,7 @@
     }
   }
 }
+
+.tooltip.nav-rail-tooltip:popover-open {
+  position-area: center end;
+}

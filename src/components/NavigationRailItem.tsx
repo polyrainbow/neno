@@ -30,6 +30,7 @@ const NavigationRailItem = ({
       icon={icon}
       title={label}
       id={id}
+      navRailButton
     />
   </div>;
 };

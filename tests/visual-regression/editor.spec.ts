@@ -307,11 +307,7 @@ test.describe("Editor", () => {
       .locator("span")
       .waitFor();
 
-    await page.evaluate(() => {
-      const note = document.querySelector(".note")!;
-      note.scrollTo(0, note.scrollHeight);
-    });
-    expect(await page.locator(".note").screenshot())
+    expect(await page.locator("#stats").screenshot())
       .toMatchSnapshot("editor-note-stats-with-files-light.png");
   });
 

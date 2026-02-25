@@ -9,6 +9,7 @@ interface IconButtonProps {
   onClick: () => void,
   disabled?: boolean,
   disableTooltip?: boolean,
+  navRailButton?: boolean,
 }
 
 const IconButton = ({
@@ -18,6 +19,7 @@ const IconButton = ({
   onClick,
   disabled = false,
   disableTooltip = false,
+  navRailButton = false,
 }: IconButtonProps) => {
   const ref = useRef<HTMLButtonElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
@@ -28,7 +30,10 @@ const IconButton = ({
     const showPopover = () => {
       const popoverElement = document.createElement("div");
       popoverElement.popover = "auto";
-      popoverElement.className = "tooltip";
+      popoverElement.classList.add("tooltip");
+      if (navRailButton) {
+        popoverElement.classList.add("nav-rail-tooltip");
+      }
       document.body.appendChild(popoverElement);
       popoverElement.innerHTML = title;
       popoverElement.showPopover();
