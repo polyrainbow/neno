@@ -717,27 +717,24 @@ test.describe("Editor view", () => {
     },
   );
 
-  /*
-  Fails. https://github.com/facebook/lexical/issues/5882
-
+  // Fix for https://github.com/facebook/lexical/issues/5882
   test(
     "newline should be correctly created when pressing enter within URL",
     async ({ page }) => {
-      await page.keyboard.type("http://example.com");
-      await page.keyboard.press("ArrowLeft");
-      await page.keyboard.press("Enter");
+      await page.keyboard.type("http://example.com", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Enter", { delay: 100 });
 
-      const paragraphs = (
-        await page.$$("div[data-lexical-editor] .editor-paragraph")
-      ) as ElementHandle<HTMLElement>[];
+      const paragraphs = await page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      ).all();
 
-      expect(paragraphs.length).toBe(2);
+      expect(paragraphs).toHaveLength(2);
       expect((await paragraphs[0].innerText()).trim())
         .toBe("http://example.co");
       expect((await paragraphs[1].innerText()).trim()).toBe("m");
     },
   );
-  */
 
 
   test(
