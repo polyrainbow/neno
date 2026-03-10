@@ -16,6 +16,7 @@ import {
   changeSlugReferencesInNote,
   getNoteTitle,
 } from "../notes";
+import subwaytext from "../subwaytext/index.js";
 
 globalThis.getNoteTitle = getNoteTitle;
 globalThis.getAllInlineSpans = getAllInlineSpans;
@@ -71,6 +72,8 @@ const enabledInterfaces = new Set([
   "getNoteTitle",
   "getSlugsFromInlineText",
   "getAllInlineSpans",
+  // programmable notes
+  "thisNote",
 ]);
 
 Object.getOwnPropertyNames( globalThis ).forEach( function( prop ) {
@@ -119,6 +122,14 @@ onmessage = async (event) => {
     }
 
     globalThis.graph = await globalThis.notesProvider.getGraph();
+
+    if (eventData.noteContent !== undefined) {
+      globalThis.thisNote = {
+        slug: eventData.noteSlug || "",
+        content: eventData.noteContent,
+        blocks: subwaytext(eventData.noteContent),
+      };
+    }
 
     try {
       await Object.getPrototypeOf(

@@ -102,7 +102,11 @@ export function BlockTransformPlugin(): null {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
     editor.registerNodeTransform(RootNode, (root: RootNode) => {
-      assignCorrectElementNodes(root.getChildren());
+      const blockNodes = root.getChildren()
+        .filter(
+          (child) => child instanceof ParagraphNode,
+        ) as BlockNode[];
+      assignCorrectElementNodes(blockNodes);
       // Node.replace() sets a composition key, and does not reset it again,
       // so we have to do it manually to not break backspace functionality
       $setCompositionKey(null);
