@@ -65,6 +65,7 @@ const enabledInterfaces = new Set([
   "parseFloat",
   "parseInt",
   "Infinity",
+  "Intl",
   "JSON",
   "Math",
   "NaN",
