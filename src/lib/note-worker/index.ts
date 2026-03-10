@@ -16,10 +16,16 @@ import {
   changeSlugReferencesInNote,
   getNoteTitle,
 } from "../notes";
+import subwaytext from "../subwaytext/index.js";
 
 globalThis.getNoteTitle = getNoteTitle;
 globalThis.getAllInlineSpans = getAllInlineSpans;
 globalThis.getSlugsFromInlineText = getSlugsFromInlineText;
+
+// Capture AsyncFunction constructor before the sandbox locks down globalThis.
+const AsyncFunction = Object.getPrototypeOf(
+  async function() {},
+).constructor;
 
 /*
   Making Worker environment safer
@@ -59,6 +65,7 @@ const enabledInterfaces = new Set([
   "parseFloat",
   "parseInt",
   "Infinity",
+  "Intl",
   "JSON",
   "Math",
   "NaN",
@@ -71,6 +78,8 @@ const enabledInterfaces = new Set([
   "getNoteTitle",
   "getSlugsFromInlineText",
   "getAllInlineSpans",
+  // programmable notes
+  "thisNote",
 ]);
 
 Object.getOwnPropertyNames( globalThis ).forEach( function( prop ) {
@@ -120,10 +129,16 @@ onmessage = async (event) => {
 
     globalThis.graph = await globalThis.notesProvider.getGraph();
 
+    if (eventData.noteContent !== undefined) {
+      globalThis.thisNote = {
+        slug: eventData.noteSlug || "",
+        content: eventData.noteContent,
+        blocks: subwaytext(eventData.noteContent),
+      };
+    }
+
     try {
-      await Object.getPrototypeOf(
-        async function() {},
-      ).constructor(eventData.script)();
+      await new AsyncFunction(eventData.script)();
     } catch (e: Error) {
       globalThis.println(e.toString());
     }

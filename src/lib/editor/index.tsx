@@ -25,6 +25,9 @@ import { InlineCodePlugin } from "./plugins/InlineCodePlugin";
 import { CodeBlockNode } from "./nodes/CodeBlockNode";
 import { BlockTransformPlugin } from "./plugins/BlockTransformPlugin";
 import { QuoteBlockNode } from "./nodes/QuoteBlockNode";
+import { ScriptOutputNode } from "./nodes/ScriptOutputNode";
+import ProgrammableNotePlugin from "./plugins/ProgrammableNotePlugin";
+import { ScriptExecutor } from "./plugins/ProgrammableNotePlugin";
 import { LinkType } from "../../types/LinkType";
 import { UserRequestType } from "./types/UserRequestType";
 import { ListItemNode } from "./nodes/ListItemNode";
@@ -66,6 +69,9 @@ interface EditorProps {
   onUserRequest: (type: UserRequestType, value: string) => void,
   getTransclusionContent: TransclusionContentGetter,
   getLinkAvailability: (link: string, linkType: LinkType) => Promise<boolean>,
+  executeScript?: ScriptExecutor,
+  activeNoteSlug?: string,
+  scriptRefreshTrigger?: number,
 }
 
 export const Editor = ({
@@ -75,6 +81,9 @@ export const Editor = ({
   onUserRequest,
   getTransclusionContent,
   getLinkAvailability,
+  executeScript,
+  activeNoteSlug,
+  scriptRefreshTrigger,
 }: EditorProps) => {
   return <>
     <ContentEditable />
@@ -110,6 +119,14 @@ export const Editor = ({
     <TransclusionPlugin
       getTransclusionContent={getTransclusionContent}
     />
+    {executeScript
+      ? <ProgrammableNotePlugin
+        executeScript={executeScript}
+        activeNoteSlug={activeNoteSlug ?? ""}
+        refreshTrigger={scriptRefreshTrigger ?? 0}
+      />
+      : null
+    }
     <BlockTransformPlugin />
     <NodeEventPlugin
       nodeType={AutoLinkNode}
@@ -179,6 +196,7 @@ const Context = ({
       TransclusionNode,
       InlineCodeNode,
       CodeBlockNode,
+      ScriptOutputNode,
       QuoteBlockNode,
       ListItemNode,
       ListItemSigilNode,

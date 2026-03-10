@@ -38,6 +38,7 @@ import {
 } from "@lexical/react/LexicalComposerContext";
 import { InsertItem } from "../types/InsertItem";
 import { insertItems } from "../lib/editorManipulations";
+import { ScriptExecutor } from "../lib/editor/plugins/ProgrammableNotePlugin";
 
 interface NoteComponentProps {
   editorInstanceId: number,
@@ -66,6 +67,8 @@ interface NoteComponentProps {
     slug: Slug | "random" | "new",
     contentForNewNote?: string,
   ) => Promise<Slug | null>,
+  executeScript?: ScriptExecutor,
+  scriptRefreshTrigger: number,
 }
 
 
@@ -93,6 +96,8 @@ const Note = ({
   onLinkIndicatorClick,
   handleNoteExportRequest,
   loadNote,
+  executeScript,
+  scriptRefreshTrigger,
 }: NoteComponentProps) => {
   const noteElement = useRef<HTMLElement>(null);
   const notesProvider = useNotesProvider();
@@ -327,6 +332,11 @@ const Note = ({
               return getTransclusionContent(slug, note, notesProvider);
             }}
             getLinkAvailability={getLinkAvailability}
+            executeScript={executeScript}
+            activeNoteSlug={
+              "slug" in note ? note.slug : ""
+            }
+            scriptRefreshTrigger={scriptRefreshTrigger}
           />
           <div
             className="note-props"

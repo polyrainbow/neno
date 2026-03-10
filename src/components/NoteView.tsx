@@ -27,6 +27,7 @@ import {
 import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import useRunOnce from "../hooks/useRunOnce";
+import useScriptExecutor from "../hooks/useScriptExecutor";
 import NavigationRail from "./NavigationRail";
 
 
@@ -60,6 +61,9 @@ const NoteView = ({ slug }: NoteViewProps) => {
   const [editor] = useLexicalComposerContext();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
+  const executeScript = useScriptExecutor();
+  const [scriptRefreshTrigger, setScriptRefreshTrigger]
+    = useState(0);
 
   const {
     isBusy,
@@ -131,6 +135,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
     setUploadInProgress(true);
     try {
       await saveActiveNoteAndRefreshViews();
+      setScriptRefreshTrigger((prev) => prev + 1);
     } catch (e) {
       alert(e);
     }
@@ -364,6 +369,8 @@ const NoteView = ({ slug }: NoteViewProps) => {
           }}
           handleNoteExportRequest={handleNoteExportRequest}
           loadNote={loadNote}
+          executeScript={executeScript}
+          scriptRefreshTrigger={scriptRefreshTrigger}
         />
       </div>
     </main>

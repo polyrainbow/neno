@@ -163,21 +163,72 @@ div[data-lexical-editor] {
     margin-bottom: var(--small-gap);
   }
 
+  .script-output-wrapper {
+    user-select: none;
+    font-family: var(--code-font);
+    background-color: var(--accent-color-interactible);
+    border-left: 0.25rem solid var(--link-color);
+    padding: var(--small-interactive-element-padding);
+    margin-bottom: var(--small-gap);
+    font-size: var(--default-font-size);
+    line-height: var(--default-line-height);
+
+    .script-output {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .script-output-copy-button {
+      margin-inline-start: auto;
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      opacity: 0;
+      transition: opacity 0.15s;
+
+      .svg-icon {
+        height: 1.125rem;
+      }
+    }
+
+    .script-output:hover .script-output-copy-button {
+      opacity: 0.7;
+    }
+
+    .script-output-copy-button:hover {
+      opacity: 1 !important;
+    }
+
+    .script-output-content {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+
+    .script-output-status {
+      color: var(--alt-content-color);
+      font-style: italic;
+    }
+  }
+
   /*
-    If a code block is not followed by another, show gap
+    If a code block is not followed by another or a script output, show gap
     Goal: Gap between code blocks and different kinds of blocks
   */
-  .code-block:not(:has(+ .code-block)) {
+  .code-block:not(:has(+ .code-block, + .script-output-wrapper)) {
     margin-bottom: var(--small-gap);
   }
 
   /*
-    Elements that are not a code block but followed by one should have a margin
+    Elements that are not a code block / script output but followed by one
+    should have a margin.
     Goal: Gap between code blocks and different kinds of blocks
     Only p.s-heading already have a margin-bottom by default that should not be
     overridden.
   */
-  :not(.code-block, p.s-heading):has(+ .code-block) {
+  :not(.code-block, .script-output-wrapper, p.s-heading):has(+ .code-block) {
     margin-bottom: var(--small-gap);
   }
 
