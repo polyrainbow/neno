@@ -22,6 +22,11 @@ globalThis.getNoteTitle = getNoteTitle;
 globalThis.getAllInlineSpans = getAllInlineSpans;
 globalThis.getSlugsFromInlineText = getSlugsFromInlineText;
 
+// Capture AsyncFunction constructor before the sandbox locks down globalThis.
+const AsyncFunction = Object.getPrototypeOf(
+  async function() {},
+).constructor;
+
 /*
   Making Worker environment safer
   https://stackoverflow.com/questions/10653809/making-webworkers-a-safe-environment/10796616#10796616
@@ -132,9 +137,7 @@ onmessage = async (event) => {
     }
 
     try {
-      await Object.getPrototypeOf(
-        async function() {},
-      ).constructor(eventData.script)();
+      await new AsyncFunction(eventData.script)();
     } catch (e: Error) {
       globalThis.println(e.toString());
     }
