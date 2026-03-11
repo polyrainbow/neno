@@ -63,6 +63,7 @@ const enabledInterfaces = new Set([
   "Map",
   "Set",
   "Promise",
+  "ReadableStream",
   "Worker",
   // notes provider utils
   "getNoteTitle",
