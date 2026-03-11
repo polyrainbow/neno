@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
-import noteWorkerUrl from "../lib/note-worker/index.js?worker&url";
+import scriptWorkerUrl from "../lib/script-worker/index.js?worker&url";
 import {
-  getActiveFolderHandle,
+  getNotesWorker,
 } from "../lib/LocalDataStorage";
 
 
@@ -12,13 +12,22 @@ const useScriptExecutor = () => {
     = useRef<((output: string) => void) | null>(null);
 
   useEffect(() => {
-    const worker = new Worker(noteWorkerUrl, { type: "module" });
+    const notesWorker = getNotesWorker();
+    if (!notesWorker) return;
+
+    const worker = new Worker(scriptWorkerUrl, { type: "module" });
     workerRef.current = worker;
 
-    worker.postMessage({
-      action: "initialize",
-      folderHandle: getActiveFolderHandle(),
-    });
+    const channel = new MessageChannel();
+    notesWorker.postMessage(
+      { action: "addPort" },
+      [channel.port1],
+    );
+
+    worker.postMessage(
+      { action: "initialize" },
+      [channel.port2],
+    );
 
     worker.onmessage = (e) => {
       if (e.data.type === "INITIALIZED") {

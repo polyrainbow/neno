@@ -4,7 +4,7 @@ import {
 } from "../lib/notes/types/NoteListSortMode";
 import useNoteList from "./useNoteList";
 import NoteListItem from "../lib/notes/types/NoteListItem";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 
 const SORT_MODE_LOCAL_STORAGE_KEY = "NOTE_LIST_SORT_MODE";
 
@@ -28,7 +28,7 @@ interface ControlledNoteList {
 // hook for retrieving graph stats for the application header
 // refreshes only when manually invoked
 export default (
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
 ): ControlledNoteList => {
   const [searchQuery, setSearchQueryState] = useState<string>("");
   const [scrollTop, setScrollTop] = useState<number>(0);

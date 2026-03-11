@@ -23,7 +23,7 @@ import NoteMenuBar from "./NoteMenuBar";
 import BusyIndicator from "./BusyIndicator";
 import NoteBacklinks from "./NoteBacklinks";
 import { Slug } from "../lib/notes/types/Slug";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 import NoteSlug from "./NoteSlug";
 import { UserRequestType } from "../lib/editor/types/UserRequestType";
 import useConfirmDiscardingUnsavedChangesDialog
@@ -131,7 +131,7 @@ const Note = ({
 
 
   const uploadFiles = async (
-    notesProvider: NotesProvider,
+    notesProvider: NotesProviderProxy,
     files: File[],
   ): Promise<FileInfo[]> => {
     setUploadInProgress(true);
@@ -155,7 +155,7 @@ const Note = ({
 
 
   const uploadFilesAndInsertFileSlugsToNote = async (
-    notesProvider: NotesProvider,
+    notesProvider: NotesProviderProxy,
     files: File[],
   ): Promise<void> => {
     const fileInfos = await uploadFiles(notesProvider, files);
@@ -164,7 +164,7 @@ const Note = ({
 
 
   const handleUploadFilesRequest = async () => {
-    if (!notesProvider) throw new Error("NotesProvider not ready");
+    if (!notesProvider) throw new Error("NotesProviderProxy not ready");
     const files = await getFilesFromUserSelection(
       FILE_PICKER_ACCEPT_TYPES,
       true,
@@ -241,7 +241,7 @@ const Note = ({
   return <>
     <NoteMenuBar
       activeNote={note}
-      disableNoteSaving={!NotesProvider.isValidNoteSlugOrEmpty(slugInput)}
+      disableNoteSaving={!NotesProviderProxy.isValidNoteSlugOrEmpty(slugInput)}
       handleNoteSaveRequest={handleNoteSaveRequest}
       removeActiveNote={removeActiveNote}
       unsavedChanges={unsavedChanges}

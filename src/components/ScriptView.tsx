@@ -1,9 +1,9 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import BusyIndicator from "./BusyIndicator";
-import noteWorkerUrl from "../lib/note-worker/index.js?worker&url";
+import scriptWorkerUrl from "../lib/script-worker/index.js?worker&url";
 import {
-  getActiveFolderHandle,
+  getNotesWorker,
 } from "../lib/LocalDataStorage";
 import useRunOnce from "../hooks/useRunOnce";
 import useNotesProvider from "../hooks/useNotesProvider";
@@ -84,14 +84,26 @@ const ScriptView = ({
       return;
     }
 
-    const notesWorker = new Worker(noteWorkerUrl, { type: "module" });
-    notesWorker.postMessage({
-      action: "initialize",
-      folderHandle: getActiveFolderHandle(),
-    });
+    const parentNotesWorker = getNotesWorker();
+    if (!parentNotesWorker) {
+      setError("SCRIPT_NOT_FOUND");
+      return;
+    }
+
+    const scriptWorker = new Worker(scriptWorkerUrl, { type: "module" });
+    const channel = new MessageChannel();
+    parentNotesWorker.postMessage(
+      { action: "addPort" },
+      [channel.port1],
+    );
+    scriptWorker.postMessage(
+      { action: "initialize" },
+      [channel.port2],
+    );
+
     const { promise: workerIsReady, resolve } = Promise.withResolvers<void>();
 
-    notesWorker.onmessage = (e) => {
+    scriptWorker.onmessage = (e) => {
       if (e.data.type === "INITIALIZED") {
         resolve();
       } else if (e.data.type === "EVALUATION_COMPLETED") {
@@ -101,11 +113,11 @@ const ScriptView = ({
     };
 
     await workerIsReady;
-    setWorker(notesWorker);
+    setWorker(scriptWorker);
 
     // check if script should run at startup
     if (location.search.includes("run=true")) {
-      runScript(notesWorker, value);
+      runScript(scriptWorker, value);
     }
   });
 

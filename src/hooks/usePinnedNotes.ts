@@ -1,10 +1,10 @@
 import { useState } from "react";
 import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
 import { Slug } from "../lib/notes/types/Slug";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 
 export default (
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
 ) => {
   const [pinnedNotes, setPinnedNotes] = useState<NoteToTransmit[] | null>(null);
 

@@ -4,7 +4,7 @@ import DatabaseQuery from "../lib/notes/types/DatabaseQuery";
 import {
   NoteListSortMode,
 } from "../lib/notes/types/NoteListSortMode";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 
 type NoteList = [
   NoteListItem[], number, boolean, () => Promise<void>,
@@ -13,7 +13,7 @@ type NoteList = [
 // hook for retrieving graph stats for the application header
 // refreshes only when manually invoked
 export default (
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
   {
     searchQuery,
     sortMode,

@@ -1,21 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @stylistic/max-len */
 // @ts-nocheck
-import FileSystemAccessAPIStorageProvider from "../FileSystemAccessAPIStorageProvider";
-import NotesProvider from "../notes";
+import NotesProviderProxy from "../notes-worker/NotesProviderProxy";
 import {
-  createNoteToTransmit,
-  getNumberOfUnlinkedNotes,
-  parseSerializedNewNote,
-  serializeNewNote,
   getSlugsFromInlineText,
   getAllInlineSpans,
-  handleExistingNoteUpdate,
-  isExistingNoteSaveRequest,
-  handleNewNoteSaveRequest,
-  changeSlugReferencesInNote,
   getNoteTitle,
-} from "../notes";
+} from "../notes/noteUtils";
 import subwaytext from "../subwaytext/index.js";
 
 globalThis.getNoteTitle = getNoteTitle;
@@ -73,6 +63,7 @@ const enabledInterfaces = new Set([
   "Map",
   "Set",
   "Promise",
+  "ReadableStream",
   "Worker",
   // notes provider utils
   "getNoteTitle",
@@ -109,11 +100,8 @@ onmessage = async (event) => {
   const eventData = event.data;
 
   if (eventData.action === "initialize") {
-    const storageProvider = new FileSystemAccessAPIStorageProvider(
-      eventData.folderHandle,
-    );
-    globalThis.notesProvider = new NotesProvider(storageProvider);
-    globalThis.storageProvider = storageProvider;
+    const port = event.ports[0];
+    globalThis.notesProvider = new NotesProviderProxy(port);
     initialized = true;
     postMessage({
       type: "INITIALIZED",

@@ -299,9 +299,17 @@ test.describe("Editor view", () => {
       await page.click("#button_new");
       await page.click(".note-list .note-list-item");
 
-      const paragraphChildren = (await page.$$(
-        "div[data-lexical-editor] .editor-paragraph > *",
-      ))!;
+      const paragraph = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+      // Wait for Lexical to finish rendering wikilink spans before
+      // snapshotting children (page.$$ / .all() do not auto-wait).
+      await expect(
+        paragraph.locator(".wikilink-punctuation"),
+      ).toHaveCount(6);
+
+      const paragraphChildren
+        = await paragraph.locator("> *").all();
 
       expect(await paragraphChildren[0].innerText()).toBe("[[");
       expect(await paragraphChildren[0].getAttribute("class"))
@@ -1222,9 +1230,14 @@ bar`);
       await page.click("#button_new", { delay: 100 });
       await noteListItemLocator.click();
 
-      const nodes = await page.locator(
-        "div[data-lexical-editor] .editor-paragraph:nth-child(2) > *",
-      ).all();
+      const paragraph = page.locator(
+        "div[data-lexical-editor] .editor-paragraph:nth-child(2)",
+      );
+
+      // Wait for inline-code spans to be rendered before asserting
+      await expect(paragraph.locator(".inline-code")).toHaveCount(2);
+
+      const nodes = await paragraph.locator("> *").all();
 
       expect(await nodes[0].getAttribute("class")).toBe("inline-code");
       expect(await nodes[0].textContent()).toBe("`http://*.example.com`");

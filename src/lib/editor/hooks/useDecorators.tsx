@@ -9,7 +9,7 @@
 import type { LexicalEditor } from "lexical";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import * as React from "react";
-import { createPortal, flushSync } from "react-dom";
+import { createPortal } from "react-dom";
 
 type ErrorBoundaryProps = {
   children: React.ReactElement;
@@ -29,11 +29,15 @@ export function useDecorators(
       () => editor.getDecorators<React.ReactElement>(),
     );
 
-  // Subscribe to changes
+  // Subscribe to changes. Deferred via queueMicrotask to avoid
+  // "flushSync called from inside a lifecycle method" when a Lexical
+  // update (e.g. script output) triggers decorator changes during a
+  // React render cycle. Microtasks run before the next paint, so
+  // there is no visible flicker.
   React.useLayoutEffect(() => {
     return editor.registerDecoratorListener<React.ReactElement>(
       (nextDecorators) => {
-        flushSync(() => {
+        queueMicrotask(() => {
           setDecorators(nextDecorators);
         });
       },

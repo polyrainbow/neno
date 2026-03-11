@@ -16,7 +16,8 @@ import useHeaderStats from "../hooks/useHeaderStats";
 import useActiveNote from "../hooks/useActiveNote";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { Slug } from "../lib/notes/types/Slug";
-import NotesProvider, { getNoteTitle } from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
+import { getNoteTitle } from "../lib/notes";
 import { Context } from "../lib/editor";
 import useGoToNote from "../hooks/useGoToNote";
 import { PathTemplate } from "../types/PathTemplate";
@@ -166,7 +167,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
 
   useKeyboardShortcuts({
     onSave: () => {
-      if (!NotesProvider.isValidNoteSlugOrEmpty(slugInput)) {
+      if (!NotesProviderProxy.isValidNoteSlugOrEmpty(slugInput)) {
         return;
       }
       handleNoteSaveRequest();

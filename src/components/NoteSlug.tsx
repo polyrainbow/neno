@@ -1,5 +1,5 @@
 import ActiveNote from "../types/ActiveNote";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 import NoteSlugUpdateReferencesToggle from "./NoteSlugUpdateReferencesToggle";
 import { l } from "../lib/intl";
 import Icon from "./Icon";
@@ -48,7 +48,7 @@ const NoteSlug = ({
         className={
           "note-slug "
           + (
-            !NotesProvider.isValidNoteSlugOrEmpty(slugInput)
+            !NotesProviderProxy.isValidNoteSlugOrEmpty(slugInput)
               ? "invalid"
               : ""
           )
@@ -111,7 +111,7 @@ const NoteSlug = ({
         }}
       />
       {
-        !NotesProvider.isValidNoteSlugOrEmpty(slugInput)
+        !NotesProviderProxy.isValidNoteSlugOrEmpty(slugInput)
           ? <div className="note-slug-validation-error">
             {l("note.slug.invalid-slug").toLocaleUpperCase()}
           </div>
@@ -121,7 +121,7 @@ const NoteSlug = ({
         (
           "slug" in note
           && note.slug !== slugInput
-          && NotesProvider.isValidSlug(slugInput)
+          && NotesProviderProxy.isValidSlug(slugInput)
         )
           ? <NoteSlugUpdateReferencesToggle
             isActivated={updateReferences}
@@ -154,7 +154,7 @@ const NoteSlug = ({
             className={
               "note-slug "
               + (
-                !NotesProvider.isValidNoteSlugOrEmpty(slugInput)
+                !NotesProviderProxy.isValidNoteSlugOrEmpty(slugInput)
                   ? "invalid"
                   : ""
               )
@@ -234,7 +234,7 @@ const NoteSlug = ({
             }}
           />
           {
-            !NotesProvider.isValidNoteSlugOrEmpty(slugAlias)
+            !NotesProviderProxy.isValidNoteSlugOrEmpty(slugAlias)
               ? <div className="note-slug-validation-error">
                 {l("note.slug.invalid-slug").toLocaleUpperCase()}
               </div>

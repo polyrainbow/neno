@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { getLines } from "./utils";
 import { getNoteTitle, removeWikilinkPunctuation } from "./notes/noteUtils";
 import ActiveNote from "../types/ActiveNote";
-import NotesProvider from "./notes";
+import NotesProviderProxy from "./notes-worker/NotesProviderProxy";
 import { Slug } from "./notes/types/Slug";
 import { getMediaTypeFromFilename } from "./notes/utils";
 import { MediaType } from "./notes/types/MediaType";
@@ -60,7 +60,7 @@ export const getNoteTransclusionContent = (
 export const getTransclusionContent = async (
   slug: Slug,
   note: ActiveNote,
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
 ): Promise<ReactElement> => {
   if (!slug) {
     throw new Error("INVALID_FILE_SLUG");

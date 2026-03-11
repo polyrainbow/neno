@@ -50,7 +50,8 @@ src/
     notes/                    # Core module: CRUD, graph, indexing, search
       types/                  #   Note, graph, and relationship types
     subwaytext/               # Subtext parser & serializer
-    note-worker/              # Web Worker for background processing
+    notes-worker/             # Dedicated worker hosting NotesProvider
+    script-worker/            # Sandboxed worker for user script execution
     FileSystemAccessAPIStorageProvider.tsx
                               # File System Access API integration
   types/                      # Shared TypeScript types
@@ -70,6 +71,54 @@ src/
 - **StorageProvider** (`src/lib/FileSystemAccessAPIStorageProvider.tsx`) —
   Wraps the browser FileSystemDirectoryHandle API. The Notes module uses
   this to read/write the user's file system.
+
+### Worker architecture
+
+All note data lives in a single dedicated **notes worker** thread.
+The main thread and script workers never instantiate `NotesProvider`
+directly — they use `NotesProviderProxy`, which forwards every method
+call as an RPC message and returns a Promise for the result.
+
+```
+Main Thread (UI)              Notes Worker              Script Worker
+┌──────────────┐            ┌──────────────┐          ┌──────────────┐
+│ Proxy (RPC)  │──postMsg──▶│ NotesProvider │◀──port──│ Proxy (RPC)  │
+│              │◀──postMsg──│ (single)      │──port──▶│ Script eval  │
+└──────────────┘            └──────────────┘          └──────────────┘
+```
+
+**Why:** A single `NotesProvider` instance means a single in-memory
+graph cache. Before this design, each thread had its own instance and
+its own cache, so changes made in one thread were invisible to the
+others until a full disk re-read.
+
+**How it connects:**
+
+1. `LocalDataStorage.initializeNotesProvider()` spawns the notes
+   worker and creates a `NotesProviderProxy` that the React app uses
+   via `NotesProviderContext`.
+2. When a script worker is needed (`useScriptExecutor`, `ScriptView`),
+   the main thread creates a `MessageChannel`, sends one port to the
+   notes worker (`addPort` action) and the other to the script worker
+   (`initialize` action). The script worker wraps its port in another
+   `NotesProviderProxy`.
+3. `ReadableStream` arguments and return values are automatically
+   transferred (not cloned) across the boundary.
+
+**Key files:**
+
+| File | Role |
+|---|---|
+| `src/lib/notes-worker/index.ts` | Worker that owns `NotesProvider`; handles RPC + `MessagePort` clients |
+| `src/lib/notes-worker/NotesProviderProxy.ts` | Proxy with the same public API as `NotesProvider`; sends RPC over `Worker` or `MessagePort` |
+| `src/lib/script-worker/index.ts` | Sandboxed script execution worker; receives a `MessagePort` to the notes worker |
+| `src/lib/LocalDataStorage.ts` | Creates the notes worker, exposes `getNotesWorker()` for `MessageChannel` setup |
+
+**Gotcha — `MessagePort.start()`:** When listening on a `MessagePort`
+with `addEventListener` (as opposed to setting `onmessage`), the port
+must be explicitly started with `port.start()`. The proxy handles this
+automatically. There is a regression test in
+`NotesProviderProxy.spec.ts`.
 
 ## Tests
 
