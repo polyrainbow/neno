@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 import NoteContentBlockActions from "./NoteContentBlockActions";
 import { getObjectUrlForArbitraryGraphFile } from "../lib/LocalDataStorage";
 
 interface NoteContentBlockTextFileProps {
   file: FileInfo,
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
 }
 
 

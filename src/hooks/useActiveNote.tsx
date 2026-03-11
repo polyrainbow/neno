@@ -16,7 +16,7 @@ import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import { Slug } from "../lib/notes/types/Slug";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 import {
   NOTE_FILE_DESCRIPTION,
   NOTE_FILE_EXTENSION,
@@ -25,7 +25,7 @@ import {
 import { exportNote } from "../lib/FrontendFunctions";
 
 export default (
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
 ) => {
   const [unsavedChanges, setUnsavedChanges]
     = useContext(UnsavedChangesContext);
@@ -133,13 +133,13 @@ export default (
         },
         // for new notes, use slug input if available. for existing notes, use
         // slug input only if it's different from the current slug.
-        changeSlugTo: NotesProvider.isValidSlug(slugInput)
+        changeSlugTo: NotesProviderProxy.isValidSlug(slugInput)
           ? slugInput
           : undefined,
         aliases: new Set(displayedSlugAliases.filter((a) => {
           return a !== slugInput
             && a.trim().length > 0
-            && NotesProvider.isValidSlug(a);
+            && NotesProviderProxy.isValidSlug(a);
         })),
       };
     } else {
@@ -157,16 +157,16 @@ export default (
         // for new notes, use slug input if available. for existing notes, use
         // slug input only if it's different from the current slug.
         changeSlugTo: slugInput !== activeNote.slug
-          && NotesProvider.isValidSlug(slugInput)
+          && NotesProviderProxy.isValidSlug(slugInput)
           ? slugInput
           : undefined,
         updateReferences: slugInput !== activeNote.slug
-          && NotesProvider.isValidSlug(slugInput)
+          && NotesProviderProxy.isValidSlug(slugInput)
           && updateReferences,
         aliases: new Set(displayedSlugAliases.filter((a) => {
           return a !== slugInput
             && a.trim().length > 0
-            && NotesProvider.isValidSlug(a);
+            && NotesProviderProxy.isValidSlug(a);
         })),
       };
     }
@@ -174,7 +174,7 @@ export default (
 
 
   const saveActiveNote = async (): Promise<NoteToTransmit> => {
-    if (!NotesProvider.isValidNoteSlugOrEmpty(slugInput)) {
+    if (!NotesProviderProxy.isValidNoteSlugOrEmpty(slugInput)) {
       throw new Error("Tried saving an invalid slug. This should not happen!");
     }
 

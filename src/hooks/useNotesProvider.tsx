@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import NotesProviderContext from "../contexts/NotesProviderContext";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 
-export const useNotesProvider = (): NotesProvider => {
+export const useNotesProvider = (): NotesProviderProxy => {
   const notesProviderContext = useContext(NotesProviderContext);
   if (!notesProviderContext) {
     throw new Error("NotesProviderContext is not initialized");

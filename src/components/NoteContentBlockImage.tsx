@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { FileInfo } from "../lib/notes/types/FileInfo";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 import { getObjectUrlForArbitraryGraphFile } from "../lib/LocalDataStorage";
 
 interface NoteContentBlockImageProps {
   file: FileInfo,
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
 }
 
 

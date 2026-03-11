@@ -2,7 +2,7 @@ import ActiveNote from "../types/ActiveNote";
 import { getWritableStream } from "./utils";
 import { serializeNewNote } from "../lib/notes/noteUtils";
 import { l } from "./intl";
-import NotesProvider from "./notes";
+import NotesProviderProxy from "./notes-worker/NotesProviderProxy";
 import {
   NOTE_FILE_DESCRIPTION,
   NOTE_FILE_EXTENSION,
@@ -12,7 +12,7 @@ import {
 export const exportNote = async (
   activeNote: ActiveNote,
   noteContent: string,
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
 ): Promise<void> => {
   let rawNote: string;
 

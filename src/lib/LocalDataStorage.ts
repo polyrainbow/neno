@@ -1,11 +1,12 @@
 import * as IDB from "idb-keyval";
-import FileSystemAccessAPIStorageProvider
-  from "./FileSystemAccessAPIStorageProvider";
 import { getWritableStream, streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
-import NotesProvider from "./notes";
+import NotesProviderProxy from "./notes-worker/NotesProviderProxy";
 import { Slug } from "./notes/types/Slug";
 import { FileInfo } from "./notes/types/FileInfo";
+// @ts-ignore Vite worker URL import
+import notesWorkerUrl from "./notes-worker/index.ts?worker&url";
+import { getExtensionFromFilename } from "./notes/utils";
 
 /*
   Notes:
@@ -33,34 +34,40 @@ async function verifyPermission(
     return;
   }
   // The user didn't grant permission
-  throw new Error("User did not grant permission to " + fileSystemHandle.name);
+  throw new Error(
+    "User did not grant permission to " + fileSystemHandle.name,
+  );
 }
 
 
 const FOLDER_HANDLE_STORAGE_KEY = "LOCAL_DB_FOLDER_HANDLE";
 let folderHandle: FileSystemDirectoryHandle | null = null;
-let notesProvider: NotesProvider | null = null;
+let notesProvider: NotesProviderProxy | null = null;
+let notesWorker: Worker | null = null;
 
 
-export const getExistingFolderHandleName = async (): Promise<string | null> => {
-  if (folderHandle) {
-    return folderHandle.name;
-  }
+export const getExistingFolderHandleName
+  = async (): Promise<string | null> => {
+    if (folderHandle) {
+      return folderHandle.name;
+    }
 
-  const folderHandleFromStorage = await IDB.get<FileSystemDirectoryHandle>(
-    FOLDER_HANDLE_STORAGE_KEY,
-  );
-  if (folderHandleFromStorage) {
-    return folderHandleFromStorage.name;
-  }
+    const folderHandleFromStorage
+      = await IDB.get<FileSystemDirectoryHandle>(
+        FOLDER_HANDLE_STORAGE_KEY,
+      );
+    if (folderHandleFromStorage) {
+      return folderHandleFromStorage.name;
+    }
 
-  return null;
-};
+    return null;
+  };
 
 
-export const getActiveFolderHandle = (): FileSystemDirectoryHandle | null => {
-  return folderHandle;
-};
+export const getActiveFolderHandle
+  = (): FileSystemDirectoryHandle | null => {
+    return folderHandle;
+  };
 
 export const getFolderHandleFromStorage = async (
 ): Promise<FileSystemDirectoryHandle> => {
@@ -73,35 +80,47 @@ export const getFolderHandleFromStorage = async (
   return folderHandle;
 };
 
-/*
-  Creates a NotesProvider that stores all data in the Origin private file system
-*/
-const createOPFSNotesProvider = async (
-  createDummyNotes: boolean,
-): Promise<NotesProvider> => {
-  const opfsDirectory = await navigator.storage.getDirectory();
-  const memoryStorageProvider = new FileSystemAccessAPIStorageProvider(
-    opfsDirectory,
-  );
-  if (createDummyNotes) {
-    for (let i = 1; i <= 1000; i++) {
-      await memoryStorageProvider.writeObject(
-        "note-" + i + ".subtext",
-        "Test note " + i,
-      );
-    }
+
+function createNotesWorkerAndProxy(
+  initMessage: Record<string, unknown>,
+): Promise<NotesProviderProxy> {
+  if (notesWorker) {
+    notesWorker.terminate();
   }
-  notesProvider = new NotesProvider(memoryStorageProvider);
-  return notesProvider;
-};
+
+  const worker = new Worker(notesWorkerUrl, { type: "module" });
+  notesWorker = worker;
+
+  return new Promise((resolve, reject) => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.data.action === "initialized") {
+        worker.removeEventListener("message", onMessage);
+        const proxy = new NotesProviderProxy(worker);
+        notesProvider = proxy;
+        resolve(proxy);
+      } else if (e.data.action === "error") {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(e.data.error as string));
+      }
+    };
+    worker.addEventListener("message", onMessage);
+    worker.postMessage({
+      action: "initialize",
+      ...initMessage,
+    });
+  });
+}
 
 
 export const initializeNotesProvider = async (
   newFolderHandle?: FileSystemDirectoryHandle,
   createDummyNotes?: boolean,
-): Promise<NotesProvider> => {
+): Promise<NotesProviderProxy> => {
   if (!newFolderHandle) {
-    return createOPFSNotesProvider(createDummyNotes ?? false);
+    return createNotesWorkerAndProxy({
+      useOPFS: true,
+      createDummyNotes: createDummyNotes ?? false,
+    });
   }
 
   await verifyPermission(newFolderHandle, true);
@@ -112,26 +131,31 @@ export const initializeNotesProvider = async (
   );
 
   folderHandle = newFolderHandle;
-  const storageProvider = new FileSystemAccessAPIStorageProvider(folderHandle);
-  notesProvider = new NotesProvider(storageProvider);
-  return notesProvider;
+  return createNotesWorkerAndProxy({
+    folderHandle: newFolderHandle,
+  });
 };
 
 
-export const initializeNotesProviderWithFolderHandleFromStorage = async (
-): Promise<NotesProvider> => {
-  const folderHandleFromStorage = await getFolderHandleFromStorage();
-  return initializeNotesProvider(folderHandleFromStorage);
-};
+export const initializeNotesProviderWithFolderHandleFromStorage
+  = async (): Promise<NotesProviderProxy> => {
+    const folderHandleFromStorage = await getFolderHandleFromStorage();
+    return initializeNotesProvider(folderHandleFromStorage);
+  };
 
 
 export const isInitialized = (): boolean => {
-  return notesProvider instanceof NotesProvider;
+  return notesProvider !== null;
 };
 
 
-export const getNotesProvider = (): NotesProvider | null => {
+export const getNotesProvider = (): NotesProviderProxy | null => {
   return notesProvider;
+};
+
+
+export const getNotesWorker = (): Worker | null => {
+  return notesWorker;
 };
 
 
@@ -143,8 +167,10 @@ export const getObjectUrlForArbitraryGraphFile = async (
   }
 
   const readable
-    = await notesProvider.getReadableArbitraryGraphFileStream(fileInfo.slug);
-  const extension = NotesProvider.getExtensionFromFilename(fileInfo.filename);
+    = await notesProvider.getReadableArbitraryGraphFileStream(
+      fileInfo.slug,
+    );
+  const extension = getExtensionFromFilename(fileInfo.filename);
   const mimeType = extension && MimeTypes.has(extension)
     ? MimeTypes.get(extension) as string
     : "application/neno-filestream";
@@ -165,7 +191,7 @@ export const saveFile = async (slug: Slug) => {
     = await notesProvider.getReadableArbitraryGraphFileStream(
       slug,
     );
-  const extension = NotesProvider.getExtensionFromFilename(slug);
+  const extension = getExtensionFromFilename(slug);
   const mimeType = extension && MimeTypes.has(extension)
     ? MimeTypes.get(extension) as string
     : "application/neno-filestream";

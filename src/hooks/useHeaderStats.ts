@@ -1,11 +1,11 @@
 import { useState } from "react";
 import GraphStats from "../lib/notes/types/GraphStats";
-import NotesProvider from "../lib/notes";
+import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 
 // hook for retrieving graph stats for the application header
 // refreshes only when manually invoked
 export default (
-  notesProvider: NotesProvider,
+  notesProvider: NotesProviderProxy,
 ): [GraphStats | null, () => Promise<void>] => {
   const [headerStats, setHeaderStats] = useState<GraphStats | null>(null);
 
