@@ -2,7 +2,7 @@ import {
   $getRoot,
   CLEAR_HISTORY_COMMAND,
 } from "lexical";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
@@ -19,7 +19,7 @@ export default ({
   const [editor] = useLexicalComposerContext();
   const currentInstanceIdRef = useRef<number>(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     editor.update(() => {
       const root = $getRoot();
 
@@ -31,7 +31,7 @@ export default ({
       }
 
       currentInstanceIdRef.current = instanceId;
-    });
+    }, { discrete: true });
   }, [editor, initialText, instanceId]);
 
   return null;
