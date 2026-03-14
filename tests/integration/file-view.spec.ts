@@ -66,11 +66,11 @@ test.describe("File view", () => {
 
   test("should create new note with file as reference", async ({ page }) => {
     await page.getByText("Create note with file").click();
-    const textInEditor
-      = await page.locator("div[data-lexical-editor]").innerText();
-
-    expect(textInEditor.startsWith("/files/test.txt"))
-      .toBe(true);
+    const firstParagraphInEditor = page.locator(
+      "div[data-lexical-editor] > .editor-paragraph",
+    ).nth(0);
+    // Paragraph should start with slug (followed by the transclusion content)
+    await expect(firstParagraphInEditor).toHaveText(/^\/files\/test.txt.*/);
   });
 
   test("should rename file correctly", async ({ page }) => {
