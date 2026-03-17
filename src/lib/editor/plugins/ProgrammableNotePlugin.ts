@@ -39,6 +39,42 @@ const DEBOUNCE_MS = 500;
 
 const PROGRAMMABLE_NOTE_TAG = "programmable-note";
 
+const SCRIPT_BLOCK_CLASS = "script-block";
+
+const getScriptBlockNodeKeys = (
+  children: LexicalNode[],
+): Set<string> => {
+  const keys = new Set<string>();
+  let i = 0;
+
+  while (i < children.length) {
+    const child = children[i];
+    if (
+      $isCodeBlockNode(child)
+      && child.getTextContent().startsWith("```")
+      && child.getTextContent().substring(3).trim() === "run"
+    ) {
+      keys.add(child.getKey());
+      i++;
+
+      while (i < children.length) {
+        const inner = children[i];
+        keys.add(inner.getKey());
+        if (
+          $isCodeBlockNode(inner)
+          && inner.getTextContent().trimEnd() === "```"
+        ) {
+          break;
+        }
+        i++;
+      }
+    }
+    i++;
+  }
+
+  return keys;
+};
+
 const extractScriptBlocks = (
   children: LexicalNode[],
 ): ScriptBlock[] => {
@@ -368,6 +404,40 @@ export default function ProgrammableNotePlugin({
       unregisterParagraph();
       unregisterBackspace();
     };
+  }, [editor]);
+
+  useEffect(() => {
+    const applyScriptBlockClasses = () => {
+      const { scriptKeys, allCodeBlockKeys }
+        = editor.getEditorState().read(() => {
+          const root = $getRoot();
+          const children = root.getChildren();
+          return {
+            scriptKeys: getScriptBlockNodeKeys(children),
+            allCodeBlockKeys: children
+              .filter((c) => $isCodeBlockNode(c))
+              .map((c) => c.getKey()),
+          };
+        });
+
+      for (const key of allCodeBlockKeys) {
+        const el = editor.getElementByKey(key);
+        if (el) {
+          el.classList.toggle(
+            SCRIPT_BLOCK_CLASS,
+            scriptKeys.has(key),
+          );
+        }
+      }
+    };
+
+    const unregister = editor.registerUpdateListener(() => {
+      applyScriptBlockClasses();
+    });
+
+    applyScriptBlockClasses();
+
+    return unregister;
   }, [editor]);
 
   return null;

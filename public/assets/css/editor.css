@@ -131,6 +131,10 @@ div[data-lexical-editor] {
     &::highlight(inline-code-sigil) {
       color: var(--alt-content-color);
     }
+
+    &.script-block {
+      font-size: var(--small-font-size);
+    }
   }
 
   .quote-block {
@@ -205,6 +209,7 @@ div[data-lexical-editor] {
       margin: 0;
       white-space: pre-wrap;
       overflow-wrap: break-word;
+      font-family: inherit;
     }
 
     .script-output-status {
