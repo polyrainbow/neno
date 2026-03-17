@@ -206,6 +206,20 @@ const destroyListItemSigil = (lisNode: ListItemSigilNode) => {
     return;
   }
 
+  // Sigil inside ListItemNode absorbed extra text (e.g. user typed
+  // inside the "- " sigil): mark the parent dirty so
+  // listItemNodeNormalizationTransform re-splits the sigil.
+  const liParent = lisNode.getParent();
+  if (
+    $isListItemNode(liParent)
+    && liParent.getFirstChild() === lisNode
+    && lisNode.getTextContentSize() > 2
+    && lisNode.getTextContent().startsWith("- ")
+  ) {
+    liParent.markDirty();
+    return;
+  }
+
   const previousSibling = lisNode.getPreviousSibling();
   const nextSibling = lisNode.getNextSibling();
 
