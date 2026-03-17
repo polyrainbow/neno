@@ -29,10 +29,18 @@ export default (
   const [numberOfResults, setNumberOfResults] = useState<number>(NaN);
   const [isBusy, setIsBusy] = useState<boolean>(true);
 
+  const busyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const refreshNoteList = useCallback(
     async () => {
-      setNoteListItems([]);
-      setIsBusy(true);
+      if (busyTimerRef.current !== null) {
+        clearTimeout(busyTimerRef.current);
+      }
+
+      busyTimerRef.current = setTimeout(() => {
+        setNoteListItems([]);
+        setIsBusy(true);
+      }, 300);
 
       const options: DatabaseQuery = {
         page,
@@ -52,6 +60,10 @@ export default (
 
       // ... some time later - check if this is the current request
       if (currentRequestId.current === requestId) {
+        if (busyTimerRef.current !== null) {
+          clearTimeout(busyTimerRef.current);
+          busyTimerRef.current = null;
+        }
         setNoteListItems(results);
         setNumberOfResults(numberOfResults);
         setIsBusy(false);
@@ -63,6 +75,14 @@ export default (
   useEffect(() => {
     refreshNoteList();
   }, [page, sortMode, searchQuery]);
+
+  useEffect(() => {
+    return () => {
+      if (busyTimerRef.current !== null) {
+        clearTimeout(busyTimerRef.current);
+      }
+    };
+  }, []);
 
   return [noteListItems, numberOfResults, isBusy, refreshNoteList];
 };
