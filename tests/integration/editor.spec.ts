@@ -1405,4 +1405,28 @@ bar`);
         .toBe("abc");
     },
   );
+
+  test(
+    "typing in middle of list item sigil should not add text to sigil node",
+    async ({ page }) => {
+      await page.keyboard.type("- 1", { delay: 100 });
+      // Move cursor 2 to the left (into the sigil "- ")
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      // Type " 1" — the "1" should end up in the content node, not sigil
+      await page.keyboard.type(" 1", { delay: 100 });
+
+      const paragraph = page.locator(
+        "div[data-lexical-editor] .editor-paragraph:nth-child(1)",
+      );
+
+      await expect(paragraph).toHaveClass(/list-item/);
+
+      const sigil = paragraph.locator(".list-item-sigil");
+      const content = paragraph.locator(".list-item-content");
+
+      await expect(sigil).toHaveText("- ");
+      await expect(content).toHaveText("1 1");
+    },
+  );
 });
