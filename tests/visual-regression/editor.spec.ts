@@ -311,6 +311,40 @@ test.describe("Editor", () => {
       .toMatchSnapshot("editor-note-stats-with-files-light.png");
   });
 
+  test("inline script - light", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "light" });
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill(
+      "# Note with inline script\n"
+      + "Some paragraph text\n"
+      + "```run\n"
+      + "println(\"Hello from script\")\n"
+      + "```\n"
+      + "Another paragraph",
+    );
+    await page.locator(".script-output-content").waitFor({ timeout: 10000 });
+    expect(await page.locator(".note").screenshot())
+      .toMatchSnapshot("editor-inline-script-light.png");
+  });
+
+  test("inline script - dark", async ({ page }) => {
+    page.emulateMedia({ colorScheme: "dark" });
+    const editor = page.locator("div[data-lexical-editor]");
+    await expect(editor).toBeFocused();
+    await editor.fill(
+      "# Note with inline script\n"
+      + "Some paragraph text\n"
+      + "```run\n"
+      + "println(\"Hello from script\")\n"
+      + "```\n"
+      + "Another paragraph",
+    );
+    await page.locator(".script-output-content").waitFor({ timeout: 10000 });
+    expect(await page.locator(".note").screenshot())
+      .toMatchSnapshot("editor-inline-script-dark.png");
+  });
+
   test("modal - light", async ({ page }) => {
     page.emulateMedia({ colorScheme: "light" });
 
