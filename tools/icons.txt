@@ -43,6 +43,7 @@ grid_view
 headphones
 help
 help_outline
+history
 home
 hourglass_full
 hub

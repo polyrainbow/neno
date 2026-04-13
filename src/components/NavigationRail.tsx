@@ -112,6 +112,28 @@ const NavigationRail = ({
       }}
     />
     <NavigationRailItem
+      isActive={activeView === "history"}
+      id="history-view"
+      disabled={!isInitialized()}
+      label={l("menu.history")}
+      icon="history"
+      onClick={async () => {
+        const target = getAppPath(
+          PathTemplate.HISTORY,
+          new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+        );
+        if (pathname === target) return;
+
+        if (unsavedChanges) {
+          await confirmDiscardingUnsavedChanges();
+          setUnsavedChanges(false);
+        }
+
+        // @ts-ignore
+        navigation.navigate(target);
+      }}
+    />
+    <NavigationRailItem
       isActive={activeView === "stats"}
       id="stats-view"
       disabled={!isInitialized()}

@@ -33,11 +33,19 @@ import {
 import { FileInfo } from "./types/FileInfo.js";
 import { CanonicalNoteHeader } from "./types/CanonicalNoteHeader.js";
 
+export type FlushCallback = (change: {
+  canonicalNoteSlugs: Set<Slug> | "all";
+  aliases: Set<Slug> | "all";
+  arbitraryFiles: Set<Slug> | "all";
+  flushPins: boolean;
+}) => Promise<void>;
+
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
   #loadedGraph: Graph | null = null;
   #graphRetrievalInProgress: Promise<void> | null = null;
   #finishedObtainingGraph: (() => void) = () => {};
+  #onFlush: FlushCallback | null = null;
 
   static #PINS_FILENAME = ".pins.neno";
   static #GRAPH_FILE_EXTENSION = ".subtext";
@@ -342,8 +350,10 @@ export default class DatabaseIO {
 
   constructor(config: {
     storageProvider: StorageProvider,
+    onFlush?: FlushCallback,
   }) {
     this.#storageProvider = config.storageProvider;
+    this.#onFlush = config.onFlush ?? null;
   }
 
 
@@ -523,6 +533,15 @@ export default class DatabaseIO {
 
     if (flushPins) {
       await this.writePinsFile(graph.pinnedNotes);
+    }
+
+    if (this.#onFlush) {
+      await this.#onFlush({
+        canonicalNoteSlugs: canonicalNoteSlugsToFlush,
+        aliases: aliasesToFlush,
+        arbitraryFiles: arbitraryFilesToFlush,
+        flushPins,
+      });
     }
   }
 

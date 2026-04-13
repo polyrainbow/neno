@@ -41,9 +41,32 @@ async function verifyPermission(
 
 
 const FOLDER_HANDLE_STORAGE_KEY = "LOCAL_DB_FOLDER_HANDLE";
+const GIT_USER_NAME_KEY = "git.user.name";
+const GIT_USER_EMAIL_KEY = "git.user.email";
+const GIT_USER_NAME_DEFAULT = "NENO";
+const GIT_USER_EMAIL_DEFAULT = "noreply@neno.local";
+
 let folderHandle: FileSystemDirectoryHandle | null = null;
 let notesProvider: NotesProviderProxy | null = null;
 let notesWorker: Worker | null = null;
+
+export const getGitAuthor = (): { name: string; email: string } => {
+  return {
+    name: localStorage.getItem(GIT_USER_NAME_KEY) || GIT_USER_NAME_DEFAULT,
+    email: localStorage.getItem(GIT_USER_EMAIL_KEY) || GIT_USER_EMAIL_DEFAULT,
+  };
+};
+
+export const setGitAuthor = (
+  name: string,
+  email: string,
+): void => {
+  localStorage.setItem(GIT_USER_NAME_KEY, name);
+  localStorage.setItem(GIT_USER_EMAIL_KEY, email);
+  if (notesProvider) {
+    notesProvider.setGitAuthor({ name, email });
+  }
+};
 
 
 export const getExistingFolderHandleName
@@ -120,6 +143,7 @@ export const initializeNotesProvider = async (
     return createNotesWorkerAndProxy({
       useOPFS: true,
       createDummyNotes: createDummyNotes ?? false,
+      gitAuthor: getGitAuthor(),
     });
   }
 
@@ -133,6 +157,7 @@ export const initializeNotesProvider = async (
   folderHandle = newFolderHandle;
   return createNotesWorkerAndProxy({
     folderHandle: newFolderHandle,
+    gitAuthor: getGitAuthor(),
   });
 };
 

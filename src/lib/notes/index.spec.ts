@@ -2504,4 +2504,41 @@ describe("Notes module", () => {
       );
     },
   );
+
+  it("invokes post-flush callback with change sets on put", async () => {
+    const changes: Array<{
+      canonicalNoteSlugs: unknown;
+      aliases: unknown;
+      arbitraryFiles: unknown;
+      flushPins: boolean;
+    }> = [];
+
+    const notesProvider = new NotesProvider(new MockStorageProvider(), {
+      onFlush: async (c) => {
+        changes.push(c);
+      },
+    });
+
+    await notesProvider.put({
+      note: {
+        content: "hello",
+        meta: { additionalHeaders: {}, flags: [] },
+      },
+      changeSlugTo: "first",
+      aliases: new Set(),
+    });
+
+    expect(changes.length).toBe(1);
+    expect(changes[0].canonicalNoteSlugs).toBeInstanceOf(Set);
+    expect(
+      Array.from(changes[0].canonicalNoteSlugs as Set<string>),
+    ).toEqual(["first"]);
+    expect(changes[0].flushPins).toBe(false);
+
+    await notesProvider.remove("first");
+    expect(changes.length).toBe(2);
+    expect(
+      Array.from(changes[1].canonicalNoteSlugs as Set<string>),
+    ).toEqual(["first"]);
+  });
 });

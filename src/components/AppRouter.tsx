@@ -7,6 +7,7 @@ import ListView from "./ListView";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
 import StatsView from "./StatsView";
+import HistoryView from "./HistoryView";
 import SettingsView from "./SettingsView";
 import NoteAccessProvider from "./NoteAccessProvider";
 import ScriptView from "./ScriptView";
@@ -131,6 +132,15 @@ const AppRouter = () => {
           ),
         },
         {
+          id: "history",
+          path: getAppPath(
+            PathTemplate.HISTORY,
+            new Map([["GRAPH_ID", ":graphId"]]),
+            undefined,
+            true,
+          ),
+        },
+        {
           id: "settings",
           path: getAppPath(
             PathTemplate.SETTINGS,
@@ -204,6 +214,10 @@ const AppRouter = () => {
   } else if (routeId === "stats") {
     return <NoteAccessProvider>
       <StatsView />
+    </NoteAccessProvider>;
+  } else if (routeId === "history") {
+    return <NoteAccessProvider>
+      <HistoryView />
     </NoteAccessProvider>;
   } else if (routeId === "settings") {
     return <SettingsView />;

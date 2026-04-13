@@ -1,4 +1,4 @@
-import DatabaseIO from "./DatabaseIO.js";
+import DatabaseIO, { FlushCallback } from "./DatabaseIO.js";
 import {
   createNoteToTransmit,
   getNumberOfUnlinkedNotes,
@@ -68,8 +68,12 @@ export default class NotesProvider {
 
   constructor(
     storageProvider: StorageProvider,
+    options?: { onFlush?: FlushCallback },
   ) {
-    this.#io = new DatabaseIO({ storageProvider });
+    this.#io = new DatabaseIO({
+      storageProvider,
+      onFlush: options?.onFlush,
+    });
   }
 
   /*

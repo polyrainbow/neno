@@ -21,6 +21,23 @@ import {
   isValidSlugOrEmpty,
   isValidNoteSlugOrEmpty,
 } from "../notes/slugUtils";
+import {
+  ChangedFile,
+  CommitInfo,
+  CommitHistoryOptions,
+  DiffLine,
+  DiffSegment,
+  FileDiff,
+} from "./git";
+
+export type {
+  ChangedFile,
+  CommitInfo,
+  CommitHistoryOptions,
+  DiffLine,
+  DiffSegment,
+  FileDiff,
+};
 
 type RPCTarget = Worker | MessagePort;
 
@@ -210,5 +227,25 @@ export default class NotesProviderProxy {
 
   async graphExistsInStorage(): Promise<boolean> {
     return await this.#call("graphExistsInStorage", []) as boolean;
+  }
+
+  async getCommitHistory(
+    options: CommitHistoryOptions,
+  ): Promise<CommitInfo[]> {
+    return await this.#call(
+      "getCommitHistory",
+      [options],
+    ) as CommitInfo[];
+  }
+
+  async getCommitDiff(oid: string): Promise<FileDiff[]> {
+    return await this.#call("getCommitDiff", [oid]) as FileDiff[];
+  }
+
+  setGitAuthor(author: { name: string; email: string }): void {
+    this.#target.postMessage({
+      action: "setGitAuthor",
+      author,
+    });
   }
 }

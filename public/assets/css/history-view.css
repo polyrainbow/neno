@@ -1,0 +1,171 @@
+.history-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--default-gap);
+
+  .busy-indicator {
+    height: 4rem;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--default-gap);
+  }
+
+  .history-load-more {
+    align-self: center;
+  }
+
+  .history-commit {
+    background: var(--accent-color-interactible);
+    border-radius: var(--border-radius);
+    padding: var(--default-gap);
+    display: flex;
+    flex-direction: column;
+    gap: var(--small-gap);
+  }
+
+  .history-commit-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--small-gap);
+  }
+
+  .history-commit-oid {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: var(--small-font-size);
+    opacity: 0.8;
+  }
+
+  .history-commit-subject {
+    flex: 1 1 auto;
+    overflow-wrap: anywhere;
+  }
+
+  .history-commit-author,
+  .history-commit-date {
+    font-size: var(--small-font-size);
+    opacity: 0.8;
+  }
+
+  .history-commit-body {
+    margin: 0;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: var(--small-font-size);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    opacity: 0.85;
+  }
+
+  .history-commit-changes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: var(--small-font-size);
+  }
+
+  .history-commit-change {
+    display: flex;
+    gap: 0.5rem;
+    overflow-wrap: anywhere;
+  }
+
+  .history-commit-change-marker {
+    width: 1ch;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .history-commit-change.delete .history-commit-change-marker,
+  .history-commit-change.delete .history-commit-change-path {
+    color: var(--error-and-danger-text-color);
+  }
+
+  .history-show-diff {
+    align-self: flex-start;
+    width: fit-content;
+  }
+
+  .history-commit-diff {
+    margin-top: var(--small-gap);
+  }
+
+  .commit-diff {
+    display: flex;
+    flex-direction: column;
+    gap: var(--default-gap);
+  }
+
+  .commit-diff-file {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background: var(--background-color);
+  }
+
+  .commit-diff-file-header {
+    display: flex;
+    gap: var(--small-gap);
+    align-items: baseline;
+    padding: 0.5rem var(--small-gap);
+    background: var(--accent-color-interactible);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: var(--small-font-size);
+  }
+
+  .commit-diff-file-change {
+    text-transform: uppercase;
+    font-weight: bold;
+    opacity: 0.8;
+  }
+
+  .commit-diff-file-change.delete {
+    color: var(--error-and-danger-text-color);
+  }
+
+  .commit-diff-file-path {
+    overflow-wrap: anywhere;
+  }
+
+  .commit-diff-body {
+    margin: 0;
+    padding: var(--small-gap);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: var(--small-font-size);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+
+  .commit-diff-line {
+    display: block;
+  }
+
+  .commit-diff-line.add {
+    background: rgb(0 200 0 / 25%);
+  }
+
+  .commit-diff-line.remove {
+    background: rgb(255 80 80 / 25%);
+  }
+
+  .commit-diff-line.add .commit-diff-segment.emphasized {
+    background: rgb(0 200 0 / 55%);
+    border-radius: 2px;
+  }
+
+  .commit-diff-line.remove .commit-diff-segment.emphasized {
+    background: rgb(255 80 80 / 55%);
+    border-radius: 2px;
+  }
+
+  .commit-diff-placeholder {
+    margin: 0;
+    padding: var(--small-gap);
+    font-style: italic;
+    opacity: 0.7;
+  }
+}
+
