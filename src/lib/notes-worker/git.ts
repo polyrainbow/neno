@@ -84,16 +84,25 @@ async function fileExists(
   }
 }
 
+function getHeadPath(dir: string): string {
+  return dir.endsWith("/")
+    ? `${dir}.git/HEAD`
+    : `${dir}/.git/HEAD`;
+}
+
+export async function hasExistingRepo(
+  fs: FileSystemAccessFs,
+  dir: string,
+): Promise<boolean> {
+  return fileExists(fs, getHeadPath(dir));
+}
+
 export async function ensureRepo(
   fs: FileSystemAccessFs,
   dir: string,
   author: GitAuthor,
 ): Promise<void> {
-  const headPath = dir.endsWith("/")
-    ? `${dir}.git/HEAD`
-    : `${dir}/.git/HEAD`;
-
-  if (await fileExists(fs, headPath)) {
+  if (await hasExistingRepo(fs, dir)) {
     return;
   }
 

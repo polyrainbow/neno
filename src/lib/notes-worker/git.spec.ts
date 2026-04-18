@@ -7,6 +7,7 @@ import {
   commitChanged,
   getCommitDiff,
   getCommitHistory,
+  hasExistingRepo,
 } from "./git";
 
 const AUTHOR = { name: "Test", email: "test@example.com" };
@@ -46,6 +47,14 @@ describe("git helpers via FileSystemAccessFs", () => {
     expect(tree).toContain("existing.subtext");
     expect(tree).toContain("other.subtext");
     expect(tree).toContain(".gitignore");
+  });
+
+  it("hasExistingRepo returns false before init and true after", async () => {
+    const { fs } = makeFs();
+    expect(await hasExistingRepo(fs, "/")).toBe(false);
+
+    await ensureRepo(fs, "/", AUTHOR);
+    expect(await hasExistingRepo(fs, "/")).toBe(true);
   });
 
   it("ensureRepo is a no-op on an existing repo", async () => {

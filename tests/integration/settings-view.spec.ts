@@ -19,7 +19,7 @@ test.describe("Settings view", () => {
 
     const select = page.getByRole("combobox");
     await select.selectOption("de-DE");
-    await page.getByText("Change").click();
+    await page.getByRole("button", { name: "Change" }).click();
 
     await expect(headerEnglish).not.toBeAttached();
     await expect(headerGerman).toBeAttached();

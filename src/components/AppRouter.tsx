@@ -15,9 +15,11 @@ import { useState } from "react";
 import { ActiveRoute, initRouter } from "../lib/router";
 import useRunOnce from "../hooks/useRunOnce";
 import ScriptsView from "./ScriptsView";
+import useGitEnabled from "../hooks/useGitEnabled";
 
 const AppRouter = () => {
   const [activeRoute, setActiveRoute] = useState<ActiveRoute | null>(null);
+  const gitEnabled = useGitEnabled();
 
   useRunOnce(() => {
     initRouter({
@@ -216,6 +218,21 @@ const AppRouter = () => {
       <StatsView />
     </NoteAccessProvider>;
   } else if (routeId === "history") {
+    if (!gitEnabled) {
+      // @ts-ignore
+      navigation.navigate(
+        getAppPath(
+          PathTemplate.NEW_NOTE,
+          new Map([["GRAPH_ID", "local"]]),
+          undefined,
+          true,
+        ),
+        {
+          history: "replace",
+        },
+      );
+      return null;
+    }
     return <NoteAccessProvider>
       <HistoryView />
     </NoteAccessProvider>;

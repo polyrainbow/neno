@@ -9,6 +9,7 @@ import {
   getCommitDiff,
   getCommitHistory,
   GitAuthor,
+  hasExistingRepo,
 } from "./git";
 
 // isomorphic-git uses Node's Buffer internally; make it available
@@ -17,6 +18,7 @@ import {
 
 let notesProvider: NotesProvider | null = null;
 let gitFs: FileSystemAccessFs | null = null;
+let dirHandleForGit: FileSystemDirectoryHandle | null = null;
 let gitAuthor: GitAuthor = {
   name: "NENO",
   email: "noreply@neno.local",
@@ -39,6 +41,8 @@ type RPCAction = {
 } | {
   action: "setGitAuthor";
   author: GitAuthor;
+} | {
+  action: "enableGit";
 };
 
 function getTransferables(value: unknown): Transferable[] {
@@ -151,15 +155,19 @@ onmessage = async (event: MessageEvent<RPCMessage | RPCAction>) => {
         gitAuthor = eventData.gitAuthor;
       }
 
-      gitFs = new FileSystemAccessFs(dirHandle);
-      try {
-        await ensureRepo(gitFs, "/", gitAuthor);
-      } catch (e) {
-        postMessage({
-          action: "error",
-          error: e instanceof Error ? e.message : String(e),
-        });
-        return;
+      dirHandleForGit = dirHandle;
+      const candidateGitFs = new FileSystemAccessFs(dirHandle);
+      if (await hasExistingRepo(candidateGitFs, "/")) {
+        try {
+          await ensureRepo(candidateGitFs, "/", gitAuthor);
+          gitFs = candidateGitFs;
+        } catch (e) {
+          postMessage({
+            action: "error",
+            error: e instanceof Error ? e.message : String(e),
+          });
+          return;
+        }
       }
 
       notesProvider = new NotesProvider(storageProvider, {
@@ -168,7 +176,10 @@ onmessage = async (event: MessageEvent<RPCMessage | RPCAction>) => {
           await commitChanged(gitFs, "/", change, gitAuthor);
         },
       });
-      postMessage({ action: "initialized" });
+      postMessage({
+        action: "initialized",
+        gitEnabled: gitFs !== null,
+      });
       return;
     }
 
@@ -180,6 +191,32 @@ onmessage = async (event: MessageEvent<RPCMessage | RPCAction>) => {
 
     if (eventData.action === "setGitAuthor") {
       gitAuthor = eventData.author;
+      return;
+    }
+
+    if (eventData.action === "enableGit") {
+      if (gitFs) {
+        postMessage({ action: "gitEnabled" });
+        return;
+      }
+      if (!dirHandleForGit) {
+        postMessage({
+          action: "gitEnableFailed",
+          error: "Worker not initialized",
+        });
+        return;
+      }
+      const candidateGitFs = new FileSystemAccessFs(dirHandleForGit);
+      try {
+        await ensureRepo(candidateGitFs, "/", gitAuthor);
+        gitFs = candidateGitFs;
+        postMessage({ action: "gitEnabled" });
+      } catch (e) {
+        postMessage({
+          action: "gitEnableFailed",
+          error: e instanceof Error ? e.message : String(e),
+        });
+      }
       return;
     }
 
