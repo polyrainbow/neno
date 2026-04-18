@@ -9,6 +9,7 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { isInitialized } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
+import useGitEnabled from "../hooks/useGitEnabled";
 
 interface NavigationRailProps {
   activeView: string,
@@ -24,6 +25,7 @@ const NavigationRail = ({
   const isSmallScreen = useIsSmallScreen();
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
+  const gitEnabled = useGitEnabled();
 
   return <div className="navigation-rail">
     <NavigationRailItem
@@ -111,6 +113,28 @@ const NavigationRail = ({
         navigation.navigate(target);
       }}
     />
+    {gitEnabled && <NavigationRailItem
+      isActive={activeView === "history"}
+      id="history-view"
+      disabled={!isInitialized()}
+      label={l("menu.history")}
+      icon="history"
+      onClick={async () => {
+        const target = getAppPath(
+          PathTemplate.HISTORY,
+          new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+        );
+        if (pathname === target) return;
+
+        if (unsavedChanges) {
+          await confirmDiscardingUnsavedChanges();
+          setUnsavedChanges(false);
+        }
+
+        // @ts-ignore
+        navigation.navigate(target);
+      }}
+    />}
     <NavigationRailItem
       isActive={activeView === "stats"}
       id="stats-view"

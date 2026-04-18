@@ -7,6 +7,7 @@ import ListView from "./ListView";
 import FilesView from "./FilesView";
 import FileView from "./FileView";
 import StatsView from "./StatsView";
+import HistoryView from "./HistoryView";
 import SettingsView from "./SettingsView";
 import NoteAccessProvider from "./NoteAccessProvider";
 import ScriptView from "./ScriptView";
@@ -14,9 +15,11 @@ import { useState } from "react";
 import { ActiveRoute, initRouter } from "../lib/router";
 import useRunOnce from "../hooks/useRunOnce";
 import ScriptsView from "./ScriptsView";
+import useGitEnabled from "../hooks/useGitEnabled";
 
 const AppRouter = () => {
   const [activeRoute, setActiveRoute] = useState<ActiveRoute | null>(null);
+  const gitEnabled = useGitEnabled();
 
   useRunOnce(() => {
     initRouter({
@@ -131,6 +134,15 @@ const AppRouter = () => {
           ),
         },
         {
+          id: "history",
+          path: getAppPath(
+            PathTemplate.HISTORY,
+            new Map([["GRAPH_ID", ":graphId"]]),
+            undefined,
+            true,
+          ),
+        },
+        {
           id: "settings",
           path: getAppPath(
             PathTemplate.SETTINGS,
@@ -204,6 +216,25 @@ const AppRouter = () => {
   } else if (routeId === "stats") {
     return <NoteAccessProvider>
       <StatsView />
+    </NoteAccessProvider>;
+  } else if (routeId === "history") {
+    if (!gitEnabled) {
+      // @ts-ignore
+      navigation.navigate(
+        getAppPath(
+          PathTemplate.NEW_NOTE,
+          new Map([["GRAPH_ID", "local"]]),
+          undefined,
+          true,
+        ),
+        {
+          history: "replace",
+        },
+      );
+      return null;
+    }
+    return <NoteAccessProvider>
+      <HistoryView />
     </NoteAccessProvider>;
   } else if (routeId === "settings") {
     return <SettingsView />;

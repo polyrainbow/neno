@@ -41,9 +41,75 @@ async function verifyPermission(
 
 
 const FOLDER_HANDLE_STORAGE_KEY = "LOCAL_DB_FOLDER_HANDLE";
+const GIT_USER_NAME_KEY = "git.user.name";
+const GIT_USER_EMAIL_KEY = "git.user.email";
+const GIT_USER_NAME_DEFAULT = "NENO";
+const GIT_USER_EMAIL_DEFAULT = "noreply@neno.local";
+
 let folderHandle: FileSystemDirectoryHandle | null = null;
 let notesProvider: NotesProviderProxy | null = null;
 let notesWorker: Worker | null = null;
+let gitEnabledFlag = false;
+const gitEnabledSubscribers = new Set<() => void>();
+
+const notifyGitEnabledSubscribers = (): void => {
+  for (const cb of gitEnabledSubscribers) {
+    cb();
+  }
+};
+
+export const isGitEnabled = (): boolean => gitEnabledFlag;
+
+export const subscribeGitEnabled = (cb: () => void): void => {
+  gitEnabledSubscribers.add(cb);
+};
+
+export const unsubscribeGitEnabled = (cb: () => void): void => {
+  gitEnabledSubscribers.delete(cb);
+};
+
+export const getGitAuthor = (): { name: string; email: string } => {
+  return {
+    name: localStorage.getItem(GIT_USER_NAME_KEY) || GIT_USER_NAME_DEFAULT,
+    email: localStorage.getItem(GIT_USER_EMAIL_KEY) || GIT_USER_EMAIL_DEFAULT,
+  };
+};
+
+export const setGitAuthor = (
+  name: string,
+  email: string,
+): void => {
+  localStorage.setItem(GIT_USER_NAME_KEY, name);
+  localStorage.setItem(GIT_USER_EMAIL_KEY, email);
+  if (notesProvider) {
+    notesProvider.setGitAuthor({ name, email });
+  }
+};
+
+export const enableGit = async (): Promise<void> => {
+  if (!notesWorker) {
+    throw new Error("Notes worker not initialized");
+  }
+  const worker = notesWorker;
+  await new Promise<void>((resolve, reject) => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.action === "gitEnabled") {
+        worker.removeEventListener("message", onMessage);
+        resolve();
+      } else if (e.data?.action === "gitEnableFailed") {
+        worker.removeEventListener("message", onMessage);
+        reject(new Error(e.data.error as string));
+      }
+    };
+    worker.addEventListener("message", onMessage);
+    worker.postMessage({ action: "enableGit" });
+  });
+  gitEnabledFlag = true;
+  if (notesProvider) {
+    notesProvider.setGitAuthor(getGitAuthor());
+  }
+  notifyGitEnabledSubscribers();
+};
 
 
 export const getExistingFolderHandleName
@@ -88,6 +154,11 @@ function createNotesWorkerAndProxy(
     notesWorker.terminate();
   }
 
+  if (gitEnabledFlag) {
+    gitEnabledFlag = false;
+    notifyGitEnabledSubscribers();
+  }
+
   const worker = new Worker(notesWorkerUrl, { type: "module" });
   notesWorker = worker;
 
@@ -97,6 +168,11 @@ function createNotesWorkerAndProxy(
         worker.removeEventListener("message", onMessage);
         const proxy = new NotesProviderProxy(worker);
         notesProvider = proxy;
+        const nextGitEnabled = Boolean(e.data.gitEnabled);
+        if (nextGitEnabled !== gitEnabledFlag) {
+          gitEnabledFlag = nextGitEnabled;
+          notifyGitEnabledSubscribers();
+        }
         resolve(proxy);
       } else if (e.data.action === "error") {
         worker.removeEventListener("message", onMessage);
@@ -120,6 +196,7 @@ export const initializeNotesProvider = async (
     return createNotesWorkerAndProxy({
       useOPFS: true,
       createDummyNotes: createDummyNotes ?? false,
+      gitAuthor: getGitAuthor(),
     });
   }
 
@@ -133,6 +210,7 @@ export const initializeNotesProvider = async (
   folderHandle = newFolderHandle;
   return createNotesWorkerAndProxy({
     folderHandle: newFolderHandle,
+    gitAuthor: getGitAuthor(),
   });
 };
 
