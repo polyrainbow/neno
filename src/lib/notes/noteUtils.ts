@@ -41,7 +41,7 @@ import {
   NewNoteSaveRequest,
   NoteSaveRequest,
 } from "./types/NoteSaveRequest.js";
-import serialize from "../subwaytext/serialize.js";
+import serialize, { serializeInlineText } from "../subwaytext/serialize.js";
 import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 import DatabaseIO from "./DatabaseIO.js";
 import GraphObject from "./types/Graph.js";
@@ -424,6 +424,17 @@ const getBlocks = (
 };
 
 
+const getKeyValuesFromBlocks = (blocks: Block[]): Map<string, string> => {
+  const keyValues = new Map<string, string>();
+  for (const block of blocks) {
+    if (block.type === BlockType.KEY_VALUE_PAIR) {
+      keyValues.set(block.data.key, serializeInlineText(block.data.value));
+    }
+  }
+  return keyValues;
+};
+
+
 const createNoteToTransmit = async (
   existingNote: ExistingNote,
   graph: Graph,
@@ -446,6 +457,7 @@ const createNoteToTransmit = async (
     numberOfBlocks: blocks.length,
     files: getFileInfosForFilesLinkedInNote(graph, existingNote.meta.slug),
     aliases: getAliasesOfSlug(graph, existingNote.meta.slug),
+    keyValues: getKeyValuesFromBlocks(blocks),
   };
 
   if (includeParsedContent) {
@@ -933,4 +945,5 @@ export {
   getAliasesOfSlug,
   cleanSerializedNote,
   getFileInfosForFilesLinkedInNote,
+  getKeyValuesFromBlocks,
 };

@@ -10,4 +10,5 @@ export default interface NoteToTransmit extends ExistingNote {
   readonly numberOfCharacters: number,
   readonly numberOfBlocks: number,
   readonly aliases: Set<string>,
+  readonly keyValues: Map<string, string>,
 }

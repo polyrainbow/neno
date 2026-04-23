@@ -5,11 +5,10 @@ import {
   getSlugsFromInlineText,
   getAllInlineSpans,
   getNoteTitle,
+  getKeyValuesFromBlocks,
 } from "../notes/noteUtils";
 import { sluggifyWikilinkText } from "../notes/slugUtils";
 import subwaytext from "../subwaytext/index.js";
-import { serializeInlineText } from "../subwaytext/serialize";
-import { BlockType } from "../subwaytext/types/Block";
 
 globalThis.getNoteTitle = getNoteTitle;
 globalThis.getAllInlineSpans = getAllInlineSpans;
@@ -124,17 +123,11 @@ onmessage = async (event) => {
 
     if (eventData.noteContent !== undefined) {
       const blocks = subwaytext(eventData.noteContent);
-      const keyValues = new Map<string, string>();
-      for (const block of blocks) {
-        if (block.type === BlockType.KEY_VALUE_PAIR) {
-          keyValues.set(block.data.key, serializeInlineText(block.data.value));
-        }
-      }
       globalThis.thisNote = {
         slug: eventData.noteSlug || "",
         content: eventData.noteContent,
         blocks,
-        keyValues,
+        keyValues: getKeyValuesFromBlocks(blocks),
       };
     }
 
