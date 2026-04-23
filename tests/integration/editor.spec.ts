@@ -600,7 +600,7 @@ test.describe("Editor view", () => {
   test(
     "select all command works with URL",
     async ({ page }) => {
-      await page.keyboard.type("http://example.com");
+      await page.keyboard.type("http://example.com", { delay: 20 });
       await page.keyboard.press(KEY_COMBINATIONS.SELECT_ALL);
       await page.keyboard.press("Backspace");
 
