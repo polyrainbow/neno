@@ -41,6 +41,8 @@ const PROGRAMMABLE_NOTE_TAG = "programmable-note";
 
 const SCRIPT_BLOCK_CLASS = "script-block";
 
+const SCRIPT_FENCE_LABELS = ["run", "mod"];
+
 const getScriptBlockNodeKeys = (
   children: LexicalNode[],
 ): Set<string> => {
@@ -52,7 +54,9 @@ const getScriptBlockNodeKeys = (
     if (
       $isCodeBlockNode(child)
       && child.getTextContent().startsWith("```")
-      && child.getTextContent().substring(3).trim() === "run"
+      && SCRIPT_FENCE_LABELS.includes(
+        child.getTextContent().substring(3).trim(),
+      )
     ) {
       keys.add(child.getKey());
       i++;

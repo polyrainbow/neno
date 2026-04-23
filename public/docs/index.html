@@ -817,6 +817,63 @@ Array.from(redLinks.entries())
   });
   </pre>
 
+  <h3>Reusable modules with <code>mod</code> blocks</h3>
+
+  <p>
+    You can share code between scripts by defining modules in
+    <code>mod</code> fenced blocks inside any note, and loading them
+    from <code>run</code> blocks in other notes via the
+    <code>use()</code> function.
+  </p>
+
+  <p>
+    To define a module, add a single <code>mod</code> fenced block to a
+    note. Whatever the block <code>return</code>s is the module's
+    exported value. For example, a note with the slug
+    <code>math-utils</code> might contain:
+  </p>
+
+  <pre class="code-block">
+```mod
+const double = (x) => x * 2;
+const triple = (x) => x * 3;
+return { double, triple };
+```</pre>
+
+  <p>
+    Import it from any <code>run</code> block using
+    <code>await use("slug")</code>, where <code>slug</code> is the slug
+    of the note that contains the <code>mod</code> block:
+  </p>
+
+  <pre class="code-block">
+```run
+const m = await use("math-utils");
+println(m.double(21));
+```</pre>
+
+  <p>
+    Modules themselves may call <code>use()</code> to load further
+    modules. Import cycles (module A importing module B that imports A)
+    are detected and raise an error.
+  </p>
+
+  <p>
+    Inside a module, the same globals are available as in
+    <code>run</code> blocks (<code>notesProvider</code>,
+    <code>graph</code>, <code>println</code>, etc.).
+    <code>thisNote</code> refers to the module's own note rather than
+    the caller's &mdash; so if a module needs the caller's context, pass
+    it in as a function argument.
+  </p>
+
+  <p>
+    Modules are re-fetched on every script execution, so editing a
+    <code>mod</code> block takes effect the next time an importing
+    <code>run</code> block runs (for instance, when its note is reopened
+    or its code is edited).
+  </p>
+
 
   <h2>Known issues</h2>
 
