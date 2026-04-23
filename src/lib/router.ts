@@ -21,10 +21,17 @@ const getActiveRouteFromURL = (
   for (const route of routes) {
     // @ts-ignore
     const pattern = new URLPattern({ pathname: route.path });
-    if (pattern.test(url)) {
+    const result = pattern.exec(url);
+    if (result) {
+      const params: Record<string, string> = {};
+      for (const [key, value] of Object.entries(result.pathname.groups)) {
+        if (typeof value === "string") {
+          params[key] = value;
+        }
+      }
       return {
         routeId: route.id,
-        params: pattern.exec(url).pathname.groups,
+        params,
       };
     } else {
       continue;

@@ -157,9 +157,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
       // @ts-ignore
       navigation.navigate(
         targetPath,
-        {
-          replace: true,
-        },
+        { history: "replace" },
       );
     }
   };
