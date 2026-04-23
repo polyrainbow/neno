@@ -5,12 +5,15 @@ import {
   getSlugsFromInlineText,
   getAllInlineSpans,
   getNoteTitle,
+  getKeyValuesFromBlocks,
 } from "../notes/noteUtils";
+import { sluggifyWikilinkText } from "../notes/slugUtils";
 import subwaytext from "../subwaytext/index.js";
 
 globalThis.getNoteTitle = getNoteTitle;
 globalThis.getAllInlineSpans = getAllInlineSpans;
 globalThis.getSlugsFromInlineText = getSlugsFromInlineText;
+globalThis.sluggifyWikilinkText = sluggifyWikilinkText;
 
 // Capture AsyncFunction constructor before the sandbox locks down globalThis.
 const AsyncFunction = Object.getPrototypeOf(
@@ -69,6 +72,7 @@ const enabledInterfaces = new Set([
   "getNoteTitle",
   "getSlugsFromInlineText",
   "getAllInlineSpans",
+  "sluggifyWikilinkText",
   // programmable notes
   "thisNote",
 ]);
@@ -118,10 +122,12 @@ onmessage = async (event) => {
     globalThis.graph = await globalThis.notesProvider.getGraph();
 
     if (eventData.noteContent !== undefined) {
+      const blocks = subwaytext(eventData.noteContent);
       globalThis.thisNote = {
         slug: eventData.noteSlug || "",
         content: eventData.noteContent,
-        blocks: subwaytext(eventData.noteContent),
+        blocks,
+        keyValues: getKeyValuesFromBlocks(blocks),
       };
     }
 
