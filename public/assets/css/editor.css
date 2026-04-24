@@ -137,6 +137,22 @@ div[data-lexical-editor] {
     }
   }
 
+  ::highlight(code-token-keyword)     { color: var(--token-keyword); }
+  ::highlight(code-token-string)      { color: var(--token-string); }
+  ::highlight(code-token-number)      { color: var(--token-number); }
+  ::highlight(code-token-boolean)     { color: var(--token-boolean); }
+  ::highlight(code-token-function)    { color: var(--token-function); }
+  ::highlight(code-token-class-name)  { color: var(--token-class-name); }
+  ::highlight(code-token-operator)    { color: var(--token-operator); }
+  ::highlight(code-token-punctuation) { color: var(--token-punctuation); }
+  ::highlight(code-token-comment)     { color: var(--token-comment); }
+  ::highlight(code-token-regex)       { color: var(--token-regex); }
+  ::highlight(code-token-property)    { color: var(--token-property); }
+  ::highlight(code-token-tag)         { color: var(--token-tag); }
+  ::highlight(code-token-attr-name)   { color: var(--token-attr-name); }
+  ::highlight(code-token-attr-value)  { color: var(--token-attr-value); }
+  ::highlight(code-token-builtin)     { color: var(--token-builtin); }
+
   .quote-block {
     border-left: 0.375rem solid var(--alt-content-color);
     padding: 0.188rem var(--default-gap);
