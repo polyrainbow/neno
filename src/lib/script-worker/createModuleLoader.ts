@@ -39,7 +39,14 @@ export function createModuleLoader(deps: LoaderDeps): ModuleLoader {
 
     const promise = (async () => {
       try {
-        const raw = await deps.getRawNote(slug);
+        let raw: string;
+        try {
+          raw = await deps.getRawNote(slug);
+        } catch {
+          throw new Error(
+            "Error in use() call: Slug \"" + slug + "\" not found",
+          );
+        }
         const blocks = subwaytext(raw);
         const modBlock = blocks.find(
           (b): b is Extract<Block, { type: BlockType.CODE }> =>

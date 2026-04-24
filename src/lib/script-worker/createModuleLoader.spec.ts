@@ -57,12 +57,12 @@ describe("createModuleLoader", () => {
   );
 
   it(
-    "propagates getRawNote errors",
+    "throws a clear error when the slug does not exist",
     async () => {
       const deps = makeDeps({});
       const { use } = createModuleLoader(deps);
       await expect(use("missing")).rejects.toThrow(
-        "note not found: missing",
+        "Error in use() call: Slug \"missing\" not found",
       );
     },
   );
