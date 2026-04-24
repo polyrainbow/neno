@@ -9,6 +9,7 @@ import {
 } from "../notes/noteUtils";
 import { sluggifyWikilinkText } from "../notes/slugUtils";
 import subwaytext from "../subwaytext/index.js";
+import { createModuleLoader } from "./createModuleLoader.js";
 
 globalThis.getNoteTitle = getNoteTitle;
 globalThis.getAllInlineSpans = getAllInlineSpans;
@@ -75,6 +76,7 @@ const enabledInterfaces = new Set([
   "sluggifyWikilinkText",
   // programmable notes
   "thisNote",
+  "use",
 ]);
 
 Object.getOwnPropertyNames( globalThis ).forEach( function( prop ) {
@@ -98,6 +100,16 @@ globalThis.println = (val: string): void => {
   globalThis.output += val + "\n";
 };
 
+const moduleLoader = createModuleLoader({
+  getRawNote: (slug) => globalThis.notesProvider.getRawNote(slug),
+  runModule: (code) => new AsyncFunction(code)(),
+  getThisNote: () => globalThis.thisNote,
+  setThisNote: (note) => {
+    globalThis.thisNote = note;
+  },
+});
+globalThis.use = moduleLoader.use;
+
 let initialized = false;
 
 onmessage = async (event) => {
@@ -119,6 +131,7 @@ onmessage = async (event) => {
       return;
     }
 
+    moduleLoader.reset();
     globalThis.graph = await globalThis.notesProvider.getGraph();
 
     if (eventData.noteContent !== undefined) {
