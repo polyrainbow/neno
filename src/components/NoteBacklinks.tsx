@@ -6,6 +6,9 @@ import { l } from "../lib/intl";
 import ActiveNote from "../types/ActiveNote";
 import { Slug } from "../lib/notes/types/Slug";
 import { getCompareKeyForTimestamp } from "../lib/notes/utils";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../types/PathTemplate";
+import { LOCAL_GRAPH_ID } from "../config";
 
 
 interface NoteBacklinksProps {
@@ -49,6 +52,10 @@ const NoteBacklinks = ({
           .map((displayedLinkedNote) => <NoteListItem
             key={"note-link-list-item-" + displayedLinkedNote.slug}
             note={displayedLinkedNote}
+            href={getAppPath(PathTemplate.EXISTING_NOTE, new Map([
+              ["GRAPH_ID", LOCAL_GRAPH_ID],
+              ["SLUG", displayedLinkedNote.slug],
+            ]))}
             onSelect={async () => {
               if (unsavedChanges) {
                 await confirmDiscardingUnsavedChanges();

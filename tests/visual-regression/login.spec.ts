@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 test.describe("Login", () => {
   test("should look fine - light", async ({ page }) => {
     await page.waitForSelector("img[alt='NENO logo']");
-    expect(await page.screenshot()).toMatchSnapshot("login-light.png", {
+    await expect(page).toHaveScreenshot("login-light.png", {
       maxDiffPixels: 200,
     });
   });
@@ -15,7 +15,7 @@ test.describe("Login", () => {
   test("should look fine - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
     await page.waitForSelector("img[alt='NENO logo']");
-    expect(await page.screenshot()).toMatchSnapshot("login-dark.png", {
+    await expect(page).toHaveScreenshot("login-dark.png", {
       maxDiffPixels: 200,
     });
   });

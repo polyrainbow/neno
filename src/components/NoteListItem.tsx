@@ -4,12 +4,14 @@ import NoteListItemInfo from "./NoteListItemInfo";
 import { l } from "../lib/intl";
 import NoteListItemType from "../lib/notes/types/NoteListItem";
 import SparseNoteInfo from "../lib/notes/types/SparseNoteInfo";
+import { handleSpaClick } from "../lib/utils";
 
 interface NoteListItemProps {
   key: string,
   note: NoteListItemType | SparseNoteInfo,
   isActive: boolean,
   isLinked: boolean,
+  href: string,
   onSelect: () => void,
   onLinkIndicatorClick?: () => void,
   isLinkable: boolean,
@@ -22,6 +24,7 @@ const NoteListItem = ({
   isActive,
   isSelected,
   isLinked,
+  href,
   onSelect,
   onLinkIndicatorClick,
   isLinkable,
@@ -42,9 +45,10 @@ const NoteListItem = ({
   return <div
     className={trClassList.join(" ")}
   >
-    <button
+    <a
       className="note-list-item-main with-link-edge"
-      onClick={() => onSelect()}
+      href={href}
+      onClick={(e) => handleSpaClick(e, onSelect)}
     >
       <div
         className="title"
@@ -52,7 +56,7 @@ const NoteListItem = ({
         {note.title || l("list.untitled-note")}
       </div>
       <NoteListItemInfo note={note} />
-    </button>
+    </a>
     <NoteListItemLinkedNotesIndicator
       isLinkable={isLinkable}
       isActive={isActive}

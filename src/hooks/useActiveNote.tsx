@@ -24,6 +24,10 @@ import {
 } from "../config";
 import { exportNote } from "../lib/FrontendFunctions";
 
+export type ExternalChange
+  = { kind: "modified" }
+  | { kind: "deleted" };
+
 export default (
   notesProvider: NotesProviderProxy,
 ) => {
@@ -32,7 +36,11 @@ export default (
   const newNoteObject: UnsavedActiveNote = getNewNoteObject({});
   const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
   const [isBusy, setIsBusy] = useState<boolean>(false);
+  const [externalChange, setExternalChange]
+    = useState<ExternalChange | null>(null);
   const noteContentRef = useRef<string>("");
+  const unsavedChangesRef = useRef<boolean>(unsavedChanges);
+  unsavedChangesRef.current = unsavedChanges;
 
   /* Deliberately setting this always to false instead of saving preference
   in local storage, so the user has to make this decision more consciously. */
@@ -260,6 +268,7 @@ export default (
     slug: Slug | "random" | "new",
     contentForNewNote?: string,
   ): Promise<Slug | null> => {
+    setExternalChange(null);
     if (slug === "new") {
       createNewNote({
         slug: undefined,
@@ -294,6 +303,44 @@ export default (
   };
 
 
+  const checkForExternalChanges = async (): Promise<void> => {
+    if (activeNote.isUnsaved) return;
+    const slug = activeNote.slug;
+    try {
+      const fresh = await notesProvider.get(slug);
+      const localContent = noteContentRef.current;
+      if (fresh.content === localContent) {
+        // No real change for this note (broadcast was for something else).
+        return;
+      }
+      if (!unsavedChangesRef.current) {
+        // Clean editor: silently adopt the new content.
+        setActiveNoteFromServer(fresh);
+        updateEditorInstance();
+      } else {
+        setExternalChange({ kind: "modified" });
+      }
+    } catch (e) {
+      if (e instanceof Error && e.message === "NOTE_NOT_FOUND") {
+        setExternalChange({ kind: "deleted" });
+      }
+    }
+  };
+
+
+  const reloadActiveNoteFromExternal = async (): Promise<void> => {
+    if (activeNote.isUnsaved) return;
+    setExternalChange(null);
+    setUnsavedChanges(false);
+    await loadNote(activeNote.slug);
+  };
+
+
+  const dismissExternalChange = (): void => {
+    setExternalChange(null);
+  };
+
+
   return {
     isBusy,
     activeNote,
@@ -315,5 +362,9 @@ export default (
     updateReferences,
     setUpdateReferences,
     handleNoteExportRequest,
+    externalChange,
+    checkForExternalChanges,
+    reloadActiveNoteFromExternal,
+    dismissExternalChange,
   };
 };

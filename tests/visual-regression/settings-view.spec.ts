@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("Settings view", () => {
   test("should look fine - light", async ({ page }) => {
-    expect(await page.screenshot()).toMatchSnapshot("settings-view-light.png", {
+    await expect(page).toHaveScreenshot("settings-view-light.png", {
       maxDiffPixels: 200,
     });
   });

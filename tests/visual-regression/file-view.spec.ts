@@ -67,19 +67,18 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("File view", () => {
   test("should look fine - light", async ({ page }) => {
-    expect(await page.screenshot()).toMatchSnapshot("file-view-light.png");
+    await expect(page).toHaveScreenshot("file-view-light.png");
   });
 
   test("should look fine - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
-    expect(await page.screenshot()).toMatchSnapshot("file-view-dark.png");
+    await expect(page).toHaveScreenshot("file-view-dark.png");
   });
 
   test("should look fine with image - light", async ({ page }) => {
     await page.getByText("Show all files", { exact: true }).click();
     await page.getByText("beach.jpg").click();
     await page.locator(".file-container img").waitFor();
-    expect(await page.screenshot())
-      .toMatchSnapshot("file-view-image-light.png");
+    await expect(page).toHaveScreenshot("file-view-image-light.png");
   });
 });

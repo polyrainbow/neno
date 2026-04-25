@@ -41,7 +41,6 @@ test.beforeEach(async ({ page }) => {
 test.describe("File view mobile", () => {
   test("should look fine - light", async ({ page }) => {
     await page.setViewportSize({ width: 412, height: 914 });
-    expect(await page.screenshot())
-      .toMatchSnapshot("file-view-mobile-light.png");
+    await expect(page).toHaveScreenshot("file-view-mobile-light.png");
   });
 });

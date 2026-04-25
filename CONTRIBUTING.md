@@ -28,7 +28,48 @@ The release package will now be built remotely with the script
 
 ## High-level architecture
 
-![High-level architecture](./high-level-modules.png)
+```
+┌──────────────────────────────────────────────────────────┐
+│ Browser tab (main thread)                                │
+│                                                          │
+│  React UI  ──  Lexical Editor  ──  NotesProviderProxy    │
+│                                            │             │
+└────────────────────────────────────────────┼─────────────┘
+                                             │
+                             MessagePort RPC │
+                                             ▼
+            ┌──────────────────────────────────────┐
+            │ SharedWorker (one per origin)        │
+            │                                      │
+            │   NotesProvider (single in-memory    │
+            │                  graph)              │
+            │   ├── Subwaytext parser              │
+            │   ├── FileSystemAccessAPI-           │
+            │   │   StorageProvider                │
+            │   └── isomorphic-git (optional)      │
+            └─────────────────┬────────────────────┘
+                              │
+                              ▼
+            ┌──────────────────────────────────────┐
+            │ User's file system                   │
+            │ (FileSystemDirectoryHandle, or       │
+            │  Origin Private File System fallback)│
+            │                                      │
+            │  *.subtext notes, attachments, .git/ │
+            └──────────────────────────────────────┘
+```
+
+All open NENO tabs of the same origin connect to the same `SharedWorker`,
+so there is exactly one `NotesProvider` and one in-memory graph cache for
+the whole session. A tab's React UI never touches `NotesProvider`
+directly — it goes through `NotesProviderProxy`, which forwards each
+method call as an RPC over a `MessagePort`. Mutations from any tab are
+broadcast back to the other tabs so their views stay in sync.
+
+User-defined scripts run in a dedicated, sandboxed `Worker` per tab.
+The tab forwards a `MessagePort` from its own connection to the
+`SharedWorker` so the script worker can issue RPCs against the same
+graph instance without bypassing the sandbox.
 
 ### Core application
 - Technology: React
@@ -45,6 +86,16 @@ NENO highly depends on the heart of the application, the "Notes" module.
 It contains all the core logic to create/read/update/delete notes and files.
 It manages the note graph, including indexes.
 
+### Notes worker (SharedWorker)
+- Entry point: `/src/lib/notes-worker`
+
+Hosts the single `NotesProvider` instance. Tabs connect to it via
+`SharedWorker` and talk to it through `NotesProviderProxy`
+(`/src/lib/notes-worker/NotesProviderProxy.ts`). The first tab in a
+session initializes the worker with a `FileSystemDirectoryHandle`;
+later tabs in the same session piggyback on the existing setup and
+skip the folder picker.
+
 ### FileSystemAccessAPIStorageProvider
 - Entry point: `/src/lib/FileSystemAccessAPIStorageProvider.tsx`
 
@@ -59,6 +110,13 @@ that is saved in the file system of the user's device.
 NENO's Subtext parser parses a Subtext string to an array of blocks.
 It can also serialize blocks to a Subtext string. The "Notes" module depends
 on it.
+
+### Script worker
+- Entry point: `/src/lib/script-worker`
+
+Sandboxed dedicated worker that evaluates user-defined scripts. The
+tab spawns one on demand and bridges it to the notes worker via a
+transferred `MessagePort`.
 
 ## Commit convention
 See https://www.conventionalcommits.org/en/v1.0.0/
@@ -79,7 +137,7 @@ hosting environment and run `npm run build`.
 
 ### 4. Copy files to webspace
 
-Copy the all files from the `dist` directory your filespace.
+Copy all files from the `dist` directory to your webspace.
 
 Make sure that your webspace contains a SPA fallback mechanism so that requests
 to non-existing files are forwarded to `index.html`.

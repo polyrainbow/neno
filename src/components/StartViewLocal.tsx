@@ -45,6 +45,13 @@ const StartViewLocal = () => {
         : ""
     }
     {
+      localDisclaimer === "OTHER_TABS_OPEN"
+        ? <p className="error-text">
+          {l("start.local.other-tabs-open")}
+        </p>
+        : ""
+    }
+    {
       typeof localDatabaseFolderHandleName === "string"
         ? <>
           <p>
@@ -68,7 +75,11 @@ const StartViewLocal = () => {
                     new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
                   ));
                 }
-              } catch (_e) {
+              } catch (e) {
+                if (e instanceof Error && e.message === "OTHER_TABS_OPEN") {
+                  setLocalDisclaimer("OTHER_TABS_OPEN");
+                  return;
+                }
                 // it could be that the folder is not there anymore but we
                 // still have a handle
                 setLocalDatabaseFolderHandleName(null);
@@ -91,17 +102,25 @@ const StartViewLocal = () => {
       type="button"
       className="default-button default-action"
       onClick={async () => {
+        let folderHandle;
         try {
           // @ts-ignore
-          const folderHandle = await window.showDirectoryPicker();
+          folderHandle = await window.showDirectoryPicker();
+        } catch (_e) {
+          // It is fine if the user aborts the directory selection
+          return;
+        }
+        try {
           await initializeNotesProvider(folderHandle);
           // @ts-ignore
           navigation.navigate(getAppPath(
             PathTemplate.NEW_NOTE,
             new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
           ));
-        } catch (_e) {
-          // It is fine if the user aborts the directory selection
+        } catch (e) {
+          if (e instanceof Error && e.message === "OTHER_TABS_OPEN") {
+            setLocalDisclaimer("OTHER_TABS_OPEN");
+          }
         }
       }}
     >

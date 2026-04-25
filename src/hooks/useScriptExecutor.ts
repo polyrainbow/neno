@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import scriptWorkerUrl from "../lib/script-worker/index.js?worker&url";
 import {
-  getNotesWorker,
+  getNotesWorkerPort,
 } from "../lib/LocalDataStorage";
 
 
@@ -12,14 +12,14 @@ const useScriptExecutor = () => {
     = useRef<((output: string) => void) | null>(null);
 
   useEffect(() => {
-    const notesWorker = getNotesWorker();
-    if (!notesWorker) return;
+    const notesWorkerPort = getNotesWorkerPort();
+    if (!notesWorkerPort) return;
 
     const worker = new Worker(scriptWorkerUrl, { type: "module" });
     workerRef.current = worker;
 
     const channel = new MessageChannel();
-    notesWorker.postMessage(
+    notesWorkerPort.postMessage(
       { action: "addPort" },
       [channel.port1],
     );

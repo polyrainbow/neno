@@ -27,6 +27,7 @@ import ExistingNote from "./types/ExistingNote.js";
 import { Slug } from "./types/Slug.js";
 // @ts-ignore
 import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
+import subwaytext from "../subwaytext/index.js";
 import {
   isValidSlug,
 } from "./slugUtils.js";
@@ -283,6 +284,16 @@ export default class DatabaseIO {
     interface ParsedDocument {
       id: string;
       parsedContent: Block[];
+    }
+
+    // Some environments (notably SharedWorker in chrome-headless-shell)
+    // do not expose the Worker constructor. Fall back to in-thread parsing.
+    if (typeof Worker === "undefined") {
+      const blockIndex = new Map<Slug, Block[]>();
+      for (const note of notes) {
+        blockIndex.set(note.meta.slug, subwaytext(note.content));
+      }
+      return Promise.resolve(blockIndex);
     }
 
     const concurrency = navigator.hardwareConcurrency || 2;

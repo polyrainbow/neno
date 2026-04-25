@@ -118,4 +118,47 @@ describe("NotesProviderProxy over MessagePort", () => {
     expect(graph.pinnedNotes).toEqual([]);
     expect(graph.notes).toBeInstanceOf(Map);
   });
+
+  it(
+    "should deliver broadcast events to subscribers",
+    async () => {
+      const events: string[] = [];
+      proxy.subscribe((e) => events.push(e.event));
+
+      serverPort.postMessage({ event: "mutation" });
+      serverPort.postMessage({ event: "gitEnabled" });
+
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(events).toEqual(["mutation", "gitEnabled"]);
+    },
+  );
+
+  it("should not call unsubscribed listeners", async () => {
+    const events: string[] = [];
+    const listener = (e: { event: string }) => events.push(e.event);
+    proxy.subscribe(listener);
+    proxy.unsubscribe(listener);
+
+    serverPort.postMessage({ event: "mutation" });
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(events).toEqual([]);
+  });
+
+  it("should not confuse RPC replies with broadcast events", async () => {
+    const events: string[] = [];
+    proxy.subscribe((e) => events.push(e.event));
+
+    setupMockHandler(serverPort, ({ method, args }) => {
+      if (method === "getRawNote") {
+        return "x:" + (args[0] as string);
+      }
+      throw new Error("Unknown");
+    });
+
+    const result = await proxy.getRawNote("a");
+    expect(result).toBe("x:a");
+    expect(events).toEqual([]);
+  });
 });
