@@ -85,9 +85,9 @@
 
   <p>
     We think that credible exit is an essential factor for serious
-    tools for thought, because we think that a person's knowledge is
-    so precious that there should not even be the slightest possibility for it to 
-    get stuck or even get lost in a proprietary app or hard-to-parse data
+    tools for thought, because a person's knowledge is
+    so precious that there should not even be the slightest possibility for it
+    to get stuck or be lost in a proprietary app or hard-to-parse data
     format.
   </p>
 
@@ -217,11 +217,7 @@
   </p>
   
   <p>
-  Beware that yor web browser has to support a feature called
-  "File System Access API". At the time of writing, the desktop versions
-  of Chrome, Edge, Opera, and Safari do support it.
-  Mobile browser versions are not supported yet.
-  We recommend to use a Chromium-based browser (Chrome, Opera, Edge, etc.).
+  At the time of writing, NENO works with Chrome, Edge, and Opera.
   </p>
   
   <h2>Taking notes</h2>
@@ -246,7 +242,7 @@
     Notes are written in
     <a href="https://github.com/polyrainbow/subtext/blob/main/guide.md">Subtext</a>,
     a format specifically designed for note-taking. Subtext documents are
-    easily composable as Subtext is a block-based plain-text format with
+    easily composable because Subtext is a block-based plain-text format with
     minimal markup syntax.
     <a href="https://github.com/polyrainbow/subtext/blob/main/guide.md">
       Here's a guide to get you started with Subtext</a>.
@@ -293,9 +289,9 @@
   <h3>Slugs</h3>
   <p>
     Every note that you create is assigned a slug, which is a unique key to
-    identify and find the note. The slug is also used as a note's filename.
-    The slug is either generated based on the note's content, or you can
-    manually set it.
+    identify and find the note. The slug is also used as the note's filename.
+    The slug is either generated automatically based on the note's content, or
+    you can set it manually.
     When referencing a note in a Wikilink, the link text is normalized to
     a slug.
     E.g. when writing the Wikilink <code>[[My Favorite Note (probably)]]</code>,
@@ -318,11 +314,11 @@
   <h3>Updating slugs and references</h3>
 
   <p>
-    Slugs of already saved notes can be updated any time. When editing the
+    Slugs of already saved notes can be updated at any time. When editing the
     slug of an already saved note in the slug input, a toggle with the label
     "Update references" is displayed. When you save the new slug with the toggle
-    activated, all wikilinks and slashlinks throughout the whole graph, that
-    reference the current note, will also be updated.
+    activated, all wikilinks and slashlinks throughout the whole graph that
+    reference the current note will also be updated.
   </p>
 
   <figure>
@@ -376,7 +372,7 @@
   <p>
     Aliases are a useful feature when writing notes in multiple languages.
     For example, you can create a note with the slug "entropy" and assign it the
-    German word "entropie" as note alias. Or you could add the alias
+    German word "entropie" as a note alias. Or you could add the alias
     "complex" to the note "complexity" and reference
     that note in a sentence like <code>This algorithm is [[complex]]</code>.
   </p>
@@ -384,7 +380,7 @@
   <h3>Pins</h3>
 
   <p>
-    You can pin notes to the topbar by clicking on the pin icon. Click it again
+    You can pin notes to the top bar by clicking on the pin icon. Click it again
     to unpin the note.
   </p>
 
@@ -402,10 +398,10 @@
   <h2>Search</h2>
   <p>
     By default, entering a value in the search input will search for note titles
-    that include all the words given.
+    that include all the given words.
     By entering a token prefix followed by a
     <code>:</code> before
-    the actual search string, you can change that behavior.
+    the actual search string, you can change this behavior.
   </p>
 
   <h3>Token prefixes</h3>
@@ -422,8 +418,8 @@
   </p>
 
   <p>
-    <code>duplicates:url</code> - Show notes with same URLs
-
+    <code>duplicates:url</code> - Show notes with the same URLs
+    <br>
     When you have a lot of notes, chances are that the same URL is included in
     several notes. This search query helps you find those notes.
   </p>
@@ -434,15 +430,16 @@
 
   <p>
     <code>ft:</code> - Full-text search
-    Perform a full-text search on all notes by typing `ft:` followed by
-    the search query
-    into the search box. The full-text search is case-insensitive.
+    <br>
+    Perform a full-text search on all notes by typing <code>ft:</code>
+    followed by the search query into the search box.
+    The full-text search is case-insensitive.
   </p>
 
   <p>
     <code>has-block:</code> - Search for notes that contain a specific block type.
-
-    For example <code>has-block:list</code>. The following block types are supported:
+    <br>
+    For example, <code>has-block:list</code>. The following block types are supported:
     <ul>
       <li>paragraph</li>
       <li>heading</li>
@@ -456,8 +453,8 @@
 
   <p>
     <code>has-media:</code> - Search for notes that contain a specific media type.
-
-    For example <code>has-media:audio</code>. The following media types are supported:
+    <br>
+    For example, <code>has-media:audio</code>. The following media types are supported:
 
     <ul>
       <li>audio</li>
@@ -468,29 +465,31 @@
   </p>
 
   <p>
-    <code>has-url:</code> - Search for notes that contain a specific url.
-
-    For example <code>has-url:https://example.com</code>
+    <code>has-url:</code> - Search for notes that contain a specific URL.
+    <br>
+    For example, <code>has-url:https://example.com</code>
   </p>
 
   <p>
     <code>links-to:</code> - Find all notes that link to a specific note,
     identified by its slug.
-
-    For example <code>links-to:target-note-slug</code>
+    <br>
+    For example, <code>links-to:target-note-slug</code>
   </p>
 
   <p>
-    <code>$[KEY]:</code> - Search for notes with key-value pair with
-    the key <code>[KEY]</code>.
-    For example <code>$check-back:</code> will find
+    <code>$[KEY]:</code> - Search for notes with a key-value pair whose
+    key is <code>[KEY]</code>.
+    <br>
+    For example, <code>$check-back:</code> will find
     all notes that have a key-value pair with the key <code>check-back</code>.
   </p>
 
   <p>
-    <code>$[KEY]:[VALUE]</code> - Search for notes with key-value pair with
-    the key <code>[KEY]</code> and the value <code>[VALUE]</code>.
-    For example <code>$check-back:2040-01-01</code> will find
+    <code>$[KEY]:[VALUE]</code> - Search for notes with a key-value pair whose
+    key is <code>[KEY]</code> and whose value is <code>[VALUE]</code>.
+    <br>
+    For example, <code>$check-back:2040-01-01</code> will find
     all notes that have a key-value pair with the key <code>check-back</code>
     and a value that includes <code>2040-01-01</code>.
   </p>
@@ -539,7 +538,7 @@
     by convention starting with the prefix <code>files/</code>,
     e.g. <code>files/image.png</code>.
     A slashlink to the file and a transclusion
-    of the file is automatically added to
+    of the file are automatically added to
     the currently active note. If applicable, the transclusion contains a
     preview (images, plain text) or a player for the file (video, audio).
   </p>
@@ -551,8 +550,8 @@
 
   <p>
     In the files view, you get an overview of all files in your notes folder.
-    You can also search for files whose slugs that start with a specific
-    string by entering that string into the search input, e. g.
+    You can also search for files whose slugs start with a specific
+    string by entering that string into the search input, e.g.
     <code>files/</code>. If you want to find all files that end with a specific
     string, type <code>ends-with:</code> into the search input field, followed
     by the desired string, e.g. <code>ends-with:.jpg</code>.
@@ -573,7 +572,7 @@
   <h2>Stats</h2>
 
   <p>
-    It might be interesting to you to see some stats on your graph or see how
+    You might be interested in seeing some stats on your graph, or in how
     many
     <a href="https://en.wikipedia.org/wiki/Component_(graph_theory)">components</a>
     it has. Use the "Stats" view for this, which you can find in the app menu.
@@ -583,13 +582,13 @@
 
   <p>
     Scripting is probably the most powerful (and also most dangerous)
-    feature of NENO as it allows the programmatic manipulation of your
-    knowledge graph, using the full flexibility of a JavaScript environment.
-    Use with caution and be sure to backup your data beforehand.
+    feature of NENO, as it allows the programmatic manipulation of your
+    knowledge graph using the full flexibility of a JavaScript environment.
+    Use with caution and be sure to back up your data beforehand.
   </p>
 
   <p>
-    The possibilities are endless but here are some example use cases:
+    The possibilities are endless, but here are some example use cases:
 
     <ul>
       <li>
@@ -600,24 +599,69 @@
         creating a list of events based on dates mentioned in the note graph
       </li>
       <li>
-        creating a website with aggregated data from the note graph.
+        creating a website with aggregated data from the note graph
       </li>
     </ul>
   </p>
 
-  <h3>Creating a script</h3>
-
   <p>
-    Go to "Files" view. Scroll to the section "Create script" at the bottom,
-    enter the name of the script
-    and click on "Create". You should now be able too see the new script
-    in the files list. Click on it and then click on "Open in script editor".
+    NENO offers two ways to run scripts: <em>programmable notes</em>, which
+    let you embed JavaScript directly inside any note, and standalone
+    script files managed via the Scripts view (or the Files view).
   </p>
 
-  <h3>Variables</h3>
+  <h3>Programmable notes</h3>
 
   <p>
-    The following variables are defined in the JavaScript environment:
+    Any note can become a programmable note by adding a fenced
+    <code>run</code> block to it. The editor detects the block, executes
+    its contents in a sandboxed worker, and renders the script's output
+    immediately below the closing fence. The output is updated automatically
+    as you edit the script &mdash; no save or button click is required.
+  </p>
+
+  <pre class="code-block">
+```run
+println("Hello from a programmable note!");
+println("This graph contains " + graph.notes.size + " note(s).");
+```</pre>
+
+  <p>
+    After a short debounce on any edit in the note, NENO checks each
+    <code>run</code> block and re-executes only those whose code has
+    changed since the previous run.
+    Scripts also re-run when you save the note or switch to it. The
+    rendered output is not part of the saved note content; only the
+    fenced block is persisted to disk. Removing the <code>run</code> block
+    also removes its output. Inside a <code>run</code> block, the variable
+    <code>thisNote</code> gives you access to the surrounding note (see
+    <a href="#variables">Variables</a> below).
+  </p>
+
+  <p>
+    Programmable notes are perfect for live dashboards over your graph:
+    counts, todo aggregations, calendar listings, link audits, etc. For
+    one-off transformations or larger jobs you may prefer a standalone
+    script file (see below).
+  </p>
+
+  <h3>Creating a standalone script</h3>
+
+  <p>
+    Open the "Scripts" view from the navigation rail. It lists all
+    existing scripts (files under <code>scripts/</code> with the
+    <code>.neno.js</code> suffix) and provides a "Create script" form at
+    the bottom: enter a name, click "Create", and the new script appears
+    in the list, ready to be opened in the script editor.
+    Scripts can also be reached from the Files view, where they show up
+    alongside any other files.
+  </p>
+
+  <h3 id="variables">Variables</h3>
+
+  <p>
+    The following variables are defined in the JavaScript environment of
+    both standalone scripts and programmable notes:
   </p>
 
     <h4><code>notesProvider</code></h4>
@@ -659,6 +703,16 @@
 
     <p>
       Type: <code>(val: string): void</code>
+    </p>
+
+    <h4><code>thisNote</code></h4>
+    <p>
+      Inside a programmable note, the surrounding note. Includes the
+      note's <code>slug</code>, raw <code>content</code>, parsed
+      <code>blocks</code>, and any <code>keyValues</code> declared in the
+      note. <code>undefined</code> when the script is run as a standalone
+      script file. Inside a <code>mod</code> module, <code>thisNote</code>
+      always refers to the module's own note, not the importing note.
     </p>
 
   <h3>Example scripts</h3>
@@ -879,12 +933,11 @@ println(m.double(21));
 
   <h3>Browsers installed with Flatpak</h3>
   <p>
-    On Linux, we do not recommend to use NENO with a browser installed via Flatpak.
-    In our tests, Chrome lacked necessary permissions to access files in the
-    local user
-    directory to access PWAs, but more importantly, performance of loading
-    a graph folder from disk is very slow compared to a Chrome installation
-    via the RPM file provided by Google.
+    On Linux, we do not recommend using NENO with a browser installed via Flatpak.
+    In our tests, Chrome lacked the necessary permissions to access PWAs in the
+    local user directory; more importantly, loading a graph folder from disk
+    was very slow compared to a Chrome installation from the RPM file provided
+    by Google.
   </p>
 
   <h2>Acknowledgements</h2>
