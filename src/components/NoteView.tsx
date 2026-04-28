@@ -67,30 +67,16 @@ const NoteView = ({ slug }: NoteViewProps) => {
     = useState(0);
 
   const {
-    isBusy,
     activeNote,
-    saveActiveNote,
-    removeActiveNote,
-    duplicateNote,
-    loadNote,
-    importNote,
     setActiveNote,
-    handleEditorContentChange,
+    isBusy,
     unsavedChanges,
     setUnsavedChanges,
-    slugInput,
-    setSlugInput,
-    displayedSlugAliases,
-    setDisplayedSlugAliases,
-    editorInstanceId,
-    updateEditorInstance,
-    updateReferences,
-    setUpdateReferences,
-    handleNoteExportRequest,
+    slugForm,
+    editor: noteEditor,
+    references,
+    actions,
     externalChange,
-    checkForExternalChanges,
-    reloadActiveNoteFromExternal,
-    dismissExternalChange,
   } = useActiveNote(notesProvider);
 
   const [headerStats, refreshHeaderStats] = useHeaderStats(notesProvider);
@@ -116,7 +102,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
   };
 
   const saveActiveNoteAndRefreshViews = async () => {
-    const noteFromDatabase = await saveActiveNote();
+    const noteFromDatabase = await actions.save();
 
     goToNote(
       noteFromDatabase.meta.slug,
@@ -169,7 +155,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
 
   useKeyboardShortcuts({
     onSave: () => {
-      if (!NotesProviderProxy.isValidNoteSlugOrEmpty(slugInput)) {
+      if (!NotesProviderProxy.isValidNoteSlugOrEmpty(slugForm.input)) {
         return;
       }
       handleNoteSaveRequest();
@@ -237,7 +223,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
     contentIfNewNote?: string,
   ) => {
     if (slug === "new") {
-      await loadNote(
+      await actions.load(
         slug,
         contentIfNewNote || "",
       );
@@ -259,7 +245,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
         && validNoteSlug === activeNote.slug
       ))
     ) {
-      const receivedNoteSlug = await loadNote(
+      const receivedNoteSlug = await actions.load(
         validNoteSlug,
         contentIfNewNote,
       );
@@ -297,7 +283,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
     const listener = (e: { event: string }) => {
       if (e.event !== "mutation") return;
       refreshContentViews();
-      checkForExternalChanges();
+      externalChange.check();
     };
     notesProvider.subscribe(listener);
     return () => notesProvider.unsubscribe(listener);
@@ -340,13 +326,13 @@ const NoteView = ({ slug }: NoteViewProps) => {
           : null
       }
       <div className="main-content-besides-sidebar">
-        {externalChange ? (
+        {externalChange.state ? (
           <div
             className="external-change-banner"
             role="status"
           >
             <span>
-              {externalChange.kind === "deleted"
+              {externalChange.state.kind === "deleted"
                 ? l("editor.external-change.deleted")
                 : l("editor.external-change.modified")}
             </span>
@@ -354,22 +340,22 @@ const NoteView = ({ slug }: NoteViewProps) => {
               <button
                 type="button"
                 onClick={() => {
-                  if (externalChange.kind === "deleted") {
-                    dismissExternalChange();
+                  if (externalChange.state?.kind === "deleted") {
+                    externalChange.dismiss();
                     setUnsavedChanges(false);
                     goToNote("new");
                   } else {
-                    reloadActiveNoteFromExternal();
+                    externalChange.reload();
                   }
                 }}
               >
-                {externalChange.kind === "deleted"
+                {externalChange.state.kind === "deleted"
                   ? l("editor.external-change.reload-deleted")
                   : l("editor.external-change.reload")}
               </button>
               <button
                 type="button"
-                onClick={dismissExternalChange}
+                onClick={externalChange.dismiss}
               >
                 {l("editor.external-change.dismiss")}
               </button>
@@ -377,14 +363,14 @@ const NoteView = ({ slug }: NoteViewProps) => {
           </div>
         ) : null}
         <Note
-          editorInstanceId={editorInstanceId}
+          editorInstanceId={noteEditor.instanceId}
           isBusy={isBusy}
           note={activeNote}
-          setSlugInput={setSlugInput}
-          slugInput={slugInput}
-          displayedSlugAliases={displayedSlugAliases}
-          setDisplayedSlugAliases={setDisplayedSlugAliases}
-          handleEditorContentChange={handleEditorContentChange}
+          setSlugInput={slugForm.setInput}
+          slugInput={slugForm.input}
+          displayedSlugAliases={slugForm.aliases}
+          setDisplayedSlugAliases={slugForm.setAliases}
+          handleEditorContentChange={noteEditor.handleContentChange}
           addFilesToNoteObject={(files: Set<FileInfo>): void => {
             setActiveNote((previousState) => {
               return {
@@ -396,29 +382,29 @@ const NoteView = ({ slug }: NoteViewProps) => {
           setUnsavedChanges={setUnsavedChanges}
           handleNoteSaveRequest={handleNoteSaveRequest}
           removeActiveNote={async () => {
-            await removeActiveNote();
+            await actions.remove();
             refreshContentViews();
             setCanonicalNewNotePath();
           }}
           unsavedChanges={unsavedChanges}
           pinOrUnpinNote={pinOrUnpinNote}
           duplicateNote={async () => {
-            const duplicate = await duplicateNote();
+            const duplicate = await actions.duplicate();
             refreshContentViews();
             goToNote(duplicate.meta.slug);
-            updateEditorInstance();
+            noteEditor.updateInstance();
           }}
-          importNote={importNote}
+          importNote={actions.importFromFile}
           uploadInProgress={uploadInProgress}
           setUploadInProgress={setUploadInProgress}
-          updateReferences={updateReferences}
-          setUpdateReferences={setUpdateReferences}
+          updateReferences={references.update}
+          setUpdateReferences={references.setUpdate}
           onLinkIndicatorClick={(slug: Slug, title: string) => {
             const wikilink = Utils.getWikilinkForNote(slug, title);
             insert(wikilink, editor);
           }}
-          handleNoteExportRequest={handleNoteExportRequest}
-          loadNote={loadNote}
+          handleNoteExportRequest={actions.exportToFile}
+          loadNote={actions.load}
           executeScript={executeScript}
           scriptRefreshTrigger={scriptRefreshTrigger}
         />
