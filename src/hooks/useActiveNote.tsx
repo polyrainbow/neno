@@ -4,7 +4,7 @@ import {
 } from "../lib/notes/types/NoteSaveRequest";
 import {
   parseSerializedNewNote,
-} from "../lib/notes/noteUtils";
+} from "../lib/notes/noteHeaders";
 import ActiveNote, { UnsavedActiveNote } from "../types/ActiveNote";
 import { useContext, useRef, useState } from "react";
 import {

@@ -1,6 +1,6 @@
 import ActiveNote from "../types/ActiveNote";
 import { getWritableStream } from "./utils";
-import { serializeNewNote } from "../lib/notes/noteUtils";
+import { serializeNewNote } from "../lib/notes/noteHeaders";
 import { l } from "./intl";
 import NotesProviderProxy from "./notes-worker/NotesProviderProxy";
 import {
