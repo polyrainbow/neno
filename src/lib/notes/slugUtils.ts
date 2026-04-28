@@ -17,6 +17,38 @@ const trimSlug = (slug: string): string => {
 };
 
 
+const INVALID_SLUG_CHARS = /[^\p{L}\p{M}\d\-_]+/gu;
+const INVALID_SLUG_CHARS_KEEP_DOTS = /[^\p{L}\p{M}\d\-._]+/gu;
+const INVALID_SLUG_CHARS_KEEP_SLASHES = /[^\p{L}\p{M}\d\-_/]+/gu;
+
+
+// Shared NFC + trim + apostrophe-strip + invalid-char-to-dash pipeline.
+// Caller-specific transformations (slash collapsing, dotfile stripping,
+// dash dedup, lowercasing, edge-trim, truncation) happen on top.
+const normalizeSlugBase = (
+  text: string,
+  options: { keepDots?: boolean; keepSlashes?: boolean } = {},
+): string => {
+  const invalidChars
+    = options.keepSlashes
+      ? INVALID_SLUG_CHARS_KEEP_SLASHES
+      : options.keepDots
+        ? INVALID_SLUG_CHARS_KEEP_DOTS
+        : INVALID_SLUG_CHARS;
+
+  return text
+    .normalize("NFC")
+    .trim()
+    .replace(/['’]+/g, "")
+    .replace(invalidChars, "-");
+};
+
+
+const collapseDashesAndLowercase = (s: string): string => {
+  return trimSlug(s.replace(/-+/g, "-").toLowerCase());
+};
+
+
 /*
   Turns wiki link text into a slug, without truncating.
   It is used to obtain a slug from a Wikilink.
@@ -31,46 +63,26 @@ const trimSlug = (slug: string): string => {
   e.g. [[Person//Alice A.]]
 */
 const sluggifyWikilinkText = (text: string): string => {
-  const slug = text
-    // Normalize to NFC to ensure canonical equivalence
-    .normalize("NFC")
-    // Trim leading/trailing whitespace
-    .trim()
-    // remove invalid chars
-    .replace(/['’]+/g, "")
-    // Replace invalid chars with dashes. Keep / for processing afterwards
-    .replace(/[^\p{L}\p{M}\d\-_/]+/gu, "-")
-    // replace single slashes
+  const withSlashes = normalizeSlugBase(text, { keepSlashes: true })
+    // replace single slashes with dashes
     .replace(/(?<!\/)\/(?!\/)/g, "-")
-    // replace multiple slashes (//, ///, ...) with /
-    .replace(/\/\/+/g, "/")
-    // Replace runs of one or more dashes with a single dash
-    .replace(/-+/g, "-")
-    .toLowerCase();
+    // collapse multiple slashes (//, ///, ...) into a single /
+    .replace(/\/\/+/g, "/");
 
-  return trimSlug(slug);
+  return collapseDashesAndLowercase(withSlashes);
 };
 
 
 // same as above, but leaves dots in place
 // should be used for uploaded files, but not for note content or note slugs.
 const sluggifyFilename = (text: string): string => {
-  const slug = text
-    // Normalize to NFC to ensure canonical equivalence
-    .normalize("NFC")
-    // Trim leading/trailing whitespace
-    .trim()
-    // remove invalid chars
-    .replace(/['’]+/g, "")
-    // Replace invalid chars with dashes.
-    .replace(/[^\p{L}\p{M}\d\-._]+/gu, "-")
-    // Replace runs of one or more dashes with a single dash
+  const normalized = normalizeSlugBase(text, { keepDots: true })
     .replace(/-+/g, "-")
     // we do not allow dotfiles for now
-    .replace(/^\./g, "")
+    .replace(/^\./, "")
     .toLowerCase();
 
-  return trimSlug(slug);
+  return trimSlug(normalized);
 };
 
 
@@ -82,20 +94,7 @@ const sluggifyFilename = (text: string): string => {
   for a normal note.
 */
 const sluggifyNoteText = (text: string): string => {
-  const slug = text
-    // Normalize to NFC to ensure canonical equivalence
-    .normalize("NFC")
-    // Trim leading/trailing whitespace
-    .trim()
-    // remove invalid chars
-    .replace(/['’]+/g, "")
-    // Replace invalid chars with dashes (including invalid slashes).
-    .replace(/[^\p{L}\p{M}\d\-_]+/gu, "-")
-    // Replace runs of one or more dashes with a single dash
-    .replace(/-+/g, "-")
-    .toLowerCase();
-
-  return trimSlug(slug)
+  return collapseDashesAndLowercase(normalizeSlugBase(text))
     // Truncate to avoid file name length limit issues.
     // Windows systems can handle up to 255, but we truncate at 200 to leave
     // a bit of room for things like version numbers.
