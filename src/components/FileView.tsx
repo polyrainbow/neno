@@ -28,6 +28,7 @@ import {
 } from "../lib/LocalDataStorage";
 import useConfirm from "../hooks/useConfirm";
 import FileViewPreview from "./FileViewPreview";
+import { navigateTo } from "../lib/navigation";
 import HeaderButton from "./HeaderButton";
 import FileViewRenameForm from "./FileViewRenameForm";
 import { Slug } from "../lib/notes/types/Slug";
@@ -124,8 +125,7 @@ const FileView = ({
             onClick={async () => {
               if (!fileInfo) return;
 
-              // @ts-ignore
-              navigation.navigate(
+              navigateTo(
                 getAppPath(
                   PathTemplate.NEW_NOTE,
                   new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
@@ -259,8 +259,7 @@ const FileView = ({
               setFileInfo(newFileInfo);
               setObjectUrl(objectUrl);
 
-              // @ts-ignore
-              navigation.navigate(
+              navigateTo(
                 getAppPath(
                   PathTemplate.FILE,
                   new Map([

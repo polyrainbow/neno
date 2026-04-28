@@ -10,6 +10,7 @@ import {
 import { getObjectUrlForArbitraryGraphFile } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID, NENO_SCRIPT_FILE_SUFFIX } from "../config";
 import FloatingActionButton from "./FloatingActionButton";
+import { navigateTo } from "../lib/navigation";
 
 interface FilesViewPreviewBoxProps {
   key: string,
@@ -86,8 +87,7 @@ const FilesViewPreviewBox = ({
           title={l("files.open-in-script-editor")}
           icon="create"
           onClick={(e) => {
-            // @ts-ignore
-            navigation.navigate(getAppPath(
+            navigateTo(getAppPath(
               PathTemplate.SCRIPT,
               new Map([
                 ["GRAPH_ID", LOCAL_GRAPH_ID],

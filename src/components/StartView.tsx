@@ -9,6 +9,7 @@ import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
 import { useState } from "react";
 import NavigationRail from "./NavigationRail";
+import { navigateTo } from "../lib/navigation";
 
 const StartView = () => {
   const [
@@ -54,11 +55,9 @@ const StartView = () => {
                 const urlSearchParams
                   = new URLSearchParams(window.location.search);
                 if (urlSearchParams.has("redirect")) {
-                  // @ts-ignore
-                  navigation.navigate(urlSearchParams.get("redirect") ?? "/");
+                  navigateTo(urlSearchParams.get("redirect") ?? "/");
                 } else {
-                  // @ts-ignore
-                  navigation.navigate(getAppPath(
+                  navigateTo(getAppPath(
                     PathTemplate.NEW_NOTE,
                     new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
                   ));
@@ -76,11 +75,9 @@ const StartView = () => {
                 const urlSearchParams
                   = new URLSearchParams(window.location.search);
                 if (urlSearchParams.has("redirect")) {
-                  // @ts-ignore
-                  navigation.navigate(urlSearchParams.get("redirect") ?? "/");
+                  navigateTo(urlSearchParams.get("redirect") ?? "/");
                 } else {
-                  // @ts-ignore
-                  navigation.navigate(getAppPath(
+                  navigateTo(getAppPath(
                     PathTemplate.NEW_NOTE,
                     new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
                   ));

@@ -11,6 +11,7 @@ import useHeaderStats from "../hooks/useHeaderStats";
 import usePinnedNotes from "../hooks/usePinnedNotes";
 import { LOCAL_GRAPH_ID } from "../config";
 import NavigationRail from "./NavigationRail";
+import { navigateTo } from "../lib/navigation";
 
 
 const ListView = () => {
@@ -66,8 +67,7 @@ const ListView = () => {
     <FloatingActionButton
       title={l("editor.new-note")}
       icon="add"
-      // @ts-ignore
-      onClick={() => navigation.navigate(getAppPath(
+      onClick={() => navigateTo(getAppPath(
         PathTemplate.NEW_NOTE,
         new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
       ))}

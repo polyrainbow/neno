@@ -16,6 +16,7 @@ import { ActiveRoute, initRouter } from "../lib/router";
 import useRunOnce from "../hooks/useRunOnce";
 import ScriptsView from "./ScriptsView";
 import useGitEnabled from "../hooks/useGitEnabled";
+import { navigateTo } from "../lib/navigation";
 
 const AppRouter = () => {
   const [activeRoute, setActiveRoute] = useState<ActiveRoute | null>(null);
@@ -162,8 +163,7 @@ const AppRouter = () => {
   const routeId = activeRoute.routeId;
 
   if (routeId === "root") {
-    // @ts-ignore
-    navigation.navigate(
+    navigateTo(
       getAppPath(
         PathTemplate.NEW_NOTE,
         new Map([["GRAPH_ID", "local"]]),
@@ -189,8 +189,7 @@ const AppRouter = () => {
       <FileView slug={activeRoute.params.slug} />
     </NoteAccessProvider>;
   } else if (routeId === "unselected-note") {
-    // @ts-ignore
-    navigation.navigate(
+    navigateTo(
       getAppPath(
         PathTemplate.NEW_NOTE,
         new Map([["GRAPH_ID", "local"]]),
@@ -219,8 +218,7 @@ const AppRouter = () => {
     </NoteAccessProvider>;
   } else if (routeId === "history") {
     if (!gitEnabled) {
-      // @ts-ignore
-      navigation.navigate(
+      navigateTo(
         getAppPath(
           PathTemplate.NEW_NOTE,
           new Map([["GRAPH_ID", "local"]]),

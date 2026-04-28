@@ -3,6 +3,7 @@ import { l } from "../lib/intl";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
+import { navigateTo } from "../lib/navigation";
 
 interface ScriptsViewItemProps {
   file: FileInfo;
@@ -29,8 +30,7 @@ const ScriptsViewItem = ({
       <button
         className="default-button-small default-action"
         onClick={() => {
-          // @ts-ignore
-          navigation.navigate(getAppPath(
+          navigateTo(getAppPath(
             PathTemplate.SCRIPT,
             new Map([
               ["GRAPH_ID", LOCAL_GRAPH_ID],
@@ -43,8 +43,7 @@ const ScriptsViewItem = ({
       <button
         className="default-button-small default-action"
         onClick={() => {
-          // @ts-ignore
-          navigation.navigate(getAppPath(
+          navigateTo(getAppPath(
             PathTemplate.SCRIPT,
             new Map([
               ["GRAPH_ID", LOCAL_GRAPH_ID],

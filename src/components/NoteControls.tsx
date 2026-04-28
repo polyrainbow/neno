@@ -13,6 +13,7 @@ import { LOCAL_GRAPH_ID } from "../config";
 import useConfirm from "../hooks/useConfirm";
 import useGoToNote from "../hooks/useGoToNote";
 import { getNoteTitle } from "../lib/notes";
+import { navigateTo } from "../lib/navigation";
 
 interface NoteControlsProps {
   activeNote: ActiveNote,
@@ -64,8 +65,7 @@ const NoteControls = ({
               await confirmDiscardingUnsavedChanges();
               setUnsavedChanges(false);
             }
-            // @ts-ignore
-            navigation.navigate(getAppPath(
+            navigateTo(getAppPath(
               PathTemplate.LIST,
               new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
             ));

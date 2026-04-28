@@ -21,6 +21,7 @@ import useConfirmDiscardingUnsavedChangesDialog
 import { l } from "../lib/intl";
 import { Slug } from "../lib/notes/types/Slug";
 import NavigationRail from "./NavigationRail";
+import { navigateTo } from "../lib/navigation";
 
 interface CustomScript {
   slug: string;
@@ -218,8 +219,7 @@ const ScriptView = ({
                 await confirmDiscardingUnsavedChanges();
                 setUnsavedChanges(false);
               }
-              // @ts-ignore
-              navigation.navigate(
+              navigateTo(
                 getAppPath(
                   PathTemplate.FILE,
                   new Map([

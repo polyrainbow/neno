@@ -10,6 +10,7 @@ import useConfirmDiscardingUnsavedChangesDialog
 import { isInitialized } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 import useGitEnabled from "../hooks/useGitEnabled";
+import { navigateTo } from "../lib/navigation";
 
 interface NavigationRailProps {
   activeView: string,
@@ -40,8 +41,7 @@ const NavigationRail = ({
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(getAppPath(PathTemplate.START));
+        navigateTo(getAppPath(PathTemplate.START));
       }}
     />
     <NavigationRailItem
@@ -65,8 +65,7 @@ const NavigationRail = ({
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
       }}
     />
     <NavigationRailItem
@@ -87,8 +86,7 @@ const NavigationRail = ({
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
       }}
     />
     <NavigationRailItem
@@ -109,8 +107,7 @@ const NavigationRail = ({
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
       }}
     />
     {gitEnabled && <NavigationRailItem
@@ -131,8 +128,7 @@ const NavigationRail = ({
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
       }}
     />}
     <NavigationRailItem
@@ -153,8 +149,7 @@ const NavigationRail = ({
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
       }}
     />
     <NavigationRailItem
@@ -175,8 +170,7 @@ const NavigationRail = ({
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
       }}
     />
   </div>;
