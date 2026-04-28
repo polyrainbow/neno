@@ -37,7 +37,6 @@ test.describe("Editor", () => {
     const editor = page.locator("div[data-lexical-editor]");
     await expect(editor).toBeFocused();
     await editor.fill(TEST_NOTE);
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor.png");
+    await expect(page).toHaveScreenshot("editor.png");
   });
 });

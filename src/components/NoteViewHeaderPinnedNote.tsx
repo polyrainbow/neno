@@ -1,7 +1,14 @@
 import NoteToTransmit from "../lib/notes/types/NoteToTransmit";
-import { getWikilinkForNote, shortenText } from "../lib/utils";
+import {
+  getAppPath,
+  getIconSrc,
+  getWikilinkForNote,
+  handleSpaClick,
+  shortenText,
+} from "../lib/utils";
 import { getNoteTitle } from "../lib/notes/noteUtils";
-import HeaderButton from "./HeaderButton";
+import { PathTemplate } from "../types/PathTemplate";
+import { LOCAL_GRAPH_ID } from "../config";
 
 interface NoteViewHeaderPinnedNoteProps {
   key: string,
@@ -22,13 +29,24 @@ const NoteViewHeaderPinnedNote = ({
   onDragOver,
 }: NoteViewHeaderPinnedNoteProps) => {
   const noteTitle = getNoteTitle(note.content);
+  const href = getAppPath(PathTemplate.EXISTING_NOTE, new Map([
+    ["GRAPH_ID", LOCAL_GRAPH_ID],
+    ["SLUG", note.meta.slug],
+  ]));
 
-  return <HeaderButton
-    className={"pinned-note " + (isActive ? "active" : "")}
-    onClick={() => onClick()}
+  return <a
+    href={href}
+    className={
+      "with-icon pinned-note " + (isActive ? "active" : "")
+    }
+    onClick={(e) => handleSpaClick(e, onClick)}
     draggable
     onDragStart={(e) => {
       const wikilink = getWikilinkForNote(note.meta.slug, noteTitle);
+
+      // Anchors auto-populate the drag with their URL and HTML; clear
+      // first so only the wikilink is delivered to the editor.
+      e.dataTransfer.clearData();
 
       // element can either be linked (in editor) or moved
       // (to different position in header pin list)
@@ -38,20 +56,27 @@ const NoteViewHeaderPinnedNote = ({
       onDragStart();
     }}
     onDragEnd={(e) => onDragEnd(e.nativeEvent)}
-    onDragOver={(e: React.DragEvent<HTMLButtonElement>) => {
+    onDragOver={(e: React.DragEvent<HTMLAnchorElement>) => {
       e.dataTransfer.dropEffect = "move";
       onDragOver(e.nativeEvent);
       e.preventDefault(); // important to remove ghost return effect
     }}
-    icon="push_pin"
   >
-    {
-      shortenText(
-        noteTitle || note.meta.slug,
-        35,
-      )
-    }
-  </HeaderButton>;
+    <img
+      src={getIconSrc("push_pin")}
+      role="presentation"
+      className="svg-icon"
+      draggable={false}
+    />
+    <span>
+      {
+        shortenText(
+          noteTitle || note.meta.slug,
+          35,
+        )
+      }
+    </span>
+  </a>;
 };
 
 

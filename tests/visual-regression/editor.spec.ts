@@ -39,12 +39,12 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("Editor", () => {
   test("should look fine empty - light", async ({ page }) => {
-    expect(await page.screenshot()).toMatchSnapshot("editor-empty-light.png");
+    await expect(page).toHaveScreenshot("editor-empty-light.png");
   });
 
   test("should look fine empty - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
-    expect(await page.screenshot()).toMatchSnapshot("editor-empty-dark.png");
+    await expect(page).toHaveScreenshot("editor-empty-dark.png");
   });
 
   test("existing notes - light", async ({ page }) => {
@@ -63,8 +63,7 @@ test.describe("Editor", () => {
     // header stats are updated asynchronously, wait for them
     const headerStatsNoteCount = page.getByLabel("Number of notes");
     await expect(headerStatsNoteCount).toHaveText("2");
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-existing-notes-light.png");
+    await expect(page).toHaveScreenshot("editor-existing-notes-light.png");
   });
 
   test("existing notes - dark", async ({ page }) => {
@@ -83,8 +82,7 @@ test.describe("Editor", () => {
     // header stats are updated asynchronously, wait for them
     const headerStatsNoteCount = page.getByLabel("Number of notes");
     await expect(headerStatsNoteCount).toHaveText("2");
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-existing-notes-dark.png");
+    await expect(page).toHaveScreenshot("editor-existing-notes-dark.png");
   });
 
   test("test note - light", async ({ page }) => {
@@ -92,8 +90,7 @@ test.describe("Editor", () => {
     const editor = page.locator("div[data-lexical-editor]");
     await expect(editor).toBeFocused();
     await editor.fill(TEST_NOTE);
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-test-note-light.png");
+    await expect(page).toHaveScreenshot("editor-test-note-light.png");
   });
 
   test("test note - dark", async ({ page }) => {
@@ -101,8 +98,7 @@ test.describe("Editor", () => {
     const editor = page.locator("div[data-lexical-editor]");
     await expect(editor).toBeFocused();
     await editor.fill(TEST_NOTE);
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-test-note-dark.png");
+    await expect(page).toHaveScreenshot("editor-test-note-dark.png");
   });
 
   test("test note - print", async ({ page }) => {
@@ -111,8 +107,7 @@ test.describe("Editor", () => {
     const editor = page.locator("div[data-lexical-editor]");
     await expect(editor).toBeFocused();
     await editor.fill(TEST_NOTE);
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-test-note-print.png");
+    await expect(page).toHaveScreenshot("editor-test-note-print.png");
   });
 
   test("search presets - light", async ({ page }) => {
@@ -121,7 +116,7 @@ test.describe("Editor", () => {
     await page.waitForFunction(() => document.fonts.ready);
     const firstFindButtonLocator = page.getByText("Find").first();
     await firstFindButtonLocator.waitFor();
-    expect(await page.screenshot()).toMatchSnapshot("search-presets-light.png");
+    await expect(page).toHaveScreenshot("search-presets-light.png");
   });
 
   test("search presets - dark", async ({ page }) => {
@@ -130,7 +125,7 @@ test.describe("Editor", () => {
     await page.waitForFunction(() => document.fonts.ready);
     const firstFindButtonLocator = page.getByText("Find").first();
     await firstFindButtonLocator.waitFor();
-    expect(await page.screenshot()).toMatchSnapshot("search-presets-dark.png");
+    await expect(page).toHaveScreenshot("search-presets-dark.png");
   });
 
   test("search results disclaimer - light", async ({ page }) => {
@@ -146,8 +141,8 @@ test.describe("Editor", () => {
     const searchInput = page.locator("#search-input");
     await searchInput.click();
     await searchInput.fill("1");
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-search-results-disclaimer-light.png");
+    await expect(page)
+      .toHaveScreenshot("editor-search-results-disclaimer-light.png");
   });
 
   test("search results disclaimer - dark", async ({ page }) => {
@@ -163,8 +158,8 @@ test.describe("Editor", () => {
     const searchInput = page.locator("#search-input");
     await searchInput.click();
     await searchInput.fill("1");
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-search-results-disclaimer-dark.png");
+    await expect(page)
+      .toHaveScreenshot("editor-search-results-disclaimer-dark.png");
   });
 
   test("note with image - light", async ({ page }) => {
@@ -189,8 +184,8 @@ test.describe("Editor", () => {
     await page.dispatchEvent("section.note", "drop", { dataTransfer });
     await page.click("#button_save");
     await page.locator(".preview-block-image-wrapper img").waitFor();
-    expect(await page.locator(".note").screenshot())
-      .toMatchSnapshot("editor-note-with-image-light.png");
+    await expect(page.locator(".note"))
+      .toHaveScreenshot("editor-note-with-image-light.png");
   });
 
   test("note with image - dark", async ({ page }) => {
@@ -216,8 +211,8 @@ test.describe("Editor", () => {
     await page.dispatchEvent("section.note", "drop", { dataTransfer });
     await page.click("#button_save");
     await page.locator(".preview-block-image-wrapper img").waitFor();
-    expect(await page.locator(".note").screenshot())
-      .toMatchSnapshot("editor-note-with-image-dark.png");
+    await expect(page.locator(".note"))
+      .toHaveScreenshot("editor-note-with-image-dark.png");
   });
 
   test("note with plain text file - light", async ({ page }) => {
@@ -240,8 +235,8 @@ test.describe("Editor", () => {
 
     await page.dispatchEvent("section.note", "drop", { dataTransfer });
     await page.click("#button_save");
-    expect(await page.locator(".note").screenshot())
-      .toMatchSnapshot("editor-note-with-plain-text-file-light.png");
+    await expect(page.locator(".note"))
+      .toHaveScreenshot("editor-note-with-plain-text-file-light.png");
   });
 
   test("note with plain text file - dark", async ({ page }) => {
@@ -264,8 +259,8 @@ test.describe("Editor", () => {
 
     await page.dispatchEvent("section.note", "drop", { dataTransfer });
     await page.click("#button_save");
-    expect(await page.locator(".note").screenshot())
-      .toMatchSnapshot("editor-note-with-plain-text-file-dark.png");
+    await expect(page.locator(".note"))
+      .toHaveScreenshot("editor-note-with-plain-text-file-dark.png");
   });
 
   test("note stats with files - light", async ({ page }) => {
@@ -303,12 +298,12 @@ test.describe("Editor", () => {
 
     await page.click("#button_save");
 
-    await page.getByRole("link", { name: "/files/test.txt" })
-      .locator("span")
+    await page.locator("#stats")
+      .getByRole("link", { name: "files/test.txt", exact: true })
       .waitFor();
 
-    expect(await page.locator("#stats").screenshot())
-      .toMatchSnapshot("editor-note-stats-with-files-light.png");
+    await expect(page.locator("#stats"))
+      .toHaveScreenshot("editor-note-stats-with-files-light.png");
   });
 
   test("inline script - light", async ({ page }) => {
@@ -324,8 +319,8 @@ test.describe("Editor", () => {
       + "Another paragraph",
     );
     await page.locator(".script-output-content").waitFor({ timeout: 10000 });
-    expect(await page.locator(".note").screenshot())
-      .toMatchSnapshot("editor-inline-script-light.png");
+    await expect(page.locator(".note"))
+      .toHaveScreenshot("editor-inline-script-light.png");
   });
 
   test("inline script - dark", async ({ page }) => {
@@ -341,8 +336,8 @@ test.describe("Editor", () => {
       + "Another paragraph",
     );
     await page.locator(".script-output-content").waitFor({ timeout: 10000 });
-    expect(await page.locator(".note").screenshot())
-      .toMatchSnapshot("editor-inline-script-dark.png");
+    await expect(page.locator(".note"))
+      .toHaveScreenshot("editor-inline-script-dark.png");
   });
 
   test("modal - light", async ({ page }) => {
@@ -351,8 +346,7 @@ test.describe("Editor", () => {
     page.keyboard.type(" ");
     await page.click("#button_new");
 
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-modal-light.png");
+    await expect(page).toHaveScreenshot("editor-modal-light.png");
   });
 
   test("modal - dark", async ({ page }) => {
@@ -361,7 +355,6 @@ test.describe("Editor", () => {
     page.keyboard.type(" ");
     await page.click("#button_new");
 
-    expect(await page.screenshot())
-      .toMatchSnapshot("editor-modal-dark.png");
+    await expect(page).toHaveScreenshot("editor-modal-dark.png");
   });
 });

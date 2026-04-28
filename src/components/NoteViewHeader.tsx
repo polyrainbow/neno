@@ -74,7 +74,7 @@ const NoteViewHeader = ({
                         setDragTargetSlotIndex(pinIndex);
 
                         pinRects.current = Array.from(
-                          document.querySelectorAll("button.pinned-note"),
+                          document.querySelectorAll("a.pinned-note"),
                         )
                           .map((el) => {
                             return el.getBoundingClientRect();

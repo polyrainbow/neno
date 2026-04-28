@@ -5,7 +5,7 @@ import NoteListStatusIndicator, {
 import NoteListItem from "./NoteListItem";
 import Pagination from "./Pagination";
 import NoteSearchDisclaimer from "./NoteSearchDisclaimer";
-import { SEARCH_RESULTS_PER_PAGE } from "../config";
+import { LOCAL_GRAPH_ID, SEARCH_RESULTS_PER_PAGE } from "../config";
 import ActiveNote from "../types/ActiveNote";
 import {
   NoteListSortMode,
@@ -13,6 +13,8 @@ import {
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import NoteListItemType from "../lib/notes/types/NoteListItem";
 import { Slug } from "../lib/notes/types/Slug";
+import { getAppPath } from "../lib/utils";
+import { PathTemplate } from "../types/PathTemplate";
 
 
 interface NoteListProps {
@@ -145,6 +147,10 @@ const NoteList = ({
             isSelected={i === selectedIndex}
             isActive={isActive}
             isLinked={isLinked}
+            href={getAppPath(PathTemplate.EXISTING_NOTE, new Map([
+              ["GRAPH_ID", LOCAL_GRAPH_ID],
+              ["SLUG", note.slug],
+            ]))}
             key={`main-notes-list-item-${note.slug}`}
             onSelect={() => onSelect(note.slug)}
             isLinkable={itemsAreLinkable}

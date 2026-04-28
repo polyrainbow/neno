@@ -181,9 +181,9 @@ interface ParsedDocument {
 
 if (
   // @ts-ignore
-  typeof WorkerGlobalScope !== "undefined"
+  typeof DedicatedWorkerGlobalScope !== "undefined"
   // @ts-ignore
-  && self instanceof WorkerGlobalScope
+  && self instanceof DedicatedWorkerGlobalScope
 ) {
   onmessage = (event) => {
     const eventData = event.data;

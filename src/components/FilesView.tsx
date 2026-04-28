@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import FilesViewPreviewBox from "./FilesViewPreviewBox";
 import { l } from "../lib/intl";
 import { FileInfo } from "../lib/notes/types/FileInfo";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import FlexContainer from "./FlexContainer";
 import useNotesProvider from "../hooks/useNotesProvider";
+import useWorkerMutation from "../hooks/useWorkerMutation";
 import { Slug } from "../lib/notes/types/Slug";
 import Pagination from "./Pagination";
 import { DEFAULT_DOCUMENT_TITLE, SEARCH_RESULTS_PER_PAGE } from "../config";
@@ -82,17 +83,19 @@ const FilesView = () => {
     filteredFiles, page, SEARCH_RESULTS_PER_PAGE,
   );
 
-  const updateFiles = async () => {
+  const updateFiles = useCallback(async () => {
     const files: FileInfo[] = await notesProvider.getFiles();
     setFiles(files);
     await updateDanglingFiles();
     setStatus("READY");
-  };
+  }, [notesProvider]);
 
   useEffect(() => {
     if (!notesProvider) return;
     updateFiles();
   }, [notesProvider]);
+
+  useWorkerMutation(notesProvider, updateFiles);
 
   useEffect(() => {
     const container = containerRef.current;

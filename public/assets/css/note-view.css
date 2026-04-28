@@ -113,7 +113,24 @@
       & {
         width: calc(100vw - var(--xl-list-width));
       }
-    }  
+    }
+  }
+
+  .external-change-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--default-padding);
+    padding: var(--default-padding);
+    background: var(--accent-background-color, #fff3cd);
+    border-bottom: 1px solid var(--border-color, #d6cfae);
+    font-size: 0.95em;
+  }
+
+  .external-change-banner-actions {
+    display: flex;
+    gap: 0.5em;
+    flex-shrink: 0;
   }
 
   .note {

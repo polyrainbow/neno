@@ -46,6 +46,12 @@ interface PendingCall {
   reject: (reason: Error) => void;
 }
 
+export type WorkerEvent
+  = { event: "mutation" }
+  | { event: "gitEnabled" };
+
+export type WorkerEventListener = (event: WorkerEvent) => void;
+
 export default class NotesProviderProxy {
   /* STATIC — pure functions, no worker needed */
 
@@ -59,13 +65,21 @@ export default class NotesProviderProxy {
   #target: RPCTarget;
   #pendingCalls = new Map<number, PendingCall>();
   #nextId = 0;
+  #listeners = new Set<WorkerEventListener>();
 
   constructor(target: RPCTarget) {
     this.#target = target;
 
     const handler = (event: Event) => {
-      const { id, result, error }
-        = (event as MessageEvent).data;
+      const data = (event as MessageEvent).data;
+      if (!data || typeof data !== "object") return;
+      if ("event" in data) {
+        for (const listener of this.#listeners) {
+          listener(data as WorkerEvent);
+        }
+        return;
+      }
+      const { id, result, error } = data;
       if (id === undefined) return;
       const pending = this.#pendingCalls.get(id as number);
       if (!pending) return;
@@ -83,6 +97,14 @@ export default class NotesProviderProxy {
     if ("start" in target) {
       (target as MessagePort).start();
     }
+  }
+
+  subscribe(listener: WorkerEventListener): void {
+    this.#listeners.add(listener);
+  }
+
+  unsubscribe(listener: WorkerEventListener): void {
+    this.#listeners.delete(listener);
   }
 
   #call(

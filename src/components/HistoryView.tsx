@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { l } from "../lib/intl";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
+import useWorkerMutation from "../hooks/useWorkerMutation";
 import BusyIndicator from "./BusyIndicator";
 import NavigationRail from "./NavigationRail";
 import HistoryList from "./HistoryList";
@@ -15,18 +16,20 @@ const HistoryView = () => {
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchInitial = async () => {
-      const page = await notesProvider.getCommitHistory({
-        limit: PAGE_SIZE,
-        offset: 0,
-      });
-      setCommits(page);
-      setHasMore(page.length === PAGE_SIZE);
-    };
-
-    fetchInitial();
+  const fetchInitial = useCallback(async () => {
+    const page = await notesProvider.getCommitHistory({
+      limit: PAGE_SIZE,
+      offset: 0,
+    });
+    setCommits(page);
+    setHasMore(page.length === PAGE_SIZE);
   }, [notesProvider]);
+
+  useEffect(() => {
+    fetchInitial();
+  }, [fetchInitial]);
+
+  useWorkerMutation(notesProvider, fetchInitial);
 
   const loadMore = useCallback(async () => {
     if (commits === null || isLoadingMore) return;

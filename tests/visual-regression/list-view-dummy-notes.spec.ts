@@ -19,25 +19,18 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("Editor", () => {
   test("should look fine - light", async ({ page }) => {
-    expect(await page.screenshot())
-      .toMatchSnapshot(
-        "list-view-light.png",
-      );
+    await expect(page).toHaveScreenshot("list-view-light.png");
   });
 
   test("should look fine - dark", async ({ page }) => {
     page.emulateMedia({ colorScheme: "dark" });
-    expect(await page.screenshot())
-      .toMatchSnapshot("list-view-dark.png");
+    await expect(page).toHaveScreenshot("list-view-dark.png");
   });
 
   test("FAB should not scroll with list", async ({ page }) => {
     await page.evaluate(() => {
       document.documentElement.scrollTop = 1000;
     });
-    expect(await page.screenshot())
-      .toMatchSnapshot(
-        "list-view-scrolled-light.png",
-      );
+    await expect(page).toHaveScreenshot("list-view-scrolled-light.png");
   });
 });

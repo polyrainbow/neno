@@ -55,6 +55,9 @@
     padding: 0.9em;
     width: 100%;
     outline-offset: -0.125rem;
+    color: inherit;
+    text-decoration: none;
+    font: inherit;
 
     &.with-link-edge {
       width: calc(100% - 2.5rem);

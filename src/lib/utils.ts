@@ -4,6 +4,7 @@ import * as Config from "../config";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { Slug } from "./notes/types/Slug";
 import { sluggifyWikilinkText } from "./notes/slugUtils";
+import type React from "react";
 
 
 const shortenText = (text: string, maxLength: number): string => {
@@ -221,6 +222,20 @@ const getWikilinkForNote = (slug: Slug, title: string): string => {
 };
 
 
+// For anchor-based SPA navigation: only intercept plain left-clicks.
+// Modifier-clicks and middle-clicks fall through to the browser so the
+// link opens in a new tab/window.
+const handleSpaClick = (
+  e: React.MouseEvent,
+  fn: () => void,
+): void => {
+  if (e.button !== 0) return;
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  e.preventDefault();
+  fn();
+};
+
+
 export {
   getPagedMatches,
   ISOTimestampToLocaleString,
@@ -236,4 +251,5 @@ export {
   createContentFromSlugs,
   getLines,
   getWikilinkForNote,
+  handleSpaClick,
 };

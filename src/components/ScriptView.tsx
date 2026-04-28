@@ -3,7 +3,7 @@ import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import BusyIndicator from "./BusyIndicator";
 import scriptWorkerUrl from "../lib/script-worker/index.js?worker&url";
 import {
-  getNotesWorker,
+  getNotesWorkerPort,
 } from "../lib/LocalDataStorage";
 import useRunOnce from "../hooks/useRunOnce";
 import useNotesProvider from "../hooks/useNotesProvider";
@@ -84,15 +84,15 @@ const ScriptView = ({
       return;
     }
 
-    const parentNotesWorker = getNotesWorker();
-    if (!parentNotesWorker) {
+    const parentNotesWorkerPort = getNotesWorkerPort();
+    if (!parentNotesWorkerPort) {
       setError("SCRIPT_NOT_FOUND");
       return;
     }
 
     const scriptWorker = new Worker(scriptWorkerUrl, { type: "module" });
     const channel = new MessageChannel();
-    parentNotesWorker.postMessage(
+    parentNotesWorkerPort.postMessage(
       { action: "addPort" },
       [channel.port1],
     );

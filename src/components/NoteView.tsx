@@ -87,6 +87,10 @@ const NoteView = ({ slug }: NoteViewProps) => {
     updateReferences,
     setUpdateReferences,
     handleNoteExportRequest,
+    externalChange,
+    checkForExternalChanges,
+    reloadActiveNoteFromExternal,
+    dismissExternalChange,
   } = useActiveNote(notesProvider);
 
   const [headerStats, refreshHeaderStats] = useHeaderStats(notesProvider);
@@ -288,6 +292,17 @@ const NoteView = ({ slug }: NoteViewProps) => {
     );
   }, [slug]);
 
+
+  useEffect(() => {
+    const listener = (e: { event: string }) => {
+      if (e.event !== "mutation") return;
+      refreshContentViews();
+      checkForExternalChanges();
+    };
+    notesProvider.subscribe(listener);
+    return () => notesProvider.unsubscribe(listener);
+  }, [notesProvider, activeNote]);
+
   return <div className="view note-view">
     <NavigationRail activeView="notes" />
     <NoteViewHeader
@@ -325,6 +340,42 @@ const NoteView = ({ slug }: NoteViewProps) => {
           : null
       }
       <div className="main-content-besides-sidebar">
+        {externalChange ? (
+          <div
+            className="external-change-banner"
+            role="status"
+          >
+            <span>
+              {externalChange.kind === "deleted"
+                ? l("editor.external-change.deleted")
+                : l("editor.external-change.modified")}
+            </span>
+            <div className="external-change-banner-actions">
+              <button
+                type="button"
+                onClick={() => {
+                  if (externalChange.kind === "deleted") {
+                    dismissExternalChange();
+                    setUnsavedChanges(false);
+                    goToNote("new");
+                  } else {
+                    reloadActiveNoteFromExternal();
+                  }
+                }}
+              >
+                {externalChange.kind === "deleted"
+                  ? l("editor.external-change.reload-deleted")
+                  : l("editor.external-change.reload")}
+              </button>
+              <button
+                type="button"
+                onClick={dismissExternalChange}
+              >
+                {l("editor.external-change.dismiss")}
+              </button>
+            </div>
+          </div>
+        ) : null}
         <Note
           editorInstanceId={editorInstanceId}
           isBusy={isBusy}

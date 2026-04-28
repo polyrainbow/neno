@@ -5,7 +5,7 @@ import NotesProviderProxy from "./notes-worker/NotesProviderProxy";
 import { Slug } from "./notes/types/Slug";
 import { FileInfo } from "./notes/types/FileInfo";
 // @ts-ignore Vite worker URL import
-import notesWorkerUrl from "./notes-worker/index.ts?worker&url";
+import notesWorkerUrl from "./notes-worker/index.ts?sharedworker&url";
 import { getExtensionFromFilename } from "./notes/utils";
 
 /*
@@ -48,7 +48,8 @@ const GIT_USER_EMAIL_DEFAULT = "noreply@neno.local";
 
 let folderHandle: FileSystemDirectoryHandle | null = null;
 let notesProvider: NotesProviderProxy | null = null;
-let notesWorker: Worker | null = null;
+let sharedWorker: SharedWorker | null = null;
+let workerPort: MessagePort | null = null;
 let gitEnabledFlag = false;
 const gitEnabledSubscribers = new Set<() => void>();
 
@@ -87,22 +88,24 @@ export const setGitAuthor = (
 };
 
 export const enableGit = async (): Promise<void> => {
-  if (!notesWorker) {
+  if (!workerPort) {
     throw new Error("Notes worker not initialized");
   }
-  const worker = notesWorker;
+  const port = workerPort;
   await new Promise<void>((resolve, reject) => {
     const onMessage = (e: MessageEvent) => {
-      if (e.data?.action === "gitEnabled") {
-        worker.removeEventListener("message", onMessage);
+      const data = e.data;
+      if (!data || typeof data !== "object") return;
+      if (data.action === "gitEnabled") {
+        port.removeEventListener("message", onMessage);
         resolve();
-      } else if (e.data?.action === "gitEnableFailed") {
-        worker.removeEventListener("message", onMessage);
-        reject(new Error(e.data.error as string));
+      } else if (data.action === "gitEnableFailed") {
+        port.removeEventListener("message", onMessage);
+        reject(new Error(data.error as string));
       }
     };
-    worker.addEventListener("message", onMessage);
-    worker.postMessage({ action: "enableGit" });
+    port.addEventListener("message", onMessage);
+    port.postMessage({ action: "enableGit" });
   });
   gitEnabledFlag = true;
   if (notesProvider) {
@@ -147,43 +150,175 @@ export const getFolderHandleFromStorage = async (
 };
 
 
-function createNotesWorkerAndProxy(
-  initMessage: Record<string, unknown>,
-): Promise<NotesProviderProxy> {
-  if (notesWorker) {
-    notesWorker.terminate();
-  }
+type HelloAck = {
+  initialized: boolean;
+  gitEnabled: boolean;
+  folderName: string | null;
+  usingOPFS: boolean;
+  connectedTabCount: number;
+};
 
-  if (gitEnabledFlag) {
-    gitEnabledFlag = false;
-    notifyGitEnabledSubscribers();
-  }
+type InitOk = {
+  gitEnabled: boolean;
+  folderName: string | null;
+  usingOPFS: boolean;
+};
 
-  const worker = new Worker(notesWorkerUrl, { type: "module" });
-  notesWorker = worker;
+type InitMessage = {
+  folderHandle?: FileSystemDirectoryHandle;
+  useOPFS?: boolean;
+  createDummyNotes?: boolean;
+  gitAuthor: { name: string; email: string };
+};
 
+function setupGoodbye(port: MessagePort): void {
+  window.addEventListener("pagehide", (e) => {
+    if (e.persisted) return;
+    try {
+      port.postMessage({ action: "goodbye" });
+    } catch {
+      // port already closed; nothing to do
+    }
+  });
+}
+
+function setupGlobalEventListener(port: MessagePort): void {
+  port.addEventListener("message", (e: MessageEvent) => {
+    const data = e.data;
+    if (!data || typeof data !== "object") return;
+    if (data.event === "gitEnabled" && !gitEnabledFlag) {
+      gitEnabledFlag = true;
+      notifyGitEnabledSubscribers();
+    }
+  });
+}
+
+function ensureSharedWorker(): MessagePort {
+  if (workerPort) return workerPort;
+  sharedWorker = new SharedWorker(notesWorkerUrl, { type: "module" });
+  const port = sharedWorker.port;
+  port.start();
+  workerPort = port;
+  setupGoodbye(port);
+  setupGlobalEventListener(port);
+  return port;
+}
+
+function sendHello(port: MessagePort): Promise<HelloAck> {
+  return new Promise((resolve) => {
+    const onMessage = (e: MessageEvent) => {
+      const data = e.data;
+      if (!data || typeof data !== "object") return;
+      if (data.action !== "helloAck") return;
+      port.removeEventListener("message", onMessage);
+      resolve(data as HelloAck);
+    };
+    port.addEventListener("message", onMessage);
+    port.postMessage({ action: "hello" });
+  });
+}
+
+function sendInitialize(
+  port: MessagePort,
+  message: InitMessage,
+): Promise<InitOk> {
   return new Promise((resolve, reject) => {
     const onMessage = (e: MessageEvent) => {
-      if (e.data.action === "initialized") {
-        worker.removeEventListener("message", onMessage);
-        const proxy = new NotesProviderProxy(worker);
-        notesProvider = proxy;
-        const nextGitEnabled = Boolean(e.data.gitEnabled);
-        if (nextGitEnabled !== gitEnabledFlag) {
-          gitEnabledFlag = nextGitEnabled;
-          notifyGitEnabledSubscribers();
-        }
-        resolve(proxy);
-      } else if (e.data.action === "error") {
-        worker.removeEventListener("message", onMessage);
-        reject(new Error(e.data.error as string));
+      const data = e.data;
+      if (!data || typeof data !== "object") return;
+      if (data.action === "initialized") {
+        port.removeEventListener("message", onMessage);
+        resolve({
+          gitEnabled: Boolean(data.gitEnabled),
+          folderName: data.folderName ?? null,
+          usingOPFS: Boolean(data.usingOPFS),
+        });
+      } else if (data.action === "initError") {
+        port.removeEventListener("message", onMessage);
+        reject(new Error(data.error as string));
       }
     };
-    worker.addEventListener("message", onMessage);
-    worker.postMessage({
-      action: "initialize",
-      ...initMessage,
+    port.addEventListener("message", onMessage);
+    port.postMessage({ action: "initialize", ...message });
+  });
+}
+
+function adoptInitialState(
+  port: MessagePort,
+  ack: { gitEnabled: boolean },
+): NotesProviderProxy {
+  if (ack.gitEnabled !== gitEnabledFlag) {
+    gitEnabledFlag = ack.gitEnabled;
+    notifyGitEnabledSubscribers();
+  }
+  const proxy = new NotesProviderProxy(port);
+  notesProvider = proxy;
+  return proxy;
+}
+
+
+async function initFresh(
+  port: MessagePort,
+  newFolderHandle: FileSystemDirectoryHandle | undefined,
+  createDummyNotes: boolean,
+): Promise<NotesProviderProxy> {
+  if (!newFolderHandle) {
+    const init = await sendInitialize(port, {
+      useOPFS: true,
+      createDummyNotes,
+      gitAuthor: getGitAuthor(),
     });
+    return adoptInitialState(port, init);
+  }
+
+  await verifyPermission(newFolderHandle, true);
+  await IDB.set(FOLDER_HANDLE_STORAGE_KEY, newFolderHandle);
+  folderHandle = newFolderHandle;
+  const init = await sendInitialize(port, {
+    folderHandle: newFolderHandle,
+    gitAuthor: getGitAuthor(),
+  });
+  return adoptInitialState(port, init);
+}
+
+
+function describesSameSetup(
+  ack: HelloAck,
+  newFolderHandle: FileSystemDirectoryHandle | undefined,
+): boolean {
+  if (!newFolderHandle) {
+    // Caller wants OPFS — match only if the worker is using OPFS too.
+    return ack.usingOPFS;
+  }
+  return !ack.usingOPFS && ack.folderName === newFolderHandle.name;
+}
+
+
+export function requestFolderSwitch(): Promise<void> {
+  if (!workerPort) {
+    return Promise.reject(new Error("Notes worker not initialized"));
+  }
+  const port = workerPort;
+  return new Promise((resolve, reject) => {
+    const onMessage = (e: MessageEvent) => {
+      const data = e.data;
+      if (!data || typeof data !== "object") return;
+      if (data.action === "resetOk") {
+        port.removeEventListener("message", onMessage);
+        notesProvider = null;
+        folderHandle = null;
+        if (gitEnabledFlag) {
+          gitEnabledFlag = false;
+          notifyGitEnabledSubscribers();
+        }
+        resolve();
+      } else if (data.action === "resetDenied") {
+        port.removeEventListener("message", onMessage);
+        reject(new Error("OTHER_TABS_OPEN"));
+      }
+    };
+    port.addEventListener("message", onMessage);
+    port.postMessage({ action: "reset" });
   });
 }
 
@@ -192,26 +327,26 @@ export const initializeNotesProvider = async (
   newFolderHandle?: FileSystemDirectoryHandle,
   createDummyNotes?: boolean,
 ): Promise<NotesProviderProxy> => {
-  if (!newFolderHandle) {
-    return createNotesWorkerAndProxy({
-      useOPFS: true,
-      createDummyNotes: createDummyNotes ?? false,
-      gitAuthor: getGitAuthor(),
-    });
+  const port = ensureSharedWorker();
+  const ack = await sendHello(port);
+
+  if (ack.initialized) {
+    if (describesSameSetup(ack, newFolderHandle)) {
+      if (newFolderHandle) {
+        await IDB.set(FOLDER_HANDLE_STORAGE_KEY, newFolderHandle);
+        folderHandle = newFolderHandle;
+      }
+      return adoptInitialState(port, ack);
+    }
+    // Caller wants a different setup than the worker is running.
+    if (ack.connectedTabCount > 1) {
+      throw new Error("OTHER_TABS_OPEN");
+    }
+    // Sole tab — reset the worker and re-initialize.
+    await requestFolderSwitch();
   }
 
-  await verifyPermission(newFolderHandle, true);
-
-  await IDB.set(
-    FOLDER_HANDLE_STORAGE_KEY,
-    newFolderHandle,
-  );
-
-  folderHandle = newFolderHandle;
-  return createNotesWorkerAndProxy({
-    folderHandle: newFolderHandle,
-    gitAuthor: getGitAuthor(),
-  });
+  return initFresh(port, newFolderHandle, createDummyNotes ?? false);
 };
 
 
@@ -232,8 +367,8 @@ export const getNotesProvider = (): NotesProviderProxy | null => {
 };
 
 
-export const getNotesWorker = (): Worker | null => {
-  return notesWorker;
+export const getNotesWorkerPort = (): MessagePort | null => {
+  return workerPort;
 };
 
 
