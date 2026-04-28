@@ -234,3 +234,11 @@ export const highlightBoldSigils = () => {
   // @ts-ignore
   CSS.highlights.set("bold-sigil", highlight);
 };
+
+export const applyAllHighlights = () => {
+  highlightHeadingSigils();
+  highlightQuoteBlockSigils();
+  highlightInlineCodeSigils();
+  highlightBoldSigils();
+  highlightCodeTokens();
+};
