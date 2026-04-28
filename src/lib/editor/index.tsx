@@ -36,13 +36,7 @@ import PlainTextStateExchangePlugin
 import theme from "./theme";
 import AutoFocusPlugin from "./plugins/AutoFocusPlugin";
 import { TransclusionContentGetter } from "./types/TransclusionContentGetter";
-import {
-  highlightBoldSigils,
-  highlightCodeTokens,
-  highlightHeadingSigils,
-  highlightInlineCodeSigils,
-  highlightQuoteBlockSigils,
-} from "./utils/highlight";
+import { applyAllHighlights } from "./utils/highlight";
 import { KeyValueNode } from "./nodes/KeyValueNode";
 import { KeyValuePairKeyNode } from "./nodes/KeyValuePairKeyNode";
 import { KeyValuePlugin } from "./plugins/KeyValuePlugin";
@@ -98,11 +92,7 @@ export const Editor = ({
     <OnChangePlugin onChange={
       (editorState: EditorState) => {
         editorState.read(() => {
-          highlightHeadingSigils();
-          highlightQuoteBlockSigils();
-          highlightInlineCodeSigils();
-          highlightBoldSigils();
-          highlightCodeTokens();
+          applyAllHighlights();
           const root = $getRoot();
           onChange(getSubtextFromEditor(root));
         });
