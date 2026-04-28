@@ -28,13 +28,17 @@ export type ExternalChange
   = { kind: "modified" }
   | { kind: "deleted" };
 
-export default (
-  notesProvider: NotesProviderProxy,
-) => {
+
+// =============================================================================
+// State sub-hook — owns all useState/refs and state mutators that other
+// sub-hooks need. No async I/O or notes-provider calls live here.
+// =============================================================================
+
+const useActiveNoteState = () => {
   const [unsavedChanges, setUnsavedChanges]
     = useContext(UnsavedChangesContext);
-  const newNoteObject: UnsavedActiveNote = getNewNoteObject({});
-  const [activeNote, setActiveNote] = useState<ActiveNote>(newNoteObject);
+  const [activeNote, setActiveNote]
+    = useState<ActiveNote>(getNewNoteObject({}));
   const [isBusy, setIsBusy] = useState<boolean>(false);
   const [externalChange, setExternalChange]
     = useState<ExternalChange | null>(null);
@@ -61,9 +65,7 @@ export default (
   };
 
 
-  const handleEditorContentChange = (
-    newContent: string,
-  ): void => {
+  const handleEditorContentChange = (newContent: string): void => {
     if (noteContentRef.current !== newContent) {
       setUnsavedChanges(true);
     }
@@ -78,17 +80,6 @@ export default (
     setSlugInput(params.slug || "");
     setDisplayedSlugAliases([]);
     noteContentRef.current = "";
-  };
-
-
-  const createNewNote = async (params: CreateNewNoteParams) => {
-    setNewNote(params);
-
-    if (params.content) {
-      setUnsavedChanges(true);
-    }
-
-    updateEditorInstance();
   };
 
 
@@ -129,11 +120,65 @@ export default (
   };
 
 
+  return {
+    activeNote,
+    setActiveNote,
+    isBusy,
+    setIsBusy,
+    externalChange,
+    setExternalChange,
+    unsavedChanges,
+    setUnsavedChanges,
+    slugInput,
+    setSlugInput,
+    displayedSlugAliases,
+    setDisplayedSlugAliases,
+    editorInstanceId,
+    updateEditorInstance,
+    updateReferences,
+    setUpdateReferences,
+    noteContentRef,
+    unsavedChangesRef,
+    handleEditorContentChange,
+    setNewNote,
+    setActiveNoteFromServer,
+  };
+};
+
+
+type ActiveNoteState = ReturnType<typeof useActiveNoteState>;
+
+
+// =============================================================================
+// Actions sub-hook — verbs the user can invoke against the active note
+// (save / load / remove / duplicate / import / export). All notes-provider
+// I/O lives here. Reads and writes the state object exposed by
+// useActiveNoteState.
+// =============================================================================
+
+const useActiveNoteActions = (
+  state: ActiveNoteState,
+  notesProvider: NotesProviderProxy,
+) => {
+  const createNewNote = async (params: CreateNewNoteParams) => {
+    state.setNewNote(params);
+
+    if (params.content) {
+      state.setUnsavedChanges(true);
+    }
+
+    state.updateEditorInstance();
+  };
+
+
   const prepareNoteSaveRequest = (): NoteSaveRequest => {
+    const { activeNote, slugInput, displayedSlugAliases, updateReferences }
+      = state;
+
     if (activeNote.isUnsaved) {
       return {
         note: {
-          content: noteContentRef.current,
+          content: state.noteContentRef.current,
           meta: {
             additionalHeaders: {},
             flags: activeNote.flags,
@@ -153,7 +198,7 @@ export default (
     } else {
       return {
         note: {
-          content: noteContentRef.current,
+          content: state.noteContentRef.current,
           meta: {
             additionalHeaders: Object.fromEntries(activeNote.additionalHeaders),
             slug: activeNote.slug,
@@ -181,25 +226,25 @@ export default (
   };
 
 
-  const saveActiveNote = async (): Promise<NoteToTransmit> => {
-    if (!NotesProviderProxy.isValidNoteSlugOrEmpty(slugInput)) {
+  const save = async (): Promise<NoteToTransmit> => {
+    if (!NotesProviderProxy.isValidNoteSlugOrEmpty(state.slugInput)) {
       throw new Error("Tried saving an invalid slug. This should not happen!");
     }
 
     const noteSaveRequest = prepareNoteSaveRequest();
     const noteFromDatabase = await notesProvider.put(noteSaveRequest);
-    setActiveNoteFromServer(noteFromDatabase);
+    state.setActiveNoteFromServer(noteFromDatabase);
     // After the saving has been done, let's check if there was an editor update
     // in the meantime. Only if there was no editor update, we can be sure
     // that we have no new unsaved changes.
-    if (noteFromDatabase.content === noteContentRef.current) {
-      setUnsavedChanges(false);
+    if (noteFromDatabase.content === state.noteContentRef.current) {
+      state.setUnsavedChanges(false);
     }
     return noteFromDatabase;
   };
 
 
-  const importNote = async (): Promise<void> => {
+  const importFromFile = async (): Promise<void> => {
     const types = [{
       description: NOTE_FILE_DESCRIPTION,
       accept: { [NOTE_MIME_TYPE]: [NOTE_FILE_EXTENSION] },
@@ -215,60 +260,65 @@ export default (
       flags: [...parsedNote.meta.flags, "IMPORTED"],
       files: new Set(),
     };
-    setActiveNote(newActiveNote);
+    state.setActiveNote(newActiveNote);
     // If the user does not change the slug input, we let the app
     // suggest the slug of an imported note.
-    setSlugInput("");
-    setUnsavedChanges(true);
-    noteContentRef.current = parsedNote.content;
-    updateEditorInstance();
+    state.setSlugInput("");
+    state.setUnsavedChanges(true);
+    state.noteContentRef.current = parsedNote.content;
+    state.updateEditorInstance();
   };
 
 
-  const removeActiveNote = async () => {
-    if (activeNote.isUnsaved) {
+  const remove = async () => {
+    if (state.activeNote.isUnsaved) {
       return;
     }
 
-    await notesProvider.remove(activeNote.slug);
+    await notesProvider.remove(state.activeNote.slug);
 
     createNewNote({});
-    setUnsavedChanges(false);
+    state.setUnsavedChanges(false);
   };
 
 
-  const duplicateNote = async (): Promise<NoteToTransmit> => {
-    if (activeNote.isUnsaved) {
+  const duplicate = async (): Promise<NoteToTransmit> => {
+    if (state.activeNote.isUnsaved) {
       throw new Error("Cannot duplicate an unsaved note");
     }
 
     const noteSaveRequest: NewNoteSaveRequest = {
       note: {
         meta: {
-          additionalHeaders: Object.fromEntries(activeNote.additionalHeaders),
-          flags: [...activeNote.flags, `DUPLICATE_OF(${activeNote.slug})`],
+          additionalHeaders: Object.fromEntries(
+            state.activeNote.additionalHeaders,
+          ),
+          flags: [
+            ...state.activeNote.flags,
+            `DUPLICATE_OF(${state.activeNote.slug})`,
+          ],
         },
-        content: noteContentRef.current,
+        content: state.noteContentRef.current,
       },
       aliases: new Set(),
     };
     const noteFromServer = await notesProvider.put(noteSaveRequest);
-    setActiveNoteFromServer(noteFromServer);
-    updateEditorInstance();
+    state.setActiveNoteFromServer(noteFromServer);
+    state.updateEditorInstance();
     return noteFromServer;
   };
 
 
-  const handleNoteExportRequest = () => {
-    exportNote(activeNote, noteContentRef.current, notesProvider);
+  const exportToFile = () => {
+    exportNote(state.activeNote, state.noteContentRef.current, notesProvider);
   };
 
 
-  const loadNote = async (
+  const load = async (
     slug: Slug | "random" | "new",
     contentForNewNote?: string,
   ): Promise<Slug | null> => {
-    setExternalChange(null);
+    state.setExternalChange(null);
     if (slug === "new") {
       createNewNote({
         slug: undefined,
@@ -279,15 +329,15 @@ export default (
     }
 
     let receivedNoteSlug: Slug | null = null;
-    setIsBusy(true);
+    state.setIsBusy(true);
     try {
       const noteFromServer
         = slug === "random"
           ? await notesProvider.getRandom()
           : await notesProvider.get(slug);
-      setActiveNoteFromServer(noteFromServer);
+      state.setActiveNoteFromServer(noteFromServer);
       receivedNoteSlug = noteFromServer.meta.slug;
-      updateEditorInstance();
+      state.updateEditorInstance();
     } catch (e) {
       if (e instanceof Error && e.message === "NOTE_NOT_FOUND") {
         createNewNote({
@@ -298,83 +348,112 @@ export default (
         throw e;
       }
     }
-    setIsBusy(false);
+    state.setIsBusy(false);
     return receivedNoteSlug;
   };
 
 
-  const checkForExternalChanges = async (): Promise<void> => {
-    if (activeNote.isUnsaved) return;
-    const slug = activeNote.slug;
+  return { save, importFromFile, exportToFile, remove, duplicate, load };
+};
+
+
+type ActiveNoteActions = ReturnType<typeof useActiveNoteActions>;
+
+
+// =============================================================================
+// External change detection sub-hook — handles cross-tab sync. Watches for
+// disk-side mutations to the active note and surfaces a banner state plus
+// reload/dismiss handlers. Depends on actions.load to perform reloads.
+// =============================================================================
+
+const useExternalChangeDetection = (
+  state: ActiveNoteState,
+  load: ActiveNoteActions["load"],
+  notesProvider: NotesProviderProxy,
+) => {
+  const check = async (): Promise<void> => {
+    if (state.activeNote.isUnsaved) return;
+    const slug = state.activeNote.slug;
     try {
       const fresh = await notesProvider.get(slug);
-      const localContent = noteContentRef.current;
+      const localContent = state.noteContentRef.current;
       if (fresh.content === localContent) {
         // No real change for this note (broadcast was for something else).
         return;
       }
-      if (!unsavedChangesRef.current) {
+      if (!state.unsavedChangesRef.current) {
         // Clean editor: silently adopt the new content.
-        setActiveNoteFromServer(fresh);
-        updateEditorInstance();
+        state.setActiveNoteFromServer(fresh);
+        state.updateEditorInstance();
       } else {
-        setExternalChange({ kind: "modified" });
+        state.setExternalChange({ kind: "modified" });
       }
     } catch (e) {
       if (e instanceof Error && e.message === "NOTE_NOT_FOUND") {
-        setExternalChange({ kind: "deleted" });
+        state.setExternalChange({ kind: "deleted" });
       }
     }
   };
 
 
-  const reloadActiveNoteFromExternal = async (): Promise<void> => {
-    if (activeNote.isUnsaved) return;
-    setExternalChange(null);
-    setUnsavedChanges(false);
-    await loadNote(activeNote.slug);
+  const reload = async (): Promise<void> => {
+    if (state.activeNote.isUnsaved) return;
+    state.setExternalChange(null);
+    state.setUnsavedChanges(false);
+    await load(state.activeNote.slug);
   };
 
 
-  const dismissExternalChange = (): void => {
-    setExternalChange(null);
+  const dismiss = (): void => {
+    state.setExternalChange(null);
   };
 
+
+  return { check, reload, dismiss };
+};
+
+
+// =============================================================================
+// Orchestrator — wires the three sub-hooks together and exposes the same
+// grouped return shape NoteView already consumes.
+// =============================================================================
+
+export default (notesProvider: NotesProviderProxy) => {
+  const state = useActiveNoteState();
+  const actions = useActiveNoteActions(state, notesProvider);
+  const externalChange = useExternalChangeDetection(
+    state,
+    actions.load,
+    notesProvider,
+  );
 
   return {
-    activeNote,
-    setActiveNote,
-    isBusy,
-    unsavedChanges,
-    setUnsavedChanges,
+    activeNote: state.activeNote,
+    setActiveNote: state.setActiveNote,
+    isBusy: state.isBusy,
+    unsavedChanges: state.unsavedChanges,
+    setUnsavedChanges: state.setUnsavedChanges,
     slugForm: {
-      input: slugInput,
-      setInput: setSlugInput,
-      aliases: displayedSlugAliases,
-      setAliases: setDisplayedSlugAliases,
+      input: state.slugInput,
+      setInput: state.setSlugInput,
+      aliases: state.displayedSlugAliases,
+      setAliases: state.setDisplayedSlugAliases,
     },
     editor: {
-      instanceId: editorInstanceId,
-      updateInstance: updateEditorInstance,
-      handleContentChange: handleEditorContentChange,
+      instanceId: state.editorInstanceId,
+      updateInstance: state.updateEditorInstance,
+      handleContentChange: state.handleEditorContentChange,
     },
     references: {
-      update: updateReferences,
-      setUpdate: setUpdateReferences,
+      update: state.updateReferences,
+      setUpdate: state.setUpdateReferences,
     },
-    actions: {
-      save: saveActiveNote,
-      importFromFile: importNote,
-      exportToFile: handleNoteExportRequest,
-      remove: removeActiveNote,
-      duplicate: duplicateNote,
-      load: loadNote,
-    },
+    actions,
     externalChange: {
-      state: externalChange,
-      check: checkForExternalChanges,
-      reload: reloadActiveNoteFromExternal,
-      dismiss: dismissExternalChange,
+      state: state.externalChange,
+      check: externalChange.check,
+      reload: externalChange.reload,
+      dismiss: externalChange.dismiss,
     },
   };
 };
