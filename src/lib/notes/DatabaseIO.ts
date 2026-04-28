@@ -13,12 +13,12 @@ import { ErrorMessage } from "./types/ErrorMessage.js";
 import StorageProvider from "./types/StorageProvider.js";
 import {
   cleanSerializedNote,
-  getSlugsFromParsedNote,
   parseGraphFileHeaders,
   parseSerializedExistingGraphFile,
   serializeNote,
   serializeNoteHeaders,
-} from "./noteUtils.js";
+} from "./noteHeaders.js";
+import { getSlugsFromParsedNote } from "./noteUtils.js";
 import {
   Block,
 } from "../subwaytext/types/Block.js";

@@ -1,11 +1,11 @@
 import ExistingNote from "./types/ExistingNote.js";
 import NewNote from "./types/NewNote.js";
+import { getNoteTitle } from "./noteUtils.js";
 import {
-  getNoteTitle,
   parseSerializedExistingGraphFile,
   parseSerializedNewNote,
   serializeNote,
-} from "./noteUtils.js";
+} from "./noteHeaders.js";
 import { describe, it, expect } from "vitest";
 
 describe("getNoteTitle", () => {

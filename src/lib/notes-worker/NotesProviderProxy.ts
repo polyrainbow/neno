@@ -15,7 +15,7 @@ import {
 import {
   parseSerializedNewNote,
   serializeNewNote,
-} from "../notes/noteUtils";
+} from "../notes/noteHeaders";
 import {
   isValidSlug,
   isValidSlugOrEmpty,

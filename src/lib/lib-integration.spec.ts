@@ -1,4 +1,4 @@
-import { changeSlugReferencesInNote } from "./notes/noteUtils";
+import { changeSlugReferencesInNote } from "./notes/noteSaveHandlers";
 import subwaytext from "./subwaytext";
 import serialize from "./subwaytext/serialize";
 import { describe, it, expect } from "vitest";

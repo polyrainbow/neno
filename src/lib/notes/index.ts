@@ -2,16 +2,20 @@ import DatabaseIO, { FlushCallback } from "./DatabaseIO.js";
 import {
   createNoteToTransmit,
   getNumberOfUnlinkedNotes,
-  parseSerializedNewNote,
-  serializeNewNote,
   getSlugsFromInlineText,
   getAllInlineSpans,
-  handleExistingNoteUpdate,
-  isExistingNoteSaveRequest,
-  handleNewNoteSaveRequest,
-  changeSlugReferencesInNote,
   getNoteTitle,
 } from "./noteUtils.js";
+import {
+  parseSerializedNewNote,
+  serializeNewNote,
+} from "./noteHeaders.js";
+import {
+  changeSlugReferencesInNote,
+  handleExistingNoteUpdate,
+  handleNewNoteSaveRequest,
+  isExistingNoteSaveRequest,
+} from "./noteSaveHandlers.js";
 import {
   getNumberOfComponents,
   getGraphLinks,
