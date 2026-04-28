@@ -38,6 +38,7 @@ import {
 } from "@lexical/react/LexicalComposerContext";
 import { InsertItem } from "../types/InsertItem";
 import { insertItems } from "../lib/editorManipulations";
+import { navigateTo } from "../lib/navigation";
 import { ScriptExecutor } from "../lib/editor/plugins/ProgrammableNotePlugin";
 
 interface NoteComponentProps {
@@ -309,8 +310,7 @@ const Note = ({
                   try {
                     await notesProvider.getFileInfo(slug);
 
-                    // @ts-ignore
-                    navigation.navigate(
+                    navigateTo(
                       getAppPath(PathTemplate.FILE, new Map([
                         ["GRAPH_ID", LOCAL_GRAPH_ID],
                         ["FILE_SLUG", slug],

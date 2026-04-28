@@ -8,6 +8,7 @@ import {
   initializeNotesProviderWithFolderHandleFromStorage,
 } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
+import { navigateTo } from "../lib/navigation";
 
 const StartViewLocal = () => {
   const [localDisclaimer, setLocalDisclaimer]
@@ -66,11 +67,9 @@ const StartViewLocal = () => {
                 const urlSearchParams
                   = new URLSearchParams(window.location.search);
                 if (urlSearchParams.has("redirect")) {
-                  // @ts-ignore
-                  navigation.navigate(urlSearchParams.get("redirect") ?? "/");
+                  navigateTo(urlSearchParams.get("redirect") ?? "/");
                 } else {
-                  // @ts-ignore
-                  navigation.navigate(getAppPath(
+                  navigateTo(getAppPath(
                     PathTemplate.NEW_NOTE,
                     new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
                   ));
@@ -112,8 +111,7 @@ const StartViewLocal = () => {
         }
         try {
           await initializeNotesProvider(folderHandle);
-          // @ts-ignore
-          navigation.navigate(getAppPath(
+          navigateTo(getAppPath(
             PathTemplate.NEW_NOTE,
             new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
           ));

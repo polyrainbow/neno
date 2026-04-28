@@ -30,6 +30,10 @@ import useConfirmDiscardingUnsavedChangesDialog
 import useRunOnce from "../hooks/useRunOnce";
 import useScriptExecutor from "../hooks/useScriptExecutor";
 import NavigationRail from "./NavigationRail";
+import {
+  getCurrentNavigationState,
+  navigateTo,
+} from "../lib/navigation";
 
 
 const getValidNoteSlug = (
@@ -144,11 +148,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
     if (location.pathname !== targetPath) {
       /* whatever has been written to the address bar, let's replace it with
       the canonical path for a new note */
-      // @ts-ignore
-      navigation.navigate(
-        targetPath,
-        { history: "replace" },
-      );
+      navigateTo(targetPath, { history: "replace" });
     }
   };
 
@@ -210,8 +210,8 @@ const NoteView = ({ slug }: NoteViewProps) => {
     if (getValidNoteSlug(slug) === null) {
       goToNote("new", {
         contentIfNewNote:
-          // @ts-ignore
-          navigation.currentEntry.getState()?.contentIfNewNote || "",
+          getCurrentNavigationState<{ contentIfNewNote?: string }>()
+            ?.contentIfNewNote || "",
       });
       setCanonicalNewNotePath();
     }
@@ -253,8 +253,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
         typeof receivedNoteSlug === "string"
         && validNoteSlug !== receivedNoteSlug
       ) {
-        // @ts-ignore
-        navigation.navigate(
+        navigateTo(
           Utils.getAppPath(
             PathTemplate.EXISTING_NOTE,
             new Map([
@@ -273,8 +272,8 @@ const NoteView = ({ slug }: NoteViewProps) => {
   useEffect(() => {
     loadNoteAndRefreshURL(
       slug,
-      // @ts-ignore
-      navigation.currentEntry.getState()?.contentIfNewNote,
+      getCurrentNavigationState<{ contentIfNewNote?: string }>()
+        ?.contentIfNewNote,
     );
   }, [slug]);
 

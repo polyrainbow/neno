@@ -11,6 +11,7 @@ import {
 import { getAppPath } from "../lib/utils";
 import { PathTemplate } from "../types/PathTemplate";
 import useRunOnce from "../hooks/useRunOnce";
+import { navigateTo } from "../lib/navigation";
 
 const NoteAccessProvider = ({
   children,
@@ -34,8 +35,7 @@ const NoteAccessProvider = ({
             "redirect",
             window.location.pathname,
           );
-          // @ts-ignore
-          navigation.navigate(
+          navigateTo(
             getAppPath(PathTemplate.START, new Map(), urlParams),
             {
               history: "replace",

@@ -9,6 +9,7 @@ import useConfirmDiscardingUnsavedChangesDialog
   from "../hooks/useConfirmDiscardingUnsavedChangesDialog";
 import { isInitialized } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
+import { navigateTo } from "../lib/navigation";
 
 /*
   Closing the app menu after calling navigate() is essential.
@@ -55,8 +56,7 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(getAppPath(PathTemplate.START));
+        navigateTo(getAppPath(PathTemplate.START));
         setIsAppMenuOpen(false);
       }}
     />
@@ -81,8 +81,7 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
         setIsAppMenuOpen(false);
       }}
     />
@@ -104,8 +103,7 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
         setIsAppMenuOpen(false);
       }}
     />
@@ -127,8 +125,7 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
         setIsAppMenuOpen(false);
       }}
     />
@@ -150,8 +147,7 @@ const AppMenu = ({ ref, onSelect }: AppMenuProps) => {
           setUnsavedChanges(false);
         }
 
-        // @ts-ignore
-        navigation.navigate(target);
+        navigateTo(target);
         setIsAppMenuOpen(false);
       }}
     />

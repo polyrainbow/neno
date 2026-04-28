@@ -2,6 +2,7 @@ import { PathTemplate } from "../types/PathTemplate";
 import { getAppPath } from "../lib/utils";
 import { Slug } from "../lib/notes/types/Slug";
 import { LOCAL_GRAPH_ID } from "../config";
+import { navigateTo } from "../lib/navigation";
 
 interface Params {
   replace?: boolean,
@@ -21,8 +22,7 @@ const useGoToNote = () => {
       ]),
     );
 
-    // @ts-ignore
-    return navigation.navigate(path, {
+    return navigateTo(path, {
       history: params?.replace ? "replace" : "push",
       state: {
         contentIfNewNote: params?.contentIfNewNote,
