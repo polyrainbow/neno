@@ -388,11 +388,18 @@ const getFileSlugsReferencedInNote = (
   graph: Graph,
   noteSlug: Slug,
 ): Set<Slug> => {
-  const blocks: Block[]
-    = graph.indexes.blocks.get(noteSlug) as Block[];
-  const allInlineSpans = getAllInlineSpans(blocks);
-  const allReferencedSlugs = getSlugsFromInlineText(allInlineSpans);
-  return new Set(allReferencedSlugs.filter(s => graph.files.has(s)));
+  // Read from the precomputed outgoing-links index instead of re-parsing
+  // blocks. The index is populated in updateOutgoingLinksIndex with exactly
+  // the same slug set this function used to derive on every call.
+  const outgoingLinks = graph.indexes.outgoingLinks.get(noteSlug)
+    ?? new Set<Slug>();
+  const fileSlugs = new Set<Slug>();
+  for (const slug of outgoingLinks) {
+    if (graph.files.has(slug)) {
+      fileSlugs.add(slug);
+    }
+  }
+  return fileSlugs;
 };
 
 

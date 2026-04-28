@@ -468,15 +468,18 @@ export default class NotesProvider {
   // get files not used in any note
   async getSlugsOfDanglingFiles(): Promise<Slug[]> {
     const graph = await this.#io.getGraph();
-    const allBlocks: Block[]
-      = Array.from(graph.indexes.blocks.values()).flat();
-    const allInlineSpans = getAllInlineSpans(allBlocks);
-    const allUsedSlugs = getSlugsFromInlineText(allInlineSpans);
-    const allUsedFileSlugs = allUsedSlugs.filter(isValidSlug);
+    // Aggregate from the precomputed outgoing-links index across all notes
+    // instead of re-parsing every block.
+    const allUsedFileSlugs = new Set<Slug>();
+    for (const outgoingLinks of graph.indexes.outgoingLinks.values()) {
+      for (const slug of outgoingLinks) {
+        if (isValidSlug(slug)) {
+          allUsedFileSlugs.add(slug);
+        }
+      }
+    }
     return Array.from(graph.files.keys())
-      .filter((slug) => {
-        return !allUsedFileSlugs.includes(slug);
-      });
+      .filter((slug) => !allUsedFileSlugs.has(slug));
   }
 
 
