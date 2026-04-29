@@ -84,7 +84,10 @@ const setupRunBlock = (
       const closing = $createCodeBlockNode();
       closing.append($createTextNode("```"));
 
-      const output = $createScriptOutputNode("hello\n", false);
+      const output = $createScriptOutputNode(
+        [{ type: "text", value: "hello\n" }],
+        false,
+      );
 
       root.append(opening, body, closing, output);
 
@@ -397,7 +400,7 @@ describe("ProgrammableNotePlugin", () => {
             closing.append(closingText);
 
             const output = $createScriptOutputNode(
-              "hello\n",
+              [{ type: "text", value: "hello\n" }],
               false,
             );
 
@@ -556,7 +559,7 @@ describe("ProgrammableNotePlugin", () => {
             closing.append($createTextNode("```"));
 
             const output = $createScriptOutputNode(
-              "hello\n", false,
+              [{ type: "text", value: "hello\n" }], false,
             );
 
             const trailing = $createParagraphNode();
@@ -685,7 +688,7 @@ describe("ProgrammableNotePlugin", () => {
               closing.append($createTextNode("```"));
 
               const output = $createScriptOutputNode(
-                "hello\n", false,
+                [{ type: "text", value: "hello\n" }], false,
               );
 
               const trailing = $createParagraphNode();
@@ -773,7 +776,7 @@ describe("ProgrammableNotePlugin", () => {
               closing.append($createTextNode("```"));
 
               const output = $createScriptOutputNode(
-                "hello\n", false,
+                [{ type: "text", value: "hello\n" }], false,
               );
 
               const trailing = $createParagraphNode();

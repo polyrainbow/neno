@@ -95,9 +95,44 @@ Object.getOwnPropertyNames( globalThis ).forEach( function( prop ) {
   https://stackoverflow.com/a/63972569/3890888
 */
 globalThis.notesProvider = null;
-globalThis.output = "";
-globalThis.println = (val: string): void => {
-  globalThis.output += val + "\n";
+globalThis.output = [];
+globalThis.print = (
+  val: string,
+  padStart?: number,
+  padEnd?: number,
+  padString?: string,
+): void => {
+  let value = val;
+  if (padStart !== undefined) value = value.padStart(padStart, padString);
+  if (padEnd !== undefined) value = value.padEnd(padEnd, padString);
+  globalThis.output.push({ type: "text", value });
+};
+globalThis.println = (val: string | undefined): void => {
+  globalThis.output.push({ type: "text", value: (val ?? "") + "\n" });
+};
+globalThis.printNoteTitle = (
+  title: string,
+  padStart?: number,
+  padEnd?: number,
+  padString?: string,
+): void => {
+  if (padStart !== undefined && title.length < padStart) {
+    globalThis.output.push({
+      type: "text",
+      value: "".padStart(padStart - title.length, padString),
+    });
+  }
+  globalThis.output.push({
+    type: "noteLink",
+    title,
+    slug: sluggifyWikilinkText(title),
+  });
+  if (padEnd !== undefined && title.length < padEnd) {
+    globalThis.output.push({
+      type: "text",
+      value: "".padEnd(padEnd - title.length, padString),
+    });
+  }
 };
 
 const moduleLoader = createModuleLoader({
@@ -154,6 +189,6 @@ onmessage = async (event) => {
       type: "EVALUATION_COMPLETED",
       output: globalThis.output,
     });
-    globalThis.output = "";
+    globalThis.output = [];
   }
 };

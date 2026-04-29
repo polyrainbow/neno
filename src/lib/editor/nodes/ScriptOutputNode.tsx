@@ -6,19 +6,28 @@ import {
 } from "lexical";
 import { ReactNode, useState } from "react";
 import { getIconSrc } from "../../utils";
+import { Output } from "../../script-worker/outputTypes";
+import ScriptOutputRenderer from "../../../components/ScriptOutput";
+
+
+const outputAsPlainText = (output: Output): string => {
+  return output.map((segment) => {
+    return segment.type === "text" ? segment.value : segment.title;
+  }).join("");
+};
 
 
 const ScriptOutput = ({
   output,
   isExecuting,
 }: {
-  output: string;
+  output: Output;
   isExecuting: boolean;
 }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(output).then(() => {
+    navigator.clipboard.writeText(outputAsPlainText(output)).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     });
@@ -33,7 +42,9 @@ const ScriptOutput = ({
   }
 
   return <div className="script-output">
-    <pre className="script-output-content">{output}</pre>
+    <pre className="script-output-content">
+      <ScriptOutputRenderer output={output} />
+    </pre>
     <button
       className="script-output-copy-button"
       onClick={handleCopy}
@@ -66,11 +77,11 @@ export class ScriptOutputNode extends DecoratorNode<ReactNode> {
     );
   }
 
-  __output: string;
+  __output: Output;
   __isExecuting: boolean;
 
   constructor(
-    output: string,
+    output: Output,
     isExecuting: boolean,
     key?: NodeKey,
   ) {
@@ -79,7 +90,7 @@ export class ScriptOutputNode extends DecoratorNode<ReactNode> {
     this.__isExecuting = isExecuting;
   }
 
-  setOutput(output: string): void {
+  setOutput(output: Output): void {
     const writable = this.getWritable();
     writable.__output = output;
     writable.__isExecuting = false;
@@ -126,7 +137,7 @@ export class ScriptOutputNode extends DecoratorNode<ReactNode> {
 
 
 export function $createScriptOutputNode(
-  output: string = "",
+  output: Output = [],
   isExecuting: boolean = true,
 ): ScriptOutputNode {
   return new ScriptOutputNode(output, isExecuting);

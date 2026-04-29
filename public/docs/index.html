@@ -696,6 +696,15 @@ println("This graph contains " + graph.notes.size + " note(s).");
       Type: <code><a href="https://github.com/polyrainbow/neno/blob/main/src/lib/notes/types/Graph.ts#L20">GraphObject</a></code>
     </p>
 
+    <h4><code>print</code></h4>
+    <p>
+      A function to add text to the output without a trailing line break.
+    </p>
+
+    <p>
+      Type: <code>(val: string): void</code>
+    </p>
+
     <h4><code>println</code></h4>
     <p>
       A function to add a line to the output.
@@ -703,6 +712,17 @@ println("This graph contains " + graph.notes.size + " note(s).");
 
     <p>
       Type: <code>(val: string): void</code>
+    </p>
+
+    <h4><code>printNoteTitle</code></h4>
+    <p>
+      A function to add a clickable note title to the output. The given
+      title is sluggified to derive the linked note's slug, so the link
+      navigates to the note that the title would resolve to.
+    </p>
+
+    <p>
+      Type: <code>(title: string): void</code>
     </p>
 
     <h4><code>thisNote</code></h4>

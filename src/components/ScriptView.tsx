@@ -22,6 +22,8 @@ import { l } from "../lib/intl";
 import { Slug } from "../lib/notes/types/Slug";
 import NavigationRail from "./NavigationRail";
 import { navigateTo } from "../lib/navigation";
+import { Output } from "../lib/script-worker/outputTypes";
+import ScriptOutput from "./ScriptOutput";
 
 interface CustomScript {
   slug: string;
@@ -37,7 +39,7 @@ const ScriptView = ({
 }: ScriptViewProps) => {
   const [activeScript, setActiveScript] = useState<CustomScript | null>(null);
   const [scriptInput, setScriptInput] = useState<string | null>(null);
-  const [output, setOutput] = useState<string | null>(null);
+  const [output, setOutput] = useState<Output | null>(null);
   const [isBusyComputingOutput, setIsBusyComputingOutput] = useState<boolean>(
     false,
   );
@@ -257,7 +259,9 @@ const ScriptView = ({
                 ? <BusyIndicator
                   alt="Busy"
                 />
-                : <p className="script-output">{output ?? ""}</p>
+                : <p className="script-output">
+                  {output && <ScriptOutput output={output} />}
+                </p>
             }
           </div>
         </div>
