@@ -38,7 +38,7 @@ import {
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { mergeRegister } from "@lexical/utils";
 import {
   $createWikiLinkPunctuationNode,
@@ -69,7 +69,7 @@ const getWikiLinkMatch = (text: string): EntityMatch | null => {
 
 function registerWikilinkTransforms(
   editor: LexicalEditor,
-  getLinkAvailability: (link: string) => Promise<boolean>,
+  getLinkAvailability: (link: string) => boolean | Promise<boolean>,
 ): Array<() => void> {
   const replaceWithSimpleText = (node: TextNode): void => {
     const textNode = $createTextNode(node.getTextContent());
@@ -239,11 +239,13 @@ function registerWikilinkTransforms(
 export function WikiLinkPlugin(
   {
     getLinkAvailability,
-  }: { getLinkAvailability: (link: string) => Promise<boolean> },
+  }: {
+    getLinkAvailability: (link: string) => boolean | Promise<boolean>,
+  },
 ): null {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editor.hasNodes([WikiLinkContentNode, WikiLinkPunctuationNode])) {
       throw new Error("WikiLinkPlugin: WikiLinkNodes not registered on editor");
     }

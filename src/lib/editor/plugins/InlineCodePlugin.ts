@@ -3,22 +3,15 @@ import { $createInlineCodeNode, InlineCodeNode } from "../nodes/InlineCodeNode";
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { useLexicalTextEntity } from "@lexical/react/useLexicalTextEntity";
-import { useCallback, useEffect } from "react";
+import { registerLexicalTextEntity } from "@lexical/text";
+import { mergeRegister } from "@lexical/utils";
+import { useCallback, useLayoutEffect } from "react";
 
 
 const REGEX = /`[^`]+`/;
 
 export function InlineCodePlugin(): null {
   const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    if (!editor.hasNodes([InlineCodeNode])) {
-      throw new Error(
-        "InlineCodePlugin: InlineCodeNode not registered on editor",
-      );
-    }
-  }, [editor]);
 
   const createInlineCodeNode = useCallback(
     (textNode: TextNode): InlineCodeNode => {
@@ -43,11 +36,22 @@ export function InlineCodePlugin(): null {
     };
   }, []);
 
-  useLexicalTextEntity<InlineCodeNode>(
-    getInlineCodeMatch,
-    InlineCodeNode,
-    createInlineCodeNode,
-  );
+  useLayoutEffect(() => {
+    if (!editor.hasNodes([InlineCodeNode])) {
+      throw new Error(
+        "InlineCodePlugin: InlineCodeNode not registered on editor",
+      );
+    }
+
+    return mergeRegister(
+      ...registerLexicalTextEntity(
+        editor,
+        getInlineCodeMatch,
+        InlineCodeNode,
+        createInlineCodeNode,
+      ),
+    );
+  }, [editor, getInlineCodeMatch, createInlineCodeNode]);
 
   return null;
 }

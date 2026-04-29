@@ -1,7 +1,7 @@
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import {
   TransclusionNode,
 } from "../nodes/TransclusionNode";
@@ -69,7 +69,7 @@ export default function TransclusionPlugin({
 }: TransclusionPluginProps) {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editor.hasNodes([TransclusionNode])) {
       throw new Error("Transclusion plugin is missing required nodes");
     }

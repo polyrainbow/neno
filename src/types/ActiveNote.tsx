@@ -22,6 +22,13 @@ export interface SavedActiveNote extends BaseActiveNote {
   numberOfCharacters: number,
   numberOfBlocks: number,
   outgoingLinks: NotePreview[],
+  /*
+    Availability of every slug referenced in the note's content, keyed
+    by the slug as it appears in the content (before alias resolution).
+    See NoteToTransmit.unresolvedOutgoingLinkAvailability. Used for
+    synchronous link-availability lookups in the editor.
+  */
+  unresolvedOutgoingLinkAvailability: Map<Slug, boolean>,
   backlinks: SparseNoteInfo[],
   additionalHeaders: [string, string][],
 }

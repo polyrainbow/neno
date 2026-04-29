@@ -8,7 +8,7 @@ import {
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { mergeRegister } from "@lexical/utils";
 import {
   $createKeyValuePairKeyNode,
@@ -197,7 +197,7 @@ function registerTransforms(
 export function KeyValuePlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editor.hasNodes([KeyValueNode, KeyValuePairKeyNode])) {
       throw new Error("KeyValuePlugin: Nodes not registered on editor");
     }

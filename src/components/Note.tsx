@@ -211,25 +211,43 @@ const Note = ({
   };
 
 
-  const getLinkAvailability = async (
+  const getLinkAvailability = (
     linkText: string,
     linkType: LinkType,
-  ): Promise<boolean> => {
+  ): boolean | Promise<boolean> => {
     const slug = linkType === LinkType.WIKILINK
       ? sluggifyWikilinkText(linkText)
       : linkText;
 
-    try {
-      await notesProvider.getFileInfo(slug);
-      return true;
-    } catch (_e) {
-      try {
-        await notesProvider.get(slug);
-        return true;
-      } catch (_e) {
-        return false;
+    /*
+      Fast sync path: every slug referenced in the saved note's content
+      has its availability pre-computed in unresolvedOutgoingLinkAvailability,
+      so we can return synchronously here. Avoids a worker RPC round-trip
+      on initial render and prevents a flicker from the available/unavailable
+      class being added after the Promise resolves. Falls through to the
+      async lookup only for slugs the user has typed since the note was
+      loaded (which aren't in the map).
+    */
+    if ("unresolvedOutgoingLinkAvailability" in note) {
+      const known = note.unresolvedOutgoingLinkAvailability.get(slug);
+      if (known !== undefined) {
+        return known;
       }
     }
+
+    return (async () => {
+      try {
+        await notesProvider.getFileInfo(slug);
+        return true;
+      } catch (_e) {
+        try {
+          await notesProvider.get(slug);
+          return true;
+        } catch (_e) {
+          return false;
+        }
+      }
+    })();
   };
 
   useEffect(() => {

@@ -291,6 +291,16 @@ const createNoteToTransmit = async (
         const notePreview = getNotePreview(graph, slug);
         return notePreview;
       }),
+    unresolvedOutgoingLinkAvailability: new Map(
+      Array.from(
+        graph.indexes.outgoingLinks.get(existingNote.meta.slug) ?? [],
+      ).map((slug): [Slug, boolean] => {
+        const isAvailable = graph.notes.has(slug)
+          || graph.aliases.has(slug)
+          || graph.files.has(slug);
+        return [slug, isAvailable];
+      }),
+    ),
     backlinks: getBacklinks(graph, existingNote.meta.slug),
     numberOfCharacters: getNumberOfCharacters(existingNote),
     numberOfBlocks: blocks.length,

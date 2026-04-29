@@ -11,17 +11,12 @@ import { $createBoldNode, BoldNode } from "../nodes/BoldNode";
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { useLexicalTextEntity } from "@lexical/react/useLexicalTextEntity";
-import { useCallback, useEffect } from "react";
+import { registerLexicalTextEntity } from "@lexical/text";
+import { mergeRegister } from "@lexical/utils";
+import { useCallback, useLayoutEffect } from "react";
 
 export function BoldPlugin(): null {
   const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    if (!editor.hasNodes([BoldNode])) {
-      throw new Error("BoldPlugin: BoldNode not registered on editor");
-    }
-  }, [editor]);
 
   const createBoldNode = useCallback((textNode: TextNode): BoldNode => {
     return $createBoldNode(textNode.getTextContent());
@@ -64,11 +59,20 @@ export function BoldPlugin(): null {
     return null;
   }, []);
 
-  useLexicalTextEntity<BoldNode>(
-    getBoldMatch,
-    BoldNode,
-    createBoldNode,
-  );
+  useLayoutEffect(() => {
+    if (!editor.hasNodes([BoldNode])) {
+      throw new Error("BoldPlugin: BoldNode not registered on editor");
+    }
+
+    return mergeRegister(
+      ...registerLexicalTextEntity(
+        editor,
+        getBoldMatch,
+        BoldNode,
+        createBoldNode,
+      ),
+    );
+  }, [editor, getBoldMatch, createBoldNode]);
 
   return null;
 }

@@ -10,7 +10,7 @@ import {
 import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { $isListItemNode, ListItemNode } from "../nodes/ListItemNode";
 import {
   $isListItemSigilNode,
@@ -288,7 +288,7 @@ const appendAutoLinkNodesToContent = (textNode: AutoLinkNode) => {
 export function ListItemPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     editor.registerNodeTransform(
       ListItemNode,
       listItemNodeNormalizationTransform,

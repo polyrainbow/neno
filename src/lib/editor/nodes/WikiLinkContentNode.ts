@@ -28,30 +28,45 @@ export class WikiLinkContentNode extends TextNode {
     );
   }
 
-  #getLinkAvailability: (link: string) => Promise<boolean>;
+  #getLinkAvailability: (link: string) => boolean | Promise<boolean>;
 
   constructor(
     text: string,
-    getLinkAvailability: (link: string) => Promise<boolean>,
+    getLinkAvailability: (link: string) => boolean | Promise<boolean>,
     key?: NodeKey,
   ) {
     super(text, key);
     this.#getLinkAvailability = getLinkAvailability;
   }
 
+  #applyAvailabilityClasses(
+    element: HTMLElement,
+    isAvailable: boolean,
+  ): void {
+    if (isAvailable) {
+      element.classList.add("available");
+      element.classList.remove("unavailable");
+    } else {
+      element.classList.add("unavailable");
+      element.classList.remove("available");
+    }
+  }
+
+  #resolveAvailability(element: HTMLElement): void {
+    const result = this.#getLinkAvailability(this.__text);
+    if (typeof result === "boolean") {
+      this.#applyAvailabilityClasses(element, result);
+    } else {
+      result.then((isAvailable) => {
+        this.#applyAvailabilityClasses(element, isAvailable);
+      });
+    }
+  }
+
   createDOM(config: EditorConfig): HTMLElement {
     const element = super.createDOM(config);
     addClassNamesToElement(element, config.theme.wikiLinkContent);
-
-    this.#getLinkAvailability(this.__text)
-      .then((isAvailable) => {
-        if (isAvailable) {
-          element?.classList.add("available");
-        } else {
-          element?.classList.add("unavailable");
-        }
-      });
-
+    this.#resolveAvailability(element);
     return element;
   }
 
@@ -63,16 +78,7 @@ export class WikiLinkContentNode extends TextNode {
   ): boolean {
     // We have to call the parent method so that text editing properly works
     super.updateDOM(prevNode, element, config);
-    this.#getLinkAvailability(this.__text)
-      .then((isAvailable) => {
-        if (isAvailable) {
-          element?.classList.add("available");
-          element?.classList.remove("unavailable");
-        } else {
-          element?.classList.add("unavailable");
-          element?.classList.remove("available");
-        }
-      });
+    this.#resolveAvailability(element);
 
     // We have to return false so that the node is not re-created all the time
     // which prevents the usage of dead keys.
@@ -123,7 +129,7 @@ export class WikiLinkContentNode extends TextNode {
 
 export function $createWikiLinkContentNode(
   text = "",
-  getLinkAvailability: (link: string) => Promise<boolean>,
+  getLinkAvailability: (link: string) => boolean | Promise<boolean>,
 ): WikiLinkContentNode {
   return $applyNodeReplacement(
     new WikiLinkContentNode(text, getLinkAvailability),

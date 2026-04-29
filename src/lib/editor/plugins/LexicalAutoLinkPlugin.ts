@@ -49,7 +49,7 @@ import {
   ParagraphNode,
   TextNode,
 } from "lexical";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { $isTransclusionNode } from "../nodes/TransclusionNode";
 
 type ChangeHandler = (url: string | null, prevUrl: string | null) => void;
@@ -306,7 +306,7 @@ function useAutoLink(
   matchers: Array<LinkMatcher>,
   onChange?: ChangeHandler,
 ): void {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editor.hasNodes([AutoLinkNode])) {
       throw new Error(
         "LexicalAutoLinkPlugin: AutoLinkNode not registered on editor",

@@ -63,7 +63,10 @@ interface EditorProps {
   onChange: (text: string) => void,
   onUserRequest: (type: UserRequestType, value: string) => void,
   getTransclusionContent: TransclusionContentGetter,
-  getLinkAvailability: (link: string, linkType: LinkType) => Promise<boolean>,
+  getLinkAvailability: (
+    link: string,
+    linkType: LinkType,
+  ) => boolean | Promise<boolean>,
   executeScript?: ScriptExecutor,
   activeNoteSlug?: string,
   scriptRefreshTrigger?: number,
@@ -84,10 +87,6 @@ export const Editor = ({
     <ContentEditable />
     <SubtextPlugin
       ErrorBoundary={LexicalErrorBoundary}
-    />
-    <PlainTextStateExchangePlugin
-      initialText={initialText}
-      instanceId={instanceId}
     />
     <OnChangePlugin onChange={
       (editorState: EditorState) => {
@@ -120,6 +119,18 @@ export const Editor = ({
       : null
     }
     <BlockTransformPlugin />
+    {/*
+      PlainTextStateExchangePlugin commits the initial editor state in a
+      useLayoutEffect. It must run after every plugin that registers node
+      transforms (Bold, InlineCode, BlockTransform, WikiLink, ListItem,
+      KeyValue, Transclusion, AutoLink) so that those transforms run during
+      the initial commit and the DOM is fully styled in the same paint as
+      the highlights from applyAllHighlights().
+    */}
+    <PlainTextStateExchangePlugin
+      initialText={initialText}
+      instanceId={instanceId}
+    />
     <NodeEventPlugin
       nodeType={AutoLinkNode}
       eventType="click"
