@@ -3,13 +3,14 @@ import scriptWorkerUrl from "../lib/script-worker/index.js?worker&url";
 import {
   getNotesWorkerPort,
 } from "../lib/LocalDataStorage";
+import { Output } from "../lib/script-worker/outputTypes";
 
 
 const useScriptExecutor = () => {
   const workerRef = useRef<Worker | null>(null);
   const isReadyRef = useRef(false);
   const pendingResolveRef
-    = useRef<((output: string) => void) | null>(null);
+    = useRef<((output: Output) => void) | null>(null);
 
   useEffect(() => {
     const notesWorkerPort = getNotesWorkerPort();
@@ -52,10 +53,10 @@ const useScriptExecutor = () => {
       script: string,
       noteContent: string,
       noteSlug: string,
-    ): Promise<string> => {
+    ): Promise<Output> => {
       if (!workerRef.current || !isReadyRef.current) {
         return Promise.resolve(
-          "Script executor not ready.\n",
+          [{ type: "text", value: "Script executor not ready.\n" }],
         );
       }
 

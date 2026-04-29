@@ -22,12 +22,13 @@ import {
   $createScriptOutputNode,
   $isScriptOutputNode,
 } from "../nodes/ScriptOutputNode";
+import { Output } from "../../script-worker/outputTypes";
 
 export type ScriptExecutor = (
   script: string,
   noteContent: string,
   noteSlug: string,
-) => Promise<string>;
+) => Promise<Output>;
 
 interface ScriptBlock {
   openingNodeKey: string;
@@ -231,7 +232,7 @@ export default function ProgrammableNotePlugin({
             nextSibling.setExecuting();
           } else {
             closingNode.insertAfter(
-              $createScriptOutputNode("", true),
+              $createScriptOutputNode([], true),
             );
           }
         }
