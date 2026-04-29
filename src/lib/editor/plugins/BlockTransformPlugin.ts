@@ -14,7 +14,7 @@ import {
   ParagraphNode,
   RootNode,
 } from "lexical";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import {
   $createCodeBlockNode,
   CodeBlockNode,
@@ -100,7 +100,7 @@ const assignCorrectElementNodes = (
 
 export function BlockTransformPlugin(): null {
   const [editor] = useLexicalComposerContext();
-  useEffect(() => {
+  useLayoutEffect(() => {
     editor.registerNodeTransform(RootNode, (root: RootNode) => {
       const blockNodes = root.getChildren()
         .filter(

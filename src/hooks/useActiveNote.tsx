@@ -106,6 +106,8 @@ const useActiveNoteState = () => {
       createdAt: noteFromServer.meta.createdAt,
       updatedAt: noteFromServer.meta.updatedAt,
       outgoingLinks: noteFromServer.outgoingLinks,
+      unresolvedOutgoingLinkAvailability:
+        noteFromServer.unresolvedOutgoingLinkAvailability,
       backlinks: noteFromServer.backlinks,
       numberOfCharacters: noteFromServer.numberOfCharacters,
       numberOfBlocks: noteFromServer.numberOfBlocks,
