@@ -1,4 +1,4 @@
-import reactRecommended from "eslint-plugin-react/configs/recommended.js";
+// import reactRecommended from "eslint-plugin-react/configs/recommended.js";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import stylistic from "@stylistic/eslint-plugin";
@@ -6,7 +6,9 @@ import stylistic from "@stylistic/eslint-plugin";
 export default [
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
-  reactRecommended,
+  // Temporarily disabled until eslint-plugin-react is updated to support
+  // eslint v10
+  // reactRecommended,
   {
     "plugins": {
       "@stylistic": stylistic,
@@ -35,9 +37,9 @@ export default [
       ],
 
       // react
-      "react/jsx-pascal-case": "error",
-      "react/jsx-uses-vars": ["error"],
-      "react/react-in-jsx-scope": [0],
+      // "react/jsx-pascal-case": "error",
+      // "react/jsx-uses-vars": ["error"],
+      // "react/react-in-jsx-scope": [0],
 
       // react-hooks - temporarily disabled
       // "react-hooks/rules-of-hooks": "error",

@@ -122,7 +122,7 @@ const registerCommandHandlers = (
     }
 
     const anchor = selection.anchor;
-    let node: LexicalNode | null = null;
+    let node: LexicalNode | null;
 
     if (anchor.type === "text") {
       node = anchor.getNode().getParent();
