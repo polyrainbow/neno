@@ -54,7 +54,7 @@ const Pagination = ({
       <nav>
         <ul>
           {items.map(({ page, type, selected, ...item }, index) => {
-            let children: React.ReactNode | null = null;
+            let children: React.ReactNode | null;
 
             if (type === "start-ellipsis" || type === "end-ellipsis") {
               children = <span className="pagination-ellipsis">…</span>;

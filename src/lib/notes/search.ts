@@ -85,9 +85,7 @@ export const getRawTokensFromQueryString = (queryString: string): string[] => {
     const step = iterator.next();
     if (step.done) {
       if (mode === "token") {
-        mode = "whitespace";
         rawTokens.push(collector);
-        collector = "";
       }
       break;
     }

@@ -275,7 +275,7 @@ export async function commitChanged(
   const modifies: string[] = [];
   const removes: string[] = [];
 
-  let headOid: string | null = null;
+  let headOid: string | null;
   try {
     headOid = await git.resolveRef({ fs, dir, ref: "HEAD" });
   } catch {
