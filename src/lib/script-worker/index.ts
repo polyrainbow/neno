@@ -102,13 +102,16 @@ globalThis.print = (
   padEnd?: number,
   padString?: string,
 ): void => {
-  let value = val;
+  let value = String(val);
   if (padStart !== undefined) value = value.padStart(padStart, padString);
   if (padEnd !== undefined) value = value.padEnd(padEnd, padString);
   globalThis.output.push({ type: "text", value });
 };
 globalThis.println = (val: string | undefined): void => {
-  globalThis.output.push({ type: "text", value: (val ?? "") + "\n" });
+  globalThis.output.push({
+    type: "text",
+    value: (val === undefined ? "" : String(val)) + "\n",
+  });
 };
 globalThis.printNoteTitle = (
   title: string,
