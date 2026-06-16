@@ -128,9 +128,9 @@ describe("NotesProviderProxy over MessagePort", () => {
       serverPort.postMessage({ event: "mutation" });
       serverPort.postMessage({ event: "gitEnabled" });
 
-      await new Promise((r) => setTimeout(r, 0));
-
-      expect(events).toEqual(["mutation", "gitEnabled"]);
+      await vi.waitFor(() => {
+        expect(events).toEqual(["mutation", "gitEnabled"]);
+      });
     },
   );
 
