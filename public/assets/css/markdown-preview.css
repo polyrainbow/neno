@@ -1,0 +1,146 @@
+:root {
+  --markdown-code-background-color: var(--accent-color-interactible);
+  --markdown-quote-border-color: var(--alt-content-color);
+}
+
+.markdown-preview {
+  /*
+    The preview gets the plain background color, so that it also works on the
+    tinted surfaces it is embedded in (note preview block, file view).
+  */
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+  padding: var(--default-padding);
+  line-height: 1.6em;
+  overflow-wrap: break-word;
+  width: 100%;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 1em 0 0.5em;
+    line-height: 1.3em;
+  }
+
+  h1 {
+    font-size: var(--h1-font-size);
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: var(--default-font-size);
+  }
+
+  p {
+    margin: 0.5em 0;
+  }
+
+  ul,
+  ol {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+  }
+
+  li {
+    margin: 0.2em 0;
+  }
+
+  li.task-list-item {
+    list-style: none;
+    margin-left: -1.3em;
+
+    input[type="checkbox"] {
+      width: 1em;
+      height: 1em;
+      margin: 0 0.4em 0 0;
+      vertical-align: middle;
+    }
+  }
+
+  code {
+    font-family: var(--code-font);
+    font-size: var(--small-font-size);
+    background-color: var(--markdown-code-background-color);
+    border-radius: calc(var(--border-radius) / 3);
+    padding: 0.1em 0.3em;
+  }
+
+  pre {
+    box-sizing: border-box;
+    background-color: var(--markdown-code-background-color);
+    border-radius: var(--border-radius);
+    padding: var(--small-interactive-element-padding);
+    overflow-x: auto;
+    tab-size: 4;
+
+    code {
+      background-color: transparent;
+      padding: 0;
+      white-space: pre;
+    }
+  }
+
+  blockquote {
+    margin: 0.5em 0;
+    padding: 0.1em 1em;
+    border-left: var(--thick-line-width) solid
+      var(--markdown-quote-border-color);
+    color: var(--alt-content-color);
+  }
+
+  hr {
+    border: none;
+    border-top: var(--default-border);
+    margin: 1em 0;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  a {
+    color: var(--link-color);
+  }
+
+  .markdown-table-wrapper {
+    overflow-x: auto;
+    margin: 0.5em 0;
+  }
+
+  table {
+    border-collapse: collapse;
+
+    th,
+    td {
+      border: var(--default-border);
+      padding: 0.313rem 0.625rem;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    thead th {
+      background-color: var(--accent-color-interactible);
+    }
+  }
+}

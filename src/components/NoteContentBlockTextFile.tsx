@@ -3,6 +3,8 @@ import { FileInfo } from "../lib/notes/types/FileInfo";
 import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 import NoteContentBlockActions from "./NoteContentBlockActions";
 import { getObjectUrlForArbitraryGraphFile } from "../lib/LocalDataStorage";
+import { isMarkdownFilename } from "../lib/notes/utils";
+import MarkdownPreview from "./MarkdownPreview";
 
 interface NoteContentBlockTextFileProps {
   file: FileInfo,
@@ -40,12 +42,19 @@ const NoteContentBlockTextFile = ({
       <NoteContentBlockActions file={file} />
     </div>
     <div className="preview-block-audio-second-line">
-      <pre
-        key={Math.random()}
-        className="preview-block-file-text"
-      >
-        {text}
-      </pre>
+      {
+        isMarkdownFilename(file.filename)
+          ? <MarkdownPreview
+            markdown={text}
+            className="preview-block-file-markdown"
+          />
+          : <pre
+            key={Math.random()}
+            className="preview-block-file-text"
+          >
+            {text}
+          </pre>
+      }
     </div>
   </div>;
 };
