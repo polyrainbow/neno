@@ -57,6 +57,7 @@ const getMediaTypeFromFilename = (
     "rs": MediaType.TEXT,
     "txt": MediaType.TEXT,
     "md": MediaType.TEXT,
+    "markdown": MediaType.TEXT,
     "xq": MediaType.TEXT,
     "xql": MediaType.TEXT,
     "xqm": MediaType.TEXT,
@@ -71,6 +72,14 @@ const getMediaTypeFromFilename = (
   return map.has(extension)
     ? map.get(extension) as MediaType
     : MediaType.OTHER;
+};
+
+
+const MARKDOWN_EXTENSIONS = new Set(["md", "markdown"]);
+
+const isMarkdownFilename = (filename: string): boolean => {
+  const extension = getExtensionFromFilename(filename);
+  return extension !== null && MARKDOWN_EXTENSIONS.has(extension);
 };
 
 
@@ -184,6 +193,7 @@ export {
   getExtensionFromFilename,
   removeExtensionFromFilename,
   getMediaTypeFromFilename,
+  isMarkdownFilename,
   shortenText,
   setsAreEqual,
   getRandomKey,

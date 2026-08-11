@@ -21,6 +21,7 @@ import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
 import useNotesProvider from "../hooks/useNotesProvider";
 import {
   getMediaTypeFromFilename,
+  isMarkdownFilename,
 } from "../lib/notes/utils";
 import {
   getObjectUrlForArbitraryGraphFile,
@@ -204,6 +205,9 @@ const FileView = ({
             type={type}
             src={objectUrl}
             text={text}
+            isMarkdown={
+              fileInfo ? isMarkdownFilename(fileInfo.filename) : false
+            }
           />
           : ""
       }
