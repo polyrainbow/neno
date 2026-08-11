@@ -253,6 +253,37 @@ describe("markdown parser", () => {
       .toBe("done");
   });
 
+  it("should not let an arbitrary number start a list mid-paragraph", () => {
+    const blocks = parseMarkdown(
+      "Those that wait will be deploying in late\n"
+      + "2027. We expect a demand crush in H1 2027.\n",
+    );
+
+    expect(blocks.length).toBe(1);
+    expect(blocks[0].type).toBe(MarkdownBlockType.PARAGRAPH);
+    expect(getPlainText(getInlineSpans(blocks[0]))).toBe(
+      "Those that wait will be deploying in late\n"
+      + "2027. We expect a demand crush in H1 2027.",
+    );
+  });
+
+  it("should let a list starting with 1. interrupt a paragraph", () => {
+    const blocks = parseMarkdown("paragraph\n1. first\n2. second\n");
+
+    expect(blocks.length).toBe(2);
+    expect(blocks[0].type).toBe(MarkdownBlockType.PARAGRAPH);
+    expect(blocks[1].type).toBe(MarkdownBlockType.LIST);
+    expect((blocks[1] as MarkdownBlockList).items.length).toBe(2);
+  });
+
+  it("should start a list with any number after a blank line", () => {
+    const blocks = parseMarkdown("paragraph\n\n2027. an item\n");
+
+    expect(blocks.length).toBe(2);
+    expect(blocks[1].type).toBe(MarkdownBlockType.LIST);
+    expect((blocks[1] as MarkdownBlockList).start).toBe(2027);
+  });
+
   it("should end a list at a following paragraph", () => {
     const blocks = parseMarkdown("- one\n\nparagraph\n");
 

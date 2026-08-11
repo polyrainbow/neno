@@ -15,6 +15,12 @@ const HORIZONTAL_RULE
   = /^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$/;
 const QUOTE = /^ {0,3}> ?/;
 const LIST_ITEM = /^( *)([-*+]|\d{1,9}[.)])(?:[ \t]+|$)/;
+/*
+  A list may only interrupt a paragraph if it starts with "1." or a bullet and
+  is not empty. Otherwise a wrapped line that happens to begin with a year or
+  another number, e.g. "2027. We expect …", would turn into a list.
+*/
+const LIST_ITEM_INTERRUPTING_PARAGRAPH = /^ {0,3}(?:[-*+]|1[.)])[ \t]+\S/;
 const SETEXT_UNDERLINE = /^ {0,3}(=+|-+)[ \t]*$/;
 const TABLE_DELIMITER_ROW
   = /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$/;
@@ -36,6 +42,16 @@ const startsNewBlock = (line: string): boolean => {
     || HORIZONTAL_RULE.test(line)
     || QUOTE.test(line)
     || LIST_ITEM.test(line);
+};
+
+
+const interruptsParagraph = (line: string): boolean => {
+  return isBlank(line)
+    || ATX_HEADING.test(line)
+    || CODE_FENCE.test(line)
+    || HORIZONTAL_RULE.test(line)
+    || QUOTE.test(line)
+    || LIST_ITEM_INTERRUPTING_PARAGRAPH.test(line);
 };
 
 
@@ -365,7 +381,7 @@ const parseBlocks = (lines: string[]): MarkdownBlock[] => {
       }
 
       if (
-        startsNewBlock(lines[i])
+        interruptsParagraph(lines[i])
         || (
           i + 1 < lines.length
           && lines[i].includes("|")
