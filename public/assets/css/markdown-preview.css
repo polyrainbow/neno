@@ -13,6 +13,9 @@
   padding: var(--default-padding);
   line-height: 1.6em;
   overflow-wrap: break-word;
+
+  /* the padding must not add to the width of the parent's content box */
+  box-sizing: border-box;
   width: 100%;
 
   > :first-child {
