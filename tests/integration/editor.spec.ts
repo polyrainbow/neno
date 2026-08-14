@@ -946,11 +946,11 @@ test.describe("Editor view", () => {
 
       // copy
       await page.keyboard.press(
-        KEY_COMBINATIONS.COPY, { delay: 100 }
+        KEY_COMBINATIONS.COPY, { delay: 100 },
       );
 
       const clipboardText1 = await page.evaluate(
-        "navigator.clipboard.readText()"
+        "navigator.clipboard.readText()",
       );
       expect(clipboardText1).toBe("3\n4");
 
@@ -964,7 +964,7 @@ test.describe("Editor view", () => {
 
       // paste
       await page.keyboard.press(
-        KEY_COMBINATIONS.PASTE, { delay: 100 }
+        KEY_COMBINATIONS.PASTE, { delay: 100 },
       );
 
       await page.waitForTimeout(100);
