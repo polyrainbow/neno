@@ -50,8 +50,6 @@ export class ListItemContentNode extends ElementNode {
       otherwise.
       https://github.com/facebook/lexical/blob/main/packages/lexical/src/
       LexicalSelection.ts#L556
-
-      Currently not testable due to missing Playwright clipboard isolation.
     */
     return true;
   }

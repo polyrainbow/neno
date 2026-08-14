@@ -928,13 +928,6 @@ test.describe("Editor view", () => {
   );
   */
 
-  /*
-  The following test fails in headless mode but succeeds in headful mode.
-  Likely reason: Playwright does not have clipboard isolation.
-  See also:
-  https://github.com/microsoft/playwright/issues/11654
-  https://github.com/microsoft/playwright/issues/13097
-
   test(
     "copying and pasting multiline text should work",
     async ({ page, context }) => {
@@ -984,7 +977,7 @@ test.describe("Editor view", () => {
       expect((await paragraphs[1].innerText()).trim()).toBe("4");
     },
   );
-  */
+
 
   test(
     "wikilink should not be created inside code block node",
