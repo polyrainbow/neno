@@ -928,13 +928,6 @@ test.describe("Editor view", () => {
   );
   */
 
-  /*
-  The following test fails in headless mode but succeeds in headful mode.
-  Likely reason: Playwright does not have clipboard isolation.
-  See also:
-  https://github.com/microsoft/playwright/issues/11654
-  https://github.com/microsoft/playwright/issues/13097
-
   test(
     "copying and pasting multiline text should work",
     async ({ page, context }) => {
@@ -953,11 +946,11 @@ test.describe("Editor view", () => {
 
       // copy
       await page.keyboard.press(
-        KEY_COMBINATIONS.COPY, { delay: 100 }
+        KEY_COMBINATIONS.COPY, { delay: 100 },
       );
 
       const clipboardText1 = await page.evaluate(
-        "navigator.clipboard.readText()"
+        "navigator.clipboard.readText()",
       );
       expect(clipboardText1).toBe("3\n4");
 
@@ -971,7 +964,7 @@ test.describe("Editor view", () => {
 
       // paste
       await page.keyboard.press(
-        KEY_COMBINATIONS.PASTE, { delay: 100 }
+        KEY_COMBINATIONS.PASTE, { delay: 100 },
       );
 
       await page.waitForTimeout(100);
@@ -984,7 +977,7 @@ test.describe("Editor view", () => {
       expect((await paragraphs[1].innerText()).trim()).toBe("4");
     },
   );
-  */
+
 
   test(
     "wikilink should not be created inside code block node",
