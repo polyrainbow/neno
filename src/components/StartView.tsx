@@ -101,6 +101,13 @@ const StartView = () => {
           <a href="https://github.com/polyrainbow/neno/">
             {l("start.links.source-code")}
           </a>
+          <a
+            href={
+              ROOT_PATH + "docs/third-party-licenses.html"
+            }
+          >
+            {l("start.links.third-party-licenses")}
+          </a>
         </div>
         <p className="version">{VERSION}</p>
       </footer>

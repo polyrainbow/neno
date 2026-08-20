@@ -163,6 +163,7 @@
   "settings": "Settings",
   "start.introduction": "Your personal knowledge garden",
   "start.links.source-code": "Source code",
+  "start.links.third-party-licenses": "Third-party licenses",
   "start.links.user-manual": "User manual",
   "start.local.already-created-folder": "You have already created a folder that you can just open.",
   "start.local.error-accessing-folder": "There was a problem accessing the folder. Have you moved or deleted it?",
