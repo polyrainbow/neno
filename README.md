@@ -45,3 +45,12 @@ must support File System Access (e.g. Chrome, Edge).
 * [User manual](https://polyrainbow.github.io/neno/docs/index.html)
 * [Subtext Graph Specification](https://polyrainbow.github.io/neno/docs/subtext-graph-specification.html)
 * [Contributing](./CONTRIBUTING.md)
+
+## Licensing
+
+NENO is licensed under the [Apache License 2.0](./LICENSE).
+
+The bundled fonts — IBM Plex Mono (© 2017 IBM Corp.) and Mona Sans
+(© 2022 The Mona Sans Project Authors) — are third-party Font Software
+licensed under the SIL Open Font License 1.1, not under Apache-2.0. See
+[`NOTICE.md`](./NOTICE.md) for the full third-party notices.

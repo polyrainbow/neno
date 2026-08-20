@@ -163,6 +163,7 @@
   "settings": "Einstellungen",
   "start.introduction": "Dein persönlicher Wissens-Graph",
   "start.links.source-code": "Quellcode",
+  "start.links.third-party-licenses": "Lizenzen von Drittanbietern",
   "start.links.user-manual": "Benutzerhandbuch (englisch)",
   "start.local.already-created-folder": "Du hast bereits einen Notizordner erstellt, die du öffnen kannst.",
   "start.local.error-accessing-folder": "Es gab ein Problem beim Zugriff auf den Datenbankordner. Hast du ihn verschoben oder gelöscht?",
