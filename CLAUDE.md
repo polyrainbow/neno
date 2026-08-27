@@ -51,6 +51,7 @@ electron/                     # Electron main process (compiled separately)
   windowGeometry.ts           #   Pure display-fitting geometry
   dialogs.ts                  #   Native folder/open/save dialogs
   unsavedChanges.ts           #   Native confirm on window close
+  findInPage.ts               #   Find-on-page IPC + the Edit menu items
   storage/
     NodeFsStorageProvider.ts  #   StorageProvider on node:fs/promises
     nodeFsGit.ts              #   isomorphic-git fs on node:fs/promises
@@ -242,6 +243,39 @@ isomorphic-git branches on `err.code === "ENOENT"`.
   bar of the "N" off the canvas, and a `webContents.capturePage()` is
   composited for the display, which converts the pixels out of sRGB and
   desaturates them.
+
+### Find on page
+
+Chromium's find bar is browser UI that Electron does not ship, so Cmd-F
+is built from `webContents.findInPage()` plus a React bar
+(`src/components/FindBar.tsx`); `electron/findInPage.ts` is the plumbing
+and owns the Edit menu items. The accelerators live on the menu rather
+than on a renderer keydown listener, so they fire regardless of focus.
+In a browser the component renders nothing — there, Cmd-F is the
+browser's own find.
+
+Three things about it are not guessable:
+
+- **`findNext` means "begin a new session", not "advance"** — the
+  opposite of how it reads. Getting it backwards fails silently: a
+  follow-up request with no session open emits no `found-in-page` event
+  at all. `FindQuery.newSession` in `bridgeTypes.ts` carries the honest
+  name and `findInPage.ts` does the mapping in one place.
+- **The bar is inside the page it searches**, so the term in its own
+  input matches itself once on every search. Nothing short of a second
+  `WebContentsView` avoids that — shadow roots and iframes are all
+  traversed — so the phantom is accounted for instead: it is always the
+  last match, which makes it subtractable and skippable
+  (`src/lib/findInPage.ts`, with tests). The match counter would match
+  too, which is why it is drawn as CSS generated content — the one kind
+  of text `findInPage` does not search.
+- **`findInPage` takes focus**, by selecting the match. Taking focus
+  back unconditionally resets stepping to the first match, because
+  Chromium anchors "the next match" on the page selection; never taking
+  it back drops keystrokes mid-word. So it is reclaimed only after a
+  new-session search, and a window-level `keydown` listener picks up
+  Escape, Enter and typing for the state stepping leaves behind
+  (`document.body` focused, keystrokes going nowhere).
 
 ### Storage-provider details that only bite on a real file system
 

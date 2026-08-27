@@ -16,6 +16,33 @@ import { contextBridge, ipcRenderer } from "electron";
 // Keep in sync with STORAGE_PORT_MESSAGE in
 // src/lib/electron/bridgeTypes.ts.
 const STORAGE_PORT_MESSAGE = "neno:storage-port";
+// Likewise FIND_COMMAND_MESSAGE and FIND_RESULT_MESSAGE.
+const FIND_COMMAND_MESSAGE = "neno:find-command";
+const FIND_RESULT_MESSAGE = "neno:find-result";
+
+type FindQuery = { text: string; forward: boolean; newSession: boolean };
+type FindResult = {
+  requestId: number;
+  matches: number;
+  activeMatchOrdinal: number;
+};
+type FindCommand = "open" | "next" | "previous";
+
+/*
+  ipcRenderer itself must not cross the bridge, so subscriptions are
+  handed over as plain functions that close over it and return their own
+  unsubscribe.
+*/
+function subscribe<T>(
+  channel: string,
+  listener: (payload: T) => void,
+): () => void {
+  const handler = (_event: unknown, payload: T) => listener(payload);
+  ipcRenderer.on(channel, handler);
+  return () => {
+    ipcRenderer.off(channel, handler);
+  };
+}
 
 const neno = {
   pickFolder: (): Promise<string | null> =>
@@ -55,6 +82,18 @@ const neno = {
 
   setUnsavedChanges: (hasUnsavedChanges: boolean): Promise<void> =>
     ipcRenderer.invoke("window:setUnsavedChanges", hasUnsavedChanges),
+
+  findInPage: (query: FindQuery): Promise<number | null> =>
+    ipcRenderer.invoke("find:start", query),
+
+  stopFindInPage: (): Promise<void> =>
+    ipcRenderer.invoke("find:stop"),
+
+  onFindResult: (listener: (result: FindResult) => void): () => void =>
+    subscribe(FIND_RESULT_MESSAGE, listener),
+
+  onFindCommand: (listener: (command: FindCommand) => void): () => void =>
+    subscribe(FIND_COMMAND_MESSAGE, listener),
 };
 
 contextBridge.exposeInMainWorld("neno", neno);

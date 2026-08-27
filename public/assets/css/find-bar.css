@@ -1,0 +1,52 @@
+/*
+  Floats over the top right of the window, the way a browser's own find
+  bar does. Chromium draws the match highlights itself, so this only has
+  to stay out of their way.
+*/
+.find-bar {
+  position: fixed;
+  top: var(--default-gap);
+  right: var(--default-gap);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: var(--default-gap);
+  padding: var(--small-interactive-element-padding);
+  background-color: var(--background-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 0.125rem 0.75rem rgb(0 0 0 / 30%);
+
+  .find-bar-input {
+    width: 14rem;
+  }
+
+  .find-bar-status {
+    /* Generated content — see FindBar.tsx. */
+    &::after {
+      content: attr(data-status);
+    }
+
+    color: var(--alt-content-color);
+    font-size: var(--default-font-size);
+
+    /* Reserves the widest plausible status so buttons do not shift. */
+    min-width: 6rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+}
+
+@media only screen and (max-width: 599px) {
+  .find-bar {
+    left: var(--default-gap);
+
+    .find-bar-input {
+      width: auto;
+      flex: 1;
+    }
+
+    .find-bar-status {
+      min-width: 0;
+    }
+  }
+}

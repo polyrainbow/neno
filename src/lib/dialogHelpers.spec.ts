@@ -35,6 +35,10 @@ const makeBridge = (overrides: Partial<NenoBridge> = {}) => {
     },
     connectStorage: async () => undefined,
     setUnsavedChanges: async () => undefined,
+    findInPage: async () => null,
+    stopFindInPage: async () => undefined,
+    onFindResult: () => () => undefined,
+    onFindCommand: () => () => undefined,
     ...overrides,
   };
 
