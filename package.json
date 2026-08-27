@@ -1,7 +1,7 @@
 {
   "name": "neno",
   "productName": "NENO",
-  "version": "10.10.0",
+  "version": "11.0.0",
   "description": "NENO is a note-taking app that helps you manage your personal knowledge garden.",
   "type": "module",
   "main": "dist-electron/main.cjs",
