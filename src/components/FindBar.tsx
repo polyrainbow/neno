@@ -30,11 +30,11 @@ import { l } from "../lib/intl";
 import IconButton from "./IconButton";
 
 /*
-  How long after issuing a search a blur is still attributable to
-  findInPage. Long enough to cover the round trip, short enough that a
-  deliberate click into the page is never fought over.
+  How many times one user action may correct itself — skipping the
+  phantom, then re-stepping a search that did not move. A bound, because
+  each correction issues a fresh search and so a fresh request id.
 */
-const THEFT_WINDOW_MS = 400;
+const MAX_CORRECTIONS = 2;
 
 const FindBar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -44,6 +44,7 @@ const FindBar = () => {
   /* Bumped on every open so re-opening re-selects the term. */
   const [focusToken, setFocusToken] = useState<number>(0);
 
+  const barRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const queryRef = useRef<string>("");
   const isOpenRef = useRef<boolean>(false);
@@ -51,12 +52,14 @@ const FindBar = () => {
   const newestRequestId = useRef<number>(0);
   const lastDirection = useRef<boolean>(true);
   /*
-    Open only between issuing a search and its first result — the window
-    in which a blur can be blamed on findInPage rather than on the user
-    clicking into the page.
+    Whether the input should keep focus through the search in flight.
+    Armed when the user types, released once that search reports back —
+    so the hold lasts exactly as long as the search does, however long
+    a big graph takes, and nothing is fought over afterwards. Stepping
+    never arms it: it needs the page selection to stay where findInPage
+    put it.
   */
-  const expectFocusTheft = useRef<boolean>(false);
-  const theftTimeout = useRef<number | undefined>(undefined);
+  const holdFocus = useRef<boolean>(true);
   /* Guards against skipping twice on the same streamed request. */
   const skippedRequestId = useRef<number>(0);
   /*
@@ -65,6 +68,7 @@ const FindBar = () => {
   */
   const ordinalBeforeStep = useRef<number>(0);
   const lastWasNewSession = useRef<boolean>(true);
+  const corrections = useRef<number>(0);
   const elementFocusedBeforeOpen = useRef<HTMLElement | null>(null);
 
   queryRef.current = query;
@@ -75,6 +79,7 @@ const FindBar = () => {
     text: string,
     forward: boolean,
     newSession: boolean,
+    keepFocus: boolean,
   ): void => {
     if (text.length === 0) {
       isSearching.current = false;
@@ -85,23 +90,25 @@ const FindBar = () => {
     isSearching.current = true;
     lastDirection.current = forward;
     lastWasNewSession.current = newSession;
+    holdFocus.current = keepFocus;
     if (!newSession) {
       ordinalBeforeStep.current = resultRef.current?.activeMatchOrdinal ?? 0;
     }
 
-    /*
-      Only for a new session. Chromium anchors "the match after this one"
-      on the page selection, so taking focus back after a step would
-      reset stepping to the first match every time.
-    */
-    expectFocusTheft.current = newSession;
-    window.clearTimeout(theftTimeout.current);
-    theftTimeout.current = window.setTimeout(() => {
-      expectFocusTheft.current = false;
-    }, THEFT_WINDOW_MS);
-
     void getBridge().findInPage({ text, forward, newSession });
   }, []);
+
+  /* Typing: a fresh search that must not cost the input its focus. */
+  const searchWhileTyping = useCallback((text: string): void => {
+    corrections.current = 0;
+    search(text, true, true, true);
+  }, [search]);
+
+  /* Stepping: focus goes to the match, which is where the user asked. */
+  const stepToMatch = useCallback((forward: boolean): void => {
+    corrections.current = 0;
+    search(queryRef.current, forward, false, false);
+  }, [search]);
 
   const open = useCallback((): void => {
     if (!isOpenRef.current) {
@@ -110,18 +117,17 @@ const FindBar = () => {
       setIsOpen(true);
       /* Chrome-like: re-opening keeps the term and highlights it again. */
       if (queryRef.current.length > 0) {
-        search(queryRef.current, true, true);
+        searchWhileTyping(queryRef.current);
       }
     }
     setFocusToken((token) => token + 1);
-  }, [search]);
+  }, [searchWhileTyping]);
 
   const close = useCallback((): void => {
     setIsOpen(false);
     setResult(null);
     isSearching.current = false;
-    expectFocusTheft.current = false;
-    window.clearTimeout(theftTimeout.current);
+    holdFocus.current = true;
     void getBridge().stopFindInPage();
 
     const previous = elementFocusedBeforeOpen.current;
@@ -149,11 +155,7 @@ const FindBar = () => {
         went somewhere that did not blur the input.
       */
       const input = inputRef.current;
-      if (
-        expectFocusTheft.current
-        && input
-        && document.activeElement !== input
-      ) {
+      if (holdFocus.current && input && document.activeElement !== input) {
         input.focus();
       }
 
@@ -172,13 +174,22 @@ const FindBar = () => {
           )
         )
         && skippedRequestId.current !== incoming.requestId
+        && corrections.current < MAX_CORRECTIONS
       ) {
         skippedRequestId.current = incoming.requestId;
-        search(queryRef.current, lastDirection.current, false);
+        corrections.current += 1;
+        search(
+          queryRef.current,
+          lastDirection.current,
+          false,
+          holdFocus.current,
+        );
         return;
       }
 
       setResult(incoming);
+      /* The search reported back, so the hold has served its purpose. */
+      holdFocus.current = false;
     });
   }, [search]);
 
@@ -194,15 +205,33 @@ const FindBar = () => {
         open();
         return;
       }
-      search(queryRef.current, command === "next", false);
+      stepToMatch(command === "next");
     });
-  }, [open, search]);
+  }, [open, stepToMatch]);
 
   useEffect(() => {
     if (!isOpen) return;
     inputRef.current?.focus();
     inputRef.current?.select();
   }, [isOpen, focusToken]);
+
+  /*
+    Holding focus is about findInPage stealing it, never about the user
+    choosing to go elsewhere. A press outside the bar is that choice, so
+    it releases the hold before the blur handler can fight it.
+  */
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node | null;
+      if (target && barRef.current?.contains(target)) return;
+      holdFocus.current = false;
+    };
+
+    window.addEventListener("pointerdown", onPointerDown, true);
+    return () => window.removeEventListener("pointerdown", onPointerDown, true);
+  }, [isOpen]);
 
   /*
     Stepping leaves focus on nothing — findInPage selects the match, and
@@ -222,7 +251,7 @@ const FindBar = () => {
         close();
       } else if (e.key === "Enter") {
         e.preventDefault();
-        search(queryRef.current, !e.shiftKey, false);
+        stepToMatch(!e.shiftKey);
       } else if (
         e.key.length === 1
         && !e.metaKey && !e.ctrlKey && !e.altKey
@@ -231,13 +260,13 @@ const FindBar = () => {
         const next = queryRef.current + e.key;
         inputRef.current?.focus();
         setQuery(next);
-        search(next, true, true);
+        searchWhileTyping(next);
       }
     };
 
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, [isOpen, close, search]);
+  }, [isOpen, close, stepToMatch, searchWhileTyping]);
 
   if (!isElectron() || !isOpen) return null;
 
@@ -251,7 +280,7 @@ const FindBar = () => {
         total: getVisibleTotal(result).toString(),
       });
 
-  return <div className="find-bar" role="search">
+  return <div className="find-bar" role="search" ref={barRef}>
     <input
       ref={inputRef}
       type="text"
@@ -261,7 +290,7 @@ const FindBar = () => {
       placeholder={l("find.placeholder")}
       onChange={(e) => {
         setQuery(e.target.value);
-        search(e.target.value, true, true);
+        searchWhileTyping(e.target.value);
       }}
       onBlur={() => {
         /*
@@ -270,7 +299,7 @@ const FindBar = () => {
           keystroke. Blur fires in the same task as the steal, so taking
           focus back here closes the gap the result event cannot.
         */
-        if (expectFocusTheft.current) inputRef.current?.focus();
+        if (holdFocus.current) inputRef.current?.focus();
       }}
       onKeyDown={(e) => {
         /* The app's global shortcuts listen on document.body. */
@@ -281,7 +310,7 @@ const FindBar = () => {
           close();
         } else if (e.key === "Enter") {
           e.preventDefault();
-          search(query, !e.shiftKey, false);
+          stepToMatch(!e.shiftKey);
         }
       }}
     />
@@ -300,14 +329,14 @@ const FindBar = () => {
       title={l("find.previous")}
       disableTooltip={true}
       disabled={!hasQuery}
-      onClick={() => search(query, false, false)}
+      onClick={() => stepToMatch(false)}
     />
     <IconButton
       icon="arrow_downward"
       title={l("find.next")}
       disableTooltip={true}
       disabled={!hasQuery}
-      onClick={() => search(query, true, false)}
+      onClick={() => stepToMatch(true)}
     />
     <IconButton
       icon="close"

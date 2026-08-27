@@ -272,10 +272,14 @@ Three things about it are not guessable:
 - **`findInPage` takes focus**, by selecting the match. Taking focus
   back unconditionally resets stepping to the first match, because
   Chromium anchors "the next match" on the page selection; never taking
-  it back drops keystrokes mid-word. So it is reclaimed only after a
-  new-session search, and a window-level `keydown` listener picks up
-  Escape, Enter and typing for the state stepping leaves behind
-  (`document.body` focused, keystrokes going nowhere).
+  it back drops keystrokes mid-word. So the hold is tied to intent, not
+  to a clock: typing arms it, the search's own result releases it, and
+  stepping never arms it at all. It must not be a timer — searching a
+  real graph can take longer than any window worth guessing, and the
+  steal then lands after it has expired, which is exactly what it feels
+  like to be thrown out of the box mid-word. A window-level `keydown`
+  listener picks up Escape, Enter and typing for the state stepping
+  leaves behind (`document.body` focused, keystrokes going nowhere).
 
 ### Storage-provider details that only bite on a real file system
 
