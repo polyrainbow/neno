@@ -7,7 +7,7 @@
   >
 </p>
 
-# NENO ![Build](https://github.com/polyrainbow/neno/actions/workflows/build.yml/badge.svg)
+# NENO ![CI](https://github.com/polyrainbow/neno/actions/workflows/ci.yml/badge.svg)
 
 ## What is NENO?
 

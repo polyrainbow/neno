@@ -1,0 +1,103 @@
+name: CI
+
+# Every check that gates a change: linting, unit tests, the Playwright
+# integration suite and a real electron-builder packaging run. The
+# release workflow calls this same file with workflow_call, so a tagged
+# build is verified by exactly the checks a pull request gets, and it
+# publishes the .dmg this workflow produced.
+#
+# Everything runs on macOS because that is the only platform the app
+# ships on: the .dmg can only be built there, and the Node fs storage
+# provider has APFS-specific behaviour (NFC normalization) that its
+# unit tests cover.
+#
+# The visual regression suite is deliberately not here — its snapshots
+# are pixel comparisons taken on a developer machine, which a runner's
+# font and GPU stack will not reproduce. Run `npm run
+# visual-regression-test` locally instead.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  checks:
+    name: Lint, unit tests and type check
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: npm
+    - run: npm ci
+    - name: Stylelint
+      run: npm run stylelint
+    - name: ESLint (src, electron, tests)
+      run: npm run lint
+    - name: Unit and i18n tests
+      run: npm run test
+    - name: TypeScript check and renderer build
+      run: npm run build
+
+  integration-tests:
+    name: Integration tests
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: npm
+    - run: npm ci
+    # Only the chromium project is configured in playwright.config.ts.
+    - name: Install Playwright browser
+      run: npx playwright install chromium
+    - name: Run Playwright tests
+      run: npm run integration-test
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  package:
+    name: Package macOS app
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      # The build is unsigned; do not let electron-builder look for an
+      # identity in the runner's keychain.
+      CSC_IDENTITY_AUTO_DISCOVERY: false
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: npm
+    - run: npm ci
+    # Builds the renderer and the main/preload bundles, renders
+    # build/icon.png with Electron's Chromium and produces
+    # release/NENO-<version>.dmg.
+    - name: Build macOS app
+      run: npm run electron:build
+    - name: Upload .dmg
+      uses: actions/upload-artifact@v4
+      with:
+        name: neno-dmg
+        path: release/*.dmg
+        if-no-files-found: error
+        retention-days: 7

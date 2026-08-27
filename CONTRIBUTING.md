@@ -42,16 +42,46 @@ Then either:
 To produce a local `.dmg`, run `npm run electron:build`; the artifact
 lands in `release/`.
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull
+request, on macOS runners — the only platform the app ships on. Three
+jobs run in parallel:
+
+* **checks** — `npm run stylelint`, `npm run lint`, `npm run test`
+  (unit + i18n) and `npm run build` (TypeScript for `src/` and
+  `electron/`, plus the Vite build).
+* **integration-tests** — `npm run integration-test`, the Playwright
+  suite against `npm run dev` in OPFS mode. The HTML report is uploaded
+  as an artifact.
+* **package** — `npm run electron:build`, so a break in the icon
+  rendering, the main/preload bundles or the electron-builder config
+  surfaces on the pull request rather than at release time. The `.dmg`
+  is uploaded as an artifact.
+
+Together that is `npm run all-checks` plus the packaging step. The
+visual regression suite is not part of CI: its snapshots are pixel
+comparisons taken on a developer machine, which a runner's font and GPU
+stack will not reproduce. Run `npm run visual-regression-test` locally
+instead.
+
 ## Publishing a release
 
 1. Run `npm run version:{major,minor,patch}`
 2. Push commit to remote
 3. Push tag to remote: `git push origin vX.Y.Z`
 
-`.github/workflows/release.yml` then runs `npm run electron:build` on a
-macOS runner and attaches `release/NENO-<version>.dmg` to the GitHub
-release. The build is unsigned (`CSC_IDENTITY_AUTO_DISCOVERY=false`), so
-users need the right-click → Open detour described in the
+`.github/workflows/release.yml` triggers on version tags
+(`v1.2.3`, or `v1.2.3-beta.1`, which is published as a prerelease). It
+first checks that the tag matches the version in `package.json` — the
+`.dmg` is named after that version, so a tag that disagrees would
+publish a mislabelled file — then calls the CI workflow above and
+attaches the `NENO-<version>.dmg` that its packaging job produced to a
+GitHub release with generated release notes. Nothing is published that
+has not passed the tests.
+
+The build is unsigned (`CSC_IDENTITY_AUTO_DISCOVERY=false`), so users
+need the right-click → Open detour described in the
 [README](./README.md).
 
 ## High-level architecture
