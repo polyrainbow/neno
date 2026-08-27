@@ -28,6 +28,12 @@ import {
   registerUnsavedChangesHandler,
   registerUnsavedChangesIpc,
 } from "./unsavedChanges";
+import {
+  applyWindowState,
+  getInitialWindowState,
+  trackWindowState,
+} from "./windowState";
+import { MIN_HEIGHT, MIN_WIDTH } from "./windowGeometry";
 
 const APP_SCHEME = "neno";
 const APP_ORIGIN = `${APP_SCHEME}://app`;
@@ -216,12 +222,16 @@ function isAppUrl(url: string): boolean {
   return IS_DEV && url.startsWith(DEV_SERVER_URL as string);
 }
 
-function createWindow(): BrowserWindow {
+async function createWindow(): Promise<BrowserWindow> {
+  const windowState = await getInitialWindowState();
+
   const window = new BrowserWindow({
-    width: 1280,
-    height: 860,
-    minWidth: 640,
-    minHeight: 480,
+    width: windowState.width,
+    height: windowState.height,
+    x: windowState.x,
+    y: windowState.y,
+    minWidth: MIN_WIDTH,
+    minHeight: MIN_HEIGHT,
     title: "NENO",
     backgroundColor: "#1a1a1a",
     show: false,
@@ -237,6 +247,9 @@ function createWindow(): BrowserWindow {
       plugins: true,
     },
   });
+
+  applyWindowState(window, windowState);
+  trackWindowState(window);
 
   window.once("ready-to-show", () => {
     window.show();
@@ -350,7 +363,7 @@ function buildMenu(): void {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   void applyDevDockIcon();
   protocol.handle(APP_SCHEME, handleAppRequest);
   applyContentSecurityPolicy();
@@ -359,11 +372,11 @@ app.whenReady().then(() => {
   registerStorageBridge();
   registerUnsavedChangesIpc();
   buildMenu();
-  createWindow();
+  await createWindow();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      void createWindow();
     }
   });
 });

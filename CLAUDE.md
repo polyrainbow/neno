@@ -45,7 +45,10 @@ npm run all-checks       # stylelint + lint + test + integration-test + build
 electron/                     # Electron main process (compiled separately)
   main.ts                     #   Window, neno:// protocol, CSP, menu
   preload.ts                  #   contextBridge surface (window.neno)
-  config.ts                   #   ~/.config/neno/config.json (last folder)
+  config.ts                   #   ~/.config/neno/config.json (last folder,
+                              #   window bounds)
+  windowState.ts              #   Remembers/restores the window bounds
+  windowGeometry.ts           #   Pure display-fitting geometry
   dialogs.ts                  #   Native folder/open/save dialogs
   unsavedChanges.ts           #   Native confirm on window close
   storage/
@@ -229,6 +232,10 @@ isomorphic-git branches on `err.code === "ENOENT"`.
   `tools/electronDev.mjs` rewrites it in `node_modules`. A packaged app
   needs neither — electron-builder's `productName` and the derived
   `.icns` cover both.
+- The default window is 1440 wide, not 1280: the note list sidebar is
+  hidden below `min-width: 1281px`, so a 1280px window opens without it.
+  `MIN_WIDTH`/`DEFAULT_WIDTH` live in `electron/windowGeometry.ts`
+  alongside the comment explaining the tie to the CSS.
 - `tools/buildIcon.mjs` renders `build/icon.png` with Electron's own
   Chromium, through a `<canvas>`. Both halves matter: `rsvg-convert`
   ignores the logo's `transform-origin` attributes and throws the middle

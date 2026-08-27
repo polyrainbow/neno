@@ -15,8 +15,18 @@ import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 
+export type WindowState = {
+  width: number;
+  height: number;
+  x?: number;
+  y?: number;
+  maximized?: boolean;
+  fullScreen?: boolean;
+};
+
 type Config = {
   lastFolder?: string | null;
+  window?: WindowState;
 };
 
 let cachedConfig: Config | null = null;
@@ -81,6 +91,27 @@ export async function setLastFolder(
   const config = await readConfig();
   await writeConfig({ ...config, lastFolder: folderPath });
 }
+
+export async function getWindowState(): Promise<WindowState | null> {
+  const config = await readConfig();
+  const state = config.window;
+  if (
+    !state
+    || typeof state !== "object"
+    || typeof state.width !== "number"
+    || typeof state.height !== "number"
+  ) {
+    return null;
+  }
+  return state;
+}
+
+
+export async function setWindowState(state: WindowState): Promise<void> {
+  const config = await readConfig();
+  await writeConfig({ ...config, window: state });
+}
+
 
 export function registerConfigHandlers(): void {
   ipcMain.handle("config:getLastFolder", () => getLastFolder());
