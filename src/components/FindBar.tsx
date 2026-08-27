@@ -36,6 +36,15 @@ import IconButton from "./IconButton";
 */
 const MAX_CORRECTIONS = 2;
 
+/*
+  How long the input goes quiet before the search runs. This is what
+  keeps typing safe rather than merely recoverable: findInPage takes
+  focus when it lands on a match, so a search running between two
+  keystrokes is a race for the caret that the typist sometimes loses.
+  Waiting for a pause means no search is ever in flight mid-word.
+*/
+const TYPING_DEBOUNCE_MS = 220;
+
 const FindBar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
@@ -69,6 +78,9 @@ const FindBar = () => {
   const ordinalBeforeStep = useRef<number>(0);
   const lastWasNewSession = useRef<boolean>(true);
   const corrections = useRef<number>(0);
+  const debounceTimeout = useRef<number | undefined>(undefined);
+  /* Set once the user takes focus out of the bar deliberately. */
+  const userLeftBar = useRef<boolean>(false);
   const elementFocusedBeforeOpen = useRef<HTMLElement | null>(null);
 
   queryRef.current = query;
@@ -98,14 +110,32 @@ const FindBar = () => {
     void getBridge().findInPage({ text, forward, newSession });
   }, []);
 
-  /* Typing: a fresh search that must not cost the input its focus. */
+  /*
+    Typing: a fresh search that must not cost the input its focus, and
+    that waits for the typist to pause. An emptied box clears the
+    highlight straight away — there is nothing to race.
+  */
   const searchWhileTyping = useCallback((text: string): void => {
+    window.clearTimeout(debounceTimeout.current);
     corrections.current = 0;
-    search(text, true, true, true);
+
+    if (text.length === 0) {
+      search(text, true, true, true);
+      return;
+    }
+
+    debounceTimeout.current = window.setTimeout(() => {
+      search(text, true, true, true);
+    }, TYPING_DEBOUNCE_MS);
   }, [search]);
 
-  /* Stepping: focus goes to the match, which is where the user asked. */
+  /*
+    Stepping: focus goes to the match, which is where the user asked.
+    Anything still pending would search the same text a moment later and
+    undo the step, so it is dropped.
+  */
   const stepToMatch = useCallback((forward: boolean): void => {
+    window.clearTimeout(debounceTimeout.current);
     corrections.current = 0;
     search(queryRef.current, forward, false, false);
   }, [search]);
@@ -114,6 +144,7 @@ const FindBar = () => {
     if (!isOpenRef.current) {
       elementFocusedBeforeOpen.current
         = document.activeElement as HTMLElement | null;
+      userLeftBar.current = false;
       setIsOpen(true);
       /* Chrome-like: re-opening keeps the term and highlights it again. */
       if (queryRef.current.length > 0) {
@@ -128,6 +159,7 @@ const FindBar = () => {
     setResult(null);
     isSearching.current = false;
     holdFocus.current = true;
+    window.clearTimeout(debounceTimeout.current);
     void getBridge().stopFindInPage();
 
     const previous = elementFocusedBeforeOpen.current;
@@ -218,7 +250,8 @@ const FindBar = () => {
   /*
     Holding focus is about findInPage stealing it, never about the user
     choosing to go elsewhere. A press outside the bar is that choice, so
-    it releases the hold before the blur handler can fight it.
+    it releases the hold before the blur handler can fight it, and marks
+    the bar as left so the recovery below stops reclaiming keystrokes.
   */
   useEffect(() => {
     if (!isOpen) return;
@@ -227,6 +260,7 @@ const FindBar = () => {
       const target = e.target as Node | null;
       if (target && barRef.current?.contains(target)) return;
       holdFocus.current = false;
+      userLeftBar.current = true;
     };
 
     window.addEventListener("pointerdown", onPointerDown, true);
@@ -234,17 +268,20 @@ const FindBar = () => {
   }, [isOpen]);
 
   /*
-    Stepping leaves focus on nothing — findInPage selects the match, and
-    document.body ends up active — so Escape, Enter and further typing
-    would fall on the floor. Reclaim them, but only from that state: if
-    the user deliberately clicked into the editor then activeElement is
-    the editor, and the bar stays out of the way.
+    findInPage takes focus when it lands on a match, and where it leaves
+    it is not something to rely on — document.body while stepping here,
+    but the match's own container is just as possible. So this does not
+    test for one landing spot: while the bar is open and the user has
+    not left it themselves, any keystroke arriving outside the bar
+    belongs to the bar. That also keeps stray keys out of the note.
   */
   useEffect(() => {
     if (!isOpen) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (document.activeElement !== document.body) return;
+      if (userLeftBar.current) return;
+      const active = document.activeElement;
+      if (active && barRef.current?.contains(active)) return;
 
       if (e.key === "Escape") {
         e.preventDefault();
@@ -305,7 +342,11 @@ const FindBar = () => {
         /* The app's global shortcuts listen on document.body. */
         e.stopPropagation();
 
-        if (e.key === "Escape") {
+        if (e.key === "Tab") {
+          /* Leaving on purpose, so stop holding on to focus. */
+          holdFocus.current = false;
+          userLeftBar.current = true;
+        } else if (e.key === "Escape") {
           e.preventDefault();
           close();
         } else if (e.key === "Enter") {
