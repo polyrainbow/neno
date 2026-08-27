@@ -1,55 +1,31 @@
-import * as IDB from "idb-keyval";
 import { getWritableStream, streamToBlob } from "./utils";
 import MimeTypes from "./MimeTypes";
 import NotesProviderProxy from "./notes-worker/NotesProviderProxy";
 import { Slug } from "./notes/types/Slug";
 import { FileInfo } from "./notes/types/FileInfo";
 // @ts-ignore Vite worker URL import
-import notesWorkerUrl from "./notes-worker/index.ts?sharedworker&url";
+import notesWorkerUrl from "./notes-worker/index.ts?worker&url";
 import { getExtensionFromFilename } from "./notes/utils";
+import { getBridge, isElectron } from "./electron/bridge";
+import connectStorage from "./electron/connectStorage";
 
-/*
-  Notes:
-  FileSystemHandle.requestPermission currently requires to be called
-  from a user gesture: https://stackoverflow.com/a/69897694/3890888
-*/
-
-async function verifyPermission(
-  fileSystemHandle: FileSystemHandle,
-  readWrite: boolean,
-): Promise<void> {
-  // @ts-ignore
-  const options: FileSystemHandlePermissionDescriptor = {};
-  if (readWrite) {
-    options.mode = "readwrite";
-  }
-  // Check if permission was already granted. If so, resolve.
-  // @ts-ignore
-  if ((await fileSystemHandle.queryPermission(options)) === "granted") {
-    return;
-  }
-  // Request permission. If the user grants permission, resolve.
-  // @ts-ignore
-  if ((await fileSystemHandle.requestPermission(options)) === "granted") {
-    return;
-  }
-  // The user didn't grant permission
-  throw new Error(
-    "User did not grant permission to " + fileSystemHandle.name,
-  );
-}
-
-
-const FOLDER_HANDLE_STORAGE_KEY = "LOCAL_DB_FOLDER_HANDLE";
 const GIT_USER_NAME_KEY = "git.user.name";
 const GIT_USER_EMAIL_KEY = "git.user.email";
 const GIT_USER_NAME_DEFAULT = "NENO";
 const GIT_USER_EMAIL_DEFAULT = "noreply@neno.local";
 
-let folderHandle: FileSystemDirectoryHandle | null = null;
+/*
+  The notes worker is a dedicated Worker: there is exactly one NENO
+  window, so there is no cross-tab arbitration to do. `PortLike` keeps
+  the rest of this file agnostic about whether it is talking to a Worker
+  or a MessagePort.
+*/
+type PortLike = Pick<Worker, "postMessage" | "addEventListener"
+  | "removeEventListener">;
+
+let folderPath: string | null = null;
 let notesProvider: NotesProviderProxy | null = null;
-let sharedWorker: SharedWorker | null = null;
-let workerPort: MessagePort | null = null;
+let workerPort: PortLike | null = null;
 let gitEnabledFlag = false;
 const gitEnabledSubscribers = new Set<() => void>();
 
@@ -115,38 +91,28 @@ export const enableGit = async (): Promise<void> => {
 };
 
 
-export const getExistingFolderHandleName
-  = async (): Promise<string | null> => {
-    if (folderHandle) {
-      return folderHandle.name;
-    }
-
-    const folderHandleFromStorage
-      = await IDB.get<FileSystemDirectoryHandle>(
-        FOLDER_HANDLE_STORAGE_KEY,
-      );
-    if (folderHandleFromStorage) {
-      return folderHandleFromStorage.name;
-    }
-
-    return null;
-  };
+const getBasename = (path: string): string => {
+  const segments = path.split("/").filter((segment) => segment.length > 0);
+  return segments.length > 0 ? segments[segments.length - 1] : path;
+};
 
 
-export const getActiveFolderHandle
-  = (): FileSystemDirectoryHandle | null => {
-    return folderHandle;
-  };
+/*
+  The absolute path of the folder used last lives in the Electron main
+  process (userData/config.json), so there is no permission prompt and no
+  FileSystemDirectoryHandle round-trip through IndexedDB.
+*/
+const getExistingFolderPath = async (): Promise<string | null> => {
+  if (folderPath) return folderPath;
+  if (!isElectron()) return null;
+  return await getBridge().getLastFolder();
+};
 
-export const getFolderHandleFromStorage = async (
-): Promise<FileSystemDirectoryHandle> => {
-  const folderHandle = await IDB.get<FileSystemDirectoryHandle>(
-    FOLDER_HANDLE_STORAGE_KEY,
-  );
-  if (!folderHandle) {
-    throw new Error("No folder handle in storage");
-  }
-  return folderHandle;
+
+/** Basename of the folder the start view can offer to reopen. */
+export const getExistingFolderName = async (): Promise<string | null> => {
+  const path = await getExistingFolderPath();
+  return path === null ? null : getBasename(path);
 };
 
 
@@ -154,35 +120,25 @@ type HelloAck = {
   initialized: boolean;
   gitEnabled: boolean;
   folderName: string | null;
+  folderPath: string | null;
   usingOPFS: boolean;
-  connectedTabCount: number;
 };
 
 type InitOk = {
   gitEnabled: boolean;
   folderName: string | null;
+  folderPath: string | null;
   usingOPFS: boolean;
 };
 
 type InitMessage = {
-  folderHandle?: FileSystemDirectoryHandle;
+  folderPath?: string;
   useOPFS?: boolean;
   createDummyNotes?: boolean;
   gitAuthor: { name: string; email: string };
 };
 
-function setupGoodbye(port: MessagePort): void {
-  window.addEventListener("pagehide", (e) => {
-    if (e.persisted) return;
-    try {
-      port.postMessage({ action: "goodbye" });
-    } catch {
-      // port already closed; nothing to do
-    }
-  });
-}
-
-function setupGlobalEventListener(port: MessagePort): void {
+function setupGlobalEventListener(port: PortLike): void {
   port.addEventListener("message", (e: MessageEvent) => {
     const data = e.data;
     if (!data || typeof data !== "object") return;
@@ -193,18 +149,14 @@ function setupGlobalEventListener(port: MessagePort): void {
   });
 }
 
-function ensureSharedWorker(): MessagePort {
+function ensureWorker(): PortLike {
   if (workerPort) return workerPort;
-  sharedWorker = new SharedWorker(notesWorkerUrl, { type: "module" });
-  const port = sharedWorker.port;
-  port.start();
-  workerPort = port;
-  setupGoodbye(port);
-  setupGlobalEventListener(port);
-  return port;
+  workerPort = new Worker(notesWorkerUrl, { type: "module" });
+  setupGlobalEventListener(workerPort);
+  return workerPort;
 }
 
-function sendHello(port: MessagePort): Promise<HelloAck> {
+function sendHello(port: PortLike): Promise<HelloAck> {
   return new Promise((resolve) => {
     const onMessage = (e: MessageEvent) => {
       const data = e.data;
@@ -219,8 +171,9 @@ function sendHello(port: MessagePort): Promise<HelloAck> {
 }
 
 function sendInitialize(
-  port: MessagePort,
+  port: PortLike,
   message: InitMessage,
+  transfer: Transferable[] = [],
 ): Promise<InitOk> {
   return new Promise((resolve, reject) => {
     const onMessage = (e: MessageEvent) => {
@@ -231,6 +184,7 @@ function sendInitialize(
         resolve({
           gitEnabled: Boolean(data.gitEnabled),
           folderName: data.folderName ?? null,
+          folderPath: data.folderPath ?? null,
           usingOPFS: Boolean(data.usingOPFS),
         });
       } else if (data.action === "initError") {
@@ -239,30 +193,30 @@ function sendInitialize(
       }
     };
     port.addEventListener("message", onMessage);
-    port.postMessage({ action: "initialize", ...message });
+    port.postMessage({ action: "initialize", ...message }, transfer);
   });
 }
 
 function adoptInitialState(
-  port: MessagePort,
+  port: PortLike,
   ack: { gitEnabled: boolean },
 ): NotesProviderProxy {
   if (ack.gitEnabled !== gitEnabledFlag) {
     gitEnabledFlag = ack.gitEnabled;
     notifyGitEnabledSubscribers();
   }
-  const proxy = new NotesProviderProxy(port);
+  const proxy = new NotesProviderProxy(port as Worker);
   notesProvider = proxy;
   return proxy;
 }
 
 
 async function initFresh(
-  port: MessagePort,
-  newFolderHandle: FileSystemDirectoryHandle | undefined,
+  port: PortLike,
+  newFolderPath: string | undefined,
   createDummyNotes: boolean,
 ): Promise<NotesProviderProxy> {
-  if (!newFolderHandle) {
+  if (!newFolderPath) {
     const init = await sendInitialize(port, {
       useOPFS: true,
       createDummyNotes,
@@ -271,26 +225,35 @@ async function initFresh(
     return adoptInitialState(port, init);
   }
 
-  await verifyPermission(newFolderHandle, true);
-  await IDB.set(FOLDER_HANDLE_STORAGE_KEY, newFolderHandle);
-  folderHandle = newFolderHandle;
-  const init = await sendInitialize(port, {
-    folderHandle: newFolderHandle,
-    gitAuthor: getGitAuthor(),
-  });
+  /*
+    The Node fs implementations live in the Electron main process; the
+    worker reaches them through this port.
+  */
+  const storagePort = await connectStorage(newFolderPath);
+  await getBridge().setLastFolder(newFolderPath);
+  folderPath = newFolderPath;
+  const init = await sendInitialize(
+    port,
+    {
+      folderPath: newFolderPath,
+      gitAuthor: getGitAuthor(),
+    },
+    [storagePort],
+  );
   return adoptInitialState(port, init);
 }
 
 
 function describesSameSetup(
   ack: HelloAck,
-  newFolderHandle: FileSystemDirectoryHandle | undefined,
+  newFolderPath: string | undefined,
 ): boolean {
-  if (!newFolderHandle) {
+  if (!newFolderPath) {
     // Caller wants OPFS — match only if the worker is using OPFS too.
     return ack.usingOPFS;
   }
-  return !ack.usingOPFS && ack.folderName === newFolderHandle.name;
+  // Full paths, so two folders that merely share a basename do not match.
+  return !ack.usingOPFS && ack.folderPath === newFolderPath;
 }
 
 
@@ -299,23 +262,19 @@ export function requestFolderSwitch(): Promise<void> {
     return Promise.reject(new Error("Notes worker not initialized"));
   }
   const port = workerPort;
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const onMessage = (e: MessageEvent) => {
       const data = e.data;
       if (!data || typeof data !== "object") return;
-      if (data.action === "resetOk") {
-        port.removeEventListener("message", onMessage);
-        notesProvider = null;
-        folderHandle = null;
-        if (gitEnabledFlag) {
-          gitEnabledFlag = false;
-          notifyGitEnabledSubscribers();
-        }
-        resolve();
-      } else if (data.action === "resetDenied") {
-        port.removeEventListener("message", onMessage);
-        reject(new Error("OTHER_TABS_OPEN"));
+      if (data.action !== "resetOk") return;
+      port.removeEventListener("message", onMessage);
+      notesProvider = null;
+      folderPath = null;
+      if (gitEnabledFlag) {
+        gitEnabledFlag = false;
+        notifyGitEnabledSubscribers();
       }
+      resolve();
     };
     port.addEventListener("message", onMessage);
     port.postMessage({ action: "reset" });
@@ -324,36 +283,35 @@ export function requestFolderSwitch(): Promise<void> {
 
 
 export const initializeNotesProvider = async (
-  newFolderHandle?: FileSystemDirectoryHandle,
+  newFolderPath?: string,
   createDummyNotes?: boolean,
 ): Promise<NotesProviderProxy> => {
-  const port = ensureSharedWorker();
+  const port = ensureWorker();
   const ack = await sendHello(port);
 
   if (ack.initialized) {
-    if (describesSameSetup(ack, newFolderHandle)) {
-      if (newFolderHandle) {
-        await IDB.set(FOLDER_HANDLE_STORAGE_KEY, newFolderHandle);
-        folderHandle = newFolderHandle;
+    if (describesSameSetup(ack, newFolderPath)) {
+      if (newFolderPath) {
+        await getBridge().setLastFolder(newFolderPath);
+        folderPath = newFolderPath;
       }
       return adoptInitialState(port, ack);
     }
     // Caller wants a different setup than the worker is running.
-    if (ack.connectedTabCount > 1) {
-      throw new Error("OTHER_TABS_OPEN");
-    }
-    // Sole tab — reset the worker and re-initialize.
     await requestFolderSwitch();
   }
 
-  return initFresh(port, newFolderHandle, createDummyNotes ?? false);
+  return initFresh(port, newFolderPath, createDummyNotes ?? false);
 };
 
 
-export const initializeNotesProviderWithFolderHandleFromStorage
+export const initializeNotesProviderWithLastFolder
   = async (): Promise<NotesProviderProxy> => {
-    const folderHandleFromStorage = await getFolderHandleFromStorage();
-    return initializeNotesProvider(folderHandleFromStorage);
+    const lastFolder = await getBridge().getLastFolder();
+    if (!lastFolder) {
+      throw new Error("No folder path in storage");
+    }
+    return initializeNotesProvider(lastFolder);
   };
 
 
@@ -367,7 +325,7 @@ export const getNotesProvider = (): NotesProviderProxy | null => {
 };
 
 
-export const getNotesWorkerPort = (): MessagePort | null => {
+export const getNotesWorkerPort = (): PortLike | null => {
   return workerPort;
 };
 
@@ -405,18 +363,16 @@ export const saveFile = async (slug: Slug) => {
       slug,
     );
   const extension = getExtensionFromFilename(slug);
-  const mimeType = extension && MimeTypes.has(extension)
-    ? MimeTypes.get(extension) as string
-    : "application/neno-filestream";
 
   const writable = await getWritableStream({
-    types: [{
-      accept: {
-        [mimeType]: ["." + extension],
-      },
-    }],
     suggestedName: fileInfo.filename,
+    filters: extension
+      ? [{ name: extension.toUpperCase() + " file", extensions: [extension] }]
+      : [],
   });
+
+  // The user cancelled the save dialog.
+  if (!writable) return;
 
   await readable.pipeTo(writable);
 };

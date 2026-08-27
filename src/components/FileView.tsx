@@ -80,6 +80,17 @@ const FileView = ({
   }, [notesProvider, slug]);
 
 
+  /*
+    The app process stays open for days, so every object URL that gets
+    replaced or unmounted has to be released explicitly.
+  */
+  useEffect(() => {
+    if (objectUrl === null) return;
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [objectUrl]);
+
   useEffect(() => {
     if (canShowTextPreview && typeof objectUrl === "string") {
       fetch(objectUrl)

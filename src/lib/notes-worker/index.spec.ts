@@ -3,9 +3,10 @@ import {
 } from "vitest";
 
 /*
-  Drives the worker module's onconnect handler with synthetic
-  MessagePorts. jsdom has no SharedWorker, but the module's onconnect
-  is invoked the same way: once per tab, with port[0] for that tab.
+  Drives the worker module through the worker global, which is the single
+  window's port now that this is a dedicated Worker rather than a
+  SharedWorker. Script workers still attach extra MessagePorts via the
+  `addPort` action, and those are exercised here too.
 
   Heavy dependencies (NotesProvider, FileSystemAccessAPIStorageProvider,
   FileSystemAccessFs, git) are mocked because they need a real
@@ -41,24 +42,58 @@ vi.mock("./git", () => ({
 }));
 
 
-type Connector = (port: MessagePort) => void;
+type WorkerHarness = {
+  /** Port the test writes to; the worker sees the other end. */
+  window: MessagePort;
+};
 
-type OnConnectHandler = (event: MessageEvent) => void;
+/*
+  The worker registers itself on the worker global, so the global's
+  addEventListener/postMessage are redirected to one end of a
+  MessageChannel and the test drives the protocol from the other end.
+  The redirection stays installed for the whole file and follows
+  `workerSide`, which each reload replaces.
+*/
+let workerSide: MessagePort | null = null;
+let redirectionInstalled = false;
 
-async function loadFreshWorker(): Promise<Connector> {
-  vi.resetModules();
-  const slot: { handler: OnConnectHandler | null } = { handler: null };
-  Object.defineProperty(globalThis, "onconnect", {
-    configurable: true,
-    set(handler: OnConnectHandler) { slot.handler = handler; },
-    get() { return slot.handler; },
-  });
-  await import("./index");
-  const onconnect = slot.handler;
-  if (!onconnect) throw new Error("onconnect was not set");
-  return (port: MessagePort) => {
-    onconnect({ ports: [port] } as unknown as MessageEvent);
+function installGlobalRedirection(): void {
+  if (redirectionInstalled) return;
+  redirectionInstalled = true;
+
+  globalThis.addEventListener = ((
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: AddEventListenerOptions,
+  ) => {
+    if (type !== "message" || !workerSide) return;
+    workerSide.addEventListener(
+      "message",
+      listener as EventListener,
+      options,
+    );
+    workerSide.start();
+  }) as typeof globalThis.addEventListener;
+
+  (globalThis as unknown as { postMessage: unknown }).postMessage = (
+    message: unknown,
+    transfer?: Transferable[],
+  ) => {
+    workerSide?.postMessage(message, (transfer ?? []) as Transferable[]);
   };
+}
+
+async function loadFreshWorker(): Promise<WorkerHarness> {
+  vi.resetModules();
+  installGlobalRedirection();
+
+  const channel = new MessageChannel();
+  workerSide = channel.port2;
+
+  await import("./index");
+
+  channel.port1.start();
+  return { window: channel.port1 };
 }
 
 
@@ -73,7 +108,7 @@ function fakeFolderHandle(name: string): FileSystemDirectoryHandle {
 function expectMessage<T = unknown>(
   port: MessagePort,
   predicate: (data: unknown) => boolean,
-  timeoutMs = 100,
+  timeoutMs = 200,
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     const ac = new AbortController();
@@ -92,155 +127,220 @@ function expectMessage<T = unknown>(
 }
 
 
-function connectTab(connect: Connector): MessagePort {
-  const channel = new MessageChannel();
-  connect(channel.port2);
-  return channel.port1;
+function hasAction(action: string) {
+  return (d: unknown): boolean =>
+    Boolean(d) && (d as { action?: string }).action === action;
 }
 
 
-describe("notes worker SharedWorker protocol", () => {
-  let connect: Connector;
+describe("notes worker protocol", () => {
+  let harness: WorkerHarness;
 
   beforeEach(async () => {
-    connect = await loadFreshWorker();
+    harness = await loadFreshWorker();
   });
 
   it(
     "responds to hello with initialized:false on a fresh worker",
     async () => {
-      const tab = connectTab(connect);
       const pending = expectMessage<{
         action: string;
         initialized: boolean;
-        connectedTabCount: number;
-      }>(tab, (d) =>
-        Boolean(d) && (d as { action?: string }).action === "helloAck",
-      );
-      tab.postMessage({ action: "hello" });
+      }>(harness.window, hasAction("helloAck"));
+      harness.window.postMessage({ action: "hello" });
       const ack = await pending;
       expect(ack.initialized).toBe(false);
-      expect(ack.connectedTabCount).toBe(1);
     },
   );
 
-  it(
-    "tracks connected tab count across connect and goodbye",
+  it("allows reset at any time — that is how a folder switch works",
     async () => {
-      const tabA = connectTab(connect);
-      tabA.start();
-      const tabB = connectTab(connect);
-      tabB.start();
-
-      // Hello on B → count is 2.
-      const ackB = expectMessage<{ connectedTabCount: number }>(
-        tabB,
-        (d) => Boolean(d) && (d as { action?: string }).action === "helloAck",
+      harness.window.postMessage({ action: "reset" });
+      const reply = await expectMessage<{ action: string }>(
+        harness.window,
+        hasAction("resetOk"),
       );
-      tabB.postMessage({ action: "hello" });
-      expect((await ackB).connectedTabCount).toBe(2);
-
-      // B says goodbye, hello on A → count is 1.
-      tabB.postMessage({ action: "goodbye" });
-      // Give the worker a tick to process goodbye.
-      await new Promise((r) => setTimeout(r, 0));
-
-      const ackA = expectMessage<{ connectedTabCount: number }>(
-        tabA,
-        (d) => Boolean(d) && (d as { action?: string }).action === "helloAck",
-      );
-      tabA.postMessage({ action: "hello" });
-      expect((await ackA).connectedTabCount).toBe(1);
+      expect(reply.action).toBe("resetOk");
     },
   );
-
-  it("denies reset when another tab is connected", async () => {
-    const tabA = connectTab(connect);
-    tabA.start();
-    const tabB = connectTab(connect);
-    tabB.start();
-
-    tabA.postMessage({ action: "reset" });
-    const reply = await expectMessage<{
-      action: string; connectedTabCount: number;
-    }>(tabA, (d) =>
-      Boolean(d) && (d as { action?: string }).action === "resetDenied",
-    );
-    expect(reply.action).toBe("resetDenied");
-    expect(reply.connectedTabCount).toBe(2);
-  });
-
-  it("allows reset when alone", async () => {
-    const tabA = connectTab(connect);
-    tabA.start();
-    tabA.postMessage({ action: "reset" });
-    const reply = await expectMessage<{ action: string }>(
-      tabA,
-      (d) => Boolean(d) && (d as { action?: string }).action === "resetOk",
-    );
-    expect(reply.action).toBe("resetOk");
-  });
 
   it("initializes once across simultaneous initialize calls", async () => {
-    const tabA = connectTab(connect);
-    const tabB = connectTab(connect);
-    tabA.start();
-    tabB.start();
-
-    const handle = fakeFolderHandle("test-folder");
-    const aReply = expectMessage<{
-      action: string; folderName: string;
-    }>(tabA, (d) =>
-      Boolean(d) && (d as { action?: string }).action === "initialized",
+    const replies = expectMessage<{ folderName: string }>(
+      harness.window,
+      hasAction("initialized"),
     );
-    const bReply = expectMessage<{
-      action: string; folderName: string;
-    }>(tabB, (d) =>
-      Boolean(d) && (d as { action?: string }).action === "initialized",
-    );
-    tabA.postMessage({
+    harness.window.postMessage({
       action: "initialize",
-      folderHandle: handle,
+      folderHandle: fakeFolderHandle("test-folder"),
       gitAuthor: { name: "n", email: "e" },
     });
-    tabB.postMessage({
+    harness.window.postMessage({
       action: "initialize",
       folderHandle: fakeFolderHandle("other-folder"),
       gitAuthor: { name: "n", email: "e" },
     });
 
-    const [a, b] = await Promise.all([aReply, bReply]);
-    // Both tabs see the same folderName — first writer wins.
-    expect(a.folderName).toBe("test-folder");
-    expect(b.folderName).toBe("test-folder");
+    expect((await replies).folderName).toBe("test-folder");
   });
 
   it("hello after init reports initialized:true and folderName", async () => {
-    const tabA = connectTab(connect);
-    tabA.start();
-    const initReply = expectMessage<unknown>(tabA, (d) =>
-      Boolean(d) && (d as { action?: string }).action === "initialized",
+    const initReply = expectMessage<unknown>(
+      harness.window,
+      hasAction("initialized"),
     );
-    tabA.postMessage({
+    harness.window.postMessage({
       action: "initialize",
       folderHandle: fakeFolderHandle("some-folder"),
       gitAuthor: { name: "n", email: "e" },
     });
     await initReply;
 
-    const tabB = connectTab(connect);
     const ackPromise = expectMessage<{
-      action: string;
       initialized: boolean;
       folderName: string;
-      connectedTabCount: number;
-    }>(tabB, (d) =>
-      Boolean(d) && (d as { action?: string }).action === "helloAck",
-    );
-    tabB.postMessage({ action: "hello" });
+    }>(harness.window, hasAction("helloAck"));
+    harness.window.postMessage({ action: "hello" });
     const ack = await ackPromise;
     expect(ack.initialized).toBe(true);
     expect(ack.folderName).toBe("some-folder");
-    expect(ack.connectedTabCount).toBe(2);
+  });
+
+  it("resets folderName so a folder switch can re-initialize", async () => {
+    const initReply = expectMessage<unknown>(
+      harness.window,
+      hasAction("initialized"),
+    );
+    harness.window.postMessage({
+      action: "initialize",
+      folderHandle: fakeFolderHandle("first-folder"),
+      gitAuthor: { name: "n", email: "e" },
+    });
+    await initReply;
+
+    const resetReply = expectMessage<unknown>(
+      harness.window,
+      hasAction("resetOk"),
+    );
+    harness.window.postMessage({ action: "reset" });
+    await resetReply;
+
+    const secondInit = expectMessage<{ folderName: string }>(
+      harness.window,
+      hasAction("initialized"),
+    );
+    harness.window.postMessage({
+      action: "initialize",
+      folderHandle: fakeFolderHandle("second-folder"),
+      gitAuthor: { name: "n", email: "e" },
+    });
+    expect((await secondInit).folderName).toBe("second-folder");
+  });
+
+  /*
+    The Electron variant: a folder path plus a transferred MessagePort to
+    the main process. Nothing is actually read over the port here — the
+    StorageProvider and git are mocked out — but the worker has to accept
+    the shape and report the path back so a folder switch can be detected
+    even between two folders that share a basename.
+  */
+  it("reports the absolute folder path for a folderPath init", async () => {
+    const initReply = expectMessage<unknown>(
+      harness.window,
+      hasAction("initialized"),
+    );
+    const storageChannel = new MessageChannel();
+    harness.window.postMessage(
+      {
+        action: "initialize",
+        folderPath: "/Users/someone/Documents/notes",
+        gitAuthor: { name: "n", email: "e" },
+      },
+      [storageChannel.port1],
+    );
+    await initReply;
+
+    const ackPromise = expectMessage<{
+      folderName: string;
+      folderPath: string;
+      usingOPFS: boolean;
+    }>(harness.window, hasAction("helloAck"));
+    harness.window.postMessage({ action: "hello" });
+    const ack = await ackPromise;
+    expect(ack.folderPath).toBe("/Users/someone/Documents/notes");
+    expect(ack.folderName).toBe("notes");
+    expect(ack.usingOPFS).toBe(false);
+  });
+
+  it("rejects a folderPath init without a storage port", async () => {
+    const errorReply = expectMessage<{ error: string }>(
+      harness.window,
+      hasAction("initError"),
+    );
+    harness.window.postMessage({
+      action: "initialize",
+      folderPath: "/Users/someone/notes",
+      gitAuthor: { name: "n", email: "e" },
+    });
+    expect((await errorReply).error).toMatch(/storage port/);
+  });
+
+  it("clears the folder path on reset", async () => {
+    const initReply = expectMessage<unknown>(
+      harness.window,
+      hasAction("initialized"),
+    );
+    const storageChannel = new MessageChannel();
+    harness.window.postMessage(
+      {
+        action: "initialize",
+        folderPath: "/Users/someone/notes",
+        gitAuthor: { name: "n", email: "e" },
+      },
+      [storageChannel.port1],
+    );
+    await initReply;
+
+    const resetReply = expectMessage<unknown>(
+      harness.window,
+      hasAction("resetOk"),
+    );
+    harness.window.postMessage({ action: "reset" });
+    await resetReply;
+
+    const ackPromise = expectMessage<{
+      initialized: boolean;
+      folderPath: string | null;
+    }>(harness.window, hasAction("helloAck"));
+    harness.window.postMessage({ action: "hello" });
+    const ack = await ackPromise;
+    expect(ack.initialized).toBe(false);
+    expect(ack.folderPath).toBe(null);
+  });
+
+  it("dispatches RPC on ports attached via addPort", async () => {
+    const initReply = expectMessage<unknown>(
+      harness.window,
+      hasAction("initialized"),
+    );
+    harness.window.postMessage({
+      action: "initialize",
+      folderHandle: fakeFolderHandle("some-folder"),
+      gitAuthor: { name: "n", email: "e" },
+    });
+    await initReply;
+
+    const channel = new MessageChannel();
+    harness.window.postMessage({ action: "addPort" }, [channel.port1]);
+
+    const reply = expectMessage<{ id: number; result: unknown }>(
+      channel.port2,
+      (d) => Boolean(d) && (d as { id?: number }).id === 7,
+    );
+    channel.port2.postMessage({
+      id: 7,
+      method: "put",
+      args: [{}],
+    });
+    expect((await reply).result).toEqual({ meta: { slug: "x" } });
   });
 });

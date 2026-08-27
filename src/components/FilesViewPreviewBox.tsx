@@ -29,13 +29,13 @@ const FilesViewPreviewBox = ({
 
 
   useEffect(() => {
+    // Only the image thumbnail keeps the object URL; every other media
+    // type shows a static icon, so its URL must be released right away.
+    let heldObjectUrl: string | null = null;
+    let cancelled = false;
+
     getObjectUrlForArbitraryGraphFile(file)
       .then((src) => {
-        if (isNenoScript) {
-          setThumbnailImageSrc(getIconSrc("neno"));
-          return;
-        }
-
         const thumbnailImageSrcMap = {
           [MediaType.IMAGE]: src,
           [MediaType.AUDIO]: getIconSrc("audio_file"),
@@ -45,8 +45,23 @@ const FilesViewPreviewBox = ({
           [MediaType.OTHER]: getIconSrc("draft"),
         };
 
-        setThumbnailImageSrc(thumbnailImageSrcMap[type]);
+        const thumbnail = isNenoScript
+          ? getIconSrc("neno")
+          : thumbnailImageSrcMap[type];
+
+        if (thumbnail === src && !cancelled) {
+          heldObjectUrl = src;
+        } else {
+          URL.revokeObjectURL(src);
+        }
+
+        if (!cancelled) setThumbnailImageSrc(thumbnail);
       });
+
+    return () => {
+      cancelled = true;
+      if (heldObjectUrl) URL.revokeObjectURL(heldObjectUrl);
+    };
   }, []);
 
 

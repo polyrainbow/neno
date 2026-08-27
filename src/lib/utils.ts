@@ -4,6 +4,8 @@ import * as Config from "../config";
 import CreateNewNoteParams from "../types/CreateNewNoteParams";
 import { Slug } from "./notes/types/Slug";
 import { sluggifyWikilinkText } from "./notes/slugUtils";
+import { getBridge } from "./electron/bridge";
+import { PickerFilter, SaveDialogOptions } from "./electron/bridgeTypes";
 import type React from "react";
 
 
@@ -128,24 +130,20 @@ const getIconSrc = (iconName: string): string => {
 };
 
 
+/*
+  Native open dialog via the Electron main process. `main` streams the
+  bytes back and we wrap them as File objects, so the call sites are
+  unchanged from the File System Access API version.
+*/
 const getFilesFromUserSelection = async (
-  // @ts-ignore
-  types: FilePickerAcceptType[],
+  filters: PickerFilter[],
   multiple: boolean,
 ): Promise<File[]> => {
-  // @ts-ignore
-  const fileHandles = await window.showOpenFilePicker({
-    multiple,
-    types,
-    excludeAcceptAllOption: false,
-  });
+  const pickedFiles = await getBridge().pickFilesToOpen(filters, multiple);
 
-  const files = await Promise.all(
-    // @ts-ignore
-    fileHandles.map((fileHandle) => fileHandle.getFile()),
+  return pickedFiles.map(
+    ({ name, data }) => new File([data], name),
   );
-
-  return files;
 };
 
 
@@ -163,13 +161,37 @@ const readFileAsString = async (file: File): Promise<string> => {
 };
 
 
-// @ts-ignore
-const getWritableStream = async (opts: SaveFilePickerOptions) => {
-  // @ts-ignore
-  const newHandle = await window.showSaveFilePicker(opts);
-  // create a FileSystemWritableFileStream to write to
-  const writableStream = await newHandle.createWritable();
-  return writableStream;
+/*
+  Native save dialog via the Electron main process, wrapped in a
+  WritableStream that chunks to main. Resolves to null if the user
+  cancels the dialog.
+*/
+const getWritableStream = async (
+  opts: SaveDialogOptions,
+): Promise<WritableStream<Uint8Array | string> | null> => {
+  const bridge = getBridge();
+  const sessionId = await bridge.pickFileToSave(opts);
+
+  if (sessionId === null) return null;
+
+  const encoder = new TextEncoder();
+
+  return new WritableStream<Uint8Array | string>({
+    async write(chunk) {
+      const bytes = typeof chunk === "string"
+        ? encoder.encode(chunk)
+        : chunk;
+      // Copy so transferring cannot detach a buffer the producer owns.
+      const buffer = bytes.slice().buffer as ArrayBuffer;
+      await bridge.writeChunk(sessionId, buffer);
+    },
+    async close() {
+      await bridge.closeWrite(sessionId);
+    },
+    async abort() {
+      await bridge.abortWrite(sessionId);
+    },
+  });
 };
 
 

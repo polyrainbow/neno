@@ -7,21 +7,24 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-15
     permissions:
       contents: write
+    env:
+      # The build is unsigned; do not let electron-builder look for an
+      # identity in the runner's keychain.
+      CSC_IDENTITY_AUTO_DISCOVERY: false
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: '24'
-    - run: npm i
-    - name: Build release package
-      working-directory: ./tools
-      run: ./buildReleasePackage.sh
+    - run: npm ci
+    - name: Build macOS app
+      run: npm run electron:build
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "neno-v*.tar.gz"
+        artifacts: "release/*.dmg"
         artifactErrorsFailBuild: true
         generateReleaseNotes: true
         token: ${{ secrets.GITHUB_TOKEN }}

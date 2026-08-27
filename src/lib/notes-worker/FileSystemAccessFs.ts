@@ -8,6 +8,10 @@
   the promise API with a `promises` alias pointing back at itself.
 */
 
+import { FsStat, GitFs, makeStatFromType } from "./GitFs";
+
+export type { FsStat };
+
 const TEXT_DECODER = new TextDecoder();
 
 const FILE_MODE = 0o100644;
@@ -19,21 +23,6 @@ type PathSegments = {
 };
 
 type AnyHandle = FileSystemDirectoryHandle | FileSystemFileHandle;
-
-export interface FsStat {
-  type: "file" | "dir" | "symlink";
-  mode: number;
-  size: number;
-  ino: number;
-  mtimeMs: number;
-  ctimeMs: number;
-  uid: number;
-  gid: number;
-  dev: number;
-  isFile(): boolean;
-  isDirectory(): boolean;
-  isSymbolicLink(): boolean;
-}
 
 function normalizePath(path: string): string {
   return path.replace(/\\/g, "/");
@@ -118,7 +107,7 @@ function makeStat(args: {
 }): FsStat {
   const { type, size, mtimeMs, path } = args;
   const mode = type === "dir" ? DIR_MODE : FILE_MODE;
-  return {
+  return makeStatFromType({
     type,
     mode,
     size,
@@ -128,10 +117,7 @@ function makeStat(args: {
     uid: 1,
     gid: 1,
     dev: 1,
-    isFile: () => type === "file",
-    isDirectory: () => type === "dir",
-    isSymbolicLink: () => type === "symlink",
-  };
+  });
 }
 
 async function getEntry(
@@ -154,7 +140,7 @@ async function getEntry(
   return await parent.getDirectoryHandle(name);
 }
 
-export default class FileSystemAccessFs {
+export default class FileSystemAccessFs implements GitFs {
   #root: FileSystemDirectoryHandle;
   promises: FileSystemAccessFs;
 

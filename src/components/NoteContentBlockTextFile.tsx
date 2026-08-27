@@ -19,12 +19,25 @@ const NoteContentBlockTextFile = ({
   const [text, setText] = useState<string>("");
 
   useEffect(() => {
+    let cancelled = false;
+
     getObjectUrlForArbitraryGraphFile(file)
-      .then((url) => {
-        return fetch(url);
+      .then(async (url) => {
+        try {
+          const response = await fetch(url);
+          return await response.text();
+        } finally {
+          // Nothing else references the blob once it has been read.
+          URL.revokeObjectURL(url);
+        }
       })
-      .then((response) => response.text())
-      .then((text) => setText(text));
+      .then((text) => {
+        if (!cancelled) setText(text);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [file, notesProvider]);
 
   return <div
