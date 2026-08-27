@@ -38,7 +38,7 @@ export default defineConfig({
   build: {
     outDir: "dist-electron",
     emptyOutDir: true,
-    target: "node22",
+    target: "node24",
     minify: false,
     sourcemap: true,
     lib: {

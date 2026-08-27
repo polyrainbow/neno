@@ -222,6 +222,13 @@ isomorphic-git branches on `err.code === "ENOENT"`.
   `NoteContentBlockTextFile` fetches its own blob URL back.
 - `setWindowOpenHandler` → `shell.openExternal` — `window.open` in
   `Note.tsx` would otherwise spawn a bare chrome-less window.
+- The Dock icon and the menu-bar title come from the running bundle, and
+  in development that bundle is Electron's own. `applyDevDockIcon()`
+  sets the icon at runtime from `build/icon.png`; the menu title comes
+  from `CFBundleName`, which no API can override, so
+  `tools/electronDev.mjs` rewrites it in `node_modules`. A packaged app
+  needs neither — electron-builder's `productName` and the derived
+  `.icns` cover both.
 
 ### Storage-provider details that only bite on a real file system
 

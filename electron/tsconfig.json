@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2023",
+    "target": "ES2024",
     /*
       The main and preload bundles are produced by Vite
       (vite.electron.config.ts), so imports are resolved the way a

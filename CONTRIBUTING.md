@@ -18,9 +18,20 @@ Make sure you have Node.js v24 and macOS. Clone this repo and run `npm i`.
 
 Then either:
 
-* `npm run electron:dev` — builds the main/preload bundles, starts the
-  Vite dev server and opens the Electron window against it. This is the
-  normal way to work on NENO.
+* `npm run electron:dev` — renders the app icon, builds the main/preload
+  bundles, starts the Vite dev server and opens the Electron window
+  against it. This is the normal way to work on NENO.
+
+  Two things about the dev window are cosmetic patches, because in
+  development the running bundle is Electron's own rather than NENO's:
+  the Dock icon is set at runtime from `build/icon.png`, and the
+  application menu's title comes from the bundle's `CFBundleName`, which
+  no Electron API can override — so the launcher rewrites it to "NENO"
+  inside `node_modules`. A fresh `npm i` reverts that rename; the next
+  run simply applies it again, and macOS may need a moment to drop the
+  old name from its Launch Services cache. The packaged app needs
+  neither patch: it gets both from electron-builder's `productName` and
+  the derived `.icns`.
 * `npm run dev` — the Vite dev server alone, at `localhost:5173`. Useful
   for renderer-only work and for the Playwright suite, but `window.neno`
   is absent there, so the native dialogs and the Node-fs graph folder are
@@ -178,7 +189,7 @@ Run `npm i`
 Run `npm run electron:build`. This type-checks both roots, builds the
 renderer into `dist/` and the main/preload bundles into `dist-electron/`,
 renders the app icon into `build/icon.png` and hands everything to
-electron-builder.
+electron-builder, which derives the bundle's `.icns` from that PNG.
 
 The icon step needs either `rsvg-convert` (`brew install librsvg`) or the
 macOS built-ins `qlmanage`/`sips`.

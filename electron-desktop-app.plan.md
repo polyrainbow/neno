@@ -110,7 +110,7 @@ New `electron/` directory, compiled separately from the renderer.
 * `electron/tsconfig.json` — `module: NodeNext`, `types: ["node"]`,
   includes `electron/**` plus the shared bridge types.
 * `vite.electron.config.ts` — two `build.lib` entries (`main`,
-  `preload`), `formats: ["cjs"]`, `target: "node22"`, `external:
+  `preload`), `formats: ["cjs"]`, `target: "node24"`, `external:
   ["electron", …node builtins]`, `outDir: "dist-electron"`.
 * `tools/electronDev.mjs` — spawns `vite` and then `electron .` with
   `NENO_DEV_SERVER_URL` set, using only `node:child_process` (no new
@@ -247,7 +247,7 @@ Wiring:
   `electron:dev` (`node tools/electronDev.mjs`), `build:electron`
   (`vite build --config vite.electron.config.ts`), `electron:build`
   (`tsc && vite build && npm run build:electron && electron-builder
-  --mac`). Add `electron` (43.x) and `electron-builder` (26.x) as
+  --mac`). Add `electron` (44.x) and `electron-builder` (26.x) as
   devDependencies. Add an `engines.node: ">=24"` field while here.
 * `electron-builder.yml` — `appId: io.github.polyrainbow.neno`,
   `productName: NENO`, `files: [dist/**, dist-electron/**]`,

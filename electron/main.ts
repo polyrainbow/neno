@@ -100,6 +100,19 @@ async function isReadableFile(filePath: string): Promise<boolean> {
   }
 }
 
+/*
+  A packaged app takes its Dock icon from the bundle's .icns, which
+  electron-builder derives from build/icon.png. In development the
+  running bundle is Electron's own, so the icon has to be set at
+  runtime; tools/electronDev.mjs renders build/icon.png first.
+*/
+async function applyDevDockIcon(): Promise<void> {
+  if (!IS_DEV || !app.dock) return;
+  const iconPath = path.join(app.getAppPath(), "build", "icon.png");
+  if (!await isReadableFile(iconPath)) return;
+  app.dock.setIcon(iconPath);
+}
+
 function toResponse(filePath: string): Response {
   const body = Readable.toWeb(
     createReadStream(filePath),
@@ -338,6 +351,7 @@ function buildMenu(): void {
 }
 
 app.whenReady().then(() => {
+  void applyDevDockIcon();
   protocol.handle(APP_SCHEME, handleAppRequest);
   applyContentSecurityPolicy();
   registerConfigHandlers();
