@@ -99,8 +99,8 @@ const getBasename = (path: string): string => {
 
 /*
   The absolute path of the folder used last lives in the Electron main
-  process (userData/config.json), so there is no permission prompt and no
-  FileSystemDirectoryHandle round-trip through IndexedDB.
+  process ($HOME/.config/neno/config.json), so there is no permission
+  prompt and no FileSystemDirectoryHandle round-trip through IndexedDB.
 */
 const getExistingFolderPath = async (): Promise<string | null> => {
   if (folderPath) return folderPath;

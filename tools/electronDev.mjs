@@ -96,7 +96,9 @@ await nameDevBundle();
   electron/main.ts sets the dev Dock icon from build/icon.png, since the
   dev bundle carries Electron's own .icns.
 */
-const icons = run("./tools/buildIcons.sh", [], { cwd: PROJECT_ROOT });
+const icons = run("npx", ["electron", "tools/buildIcon.mjs"], {
+  cwd: PROJECT_ROOT,
+});
 const [iconsCode] = await once(icons, "exit");
 if (iconsCode !== 0) {
   // A missing icon is not worth blocking development over.

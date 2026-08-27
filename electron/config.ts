@@ -3,10 +3,16 @@
   folder lives here instead of in an IndexedDB-held
   FileSystemDirectoryHandle, so relaunching reopens the folder with no
   permission prompt.
+
+  The file is $HOME/.config/neno/config.json — a fixed, inspectable
+  location rather than app.getPath("userData"), which moves with
+  app.name and would silently strand the stored folder if the app were
+  ever renamed.
 */
 
-import { app, ipcMain } from "electron";
+import { ipcMain } from "electron";
 import * as fs from "node:fs/promises";
+import * as os from "node:os";
 import * as path from "node:path";
 
 type Config = {
@@ -15,8 +21,12 @@ type Config = {
 
 let cachedConfig: Config | null = null;
 
+function getConfigDirectory(): string {
+  return path.join(os.homedir(), ".config", "neno");
+}
+
 function getConfigPath(): string {
-  return path.join(app.getPath("userData"), "config.json");
+  return path.join(getConfigDirectory(), "config.json");
 }
 
 async function readConfig(): Promise<Config> {
@@ -35,7 +45,18 @@ async function writeConfig(config: Config): Promise<void> {
   cachedConfig = config;
   const configPath = getConfigPath();
   await fs.mkdir(path.dirname(configPath), { recursive: true });
-  await fs.writeFile(configPath, JSON.stringify(config, null, 2), "utf8");
+  /*
+    Write and rename, so a crash mid-write cannot leave a truncated file
+    behind — readConfig would parse that as an empty config and quietly
+    forget the folder.
+  */
+  const temporaryPath = `${configPath}.tmp`;
+  await fs.writeFile(
+    temporaryPath,
+    JSON.stringify(config, null, 2) + "\n",
+    "utf8",
+  );
+  await fs.rename(temporaryPath, configPath);
 }
 
 export async function getLastFolder(): Promise<string | null> {

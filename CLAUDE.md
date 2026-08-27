@@ -45,7 +45,7 @@ npm run all-checks       # stylelint + lint + test + integration-test + build
 electron/                     # Electron main process (compiled separately)
   main.ts                     #   Window, neno:// protocol, CSP, menu
   preload.ts                  #   contextBridge surface (window.neno)
-  config.ts                   #   userData/config.json (last folder)
+  config.ts                   #   ~/.config/neno/config.json (last folder)
   dialogs.ts                  #   Native folder/open/save dialogs
   unsavedChanges.ts           #   Native confirm on window close
   storage/
@@ -229,6 +229,12 @@ isomorphic-git branches on `err.code === "ENOENT"`.
   `tools/electronDev.mjs` rewrites it in `node_modules`. A packaged app
   needs neither — electron-builder's `productName` and the derived
   `.icns` cover both.
+- `tools/buildIcon.mjs` renders `build/icon.png` with Electron's own
+  Chromium, through a `<canvas>`. Both halves matter: `rsvg-convert`
+  ignores the logo's `transform-origin` attributes and throws the middle
+  bar of the "N" off the canvas, and a `webContents.capturePage()` is
+  composited for the display, which converts the pixels out of sRGB and
+  desaturates them.
 
 ### Storage-provider details that only bite on a real file system
 

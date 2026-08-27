@@ -24,7 +24,8 @@ Then either:
 
   Two things about the dev window are cosmetic patches, because in
   development the running bundle is Electron's own rather than NENO's:
-  the Dock icon is set at runtime from `build/icon.png`, and the
+  the Dock icon is set at runtime from `build/icon.png` (which the
+  launcher renders first), and the
   application menu's title comes from the bundle's `CFBundleName`, which
   no Electron API can override — so the launcher rewrites it to "NENO"
   inside `node_modules`. A fresh `npm i` reverts that rename; the next
@@ -191,8 +192,13 @@ renderer into `dist/` and the main/preload bundles into `dist-electron/`,
 renders the app icon into `build/icon.png` and hands everything to
 electron-builder, which derives the bundle's `.icns` from that PNG.
 
-The icon step needs either `rsvg-convert` (`brew install librsvg`) or the
-macOS built-ins `qlmanage`/`sips`.
+`tools/buildIcon.mjs` does the icon rendering, and does it with
+Electron's own Chromium (`npx electron tools/buildIcon.mjs`) — no extra
+tool to install. That is not gratuitous: the logo places the bars of its
+"N" with the `transform-origin` presentation attribute, which
+`rsvg-convert` silently ignores, and it rasterizes through a `<canvas>`
+rather than a window capture so the pixels stay in sRGB instead of being
+converted to the display's gamut.
 
 ### 4. Install the result
 

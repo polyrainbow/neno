@@ -255,9 +255,9 @@ Wiring:
   `directories: { output: release, buildResources: build }`. No
   signing config (`CSC_IDENTITY_AUTO_DISCOVERY=false` in CI).
 * Icon: only `public/assets/app-icon/logo.svg` exists. Add
-  `tools/buildIcons.sh` rendering it to a 1024×1024 `build/icon.png`
-  (`rsvg-convert`, or `sips` from a PDF) — electron-builder derives
-  the `.icns` from that.
+  `tools/buildIcon.mjs` rendering it to a 1024×1024 `build/icon.png`
+  with Electron's own Chromium — electron-builder derives the `.icns`
+  from that.
 * `.gitignore` — add `dist-electron/`, `release/`, `build/icon.png`.
 * `.github/workflows/release.yml` — switch `runs-on` to `macos-15`,
   replace the `tools/buildReleasePackage.sh` step with
