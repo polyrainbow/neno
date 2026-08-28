@@ -181,13 +181,29 @@
   </p>
 
   <p>
+    NENO requires <strong>macOS on Apple Silicon</strong> &mdash; the release
+    is an arm64 build and will not run on an Intel Mac. Applications is only
+    a convention: if you have no admin rights on the machine, keep the app
+    wherever you like, such as your Desktop, and adjust the paths below to
+    match.
+  </p>
+
+  <p>
     The build is not code-signed, so macOS will refuse to launch it on the
     first attempt. Right-click (or Control-click) NENO in Finder and choose
-    <strong>Open</strong>, then confirm. If macOS instead says the app
-    &ldquo;is damaged and can't be opened&rdquo;, the download picked up a
-    quarantine attribute; clear it in a terminal with
-    <code>xattr -dr com.apple.quarantine /Applications/NENO.app</code>.
-    Every launch after the first one works normally.
+    <strong>Open</strong>, then confirm.
+  </p>
+
+  <p>
+    If macOS instead says the app &ldquo;is damaged and can't be
+    opened&rdquo;, the download picked up a quarantine attribute.
+    Right-click &rarr; Open does not get past that one; clear the attribute
+    in a terminal instead, with
+    <code>xattr -dr com.apple.quarantine /Applications/NENO.app</code>
+    (or <code>xattr -dr com.apple.quarantine ~/Desktop/NENO.app</code>, and
+    so on). No <code>sudo</code> and no admin rights are needed: the app is
+    yours, wherever you put it. Every launch after the first one works
+    normally.
   </p>
 
   <figure>

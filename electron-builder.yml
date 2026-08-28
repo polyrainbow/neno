@@ -15,6 +15,11 @@ files:
   # and node builtins.
   - "!node_modules/**"
 
+# Ad-hoc signs the packed app before it goes into the .dmg. Not
+# optional: without it macOS calls the downloaded app damaged. See the
+# hook for why electron-builder's own signing options cannot do this.
+afterPack: tools/afterPack.mjs
+
 mac:
   target: dmg
   category: public.app-category.productivity

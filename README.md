@@ -42,17 +42,25 @@ Download the latest `NENO-<version>.dmg` from the
 drag NENO to your Applications folder. Then read the
 [user manual](https://polyrainbow.github.io/neno/docs/index.html).
 
-NENO requires macOS. The build is **not code-signed**, so the first launch
-needs a detour around Gatekeeper: right-click (or Control-click) the app in
-Finder and choose **Open**, then confirm. If macOS instead claims the app
-"is damaged and can't be opened", the download picked up a quarantine
-attribute; clear it with:
+NENO requires **macOS on Apple Silicon** — the release is an arm64 build,
+so it will not run on an Intel Mac. Applications is only a convention: if
+you have no admin rights on the machine, keep the app anywhere you like,
+such as `~/Desktop`, and adjust the paths below to match.
+
+The build is **not code-signed**, so the first launch needs a detour around
+Gatekeeper: right-click (or Control-click) the app in Finder and choose
+**Open**, then confirm.
+
+If macOS instead claims the app "is damaged and can't be opened", the
+download picked up a quarantine attribute. Right-click → Open does not get
+past that one — clear the attribute instead:
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/NENO.app
 ```
 
-Every launch after the first one works normally.
+No `sudo` and no admin rights are needed: the app is yours, wherever you
+put it. Every launch after the first one works normally.
 
 ## Further reading
 
