@@ -92,6 +92,14 @@ jobs:
     # Builds the renderer and the main/preload bundles, renders
     # build/icon.png with Electron's Chromium and produces
     # release/NENO-<version>.dmg.
+    #
+    # The script passes --publish never, and must keep doing so:
+    # electron-builder otherwise starts publishing on its own as soon as
+    # it detects a CI tag build, and then fails the job asking for a
+    # GH_TOKEN it has no reason to need. Publishing is the separate
+    # `publish` job's work, from the artifact uploaded below. That
+    # difference only shows up on a tag, so a green pull request says
+    # nothing about it.
     - name: Build macOS app
       run: npm run electron:build
     - name: Upload .dmg

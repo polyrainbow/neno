@@ -52,7 +52,7 @@
     "electron:dev": "node tools/electronDev.mjs",
     "build": "npx tsc && npx tsc -p electron/tsconfig.json && npx vite build",
     "build:electron": "npx vite build --config vite.electron.config.ts",
-    "electron:build": "npm run build && npm run build:electron && npx electron tools/buildIcon.mjs && npx electron-builder --mac",
+    "electron:build": "npm run build && npm run build:electron && npx electron tools/buildIcon.mjs && npx electron-builder --mac --publish never",
     "lint": "npx eslint src --report-unused-disable-directives && npx eslint electron --report-unused-disable-directives && npx eslint tests --report-unused-disable-directives",
     "all-checks": "npm run stylelint && npm run lint && npm run test && npm run integration-test && npm run build",
     "all-checks-visual": "npm run all-checks && npm run visual-regression-test",
