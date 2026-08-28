@@ -1,27 +1,64 @@
 name: Release
 
-on: 
+# Pushing a version tag publishes a GitHub release with the unsigned
+# macOS .dmg attached. The tag has to be a version number: `npm version
+# patch|minor|major` creates exactly that from package.json.
+#
+# The whole CI suite runs first, and the published .dmg is the artifact
+# its packaging job built — nothing is released that has not passed the
+# tests.
+
+on:
   push:
     tags:
-    - '*'
+    - 'v[0-9]+.[0-9]+.[0-9]+'
+    - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  # The .dmg is named after the version in package.json, so a tag that
+  # disagrees with it would publish a mislabelled file. Checked before
+  # the build, to fail in seconds rather than after packaging.
+  verify-version:
+    name: Verify tag matches package.json
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Compare tag with package version
+      run: |
+        PACKAGE_VERSION="v$(node -p "require('./package.json').version")"
+        if [ "$PACKAGE_VERSION" != "$GITHUB_REF_NAME" ]; then
+          echo "Tag $GITHUB_REF_NAME does not match package.json" \
+            "version $PACKAGE_VERSION." >&2
+          exit 1
+        fi
+        echo "Releasing $GITHUB_REF_NAME."
+
+  ci:
+    name: CI
+    needs: verify-version
+    uses: ./.github/workflows/ci.yml
+
+  publish:
+    name: Publish release
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    # The .dmg comes from the packaging job of the CI run above; it is
+    # an artifact of this same workflow run.
+    - name: Download .dmg
+      uses: actions/download-artifact@v4
       with:
-        node-version: '24'
-    - run: npm i
-    - name: Build release package
-      working-directory: ./tools
-      run: ./buildReleasePackage.sh
+        name: neno-dmg
+        path: release
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "neno-v*.tar.gz"
+        artifacts: "release/*.dmg"
         artifactErrorsFailBuild: true
         generateReleaseNotes: true
+        prerelease: ${{ contains(github.ref_name, '-') }}
         token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,26 +1,15 @@
 import { useEffect } from "react";
+import { isElectron, getBridge } from "../lib/electron/bridge";
 
+/*
+  Electron ignores the string a beforeunload handler returns and would
+  block the window close with no UI at all, so instead of hooking
+  beforeunload we push the dirty flag to the main process, which
+  intercepts the window's "close" event with a native message box.
+*/
 export default (isEnabled: boolean): void => {
-  const beforeUnload = function(e: BeforeUnloadEvent) {
-    if (isEnabled) {
-      // Cancel the event
-      e.preventDefault();
-      // If you prevent default behavior in Mozilla Firefox prompt will
-      // always be shown
-      // Chrome requires returnValue to be set
-      e.returnValue = "";
-    } else {
-      // the absence of a returnValue property on the event will guarantee
-      // the browser unload happens
-      delete e.returnValue;
-    }
-  };
-
   useEffect(() => {
-    window.addEventListener("beforeunload", beforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnload);
-    };
-  }, [beforeUnload]);
+    if (!isElectron()) return;
+    getBridge().setUnsavedChanges(isEnabled);
+  }, [isEnabled]);
 };

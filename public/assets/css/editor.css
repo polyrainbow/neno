@@ -137,6 +137,21 @@ div[data-lexical-editor] {
     }
   }
 
+  /*
+    The find bar's matches (src/components/FindBar.tsx). Highlights
+    rather than wrapper elements, so the editor's DOM is left exactly as
+    Lexical rendered it.
+  */
+  ::highlight(find-match) {
+    background-color: var(--find-match-background-color);
+    color: var(--find-match-color);
+  }
+
+  ::highlight(find-match-active) {
+    background-color: var(--find-match-active-background-color);
+    color: var(--find-match-active-color);
+  }
+
   ::highlight(code-token-keyword)     { color: var(--token-keyword); }
   ::highlight(code-token-string)      { color: var(--token-string); }
   ::highlight(code-token-number)      { color: var(--token-number); }

@@ -1,0 +1,24 @@
+appId: io.github.polyrainbow.neno
+productName: NENO
+copyright: Copyright © NENO contributors
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist/**
+  - dist-electron/**
+  - package.json
+  # Everything the app needs at runtime is bundled by Vite into dist/ and
+  # dist-electron/; the main and preload bundles require only "electron"
+  # and node builtins.
+  - "!node_modules/**"
+
+mac:
+  target: dmg
+  category: public.app-category.productivity
+  icon: build/icon.png
+
+dmg:
+  artifactName: NENO-${version}.dmg

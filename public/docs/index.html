@@ -41,8 +41,8 @@
     <a href="https://towardsdatascience.com/personal-knowledge-graphs-9a23a0b099af">
       nice introduction to personal knowledge graphs by Dan McCreary</a>.
     With NENO, you retain full control over your data because you decide
-    where it is stored: On your device, on a cloud storage of your choice,
-    or even on a server under your control.
+    where it is stored: in any folder on your device, including one kept in
+    sync by the cloud storage of your choice.
     <br>
     NENO is open-source software which means it is completely free to use.
   </p>
@@ -168,30 +168,27 @@
 
   <h2>Getting started</h2>
   <p>
-    To get started with NENO, you do not need to create an account or
-    install any software. NENO is a web app that runs in your browser.
+    NENO is a macOS desktop app. You do not need to create an account or
+    sign in anywhere &mdash; download it, pick a folder, and start writing.
+  </p>
+
+  <h3>Installation</h3>
+
+  <p>
+    Download the latest <code>NENO-&lt;version&gt;.dmg</code> from the
+    <a href="https://github.com/polyrainbow/neno/releases">releases page</a>,
+    open it and drag NENO to your Applications folder.
   </p>
 
   <p>
-    <a href="https://polyrainbow.github.io/neno">Open the app.</a>
+    The build is not code-signed, so macOS will refuse to launch it on the
+    first attempt. Right-click (or Control-click) NENO in Finder and choose
+    <strong>Open</strong>, then confirm. If macOS instead says the app
+    &ldquo;is damaged and can't be opened&rdquo;, the download picked up a
+    quarantine attribute; clear it in a terminal with
+    <code>xattr -dr com.apple.quarantine /Applications/NENO.app</code>.
+    Every launch after the first one works normally.
   </p>
-
-  <h3>Optional installation</h3>
-
-  <p>
-    Even though you don't need to install NENO, doing so has some advantages.
-    Click on the install button in the address bar of your browser to install
-    NENO as a PWA (Progressive Web App). This way, you can start NENO from
-    your device like any other app.
-  </p>
-
-  <figure>
-    <img
-      alt="Installation dialog for NENO in the browser"
-      src="./img/install-app-dialog.png"
-    >
-    <figcaption>Installation dialog for NENO in the browser</figcaption>
-  </figure>
 
   <figure>
     <img
@@ -204,20 +201,16 @@
   <h3>Opening a folder</h3>
   
   <p>
-    When you open NENO for the first time, you will be asked to select a folder
-    where your notes will be stored.
+    When you open NENO for the first time, a native folder dialog asks you
+    where your notes should be stored. NENO remembers that folder, so every
+    later launch opens it straight away.
 
-    NENO stores all data in a folder of your choice on your
-    device. If you want, you could also select a cloud storage folder so that
+    NENO stores all data in that folder on your device. If you want, you
+    could also select a cloud storage folder so that
     your notes are synchronized to all your devices. You could also use a
     <a href="https://git-scm.com/">Git</a>
     repository to manage your notes. That way, you also get versioning for free.
-    <strong>Even though NENO is a web app, it does not send any user data to a
-    web server</strong>.
-  </p>
-  
-  <p>
-  At the time of writing, NENO works with Chrome, Edge, and Opera.
+    <strong>NENO does not send any user data to a web server</strong>.
   </p>
   
   <h2>Taking notes</h2>
@@ -951,13 +944,12 @@ println(m.double(21));
 
   <h2>Known issues</h2>
 
-  <h3>Browsers installed with Flatpak</h3>
+  <h3>Gatekeeper on the first launch</h3>
   <p>
-    On Linux, we do not recommend using NENO with a browser installed via Flatpak.
-    In our tests, Chrome lacked the necessary permissions to access PWAs in the
-    local user directory; more importantly, loading a graph folder from disk
-    was very slow compared to a Chrome installation from the RPM file provided
-    by Google.
+    NENO's releases are not code-signed, so macOS blocks the first launch.
+    See <a href="#installation">Installation</a> above for the
+    right-click &rarr; Open detour and the
+    <code>xattr</code> command that clears a quarantine attribute.
   </p>
 
   <h2>Acknowledgements</h2>

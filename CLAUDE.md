@@ -1,19 +1,24 @@
 # NENO
 
 Privacy-first note-taking app built on the Subtext markup language.
-Users own their data via the File System Access API — notes are stored as
-plain-text `.subtext` files on the user's device.
+NENO is a macOS desktop app built on Electron. Users own their data —
+notes are stored as plain-text `.subtext` files in a folder the user
+picks through a native dialog, read and written by Node's `fs` in the
+Electron main process.
 
 ## Commands
 
 ```sh
-npm run dev              # Dev server on localhost:5173
-npm run build            # TypeScript check + Vite production build
-npm run lint             # ESLint (src/ and tests/)
+npm run dev              # Vite dev server on localhost:5173 (renderer only)
+npm run electron:dev     # Vite dev server + Electron window
+npm run build            # TypeScript check (src + electron) + Vite build
+npm run build:electron   # Build the main/preload bundles to dist-electron/
+npm run electron:build   # Full build + electron-builder --mac (unsigned .dmg)
+npm run lint             # ESLint (src/, electron/, tests/)
 npm run lint-fix         # ESLint with --fix
 npm run stylelint        # CSS linting
 npm run test             # Unit tests (Vitest) + i18n tests
-npm run unit-test        # Vitest only
+npm run unit-test        # Vitest only (src/ and electron/)
 npm run integration-test # Playwright integration tests (needs browsers)
 npm run all-checks       # stylelint + lint + test + integration-test + build
 ```
@@ -37,6 +42,21 @@ npm run all-checks       # stylelint + lint + test + integration-test + build
 ## Architecture
 
 ```
+electron/                     # Electron main process (compiled separately)
+  main.ts                     #   Window, neno:// protocol, CSP, menu
+  preload.ts                  #   contextBridge surface (window.neno)
+  config.ts                   #   ~/.config/neno/config.json (last folder,
+                              #   window bounds)
+  windowState.ts              #   Remembers/restores the window bounds
+  windowGeometry.ts           #   Pure display-fitting geometry
+  dialogs.ts                  #   Native folder/open/save dialogs
+  unsavedChanges.ts           #   Native confirm on window close
+  findMenu.ts                 #   The Edit menu's find items
+  storage/
+    NodeFsStorageProvider.ts  #   StorageProvider on node:fs/promises
+    nodeFsGit.ts              #   isomorphic-git fs on node:fs/promises
+    bridge.ts                 #   RPC dispatch on a MessagePortMain
+
 src/
   main.tsx                    # App entry point
   components/                 # React components
@@ -52,8 +72,9 @@ src/
     subwaytext/               # Subtext parser & serializer
     notes-worker/             # Dedicated worker hosting NotesProvider
     script-worker/            # Sandboxed worker for user script execution
+    electron/                 # Renderer/worker side of the storage bridge
     FileSystemAccessAPIStorageProvider.tsx
-                              # File System Access API integration
+                              # File System Access API integration (OPFS mode)
   types/                      # Shared TypeScript types
   intl/                       # Internationalization
 ```
@@ -61,16 +82,20 @@ src/
 ### Key modules
 
 - **Notes** (`src/lib/notes/`) — Heart of the app. Manages note CRUD,
-  graph relationships, indexes, and search. Depends on Subwaytext parser
-  and FileSystemAccessAPIStorageProvider.
+  graph relationships, indexes, and search. Depends on the Subwaytext
+  parser and on whichever StorageProvider the worker was initialized
+  with.
 - **Subwaytext** (`src/lib/subwaytext/`) — Parses Subtext markup strings
   into block arrays and serializes them back. See the
   [Subtext Graph Specification](https://polyrainbow.github.io/neno/docs/subtext-graph-specification.html).
 - **Editor** (`src/lib/editor/`) — Built on [Lexical](https://lexical.dev).
   Custom nodes and plugins extend the editor for Subtext content.
-- **StorageProvider** (`src/lib/FileSystemAccessAPIStorageProvider.tsx`) —
-  Wraps the browser FileSystemDirectoryHandle API. The Notes module uses
-  this to read/write the user's file system.
+- **StorageProvider** — a 9-method contract
+  (`src/lib/notes/types/StorageProvider.ts`) with two implementations.
+  `electron/storage/NodeFsStorageProvider.ts` (Node `fs`, the real graph
+  folder) is the one users see; `src/lib/FileSystemAccessAPIStorageProvider.tsx`
+  wraps a `FileSystemDirectoryHandle` and backs the OPFS "try it out"
+  mode, which is also what the Playwright suite drives.
 
 ### Worker architecture
 
@@ -92,6 +117,11 @@ graph cache. Before this design, each thread had its own instance and
 its own cache, so changes made in one thread were invisible to the
 others until a full disk re-read.
 
+There is exactly one NENO window, so the notes worker is a plain
+dedicated `Worker` and the worker global itself is the window's port.
+There is no cross-tab arbitration; the `reset` action remains, because
+that is how a folder switch works.
+
 **How it connects:**
 
 1. `LocalDataStorage.initializeNotesProvider()` spawns the notes
@@ -112,7 +142,11 @@ others until a full disk re-read.
 | `src/lib/notes-worker/index.ts` | Worker that owns `NotesProvider`; handles RPC + `MessagePort` clients |
 | `src/lib/notes-worker/NotesProviderProxy.ts` | Proxy with the same public API as `NotesProvider`; sends RPC over `Worker` or `MessagePort` |
 | `src/lib/script-worker/index.ts` | Sandboxed script execution worker; receives a `MessagePort` to the notes worker |
-| `src/lib/LocalDataStorage.ts` | Creates the notes worker, exposes `getNotesWorker()` for `MessageChannel` setup |
+| `src/lib/LocalDataStorage.ts` | Creates the notes worker, exposes `getNotesWorkerPort()` for `MessageChannel` setup |
+| `src/lib/electron/bridgeTypes.ts` | Message types shared by `electron/` and `src/` so the bridge cannot drift |
+| `src/lib/electron/BridgeClient.ts` | Request/response id bookkeeping for the storage bridge |
+| `src/lib/electron/StorageProviderProxy.ts` | `StorageProvider` over the bridge, with chunked streams |
+| `src/lib/electron/GitFsProxy.ts` | isomorphic-git fs over the bridge |
 
 **Gotcha — `MessagePort.start()`:** When listening on a `MessagePort`
 with `addEventListener` (as opposed to setting `onmessage`), the port
@@ -120,15 +154,162 @@ must be explicitly started with `port.start()`. The proxy handles this
 automatically. There is a regression test in
 `NotesProviderProxy.spec.ts`.
 
+## Electron architecture
+
+### Why the renderer is not loaded from `file://`
+
+The router (`src/lib/router.ts`, `src/lib/navigation.ts`) is built on the
+Navigation API + `URLPattern` and matches on `location.pathname`, and
+`FileView.tsx` does full `location.href = …` navigations. Under
+`file://`, `pathname` is a disk path, every route misses and
+`AppRouter.tsx` renders "Undefined route"; OPFS, `localStorage`,
+IndexedDB and module workers are also unavailable or unreliable there.
+
+So `dist/` is served over a custom **`neno://` scheme** registered as
+`standard` + `secure`, with an SPA fallback to `index.html`. That origin
+gets a real storage partition and a secure context, so nothing in the
+router, `config.tsx`, `constants.ts` or `index.html` had to change and
+`base` stays `"/"`. The window loads `neno://app/` — **not**
+`neno://app/index.html`, which is not a route.
+
+### The storage bridge
+
+The notes worker runs in the renderer and has no Node access, so the
+Node-`fs` implementations live in the main process and are reached over
+RPC:
+
+```
+ main process                  renderer                 notes worker
+ ┌───────────────────┐      ┌─────────────┐        ┌──────────────────┐
+ │ NodeFsStorage     │◀═══════ MessagePortMain ══════▶│ StorageProxy   │
+ │ NodeFsGit         │      │ (forwards   │        │ GitFsProxy       │
+ │ dialogs, fs       │      │  the port)  │        │ NotesProvider    │
+ └───────────────────┘      └─────────────┘        └──────────────────┘
+        ▲  contextBridge (window.neno)   │  Worker RPC (unchanged)
+        └────────────────────────────────┘
+```
+
+`ipcMain.handle("storage:connect", path)` creates a `MessageChannelMain`,
+keeps `port1` and posts `port2` to the renderer; the preload forwards it
+to the page with a transferring `window.postMessage` (a `MessagePort`
+cannot cross `contextBridge`), and the renderer transfers it into the
+notes worker alongside the `initialize` action.
+
+The wire format is the `{id, method, args}` → `{id, result | error}`
+protocol `NotesProviderProxy` already used, with method names namespaced
+`storage.…` / `git.…` so one port carries both. Both proxies share a
+single `BridgeClient`, because they share the request id sequence.
+
+**Streams are chunked.** A `ReadableStream` is transferable between
+renderer contexts but not across the main-process boundary, so
+`getReadableStream` becomes `openRead` + one `readChunk` per `pull`, and
+`writeObjectFromReadable` becomes `openWrite` + `writeChunk` per chunk +
+`closeWrite` returning the byte count. Chunks are copied before they go
+on the wire; there is no transfer list, since a `MessagePortMain` can
+only transfer `MessagePort`s and everything crossing the process
+boundary is serialized regardless.
+
+Errors carry an `errorCode` field alongside the message, because
+isomorphic-git branches on `err.code === "ENOENT"`.
+
+### Non-obvious main-process requirements
+
+- `plugins: true` in `webPreferences` — without it Chromium's PDF viewer
+  is disabled and the PDF `<iframe>` in `FileViewPreview.tsx` renders
+  blank.
+- The standard **Edit** menu roles — without them Cmd-C/V/Z do not work
+  at all in a packaged Electron app.
+- `'unsafe-eval'` in the CSP — Monaco's TypeScript worker and the
+  scripting sandbox both build functions at runtime.
+- `blob:` in `img-src`, `media-src`, `frame-src` and `connect-src` —
+  object URLs back media elements and the PDF iframe, and
+  `NoteContentBlockTextFile` fetches its own blob URL back.
+- `setWindowOpenHandler` → `shell.openExternal` — `window.open` in
+  `Note.tsx` would otherwise spawn a bare chrome-less window.
+- The Dock icon and the menu-bar title come from the running bundle, and
+  in development that bundle is Electron's own. `applyDevDockIcon()`
+  sets the icon at runtime from `build/icon.png`; the menu title comes
+  from `CFBundleName`, which no API can override, so
+  `tools/electronDev.mjs` rewrites it in `node_modules`. A packaged app
+  needs neither — electron-builder's `productName` and the derived
+  `.icns` cover both.
+- The default window is 1440 wide, not 1280: the note list sidebar is
+  hidden below `min-width: 1281px`, so a 1280px window opens without it.
+  `MIN_WIDTH`/`DEFAULT_WIDTH` live in `electron/windowGeometry.ts`
+  alongside the comment explaining the tie to the CSS.
+- `tools/buildIcon.mjs` renders `build/icon.png` with Electron's own
+  Chromium, through a `<canvas>`. Both halves matter: `rsvg-convert`
+  ignores the logo's `transform-origin` attributes and throws the middle
+  bar of the "N" off the canvas, and a `webContents.capturePage()` is
+  composited for the display, which converts the pixels out of sRGB and
+  desaturates them.
+
+### Find in note
+
+Chromium's find bar is browser UI that Electron does not ship, so Cmd-F
+is built here: a React bar (`src/components/FindBar.tsx`) over a
+renderer-side search (`src/lib/findInEditor.ts`).
+`electron/findMenu.ts` owns the Edit menu items and forwards nothing but
+the command — the accelerators live on the menu rather than on a
+renderer keydown listener, so they fire regardless of focus. In a
+browser the component renders nothing — there, Cmd-F is the browser's
+own find.
+
+**`webContents.findInPage()` was tried first and does not fit.** It
+searches everything the window renders — the note list, the header, the
+navigation rail, the find bar's own input — so it answers a question
+nobody asked, and it takes focus by selecting each match, which fights
+the typist for the caret. Searching the whole graph is what the search
+bar is for; Cmd-F is for the note in front of you. Everything that
+version needed — the phantom self-match, the focus hold, the
+new-session/step distinction behind Electron's misnamed `findNext` — was
+scaffolding around those two problems, and none of it survives.
+
+What the replacement rests on:
+
+- **Matches are painted with the CSS Custom Highlight API**, the same
+  mechanism the editor already uses for code tokens and block sigils
+  (`src/lib/editor/utils/highlight.ts`, `setFindHighlights`). No DOM is
+  wrapped and no Lexical state is touched, so the document Lexical
+  thinks it has stays the document on screen, and the caret and the page
+  selection stay where the user left them. The active match is a second
+  highlight, kept disjoint from the rest so nothing is painted twice.
+- **Each block is searched on its own.** The editor's element children
+  are the subtext blocks, and keeping them apart is what stops a match
+  from spanning the gap between two of them.
+- **Case folding runs as a RegExp over the original text**, never over a
+  lower-cased copy: `toLowerCase()` can change a string's length (the
+  Turkish dotted capital İ becomes two code units), which would slide
+  every later offset and put the highlight on the wrong characters.
+- **Ranges do not survive an edit.** Lexical replaces the text nodes
+  they point at, so their highlights silently vanish. A debounced
+  `MutationObserver` on the document rebuilds them — which also covers
+  switching notes and a transclusion arriving. It cannot feed itself:
+  the state it writes back is two numbers, so a rebuild that finds what
+  the last one found re-renders nothing and mutates nothing.
+- **Only the active editor is searched.** On a view without one — the
+  scripts view, whose Monaco editor has a find widget of its own that
+  the menu accelerator pre-empts — the bar opens and reports no results.
+
+### Storage-provider details that only bite on a real file system
+
+- `.normalize("NFC")` on every name read from disk: macOS returns
+  HFS+/APFS directory listings in NFD.
+- The `#MAX_OPEN_FILES = 512` semaphore, ported verbatim from the
+  FS-Access provider — the OS fd limit applies to Node just the same.
+
 ## Tests
 
-Unit tests live next to source files as `*.spec.ts` / `*.spec.tsx`.
+Unit tests live next to source files as `*.spec.ts` / `*.spec.tsx`, in
+both `src/` and `electron/` (see `vitest.config.ts`).
 Run a single test file: `npx vitest run src/lib/notes/noteUtils.spec.ts`
 
 Integration tests are in `tests/integration/`. Visual regression tests
-are in `tests/visual-regression/`.
+are in `tests/visual-regression/`. Both drive `npm run dev` in a real
+browser at `localhost:5173` in **OPFS mode** — which is the main reason
+OPFS mode was worth keeping.
 
 ## Requirements
 
 - Node.js v24+
-- Browser with File System Access API (Chrome, Edge, Brave)
+- macOS (the packaged app is macOS-only and unsigned)

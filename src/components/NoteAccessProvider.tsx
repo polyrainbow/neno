@@ -5,7 +5,7 @@ import {
 import BusyView from "./BusyView";
 import { useState } from "react";
 import {
-  initializeNotesProviderWithFolderHandleFromStorage,
+  initializeNotesProviderWithLastFolder,
   isInitialized,
 } from "../lib/LocalDataStorage";
 import { getAppPath } from "../lib/utils";
@@ -20,7 +20,7 @@ const NoteAccessProvider = ({
 
   useRunOnce(() => {
     if (!isInitialized()) {
-      initializeNotesProviderWithFolderHandleFromStorage()
+      initializeNotesProviderWithLastFolder()
         .then(() => {
           setIsReady(true);
         })

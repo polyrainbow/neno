@@ -3,39 +3,42 @@ import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
 import { getAppPath } from "../lib/utils";
 import {
-  getExistingFolderHandleName,
+  getExistingFolderName,
   initializeNotesProvider,
-  initializeNotesProviderWithFolderHandleFromStorage,
+  initializeNotesProviderWithLastFolder,
 } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 import { navigateTo } from "../lib/navigation";
+import { getBridge } from "../lib/electron/bridge";
 
 const StartViewLocal = () => {
   const [localDisclaimer, setLocalDisclaimer]
     = useState<string | null>(null);
   const [
-    localDatabaseFolderHandleName,
-    setLocalDatabaseFolderHandleName,
+    existingFolderName,
+    setExistingFolderName,
   ] = useState<string | null>(null);
 
   useEffect(() => {
-    const retrieveLocalDatabaseFolderHandle = async () => {
-      const folderHandleName
-        = await getExistingFolderHandleName();
-      setLocalDatabaseFolderHandleName(folderHandleName);
+    const retrieveExistingFolderName = async () => {
+      setExistingFolderName(await getExistingFolderName());
     };
 
-    retrieveLocalDatabaseFolderHandle();
+    retrieveExistingFolderName();
   }, []);
 
-  // @ts-ignore
-  if (typeof window.showDirectoryPicker !== "function") {
-    return <>
-      <p>
-        {l("start.local.unsupported")}
-      </p>
-    </>;
-  }
+  const goToGraph = () => {
+    const urlSearchParams
+      = new URLSearchParams(window.location.search);
+    if (urlSearchParams.has("redirect")) {
+      navigateTo(urlSearchParams.get("redirect") ?? "/");
+    } else {
+      navigateTo(getAppPath(
+        PathTemplate.NEW_NOTE,
+        new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+      ));
+    }
+  };
 
   return <section id="start-view-local">
     {
@@ -46,14 +49,7 @@ const StartViewLocal = () => {
         : ""
     }
     {
-      localDisclaimer === "OTHER_TABS_OPEN"
-        ? <p className="error-text">
-          {l("start.local.other-tabs-open")}
-        </p>
-        : ""
-    }
-    {
-      typeof localDatabaseFolderHandleName === "string"
+      typeof existingFolderName === "string"
         ? <>
           <p>
             {l("start.local.already-created-folder")}
@@ -63,32 +59,19 @@ const StartViewLocal = () => {
             className="default-button default-action"
             onClick={async () => {
               try {
-                await initializeNotesProviderWithFolderHandleFromStorage();
-                const urlSearchParams
-                  = new URLSearchParams(window.location.search);
-                if (urlSearchParams.has("redirect")) {
-                  navigateTo(urlSearchParams.get("redirect") ?? "/");
-                } else {
-                  navigateTo(getAppPath(
-                    PathTemplate.NEW_NOTE,
-                    new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-                  ));
-                }
-              } catch (e) {
-                if (e instanceof Error && e.message === "OTHER_TABS_OPEN") {
-                  setLocalDisclaimer("OTHER_TABS_OPEN");
-                  return;
-                }
+                await initializeNotesProviderWithLastFolder();
+                goToGraph();
+              } catch (_e) {
                 // it could be that the folder is not there anymore but we
-                // still have a handle
-                setLocalDatabaseFolderHandleName(null);
+                // still have its path
+                setExistingFolderName(null);
                 setLocalDisclaimer("INVALID_FOLDER_HANDLE");
               }
             }}
           >
             {l(
               "start.local.open-folder-x",
-              { dbName: localDatabaseFolderHandleName },
+              { dbName: existingFolderName },
             )}
           </button>
         </>
@@ -100,25 +83,16 @@ const StartViewLocal = () => {
     <button
       type="button"
       className="default-button default-action"
+      id="select-folder-button"
       onClick={async () => {
-        let folderHandle;
         try {
-          // @ts-ignore
-          folderHandle = await window.showDirectoryPicker();
+          const folderPath = await getBridge().pickFolder();
+          // It is fine if the user aborts the directory selection.
+          if (folderPath === null) return;
+          await initializeNotesProvider(folderPath);
+          goToGraph();
         } catch (_e) {
-          // It is fine if the user aborts the directory selection
-          return;
-        }
-        try {
-          await initializeNotesProvider(folderHandle);
-          navigateTo(getAppPath(
-            PathTemplate.NEW_NOTE,
-            new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-          ));
-        } catch (e) {
-          if (e instanceof Error && e.message === "OTHER_TABS_OPEN") {
-            setLocalDisclaimer("OTHER_TABS_OPEN");
-          }
+          setLocalDisclaimer("INVALID_FOLDER_HANDLE");
         }
       }}
     >

@@ -7,11 +7,11 @@
   >
 </p>
 
-# NENO ![Build](https://github.com/polyrainbow/neno/actions/workflows/build.yml/badge.svg)
+# NENO ![CI](https://github.com/polyrainbow/neno/actions/workflows/ci.yml/badge.svg)
 
 ## What is NENO?
 
-NENO is a powerful note-taking app that helps you manage your personal knowledge garden. With NENO, your data belongs to you and you decide where it is stored: On your device or on a cloud storage of your choice.
+NENO is a powerful note-taking app that helps you manage your personal knowledge garden. With NENO, your data belongs to you and you decide where it is stored: NENO is a macOS desktop app that keeps your notes as plain-text files in a folder you choose — on your device, or in a synced folder of your choice.
 
 ## Screenshots
 
@@ -23,7 +23,7 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
 
 ## Features
 
-* Full data ownership: You decide where your data is stored: On your device or on a cloud storage of your choice.
+* Full data ownership: You pick the folder, NENO writes plain `.subtext` files into it — no database, no lock-in.
 * File imports and previews: Paste video, audio, PDF documents, images and code, or any arbitrary file into your note. NENO will show a preview or player where possible.
 * Simple modeless markup with [Subtext](https://github.com/polyrainbow/subtext/)
 * Programmable notes: Embed `run` blocks of JavaScript directly in any
@@ -37,8 +37,22 @@ can go back to any point in time
 
 ## Getting started
 
-Read the [user manual](https://polyrainbow.github.io/neno/docs/index.html) or just [go to the app](https://polyrainbow.github.io/neno). Please note that your browser
-must support File System Access (e.g. Chrome, Edge).
+Download the latest `NENO-<version>.dmg` from the
+[releases page](https://github.com/polyrainbow/neno/releases), open it and
+drag NENO to your Applications folder. Then read the
+[user manual](https://polyrainbow.github.io/neno/docs/index.html).
+
+NENO requires macOS. The build is **not code-signed**, so the first launch
+needs a detour around Gatekeeper: right-click (or Control-click) the app in
+Finder and choose **Open**, then confirm. If macOS instead claims the app
+"is damaged and can't be opened", the download picked up a quarantine
+attribute; clear it with:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/NENO.app
+```
+
+Every launch after the first one works normally.
 
 ## Further reading
 

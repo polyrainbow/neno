@@ -2,7 +2,12 @@ import { Buffer } from "buffer";
 import FileSystemAccessAPIStorageProvider
   from "../FileSystemAccessAPIStorageProvider";
 import NotesProvider from "../notes";
+import StorageProvider from "../notes/types/StorageProvider";
 import FileSystemAccessFs from "./FileSystemAccessFs";
+import { GitFs } from "./GitFs";
+import BridgeClient from "../electron/BridgeClient";
+import StorageProviderProxy from "../electron/StorageProviderProxy";
+import GitFsProxy from "../electron/GitFsProxy";
 import {
   commitChanged,
   ensureRepo,
@@ -17,9 +22,10 @@ import {
 (globalThis as { Buffer?: typeof Buffer }).Buffer = Buffer;
 
 let notesProvider: NotesProvider | null = null;
-let gitFs: FileSystemAccessFs | null = null;
-let dirHandleForGit: FileSystemDirectoryHandle | null = null;
+let gitFs: GitFs | null = null;
+let createGitFs: (() => GitFs) | null = null;
 let folderName: string | null = null;
+let folderPath: string | null = null;
 let usingOPFS = false;
 let gitAuthor: GitAuthor = {
   name: "NENO",
@@ -28,6 +34,12 @@ let gitAuthor: GitAuthor = {
 
 type InitOptions = {
   folderHandle?: FileSystemDirectoryHandle;
+  /*
+    Electron: the graph lives at an absolute path on disk and is reached
+    through a MessagePort to the main process, which owns the Node fs
+    implementations. The port is transferred alongside the action.
+  */
+  folderPath?: string;
   useOPFS?: boolean;
   createDummyNotes?: boolean;
   gitAuthor?: GitAuthor;
@@ -35,12 +47,15 @@ type InitOptions = {
 
 let initPromise: Promise<void> | null = null;
 
-// Tab ports: one per connected NENO tab. Counted for connectedTabCount
-// and used as broadcast targets.
-const tabPorts = new Set<MessagePort>();
-// Sub-ports: extra MessagePorts (e.g. script workers) attached via the
-// `addPort` action. Receive RPC dispatch but no broadcasts and do not
-// count as tabs.
+/*
+  The single window's port — the worker global itself, since this is a
+  dedicated worker. Broadcast target for mutation events.
+*/
+const tabPorts = new Set<PortLike>();
+/*
+  Sub-ports: extra MessagePorts (e.g. script workers) attached via the
+  `addPort` action. Receive RPC dispatch but no broadcasts.
+*/
 const subPorts = new Set<MessagePort>();
 
 const MUTATING_METHODS = new Set<string>([
@@ -68,8 +83,21 @@ type RPCAction
   | { action: "addPort" }
   | { action: "setGitAuthor"; author: GitAuthor }
   | { action: "enableGit" }
-  | { action: "reset" }
-  | { action: "goodbye" };
+  | { action: "reset" };
+
+/*
+  Both the worker global and a MessagePort can carry the protocol; only
+  a MessagePort has start().
+*/
+type PortLike = {
+  /* Method syntax so the DOM's overloaded signatures remain assignable. */
+  postMessage(message: unknown, transfer?: Transferable[]): void;
+  addEventListener(
+    type: "message",
+    listener: (event: MessageEvent) => void,
+  ): void;
+  start?(): void;
+};
 
 function getTransferables(value: unknown): Transferable[] {
   if (value instanceof ReadableStream) {
@@ -80,7 +108,7 @@ function getTransferables(value: unknown): Transferable[] {
 
 function broadcast(
   message: { event: string; [key: string]: unknown },
-  except?: MessagePort,
+  except?: PortLike,
 ): void {
   for (const port of tabPorts) {
     if (port === except) continue;
@@ -92,23 +120,55 @@ function broadcast(
   }
 }
 
+function getBasename(folderPath: string): string {
+  const segments = folderPath
+    .split("/")
+    .filter((segment) => segment.length > 0);
+  return segments.length > 0 ? segments[segments.length - 1] : folderPath;
+}
+
 async function runInitialize(
   opts: InitOptions,
+  storagePort?: MessagePort,
 ): Promise<void> {
-  let dirHandle: FileSystemDirectoryHandle;
+  let storageProvider: StorageProvider;
 
-  if (opts.useOPFS) {
-    dirHandle = await navigator.storage.getDirectory();
-    usingOPFS = true;
-  } else if (opts.folderHandle) {
-    dirHandle = opts.folderHandle;
+  /*
+    Two provider pairs: the Node fs implementations in the Electron main
+    process, reached over a MessagePort, and the File System Access API
+    provider used for the OPFS "try it out" mode.
+  */
+  if (opts.folderPath) {
+    if (!storagePort) {
+      throw new Error("No storage port transferred with folderPath");
+    }
+    /*
+      One client for both proxies: they share a single port, so they must
+      also share the request id sequence.
+    */
+    const bridgeClient = new BridgeClient(storagePort);
+    storageProvider = new StorageProviderProxy(bridgeClient);
+    createGitFs = () => new GitFsProxy(bridgeClient);
+    folderPath = opts.folderPath;
+    folderName = getBasename(opts.folderPath);
     usingOPFS = false;
   } else {
-    throw new Error("No folder handle or OPFS flag provided");
-  }
+    let dirHandle: FileSystemDirectoryHandle;
 
-  const storageProvider
-    = new FileSystemAccessAPIStorageProvider(dirHandle);
+    if (opts.useOPFS) {
+      dirHandle = await navigator.storage.getDirectory();
+      usingOPFS = true;
+    } else if (opts.folderHandle) {
+      dirHandle = opts.folderHandle;
+      usingOPFS = false;
+    } else {
+      throw new Error("No folder path, folder handle or OPFS flag provided");
+    }
+
+    storageProvider = new FileSystemAccessAPIStorageProvider(dirHandle);
+    createGitFs = () => new FileSystemAccessFs(dirHandle);
+    folderName = dirHandle.name;
+  }
 
   if (opts.createDummyNotes) {
     for (let i = 1; i <= 1000; i++) {
@@ -123,8 +183,7 @@ async function runInitialize(
     gitAuthor = opts.gitAuthor;
   }
 
-  dirHandleForGit = dirHandle;
-  const candidateGitFs = new FileSystemAccessFs(dirHandle);
+  const candidateGitFs = createGitFs();
   if (await hasExistingRepo(candidateGitFs, "/")) {
     await ensureRepo(candidateGitFs, "/", gitAuthor);
     gitFs = candidateGitFs;
@@ -136,13 +195,15 @@ async function runInitialize(
       await commitChanged(gitFs, "/", change, gitAuthor);
     },
   });
-  folderName = dirHandle.name;
 }
 
-async function ensureInitialized(opts: InitOptions): Promise<void> {
+async function ensureInitialized(
+  opts: InitOptions,
+  storagePort?: MessagePort,
+): Promise<void> {
   if (notesProvider) return;
   if (!initPromise) {
-    initPromise = runInitialize(opts).catch((e) => {
+    initPromise = runInitialize(opts, storagePort).catch((e) => {
       initPromise = null;
       throw e;
     });
@@ -153,15 +214,16 @@ async function ensureInitialized(opts: InitOptions): Promise<void> {
 function tearDown(): void {
   notesProvider = null;
   gitFs = null;
-  dirHandleForGit = null;
+  createGitFs = null;
   folderName = null;
+  folderPath = null;
   usingOPFS = false;
   initPromise = null;
 }
 
 async function handleRPCCall(
   msg: RPCMessage,
-  port: MessagePort,
+  port: PortLike,
 ): Promise<void> {
   const { id, method, args } = msg;
   const respond = (
@@ -227,7 +289,7 @@ async function handleRPCCall(
   }
 }
 
-function attachDispatch(port: MessagePort): void {
+function attachDispatch(port: PortLike): void {
   port.addEventListener("message", (event: MessageEvent) => {
     const data = event.data;
     if (data && typeof data === "object" && "action" in data) {
@@ -243,7 +305,9 @@ function attachDispatch(port: MessagePort): void {
       handleRPCCall(data as RPCMessage, port);
     }
   });
-  port.start();
+  // The worker global has no start(); a MessagePort needs one because we
+  // listen with addEventListener rather than onmessage.
+  port.start?.();
 }
 
 function registerSubPort(port: MessagePort): void {
@@ -251,14 +315,14 @@ function registerSubPort(port: MessagePort): void {
   attachDispatch(port);
 }
 
-function registerTabPort(port: MessagePort): void {
+function registerTabPort(port: PortLike): void {
   tabPorts.add(port);
   attachDispatch(port);
 }
 
 async function handleAction(
   action: RPCAction,
-  port: MessagePort,
+  port: PortLike,
   ports: readonly MessagePort[],
 ): Promise<void> {
   if (action.action === "hello") {
@@ -267,24 +331,29 @@ async function handleAction(
       initialized: notesProvider !== null,
       gitEnabled: gitFs !== null,
       folderName,
+      folderPath,
       usingOPFS,
-      connectedTabCount: tabPorts.size,
     });
     return;
   }
 
   if (action.action === "initialize") {
     try {
-      await ensureInitialized({
-        folderHandle: action.folderHandle,
-        useOPFS: action.useOPFS,
-        createDummyNotes: action.createDummyNotes,
-        gitAuthor: action.gitAuthor,
-      });
+      await ensureInitialized(
+        {
+          folderHandle: action.folderHandle,
+          folderPath: action.folderPath,
+          useOPFS: action.useOPFS,
+          createDummyNotes: action.createDummyNotes,
+          gitAuthor: action.gitAuthor,
+        },
+        ports[0],
+      );
       port.postMessage({
         action: "initialized",
         gitEnabled: gitFs !== null,
         folderName,
+        folderPath,
         usingOPFS,
       });
     } catch (e: unknown) {
@@ -312,14 +381,14 @@ async function handleAction(
       port.postMessage({ action: "gitEnabled" });
       return;
     }
-    if (!dirHandleForGit) {
+    if (!createGitFs) {
       port.postMessage({
         action: "gitEnableFailed",
         error: "Worker not initialized",
       });
       return;
     }
-    const candidateGitFs = new FileSystemAccessFs(dirHandleForGit);
+    const candidateGitFs = createGitFs();
     try {
       await ensureRepo(candidateGitFs, "/", gitAuthor);
       gitFs = candidateGitFs;
@@ -335,29 +404,14 @@ async function handleAction(
   }
 
   if (action.action === "reset") {
-    const otherTabs = tabPorts.size - (tabPorts.has(port) ? 1 : 0);
-    if (otherTabs > 0) {
-      port.postMessage({
-        action: "resetDenied",
-        connectedTabCount: tabPorts.size,
-      });
-      return;
-    }
+    // Still how a folder switch works.
     tearDown();
     port.postMessage({ action: "resetOk" });
     return;
   }
-
-  if (action.action === "goodbye") {
-    tabPorts.delete(port);
-    return;
-  }
 }
 
-// SharedWorker entry: one connect event per tab.
-(globalThis as unknown as {
-  onconnect: (event: MessageEvent) => void;
-}).onconnect = (event: MessageEvent) => {
-  const port = event.ports[0];
-  registerTabPort(port);
-};
+/*
+  Dedicated worker entry: the worker global is the single window's port.
+*/
+registerTabPort(globalThis as unknown as PortLike);

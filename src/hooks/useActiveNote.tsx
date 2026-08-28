@@ -20,7 +20,6 @@ import NotesProviderProxy from "../lib/notes-worker/NotesProviderProxy";
 import {
   NOTE_FILE_DESCRIPTION,
   NOTE_FILE_EXTENSION,
-  NOTE_MIME_TYPE,
 } from "../config";
 import { exportNote } from "../lib/FrontendFunctions";
 
@@ -247,12 +246,14 @@ const useActiveNoteActions = (
 
 
   const importFromFile = async (): Promise<void> => {
-    const types = [{
-      description: NOTE_FILE_DESCRIPTION,
-      accept: { [NOTE_MIME_TYPE]: [NOTE_FILE_EXTENSION] },
+    const filters = [{
+      name: NOTE_FILE_DESCRIPTION,
+      extensions: [NOTE_FILE_EXTENSION.replace(/^\./, "")],
     }];
 
-    const [rawNoteFile] = await getFilesFromUserSelection(types, false);
+    const [rawNoteFile] = await getFilesFromUserSelection(filters, false);
+    // The user cancelled the open dialog.
+    if (!rawNoteFile) return;
     const rawNote = await readFileAsString(rawNoteFile);
 
     const parsedNote = parseSerializedNewNote(rawNote);

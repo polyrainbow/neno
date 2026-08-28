@@ -6,7 +6,6 @@ import NotesProviderProxy from "./notes-worker/NotesProviderProxy";
 import {
   NOTE_FILE_DESCRIPTION,
   NOTE_FILE_EXTENSION,
-  NOTE_MIME_TYPE,
 } from "../config";
 
 export const exportNote = async (
@@ -40,14 +39,16 @@ export const exportNote = async (
     suggestedName: (
       "slug" in activeNote ? activeNote.slug : l("list.untitled-note")
     ) + NOTE_FILE_EXTENSION,
-    types: [{
-      description: NOTE_FILE_DESCRIPTION,
-      accept: { [NOTE_MIME_TYPE]: [NOTE_FILE_EXTENSION] },
+    filters: [{
+      name: NOTE_FILE_DESCRIPTION,
+      extensions: [NOTE_FILE_EXTENSION.replace(/^\./, "")],
     }],
   };
 
   const writableStream = await getWritableStream(opts);
+  // The user cancelled the save dialog.
+  if (!writableStream) return;
   const writer = writableStream.getWriter();
   await writer.write(rawNote);
-  writer.close();
+  await writer.close();
 };

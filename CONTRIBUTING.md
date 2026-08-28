@@ -14,8 +14,56 @@ insights on how NENO works:
 
 ## Development setup
 
-Make sure you have Node.js v24 installed. Clone this repo and run
-`npm i`. To start a development instance, run `npm run dev`.
+Make sure you have Node.js v24 and macOS. Clone this repo and run `npm i`.
+
+Then either:
+
+* `npm run electron:dev` — renders the app icon, builds the main/preload
+  bundles, starts the Vite dev server and opens the Electron window
+  against it. This is the normal way to work on NENO.
+
+  Two things about the dev window are cosmetic patches, because in
+  development the running bundle is Electron's own rather than NENO's:
+  the Dock icon is set at runtime from `build/icon.png` (which the
+  launcher renders first), and the
+  application menu's title comes from the bundle's `CFBundleName`, which
+  no Electron API can override — so the launcher rewrites it to "NENO"
+  inside `node_modules`. A fresh `npm i` reverts that rename; the next
+  run simply applies it again, and macOS may need a moment to drop the
+  old name from its Launch Services cache. The packaged app needs
+  neither patch: it gets both from electron-builder's `productName` and
+  the derived `.icns`.
+* `npm run dev` — the Vite dev server alone, at `localhost:5173`. Useful
+  for renderer-only work and for the Playwright suite, but `window.neno`
+  is absent there, so the native dialogs and the Node-fs graph folder are
+  unavailable: only the OPFS "try it out" mode works (press Cmd+. on the
+  start view).
+
+To produce a local `.dmg`, run `npm run electron:build`; the artifact
+lands in `release/`.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and every pull
+request, on macOS runners — the only platform the app ships on. Three
+jobs run in parallel:
+
+* **checks** — `npm run stylelint`, `npm run lint`, `npm run test`
+  (unit + i18n) and `npm run build` (TypeScript for `src/` and
+  `electron/`, plus the Vite build).
+* **integration-tests** — `npm run integration-test`, the Playwright
+  suite against `npm run dev` in OPFS mode. The HTML report is uploaded
+  as an artifact.
+* **package** — `npm run electron:build`, so a break in the icon
+  rendering, the main/preload bundles or the electron-builder config
+  surfaces on the pull request rather than at release time. The `.dmg`
+  is uploaded as an artifact.
+
+Together that is `npm run all-checks` plus the packaging step. The
+visual regression suite is not part of CI: its snapshots are pixel
+comparisons taken on a developer machine, which a runner's font and GPU
+stack will not reproduce. Run `npm run visual-regression-test` locally
+instead.
 
 ## Publishing a release
 
@@ -23,53 +71,75 @@ Make sure you have Node.js v24 installed. Clone this repo and run
 2. Push commit to remote
 3. Push tag to remote: `git push origin vX.Y.Z`
 
-The release package will now be built remotely with the script 
-`tools/buildReleasePackage.sh`
+`.github/workflows/release.yml` triggers on version tags
+(`v1.2.3`, or `v1.2.3-beta.1`, which is published as a prerelease). It
+first checks that the tag matches the version in `package.json` — the
+`.dmg` is named after that version, so a tag that disagrees would
+publish a mislabelled file — then calls the CI workflow above and
+attaches the `NENO-<version>.dmg` that its packaging job produced to a
+GitHub release with generated release notes. Nothing is published that
+has not passed the tests.
+
+The build is unsigned (`CSC_IDENTITY_AUTO_DISCOVERY=false`), so users
+need the right-click → Open detour described in the
+[README](./README.md).
 
 ## High-level architecture
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ Browser tab (main thread)                                │
+│ Electron main process                                    │
 │                                                          │
-│  React UI  ──  Lexical Editor  ──  NotesProviderProxy    │
-│                                            │             │
-└────────────────────────────────────────────┼─────────────┘
-                                             │
-                             MessagePort RPC │
-                                             ▼
+│  neno:// protocol (serves dist/)   native dialogs        │
+│  NodeFsStorageProvider  ·  NodeFsGit  (node:fs/promises) │
+└───────▲──────────────────────────────────────▲───────────┘
+        │ contextBridge (window.neno)          │
+        │                        MessagePortMain RPC
+┌───────┴──────────────────────────────────┐   │
+│ Renderer (neno://app)                    │   │
+│                                          │   │
+│  React UI ── Lexical Editor ── NotesProviderProxy         │
+│                                          │   │           │
+└──────────────────────────────────────────┼───┼───────────┘
+                                           │   │
+                           MessagePort RPC │   │ (port forwarded
+                                           ▼   ▼  into the worker)
             ┌──────────────────────────────────────┐
-            │ SharedWorker (one per origin)        │
+            │ Notes worker (dedicated Worker)      │
             │                                      │
             │   NotesProvider (single in-memory    │
             │                  graph)              │
             │   ├── Subwaytext parser              │
-            │   ├── FileSystemAccessAPI-           │
-            │   │   StorageProvider                │
+            │   ├── StorageProviderProxy  ─────────┼──▶ main
+            │   │   (or FileSystemAccessAPI-       │
+            │   │    StorageProvider for OPFS)     │
             │   └── isomorphic-git (optional)      │
+            │       over GitFsProxy  ──────────────┼──▶ main
             └─────────────────┬────────────────────┘
-                              │
                               ▼
             ┌──────────────────────────────────────┐
-            │ User's file system                   │
-            │ (FileSystemDirectoryHandle, or       │
-            │  Origin Private File System fallback)│
+            │ The folder the user picked           │
             │                                      │
             │  *.subtext notes, attachments, .git/ │
             └──────────────────────────────────────┘
 ```
 
-All open NENO tabs of the same origin connect to the same `SharedWorker`,
-so there is exactly one `NotesProvider` and one in-memory graph cache for
-the whole session. A tab's React UI never touches `NotesProvider`
-directly — it goes through `NotesProviderProxy`, which forwards each
-method call as an RPC over a `MessagePort`. Mutations from any tab are
-broadcast back to the other tabs so their views stay in sync.
+The renderer is served over a custom `neno://` scheme rather than
+`file://`, because the router matches on `location.pathname` and because
+`file://` has no usable storage partition. See the Electron architecture
+section of [CLAUDE.md](./CLAUDE.md) for the details, including the
+chunked stream protocol the storage bridge uses.
 
-User-defined scripts run in a dedicated, sandboxed `Worker` per tab.
-The tab forwards a `MessagePort` from its own connection to the
-`SharedWorker` so the script worker can issue RPCs against the same
-graph instance without bypassing the sandbox.
+There is exactly one NENO window, so the notes worker is a plain
+dedicated `Worker` and there is exactly one `NotesProvider` with one
+in-memory graph cache. The React UI never touches `NotesProvider`
+directly — it goes through `NotesProviderProxy`, which forwards each
+method call as an RPC.
+
+User-defined scripts run in a dedicated, sandboxed `Worker`. The window
+forwards a `MessagePort` to the notes worker so the script worker can
+issue RPCs against the same graph instance without bypassing the
+sandbox.
 
 ### Core application
 - Technology: React
@@ -86,23 +156,40 @@ NENO highly depends on the heart of the application, the "Notes" module.
 It contains all the core logic to create/read/update/delete notes and files.
 It manages the note graph, including indexes.
 
-### Notes worker (SharedWorker)
+### Notes worker
 - Entry point: `/src/lib/notes-worker`
 
-Hosts the single `NotesProvider` instance. Tabs connect to it via
-`SharedWorker` and talk to it through `NotesProviderProxy`
-(`/src/lib/notes-worker/NotesProviderProxy.ts`). The first tab in a
-session initializes the worker with a `FileSystemDirectoryHandle`;
-later tabs in the same session piggyback on the existing setup and
-skip the folder picker.
+Hosts the single `NotesProvider` instance. The window talks to it through
+`NotesProviderProxy` (`/src/lib/notes-worker/NotesProviderProxy.ts`).
+`initialize` hands it either an absolute folder path plus a
+`MessagePort` to the Electron main process, or an OPFS directory handle.
+
+### Electron main process
+- Entry point: `/electron/main.ts`
+
+Registers and serves the `neno://` scheme, creates the window, sets the
+CSP and the macOS menu, and owns the Node file system: the
+`StorageProvider` (`/electron/storage/NodeFsStorageProvider.ts`), the
+isomorphic-git adapter (`/electron/storage/nodeFsGit.ts`) and the RPC
+dispatcher that exposes both to the notes worker
+(`/electron/storage/bridge.ts`). `/electron/preload.ts` is the only
+thing the renderer can see of it.
+
+### Storage bridge (renderer side)
+- Entry point: `/src/lib/electron`
+
+`StorageProviderProxy` and `GitFsProxy` implement the same contracts as
+their in-renderer counterparts but forward every call to the main
+process. Streams are chunked, because a `ReadableStream` cannot be
+transferred across the process boundary.
 
 ### FileSystemAccessAPIStorageProvider
 - Entry point: `/src/lib/FileSystemAccessAPIStorageProvider.tsx`
 
 A class that provides methods to manage a
 [FileSystemDirectoryHandle](https://developer.mozilla.org/en-US/docs/Web/API/FileSystemDirectoryHandle). The class is initialized with such a handle.
-The "Notes" module uses an instance of this class to read and update the graph
-that is saved in the file system of the user's device.
+It backs the OPFS "try it out" mode, which is also what the Playwright
+suite drives against `npm run dev`.
 
 ### Subwaytext parser
 - Entry point: `/src/lib/subwaytext`
@@ -115,29 +202,36 @@ on it.
 - Entry point: `/src/lib/script-worker`
 
 Sandboxed dedicated worker that evaluates user-defined scripts. The
-tab spawns one on demand and bridges it to the notes worker via a
+window spawns one on demand and bridges it to the notes worker via a
 transferred `MessagePort`.
 
 ## Commit convention
 See https://www.conventionalcommits.org/en/v1.0.0/
 
-## Deploying NENO on your own server
-
-To deploy NENO, you need a web space capable of serving static files via HTTPS.
+## Building NENO yourself
 
 ### 1. Clone this repository
 
 ### 2. Install dependencies
 Run `npm i`
 
-### 3. Build the app from the source
+### 3. Build the app
 
-Set the `base` property in the Vite config to the correct basepath of your
-hosting environment and run `npm run build`.
+Run `npm run electron:build`. This type-checks both roots, builds the
+renderer into `dist/` and the main/preload bundles into `dist-electron/`,
+renders the app icon into `build/icon.png` and hands everything to
+electron-builder, which derives the bundle's `.icns` from that PNG.
 
-### 4. Copy files to webspace
+`tools/buildIcon.mjs` does the icon rendering, and does it with
+Electron's own Chromium (`npx electron tools/buildIcon.mjs`) — no extra
+tool to install. That is not gratuitous: the logo places the bars of its
+"N" with the `transform-origin` presentation attribute, which
+`rsvg-convert` silently ignores, and it rasterizes through a `<canvas>`
+rather than a window capture so the pixels stay in sRGB instead of being
+converted to the display's gamut.
 
-Copy all files from the `dist` directory to your webspace.
+### 4. Install the result
 
-Make sure that your webspace contains a SPA fallback mechanism so that requests
-to non-existing files are forwarded to `index.html`.
+`release/NENO-<version>.dmg` is a plain unsigned disk image: mount it,
+drag NENO to Applications, then right-click → Open the first time (see
+the [README](./README.md)).

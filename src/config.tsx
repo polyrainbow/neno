@@ -1,4 +1,5 @@
 import { BASE_URL, VERSION } from "./constants.js";
+import { PickerFilter } from "./lib/electron/bridgeTypes";
 
 const DEFAULT_NOTE_CONTENT = "";
 
@@ -17,16 +18,15 @@ const SEARCH_RESULTS_PER_PAGE = 50;
 
 const DEFAULT_DOCUMENT_TITLE = "NENO";
 
-// @ts-ignore
-const FILE_PICKER_ACCEPT_TYPES: FilePickerAcceptType[] = [
+const FILE_PICKER_ACCEPT_TYPES: PickerFilter[] = [
   {
-    description: "Media file",
-    accept: {
-      "audio/*": [".mp3", ".flac", ".m4a"],
-      "video/*": [".mp4", ".webm"],
-      "application/*": [".pdf", ".js"],
-      "image/*": [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"],
-    },
+    name: "Media file",
+    extensions: [
+      "mp3", "flac", "m4a",
+      "mp4", "webm",
+      "pdf", "js",
+      "png", "jpg", "jpeg", "webp", "gif", "svg",
+    ],
   },
 ];
 

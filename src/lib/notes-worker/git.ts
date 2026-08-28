@@ -9,7 +9,7 @@
 */
 
 import git from "isomorphic-git";
-import FileSystemAccessFs from "./FileSystemAccessFs";
+import { GitFs } from "./GitFs";
 import { Slug } from "../notes/types/Slug";
 
 const GITIGNORE_DEFAULT = ".DS_Store\n";
@@ -73,7 +73,7 @@ function getFilenameForSlug(slug: Slug): string {
 }
 
 async function fileExists(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   path: string,
 ): Promise<boolean> {
   try {
@@ -91,14 +91,14 @@ function getHeadPath(dir: string): string {
 }
 
 export async function hasExistingRepo(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   dir: string,
 ): Promise<boolean> {
   return fileExists(fs, getHeadPath(dir));
 }
 
 export async function ensureRepo(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   dir: string,
   author: GitAuthor,
 ): Promise<void> {
@@ -196,7 +196,7 @@ function formatMessage(
 }
 
 async function stagePath(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   dir: string,
   relPath: string,
   headOid: string | null,
@@ -235,7 +235,7 @@ async function stagePath(
 }
 
 async function stageAll(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   dir: string,
   creates: string[],
   modifies: string[],
@@ -266,7 +266,7 @@ async function stageAll(
 }
 
 export async function commitChanged(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   dir: string,
   changes: FlushChangeSets,
   author: GitAuthor,
@@ -342,7 +342,7 @@ export async function commitChanged(
 }
 
 async function getChangedPaths(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   dir: string,
   oid: string,
   parentOid: string | undefined,
@@ -392,7 +392,7 @@ async function getChangedPaths(
 }
 
 export async function getCommitHistory(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   dir: string,
   options: CommitHistoryOptions,
 ): Promise<CommitInfo[]> {
@@ -604,7 +604,7 @@ function diffLines(oldText: string, newText: string): DiffLine[] {
 }
 
 export async function getCommitDiff(
-  fs: FileSystemAccessFs,
+  fs: GitFs,
   dir: string,
   oid: string,
 ): Promise<FileDiff[]> {
