@@ -28,11 +28,7 @@ import {
   registerUnsavedChangesHandler,
   registerUnsavedChangesIpc,
 } from "./unsavedChanges";
-import {
-  buildFindMenuItems,
-  forwardFindResults,
-  registerFindHandlers,
-} from "./findInPage";
+import { buildFindMenuItems } from "./findMenu";
 import {
   applyWindowState,
   getInitialWindowState,
@@ -283,7 +279,6 @@ async function createWindow(): Promise<BrowserWindow> {
   });
 
   registerUnsavedChangesHandler(window);
-  forwardFindResults(window);
 
   if (IS_DEV) {
     void window.loadURL(DEV_SERVER_URL as string);
@@ -378,7 +373,6 @@ app.whenReady().then(async () => {
   registerDialogHandlers();
   registerStorageBridge();
   registerUnsavedChangesIpc();
-  registerFindHandlers();
   buildMenu();
   await createWindow();
 

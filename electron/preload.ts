@@ -16,16 +16,9 @@ import { contextBridge, ipcRenderer } from "electron";
 // Keep in sync with STORAGE_PORT_MESSAGE in
 // src/lib/electron/bridgeTypes.ts.
 const STORAGE_PORT_MESSAGE = "neno:storage-port";
-// Likewise FIND_COMMAND_MESSAGE and FIND_RESULT_MESSAGE.
+// Likewise FIND_COMMAND_MESSAGE.
 const FIND_COMMAND_MESSAGE = "neno:find-command";
-const FIND_RESULT_MESSAGE = "neno:find-result";
 
-type FindQuery = { text: string; forward: boolean; newSession: boolean };
-type FindResult = {
-  requestId: number;
-  matches: number;
-  activeMatchOrdinal: number;
-};
 type FindCommand = "open" | "next" | "previous";
 
 /*
@@ -82,15 +75,6 @@ const neno = {
 
   setUnsavedChanges: (hasUnsavedChanges: boolean): Promise<void> =>
     ipcRenderer.invoke("window:setUnsavedChanges", hasUnsavedChanges),
-
-  findInPage: (query: FindQuery): Promise<number | null> =>
-    ipcRenderer.invoke("find:start", query),
-
-  stopFindInPage: (): Promise<void> =>
-    ipcRenderer.invoke("find:stop"),
-
-  onFindResult: (listener: (result: FindResult) => void): () => void =>
-    subscribe(FIND_RESULT_MESSAGE, listener),
 
   onFindCommand: (listener: (command: FindCommand) => void): () => void =>
     subscribe(FIND_COMMAND_MESSAGE, listener),

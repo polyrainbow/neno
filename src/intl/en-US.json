@@ -80,7 +80,7 @@
   "find.matches": "{active} of {total}",
   "find.next": "Next match",
   "find.no-results": "No results",
-  "find.placeholder": "Find on page",
+  "find.placeholder": "Find in note",
   "find.previous": "Previous match",
   "git-config.heading": "Git commit identity",
   "git-config.user-email.label": "Email",

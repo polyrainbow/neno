@@ -1,7 +1,7 @@
 /*
   Floats over the top right of the window, the way a browser's own find
-  bar does. Chromium draws the match highlights itself, so this only has
-  to stay out of their way.
+  bar does. The matches themselves are painted in the editor, by
+  ::highlight(find-match) in editor.css.
 */
 .find-bar {
   position: fixed;
@@ -21,11 +21,6 @@
   }
 
   .find-bar-status {
-    /* Generated content — see FindBar.tsx. */
-    &::after {
-      content: attr(data-status);
-    }
-
     color: var(--alt-content-color);
     font-size: var(--default-font-size);
 

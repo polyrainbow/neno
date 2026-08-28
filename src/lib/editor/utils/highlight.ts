@@ -2,7 +2,8 @@ import { tokenizeCode } from "./tokenizeCode.js";
 
 const CODE_TOKEN_HIGHLIGHT_PREFIX = "code-token-";
 
-const collectTextNodes = (el: Element): Text[] => {
+/** Every text node under `el`, in document order. */
+export const collectTextNodes = (el: Element): Text[] => {
   const result: Text[] = [];
   for (const node of Array.from(el.childNodes)) {
     if (node.nodeType === Node.TEXT_NODE) {
@@ -233,6 +234,57 @@ export const highlightBoldSigils = () => {
   const highlight = new Highlight(...ranges);
   // @ts-ignore
   CSS.highlights.set("bold-sigil", highlight);
+};
+
+/*
+  The find bar's matches (src/components/FindBar.tsx). Two highlights
+  rather than one, so the match the user is standing on can be told
+  apart from the rest; they are kept disjoint because a range in both
+  would be painted twice.
+
+  These are not part of applyAllHighlights(): the others are derived
+  from the editor's content and are rebuilt on every change, while these
+  are derived from what the user typed into the find bar and outlive
+  nothing but the search itself.
+*/
+const FIND_MATCH_HIGHLIGHT = "find-match";
+const FIND_MATCH_ACTIVE_HIGHLIGHT = "find-match-active";
+
+export const clearFindHighlights = (): void => {
+  // @ts-ignore — CSS Custom Highlight API not in current lib.dom.d.ts
+  const registry = CSS.highlights;
+  registry.delete(FIND_MATCH_HIGHLIGHT);
+  registry.delete(FIND_MATCH_ACTIVE_HIGHLIGHT);
+};
+
+export const setFindHighlights = (
+  ranges: Range[],
+  activeIndex: number,
+): void => {
+  // @ts-ignore — CSS Custom Highlight API not in current lib.dom.d.ts
+  const registry = CSS.highlights;
+
+  if (ranges.length === 0) {
+    clearFindHighlights();
+    return;
+  }
+
+  const inactive = ranges.filter((_range, i) => i !== activeIndex);
+  const active = ranges[activeIndex];
+
+  if (inactive.length > 0) {
+    // @ts-ignore — Highlight constructor not in current lib.dom.d.ts
+    registry.set(FIND_MATCH_HIGHLIGHT, new Highlight(...inactive));
+  } else {
+    registry.delete(FIND_MATCH_HIGHLIGHT);
+  }
+
+  if (active) {
+    // @ts-ignore
+    registry.set(FIND_MATCH_ACTIVE_HIGHLIGHT, new Highlight(active));
+  } else {
+    registry.delete(FIND_MATCH_ACTIVE_HIGHLIGHT);
+  }
 };
 
 export const applyAllHighlights = () => {

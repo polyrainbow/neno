@@ -99,16 +99,6 @@ export interface NenoBridge {
   connectStorage(folderPath: string): Promise<void>;
   /** Whether closing the window should ask for confirmation first. */
   setUnsavedChanges(hasUnsavedChanges: boolean): Promise<void>;
-  /**
-   * Starts a find-on-page search, or steps through the current one when
-   * `newSession` is false. Resolves to the request id results will carry,
-   * or null when `text` is empty (which clears the highlight instead).
-   */
-  findInPage(query: FindQuery): Promise<number | null>;
-  /** Ends the search and clears the highlight. */
-  stopFindInPage(): Promise<void>;
-  /** Subscribes to search progress. Returns an unsubscribe function. */
-  onFindResult(listener: (result: FindResult) => void): () => void;
   /** Subscribes to the Edit menu's find commands. Returns an unsubscribe. */
   onFindCommand(listener: (command: FindCommand) => void): () => void;
 }
@@ -116,33 +106,12 @@ export interface NenoBridge {
 /** Message the preload uses to hand the storage MessagePort to the page. */
 export const STORAGE_PORT_MESSAGE = "neno:storage-port";
 
-/** What the Edit menu's find items ask the find bar to do. */
+/*
+  What the Edit menu's find items ask the find bar to do. The command is
+  all that crosses the process boundary: the search itself runs in the
+  renderer, over the active editor (src/lib/findInEditor.ts).
+*/
 export type FindCommand = "open" | "next" | "previous";
-
-export type FindQuery = {
-  text: string;
-  /** Search direction. Down the document when true. */
-  forward: boolean;
-  /**
-   * True starts a fresh search for `text`; false steps to the adjacent
-   * match of the session already running.
-   *
-   * This maps to Electron's `findNext`, whose name says the opposite of
-   * what it does: `findNext: true` *begins* a session. Getting it the
-   * wrong way round is silent — a follow-up request with no session open
-   * emits no "found-in-page" event at all.
-   */
-  newSession: boolean;
-};
-
-export type FindResult = {
-  requestId: number;
-  matches: number;
-  /** 1-based index of the highlighted match; 0 while there is none. */
-  activeMatchOrdinal: number;
-};
 
 /** Main → renderer: a find command from the Edit menu. */
 export const FIND_COMMAND_MESSAGE = "neno:find-command";
-/** Main → renderer: progress of the running search. */
-export const FIND_RESULT_MESSAGE = "neno:find-result";

@@ -53,6 +53,10 @@
     --main-content-color: black;
     --alt-content-color: var(--neno-gray-5);
     --link-color: var(--neno-blue-5);
+    --find-match-background-color: #fff08a;
+    --find-match-color: black;
+    --find-match-active-background-color: #ffab3d;
+    --find-match-active-color: black;
     --overlay-gradient: linear-gradient(
       105.5deg,
       #1fd4f8cc 11%,
@@ -93,6 +97,10 @@
     --main-content-color: white;
     --alt-content-color: var(--neno-gray-4);
     --link-color: var(--neno-blue-3);
+    --find-match-background-color: #6b5600;
+    --find-match-color: white;
+    --find-match-active-background-color: #c98a00;
+    --find-match-active-color: black;
     --overlay-gradient: linear-gradient(45deg, rgb(0 0 0) 0%, rgb(0 0 117 / 62%) 35%, rgb(49 0 48) 100%);
     --icon-button-enabled-filter: invert(1);
     --icon-button-disabled-filter: contrast(0.1);

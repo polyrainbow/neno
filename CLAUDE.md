@@ -51,7 +51,7 @@ electron/                     # Electron main process (compiled separately)
   windowGeometry.ts           #   Pure display-fitting geometry
   dialogs.ts                  #   Native folder/open/save dialogs
   unsavedChanges.ts           #   Native confirm on window close
-  findInPage.ts               #   Find-on-page IPC + the Edit menu items
+  findMenu.ts                 #   The Edit menu's find items
   storage/
     NodeFsStorageProvider.ts  #   StorageProvider on node:fs/promises
     nodeFsGit.ts              #   isomorphic-git fs on node:fs/promises
@@ -244,42 +244,52 @@ isomorphic-git branches on `err.code === "ENOENT"`.
   composited for the display, which converts the pixels out of sRGB and
   desaturates them.
 
-### Find on page
+### Find in note
 
 Chromium's find bar is browser UI that Electron does not ship, so Cmd-F
-is built from `webContents.findInPage()` plus a React bar
-(`src/components/FindBar.tsx`); `electron/findInPage.ts` is the plumbing
-and owns the Edit menu items. The accelerators live on the menu rather
-than on a renderer keydown listener, so they fire regardless of focus.
-In a browser the component renders nothing — there, Cmd-F is the
-browser's own find.
+is built here: a React bar (`src/components/FindBar.tsx`) over a
+renderer-side search (`src/lib/findInEditor.ts`).
+`electron/findMenu.ts` owns the Edit menu items and forwards nothing but
+the command — the accelerators live on the menu rather than on a
+renderer keydown listener, so they fire regardless of focus. In a
+browser the component renders nothing — there, Cmd-F is the browser's
+own find.
 
-Three things about it are not guessable:
+**`webContents.findInPage()` was tried first and does not fit.** It
+searches everything the window renders — the note list, the header, the
+navigation rail, the find bar's own input — so it answers a question
+nobody asked, and it takes focus by selecting each match, which fights
+the typist for the caret. Searching the whole graph is what the search
+bar is for; Cmd-F is for the note in front of you. Everything that
+version needed — the phantom self-match, the focus hold, the
+new-session/step distinction behind Electron's misnamed `findNext` — was
+scaffolding around those two problems, and none of it survives.
 
-- **`findNext` means "begin a new session", not "advance"** — the
-  opposite of how it reads. Getting it backwards fails silently: a
-  follow-up request with no session open emits no `found-in-page` event
-  at all. `FindQuery.newSession` in `bridgeTypes.ts` carries the honest
-  name and `findInPage.ts` does the mapping in one place.
-- **The bar is inside the page it searches**, so the term in its own
-  input matches itself once on every search. Nothing short of a second
-  `WebContentsView` avoids that — shadow roots and iframes are all
-  traversed — so the phantom is accounted for instead: it is always the
-  last match, which makes it subtractable and skippable
-  (`src/lib/findInPage.ts`, with tests). The match counter would match
-  too, which is why it is drawn as CSS generated content — the one kind
-  of text `findInPage` does not search.
-- **`findInPage` takes focus**, by selecting the match. Taking focus
-  back unconditionally resets stepping to the first match, because
-  Chromium anchors "the next match" on the page selection; never taking
-  it back drops keystrokes mid-word. So the hold is tied to intent, not
-  to a clock: typing arms it, the search's own result releases it, and
-  stepping never arms it at all. It must not be a timer — searching a
-  real graph can take longer than any window worth guessing, and the
-  steal then lands after it has expired, which is exactly what it feels
-  like to be thrown out of the box mid-word. A window-level `keydown`
-  listener picks up Escape, Enter and typing for the state stepping
-  leaves behind (`document.body` focused, keystrokes going nowhere).
+What the replacement rests on:
+
+- **Matches are painted with the CSS Custom Highlight API**, the same
+  mechanism the editor already uses for code tokens and block sigils
+  (`src/lib/editor/utils/highlight.ts`, `setFindHighlights`). No DOM is
+  wrapped and no Lexical state is touched, so the document Lexical
+  thinks it has stays the document on screen, and the caret and the page
+  selection stay where the user left them. The active match is a second
+  highlight, kept disjoint from the rest so nothing is painted twice.
+- **Each block is searched on its own.** The editor's element children
+  are the subtext blocks, and keeping them apart is what stops a match
+  from spanning the gap between two of them.
+- **Case folding runs as a RegExp over the original text**, never over a
+  lower-cased copy: `toLowerCase()` can change a string's length (the
+  Turkish dotted capital İ becomes two code units), which would slide
+  every later offset and put the highlight on the wrong characters.
+- **Ranges do not survive an edit.** Lexical replaces the text nodes
+  they point at, so their highlights silently vanish. A debounced
+  `MutationObserver` on the document rebuilds them — which also covers
+  switching notes and a transclusion arriving. It cannot feed itself:
+  the state it writes back is two numbers, so a rebuild that finds what
+  the last one found re-renders nothing and mutates nothing.
+- **Only the active editor is searched.** On a view without one — the
+  scripts view, whose Monaco editor has a find widget of its own that
+  the menu accelerator pre-empts — the bar opens and reports no results.
 
 ### Storage-provider details that only bite on a real file system
 
