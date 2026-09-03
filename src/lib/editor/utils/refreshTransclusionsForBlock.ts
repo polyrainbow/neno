@@ -8,8 +8,8 @@ import {
   $createTextNode,
   $getSelection,
   $isRangeSelection,
+  ElementNode,
   LexicalNode,
-  ParagraphNode,
 } from "lexical";
 import { $isAutoLinkNode, AutoLinkNode } from "@lexical/link";
 import { ElementNodeType } from "../types/ElementNodeType";
@@ -32,9 +32,9 @@ const transclusionsMatchSlashlinks = (
 };
 
 
-const splitParagraphAtLineBreaks = (node: ParagraphNode): void => {
+const splitParagraphAtLineBreaks = (node: ElementNode): void => {
   const selection = $getSelection();
-  let cursor = node;
+  let cursor: ElementNode = node;
   let startOffset = 0;
   let endOffset;
 
@@ -75,7 +75,7 @@ const isSlashlinkNode = (node: LexicalNode): node is AutoLinkNode => {
 
 
 export default (
-  node: ParagraphNode,
+  node: ElementNode,
   getTransclusionContent: TransclusionContentGetter,
 ) => {
   // this usually happens after a paste event, so let's fix the structure first

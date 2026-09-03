@@ -146,9 +146,10 @@ test.describe("Editor view", () => {
       await page.keyboard.type("test\n# heading");
       await page.keyboard.press(
         KEY_COMBINATIONS.MOVE_CURSOR_TO_BEGINNING_OF_LINE,
+        { delay: 100 },
       );
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Space");
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Space", { delay: 100 });
 
       const paragraph = page.locator(
         "div[data-lexical-editor] .editor-paragraph",
@@ -355,10 +356,10 @@ test.describe("Editor view", () => {
 
       expect(await transclusionSlug.innerText()).toBe("/link");
 
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       const transclusionElement = page.locator(
         "div[data-lexical-editor] .transclusion",
@@ -379,10 +380,10 @@ test.describe("Editor view", () => {
 
       expect(await transclusionSlug.innerText()).toBe("/link");
 
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       const transclusionElement = page.locator(
         "div[data-lexical-editor] .transclusion",
@@ -403,10 +404,10 @@ test.describe("Editor view", () => {
 
       expect(await transclusionSlug.innerText()).toBe("/link");
 
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
-      await page.keyboard.press("Backspace");
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       const transclusionElement = page.locator(
         "div[data-lexical-editor] .transclusion",
@@ -421,9 +422,9 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("/1 /2");
 
-      await page.keyboard.press("ArrowLeft");
-      await page.keyboard.press("ArrowLeft");
-      await page.keyboard.press("Backspace");
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("ArrowLeft", { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       const paragraphChildren = (await page.$$(
         "div[data-lexical-editor] .editor-paragraph > *",
@@ -602,8 +603,8 @@ test.describe("Editor view", () => {
     async ({ page }) => {
       await page.keyboard.type("http://example.com");
       await page.waitForTimeout(100);
-      await page.keyboard.press(KEY_COMBINATIONS.SELECT_ALL);
-      await page.keyboard.press("Backspace");
+      await page.keyboard.press(KEY_COMBINATIONS.SELECT_ALL, { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       const paragraphs = (
         await page.$$("div[data-lexical-editor] .editor-paragraph")
@@ -618,8 +619,8 @@ test.describe("Editor view", () => {
     "select all command works",
     async ({ page }) => {
       await page.keyboard.type("# block 1\n- block 2\nblock 3");
-      await page.keyboard.press(KEY_COMBINATIONS.SELECT_ALL);
-      await page.keyboard.press("Backspace");
+      await page.keyboard.press(KEY_COMBINATIONS.SELECT_ALL, { delay: 100 });
+      await page.keyboard.press("Backspace", { delay: 100 });
 
       const paragraphs = (
         await page.$$("div[data-lexical-editor] .editor-paragraph")
