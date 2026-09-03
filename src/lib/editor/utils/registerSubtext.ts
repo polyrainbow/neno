@@ -275,7 +275,7 @@ export function registerSubtext(editor: LexicalEditor): () => void {
       },
       COMMAND_PRIORITY_EDITOR,
     ),
-    editor.registerCommand<boolean>(
+    editor.registerCommand(
       SELECT_ALL_COMMAND,
       () => {
         $selectAll();

@@ -13,14 +13,21 @@ import type {
   LexicalNode,
   NodeKey,
   SerializedTextNode,
+  Spread,
 } from "lexical";
 import { addClassNamesToElement } from "@lexical/utils";
 import { $applyNodeReplacement, TextNode } from "lexical";
 
 
-interface SerializedWikiLinkPunctuationNode extends SerializedTextNode {
-  __isClosing: boolean;
-}
+// Declared with Spread rather than an interface: since Lexical 0.49, the
+// static importJSON() the base class declares takes
+// SerializedLexicalNode & Record<string, unknown>, and only a type alias gets
+// the implicit index signature that makes an override with a narrower
+// parameter assignable to it.
+type SerializedWikiLinkPunctuationNode = Spread<
+  { __isClosing: boolean },
+  SerializedTextNode
+>;
 
 export class WikiLinkPunctuationNode extends TextNode {
   static getType(): string {
