@@ -217,6 +217,11 @@ isomorphic-git branches on `err.code === "ENOENT"`.
 - `plugins: true` in `webPreferences` — without it Chromium's PDF viewer
   is disabled and the PDF `<iframe>` in `FileViewPreview.tsx` renders
   blank.
+- The CSP is stamped only onto app responses (`isAppUrl`). The
+  `onHeadersReceived` listener sees every response in the session,
+  including the PDF viewer's own `chrome-extension://` page, whose
+  `chrome://resources` scripts the app policy would block — another way
+  to get a blank PDF `<iframe>`.
 - The standard **Edit** menu roles — without them Cmd-C/V/Z do not work
   at all in a packaged Electron app.
 - `'unsafe-eval'` in the CSP — Monaco's TypeScript worker and the
