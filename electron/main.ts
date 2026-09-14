@@ -168,6 +168,11 @@ async function handleAppRequest(request: Request): Promise<Response> {
   return new Response("Not found", { status: 404 });
 }
 
+function isAppUrl(url: string): boolean {
+  if (url.startsWith(APP_ORIGIN)) return true;
+  return IS_DEV && url.startsWith(DEV_SERVER_URL as string);
+}
+
 function getContentSecurityPolicy(): string {
   /*
     'unsafe-eval' is unavoidable: Monaco's TypeScript worker and the
@@ -203,10 +208,22 @@ function getContentSecurityPolicy(): string {
     .join("; ");
 }
 
+/*
+  The policy is stamped onto NENO's own responses only. The listener
+  sees every response in the session, and that includes the pages of
+  Chromium's built-in PDF viewer (a chrome-extension:// frame loading
+  chrome://resources scripts), which our policy would block — leaving
+  the PDF preview blank.
+*/
 function applyContentSecurityPolicy(): void {
   const policy = getContentSecurityPolicy();
   session.defaultSession.webRequest.onHeadersReceived(
     (details, callback) => {
+      if (!isAppUrl(details.url)) {
+        callback({});
+        return;
+      }
+
       callback({
         responseHeaders: {
           ...details.responseHeaders,
@@ -215,11 +232,6 @@ function applyContentSecurityPolicy(): void {
       });
     },
   );
-}
-
-function isAppUrl(url: string): boolean {
-  if (url.startsWith(APP_ORIGIN)) return true;
-  return IS_DEV && url.startsWith(DEV_SERVER_URL as string);
 }
 
 async function createWindow(): Promise<BrowserWindow> {
