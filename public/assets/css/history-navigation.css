@@ -1,0 +1,42 @@
+/*
+  The arrow that follows a two-finger swipe in from the edge of the
+  window, the way Chromium's overscroll navigation shows one. It slides
+  in with --swipe-progress (0 to 1) and fills with the accent colour once
+  the swipe has navigated.
+*/
+.swipe-navigation-indicator {
+  --swipe-indicator-size: 3rem;
+
+  position: fixed;
+  top: calc(50% - var(--swipe-indicator-size) / 2);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--swipe-indicator-size);
+  height: var(--swipe-indicator-size);
+  border-radius: 50%;
+  background-color: var(--background-color);
+  box-shadow: 0 0.125rem 0.75rem rgb(0 0 0 / 30%);
+  opacity: min(1, calc(var(--swipe-progress) * 2));
+  pointer-events: none;
+  transition: background-color 0.1s ease;
+
+  &.back {
+    left: 0;
+    translate: calc(
+      (var(--swipe-progress) * 1.5 - 1) * var(--swipe-indicator-size)
+    ) 0;
+  }
+
+  &.forward {
+    right: 0;
+    translate: calc(
+      (1 - var(--swipe-progress) * 1.5) * var(--swipe-indicator-size)
+    ) 0;
+  }
+
+  &.triggered {
+    background-color: var(--accent-color-1);
+  }
+}

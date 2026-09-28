@@ -52,6 +52,7 @@ electron/                     # Electron main process (compiled separately)
   dialogs.ts                  #   Native folder/open/save dialogs
   unsavedChanges.ts           #   Native confirm on window close
   findMenu.ts                 #   The Edit menu's find items
+  historyMenu.ts              #   The Go menu (Back/Forward, Cmd-[ / Cmd-])
   storage/
     NodeFsStorageProvider.ts  #   StorageProvider on node:fs/promises
     nodeFsGit.ts              #   isomorphic-git fs on node:fs/promises
@@ -295,6 +296,25 @@ What the replacement rests on:
 - **Only the active editor is searched.** On a view without one — the
   scripts view, whose Monaco editor has a find widget of its own that
   the menu accelerator pre-empts — the bar opens and reports no results.
+
+### Back and forward
+
+Electron ships none of the browser's ways through the history, so NENO
+brings its own, desktop-only (in a browser they render/do nothing):
+header buttons (`HistoryNavigationButtons.tsx`), the Go menu
+(`electron/historyMenu.ts`, forwarding the command like the find menu),
+the mouse side buttons and a two-finger trackpad swipe
+(`HistoryNavigation.tsx`). All of them go through
+`useHistoryNavigation`, so leaving a note with unsaved changes asks
+first — which is why the menu does not call
+`webContents.navigationHistory` itself.
+
+Electron's `swipe` event only fires with the non-default three-finger
+"swipe between pages" setting, so the default two-finger swipe is
+recognized from horizontal wheel events (`src/lib/swipeNavigation.ts`).
+The DOM has no gesture phases, so a gesture is a run of wheel events
+without a 200 ms gap, and its first event decides whether it may
+navigate at all.
 
 ### Storage-provider details that only bite on a real file system
 

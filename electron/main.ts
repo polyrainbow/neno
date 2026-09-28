@@ -29,6 +29,7 @@ import {
   registerUnsavedChangesIpc,
 } from "./unsavedChanges";
 import { buildFindMenuItems } from "./findMenu";
+import { buildHistoryMenu } from "./historyMenu";
 import {
   applyWindowState,
   getInitialWindowState,
@@ -356,6 +357,7 @@ function buildMenu(): void {
         { role: "togglefullscreen" },
       ],
     },
+    buildHistoryMenu(),
     {
       label: "Window",
       submenu: isMac

@@ -14,6 +14,7 @@ import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import { Slug } from "../lib/notes/types/Slug";
 import BusyIndicator from "./BusyIndicator";
 import AppMenuToggle from "./AppMenuToggle";
+import HistoryNavigationButtons from "./HistoryNavigationButtons";
 
 interface NoteViewHeaderProps {
   stats: GraphStats | null,
@@ -45,6 +46,7 @@ const NoteViewHeader = ({
   return (
     <HeaderContainer>
       <AppMenuToggle />
+      <HistoryNavigationButtons />
       <FlexContainer
         className="pinned-notes"
       >

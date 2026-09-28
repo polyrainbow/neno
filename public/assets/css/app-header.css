@@ -146,4 +146,26 @@
     gap: var(--small-gap);
     display: flex;
   }
+
+  .history-navigation-buttons {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--small-gap);
+
+    .icon-button {
+      width: 2.188rem;
+      min-width: 2.188rem;
+      margin: 0;
+      padding: 0;
+      justify-content: center;
+
+      &[disabled] {
+        cursor: inherit;
+
+        &:hover {
+          background: var(--accent-color-1-light);
+        }
+      }
+    }
+  }
 }

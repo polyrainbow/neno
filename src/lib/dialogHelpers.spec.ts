@@ -36,6 +36,7 @@ const makeBridge = (overrides: Partial<NenoBridge> = {}) => {
     connectStorage: async () => undefined,
     setUnsavedChanges: async () => undefined,
     onFindCommand: () => () => undefined,
+    onHistoryCommand: () => () => undefined,
     ...overrides,
   };
 
