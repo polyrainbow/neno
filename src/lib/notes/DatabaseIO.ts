@@ -92,12 +92,22 @@ export default class DatabaseIO {
 
   private async getGraphFilenamesFromStorageProvider(): Promise<string[]> {
     const objectNames = await this.#storageProvider.getAllObjectNames();
+    const objectNameSet = new Set(objectNames);
 
     return objectNames
       .filter(
         (filename: string) => {
           return filename.endsWith(DatabaseIO.#GRAPH_FILE_EXTENSION)
-            && isValidSlug(DatabaseIO.getSlugFromGraphFilename(filename));
+            && isValidSlug(DatabaseIO.getSlugFromGraphFilename(filename))
+            /*
+              An uploaded file named foo.subtext is stored as the payload
+              foo.subtext next to its graph file foo.subtext.subtext. The
+              payload is not a graph file of its own, and reading it as one
+              would add a phantom note "foo".
+            */
+            && !objectNameSet.has(
+              DatabaseIO.getSubtextGraphFilenameForSlug(filename),
+            );
         },
       );
   }
