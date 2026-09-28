@@ -1,13 +1,15 @@
 import {
   $getRoot,
+  defineExtension,
   EditorState,
 } from "lexical";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import {
+  LexicalExtensionComposer,
+} from "@lexical/react/LexicalExtensionComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { NodeEventPlugin } from "@lexical/react/LexicalNodeEventPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode } from "./nodes/HeadingNode";
 import LinkPlugin from "./plugins/LinkPlugin";
 import { AutoLinkNode } from "@lexical/link";
@@ -85,9 +87,7 @@ export const Editor = ({
 }: EditorProps) => {
   return <>
     <ContentEditable />
-    <SubtextPlugin
-      ErrorBoundary={LexicalErrorBoundary}
-    />
+    <SubtextPlugin />
     <OnChangePlugin onChange={
       (editorState: EditorState) => {
         editorState.read(() => {
@@ -180,39 +180,55 @@ export const Editor = ({
   </>;
 };
 
+/*
+  Module scope, so that the extension is stable: LexicalExtensionComposer
+  builds a new editor whenever its extension argument changes.
+*/
+const editorExtension = defineExtension({
+  name: "[root]",
+  namespace: "MyEditor",
+  theme,
+  onError: (error: Error) => {
+    // eslint-disable-next-line no-console
+    console.error(error);
+  },
+  nodes: [
+    AutoLinkNode,
+    HeadingNode,
+    WikiLinkContentNode,
+    WikiLinkPunctuationNode,
+    BoldNode,
+    TransclusionNode,
+    InlineCodeNode,
+    CodeBlockNode,
+    ScriptOutputNode,
+    QuoteBlockNode,
+    ListItemNode,
+    ListItemSigilNode,
+    ListItemContentNode,
+    KeyValueNode,
+    KeyValuePairKeyNode,
+  ],
+});
+
+/*
+  contentEditable={null}: the composer would otherwise render a
+  ContentEditable of its own as its first child. Editor renders the one we
+  use, further down the tree.
+
+  The composer also renders the decorator nodes (transclusions, script
+  output) into their DOM elements, wrapped in LexicalErrorBoundary.
+*/
 const Context = ({
   children,
 }: React.PropsWithChildren) => {
-  const initialConfig = {
-    namespace: "MyEditor",
-    theme,
-    onError: (error: unknown) => {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    },
-    nodes: [
-      AutoLinkNode,
-      HeadingNode,
-      WikiLinkContentNode,
-      WikiLinkPunctuationNode,
-      BoldNode,
-      TransclusionNode,
-      InlineCodeNode,
-      CodeBlockNode,
-      ScriptOutputNode,
-      QuoteBlockNode,
-      ListItemNode,
-      ListItemSigilNode,
-      ListItemContentNode,
-      KeyValueNode,
-      KeyValuePairKeyNode,
-    ],
-  };
-
   return (
-    <LexicalComposer initialConfig={initialConfig}>
+    <LexicalExtensionComposer
+      extension={editorExtension}
+      contentEditable={null}
+    >
       {children}
-    </LexicalComposer>
+    </LexicalExtensionComposer>
   );
 };
 

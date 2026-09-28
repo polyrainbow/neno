@@ -26,19 +26,13 @@ import {
   useLexicalComposerContext,
 } from "@lexical/react/LexicalComposerContext";
 import { useSubtextSetup } from "../hooks/useSubtextSetup";
-import { ErrorBoundaryType, useDecorators } from "../hooks/useDecorators";
-import { ReactElement } from "react";
 
-export function SubtextPlugin({
-  ErrorBoundary,
-}: {
-  ErrorBoundary: ErrorBoundaryType;
-}): ReactElement {
+/*
+  Decorator nodes are rendered by LexicalExtensionComposer, not here.
+*/
+export function SubtextPlugin(): null {
   const [editor] = useLexicalComposerContext();
-  const decorators = useDecorators(editor, ErrorBoundary);
   useSubtextSetup(editor);
 
-  return <>
-    {decorators}
-  </>;
+  return null;
 }
