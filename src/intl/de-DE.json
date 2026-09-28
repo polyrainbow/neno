@@ -1,4 +1,6 @@
 {
+  "app.back-button.alt": "Zurück",
+  "app.forward-button.alt": "Vorwärts",
   "app.loading": "Wird geladen",
   "app.menu-button.alt": "Menü",
   "app.pinned-notes-placeholder": "Hier erscheinen deine angepinnten Notizen",
@@ -193,7 +195,6 @@
   "stats.metadata.size-of-notes": "Größe aller Notizen",
   "stats.metadata.total-storage-size": "Gesamte Speicherplatzbelegung",
   "stats.metadata.updated-at": "Letzte Aktualisierung",
-  "stats.number-of-links": "Verbindungen",
   "stats.number-of-notes": "Notizen",
   "stats.unlinked-notes": "Unverbundene Notizen"
 }

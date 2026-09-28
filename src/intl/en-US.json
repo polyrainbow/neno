@@ -1,4 +1,6 @@
 {
+  "app.back-button.alt": "Back",
+  "app.forward-button.alt": "Forward",
   "app.loading": "Loading",
   "app.menu-button.alt": "Menu",
   "app.pinned-notes-placeholder": "Your pinned notes will appear here",
@@ -193,7 +195,6 @@
   "stats.metadata.size-of-notes": "Size of notes",
   "stats.metadata.total-storage-size": "Total storage size",
   "stats.metadata.updated-at": "Updated at",
-  "stats.number-of-links": "Number of links",
   "stats.number-of-notes": "Number of notes",
   "stats.unlinked-notes": "Unlinked notes"
 }

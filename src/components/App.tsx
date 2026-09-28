@@ -4,6 +4,7 @@ import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
 import GitEnabledContext from "../contexts/GitEnabledContext";
 import AppRouter from "./AppRouter";
 import FindBar from "./FindBar";
+import HistoryNavigation from "./HistoryNavigation";
 import useWarnBeforeUnload from "../hooks/useWarnBeforeUnload";
 import { init, onChange } from "../lib/intl";
 import useRunOnce from "../hooks/useRunOnce";
@@ -45,6 +46,7 @@ const App = () => {
       <GitEnabledContext value={gitEnabled}>
         <AppRouter />
         <FindBar />
+        <HistoryNavigation />
       </GitEnabledContext>
     </UnsavedChangesContext>
   </ConfirmationServiceProvider>;

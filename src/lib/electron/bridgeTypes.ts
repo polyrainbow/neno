@@ -101,6 +101,8 @@ export interface NenoBridge {
   setUnsavedChanges(hasUnsavedChanges: boolean): Promise<void>;
   /** Subscribes to the Edit menu's find commands. Returns an unsubscribe. */
   onFindCommand(listener: (command: FindCommand) => void): () => void;
+  /** Subscribes to the Go menu's back/forward items. Returns an unsubscribe. */
+  onHistoryCommand(listener: (command: HistoryCommand) => void): () => void;
 }
 
 /** Message the preload uses to hand the storage MessagePort to the page. */
@@ -115,3 +117,13 @@ export type FindCommand = "open" | "next" | "previous";
 
 /** Main → renderer: a find command from the Edit menu. */
 export const FIND_COMMAND_MESSAGE = "neno:find-command";
+
+/*
+  What the Go menu's items ask for. The renderer performs the traversal
+  itself, so that a note with unsaved changes can ask for confirmation
+  first (src/hooks/useHistoryNavigation.ts).
+*/
+export type HistoryCommand = "back" | "forward";
+
+/** Main → renderer: a back/forward command from the Go menu. */
+export const HISTORY_COMMAND_MESSAGE = "neno:history-command";

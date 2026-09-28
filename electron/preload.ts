@@ -18,8 +18,11 @@ import { contextBridge, ipcRenderer } from "electron";
 const STORAGE_PORT_MESSAGE = "neno:storage-port";
 // Likewise FIND_COMMAND_MESSAGE.
 const FIND_COMMAND_MESSAGE = "neno:find-command";
+// Likewise HISTORY_COMMAND_MESSAGE.
+const HISTORY_COMMAND_MESSAGE = "neno:history-command";
 
 type FindCommand = "open" | "next" | "previous";
+type HistoryCommand = "back" | "forward";
 
 /*
   ipcRenderer itself must not cross the bridge, so subscriptions are
@@ -78,6 +81,11 @@ const neno = {
 
   onFindCommand: (listener: (command: FindCommand) => void): () => void =>
     subscribe(FIND_COMMAND_MESSAGE, listener),
+
+  onHistoryCommand: (
+    listener: (command: HistoryCommand) => void,
+  ): () => void =>
+    subscribe(HISTORY_COMMAND_MESSAGE, listener),
 };
 
 contextBridge.exposeInMainWorld("neno", neno);

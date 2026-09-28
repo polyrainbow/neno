@@ -1,6 +1,7 @@
 import React from "react";
 import HeaderContainer from "./HeaderContainer";
 import AppMenuToggle from "./AppMenuToggle";
+import HistoryNavigationButtons from "./HistoryNavigationButtons";
 
 interface HeaderContainerLeftRightProps {
   leftContent?: React.ReactNode,
@@ -15,6 +16,7 @@ const HeaderContainerLeftRight = ({
     <HeaderContainer>
       <div className="header-left">
         <AppMenuToggle />
+        <HistoryNavigationButtons />
         {leftContent}
       </div>
       <div className="header-right">
