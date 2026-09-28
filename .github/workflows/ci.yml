@@ -36,8 +36,8 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 20
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
       with:
         node-version: '24'
         cache: npm
@@ -56,8 +56,8 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 60
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
       with:
         node-version: '24'
         cache: npm
@@ -67,7 +67,7 @@ jobs:
       run: npx playwright install chromium
     - name: Run Playwright tests
       run: npm run integration-test
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       if: always()
       with:
         name: playwright-report
@@ -83,8 +83,8 @@ jobs:
       # identity in the runner's keychain.
       CSC_IDENTITY_AUTO_DISCOVERY: false
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
       with:
         node-version: '24'
         cache: npm
@@ -103,7 +103,7 @@ jobs:
     - name: Build macOS app
       run: npm run electron:build
     - name: Upload .dmg
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: neno-dmg
         path: release/*.dmg

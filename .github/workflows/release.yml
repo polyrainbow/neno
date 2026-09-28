@@ -23,9 +23,9 @@ jobs:
   # the build, to fail in seconds rather than after packaging.
   verify-version:
     name: Verify tag matches package.json
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Compare tag with package version
       run: |
         PACKAGE_VERSION="v$(node -p "require('./package.json').version")"
@@ -44,14 +44,14 @@ jobs:
   publish:
     name: Publish release
     needs: ci
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
     steps:
     # The .dmg comes from the packaging job of the CI run above; it is
     # an artifact of this same workflow run.
     - name: Download .dmg
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: neno-dmg
         path: release
