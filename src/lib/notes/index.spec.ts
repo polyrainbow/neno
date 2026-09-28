@@ -708,6 +708,27 @@ describe("Notes module", () => {
   );
 
   it(
+    "should not read an uploaded .subtext file back as a note",
+    async () => {
+      const mockStorageProvider = new MockStorageProvider();
+      const notesProvider = new NotesProvider(mockStorageProvider);
+
+      await notesProvider.addFile(
+        getNewTestFileReadable("foobar"),
+        "files",
+        "foo.subtext",
+      );
+
+      const reloadedNotesProvider = new NotesProvider(mockStorageProvider);
+      const notes = await reloadedNotesProvider.getNotesList({});
+      const files = await reloadedNotesProvider.getFiles();
+
+      expect(notes.numberOfResults).toBe(0);
+      expect(files.map((file) => file.slug)).toEqual(["files/foo.subtext"]);
+    },
+  );
+
+  it(
     "should NFC-normalize umlauts with combining diacritical marks",
     async () => {
       const notesProvider = new NotesProvider(new MockStorageProvider());

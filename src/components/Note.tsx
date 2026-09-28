@@ -13,7 +13,6 @@ import {
 import ActiveNote from "../types/ActiveNote";
 import {
   DEFAULT_FILE_SLUG_FOLDER,
-  FILE_PICKER_ACCEPT_TYPES,
   LOCAL_GRAPH_ID,
 } from "../config";
 import { FileInfo } from "../lib/notes/types/FileInfo";
@@ -166,10 +165,8 @@ const Note = ({
 
   const handleUploadFilesRequest = async () => {
     if (!notesProvider) throw new Error("NotesProviderProxy not ready");
-    const files = await getFilesFromUserSelection(
-      FILE_PICKER_ACCEPT_TYPES,
-      true,
-    );
+    // No filters: any file can be added to the graph.
+    const files = await getFilesFromUserSelection([], true);
 
     return uploadFilesAndInsertFileSlugsToNote(notesProvider, files);
   };
