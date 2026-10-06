@@ -109,6 +109,26 @@ const getAliasesOfSlug = (
 };
 
 
+/*
+  The aliases of every note at once. getAliasesOfSlug scans all aliases,
+  so calling it for each note of a list is O(notes × aliases).
+*/
+const getAliasesByCanonicalSlug = (
+  graph: GraphObject,
+): Map<Slug, Set<Slug>> => {
+  const aliasesByCanonicalSlug = new Map<Slug, Set<Slug>>();
+  for (const [alias, canonicalSlug] of graph.aliases) {
+    let aliases = aliasesByCanonicalSlug.get(canonicalSlug);
+    if (!aliases) {
+      aliases = new Set<Slug>();
+      aliasesByCanonicalSlug.set(canonicalSlug, aliases);
+    }
+    aliases.add(alias);
+  }
+  return aliasesByCanonicalSlug;
+};
+
+
 const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
   if (!graph.notes.has(slug)) {
     throw new Error("Could not generate note preview of " + slug);
@@ -154,11 +174,18 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
 
 const getNumberOfLinkedNotes = (graph: Graph, slug: Slug): LinkCount => {
   const outgoingLinks = getOutgoingLinksToOtherNotes(graph, slug);
-  const backlinks = getBacklinks(graph, slug);
+  /*
+    Only the count is needed, so read it from the index. getBacklinks
+    would build a preview of every backlink, each scanning all aliases.
+  */
+  const backlinkSlugs = graph.indexes.backlinks.get(slug);
+  if (!backlinkSlugs) {
+    throw new Error("Could not determine backlinks for slug " + slug);
+  }
   return {
     outgoing: outgoingLinks.size,
-    back: backlinks.length,
-    sum: outgoingLinks.size + backlinks.length,
+    back: backlinkSlugs.size,
+    sum: outgoingLinks.size + backlinkSlugs.size,
   };
 };
 
@@ -379,10 +406,11 @@ const getNumberOfFiles = (graph: Graph, noteSlug: Slug): number => {
 const createNoteListItem = (
   note: ExistingNote,
   graph: Graph,
+  aliasesByCanonicalSlug: Map<Slug, Set<Slug>>,
 ): NoteListItem => {
   const noteListItem: NoteListItem = {
     slug: note.meta.slug,
-    aliases: getAliasesOfSlug(graph, note.meta.slug),
+    aliases: new Set(aliasesByCanonicalSlug.get(note.meta.slug)),
     title: getNoteTitle(note.content),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,
@@ -400,10 +428,12 @@ const createNoteListItems = (
   existingNotes: ExistingNote[],
   graph: Graph,
 ): NoteListItem[] => {
+  const aliasesByCanonicalSlug = getAliasesByCanonicalSlug(graph);
   const noteListItems = existingNotes.map((existingNote) => {
     return createNoteListItem(
       existingNote,
       graph,
+      aliasesByCanonicalSlug,
     );
   });
 
