@@ -76,7 +76,14 @@ const handleExistingNoteUpdate = async (
   const canonicalSlugShouldChange = "changeSlugTo" in noteSaveRequest
     && typeof noteSaveRequest.changeSlugTo === "string";
 
+  /*
+    Everything a save touches is flushed at once at the end, so that with
+    git enabled a save is a single commit — including a rename that
+    rewrites every note referencing the renamed one.
+  */
+  const notesToUpdate: Set<Slug> = new Set();
   const aliasesToUpdate: Set<Slug> = new Set();
+  let flushPins = false;
 
   if (noteSaveRequest.aliases) {
     // delete aliases that are not in the new list
@@ -170,7 +177,23 @@ const handleExistingNoteUpdate = async (
     graph.notes.delete(oldSlug);
     removeSlugFromIndexes(graph, oldSlug);
 
-    let flushPins = false;
+    if (oldSlug.toLowerCase() === newSlug.toLowerCase()) {
+      /*
+        On a case-insensitive file system — the macOS default — the old
+        and the new file are the same file. Remove it on its own first:
+        flushed together, the removal would race the write, and git would
+        still find the old path on disk and keep it.
+      */
+      await io.flushChanges(
+        graph,
+        false,
+        new Set([oldSlug]),
+        new Set(),
+        new Set(),
+      );
+    } else {
+      notesToUpdate.add(oldSlug);
+    }
 
     for (let i = 0; i < graph.pinnedNotes.length; i++) {
       if (graph.pinnedNotes[i] === oldSlug) {
@@ -179,7 +202,6 @@ const handleExistingNoteUpdate = async (
       }
     }
 
-    const aliasesToUpdate: Set<Slug> = new Set();
     for (const [alias, canonicalSlug] of graph.aliases.entries()) {
       if (canonicalSlug === oldSlug) {
         graph.aliases.delete(alias);
@@ -187,14 +209,6 @@ const handleExistingNoteUpdate = async (
         aliasesToUpdate.add(alias);
       }
     }
-
-    await io.flushChanges(
-      graph,
-      flushPins,
-      new Set([oldSlug]),
-      aliasesToUpdate,
-      new Set(),
-    );
 
     existingNote.meta.slug = newSlug;
     graph.notes.set(newSlug, existingNote);
@@ -224,13 +238,7 @@ const handleExistingNoteUpdate = async (
         thatNote.content = serialize(newBlocks);
         graph.indexes.blocks.set(thatNote.meta.slug, newBlocks);
         updateIndexes(graph, thatNote);
-        await io.flushChanges(
-          graph,
-          flushPins,
-          new Set([thatNote.meta.slug]),
-          new Set(),
-          new Set(),
-        );
+        notesToUpdate.add(thatNote.meta.slug);
       }
     }
   } else {
@@ -238,10 +246,11 @@ const handleExistingNoteUpdate = async (
   }
 
   updateIndexes(graph, existingNote);
+  notesToUpdate.add(existingNote.meta.slug);
   await io.flushChanges(
     graph,
-    false,
-    new Set([existingNote.meta.slug]),
+    flushPins,
+    notesToUpdate,
     aliasesToUpdate,
     new Set(),
   );
