@@ -13,6 +13,7 @@ Object.assign(global, { TextDecoder, TextEncoder });
 import { describe, it, expect, vi } from "vitest";
 import { ErrorMessage } from "./types/ErrorMessage.js";
 import { getNewTestFileReadable } from "./test/utils.js";
+import { NoteListSortMode } from "./types/NoteListSortMode.js";
 
 vi.stubGlobal("navigator", {
   hardwareConcurrency: 4,
@@ -1992,6 +1993,48 @@ describe("Notes module", () => {
     // removing the link
     await save("source", "no links");
     expect(await backlinksOf("other")).toEqual([]);
+  });
+
+  it("should list every note with its own aliases and links", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
+    const create = async (
+      slug: string,
+      content: string,
+      aliases: string[],
+    ) => {
+      await notesProvider.put({
+        note: { content, meta: { additionalHeaders: {}, flags: [] } },
+        changeSlugTo: slug,
+        aliases: new Set(aliases),
+      });
+    };
+    await create("hub", "Hub", ["hub-1", "hub-2"]);
+    await create("spoke-a", "A /hub-1", ["a-1"]);
+    await create("spoke-b", "B /hub /spoke-a", []);
+
+    // both the paged path and the one that builds every item first
+    for (const sortMode of [
+      NoteListSortMode.UPDATE_DATE_DESCENDING,
+      NoteListSortMode.TITLE_ASCENDING,
+    ]) {
+      const page = await notesProvider.getNotesList({ sortMode });
+      const items = new Map(
+        page.results.map((item) => [item.slug, item]),
+      );
+
+      expect(Array.from(items.get("hub")!.aliases).sort())
+        .toEqual(["hub-1", "hub-2"]);
+      expect(Array.from(items.get("spoke-a")!.aliases)).toEqual(["a-1"]);
+      expect(items.get("spoke-b")!.aliases.size).toBe(0);
+
+      expect(items.get("hub")!.linkCount)
+        .toStrictEqual({ outgoing: 0, back: 2, sum: 2 });
+      expect(items.get("spoke-a")!.linkCount)
+        .toStrictEqual({ outgoing: 1, back: 1, sum: 2 });
+      expect(items.get("spoke-b")!.linkCount)
+        .toStrictEqual({ outgoing: 2, back: 0, sum: 2 });
+    }
   });
 
   it(
