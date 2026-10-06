@@ -129,7 +129,11 @@ const getAliasesByCanonicalSlug = (
 };
 
 
-const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
+const getNotePreview = (
+  graph: Graph,
+  slug: Slug,
+  aliasesByCanonicalSlug: Map<Slug, Set<Slug>>,
+): NotePreview => {
   if (!graph.notes.has(slug)) {
     throw new Error("Could not generate note preview of " + slug);
   }
@@ -139,7 +143,7 @@ const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
   return {
     content: note.content,
     slug,
-    aliases: getAliasesOfSlug(graph, slug),
+    aliases: new Set(aliasesByCanonicalSlug.get(slug)),
     title: getNoteTitle(note.content),
     createdAt: note.meta.createdAt,
     updatedAt: note.meta.updatedAt,
@@ -147,7 +151,11 @@ const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
 };
 
 
-const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
+const getBacklinks = (
+  graph: Graph,
+  slug: Slug,
+  aliasesByCanonicalSlug: Map<Slug, Set<Slug>>,
+): SparseNoteInfo[] => {
   const backlinkSlugs = graph.indexes.backlinks.get(slug);
 
   if (!backlinkSlugs) {
@@ -162,7 +170,7 @@ const getBacklinks = (graph: Graph, slug: Slug): SparseNoteInfo[] => {
 
       const backlink: SparseNoteInfo = {
         slug: note.meta.slug,
-        aliases: getAliasesOfSlug(graph, note.meta.slug),
+        aliases: new Set(aliasesByCanonicalSlug.get(note.meta.slug)),
         title: getNoteTitle(note.content),
         createdAt: note.meta.createdAt,
         updatedAt: note.meta.updatedAt,
@@ -307,6 +315,12 @@ const createNoteToTransmit = async (
   includeParsedContent?: boolean,
 ): Promise<NoteToTransmit> => {
   const blocks = getBlocks(existingNote, graph.indexes.blocks);
+  /*
+    Built once for the whole note: the previews of its links and
+    backlinks each need their aliases, and a note can have thousands of
+    backlinks.
+  */
+  const aliasesByCanonicalSlug = getAliasesByCanonicalSlug(graph);
 
   const noteToTransmit: NoteToTransmit = {
     content: existingNote.content,
@@ -315,7 +329,11 @@ const createNoteToTransmit = async (
       getOutgoingLinksToOtherNotes(graph, existingNote.meta.slug),
     )
       .map((slug: Slug) => {
-        const notePreview = getNotePreview(graph, slug);
+        const notePreview = getNotePreview(
+          graph,
+          slug,
+          aliasesByCanonicalSlug,
+        );
         return notePreview;
       }),
     unresolvedOutgoingLinkAvailability: new Map(
@@ -328,11 +346,15 @@ const createNoteToTransmit = async (
         return [slug, isAvailable];
       }),
     ),
-    backlinks: getBacklinks(graph, existingNote.meta.slug),
+    backlinks: getBacklinks(
+      graph,
+      existingNote.meta.slug,
+      aliasesByCanonicalSlug,
+    ),
     numberOfCharacters: getNumberOfCharacters(existingNote),
     numberOfBlocks: blocks.length,
     files: getFileInfosForFilesLinkedInNote(graph, existingNote.meta.slug),
-    aliases: getAliasesOfSlug(graph, existingNote.meta.slug),
+    aliases: new Set(aliasesByCanonicalSlug.get(existingNote.meta.slug)),
     keyValues: getKeyValuesFromBlocks(blocks),
   };
 

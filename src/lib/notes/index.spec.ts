@@ -2037,6 +2037,41 @@ describe("Notes module", () => {
     }
   });
 
+  it("should include aliases in a note's links and backlinks", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
+    const create = async (
+      slug: string,
+      content: string,
+      aliases: string[],
+    ) => {
+      await notesProvider.put({
+        note: { content, meta: { additionalHeaders: {}, flags: [] } },
+        changeSlugTo: slug,
+        aliases: new Set(aliases),
+      });
+    };
+    await create("hub", "Hub /target", ["hub-1"]);
+    await create("target", "Target", ["target-1", "target-2"]);
+    await create("spoke-a", "A /hub-1", ["a-1"]);
+    await create("spoke-b", "B /hub", []);
+
+    const hub = await notesProvider.get("hub");
+    expect(Array.from(hub.aliases)).toEqual(["hub-1"]);
+
+    const backlinkAliases = new Map(hub.backlinks.map(
+      (backlink) => [backlink.slug, Array.from(backlink.aliases)],
+    ));
+    expect(backlinkAliases).toEqual(new Map([
+      ["spoke-a", ["a-1"]],
+      ["spoke-b", []],
+    ]));
+
+    expect(hub.outgoingLinks.map((link) => link.slug)).toEqual(["target"]);
+    expect(Array.from(hub.outgoingLinks[0].aliases).sort())
+      .toEqual(["target-1", "target-2"]);
+  });
+
   it(
     "should fail when adding a slug of an existing note as alias to a new note",
     async () => {
