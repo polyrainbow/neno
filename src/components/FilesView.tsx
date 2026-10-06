@@ -24,18 +24,32 @@ enum FileSortMode {
   SIZE_DESCENDING = "SIZE_DESCENDING",
 }
 
+const SORT_MODE_LOCAL_STORAGE_KEY = "FILES_VIEW_SORT_MODE";
+
+const getInitialSortMode = (): FileSortMode => {
+  const storedValue = localStorage.getItem(SORT_MODE_LOCAL_STORAGE_KEY);
+  return Object.values(FileSortMode).includes(storedValue as FileSortMode)
+    ? storedValue as FileSortMode
+    : FileSortMode.CREATED_AT_DESCENDING;
+};
+
 const FilesView = () => {
   const notesProvider = useNotesProvider();
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [filterInput, setFilterInput] = useState<string>("");
   const [danglingFileSlugs, setDanglingFileSlugs] = useState<Slug[]>([]);
-  const [sortMode, setSortMode] = useState<FileSortMode>(
-    FileSortMode.CREATED_AT_DESCENDING,
+  const [sortMode, setSortModeState] = useState<FileSortMode>(
+    getInitialSortMode,
   );
   // status can be READY, BUSY
   const [status, setStatus] = useState("BUSY");
   const [page, setPage] = useState(1);
   const containerRef = useRef<HTMLElement | null>(null);
+
+  const setSortMode = (value: FileSortMode) => {
+    setSortModeState(value);
+    localStorage.setItem(SORT_MODE_LOCAL_STORAGE_KEY, value);
+  };
 
   const updateDanglingFiles = async () => {
     const slugsOfDanglingFiles: Slug[]
@@ -122,6 +136,7 @@ const FilesView = () => {
     <HeaderContainerLeftRight
       leftContent={<>
         <select
+          value={sortMode}
           onChange={(e) => setSortMode(e.target.value as FileSortMode)}
         >
           <option
