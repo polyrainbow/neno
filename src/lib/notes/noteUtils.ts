@@ -129,7 +129,7 @@ const getAliasesByCanonicalSlug = (
 };
 
 
-const getNotePreview =(graph: Graph, slug: Slug): NotePreview => {
+const getNotePreview = (graph: Graph, slug: Slug): NotePreview => {
   if (!graph.notes.has(slug)) {
     throw new Error("Could not generate note preview of " + slug);
   }
