@@ -72,6 +72,34 @@ function getFilenameForSlug(slug: Slug): string {
   return `${slug}${GRAPH_FILE_EXTENSION}`;
 }
 
+/*
+  Without a cache, isomorphic-git reads a whole packfile into memory for
+  every object it looks up in one, and throws it away again. In a packed
+  repo with committed attachments that is hundreds of MB per save, and in
+  Electron every byte of it crosses the storage bridge.
+
+  The cache holds the git index, which isomorphic-git re-validates with an
+  lstat on every use, and packfiles keyed by their content-hashed names,
+  with the pack directory listed afresh on every lookup — so it stays
+  correct when the repo is changed outside NENO. It is keyed by the fs,
+  because the worker creates a new one for every folder it opens. The
+  price is that a loaded pack stays in memory until the folder is closed.
+
+  git.commit reads the parent commit with a fresh cache of its own, so a
+  save still loads the pack once more while HEAD is packed — after a
+  commit or gc on the command line, until NENO's next commit.
+*/
+const caches = new WeakMap<GitFs, object>();
+
+function getCache(fs: GitFs): object {
+  let cache = caches.get(fs);
+  if (!cache) {
+    cache = {};
+    caches.set(fs, cache);
+  }
+  return cache;
+}
+
 async function fileExists(
   fs: GitFs,
   path: string,
@@ -111,14 +139,16 @@ export async function ensureRepo(
     dir.endsWith("/") ? `${dir}.gitignore` : `${dir}/.gitignore`,
     GITIGNORE_DEFAULT,
   );
-  const matrix = await git.statusMatrix({ fs, dir });
+  const cache = getCache(fs);
+  const matrix = await git.statusMatrix({ fs, dir, cache });
   for (const [filepath, , workdir] of matrix) {
     if (workdir === 0) continue;
-    await git.add({ fs, dir, filepath });
+    await git.add({ fs, dir, filepath, cache });
   }
   await git.commit({
     fs,
     dir,
+    cache,
     author,
     message: "initial commit",
   });
@@ -208,17 +238,21 @@ async function stagePath(
     ? `${dir}${relPath}`
     : `${dir}/${relPath}`;
 
+  const cache = getCache(fs);
+
   if (await fileExists(fs, absPath)) {
     let inHead = false;
     if (headOid) {
       try {
-        await git.readBlob({ fs, dir, oid: headOid, filepath: relPath });
+        await git.readBlob({
+          fs, dir, cache, oid: headOid, filepath: relPath,
+        });
         inHead = true;
       } catch {
         inHead = false;
       }
     }
-    await git.add({ fs, dir, filepath: relPath });
+    await git.add({ fs, dir, cache, filepath: relPath });
     if (inHead) {
       modifies.push(relPath);
     } else {
@@ -226,7 +260,7 @@ async function stagePath(
     }
   } else {
     try {
-      await git.remove({ fs, dir, filepath: relPath });
+      await git.remove({ fs, dir, cache, filepath: relPath });
       removes.push(relPath);
     } catch {
       // Not tracked and no longer on disk — nothing to do.
@@ -241,7 +275,8 @@ async function stageAll(
   modifies: string[],
   removes: string[],
 ): Promise<void> {
-  const matrix = await git.statusMatrix({ fs, dir });
+  const cache = getCache(fs);
+  const matrix = await git.statusMatrix({ fs, dir, cache });
   for (const row of matrix) {
     const [filepath, head, workdir, stage] = row;
     if (workdir === head && stage === head) {
@@ -249,13 +284,13 @@ async function stageAll(
     }
     if (workdir === 0) {
       try {
-        await git.remove({ fs, dir, filepath });
+        await git.remove({ fs, dir, cache, filepath });
         removes.push(filepath);
       } catch {
         // ignore
       }
     } else {
-      await git.add({ fs, dir, filepath });
+      await git.add({ fs, dir, cache, filepath });
       if (head === 0) {
         creates.push(filepath);
       } else {
@@ -336,6 +371,7 @@ export async function commitChanged(
   await git.commit({
     fs,
     dir,
+    cache: getCache(fs),
     author,
     message: formatMessage(creates, modifies, removes),
   });
@@ -356,6 +392,7 @@ async function getChangedPaths(
   await git.walk({
     fs,
     dir,
+    cache: getCache(fs),
     trees,
     map: async (filepath, entries) => {
       if (filepath === ".") return;
@@ -401,6 +438,7 @@ export async function getCommitHistory(
   const allCommits = await git.log({
     fs,
     dir,
+    cache: getCache(fs),
     depth: offset + limit,
   });
   const page = allCommits.slice(offset, offset + limit);
@@ -608,7 +646,8 @@ export async function getCommitDiff(
   dir: string,
   oid: string,
 ): Promise<FileDiff[]> {
-  const { commit } = await git.readCommit({ fs, dir, oid });
+  const cache = getCache(fs);
+  const { commit } = await git.readCommit({ fs, dir, cache, oid });
   const parentOid: string | undefined = commit.parent[0];
   const changedPaths = await getChangedPaths(fs, dir, oid, parentOid);
 
@@ -625,6 +664,7 @@ export async function getCommitDiff(
         const { blob } = await git.readBlob({
           fs,
           dir,
+          cache,
           oid: parentOid,
           filepath: cp.path,
         });
@@ -634,6 +674,7 @@ export async function getCommitDiff(
         const { blob } = await git.readBlob({
           fs,
           dir,
+          cache,
           oid,
           filepath: cp.path,
         });

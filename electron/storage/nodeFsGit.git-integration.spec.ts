@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import git from "isomorphic-git";
+import { execFileSync } from "node:child_process";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
@@ -135,5 +136,65 @@ describe("git helpers via NodeFsGit", () => {
       ([, head, workdir, stage]) => head !== workdir || head !== stage,
     );
     expect(dirty).toEqual([]);
+  });
+
+  /*
+    A repo the user also works on with command-line git ends up packed by
+    its automatic gc. isomorphic-git loads a whole packfile to read one
+    object from it, and without a cache it did that again on every save.
+  */
+  it("does not re-read the packfile on every save", async () => {
+    const slugs = ["a", "b", "c"];
+    for (const slug of slugs) {
+      await fs.writeFile(path.join(root, `${slug}.subtext`), "v1");
+    }
+    await ensureRepo(gitFs, "/", AUTHOR);
+    execFileSync("git", ["repack", "-adq"], { cwd: root });
+    execFileSync("git", ["prune-packed"], { cwd: root });
+
+    const save = async (slug: string): Promise<void> => {
+      await fs.writeFile(path.join(root, `${slug}.subtext`), "v2");
+      await commitChanged(
+        gitFs,
+        "/",
+        {
+          canonicalNoteSlugs: new Set([slug]),
+          aliases: new Set(),
+          arbitraryFiles: new Set(),
+          flushPins: false,
+        },
+        AUTHOR,
+      );
+    };
+
+    const readFile = gitFs.readFile.bind(gitFs);
+    let packReads = 0;
+    /*
+      Must be async: isomorphic-git calls readFile() without arguments to
+      tell a promise fs from a callback fs, and a synchronous throw makes
+      it wait for a callback that never comes.
+    */
+    gitFs.readFile = async (requestPath, options) => {
+      if (requestPath.endsWith(".pack")) packReads++;
+      return readFile(requestPath, options);
+    };
+
+    /*
+      The first save loads the pack, and loads it a second time while
+      HEAD is still packed: git.commit reads the parent commit with a
+      fresh cache of its own, whatever cache it is given.
+    */
+    await save("a");
+    packReads = 0;
+
+    await save("b");
+    await save("c");
+
+    expect(packReads).toBe(0);
+    const history = await getCommitHistory(gitFs, "/", {
+      limit: 10,
+      offset: 0,
+    });
+    expect(history[0].message.trim()).toBe("update: c");
   });
 });
