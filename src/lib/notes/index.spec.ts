@@ -1942,6 +1942,58 @@ describe("Notes module", () => {
     expect(note.aliases.has("main-slug")).toBe(true);
   });
 
+  it("should keep backlinks through aliases up to date", async () => {
+    const notesProvider = new NotesProvider(new MockStorageProvider());
+
+    const save = async (
+      slug: string,
+      content: string,
+      aliases: string[] = [],
+      isNew = false,
+    ) => {
+      await notesProvider.put({
+        note: {
+          content,
+          meta: isNew
+            ? { additionalHeaders: {}, flags: [] }
+            : { slug, additionalHeaders: {}, flags: [] },
+        },
+        ...(isNew ? { changeSlugTo: slug } : {}),
+        aliases: new Set(aliases),
+      } as NoteSaveRequest);
+    };
+    const backlinksOf = async (slug: string) => {
+      return (await notesProvider.get(slug)).backlinks
+        .map((backlink) => backlink.slug)
+        .sort();
+    };
+
+    await save("target", "", ["target-alias"], true);
+    await save("other", "", ["other-alias"], true);
+
+    // linking through an alias
+    await save("source", "/target-alias", [], true);
+    expect(await backlinksOf("target")).toEqual(["source"]);
+    expect(await backlinksOf("other")).toEqual([]);
+
+    // linking both directly and through an alias counts once
+    await save("source", "/target-alias /target");
+    expect(await backlinksOf("target")).toEqual(["source"]);
+
+    // moving the link to another note's alias
+    await save("source", "/other-alias");
+    expect(await backlinksOf("target")).toEqual([]);
+    expect(await backlinksOf("other")).toEqual(["source"]);
+
+    // the linked note is saved after the link to its alias exists
+    await save("other", "edited", ["other-alias"]);
+    expect(await backlinksOf("other")).toEqual(["source"]);
+
+    // removing the link
+    await save("source", "no links");
+    expect(await backlinksOf("other")).toEqual([]);
+  });
+
   it(
     "should fail when adding a slug of an existing note as alias to a new note",
     async () => {

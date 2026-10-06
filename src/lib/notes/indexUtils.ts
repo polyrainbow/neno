@@ -43,28 +43,32 @@ const updateBacklinksIndex = (
 
   const ourAliases = getAliasesOfSlug(graph, ourSlug);
 
+  /*
+    The notes we link to, directly or through one of their aliases.
+    Resolved once up front: looking up the aliases of every note in the
+    loop below scans all aliases each time, which made every save
+    O(notes × aliases).
+  */
+  const ourLinkTargets = new Set<Slug>(ourOutgoingLinks);
+  for (const outgoingLink of ourOutgoingLinks) {
+    const canonicalSlug = graph.aliases.get(outgoingLink);
+    if (canonicalSlug !== undefined) {
+      ourLinkTargets.add(canonicalSlug);
+    }
+  }
+
   for (const someExistingSlug of graph.notes.keys()) {
     if (someExistingSlug === ourSlug) {
       continue;
     }
 
     // Refresh their backlinks with our outgoing links
-    if (ourOutgoingLinks.includes(someExistingSlug)) {
+    if (ourLinkTargets.has(someExistingSlug)) {
       (graph.indexes.backlinks.get(someExistingSlug) as Set<Slug>)
         .add(ourSlug);
     } else {
       (graph.indexes.backlinks.get(someExistingSlug) as Set<Slug>)
         .delete(ourSlug);
-    }
-
-    // Refresh their backlinks with our mentioning of their aliases
-    const aliasesOfSomeExistingSlug = getAliasesOfSlug(graph, someExistingSlug);
-
-    if (ourOutgoingLinks.some((outgoingLink) => {
-      return aliasesOfSomeExistingSlug.has(outgoingLink);
-    })) {
-      (graph.indexes.backlinks.get(someExistingSlug) as Set<Slug>)
-        .add(ourSlug);
     }
 
     // let's fill our note's backlinks with the outgoing links of the
