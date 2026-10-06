@@ -26,8 +26,12 @@ on:
 permissions:
   contents: read
 
+# Pull request runs are grouped by PR number, not by ref: a run that
+# starts after its PR is merged sees github.ref fall back to
+# refs/heads/main, and would otherwise cancel main's push run.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: >-
+    ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
