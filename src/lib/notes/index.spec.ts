@@ -2562,4 +2562,83 @@ describe("Notes module", () => {
       Array.from(changes[1].canonicalNoteSlugs as Set<string>),
     ).toEqual(["first"]);
   });
+
+  it("flushes a rename with updated references at once", async () => {
+    const changes: Array<{ canonicalNoteSlugs: unknown; flushPins: boolean }>
+      = [];
+    const notesProvider = new NotesProvider(new MockStorageProvider(), {
+      onFlush: async (c) => {
+        changes.push(c);
+      },
+    });
+
+    const create = async (slug: string, content: string) => {
+      await notesProvider.put({
+        note: { content, meta: { additionalHeaders: {}, flags: [] } },
+        changeSlugTo: slug,
+        aliases: new Set(),
+      });
+    };
+    await create("target", "Target");
+    await create("ref-1", "Links to /target");
+    await create("ref-2", "Links to [[target]]");
+    await create("unrelated", "Nothing to see");
+    await notesProvider.pin("target");
+    changes.length = 0;
+
+    await notesProvider.put({
+      note: {
+        content: "Target",
+        meta: { slug: "target", additionalHeaders: {}, flags: [] },
+      },
+      changeSlugTo: "renamed",
+      updateReferences: true,
+      aliases: new Set(),
+    });
+
+    expect(changes.length).toBe(1);
+    expect(
+      Array.from(changes[0].canonicalNoteSlugs as Set<string>).sort(),
+    ).toEqual(["ref-1", "ref-2", "renamed", "target"]);
+    expect(changes[0].flushPins).toBe(true);
+
+    expect((await notesProvider.get("ref-1")).content)
+      .toBe("Links to /renamed");
+    expect((await notesProvider.get("ref-2")).content)
+      .toBe("Links to [[renamed]]");
+    await expect(notesProvider.get("target")).rejects.toThrow();
+  });
+
+  it("removes the old file first on a case-only rename", async () => {
+    const changes: Array<{ canonicalNoteSlugs: unknown }> = [];
+    const notesProvider = new NotesProvider(new MockStorageProvider(), {
+      onFlush: async (c) => {
+        changes.push(c);
+      },
+    });
+
+    await notesProvider.put({
+      note: {
+        content: "Berlin",
+        meta: { additionalHeaders: {}, flags: [] },
+      },
+      changeSlugTo: "berlin",
+      aliases: new Set(),
+    });
+    changes.length = 0;
+
+    await notesProvider.put({
+      note: {
+        content: "Berlin",
+        meta: { slug: "berlin", additionalHeaders: {}, flags: [] },
+      },
+      changeSlugTo: "Berlin",
+      aliases: new Set(),
+    });
+
+    expect(changes.map(
+      (c) => Array.from(c.canonicalNoteSlugs as Set<string>),
+    )).toEqual([["berlin"], ["Berlin"]]);
+    expect((await notesProvider.get("Berlin")).meta.slug).toBe("Berlin");
+  });
 });
