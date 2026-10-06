@@ -158,12 +158,15 @@ const restoreSigil = (licNode: ListItemContentNode) => {
       new ListItemSigilNode(licNode.getTextContent()),
     );
 
-    if (savedOffset !== null && $isRangeSelection(selection)) {
+    if (savedOffset !== null) {
       // Transfer cursor position onto the new sigil node.
       // The normalization transform will later re-split the sigil and
       // move the cursor into the content portion.
-      selection.anchor.set(sigilNode.getKey(), savedOffset, "text");
-      selection.focus.set(sigilNode.getKey(), savedOffset, "text");
+      // replace() installs a clone of the active selection, so the
+      // `selection` captured above is stale by now and changing it would
+      // leave the cursor on the removed content node. select() works on
+      // the current selection.
+      sigilNode.select(savedOffset, savedOffset);
     } else {
       /*
         This branch handles the case when a list item is moved to another line

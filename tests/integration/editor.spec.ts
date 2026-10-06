@@ -1113,6 +1113,36 @@ test.describe("Editor view", () => {
   );
 
 
+  test(
+    "Deleting the selected list item sigil should remove it",
+    async ({ page }) => {
+      await page.keyboard.type("- foo");
+
+      const sigil = page.locator(".list-item-sigil");
+      const box = await sigil.boundingBox();
+      if (!box) throw new Error("List item sigil not rendered");
+      const y = box.y + box.height / 2;
+      await page.mouse.move(box.x + 1, y);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width - 0.5, y, { steps: 5 });
+      await page.mouse.up();
+      await page.keyboard.press("Backspace", { delay: 100 });
+
+      const editorParagraphsLocator = page.locator(
+        "div[data-lexical-editor] .editor-paragraph",
+      );
+
+      await expect(editorParagraphsLocator).toHaveCount(1);
+      const paragraph = editorParagraphsLocator.nth(0);
+      await expect(paragraph).toHaveText("foo");
+      await expect(paragraph).toHaveClass("editor-paragraph");
+
+      await page.keyboard.type("x");
+      await expect(paragraph).toHaveText("xfoo");
+    },
+  );
+
+
   // Testing this bugfix:
   // https://github.com/facebook/lexical/issues/7789
   // https://github.com/facebook/lexical/pull/7794
