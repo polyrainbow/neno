@@ -55,6 +55,7 @@ const getMediaTypeFromFilename = (
     "c": MediaType.TEXT,
     "cpp": MediaType.TEXT,
     "rs": MediaType.TEXT,
+    "sh": MediaType.TEXT,
     "txt": MediaType.TEXT,
     "md": MediaType.TEXT,
     "markdown": MediaType.TEXT,
