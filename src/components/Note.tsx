@@ -191,7 +191,14 @@ const Note = ({
             );
             promisesToWaitFor.push(fileUploadPromise);
           }
-        } else {
+        } else if (item.type === "text/plain") {
+          /*
+            Only the plain-text flavor is inserted. A drag carries the
+            same payload in several string flavors (text/uri-list,
+            text/html), and the browser can add private ones of its
+            own. Inserting every string item put those next to the
+            wikilink of a dropped pinned note.
+          */
           const stringTransformPromise = new Promise<string>((resolve) => {
             item.getAsString((val) => {
               resolve(val);
