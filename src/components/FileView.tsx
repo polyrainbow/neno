@@ -34,6 +34,10 @@ import HeaderButton from "./HeaderButton";
 import FileViewRenameForm from "./FileViewRenameForm";
 import { Slug } from "../lib/notes/types/Slug";
 import NavigationRail from "./NavigationRail";
+import {
+  copyImageToClipboard,
+  copyTextToClipboard,
+} from "../lib/clipboard";
 
 interface FileViewProps {
   slug: Slug,
@@ -48,6 +52,7 @@ const FileView = ({
   // status can be READY, BUSY
   const [notes, setNotes] = useState<NoteListItem[] | null>(null);
   const [text, setText] = useState<string>("");
+  const [copied, setCopied] = useState(false);
 
   const type = fileInfo
     ? getMediaTypeFromFilename(fileInfo.filename)
@@ -56,6 +61,8 @@ const FileView = ({
   const confirm = useConfirm();
 
   const canShowTextPreview = type === MediaType.TEXT;
+  const canCopyToClipboard = type === MediaType.IMAGE
+    || type === MediaType.TEXT;
   const isNenoScript = slug?.endsWith(NENO_SCRIPT_FILE_SUFFIX) ?? false;
 
   useEffect(() => {
@@ -113,6 +120,14 @@ const FileView = ({
     };
   }, [fileInfo]);
 
+  useEffect(() => {
+    if (!copied) return;
+    const timeout = setTimeout(() => setCopied(false), 1500);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [copied]);
+
   const canShowPreview = type !== MediaType.OTHER;
 
   return <div className="view">
@@ -163,6 +178,30 @@ const FileView = ({
           >
             {l("files.save-duplicate")}
           </HeaderButton>
+          {
+            canCopyToClipboard
+              ? <HeaderButton
+                icon={copied ? "done" : "content_copy"}
+                disabled={!objectUrl}
+                onClick={async () => {
+                  if (!objectUrl) return;
+
+                  if (type === MediaType.IMAGE) {
+                    await copyImageToClipboard(objectUrl);
+                  } else {
+                    await copyTextToClipboard(text);
+                  }
+                  setCopied(true);
+                }}
+              >
+                {
+                  copied
+                    ? l("files.copy-to-clipboard.copied")
+                    : l("files.copy-to-clipboard")
+                }
+              </HeaderButton>
+              : ""
+          }
           {
             isNenoScript
               ? <HeaderButton

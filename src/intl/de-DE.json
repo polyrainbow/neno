@@ -55,6 +55,8 @@
   "editor.upload-in-progress": "Dateien werden hochgeladen",
   "files.confirm-delete": "Möchtest du diese Datei wirklich löschen? Das kann nicht rückgängig gemacht werden.",
   "files.confirm-delete.confirm": "Datei löschen",
+  "files.copy-to-clipboard": "In die Zwischenablage kopieren",
+  "files.copy-to-clipboard.copied": "Kopiert",
   "files.create-note-with-file": "Notiz mit dieser Datei erstellen",
   "files.create-script": "Skript erstellen",
   "files.create-script.create": "Erstellen",

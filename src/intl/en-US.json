@@ -55,6 +55,8 @@
   "editor.upload-in-progress": "Upload in progress",
   "files.confirm-delete": "Do you really want to delete this file? This action cannot be undone.",
   "files.confirm-delete.confirm": "Delete file",
+  "files.copy-to-clipboard": "Copy to clipboard",
+  "files.copy-to-clipboard.copied": "Copied",
   "files.create-note-with-file": "Create note with file",
   "files.create-script": "Create script",
   "files.create-script.create": "Create",
