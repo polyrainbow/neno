@@ -29,7 +29,12 @@ const KEY_COMBINATIONS = {
   SELECT_ALL: isMac ? "Meta+A" : "Control+A",
   COPY: isMac ? "Meta+KeyC" : "Control+KeyC",
   PASTE: isMac ? "Meta+KeyV" : "Control+KeyV",
-  SAVE: isMac ? "Meta+S" : "Control+KeyS",
+  /*
+    The combinations above are the browser's own editing commands, which
+    follow the real OS. App shortcuts follow the platform the page reports,
+    and the "Desktop Chrome" device reports Windows everywhere.
+  */
+  SAVE: "Control+KeyS",
 };
 
 test.beforeEach(async ({ page }) => {
@@ -1196,6 +1201,8 @@ bar`);
       );
 
       await expect(editorParagraphsLocator).toHaveText("foobar");
+      // The note has really been saved.
+      await expect(page).toHaveURL(/\/note\/foo$/);
     },
   );
 
@@ -1452,6 +1459,59 @@ bar`);
 
       await expect(sigil).toHaveText("- ");
       await expect(content).toHaveText("1 1");
+    },
+  );
+
+
+  test(
+    "saving should keep the scroll position of the note",
+    async ({ page }) => {
+      const lines = Array.from({ length: 80 }, (_, i) => `Line ${i}`);
+      await page.keyboard.type(["# Long note", ...lines].join("\n"));
+      const noteSection = page.locator("section.note");
+      const scrollUp = () => noteSection.evaluate((el) => {
+        el.scrollTop = 600;
+      });
+      const getScrollTop = () => noteSection.evaluate((el) => el.scrollTop);
+
+      // The first save gives the note its slug.
+      await scrollUp();
+      await page.keyboard.press(KEY_COMBINATIONS.SAVE);
+      await page.getByLabel("No unsaved changes").waitFor();
+      await expect(page).toHaveURL(/\/note\/long-note$/);
+      expect(await getScrollTop()).toBe(600);
+
+      await page.keyboard.type("!");
+      await scrollUp();
+      await page.keyboard.press(KEY_COMBINATIONS.SAVE);
+      await page.getByLabel("No unsaved changes").waitFor();
+      expect(await getScrollTop()).toBe(600);
+
+      // Opening another note still starts at its top.
+      await page.click("#button_duplicate");
+      await expect(page).not.toHaveURL(/\/note\/long-note$/);
+      await expect.poll(getScrollTop).toBe(0);
+    },
+  );
+
+
+  test(
+    "saving should keep the scroll position of a narrow window",
+    async ({ page }) => {
+      // Below this width the note list is hidden and the document scrolls.
+      await page.setViewportSize({ width: 1200, height: 800 });
+      const lines = Array.from({ length: 80 }, (_, i) => `Line ${i}`);
+      await page.keyboard.type(["# Long note", ...lines].join("\n"));
+      await page.evaluate(() => {
+        document.scrollingElement!.scrollTop = 600;
+      });
+      // Clicking the save button would scroll it into view.
+      await page.keyboard.press(KEY_COMBINATIONS.SAVE);
+      await page.getByLabel("No unsaved changes").waitFor();
+      await expect(page).toHaveURL(/\/note\/long-note$/);
+      expect(
+        await page.evaluate(() => document.scrollingElement!.scrollTop),
+      ).toBe(600);
     },
   );
 });

@@ -1,3 +1,5 @@
+import type { NavigationInfo } from "./navigation";
+
 interface UnparsedRoute {
   path: string,
   id: string,
@@ -58,9 +60,11 @@ export const initRouter = ({
       if (!activeRoute) {
         return;
       }
+      const info = event.info as NavigationInfo | undefined;
       // @ts-ignore
       event.intercept({
         focusReset: "manual",
+        scroll: info?.keepScrollPosition ? "manual" : "after-transition",
       });
       callback(activeRoute);
     } else {

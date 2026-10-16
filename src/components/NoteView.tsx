@@ -112,6 +112,7 @@ const NoteView = ({ slug }: NoteViewProps) => {
       noteFromDatabase.meta.slug,
       {
         replace: true,
+        keepScrollPosition: true,
       },
     );
 

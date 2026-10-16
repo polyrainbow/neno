@@ -254,11 +254,24 @@ const Note = ({
     })();
   };
 
+  /*
+    Saving a note for the first time gives it a slug, and so does renaming
+    it, but in both cases the user is still writing the same note, so the
+    scroll position must stay. Only a slug change that comes with a new
+    editor instance means another note is now in front of the user.
+  */
+  const scrollResetEditorInstanceId = useRef<number>(editorInstanceId);
   useEffect(() => {
-    if (noteElement.current) {
+    if (
+      noteElement.current
+      && editorInstanceId !== scrollResetEditorInstanceId.current
+    ) {
       noteElement.current.scrollTop = 0;
     }
   }, ["slug" in note ? note.slug : ""]);
+  useEffect(() => {
+    scrollResetEditorInstanceId.current = editorInstanceId;
+  }, [editorInstanceId]);
 
 
   return <>
