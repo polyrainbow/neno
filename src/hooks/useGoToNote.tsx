@@ -7,6 +7,7 @@ import { navigateTo } from "../lib/navigation";
 interface Params {
   replace?: boolean,
   contentIfNewNote?: string,
+  keepScrollPosition?: boolean,
 }
 
 const useGoToNote = () => {
@@ -26,6 +27,9 @@ const useGoToNote = () => {
       history: params?.replace ? "replace" : "push",
       state: {
         contentIfNewNote: params?.contentIfNewNote,
+      },
+      info: {
+        keepScrollPosition: params?.keepScrollPosition,
       },
     });
   };

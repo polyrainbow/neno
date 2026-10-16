@@ -1461,4 +1461,57 @@ bar`);
       await expect(content).toHaveText("1 1");
     },
   );
+
+
+  test(
+    "saving should keep the scroll position of the note",
+    async ({ page }) => {
+      const lines = Array.from({ length: 80 }, (_, i) => `Line ${i}`);
+      await page.keyboard.type(["# Long note", ...lines].join("\n"));
+      const noteSection = page.locator("section.note");
+      const scrollUp = () => noteSection.evaluate((el) => {
+        el.scrollTop = 600;
+      });
+      const getScrollTop = () => noteSection.evaluate((el) => el.scrollTop);
+
+      // The first save gives the note its slug.
+      await scrollUp();
+      await page.keyboard.press(KEY_COMBINATIONS.SAVE);
+      await page.getByLabel("No unsaved changes").waitFor();
+      await expect(page).toHaveURL(/\/note\/long-note$/);
+      expect(await getScrollTop()).toBe(600);
+
+      await page.keyboard.type("!");
+      await scrollUp();
+      await page.keyboard.press(KEY_COMBINATIONS.SAVE);
+      await page.getByLabel("No unsaved changes").waitFor();
+      expect(await getScrollTop()).toBe(600);
+
+      // Opening another note still starts at its top.
+      await page.click("#button_duplicate");
+      await expect(page).not.toHaveURL(/\/note\/long-note$/);
+      await expect.poll(getScrollTop).toBe(0);
+    },
+  );
+
+
+  test(
+    "saving should keep the scroll position of a narrow window",
+    async ({ page }) => {
+      // Below this width the note list is hidden and the document scrolls.
+      await page.setViewportSize({ width: 1200, height: 800 });
+      const lines = Array.from({ length: 80 }, (_, i) => `Line ${i}`);
+      await page.keyboard.type(["# Long note", ...lines].join("\n"));
+      await page.evaluate(() => {
+        document.scrollingElement!.scrollTop = 600;
+      });
+      // Clicking the save button would scroll it into view.
+      await page.keyboard.press(KEY_COMBINATIONS.SAVE);
+      await page.getByLabel("No unsaved changes").waitFor();
+      await expect(page).toHaveURL(/\/note\/long-note$/);
+      expect(
+        await page.evaluate(() => document.scrollingElement!.scrollTop),
+      ).toBe(600);
+    },
+  );
 });

@@ -2,9 +2,23 @@
 // (Chromium-only; not yet in lib.dom.d.ts). Confines the unavoidable
 // @ts-ignore for the global to this module so call sites stay typed.
 
+/*
+  Travels with a navigation as its `info` and reaches the router's
+  navigate listener, unlike `state`, which is stored on the history entry.
+*/
+export interface NavigationInfo {
+  /*
+    The Navigation API scrolls the document to the top after an
+    intercepted push or replace. Saving a note navigates to its URL, but
+    the user stays where they were, so a save opts out.
+  */
+  keepScrollPosition?: boolean;
+}
+
 interface NavigateOptions {
   history?: "push" | "replace";
   state?: unknown;
+  info?: NavigationInfo;
 }
 
 interface NavigationResult {
