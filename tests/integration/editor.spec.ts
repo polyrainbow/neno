@@ -29,7 +29,12 @@ const KEY_COMBINATIONS = {
   SELECT_ALL: isMac ? "Meta+A" : "Control+A",
   COPY: isMac ? "Meta+KeyC" : "Control+KeyC",
   PASTE: isMac ? "Meta+KeyV" : "Control+KeyV",
-  SAVE: isMac ? "Meta+S" : "Control+KeyS",
+  /*
+    The combinations above are the browser's own editing commands, which
+    follow the real OS. App shortcuts follow the platform the page reports,
+    and the "Desktop Chrome" device reports Windows everywhere.
+  */
+  SAVE: "Control+KeyS",
 };
 
 test.beforeEach(async ({ page }) => {
@@ -1196,6 +1201,8 @@ bar`);
       );
 
       await expect(editorParagraphsLocator).toHaveText("foobar");
+      // The note has really been saved.
+      await expect(page).toHaveURL(/\/note\/foo$/);
     },
   );
 
