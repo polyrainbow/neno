@@ -11,6 +11,7 @@ import { isInitialized } from "../lib/LocalDataStorage";
 import { LOCAL_GRAPH_ID } from "../config";
 import useGitEnabled from "../hooks/useGitEnabled";
 import { navigateTo } from "../lib/navigation";
+import SyncStatusIndicator from "./SyncStatusIndicator";
 
 interface NavigationRailProps {
   activeView: string,
@@ -27,6 +28,21 @@ const NavigationRail = ({
   const confirmDiscardingUnsavedChanges
     = useConfirmDiscardingUnsavedChangesDialog();
   const gitEnabled = useGitEnabled();
+
+  const openSettings = async () => {
+    const target = getAppPath(
+      PathTemplate.SETTINGS,
+      new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
+    );
+    if (pathname === target) return;
+
+    if (unsavedChanges) {
+      await confirmDiscardingUnsavedChanges();
+      setUnsavedChanges(false);
+    }
+
+    navigateTo(target);
+  };
 
   return <div className="navigation-rail">
     <NavigationRailItem
@@ -158,21 +174,9 @@ const NavigationRail = ({
       disabled={false}
       label={l("menu.settings")}
       icon="settings"
-      onClick={async () => {
-        const target = getAppPath(
-          PathTemplate.SETTINGS,
-          new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-        );
-        if (pathname === target) return;
-
-        if (unsavedChanges) {
-          await confirmDiscardingUnsavedChanges();
-          setUnsavedChanges(false);
-        }
-
-        navigateTo(target);
-      }}
+      onClick={openSettings}
     />
+    {gitEnabled && <SyncStatusIndicator onClick={openSettings} />}
   </div>;
 };
 

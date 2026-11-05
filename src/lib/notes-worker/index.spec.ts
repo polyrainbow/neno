@@ -8,10 +8,10 @@ import {
   SharedWorker. Script workers still attach extra MessagePorts via the
   `addPort` action, and those are exercised here too.
 
-  Heavy dependencies (NotesProvider, FileSystemAccessAPIStorageProvider,
-  FileSystemAccessFs, git) are mocked because they need a real
-  FileSystemDirectoryHandle and isomorphic-git's node-fs adapter,
-  neither of which is available in jsdom.
+  Heavy dependencies (NotesProvider, FileSystemAccessAPIStorageProvider)
+  are mocked because they need a real FileSystemDirectoryHandle, which
+  jsdom does not have. GitClient is mocked because it would ask the
+  Electron main process — absent here — whether the folder has a repo.
 */
 
 vi.mock("../FileSystemAccessAPIStorageProvider", () => ({
@@ -21,25 +21,19 @@ vi.mock("../FileSystemAccessAPIStorageProvider", () => ({
   },
 }));
 
+vi.mock("../electron/GitClient", () => ({
+  default: class {
+    async hasRepo() { return false; }
+    async setAuthor() { /* noop */ }
+  },
+}));
+
 vi.mock("../notes", () => ({
   default: class {
     async put() { return { meta: { slug: "x" } }; }
   },
 }));
 
-vi.mock("./FileSystemAccessFs", () => ({
-  default: class {
-    constructor() { /* noop */ }
-  },
-}));
-
-vi.mock("./git", () => ({
-  hasExistingRepo: async () => false,
-  ensureRepo: async () => { /* noop */ },
-  commitChanged: async () => { /* noop */ },
-  getCommitHistory: async () => [],
-  getCommitDiff: async () => [],
-}));
 
 
 type WorkerHarness = {

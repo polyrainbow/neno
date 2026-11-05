@@ -1,29 +1,24 @@
-import { Buffer } from "buffer";
 import FileSystemAccessAPIStorageProvider
   from "../FileSystemAccessAPIStorageProvider";
 import NotesProvider from "../notes";
 import StorageProvider from "../notes/types/StorageProvider";
-import FileSystemAccessFs from "./FileSystemAccessFs";
-import { GitFs } from "./GitFs";
+import { Slug } from "../notes/types/Slug";
 import BridgeClient from "../electron/BridgeClient";
 import StorageProviderProxy from "../electron/StorageProviderProxy";
-import GitFsProxy from "../electron/GitFsProxy";
+import GitClient from "../electron/GitClient";
 import {
-  commitChanged,
-  ensureRepo,
-  getCommitDiff,
-  getCommitHistory,
+  CommitHistoryOptions,
+  FlushChanges,
   GitAuthor,
-  hasExistingRepo,
-} from "./git";
-
-// isomorphic-git uses Node's Buffer internally; make it available
-// to the worker's global scope.
-(globalThis as { Buffer?: typeof Buffer }).Buffer = Buffer;
+} from "../git/types";
 
 let notesProvider: NotesProvider | null = null;
-let gitFs: GitFs | null = null;
-let createGitFs: (() => GitFs) | null = null;
+/*
+  git runs in the Electron main process, so it exists only in the
+  desktop app: the OPFS "try it out" mode has no repository.
+*/
+let gitClient: GitClient | null = null;
+let gitEnabled = false;
 let folderName: string | null = null;
 let folderPath: string | null = null;
 let usingOPFS = false;
@@ -120,6 +115,21 @@ function broadcast(
   }
 }
 
+function toFlushChanges(change: {
+  canonicalNoteSlugs: Set<Slug> | "all";
+  aliases: Set<Slug> | "all";
+  arbitraryFiles: Set<Slug> | "all";
+  flushPins: boolean;
+}): FlushChanges {
+  const list = (set: Set<Slug> | "all") => set === "all" ? "all" : [...set];
+  return {
+    canonicalNoteSlugs: list(change.canonicalNoteSlugs),
+    aliases: list(change.aliases),
+    arbitraryFiles: list(change.arbitraryFiles),
+    flushPins: change.flushPins,
+  };
+}
+
 function getBasename(folderPath: string): string {
   const segments = folderPath
     .split("/")
@@ -134,7 +144,7 @@ async function runInitialize(
   let storageProvider: StorageProvider;
 
   /*
-    Two provider pairs: the Node fs implementations in the Electron main
+    Two providers: the Node fs implementation in the Electron main
     process, reached over a MessagePort, and the File System Access API
     provider used for the OPFS "try it out" mode.
   */
@@ -143,12 +153,18 @@ async function runInitialize(
       throw new Error("No storage port transferred with folderPath");
     }
     /*
-      One client for both proxies: they share a single port, so they must
-      also share the request id sequence.
+      One client for storage and git: they share a single port, so they
+      must also share the request id sequence.
     */
     const bridgeClient = new BridgeClient(storagePort);
     storageProvider = new StorageProviderProxy(bridgeClient);
-    createGitFs = () => new GitFsProxy(bridgeClient);
+    gitClient = new GitClient(bridgeClient);
+    bridgeClient.onEvent(async (event) => {
+      if (event.event !== "pathsChanged" || !notesProvider) return;
+      await notesProvider.reloadPaths(event.paths);
+      // The open note reloads itself, or offers to, on this.
+      broadcast({ event: "mutation" });
+    });
     folderPath = opts.folderPath;
     folderName = getBasename(opts.folderPath);
     usingOPFS = false;
@@ -166,7 +182,6 @@ async function runInitialize(
     }
 
     storageProvider = new FileSystemAccessAPIStorageProvider(dirHandle);
-    createGitFs = () => new FileSystemAccessFs(dirHandle);
     folderName = dirHandle.name;
   }
 
@@ -183,16 +198,13 @@ async function runInitialize(
     gitAuthor = opts.gitAuthor;
   }
 
-  const candidateGitFs = createGitFs();
-  if (await hasExistingRepo(candidateGitFs, "/")) {
-    await ensureRepo(candidateGitFs, "/", gitAuthor);
-    gitFs = candidateGitFs;
-  }
+  gitEnabled = gitClient !== null && await gitClient.hasRepo();
+  await gitClient?.setAuthor(gitAuthor);
 
   notesProvider = new NotesProvider(storageProvider, {
     onFlush: async (change) => {
-      if (!gitFs) return;
-      await commitChanged(gitFs, "/", change, gitAuthor);
+      if (!gitEnabled || !gitClient) return;
+      await gitClient.commit(toFlushChanges(change), gitAuthor);
     },
   });
 }
@@ -213,8 +225,8 @@ async function ensureInitialized(
 
 function tearDown(): void {
   notesProvider = null;
-  gitFs = null;
-  createGitFs = null;
+  gitClient = null;
+  gitEnabled = false;
   folderName = null;
   folderPath = null;
   usingOPFS = false;
@@ -233,30 +245,15 @@ async function handleRPCCall(
     port.postMessage(data, transfer ?? []);
   };
 
-  if (method === "getCommitHistory") {
-    if (!gitFs) {
+  if (method === "getCommitHistory" || method === "getCommitDiff") {
+    if (!gitEnabled || !gitClient) {
       respond({ id, error: "Git not initialized" });
       return;
     }
     try {
-      const [options] = args as [{ limit: number; offset: number }];
-      const result = await getCommitHistory(gitFs, "/", options);
-      respond({ id, result });
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e);
-      respond({ id, error: message });
-    }
-    return;
-  }
-
-  if (method === "getCommitDiff") {
-    if (!gitFs) {
-      respond({ id, error: "Git not initialized" });
-      return;
-    }
-    try {
-      const [oid] = args as [string];
-      const result = await getCommitDiff(gitFs, "/", oid);
+      const result = method === "getCommitHistory"
+        ? await gitClient.log(args[0] as CommitHistoryOptions)
+        : await gitClient.diff(args[0] as string);
       respond({ id, result });
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
@@ -329,7 +326,7 @@ async function handleAction(
     port.postMessage({
       action: "helloAck",
       initialized: notesProvider !== null,
-      gitEnabled: gitFs !== null,
+      gitEnabled,
       folderName,
       folderPath,
       usingOPFS,
@@ -351,7 +348,7 @@ async function handleAction(
       );
       port.postMessage({
         action: "initialized",
-        gitEnabled: gitFs !== null,
+        gitEnabled,
         folderName,
         folderPath,
         usingOPFS,
@@ -373,25 +370,25 @@ async function handleAction(
 
   if (action.action === "setGitAuthor") {
     gitAuthor = action.author;
+    await gitClient?.setAuthor(gitAuthor);
     return;
   }
 
   if (action.action === "enableGit") {
-    if (gitFs) {
+    if (gitEnabled) {
       port.postMessage({ action: "gitEnabled" });
       return;
     }
-    if (!createGitFs) {
+    if (!gitClient) {
       port.postMessage({
         action: "gitEnableFailed",
-        error: "Worker not initialized",
+        error: "Version history is only available in the desktop app",
       });
       return;
     }
-    const candidateGitFs = createGitFs();
     try {
-      await ensureRepo(candidateGitFs, "/", gitAuthor);
-      gitFs = candidateGitFs;
+      await gitClient.init(gitAuthor);
+      gitEnabled = true;
       port.postMessage({ action: "gitEnabled" });
       broadcast({ event: "gitEnabled" }, port);
     } catch (e) {

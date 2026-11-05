@@ -90,6 +90,15 @@ export default class NotesProvider {
   }
 
 
+  /*
+    Re-reads these files — paths relative to the graph folder — after
+    they changed on disk without NENO, e.g. in a pull.
+  */
+  async reloadPaths(paths: string[]): Promise<void> {
+    await this.#io.reloadPaths(paths);
+  }
+
+
   async get(
     slug: Slug,
     options?: {

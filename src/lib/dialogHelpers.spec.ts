@@ -37,6 +37,12 @@ const makeBridge = (overrides: Partial<NenoBridge> = {}) => {
     setUnsavedChanges: async () => undefined,
     onFindCommand: () => () => undefined,
     onHistoryCommand: () => () => undefined,
+    getSyncStatus: async () => null,
+    setAutoSync: async () => {
+      throw new Error("not in this test");
+    },
+    syncNow: async () => undefined,
+    onSyncStatus: () => () => undefined,
     ...overrides,
   };
 

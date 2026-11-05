@@ -7,9 +7,14 @@
   `src/lib/notes-worker/NotesProviderProxy.ts` uses to talk to the notes
   worker: `{ id, method, args }` in, `{ id, result | error }` out.
   Method names are namespaced (`storage.…`, `git.…`) because a single
-  MessagePort carries both the StorageProvider and the isomorphic-git
-  file system.
+  MessagePort carries both the StorageProvider and the repository
+  operations, which run the system git in the main process.
+
+  Main also speaks first on the same port, with `BridgeEvent`s that
+  carry no id.
 */
+
+import { SyncStatus } from "../git/types";
 
 export type BridgeRequest = {
   id: number;
@@ -22,8 +27,17 @@ export type BridgeResponse = {
   result?: unknown;
   /** Human-readable message; presence of this field marks a failure. */
   error?: string;
-  /** POSIX error code (ENOENT, EEXIST, …). isomorphic-git branches on it. */
+  /** POSIX error code (ENOENT, EEXIST, …). */
   errorCode?: string;
+};
+
+/*
+  Main → notes worker, unprompted: a pull changed these paths in the
+  working tree, so the in-memory graph has to re-read them.
+*/
+export type BridgeEvent = {
+  event: "pathsChanged";
+  paths: string[];
 };
 
 /*
@@ -103,6 +117,14 @@ export interface NenoBridge {
   onFindCommand(listener: (command: FindCommand) => void): () => void;
   /** Subscribes to the Go menu's back/forward items. Returns an unsubscribe. */
   onHistoryCommand(listener: (command: HistoryCommand) => void): () => void;
+  /** Auto-sync of the open folder's repository with its remote. */
+  getSyncStatus(): Promise<SyncStatus | null>;
+  /** Rejects with the reason when sync cannot be switched on. */
+  setAutoSync(enabled: boolean): Promise<SyncStatus>;
+  /** Pull and push now — e.g. because the network just came back. */
+  syncNow(): Promise<void>;
+  /** Null when the open folder has no usable git (or no folder is open). */
+  onSyncStatus(listener: (status: SyncStatus | null) => void): () => void;
 }
 
 /** Message the preload uses to hand the storage MessagePort to the page. */
@@ -127,3 +149,6 @@ export type HistoryCommand = "back" | "forward";
 
 /** Main → renderer: a back/forward command from the Go menu. */
 export const HISTORY_COMMAND_MESSAGE = "neno:history-command";
+
+/** Main → renderer: the open folder's sync status changed. */
+export const SYNC_STATUS_MESSAGE = "neno:sync-status";

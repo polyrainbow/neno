@@ -198,5 +198,18 @@
   "stats.metadata.total-storage-size": "Total storage size",
   "stats.metadata.updated-at": "Updated at",
   "stats.number-of-notes": "Number of notes",
-  "stats.unlinked-notes": "Unlinked notes"
+  "stats.unlinked-notes": "Unlinked notes",
+  "sync.description": "Push every commit to the repository's remote as soon as it is made, and bring in what other machines pushed. If both sides changed the same lines, the newer change wins; the older one can still be recovered with git.",
+  "sync.enable": "Sync automatically with {remote}",
+  "sync.enable-failed": "Could not switch on auto-sync: {message}",
+  "sync.git-missing": "Git is not installed. Install Apple's Command Line Tools (xcode-select --install) and restart NENO.",
+  "sync.heading": "Auto-sync",
+  "sync.last-synced": "last synced {time}",
+  "sync.no-remote": "This repository has no remote. Add one on the command line (git remote add origin …) to sync it.",
+  "sync.state.error": "Sync needs attention",
+  "sync.state.offline": "Offline · commits waiting: {count}",
+  "sync.state.synced": "Synced",
+  "sync.state.syncing": "Syncing…",
+  "sync.state.waiting": "Commits waiting: {count}",
+  "sync.sync-now": "Sync now"
 }

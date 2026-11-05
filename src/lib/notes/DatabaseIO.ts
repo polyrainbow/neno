@@ -31,6 +31,7 @@ import {
 } from "./slugUtils.js";
 import { FileInfo } from "./types/FileInfo.js";
 import { CanonicalNoteHeader } from "./types/CanonicalNoteHeader.js";
+import { removeSlugFromIndexes, updateIndexes } from "./indexUtils.js";
 
 export type FlushCallback = (change: {
   canonicalNoteSlugs: Set<Slug> | "all";
@@ -38,6 +39,11 @@ export type FlushCallback = (change: {
   arbitraryFiles: Set<Slug> | "all";
   flushPins: boolean;
 }) => Promise<void>;
+
+type ParsedGraphFile
+  = { kind: "alias"; target: Slug }
+  | { kind: "file"; fileInfo: FileInfo }
+  | { kind: "note"; note: ExistingNote };
 
 export default class DatabaseIO {
   #storageProvider: StorageProvider;
@@ -47,6 +53,11 @@ export default class DatabaseIO {
   #onFlush: FlushCallback | null = null;
 
   static #PINS_FILENAME = ".pins.neno";
+  /*
+    Past this many changed files, re-reading the whole graph is cheaper
+    than updating the indexes one note at a time.
+  */
+  static #MAX_INCREMENTAL_RELOAD = 300;
   static #GRAPH_FILE_EXTENSION = ".subtext";
   static #ALIAS_HEADER_KEY = "alias-of";
   static #ARBITRARY_FILE_HEADER_KEY = "file";
@@ -110,6 +121,52 @@ export default class DatabaseIO {
       );
   }
 
+  /*
+    What one graph file describes: an alias, an uploaded file, or a note.
+    Null for a file that does not parse.
+  */
+  static #parseGraphFile(
+    slug: Slug,
+    serializedGraphFile: string,
+  ): ParsedGraphFile | null {
+    try {
+      const headers = parseGraphFileHeaders(
+        cleanSerializedNote(serializedGraphFile),
+      );
+
+      if (headers.has(DatabaseIO.#ALIAS_HEADER_KEY)) {
+        return {
+          kind: "alias",
+          target: headers.get(DatabaseIO.#ALIAS_HEADER_KEY)!,
+        };
+      }
+
+      if (
+        headers.has(DatabaseIO.#ARBITRARY_FILE_HEADER_KEY)
+        && headers.has(DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY)
+      ) {
+        return {
+          kind: "file",
+          fileInfo: {
+            slug,
+            size: parseInt(
+              headers.get(DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY)!,
+            ),
+            filename: headers.get(DatabaseIO.#ARBITRARY_FILE_HEADER_KEY)!,
+            createdAt: headers.get("created-at"),
+          },
+        };
+      }
+
+      return {
+        kind: "note",
+        note: parseSerializedExistingGraphFile(serializedGraphFile, slug),
+      };
+    } catch (_e) {
+      return null;
+    }
+  }
+
   private async parseGraph(
     serializedGraphFiles: Map<Slug, string>,
     pinsSerialized?: string,
@@ -119,37 +176,13 @@ export default class DatabaseIO {
     const files = new Map<Slug, FileInfo>();
 
     for (const [slug, serializedGraphFile] of serializedGraphFiles) {
-      try {
-        const serializedGraphFileCleaned = cleanSerializedNote(
-          serializedGraphFile,
-        );
-        const headers = parseGraphFileHeaders(serializedGraphFileCleaned);
-
-        if (headers.has(DatabaseIO.#ALIAS_HEADER_KEY)) {
-          const targetSlug = headers.get(DatabaseIO.#ALIAS_HEADER_KEY)!;
-          aliases.set(slug, targetSlug);
-        } else if (
-          headers.has(DatabaseIO.#ARBITRARY_FILE_HEADER_KEY)
-          && headers.has(DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY)
-        ) {
-          const fileInfo: FileInfo = {
-            slug,
-            size: parseInt(
-              headers.get(DatabaseIO.#ARBITRARY_FILE_SIZE_HEADER_KEY)!,
-            ),
-            filename: headers.get(DatabaseIO.#ARBITRARY_FILE_HEADER_KEY)!,
-            createdAt: headers.get("created-at"),
-          };
-          files.set(slug, fileInfo);
-        } else {
-          const parsedNote = parseSerializedExistingGraphFile(
-            serializedGraphFile,
-            slug,
-          );
-          parsedNotes.set(slug, parsedNote);
-        }
-      } catch (_e) {
-        continue;
+      const parsed = DatabaseIO.#parseGraphFile(slug, serializedGraphFile);
+      if (parsed?.kind === "alias") {
+        aliases.set(slug, parsed.target);
+      } else if (parsed?.kind === "file") {
+        files.set(slug, parsed.fileInfo);
+      } else if (parsed?.kind === "note") {
+        parsedNotes.set(slug, parsed.note);
       }
     }
 
@@ -435,6 +468,85 @@ export default class DatabaseIO {
 
     this.#finishedObtainingGraph();
     return graphFromDisk;
+  }
+
+
+  /*
+    Brings the in-memory graph up to date after something outside NENO —
+    a pull — changed these files on disk. Paths are relative to the graph
+    folder, as git reports them.
+  */
+  async reloadPaths(paths: string[]): Promise<void> {
+    // Nothing cached yet: the next getGraph() reads everything anyway.
+    if (!this.#loadedGraph) return;
+
+    if (paths.length > DatabaseIO.#MAX_INCREMENTAL_RELOAD) {
+      await this.getGraph(true);
+      return;
+    }
+
+    const graph = await this.getGraph();
+    const read = async (filename: string): Promise<string | null> => {
+      try {
+        return await this.#storageProvider.readObjectAsString(filename);
+      } catch (_e) {
+        return null;
+      }
+    };
+
+    // Read everything first, so the graph changes in one synchronous go.
+    const changedGraphFiles = new Map<Slug, string | null>();
+    let pins: string | null | undefined;
+    for (const filePath of paths) {
+      const normalized = filePath.normalize("NFC");
+      if (normalized === DatabaseIO.#PINS_FILENAME) {
+        pins = await read(normalized);
+        continue;
+      }
+      if (!normalized.endsWith(DatabaseIO.#GRAPH_FILE_EXTENSION)) {
+        // An uploaded file's payload. Its graph file carries the metadata.
+        continue;
+      }
+      const slug = DatabaseIO.getSlugFromGraphFilename(normalized);
+      // The payload of an uploaded foo.subtext, not a graph file.
+      if (!isValidSlug(slug) || graph.files.has(normalized)) continue;
+      changedGraphFiles.set(slug, await read(normalized));
+    }
+
+    const parsedGraphFiles = new Map(
+      Array.from(changedGraphFiles, ([slug, content]) => [
+        slug,
+        content === null ? null : DatabaseIO.#parseGraphFile(slug, content),
+      ]),
+    );
+
+    /*
+      An alias changes the backlinks of every note linking to it, which
+      the per-note index update cannot express.
+    */
+    for (const [slug, parsed] of parsedGraphFiles) {
+      if (graph.aliases.has(slug) || parsed?.kind === "alias") {
+        await this.getGraph(true);
+        return;
+      }
+    }
+
+    for (const [slug, parsed] of parsedGraphFiles) {
+      graph.notes.delete(slug);
+      graph.files.delete(slug);
+      removeSlugFromIndexes(graph, slug);
+
+      if (parsed?.kind === "file") {
+        graph.files.set(slug, parsed.fileInfo);
+      } else if (parsed?.kind === "note") {
+        graph.notes.set(slug, parsed.note);
+        updateIndexes(graph, parsed.note);
+      }
+    }
+
+    if (pins !== undefined) {
+      graph.pinnedNotes = pins === null ? [] : DatabaseIO.parsePinsFile(pins);
+    }
   }
 
 

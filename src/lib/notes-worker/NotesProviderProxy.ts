@@ -28,7 +28,7 @@ import {
   DiffLine,
   DiffSegment,
   FileDiff,
-} from "./git";
+} from "../git/types";
 
 export type {
   ChangedFile,

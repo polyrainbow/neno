@@ -7,6 +7,25 @@
 import { BrowserWindow, dialog, ipcMain } from "electron";
 
 const dirtyWindows = new Set<number>();
+const cleanListeners = new Set<(windowId: number) => void>();
+
+/*
+  Read by auto-sync, which must not pull a newer version of a note from
+  under unsaved edits to it.
+*/
+export function hasUnsavedChanges(windowId: number): boolean {
+  return dirtyWindows.has(windowId);
+}
+
+/** Called whenever a window goes from unsaved changes to none. */
+export function onUnsavedChangesCleared(
+  listener: (windowId: number) => void,
+): () => void {
+  cleanListeners.add(listener);
+  return () => {
+    cleanListeners.delete(listener);
+  };
+}
 
 export function registerUnsavedChangesHandler(window: BrowserWindow): void {
   let forceClose = false;
@@ -46,8 +65,10 @@ export function registerUnsavedChangesIpc(): void {
       if (!window) return;
       if (hasChanges) {
         dirtyWindows.add(window.id);
-      } else {
-        dirtyWindows.delete(window.id);
+      } else if (dirtyWindows.delete(window.id)) {
+        for (const listener of cleanListeners) {
+          listener(window.id);
+        }
       }
     },
   );
