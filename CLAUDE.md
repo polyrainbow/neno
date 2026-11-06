@@ -155,6 +155,15 @@ must be explicitly started with `port.start()`. The proxy handles this
 automatically. There is a regression test in
 `NotesProviderProxy.spec.ts`.
 
+**Gotcha — workers started from a worker:** the notes worker starts the
+subwaytext parser pool itself (`DatabaseIO`). Write such a worker as
+`new Worker(new URL("…", import.meta.url), { type: "module" })`, never
+as a `?worker&url` import: since Vite 8.3 a `?worker&url` asset imported
+from inside a worker is not written out, which only shows in a
+production build — the dev server and the Playwright suite are fine.
+`referencedScriptsExistPlugin` in `vite.config.ts` fails the build if a
+script refers to an asset that is missing.
+
 ## Electron architecture
 
 ### Why the renderer is not loaded from `file://`
