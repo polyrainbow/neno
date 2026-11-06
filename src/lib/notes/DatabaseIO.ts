@@ -25,8 +25,6 @@ import {
 import ByteRange from "./types/ByteRange.js";
 import ExistingNote from "./types/ExistingNote.js";
 import { Slug } from "./types/Slug.js";
-// @ts-ignore
-import subwaytextWorkerUrl from "../subwaytext/index.js?worker&url";
 import subwaytext from "../subwaytext/index.js";
 import {
   isValidSlug,
@@ -310,8 +308,15 @@ export default class DatabaseIO {
 
     if (DatabaseIO.#workerPool.length === 0) {
       for (let t = 0; t < concurrency; t++) {
+        /*
+          This literal form, not a `?worker&url` import: the pool is
+          started from inside the notes worker, and Vite 8.3 stopped
+          writing out a `?worker&url` asset imported from a worker.
+          `new Worker(new URL(…, import.meta.url))` is the form Vite
+          resolves itself, nested or not.
+        */
         const worker = new Worker(
-          subwaytextWorkerUrl,
+          new URL("../subwaytext/index.ts", import.meta.url),
           { type: "module" },
         );
         this.#workerPool.push(worker);
