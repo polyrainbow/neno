@@ -30,7 +30,10 @@ NENO is a powerful note-taking app that helps you manage your personal knowledge
   note to query, transform, or aggregate your graph; share helpers
   between notes via reusable `mod` modules
 * Versioning: NENO automatically manages a Git repository of your notes, so you
-can go back to any point in time
+can go back to any point in time (needs Git — Apple's Command Line Tools)
+* Sync: optionally push every change to your repository's remote right away
+  and pull in what your other machines pushed — on your own server, even one
+  reachable only on your home network
 * Interoperability: NENO works with human-readable plain-text files and implemenents the free and open [Subtext Graph Specification](https://polyrainbow.github.io/neno/docs/subtext-graph-specification.html)
 * Powerful full-text search
 * Tap-to-link: One click is enough to link one note to another

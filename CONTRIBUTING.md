@@ -91,7 +91,7 @@ need the right-click → Open detour described in the
 │ Electron main process                                    │
 │                                                          │
 │  neno:// protocol (serves dist/)   native dialogs        │
-│  NodeFsStorageProvider  ·  NodeFsGit  (node:fs/promises) │
+│  NodeFsStorageProvider (node:fs)  ·  GitSync (git CLI)   │
 └───────▲──────────────────────────────────────▲───────────┘
         │ contextBridge (window.neno)          │
         │                        MessagePortMain RPC
@@ -113,8 +113,8 @@ need the right-click → Open detour described in the
             │   ├── StorageProviderProxy  ─────────┼──▶ main
             │   │   (or FileSystemAccessAPI-       │
             │   │    StorageProvider for OPFS)     │
-            │   └── isomorphic-git (optional)      │
-            │       over GitFsProxy  ──────────────┼──▶ main
+            │   └── GitClient (optional,     ──────┼──▶ main
+            │       desktop only)                  │
             └─────────────────┬────────────────────┘
                               ▼
             ┌──────────────────────────────────────┐
@@ -170,18 +170,28 @@ Hosts the single `NotesProvider` instance. The window talks to it through
 Registers and serves the `neno://` scheme, creates the window, sets the
 CSP and the macOS menu, and owns the Node file system: the
 `StorageProvider` (`/electron/storage/NodeFsStorageProvider.ts`), the
-isomorphic-git adapter (`/electron/storage/nodeFsGit.ts`) and the RPC
-dispatcher that exposes both to the notes worker
-(`/electron/storage/bridge.ts`). `/electron/preload.ts` is the only
-thing the renderer can see of it.
+graph folder's git repository (`/electron/git`) and the RPC dispatcher
+that exposes both to the notes worker (`/electron/storage/bridge.ts`).
+`/electron/preload.ts` is the only thing the renderer can see of it.
+
+### Version history and auto-sync
+- Entry point: `/electron/git`
+
+Every saved change is committed with the system `git`, and — once
+switched on for a repository with a remote — pushed straight away, with
+what other machines pushed pulled in on open, on focus and every few
+minutes. Conflicts go to the newer side. Network calls never hold up a
+save, and an unreachable remote is a normal "offline" state. See the
+"Git and auto-sync" section of [CLAUDE.md](./CLAUDE.md) for the rules.
 
 ### Storage bridge (renderer side)
 - Entry point: `/src/lib/electron`
 
-`StorageProviderProxy` and `GitFsProxy` implement the same contracts as
-their in-renderer counterparts but forward every call to the main
-process. Streams are chunked, because a `ReadableStream` cannot be
-transferred across the process boundary.
+`StorageProviderProxy` implements the `StorageProvider` contract but
+forwards every call to the main process; `GitClient` does the same for
+the handful of repository operations the notes worker needs. Streams are
+chunked, because a `ReadableStream` cannot be transferred across the
+process boundary.
 
 ### FileSystemAccessAPIStorageProvider
 - Entry point: `/src/lib/FileSystemAccessAPIStorageProvider.tsx`

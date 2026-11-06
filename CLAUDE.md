@@ -55,8 +55,15 @@ electron/                     # Electron main process (compiled separately)
   historyMenu.ts              #   The Go menu (Back/Forward, Cmd-[ / Cmd-])
   storage/
     NodeFsStorageProvider.ts  #   StorageProvider on node:fs/promises
-    nodeFsGit.ts              #   isomorphic-git fs on node:fs/promises
-    bridge.ts                 #   RPC dispatch on a MessagePortMain
+    bridge.ts                 #   RPC dispatch on a MessagePortMain; owns
+                              #   the folder's GitSync
+  git/                        #   Version history and auto-sync, on the
+                              #   system git (see "Git and auto-sync")
+    runGit.ts                 #     Spawns git: non-interactive, timed out
+    GitRepo.ts                #     Local operations: init, commit, log, diff
+    GitSync.ts                #     Worktree lock, pull/push, triggers, status
+    rebase.ts                 #     Rebase with last-writer-wins resolution
+    classifyError.ts          #     offline / auth / rejected / other
 
 src/
   main.tsx                    # App entry point
@@ -73,6 +80,8 @@ src/
     subwaytext/               # Subtext parser & serializer
     notes-worker/             # Dedicated worker hosting NotesProvider
     script-worker/            # Sandboxed worker for user script execution
+    git/                      # Types, commit messages and the diff shared
+                              #   by electron/git/ and the history view
     electron/                 # Renderer/worker side of the storage bridge
     FileSystemAccessAPIStorageProvider.tsx
                               # File System Access API integration (OPFS mode)
@@ -147,7 +156,7 @@ that is how a folder switch works.
 | `src/lib/electron/bridgeTypes.ts` | Message types shared by `electron/` and `src/` so the bridge cannot drift |
 | `src/lib/electron/BridgeClient.ts` | Request/response id bookkeeping for the storage bridge |
 | `src/lib/electron/StorageProviderProxy.ts` | `StorageProvider` over the bridge, with chunked streams |
-| `src/lib/electron/GitFsProxy.ts` | isomorphic-git fs over the bridge |
+| `src/lib/electron/GitClient.ts` | The worker's handle on the folder's repository: commit, log, diff over the bridge |
 
 **Gotcha — `MessagePort.start()`:** When listening on a `MessagePort`
 with `addEventListener` (as opposed to setting `onmessage`), the port
@@ -192,7 +201,7 @@ RPC:
  main process                  renderer                 notes worker
  ┌───────────────────┐      ┌─────────────┐        ┌──────────────────┐
  │ NodeFsStorage     │◀═══════ MessagePortMain ══════▶│ StorageProxy   │
- │ NodeFsGit         │      │ (forwards   │        │ GitFsProxy       │
+ │ GitSync (git CLI) │      │ (forwards   │        │ GitClient        │
  │ dialogs, fs       │      │  the port)  │        │ NotesProvider    │
  └───────────────────┘      └─────────────┘        └──────────────────┘
         ▲  contextBridge (window.neno)   │  Worker RPC (unchanged)
@@ -207,8 +216,11 @@ notes worker alongside the `initialize` action.
 
 The wire format is the `{id, method, args}` → `{id, result | error}`
 protocol `NotesProviderProxy` already used, with method names namespaced
-`storage.…` / `git.…` so one port carries both. Both proxies share a
-single `BridgeClient`, because they share the request id sequence.
+`storage.…` / `git.…` so one port carries both. `StorageProviderProxy`
+and `GitClient` share a single `BridgeClient`, because they share the
+request id sequence. Main also speaks first on the same port: a
+`BridgeEvent` without an id (`pathsChanged`, after a pull) tells the
+worker which files to re-read.
 
 **Streams are chunked.** A `ReadableStream` is transferable between
 renderer contexts but not across the main-process boundary, so
@@ -219,8 +231,59 @@ on the wire; there is no transfer list, since a `MessagePortMain` can
 only transfer `MessagePort`s and everything crossing the process
 boundary is serialized regardless.
 
-Errors carry an `errorCode` field alongside the message, because
-isomorphic-git branches on `err.code === "ENOENT"`.
+Errors carry an `errorCode` field alongside the message, so callers can
+branch on `err.code` (`ENOENT`, `EEXIST`, …) as they would on Node's.
+
+### Git and auto-sync
+
+Every flush is a commit, and auto-sync pushes it to the remote at once
+and pulls in what other machines pushed. All of it runs on the **system
+git in the main process** (`electron/git/`); the worker only reports what
+a flush wrote (`git.commit` over the bridge). There is no git in OPFS
+mode, and none without git installed — `findGit()` only accepts
+`/usr/bin/git` once `xcode-select -p` succeeds, because running Apple's
+stub opens the Command Line Tools installer.
+
+- **Saving never waits for the network.** `GitSync`'s worktree lock is
+  taken by every write through the bridge (`writeObject`, `removeObject`,
+  `renameObject`, and a streamed write from `openWrite` to `closeWrite`),
+  by commits and by the rebase. Fetch and push run in a separate queue
+  that never holds it. A rebase only starts on a worktree with no
+  uncommitted tracked changes; a flush caught halfway is committed a
+  moment later, and its rejected push pulls again.
+- **git never prompts.** `runGit.ts` sets `GIT_TERMINAL_PROMPT=0`, ssh
+  `BatchMode=yes` with `ConnectTimeout=5`, an HTTPS stall limit and a
+  time limit per call, and kills the **whole process group**: ssh
+  outlives a killed git and holds the pipes open, so killing git alone
+  does not end the call. `GIT_CEILING_DIRECTORIES` stops a graph folder
+  without a `.git` of its own from being taken into an enclosing repo.
+- **An unreachable remote is a state, not an error** (`offline`): a
+  LAN-only remote is unreachable whenever the laptop is elsewhere.
+  `classifyError.ts` decides; only auth failures, a missing remote and
+  unrelated histories are errors. Failures retry with backoff, and the
+  renderer's `online` event retries at once.
+- **When:** push after every commit; pull on folder open, on window
+  focus (at most once a minute), every 5 minutes while focused, and when
+  a push is rejected. A pull waits while the window has unsaved changes
+  (`unsavedChanges.ts`), and the open note picks up pulled changes
+  through the worker's ordinary `mutation` broadcast.
+- **Conflicts: last writer wins**, per file, by the author time of each
+  side's latest commit touching it (`rebase.ts`). Text goes through
+  `git merge-file --ours/--theirs`, so only overlapping hunks are lost;
+  binary files go whole to the newer side; an edit always beats a
+  deletion. When the local side loses, its commit is kept under
+  `refs/neno/overwritten/`, because the rebase drops it from the branch.
+  Untracked files the remote also has (`.pins.neno`, written on first
+  load) are committed first, or the rebase would refuse on every pull.
+- The toggle lives in the repo's own config (`neno.autoSync` in
+  `.git/config`); the remote is the branch's upstream, else `origin`.
+  NENO never adds or changes remotes, refuses a repo whose history is
+  unrelated to its remote, and aborts a rebase a crash left behind when
+  the folder opens.
+- **Quitting:** `will-quit` waits for `disposeStorageBridges()`, which
+  kills fetch and push but lets a commit or rebase that has started
+  finish, then calls `app.exit()` — a second `app.quit()` from a
+  prevented `will-quit` never completes.
 
 ### Non-obvious main-process requirements
 
@@ -338,6 +401,12 @@ Unit tests live next to source files as `*.spec.ts` / `*.spec.tsx`, in
 both `src/` and `electron/` (see `vitest.config.ts`).
 Run a single test file: `npx vitest run src/lib/notes/noteUtils.spec.ts`
 
+The specs in `electron/git/` run the real `/usr/bin/git` against
+temporary repositories — a bare repo as the remote and two clones as two
+machines — and take seconds each, hence the suite's 30 s timeout.
+A hanging remote is simulated with `ext::sleep 30`, which is why
+`GitRepo` takes `extraConfig` (`protocol.ext.allow=always`).
+
 Integration tests are in `tests/integration/`. Visual regression tests
 are in `tests/visual-regression/`. Both drive `npm run dev` in a real
 browser at `localhost:5173` in **OPFS mode** — which is the main reason
@@ -347,3 +416,5 @@ OPFS mode was worth keeping.
 
 - Node.js v24+
 - macOS (the packaged app is macOS-only and unsigned)
+- git (Apple's Command Line Tools) for version history and auto-sync,
+  and for the `electron/git/` specs
