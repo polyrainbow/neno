@@ -49,3 +49,13 @@
     background-color: var(--accent-color-1-light);
   }
 }
+
+/* Sits at the foot of the rail, apart from the views above it. */
+.navigation-rail .sync-status-indicator {
+  margin-top: auto;
+  margin-bottom: var(--default-gap);
+}
+
+.navigation-rail .sync-state-error img.svg-icon {
+  filter: drop-shadow(0 0 0.15rem var(--neno-red-2));
+}

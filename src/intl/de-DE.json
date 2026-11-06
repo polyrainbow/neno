@@ -198,5 +198,18 @@
   "stats.metadata.total-storage-size": "Gesamte Speicherplatzbelegung",
   "stats.metadata.updated-at": "Letzte Aktualisierung",
   "stats.number-of-notes": "Notizen",
-  "stats.unlinked-notes": "Unverbundene Notizen"
+  "stats.unlinked-notes": "Unverbundene Notizen",
+  "sync.description": "Jeden Commit sofort an das Remote des Repositorys senden und übernehmen, was andere Rechner gesendet haben. Haben beide Seiten dieselben Zeilen geändert, gewinnt die neuere Änderung; die ältere lässt sich mit Git wiederherstellen.",
+  "sync.enable": "Automatisch mit {remote} synchronisieren",
+  "sync.enable-failed": "Auto-Sync konnte nicht aktiviert werden: {message}",
+  "sync.git-missing": "Git ist nicht installiert. Installiere Apples Command Line Tools (xcode-select --install) und starte NENO neu.",
+  "sync.heading": "Auto-Sync",
+  "sync.last-synced": "zuletzt synchronisiert {time}",
+  "sync.no-remote": "Dieses Repository hat kein Remote. Füge eines in der Kommandozeile hinzu (git remote add origin …), um es zu synchronisieren.",
+  "sync.state.error": "Synchronisierung braucht Aufmerksamkeit",
+  "sync.state.offline": "Offline · wartende Commits: {count}",
+  "sync.state.synced": "Synchronisiert",
+  "sync.state.syncing": "Synchronisiere …",
+  "sync.state.waiting": "Wartende Commits: {count}",
+  "sync.sync-now": "Jetzt synchronisieren"
 }

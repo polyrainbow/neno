@@ -20,6 +20,8 @@ const STORAGE_PORT_MESSAGE = "neno:storage-port";
 const FIND_COMMAND_MESSAGE = "neno:find-command";
 // Likewise HISTORY_COMMAND_MESSAGE.
 const HISTORY_COMMAND_MESSAGE = "neno:history-command";
+// Likewise SYNC_STATUS_MESSAGE.
+const SYNC_STATUS_MESSAGE = "neno:sync-status";
 
 type FindCommand = "open" | "next" | "previous";
 type HistoryCommand = "back" | "forward";
@@ -86,6 +88,22 @@ const neno = {
     listener: (command: HistoryCommand) => void,
   ): () => void =>
     subscribe(HISTORY_COMMAND_MESSAGE, listener),
+
+  /*
+    The status is structured-cloned across the bridge; its type lives in
+    src/lib/git/types.ts, which this file must not import.
+  */
+  getSyncStatus: (): Promise<unknown> =>
+    ipcRenderer.invoke("git:getSyncStatus"),
+
+  setAutoSync: (enabled: boolean): Promise<unknown> =>
+    ipcRenderer.invoke("git:setAutoSync", enabled),
+
+  syncNow: (): Promise<void> =>
+    ipcRenderer.invoke("git:syncNow"),
+
+  onSyncStatus: (listener: (status: unknown) => void): () => void =>
+    subscribe(SYNC_STATUS_MESSAGE, listener),
 };
 
 contextBridge.exposeInMainWorld("neno", neno);

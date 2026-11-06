@@ -396,8 +396,27 @@ app.whenReady().then(async () => {
   });
 });
 
+/*
+  Quitting must not wait for the network: disposing the bridges kills
+  any fetch or push. It does wait for a commit or rebase that has
+  already started — milliseconds — so the repository is never left in
+  the middle of one.
+*/
+let quitting = false;
+app.on("will-quit", (event) => {
+  if (quitting) return;
+  quitting = true;
+  event.preventDefault();
+  /*
+    exit(), not quit(): a second quit() from a prevented will-quit never
+    finishes. The windows are closed by now and the bridges disposed, so
+    there is nothing left for the quit sequence to do.
+  */
+  void disposeStorageBridges().finally(() => app.exit(0));
+});
+
 app.on("window-all-closed", () => {
-  disposeStorageBridges();
+  void disposeStorageBridges();
   /*
     macOS convention: the app stays in the dock with no window open, and
     "activate" (above) opens a fresh one.
