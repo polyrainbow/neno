@@ -38,6 +38,12 @@ export class GitError extends Error {
   readonly args: string[];
   readonly exitCode: number | null;
   readonly stderr: string;
+  /*
+    Some verdicts only appear here: `push --porcelain` reports a rejected
+    ref on stdout, and stderr gets nothing but hints, which git config
+    can switch off.
+  */
+  readonly stdout: string;
   /** Killed for running over its time limit or by an abort. */
   readonly killed: boolean;
 
@@ -46,6 +52,7 @@ export class GitError extends Error {
     exitCode: number | null,
     stderr: string,
     killed: boolean,
+    stdout = "",
   ) {
     const summary = stderr.trim().split("\n").slice(-3).join("\n");
     super(
@@ -56,6 +63,7 @@ export class GitError extends Error {
     this.args = args;
     this.exitCode = exitCode;
     this.stderr = stderr;
+    this.stdout = stdout;
     this.killed = killed;
   }
 }
@@ -186,7 +194,13 @@ export function createGitRunner(options: {
       const stderrText = Buffer.concat(stderr).toString("utf8");
       const okCodes = runOptions.okCodes ?? [0];
       if (killed || code === null || !okCodes.includes(code)) {
-        reject(new GitError(args, code, stderrText, killed));
+        reject(new GitError(
+          args,
+          code,
+          stderrText,
+          killed,
+          Buffer.concat(stdout).toString("utf8"),
+        ));
         return;
       }
       resolve({ code, stdout: Buffer.concat(stdout), stderr: stderrText });

@@ -54,7 +54,8 @@ function toTimezoneOffset(zone: string): number {
   const match = /^([+-])(\d{2})(\d{2})$/.exec(zone ?? "");
   if (!match) return 0;
   const minutes = Number(match[2]) * 60 + Number(match[3]);
-  return match[1] === "+" ? -minutes : minutes;
+  // 0 - x, not -x: UTC must come out as 0, not -0.
+  return match[1] === "+" ? 0 - minutes : minutes;
 }
 
 /** Splits NUL-separated output into its non-empty fields. */

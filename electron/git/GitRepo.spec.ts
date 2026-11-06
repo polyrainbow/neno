@@ -195,6 +195,22 @@ describe("GitRepo", () => {
       expect(log[0].timezoneOffset).toBe(new Date().getTimezoneOffset());
     });
 
+    it("reports UTC as a timezone offset of 0, not -0", async () => {
+      await writeFile(dir, "a.subtext", "A");
+      await repo.commit({
+        canonicalNoteSlugs: ["a"],
+        aliases: [],
+        arbitraryFiles: [],
+        flushPins: false,
+      }, AUTHOR);
+      git(dir, "commit", "--quiet", "--amend", "--no-edit",
+        "--date=1700000000 +0000");
+
+      const [commit] = await repo.log({ limit: 1, offset: 0 });
+
+      expect(Object.is(commit.timezoneOffset, 0)).toBe(true);
+    });
+
     it("pages through the history", async () => {
       await save("a", "1");
       await save("a", "2");

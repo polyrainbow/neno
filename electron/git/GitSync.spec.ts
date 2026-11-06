@@ -182,6 +182,34 @@ describe("GitSync", { timeout: 30_000 }, () => {
       });
     });
 
+    it("retries a rejected push when git prints no hints", async () => {
+      /*
+        With --porcelain, the "[rejected]" verdict goes to stdout; stderr
+        only carries the hints, which git config can switch off.
+      */
+      const sync = makeSync(a, {
+        repo: new GitRepo({
+          dir: a,
+          gitPath: GIT,
+          extraConfig: [
+            "advice.pushUpdateRejected=false",
+            "advice.pushFetchFirst=false",
+            "advice.pushNonFFCurrent=false",
+          ],
+        }),
+      });
+      await sync.start();
+      await sync.setAutoSync(true);
+      await pushFromB("from-b.subtext", "B");
+
+      await saveOnA(sync, "from-a", "A");
+      await sync.whenIdle();
+
+      expect(git(remote, "log", "-1", "--format=%s", "main"))
+        .toBe("create: from-a");
+      expect(sync.getStatus().unpushedCommits).toBe(0);
+    });
+
     it("waits while the editor has unsaved changes", async () => {
       let dirty = true;
       const sync = makeSync(a, { isEditorDirty: () => dirty });
