@@ -42,7 +42,7 @@ const OFFLINE = [
 export default function classifyError(error: unknown): NetworkFailure {
   if (!(error instanceof GitError)) return "other";
   if (error.killed) return "offline";
-  const text = error.stderr;
+  const text = `${error.stderr}\n${error.stdout}`;
   if (AUTH.some((pattern) => pattern.test(text))) return "auth";
   if (REJECTED.some((pattern) => pattern.test(text))) return "rejected";
   if (OFFLINE.some((pattern) => pattern.test(text))) return "offline";
