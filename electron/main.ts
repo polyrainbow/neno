@@ -28,6 +28,7 @@ import {
   registerUnsavedChangesHandler,
   registerUnsavedChangesIpc,
 } from "./unsavedChanges";
+import { buildFileMenu } from "./fileMenu";
 import { buildFindMenuItems } from "./findMenu";
 import { buildHistoryMenu } from "./historyMenu";
 import {
@@ -324,6 +325,7 @@ function buildMenu(): void {
         ],
       }]
       : []),
+    buildFileMenu(),
     {
       /*
         The standard Edit roles are not optional: without them Cmd-C,

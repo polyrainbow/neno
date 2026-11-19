@@ -2,6 +2,7 @@
     .navigation-rail,
     .app-header,
     .sidebar,
+    .find-bar,
     .note-controls,
     .note-props {
       display: none !important;
