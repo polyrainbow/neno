@@ -51,6 +51,7 @@ electron/                     # Electron main process (compiled separately)
   windowGeometry.ts           #   Pure display-fitting geometry
   dialogs.ts                  #   Native folder/open/save dialogs
   unsavedChanges.ts           #   Native confirm on window close
+  fileMenu.ts                 #   The File menu (Print, Cmd-P)
   findMenu.ts                 #   The Edit menu's find items
   historyMenu.ts              #   The Go menu (Back/Forward, Cmd-[ / Cmd-])
   storage/
