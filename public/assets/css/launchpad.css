@@ -52,6 +52,16 @@
 
   #start-view-local {
     text-align: center;
+
+    button {
+      margin: var(--default-gap) calc(var(--default-gap) / 2) 0;
+    }
+
+    label input {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+    }
   }
 
   .browser-storage-providers {

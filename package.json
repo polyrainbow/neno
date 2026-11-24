@@ -6,6 +6,8 @@
   "type": "module",
   "main": "dist-electron/main.cjs",
   "dependencies": {
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.6.2",
     "@lexical/link": "0.52.0",
     "@lexical/react": "0.52.0",
     "idb-keyval": "^6.2.5",
@@ -16,6 +18,8 @@
     "react-dom": "19.2.7"
   },
   "devDependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/cli": "8.6.2",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "1.61.0",
     "@stylistic/eslint-plugin": "5.10.0",
@@ -51,6 +55,11 @@
     "build": "npx tsc && npx tsc -p electron/tsconfig.json && npx vite build",
     "build:electron": "npx vite build --config vite.electron.config.ts",
     "electron:build": "npm run build && npm run build:electron && npx electron tools/buildIcon.mjs && npx electron-builder --mac --publish never",
+    "android:sync": "npm run build && npx cap sync android",
+    "android:build": "npm run android:sync && cd android && ./gradlew assembleDebug",
+    "android:release": "npm run android:sync && cd android && ./gradlew assembleRelease bundleRelease",
+    "android:run": "npm run android:sync && npx cap run android",
+    "android:test": "cd android && ./gradlew testDebugUnitTest",
     "lint": "npx eslint src --report-unused-disable-directives && npx eslint electron --report-unused-disable-directives && npx eslint tests --report-unused-disable-directives",
     "all-checks": "npm run stylelint && npm run lint && npm run test && npm run integration-test && npm run build",
     "all-checks-visual": "npm run all-checks && npm run visual-regression-test",

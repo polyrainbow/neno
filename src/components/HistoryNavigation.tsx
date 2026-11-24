@@ -1,5 +1,9 @@
 import { CSSProperties, useEffect, useRef, useState } from "react";
-import { getBridge, isElectron } from "../lib/electron/bridge";
+import {
+  getBridge,
+  hasNativeHost,
+  isElectron,
+} from "../lib/electron/bridge";
 import { canGoBack, canGoForward } from "../lib/navigation";
 import {
   canScrollHorizontally,
@@ -28,8 +32,12 @@ const HistoryNavigation = () => {
   const navigate = useRef({ goBack, goForward });
   navigate.current = { goBack, goForward };
 
+  /*
+    The Go menu on desktop; the system back button and back gesture on
+    Android.
+  */
   useEffect(() => {
-    if (!isElectron()) return;
+    if (!hasNativeHost()) return;
 
     return getBridge().onHistoryCommand((command) => {
       if (command === "back") {

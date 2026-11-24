@@ -1,4 +1,6 @@
 import StartViewLocal from "./StartViewLocal";
+import StartViewAndroid from "./StartViewAndroid";
+import { isAndroid } from "../lib/electron/bridge";
 import { ASSETS_PATH, ROOT_PATH, VERSION } from "../config";
 import { l } from "../lib/intl";
 import HeaderContainerLeftRight from "./HeaderContainerLeftRight";
@@ -40,7 +42,7 @@ const StartView = () => {
           <div className="slogan">{l("start.introduction")}</div>
         </div>
       </div>
-      <StartViewLocal />
+      {isAndroid() ? <StartViewAndroid /> : <StartViewLocal />}
       {
         memoryStorageProviderVisbility
           ? <div

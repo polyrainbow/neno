@@ -633,3 +633,12 @@ input:checked + .slider::before {
     }
   }  
 }
+
+/* An SSH public key (Android): one long token, shown whole. */
+.ssh-public-key {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--code-font);
+  word-break: break-all;
+  resize: none;
+}

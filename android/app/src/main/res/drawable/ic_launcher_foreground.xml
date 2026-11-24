@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The NENO logo (public/assets/app-icon/logo.svg) as the foreground of
+  the adaptive launcher icon: 108dp canvas, the 75-unit logo scaled to
+  45dp, so that even its corners stay inside the 66dp circle every
+  launcher mask shows.
+  Each bar of the "N" rotates about its own origin, as the SVG's
+  transform-origin attributes say.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group android:translateX="31.5" android:translateY="31.5"
+        android:scaleX="0.6" android:scaleY="0.6">
+        <group android:pivotX="19.125" android:pivotY="37.5" android:rotation="9.356707987528656">
+            <path android:fillColor="#5BB3FF" android:pathData="M12.375,15.203349466792101h13.5v44.5933010664158h-13.5z" />
+        </group>
+        <group android:pivotX="37.5" android:pivotY="37.5" android:rotation="146.15994386503277">
+            <path android:fillColor="#5BB3FF" android:pathData="M30.75,11.012974874478637h13.5v52.974050251042726h-13.5z" />
+        </group>
+        <group android:pivotX="55.875" android:pivotY="37.5" android:rotation="9.356707987528656">
+            <path android:fillColor="#5BB3FF" android:pathData="M49.125,15.203349466792101h13.5v44.5933010664158h-13.5z" />
+        </group>
+        <path android:fillColor="#C65DFB" android:pathData="M7.25,15.5a15.5,15.5 0 1,0 31.0,0a15.5,15.5 0 1,0 -31.0,0z" />
+        <path android:fillColor="#C65DFB" android:pathData="M44.0,15.5a15.5,15.5 0 1,0 31.0,0a15.5,15.5 0 1,0 -31.0,0z" />
+        <path android:fillColor="#C65DFB" android:pathData="M0.0,59.5a15.5,15.5 0 1,0 31.0,0a15.5,15.5 0 1,0 -31.0,0z" />
+        <path android:fillColor="#C65DFB" android:pathData="M36.75,59.5a15.5,15.5 0 1,0 31.0,0a15.5,15.5 0 1,0 -31.0,0z" />
+    </group>
+</vector>

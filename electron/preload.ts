@@ -43,6 +43,8 @@ function subscribe<T>(
 }
 
 const neno = {
+  platform: "electron" as const,
+
   pickFolder: (): Promise<string | null> =>
     ipcRenderer.invoke("dialog:pickFolder"),
 

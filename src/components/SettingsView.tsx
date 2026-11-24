@@ -5,7 +5,8 @@ import EnableGitSetting from "./EnableGitSetting";
 import NavigationRail from "./NavigationRail";
 import AutoSyncSetting from "./AutoSyncSetting";
 import useGitEnabled from "../hooks/useGitEnabled";
-import { isElectron } from "../lib/electron/bridge";
+import { hasNativeHost, isAndroid } from "../lib/electron/bridge";
+import AndroidSshKeySetting from "./AndroidSshKeySetting";
 
 
 const SettingsView = () => {
@@ -15,10 +16,12 @@ const SettingsView = () => {
     <HeaderContainerLeftRight />
     <section className="settings-view content-section-wide">
       <ChangeLanguageSetting />
-      {/* git runs in the desktop app's main process; OPFS mode has none. */}
-      {isElectron() && !gitEnabled && <EnableGitSetting />}
-      {isElectron() && gitEnabled && <GitConfigSetting />}
-      {isElectron() && gitEnabled && <AutoSyncSetting />}
+      {/* git runs in the native host (Electron main, Android); OPFS mode
+        has none. */}
+      {hasNativeHost() && !gitEnabled && <EnableGitSetting />}
+      {hasNativeHost() && gitEnabled && <GitConfigSetting />}
+      {hasNativeHost() && gitEnabled && <AutoSyncSetting />}
+      {isAndroid() && <AndroidSshKeySetting />}
     </section>
   </div>;
 };

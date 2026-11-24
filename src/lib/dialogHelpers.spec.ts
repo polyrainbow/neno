@@ -19,6 +19,7 @@ const makeBridge = (overrides: Partial<NenoBridge> = {}) => {
   const aborted: number[] = [];
 
   const bridge: NenoBridge = {
+    platform: "electron",
     pickFolder: async () => null,
     getLastFolder: async () => null,
     setLastFolder: async () => undefined,
@@ -98,7 +99,7 @@ describe("getFilesFromUserSelection", () => {
 
   it("should fail loudly when there is no bridge", async () => {
     await expect(getFilesFromUserSelection([], false))
-      .rejects.toThrow("Electron bridge is unavailable");
+      .rejects.toThrow("native bridge is unavailable");
   });
 });
 

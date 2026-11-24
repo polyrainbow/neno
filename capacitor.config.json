@@ -1,0 +1,11 @@
+{
+  "appId": "io.github.polyrainbow.neno",
+  "appName": "NENO",
+  "webDir": "dist",
+  "android": {
+    "path": "android"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

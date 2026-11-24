@@ -9,5 +9,5 @@
     "selector-id-pattern": null,
     "block-no-redundant-nested-style-rules": null
   },
-  "ignoreFiles": ["dist/**/*.css", "**/reboot.css"]
+  "ignoreFiles": ["dist/**/*.css", "**/reboot.css", "android/**/*.css"]
 }

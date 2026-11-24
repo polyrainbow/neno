@@ -1,10 +1,12 @@
 # NENO
 
 Privacy-first note-taking app built on the Subtext markup language.
-NENO is a macOS desktop app built on Electron. Users own their data —
-notes are stored as plain-text `.subtext` files in a folder the user
-picks through a native dialog, read and written by Node's `fs` in the
-Electron main process.
+NENO is a macOS desktop app built on Electron, and an Android app built
+on Capacitor around the same web code. Users own their data — notes are
+stored as plain-text `.subtext` files: on the desktop in a folder the
+user picks through a native dialog, read and written by Node's `fs` in
+the Electron main process; on Android in the app's private storage,
+read and written by Kotlin (see "Android architecture").
 
 ## Commands
 
@@ -14,6 +16,12 @@ npm run electron:dev     # Vite dev server + Electron window
 npm run build            # TypeScript check (src + electron) + Vite build
 npm run build:electron   # Build the main/preload bundles to dist-electron/
 npm run electron:build   # Full build + electron-builder --mac (unsigned .dmg)
+npm run android:sync     # Web build + copy into android/ (npx cap sync)
+npm run android:build    # android:sync + debug APK
+npm run android:release  # android:sync + release APK and AAB (signed if
+                         #   android/keystore.properties exists)
+npm run android:run      # android:sync + install on a device/emulator
+npm run android:test     # JVM unit tests of the Kotlin code (incl. JGit)
 npm run lint             # ESLint (src/, electron/, tests/)
 npm run lint-fix         # ESLint with --fix
 npm run stylelint        # CSS linting
@@ -86,8 +94,26 @@ src/
     electron/                 # Renderer/worker side of the storage bridge
     FileSystemAccessAPIStorageProvider.tsx
                               # File System Access API integration (OPFS mode)
+    android/                  # Android: window.neno and the bridge host
   types/                      # Shared TypeScript types
   intl/                       # Internationalization
+
+android/                      # Capacitor's Gradle project (checked in)
+  app/src/main/java/io/github/polyrainbow/neno/
+    NenoPlugin.kt             #   The one Capacitor plugin: bridge calls,
+                              #   sync, setup (key, host key, clone)
+    NenoGraph.kt              #   Per-process graph session: storage, lock,
+                              #   GitSync, SSH
+    PushWorker.kt             #   WorkManager job: pushes after the app
+                              #   left the foreground
+    KeystoreSecretBox.kt      #   Seals the SSH key with an Android
+                              #   Keystore key
+    storage/                  #   GraphStorage (StorageProvider in Kotlin),
+                              #   WorktreeLock
+    git/                      #   Port of electron/git/ on JGit: GitRepo,
+                              #   GitSync, Replay (last writer wins),
+                              #   ClassifyError, Ssh, CommitMessage
+  app/src/test/               #   JVM tests (JUnit), no device needed
 ```
 
 ### Key modules
@@ -396,6 +422,145 @@ navigate at all.
 - The `#MAX_OPEN_FILES = 512` semaphore, ported verbatim from the
   FS-Access provider — the OS fd limit applies to Node just the same.
 
+## Android architecture
+
+The same `dist/` runs in the Android System WebView inside a Capacitor
+shell (`capacitor.config.json`). Capacitor serves it from
+`https://localhost` with an SPA fallback to `index.html`, which gives the
+router, OPFS, module workers and the Navigation API the same secure,
+non-`file://` origin that `neno://` gives them on the desktop — nothing
+in the router had to change.
+
+### window.neno on Android
+
+There is no preload: `main.tsx` builds `window.neno` from
+`src/lib/android/AndroidBridge.ts` before React renders, behind a dynamic
+import so the desktop and browser bundles never load Capacitor. The
+bridge carries `platform: "electron" | "android"`, and the old single
+`isElectron()` is split:
+
+- `hasNativeHost()` — storage, git, sync, file dialogs, unsaved-changes
+  flag: both hosts.
+- `isElectron()` — menu-driven features (find bar, Go menu, header back
+  and forward buttons), mouse side buttons and trackpad swipes. On
+  Android the system back button/gesture feeds `onHistoryCommand`; on
+  the first history entry it puts the app in the background.
+
+`main.tsx` refuses to start in a WebView older than Chrome 122 (checked
+by feature: Navigation API, CSS Custom Highlight API, iterator helpers,
+Set methods, `Promise.withResolvers` — the build targets `esnext`) and
+says to update Android System WebView instead of failing in places.
+Emulator images without the Play Store keep their stale WebView: the
+Android 13 `google_apis` image has Chrome 109 and shows that message;
+use a newer image to look at the UI. Icon-button tooltips appear only
+for a mouse (`pointerType`), never on a tap.
+
+### Storage: a private folder, not OPFS
+
+The graph lives in `Context.filesDir/graph` — private to the app, not
+visible to other apps, the Files app or USB, gone on uninstall. Not OPFS:
+Chromium stores OPFS in an obfuscated internal layout, and JGit needs a
+real working tree. It is excluded from Android backups
+(`res/xml/data_extraction_rules.xml`): a synced graph is backed up by its
+remote, and the sealed SSH key could not be opened on another device.
+
+The notes worker cannot reach native code — Capacitor's bridge lives on
+the window — so the page serves the other end of the worker's storage
+port (`src/lib/android/AndroidBridgeHost.ts`) and forwards each
+`{id, method, args}` to `NenoPlugin.call`. The worker side
+(`BridgeClient`, `StorageProviderProxy`, `GitClient`) is the desktop's,
+unchanged. Capacitor speaks JSON, so binary data travels as
+`{ "$b64": … }`. `git.diff` is translated on the way: native code only
+returns both versions of each file (`git.fileVersions`), and the line
+diff is computed by `src/lib/git/diff.ts`, so both apps show a change
+alike.
+
+**Loading speed.** A graph load reads every note; one bridge round-trip
+per note costs ~0.2 ms each, so `StorageProvider` has an optional
+`readObjectsAsStrings` and `DatabaseIO` uses it when present (5,000
+notes: 125 ms in one call against 855 ms in 5,000). With 5,000 notes the
+editor is usable ~0.4 s after launch. Writes go through a temporary file
+moved into place (`*.neno-tmp`, excluded in `.git/info/exclude`) — a
+phone kills apps mid-write routinely.
+
+### Git on Android
+
+JGit and Apache MINA SSHD, both pure Java, bundled in the APK — there is
+no system git. `android/app/src/main/java/…/git/` ports `electron/git/`
+with the same rules (worktree lock vs. network queue, offline is a
+state, push after commit, pull on open / foreground / every 5 minutes /
+rejected push, no pull while the editor is dirty, `neno.autoSync` in
+`.git/config`). What differs, and why:
+
+- **minSdk 33.** JGit 7's pack protocol calls `InputStream.readNBytes`,
+  which Android only has from 13 on; on 10–12 it dies with
+  `NoSuchMethodError`. JGit 5.13 would run there but pins a MINA SSHD
+  from before the Terrapin fix. An `Error` like that must fail the call,
+  not the app, hence `catch (e: Throwable)` in the plugin and the sync.
+- **No rebase.** `Replay.kt` re-creates the local commits on top of the
+  fetched ones in memory (a cherry-pick per commit with the
+  last-writer-wins rules of `rebase.ts`) and checks out the result in
+  one step. Nothing is ever left mid-rebase. One subtlety: JGit's
+  `MergeAlgorithm` calls a side that is *empty* a conflict even when it
+  equals the base, where git's merge takes the other side — so a side
+  unchanged from the base is settled before merging.
+- **Errors are exceptions**, not stderr: `ClassifyError.kt` looks at the
+  cause chain's types first, then at the desktop's message patterns plus
+  JGit's and MINA's wording.
+- **Handshake timeout.** `ConnectTimeout` covers only the TCP connect; a
+  server that accepts and never speaks SSH held each operation for
+  MINA's default 2 minutes. MINA reads its defaults from system
+  properties prefixed `org.apache.sshd.config.` (not `org.apache.sshd.`),
+  so `SshSupport` sets `org.apache.sshd.config.auth-timeout`.
+- **Commit messages** end in `\n`, as `git commit` writes them and JGit
+  does not.
+- **The app in the foreground is the focused window.** Leaving it with
+  unpushed commits enqueues `PushWorker`, which pushes once the device
+  has a network, even if the process is gone by then.
+
+**SSH.** Each device makes its own ed25519 key on first use; the private
+key is sealed with an AES-GCM key in the Android Keystore and only opened
+in memory (JGit gets a `KeyPair`, never a key file). Host keys are trust
+on first use, never silent: an unknown host is refused and its key's
+fingerprint shown in the clone flow; a changed key is refused outright
+(`TrustedHosts`). Desktop NENO never adds remotes; on a phone there is no
+command line, so cloning from the start view is how a graph gets one
+(it also switches auto-sync on).
+
+**Shallow clone.** The clone fetches only the newest commit
+(`GitRepo.cloneShallow`, depth 1). A graph's history can dwarf its
+files — one real graph has 3.7 GB of history next to 1.3 GB of current
+files — and sync never needs it: pull and push only look at commits
+since. JGit's `RevWalk` treats `.git/shallow` commits as parentless, so
+the replay, unpushed counts and merge bases work unchanged
+(`ShallowCloneTest`). The history view starts at the clone; its oldest
+commit is shown without changes, since against nothing it would claim to
+add every file of the graph.
+
+**Reinstalling.** A graph can take minutes to clone again, so:
+- Every build, debug and release, is signed with the key in
+  `android/keystore.properties` (gitignored; keystore in
+  `~/.android/neno-release.jks` — back both up). A build signed with a
+  different key cannot be installed over the app, and the uninstall that
+  forces deletes the graph.
+- `android:hasFragileUserData` offers "Keep app data" on uninstall.
+  Android wipes the app's Keystore entries regardless, so the kept SSH
+  key can no longer be opened: `SshIdentity` makes a new one, marks it
+  replaced, and the SSH key setting says to add it to the server until a
+  sync goes through.
+
+### Build notes
+
+- JDK 21 and the Android SDK (`ANDROID_HOME`, or `sdk.dir` in
+  `android/local.properties`) are needed.
+- Kotlin stays on 2.2.x while AGP is 8.13: a newer Kotlin's metadata is
+  beyond what that R8 understands.
+- `android/app/src/main/assets/public` is the copied web build;
+  `npm run android:sync` refreshes it. It is gitignored.
+- The launcher and splash icon is a vector drawable of `logo.svg`
+  (`res/drawable/ic_launcher_foreground.xml`), scaled to stay inside the
+  adaptive icon's safe circle.
+
 ## Tests
 
 Unit tests live next to source files as `*.spec.ts` / `*.spec.tsx`, in
@@ -408,6 +573,12 @@ machines — and take seconds each, hence the suite's 30 s timeout.
 A hanging remote is simulated with `ext::sleep 30`, which is why
 `GitRepo` takes `extraConfig` (`protocol.ext.allow=always`).
 
+The Kotlin tests in `android/app/src/test/` (`npm run android:test`) are
+plain JUnit on the JVM. `GitSyncTest` and `GitRepoTest` mirror the cases
+of the `electron/git/` specs, with the phone driven through JGit and the
+other machine through the system git — which also shows the two get
+along. The silent-server case waits out the 20 s handshake timeout.
+
 Integration tests are in `tests/integration/`. Visual regression tests
 are in `tests/visual-regression/`. Both drive `npm run dev` in a real
 browser at `localhost:5173` in **OPFS mode** — which is the main reason
@@ -418,4 +589,6 @@ OPFS mode was worth keeping.
 - Node.js v24+
 - macOS (the packaged app is macOS-only and unsigned)
 - git (Apple's Command Line Tools) for version history and auto-sync,
-  and for the `electron/git/` specs
+  and for the `electron/git/` and Android git specs
+- For Android: JDK 21, the Android SDK; the app runs on Android 13+
+  with an up-to-date Android System WebView (Chrome 122+)

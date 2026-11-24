@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { PathTemplate } from "../types/PathTemplate";
 import { l } from "../lib/intl";
-import { getAppPath } from "../lib/utils";
 import {
   getExistingFolderName,
   initializeNotesProvider,
   initializeNotesProviderWithLastFolder,
 } from "../lib/LocalDataStorage";
-import { LOCAL_GRAPH_ID } from "../config";
-import { navigateTo } from "../lib/navigation";
 import { getBridge } from "../lib/electron/bridge";
+import { goToGraphFromStart } from "../lib/startNavigation";
 
 const StartViewLocal = () => {
   const [localDisclaimer, setLocalDisclaimer]
@@ -26,19 +23,6 @@ const StartViewLocal = () => {
 
     retrieveExistingFolderName();
   }, []);
-
-  const goToGraph = () => {
-    const urlSearchParams
-      = new URLSearchParams(window.location.search);
-    if (urlSearchParams.has("redirect")) {
-      navigateTo(urlSearchParams.get("redirect") ?? "/");
-    } else {
-      navigateTo(getAppPath(
-        PathTemplate.NEW_NOTE,
-        new Map([["GRAPH_ID", LOCAL_GRAPH_ID]]),
-      ));
-    }
-  };
 
   return <section id="start-view-local">
     {
@@ -60,7 +44,7 @@ const StartViewLocal = () => {
             onClick={async () => {
               try {
                 await initializeNotesProviderWithLastFolder();
-                goToGraph();
+                goToGraphFromStart();
               } catch (_e) {
                 // it could be that the folder is not there anymore but we
                 // still have its path
@@ -90,7 +74,7 @@ const StartViewLocal = () => {
           // It is fine if the user aborts the directory selection.
           if (folderPath === null) return;
           await initializeNotesProvider(folderPath);
-          goToGraph();
+          goToGraphFromStart();
         } catch (_e) {
           setLocalDisclaimer("INVALID_FOLDER_HANDLE");
         }
