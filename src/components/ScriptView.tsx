@@ -12,7 +12,7 @@ import { PathTemplate } from "../types/PathTemplate";
 import { LOCAL_GRAPH_ID } from "../config";
 import HeaderButton from "./HeaderButton";
 import jsWorker
-  from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
+  from "monaco-editor/language/typescript/ts.worker?worker";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import StatusIndicator from "./StatusIndicator";
 import UnsavedChangesContext from "../contexts/UnsavedChangesContext";
