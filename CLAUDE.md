@@ -514,6 +514,16 @@ rejected push, no pull while the editor is dirty, `neno.autoSync` in
   so `SshSupport` sets `org.apache.sshd.config.auth-timeout`.
 - **Commit messages** end in `\n`, as `git commit` writes them and JGit
   does not.
+- **Never touch the whole working tree.** JGit's clone leaves every
+  index entry smudged (no size and time recorded), and the next index
+  write — or a full `status`, which JGit never writes back — re-reads and
+  hashes every file: 1.3 GB of attachments took a minute on a phone,
+  inside the first pull. So `cloneShallow` records the cloned files'
+  stats itself (`recordCheckedOutFiles`), and a pull runs `status` and
+  its checkout on the paths the incoming commits change only, not
+  `DirCacheCheckout`. That also keeps one file the platform cannot
+  represent (`ß` and `ss` are one name on macOS's file system) from
+  blocking every pull.
 - **The app in the foreground is the focused window.** Leaving it with
   unpushed commits enqueues `PushWorker`, which pushes once the device
   has a network, even if the process is gone by then.

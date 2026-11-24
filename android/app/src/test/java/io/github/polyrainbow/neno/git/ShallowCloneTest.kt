@@ -89,6 +89,49 @@ class ShallowCloneTest {
   }
 
   @Test
+  fun recordsTheClonedFilesInTheIndex() {
+    // Otherwise the first index write hashes every file of the graph.
+    val repo = GitRepo(phone)
+    val index = repo.repository.readDirCache()
+    val smudged = (0 until index.entryCount).count { index.getEntry(it).isSmudged }
+    assertEquals(0, smudged)
+    assertEquals("", git(phone, "status", "--porcelain"))
+    repo.close()
+  }
+
+  @Test
+  fun pullsPastAnUnrelatedFileTheDeviceCannotRepresent() {
+    /*
+      On a case-insensitive file system, "ß" and "ss" can name the same
+      file, so one of two such paths is missing from the working tree.
+      That must not stop every pull.
+    */
+    val sync = makeSync()
+    File(phone, "files/big-1.bin").delete()
+    pushFromB("from-desktop.subtext", "Hi")
+
+    sync.syncNow().get()
+
+    assertEquals("Hi", read(phone, "from-desktop.subtext"))
+  }
+
+  @Test
+  fun waitsWhenAnIncomingFileHasUncommittedChanges() {
+    val sync = makeSync()
+    // A save that has written its file but not committed it yet.
+    write(phone, "shared.subtext", "being saved\n")
+    pushFromB("shared.subtext", "line 1\nfrom desktop\nline 3\n")
+
+    sync.syncNow().get()
+
+    assertEquals("being saved\n", read(phone, "shared.subtext"))
+    sync.commit(notes("shared"), AUTHOR)
+    sync.awaitIdle()
+    sync.syncNow().get()
+    assertEquals(0, sync.getStatus().unpushedCommits)
+  }
+
+  @Test
   fun pushesWhatThePhoneSaved() {
     val sync = makeSync()
     assertEquals(SyncState.IDLE, sync.getStatus().state)

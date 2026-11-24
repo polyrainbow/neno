@@ -3,7 +3,10 @@ package io.github.polyrainbow.neno.git
 import io.github.polyrainbow.neno.storage.WorktreeLock
 import org.eclipse.jgit.api.TransportConfigCallback
 import org.eclipse.jgit.api.errors.TransportException
-import org.eclipse.jgit.dircache.DirCacheCheckout
+import org.eclipse.jgit.diff.DiffEntry
+import org.eclipse.jgit.dircache.DirCacheEditor
+import org.eclipse.jgit.dircache.DirCacheEntry
+import org.eclipse.jgit.lib.FileMode
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.RefUpdate
@@ -13,6 +16,7 @@ import org.eclipse.jgit.transport.RefSpec
 import org.eclipse.jgit.transport.RemoteRefUpdate
 import org.eclipse.jgit.transport.TagOpt
 import org.eclipse.jgit.treewalk.TreeWalk
+import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
@@ -394,7 +398,25 @@ class GitSync(
     if (before != null && isAncestor(tracking, before)) return emptyList()
     if (before != null) checkRelated(target)
 
-    val status = repo.git.status().call()
+    /*
+      Only the paths the two sides differ in can collide with the working
+      tree; the checkout leaves every other file as it is. A status of the
+      whole tree would re-read every file whose index entry is "racily
+      clean" — after a clone, all of them: gigabytes on a graph with big
+      attachments, a minute on a phone — and JGit, unlike git, never
+      writes the refreshed entries back, so every pull would pay it again.
+      It would also stop every pull over one file the platform cannot
+      represent (two names that differ only in case, on a case-insensitive
+      file system), however far it is from what the pull changes.
+    */
+    val paths = if (before == null) {
+      treePaths(tracking).toList()
+    } else {
+      changedPaths(before, tracking)
+    }
+    val status = repo.git.status()
+      .apply { paths.forEach { addPath(it) } }
+      .call()
     /*
       A save that has written files but not committed them yet. Its
       commit comes in a moment, and its push — rejected — pulls again.
@@ -457,27 +479,71 @@ class GitSync(
     }
   }
 
-  /** Updates the index and working tree from `from` to `to`. */
+  /**
+   * Updates the index and working tree from `from` to `to`, touching only
+   * the paths the two differ in.
+   *
+   * Not JGit's DirCacheCheckout: it walks the whole working tree and
+   * re-reads every file whose index entry is racily clean — after a
+   * clone, all of them, gigabytes of attachments on a big graph — which
+   * made pulling two notes take a minute on a phone. integrate() has
+   * checked these paths for local changes already; nothing else changes.
+   */
   private fun checkout(from: ObjectId?, to: ObjectId) {
-    RevWalk(repo.repository).use { walk ->
-      val dirCache = repo.repository.lockDirCache()
+    val repository = repo.repository
+    RevWalk(repository).use { walk ->
+      val entries = repo.changedEntries(
+        walk,
+        from?.let { walk.parseCommit(it) },
+        walk.parseCommit(to),
+      )
+      if (entries.isEmpty()) return
+      val dirCache = repository.lockDirCache()
       try {
-        val toTree = walk.parseCommit(to).tree
-        val checkout = if (from == null) {
-          DirCacheCheckout(repo.repository, dirCache, toTree)
-        } else {
-          DirCacheCheckout(
-            repo.repository,
-            walk.parseCommit(from).tree,
-            dirCache,
-            toTree,
-          )
+        val editor = dirCache.editor()
+        for (entry in entries) {
+          if (entry.changeType == DiffEntry.ChangeType.DELETE) {
+            deleteFromWorktree(entry.oldPath)
+            editor.add(DirCacheEditor.DeletePath(entry.oldPath))
+            continue
+          }
+          val file = File(repo.dir, entry.newPath)
+          file.parentFile?.mkdirs()
+          val id = entry.newId.toObjectId()
+          // Streamed: an attachment can be bigger than the heap.
+          file.outputStream().use { repository.open(id).copyTo(it) }
+          if (entry.newMode == FileMode.EXECUTABLE_FILE) file.setExecutable(true)
+          val mode = entry.newMode
+          val length = file.length()
+          val modified = file.toPath().let {
+            java.nio.file.Files.getLastModifiedTime(it).toInstant()
+          }
+          editor.add(object : DirCacheEditor.PathEdit(entry.newPath) {
+            override fun apply(dirCacheEntry: DirCacheEntry) {
+              dirCacheEntry.setObjectId(id)
+              dirCacheEntry.fileMode = mode
+              dirCacheEntry.setLength(length)
+              dirCacheEntry.setLastModified(modified)
+            }
+          })
         }
-        checkout.setFailOnConflict(true)
-        checkout.checkout()
+        editor.finish()
+        dirCache.write()
+        check(dirCache.commit()) { "Could not write the index" }
       } finally {
         dirCache.unlock()
       }
+    }
+  }
+
+  /** Deletes a file, and the folders it leaves empty, as git does. */
+  private fun deleteFromWorktree(path: String) {
+    var file: File? = File(repo.dir, path)
+    file?.delete()
+    file = file?.parentFile
+    while (file != null && file != repo.dir && file.list()?.isEmpty() == true) {
+      file.delete()
+      file = file.parentFile
     }
   }
 
@@ -486,7 +552,7 @@ class GitSync(
       val toCommit = walk.parseCommit(to)
       val fromCommit = from?.let { walk.parseCommit(it) }
       return repo.changedEntries(walk, fromCommit, toCommit).map {
-        if (it.changeType == org.eclipse.jgit.diff.DiffEntry.ChangeType.DELETE) {
+        if (it.changeType == DiffEntry.ChangeType.DELETE) {
           it.oldPath
         } else {
           it.newPath

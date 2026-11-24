@@ -97,7 +97,7 @@ class GitRepo(val dir: File) : Closeable {
             save()
           }
         }
-      return GitRepo(dir)
+      return GitRepo(dir).also { it.recordCheckedOutFiles() }
     }
   }
 
@@ -280,6 +280,34 @@ class GitRepo(val dir: File) : Closeable {
       treeWalk.addTree(treeIterator(walk, parent))
       treeWalk.addTree(treeIterator(walk, commit))
       return DiffEntry.scan(treeWalk)
+    }
+  }
+
+  /*
+    JGit's clone leaves every index entry "smudged": it cannot tell
+    whether a file changed in the instant after it was written, so it
+    records none of their sizes and times. The first index write after
+    it then reads and hashes every file of the graph to find out —
+    1.3 GB of attachments took a minute on a phone, inside the first
+    pull. The clone wrote these files itself, from the very blobs the
+    index names, so their sizes and times can simply be recorded.
+  */
+  internal fun recordCheckedOutFiles() {
+    val dirCache = repository.lockDirCache()
+    try {
+      for (i in 0 until dirCache.entryCount) {
+        val entry = dirCache.getEntry(i)
+        val file = File(dir, entry.pathString)
+        if (!file.isFile) continue
+        entry.setLength(file.length())
+        entry.setLastModified(
+          java.nio.file.Files.getLastModifiedTime(file.toPath()).toInstant(),
+        )
+      }
+      dirCache.write()
+      check(dirCache.commit()) { "Could not write the index" }
+    } finally {
+      dirCache.unlock()
     }
   }
 
