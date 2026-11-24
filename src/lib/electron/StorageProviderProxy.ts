@@ -32,6 +32,13 @@ export default class StorageProviderProxy implements StorageProvider {
     return await this.#call("readObjectAsString", [requestPath]) as string;
   }
 
+  async readObjectsAsStrings(requestPaths: string[]): Promise<string[]> {
+    return await this.#call(
+      "readObjectsAsStrings",
+      [requestPaths],
+    ) as string[];
+  }
+
   async getAllObjectNames(): Promise<string[]> {
     return await this.#call("getAllObjectNames") as string[];
   }
