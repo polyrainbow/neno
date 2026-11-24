@@ -1,11 +1,11 @@
 /*
-  The open folder's auto-sync status, mirrored from the Electron main
-  process. One subscription to main for the whole app, however many
-  components read it.
+  The open folder's auto-sync status, mirrored from the native host
+  (the Electron main process, or the Android app). One subscription to
+  the host for the whole app, however many components read it.
 */
 
 import { SyncStatus } from "./git/types";
-import { getBridge, isElectron } from "./electron/bridge";
+import { getBridge, hasNativeHost } from "./electron/bridge";
 
 let status: SyncStatus | null = null;
 let started = false;
@@ -21,7 +21,7 @@ const adopt = (next: SyncStatus | null): void => {
 };
 
 function start(): void {
-  if (started || !isElectron()) return;
+  if (started || !hasNativeHost()) return;
   started = true;
   const bridge = getBridge();
   bridge.onSyncStatus(adopt);

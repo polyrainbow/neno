@@ -6,7 +6,7 @@ import { FileInfo } from "./notes/types/FileInfo";
 // @ts-ignore Vite worker URL import
 import notesWorkerUrl from "./notes-worker/index.ts?worker&url";
 import { getExtensionFromFilename } from "./notes/utils";
-import { getBridge, isElectron } from "./electron/bridge";
+import { getBridge, hasNativeHost } from "./electron/bridge";
 import connectStorage from "./electron/connectStorage";
 
 const GIT_USER_NAME_KEY = "git.user.name";
@@ -104,7 +104,7 @@ const getBasename = (path: string): string => {
 */
 const getExistingFolderPath = async (): Promise<string | null> => {
   if (folderPath) return folderPath;
-  if (!isElectron()) return null;
+  if (!hasNativeHost()) return null;
   return await getBridge().getLastFolder();
 };
 

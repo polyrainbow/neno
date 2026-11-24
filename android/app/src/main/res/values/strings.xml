@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">NENO</string>
+    <string name="title_activity_main">NENO</string>
+    <string name="package_name">io.github.polyrainbow.neno</string>
+    <string name="custom_url_scheme">io.github.polyrainbow.neno</string>
+</resources>

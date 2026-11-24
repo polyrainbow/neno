@@ -58,6 +58,21 @@ describe("NodeFsStorageProvider", () => {
       .toBe("Test note");
   });
 
+  it("should read many objects in the order asked for", async () => {
+    await storageProvider.writeObject("a.subtext", "A");
+    await storageProvider.writeObject("files/b.txt", "B");
+    expect(await storageProvider.readObjectsAsStrings(
+      ["files/b.txt", "a.subtext"],
+    )).toEqual(["B", "A"]);
+  });
+
+  it("should reject reading many when one is missing", async () => {
+    await storageProvider.writeObject("a.subtext", "A");
+    await expect(storageProvider.readObjectsAsStrings(
+      ["a.subtext", "nope.subtext"],
+    )).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
   it("should create missing parent directories on write", async () => {
     await storageProvider.writeObject("files/deep/a.txt", "x");
     expect(await storageProvider.readObjectAsString("files/deep/a.txt"))

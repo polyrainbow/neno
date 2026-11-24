@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and older; see data_extraction_rules.xml. -->
+<full-backup-content>
+    <exclude domain="file" path="graph" />
+    <exclude domain="file" path=".ssh" />
+</full-backup-content>

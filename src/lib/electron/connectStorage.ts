@@ -1,18 +1,22 @@
 /*
-  Requests a storage bridge for `folderPath` from the Electron main
-  process and returns the MessagePort that speaks to it.
+  Requests a storage bridge for `folderPath` from the native host and
+  returns the MessagePort that speaks to it.
 
-  A MessagePort cannot travel through contextBridge, so the preload hands
-  it to the page with a transferring window.postMessage; this helper
-  pairs that message with the IPC request.
+  Electron: a MessagePort cannot travel through contextBridge, so the
+  preload hands it to the page with a transferring window.postMessage;
+  this helper pairs that message with the IPC request.
+
+  Android: the page itself serves the port, forwarding to the Kotlin
+  plugin (src/lib/android/AndroidBridgeHost.ts). The folder is always
+  the app's own, so `folderPath` only matters on the desktop.
 */
 
 import { STORAGE_PORT_MESSAGE } from "./bridgeTypes";
-import { getBridge } from "./bridge";
+import { getBridge, isAndroid } from "./bridge";
 
 const PORT_TIMEOUT_MS = 15_000;
 
-export default function connectStorage(
+function connectElectronStorage(
   folderPath: string,
 ): Promise<MessagePort> {
   const bridge = getBridge();
@@ -43,4 +47,18 @@ export default function connectStorage(
       reject(e instanceof Error ? e : new Error(String(e)));
     });
   });
+}
+
+export default async function connectStorage(
+  folderPath: string,
+): Promise<MessagePort> {
+  if (isAndroid()) {
+    const [{ connectAndroidStorage }, { getNativePlugin }] = await Promise.all([
+      import("../android/AndroidBridgeHost"),
+      import("../android/nativePlugin"),
+    ]);
+    return connectAndroidStorage(getNativePlugin());
+  }
+
+  return connectElectronStorage(folderPath);
 }

@@ -87,6 +87,11 @@ export type SaveDialogOptions = {
  * the renderer can ask the main process to do goes through here.
  */
 export interface NenoBridge {
+  /**
+   * Which native host provides this bridge: the Electron preload, or
+   * src/lib/android/AndroidBridge.ts inside the Capacitor shell.
+   */
+  readonly platform: "electron" | "android";
   /** Native folder dialog. Resolves to an absolute path, or null on cancel. */
   pickFolder(): Promise<string | null>;
   /** Absolute path of the folder used last, or null if there is none. */

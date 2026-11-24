@@ -221,6 +221,20 @@ export default class DatabaseIO {
   }
 
 
+  /*
+    In one call when the provider can, which is what makes loading a
+    graph over a bridge fast.
+  */
+  async #readObjectsAsStrings(paths: string[]): Promise<string[]> {
+    if (this.#storageProvider.readObjectsAsStrings) {
+      return this.#storageProvider.readObjectsAsStrings(paths);
+    }
+    return Promise.all(
+      paths.map((path) => this.#storageProvider.readObjectAsString(path)),
+    );
+  }
+
+
   private async readAndParseGraphFromDisk(): Promise<Graph> {
     let pinsSerialized: string | undefined;
     try {
@@ -237,20 +251,13 @@ export default class DatabaseIO {
     */
 
     const noteFilenames = await this.getGraphFilenamesFromStorageProvider();
+    const contents = await this.#readObjectsAsStrings(noteFilenames);
 
     const serializedNotes = new Map(
-      await Promise.all(
-        noteFilenames.map(
-          async (filename: string): Promise<[Slug, string]> => {
-            const slug = DatabaseIO.getSlugFromGraphFilename(filename);
-            const serializedNote
-              = await this.#storageProvider.readObjectAsString(
-                filename,
-              );
-            return [slug, serializedNote];
-          },
-        ),
-      ),
+      noteFilenames.map((filename, i): [Slug, string] => [
+        DatabaseIO.getSlugFromGraphFilename(filename),
+        contents[i],
+      ]),
     );
 
     return this.parseGraph(serializedNotes, pinsSerialized);

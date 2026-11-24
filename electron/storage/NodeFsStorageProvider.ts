@@ -218,6 +218,17 @@ export default class NodeFsStorageProvider implements StorageProvider {
   }
 
 
+  /*
+    One bridge round-trip for a whole graph load instead of one per note;
+    the semaphore still bounds the open files.
+  */
+  async readObjectsAsStrings(requestPaths: string[]): Promise<string[]> {
+    return Promise.all(
+      requestPaths.map((requestPath) => this.readObjectAsString(requestPath)),
+    );
+  }
+
+
   async getReadableStream(
     requestPath: string,
     range?: ByteRange,

@@ -3,6 +3,7 @@ import { l } from "../lib/intl";
 import useSyncStatus from "../hooks/useSyncStatus";
 import { setAutoSync, syncNow } from "../lib/syncStatus";
 import { describeSyncStatus } from "../lib/describeSyncStatus";
+import { isAndroid } from "../lib/electron/bridge";
 
 const AutoSyncSetting = () => {
   const status = useSyncStatus();
@@ -48,7 +49,9 @@ const AutoSyncSetting = () => {
             {l("sync.enable", { remote })}
           </label>
         </p>
-        : <p>{l("sync.no-remote")}</p>
+        : <p>
+          {l(isAndroid() ? "sync.no-remote.android" : "sync.no-remote")}
+        </p>
     }
     {status.enabled && <p className="sync-state">
       {describeSyncStatus(status).label}
