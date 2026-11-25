@@ -9,6 +9,7 @@ import useControlledNoteList from "../hooks/useControlledNoteList";
 import useNotesProvider from "../hooks/useNotesProvider";
 import useHeaderStats from "../hooks/useHeaderStats";
 import usePinnedNotes from "../hooks/usePinnedNotes";
+import useWorkerMutation from "../hooks/useWorkerMutation";
 import { LOCAL_GRAPH_ID } from "../config";
 import NavigationRail from "./NavigationRail";
 import { navigateTo } from "../lib/navigation";
@@ -29,12 +30,25 @@ const ListView = () => {
     move,
   } = usePinnedNotes(notesProvider);
 
-  useEffect(() => {
+  const refreshContentViews = () => {
     refreshPinnedNotes();
+    // Header stats are expensive and the least urgent.
     requestIdleCallback(async () => {
       await refreshHeaderStats();
     });
-  }, []);
+  };
+
+  useEffect(refreshContentViews, []);
+
+  /*
+    A pull (auto-sync) changes the graph behind this view's back. On a
+    small screen this is the only note list there is: NoteView's sidebar,
+    which refreshes on the same event, is not rendered.
+  */
+  useWorkerMutation(notesProvider, () => {
+    controlledNoteList.refresh();
+    refreshContentViews();
+  });
 
   return <div className="view list-view">
     <NavigationRail activeView="list" />
