@@ -3,11 +3,14 @@ apply plugin: 'org.jetbrains.kotlin.android'
 
 /*
   The version follows package.json, like the desktop app's: 11.4.0
-  becomes versionName "11.4.0" and versionCode 110400.
+  becomes versionName "11.4.0" and versionCode 110400. A pre-release
+  suffix (11.5.0-beta.1) only goes into versionName; the versionCode is
+  the release's, so the release installs over the pre-release.
 */
 def packageJson = new groovy.json.JsonSlurper()
   .parse(rootProject.file("../package.json"))
-def (major, minor, patch) = packageJson.version.tokenize(".")*.toInteger()
+def (major, minor, patch) = packageJson.version
+  .tokenize("-")[0].tokenize(".")*.toInteger()
 
 /*
   Builds are signed with the key described in android/keystore.properties

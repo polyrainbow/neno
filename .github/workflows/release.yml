@@ -1,11 +1,11 @@
 name: Release
 
 # Pushing a version tag publishes a GitHub release with the unsigned
-# macOS .dmg attached. The tag has to be a version number: `npm version
+# macOS .dmg and the signed Android APK attached. The tag has to be a version number: `npm version
 # patch|minor|major` creates exactly that from package.json.
 #
-# The whole CI suite runs first, and the published .dmg is the artifact
-# its packaging job built — nothing is released that has not passed the
+# The whole CI suite runs first, and the published .dmg and APK are the
+# artifacts its packaging jobs built — nothing is released that has not passed the
 # tests.
 
 on:
@@ -40,6 +40,8 @@ jobs:
     name: CI
     needs: verify-version
     uses: ./.github/workflows/ci.yml
+    # The Android job signs the APK with the ANDROID_* secrets.
+    secrets: inherit
 
   publish:
     name: Publish release
@@ -48,16 +50,21 @@ jobs:
     permissions:
       contents: write
     steps:
-    # The .dmg comes from the packaging job of the CI run above; it is
-    # an artifact of this same workflow run.
+    # The .dmg and APK come from the packaging jobs of the CI run above;
+    # they are artifacts of this same workflow run.
     - name: Download .dmg
       uses: actions/download-artifact@v8
       with:
         name: neno-dmg
         path: release
+    - name: Download APK
+      uses: actions/download-artifact@v8
+      with:
+        name: neno-apk
+        path: release
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "release/*.dmg"
+        artifacts: "release/*.dmg,release/*.apk"
         artifactErrorsFailBuild: true
         generateReleaseNotes: true
         prerelease: ${{ contains(github.ref_name, '-') }}
