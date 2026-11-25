@@ -140,10 +140,6 @@ jobs:
         cache: gradle
     - uses: android-actions/setup-android@v4
     - run: npm ci
-    # GitSyncTest and GitRepoTest drive the other machine through the
-    # system git, which the runner has at /usr/bin/git.
-    - name: Kotlin unit tests
-      run: npm run android:test
     - name: Install the signing key
       if: env.IS_TAG == 'true'
       env:
@@ -170,6 +166,13 @@ jobs:
     # when not) and the AAB.
     - name: Build APK
       run: npm run android:release
+    # After the build: Gradle cannot even configure the project before
+    # `cap sync` (part of android:release) has generated the gitignored
+    # capacitor-cordova-android-plugins/. GitSyncTest and GitRepoTest
+    # drive the other machine through the system git, which the runner
+    # has at /usr/bin/git.
+    - name: Kotlin unit tests
+      run: npm run android:test
     - name: Name the signed APK after the version
       if: env.IS_TAG == 'true'
       run: |
