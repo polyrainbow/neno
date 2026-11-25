@@ -6,10 +6,11 @@ name: CI
 # build is verified by exactly the checks a pull request gets, and it
 # publishes the .dmg this workflow produced.
 #
-# Everything runs on macOS because that is the only platform the app
-# ships on: the .dmg can only be built there, and the Node fs storage
-# provider has APFS-specific behaviour (NFC normalization) that its
-# unit tests cover.
+# The web and desktop jobs run on macOS because that is the only
+# desktop platform the app ships on: the .dmg can only be built there,
+# and the Node fs storage provider has APFS-specific behaviour (NFC
+# normalization) that its unit tests cover. The Android job runs on
+# Linux, which is all Gradle and the JVM tests need.
 #
 # The visual regression suite is deliberately not here — its snapshots
 # are pixel comparisons taken on a developer machine, which a runner's
@@ -113,3 +114,79 @@ jobs:
         path: release/*.dmg
         if-no-files-found: error
         retention-days: 7
+
+  android:
+    name: Android tests and APK
+    runs-on: ubuntu-26.04
+    timeout-minutes: 40
+    # A tag build signs the APK with the release key. It must be the key
+    # the installed app was signed with: Android refuses an update signed
+    # with any other, and the uninstall it asks for deletes the graph.
+    # The secrets reach this file because release.yml passes them on
+    # (`secrets: inherit`); pull requests never get them, and build an
+    # unsigned APK only to prove that it builds.
+    env:
+      IS_TAG: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
+      with:
+        node-version: '24'
+        cache: npm
+    - uses: actions/setup-java@v6
+      with:
+        distribution: temurin
+        java-version: '21'
+        cache: gradle
+    - uses: android-actions/setup-android@v4
+    - run: npm ci
+    # GitSyncTest and GitRepoTest drive the other machine through the
+    # system git, which the runner has at /usr/bin/git.
+    - name: Kotlin unit tests
+      run: npm run android:test
+    - name: Install the signing key
+      if: env.IS_TAG == 'true'
+      env:
+        KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      run: |
+        if [ -z "$KEYSTORE_BASE64" ] || [ -z "$STORE_PASSWORD" ] \
+          || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+          echo "The ANDROID_* signing secrets are not all set." >&2
+          exit 1
+        fi
+        KEYSTORE="$RUNNER_TEMP/neno-release.jks"
+        printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+        {
+          printf 'storeFile=%s\n' "$KEYSTORE"
+          printf 'storePassword=%s\n' "$STORE_PASSWORD"
+          printf 'keyAlias=%s\n' "$KEY_ALIAS"
+          printf 'keyPassword=%s\n' "$KEY_PASSWORD"
+        } > android/keystore.properties
+    # Builds the web app, copies it into android/ and produces the
+    # release APK (app-release.apk when signed, app-release-unsigned.apk
+    # when not) and the AAB.
+    - name: Build APK
+      run: npm run android:release
+    - name: Name the signed APK after the version
+      if: env.IS_TAG == 'true'
+      run: |
+        VERSION="$(node -p "require('./package.json').version")"
+        APK=android/app/build/outputs/apk/release/app-release.apk
+        APKSIGNER="$(ls "$ANDROID_HOME"/build-tools/*/apksigner | tail -n 1)"
+        "$APKSIGNER" verify --print-certs "$APK"
+        mkdir -p release
+        cp "$APK" "release/NENO-$VERSION.apk"
+    - name: Upload APK
+      if: env.IS_TAG == 'true'
+      uses: actions/upload-artifact@v7
+      with:
+        name: neno-apk
+        path: release/*.apk
+        if-no-files-found: error
+        retention-days: 7
+    - name: Remove the signing key
+      if: always() && env.IS_TAG == 'true'
+      run: rm -f android/keystore.properties "$RUNNER_TEMP/neno-release.jks"
